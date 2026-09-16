@@ -33,13 +33,18 @@
     --color-gold-accent: #E2A93B;
   }
 
-  body {
+  html, body {
     margin: 0;
     padding: 0;
     font-family: var(--font-body);
     background-color: var(--color-page-base);
     color: var(--text-hero-main);
     overflow-x: hidden;
+    cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, auto;
+  }
+
+  a, button, [role="button"], input[type="button"], input[type="submit"], select, .cursor-pointer {
+    cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
   }
 
   h1, h2, h3, .font-heading {
@@ -107,7 +112,7 @@
   border-radius: var(--radius-pill);
   text-decoration: none;
   border: none;
-  cursor: pointer;
+  cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
   box-shadow: 0 4px 20px rgba(252, 229, 181, 0.25);
   transition: var(--transition-smooth);
 }
@@ -135,7 +140,7 @@
   text-decoration: none;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  cursor: pointer;
+  cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
   transition: var(--transition-smooth);
 }
 
