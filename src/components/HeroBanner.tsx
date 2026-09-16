@@ -13,166 +13,125 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   onStartFlashcard,
 }) => {
   return (
-    <section id="hero" className="relative w-full py-12 lg:py-16 overflow-hidden bg-[#FAF6EE]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="hero" className="relative w-full min-h-[92vh] flex items-center justify-center overflow-hidden">
+      {/* 1. Full-screen Ambient Background Video */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover scale-105 filter brightness-90 contrast-105 transition-transform duration-1000"
+        >
+          <source src={bannerVideo} type="video/webm" />
+          Trình duyệt của bạn không hỗ trợ video.
+        </video>
+
+        {/* Multi-layer Gradient Overlays for High Contrast & Dong Ho Rice Paper Warmth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF6EE] via-[#FAF6EE]/70 to-[#FAF6EE]/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF6EE]/50 to-[#FAF6EE]/90" />
         
-        {/* Main Grid: Left Headline & Right Video Frame */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center mb-16">
-          
-          {/* Left Column: Heading & Cultural Manifesto */}
-          <div className="lg:col-span-7 space-y-6">
-            
-            {/* Stamp Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[2px] bg-[#F8E9CF] border-2 border-[#12332B] shadow-[2px_2px_0px_#12332B] text-xs font-bold text-[#12332B]">
-              <span className="text-sm">🪷</span>
-              <span>PHONG CÁCH HỘI HỌA DÂN GIAN ĐÔNG HỒ & MỸ THUẬT TRUYỀN THỐNG</span>
-            </div>
+        {/* Subtle folk paper grid texture */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#12332b0a_1px,transparent_1px),linear-gradient(to_bottom,#12332b0a_1px,transparent_1px)] bg-[size:3rem_3rem]" />
+      </div>
 
-            {/* Hero Title with Folk Woodcut Typography */}
-            <h1 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-[#12332B] leading-[1.12] tracking-tight">
-              Thưởng Lãm <span className="text-[#1A7368] underline decoration-[#E58396] decoration-4 underline-offset-8">Văn Hóa</span> &amp; Tiếp Thu Tiếng Anh Qua{' '}
-              <span className="text-[#EAA22E] bg-[#12332B] px-3 py-1 rounded-[3px] text-white shadow-[3px_3px_0px_#1A7368] inline-block mt-2 sm:mt-0">
-                Hồn Cốt Việt
-              </span>
-            </h1>
+      {/* 2. Main Center Hero Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center flex flex-col items-center">
+        
+        {/* Cultural Folk Stamp Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[3px] bg-[#F8E9CF] border-2 border-[#12332B] shadow-[3px_3px_0px_#12332B] text-xs sm:text-sm font-bold text-[#12332B] mb-6">
+          <span className="flex h-2 w-2 relative">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1A7368] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1A7368]"></span>
+          </span>
+          <span>🪷 HỘI HỌA DÂN GIAN ĐÔNG HỒ &amp; MỸ THUẬT TRUYỀN THỐNG VIỆT NAM</span>
+        </div>
 
-            {/* Subtext */}
-            <p className="text-base sm:text-lg text-[#4A635D] leading-relaxed font-normal max-w-2xl">
-              Nền giấy điệp tự nhiên, nét khắc than tre đanh gọn và mảng màu khoáng thô thuần khiết. 
-              Học tiếng Anh học thuật tự nhiên qua Cố đô Huế, Tranh Đông Hồ, Bánh mì Sài Gòn với 
-              <strong className="text-[#1A7368] font-semibold"> Luyện Shadowing AI</strong> và 
-              <strong className="text-[#925E06] font-semibold"> Flashcard Spaced Repetition</strong>.
-            </p>
+        {/* Hero Title with Folk Woodcut Typography */}
+        <h1 className="max-w-4xl font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#12332B] leading-[1.14] tracking-tight mb-6 drop-shadow-sm">
+          Thưởng Lãm{' '}
+          <span className="text-[#1A7368] underline decoration-[#E58396] decoration-4 underline-offset-8">
+            Văn Hóa
+          </span>{' '}
+          &amp; Tiếp Thu Tiếng Anh Qua{' '}
+          <span className="text-[#EAA22E] bg-[#12332B] px-3.5 py-1 rounded-[3px] text-white shadow-[4px_4px_0px_#1A7368] inline-block mt-2 sm:mt-0">
+            Hồn Cốt Việt
+          </span>
+        </h1>
 
-            {/* Action Woodcut Stamp Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <button
-                onClick={onStartReading}
-                className="dongho-btn dongho-btn-primary px-7 py-4 text-sm sm:text-base font-bold shadow-[4px_4px_0px_#12332B]"
-              >
-                <BookOpen className="w-5 h-5 text-[#FAF6EE]" />
-                <span>Trải Nghiệm Bài Đọc Mẫu</span>
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </button>
+        {/* Subtitle */}
+        <p className="max-w-2xl text-base sm:text-lg md:text-xl text-[#351903] leading-relaxed font-medium mb-10 text-balance">
+          Chất nền giấy điệp tự nhiên, nét khắc than tre đanh gọn và mảng màu khoáng thô thuần khiết. 
+          Học ngôn ngữ tự nhiên qua di sản Việt kết hợp <strong className="text-[#1A7368]">Luyện Shadowing AI</strong> và <strong className="text-[#925E06]">Flashcard Spaced Repetition</strong>.
+        </p>
 
-              <button
-                onClick={onStartFlashcard}
-                className="dongho-btn dongho-btn-accent px-6 py-4 text-sm sm:text-base font-bold shadow-[4px_4px_0px_#12332B]"
-              >
-                <Sparkles className="w-5 h-5 text-[#12332B]" />
-                <span>Luyện Flashcards 3D</span>
-              </button>
-            </div>
+        {/* Action Woodcut Stamp Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-14 w-full max-w-lg">
+          <button
+            onClick={onStartReading}
+            className="dongho-btn dongho-btn-primary flex-1 min-w-[210px] px-7 py-4 text-sm sm:text-base font-bold shadow-[4px_4px_0px_#12332B]"
+          >
+            <BookOpen className="w-5 h-5 text-[#FAF6EE]" />
+            <span>Trải Nghiệm Bài Đọc Mẫu</span>
+            <ArrowRight className="w-4 h-4 ml-1" />
+          </button>
 
-          </div>
-
-          {/* Right Column: Woodblock Video Frame (Using banner.webm) */}
-          <div className="lg:col-span-5">
-            <div className="relative rounded-[4px] border-2 border-[#12332B] shadow-[8px_8px_0px_#12332B] overflow-hidden bg-[#FAF6EE] group">
-              
-              {/* Video Asset */}
-              <div className="relative aspect-[4/3] w-full overflow-hidden">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                >
-                  <source src={bannerVideo} type="video/webm" />
-                  Trình duyệt của bạn không hỗ trợ video.
-                </video>
-                
-                {/* Subtle warm rice paper overlay filter */}
-                <div className="absolute inset-0 bg-[#FAF6EE]/15 pointer-events-none mix-blend-multiply" />
-              </div>
-
-              {/* Bottom Stamp Caption Bar */}
-              <div className="p-4 bg-[#F8E9CF] border-t-2 border-[#12332B] flex items-center justify-between text-xs font-bold text-[#12332B]">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#1A7368] inline-block animate-pulse" />
-                  <span>Cảnh sắc Sen &amp; Hồ Gươm (Mộc Bản Động)</span>
-                </div>
-                <span className="dongho-tag bg-[#E58396] text-[#12332B] text-[10px]">
-                  Tự Nhiên 100%
-                </span>
-              </div>
-
-            </div>
-          </div>
-
+          <button
+            onClick={onStartFlashcard}
+            className="dongho-btn dongho-btn-accent flex-1 min-w-[190px] px-6 py-4 text-sm sm:text-base font-bold shadow-[4px_4px_0px_#12332B]"
+          >
+            <Sparkles className="w-5 h-5 text-[#12332B]" />
+            <span>Luyện Flashcards 3D</span>
+          </button>
         </div>
 
         {/* 4 Flat Natural Pigments Metrics Bar (Đông Hồ Aesthetic) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          
-          {/* Box 1: Primary - Sắc Tà Áo Dài */}
-          <div className="p-5 rounded-[4px] bg-[#FAF6EE] border-2 border-[#12332B] shadow-[4px_4px_0px_#12332B] flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#1A7368]">Nguyên Tắc #1</span>
-              <span className="dongho-tag bg-[#1A7368] text-white text-[10px]">100% Gốc</span>
+        <div className="w-full max-w-5xl bg-[#F8E9CF] rounded-[4px] p-6 sm:p-8 border-2 border-[#12332B] shadow-[6px_6px_0px_#12332B]">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x-2 divide-[#12332B]/20">
+            
+            {/* Metric 1 */}
+            <div className="flex flex-col items-center justify-center p-2 text-center">
+              <div className="text-[#1A7368] font-heading font-bold text-3xl sm:text-4xl mb-0.5">
+                100% Gốc
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-[#12332B]">Ngữ Cảnh Là Số 1</span>
+              <span className="text-[11px] text-[#4A635D] mt-0.5">Từ vựng luôn gắn câu gốc</span>
             </div>
-            <div>
-              <h3 className="font-heading font-bold text-2xl text-[#12332B] mb-1">
-                Ngữ Cảnh Là Số 1
-              </h3>
-              <p className="text-xs text-[#4A635D] leading-relaxed">
-                Từ vựng học thuật luôn gắn kèm câu văn bản xứ trong bài đọc di sản.
-              </p>
-            </div>
-          </div>
 
-          {/* Box 2: Accent - Sắc Vàng Hoa Hòe */}
-          <div className="p-5 rounded-[4px] bg-[#FAF6EE] border-2 border-[#12332B] shadow-[4px_4px_0px_#12332B] flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#925E06]">Âm Thanh AI</span>
-              <span className="dongho-tag bg-[#EAA22E] text-[#12332B] text-[10px]">Shadowing</span>
+            {/* Metric 2 */}
+            <div className="flex flex-col items-center justify-center p-2 text-center pt-6 md:pt-2">
+              <div className="text-[#925E06] font-heading font-bold text-3xl sm:text-4xl mb-0.5">
+                AI Shadowing
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-[#12332B]">Phát Âm Chuẩn Bản Xứ</span>
+              <span className="text-[11px] text-[#4A635D] mt-0.5">Luyện tai nghe từng câu</span>
             </div>
-            <div>
-              <h3 className="font-heading font-bold text-2xl text-[#12332B] mb-1">
-                Luyện Nghe Từng Câu
-              </h3>
-              <p className="text-xs text-[#4A635D] leading-relaxed">
-                Phát âm chuẩn bản xứ theo từng câu, chỉnh tốc độ 0.75x, 1.0x, 1.25x.
-              </p>
-            </div>
-          </div>
 
-          {/* Box 3: Heritage Green - Sắc Di Sản */}
-          <div className="p-5 rounded-[4px] bg-[#FAF6EE] border-2 border-[#12332B] shadow-[4px_4px_0px_#12332B] flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#15503C]">Chuẩn CEFR</span>
-              <span className="dongho-tag bg-[#2A816F] text-white text-[10px]">A2 - C1</span>
+            {/* Metric 3 */}
+            <div className="flex flex-col items-center justify-center p-2 text-center pt-6 md:pt-2">
+              <div className="text-[#2A816F] font-heading font-bold text-3xl sm:text-4xl mb-0.5">
+                4 Bands
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-[#12332B]">Chuẩn CEFR A2 - C1</span>
+              <span className="text-[11px] text-[#4A635D] mt-0.5">Đa dạng cấp độ bài học</span>
             </div>
-            <div>
-              <h3 className="font-heading font-bold text-2xl text-[#12332B] mb-1">
-                Đa Dạng Trình Độ
-              </h3>
-              <p className="text-xs text-[#4A635D] leading-relaxed">
-                Một chủ đề được biên soạn ở nhiều cấp độ, phù hợp mọi người học.
-              </p>
-            </div>
-          </div>
 
-          {/* Box 4: Secondary - Sắc Sen Hồng */}
-          <div className="p-5 rounded-[4px] bg-[#FAF6EE] border-2 border-[#12332B] shadow-[4px_4px_0px_#12332B] flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#9C27B0]">Tự Do Viết</span>
-              <span className="dongho-tag bg-[#E58396] text-[#12332B] text-[10px]">No-Judgment</span>
+            {/* Metric 4 */}
+            <div className="flex flex-col items-center justify-center p-2 text-center pt-6 md:pt-2">
+              <div className="text-[#9C27B0] font-heading font-bold text-3xl sm:text-4xl mb-0.5">
+                No Judgment
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-[#12332B]">Viết Tự Do An Toàn</span>
+              <span className="text-[11px] text-[#4A635D] mt-0.5">Không chấm điểm, không soi lỗi</span>
             </div>
-            <div>
-              <h3 className="font-heading font-bold text-2xl text-[#12332B] mb-1">
-                Không Gian An Toàn
-              </h3>
-              <p className="text-xs text-[#4A635D] leading-relaxed">
-                Tuyệt đối không chấm điểm hay soi lỗi ngữ pháp để bạn tự tin chia sẻ.
-              </p>
-            </div>
-          </div>
 
+          </div>
         </div>
 
       </div>
+
+      {/* Decorative Bottom Gradient Fade to Rice Paper */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#FAF6EE] to-transparent pointer-events-none" />
     </section>
   );
 };
