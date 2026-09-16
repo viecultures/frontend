@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, BookOpen, Volume2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Sparkles, BookOpen, Volume2, ShieldCheck, ArrowRight, Award } from 'lucide-react';
 import bannerVideo from '../assets/banner.webm';
 
 interface HeroBannerProps {
@@ -83,41 +83,47 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           </button>
         </div>
 
-        {/* 3. Atmospheric Glassmorphism Value Props Bar (ĐÃ BỎ TRÌNH ĐỘ TRÊN BANNER) */}
-        <div className="w-full max-w-4xl glass-card p-5 sm:p-7 backdrop-blur-xl border border-white/20">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-white/15">
+        {/* 3. Atmospheric Glassmorphism Metrics Bar on Banner */}
+        <div className="w-full max-w-5xl glass-card p-5 sm:p-7 backdrop-blur-xl border border-white/20">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 divide-y lg:divide-y-0 lg:divide-x divide-white/15">
             
-            {/* Value Prop 1 */}
+            {/* Metric 1 */}
             <div className="flex flex-col items-center justify-center p-2 text-center">
-              <div className="flex items-center gap-2 text-[#FCE5B5] mb-1">
-                <span className="text-xl">🪷</span>
-                <span className="font-heading font-bold text-xl sm:text-2xl text-white">Ngữ Cảnh Là Số 1</span>
+              <div className="font-heading font-bold text-2xl sm:text-3xl text-[#FCE5B5] mb-0.5">
+                100% Gốc
               </div>
-              <span className="text-xs text-white/80 font-normal">
-                100% từ vựng gắn liền câu văn gốc trong bài đọc
-              </span>
+              <span className="text-xs sm:text-sm font-semibold text-white">Ngữ Cảnh Là Số 1</span>
+              <span className="text-[11px] text-white/70 mt-0.5">Từ vựng luôn gắn câu gốc</span>
             </div>
 
-            {/* Value Prop 2 */}
+            {/* Metric 2: Trình Độ CEFR */}
             <div className="flex flex-col items-center justify-center p-2 text-center pt-4 sm:pt-2">
-              <div className="flex items-center gap-2 text-[#F5D280] mb-1">
-                <Volume2 className="w-5 h-5 text-[#F5D280]" />
-                <span className="font-heading font-bold text-xl sm:text-2xl text-white">AI Shadowing</span>
+              <div className="font-heading font-bold text-2xl sm:text-3xl text-[#F5D280] mb-0.5 flex items-center gap-1">
+                <Award className="w-5 h-5 text-[#F5D280]" />
+                <span>4 Bands</span>
               </div>
-              <span className="text-xs text-white/80 font-normal">
-                Phát âm chuẩn bản xứ theo từng câu bài học
-              </span>
+              <span className="text-xs sm:text-sm font-semibold text-white">Chuẩn CEFR A2 - C1</span>
+              <span className="text-[11px] text-white/70 mt-0.5">Đa dạng cấp độ bài học</span>
             </div>
 
-            {/* Value Prop 3 */}
+            {/* Metric 3 */}
             <div className="flex flex-col items-center justify-center p-2 text-center pt-4 sm:pt-2">
-              <div className="flex items-center gap-2 text-emerald-300 mb-1">
-                <ShieldCheck className="w-5 h-5 text-emerald-300" />
-                <span className="font-heading font-bold text-xl sm:text-2xl text-white">No-Judgment Zone</span>
+              <div className="font-heading font-bold text-2xl sm:text-3xl text-emerald-300 mb-0.5 flex items-center gap-1">
+                <Volume2 className="w-5 h-5 text-emerald-300" />
+                <span>Shadowing AI</span>
               </div>
-              <span className="text-xs text-white/80 font-normal">
-                Viết cảm nghĩ tự do, không chấm điểm áp lực
-              </span>
+              <span className="text-xs sm:text-sm font-semibold text-white">Phát Âm Bản Xứ</span>
+              <span className="text-[11px] text-white/70 mt-0.5">Luyện tai nghe từng câu</span>
+            </div>
+
+            {/* Metric 4 */}
+            <div className="flex flex-col items-center justify-center p-2 text-center pt-4 sm:pt-2">
+              <div className="font-heading font-bold text-2xl sm:text-3xl text-[#E58396] mb-0.5 flex items-center gap-1">
+                <ShieldCheck className="w-5 h-5 text-[#E58396]" />
+                <span>No-Judgment</span>
+              </div>
+              <span className="text-xs sm:text-sm font-semibold text-white">Viết Tự Do An Toàn</span>
+              <span className="text-[11px] text-white/70 mt-0.5">Không chấm điểm áp lực</span>
             </div>
 
           </div>

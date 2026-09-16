@@ -1,23 +1,16 @@
 import React from 'react';
-import { BookOpen, Sparkles, FileText, Compass, Award } from 'lucide-react';
-import type { CEFRLevel } from '../types';
+import { BookOpen, Sparkles, FileText, Compass } from 'lucide-react';
 import logoImg from '../assets/logo/logo.jpg';
 
 interface NavbarProps {
-  selectedLevel: CEFRLevel | 'all';
-  onSelectLevel: (level: CEFRLevel | 'all') => void;
   onOpenDocs: () => void;
   onNavigateToSection: (sectionId: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  selectedLevel,
-  onSelectLevel,
   onOpenDocs,
   onNavigateToSection,
 }) => {
-  const levels: (CEFRLevel | 'all')[] = ['all', 'A2', 'B1', 'B2', 'C1'];
-
   return (
     <header className="sticky top-0 z-40 w-full bg-[#0D1C18]/85 border-b border-white/10 backdrop-blur-xl transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,36 +75,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Right Action: Level Filter & Docs */}
+          {/* Right Action: Design.md Specs Button */}
           <div className="flex items-center gap-3">
-            {/* Band Level Selector Pills */}
-            <div className="hidden lg:flex items-center bg-black/40 px-2 py-1 rounded-full border border-white/15 text-xs">
-              <span className="px-2 text-white/70 font-medium flex items-center gap-1">
-                <Award className="w-3.5 h-3.5 text-[#F5D280]" /> Trình độ:
-              </span>
-              {levels.map((lvl) => (
-                <button
-                  key={lvl}
-                  onClick={() => onSelectLevel(lvl)}
-                  className={`px-2.5 py-1 rounded-full font-medium text-xs transition-all ${
-                    selectedLevel === lvl
-                      ? 'bg-[#FCE5B5] text-[#18221E] font-semibold shadow-sm'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {lvl === 'all' ? 'Tất cả' : lvl}
-                </button>
-              ))}
-            </div>
-
-            {/* View Specs / Docs */}
             <button
               onClick={onOpenDocs}
               className="btn-pill-glass text-xs px-4 py-2"
               title="Xem đặc tả tài liệu thiết kế"
             >
               <FileText className="w-4 h-4 text-[#F5D280]" />
-              <span className="hidden sm:inline">Design.md</span>
+              <span>Design.md</span>
             </button>
           </div>
 

@@ -61,8 +61,6 @@ export function App() {
       
       {/* 1. Floating Glass Navbar */}
       <Navbar
-        selectedLevel={selectedLevel}
-        onSelectLevel={setSelectedLevel}
         onOpenDocs={() => setIsSpecsDrawerOpen(true)}
         onNavigateToSection={handleNavigate}
       />
