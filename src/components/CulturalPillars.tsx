@@ -1,58 +1,58 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, ArrowRight } from 'lucide-react';
 
 export const CulturalPillars: React.FC = () => {
   const pillars = [
     {
       icon: '🪷',
-      title: 'Học Trong Ngữ Cảnh Thân Thuộc & Tự Hào',
-      subtitle: 'Contextual Pride-driven Learning',
-      description: 'Thay vì những chủ đề phương Tây xa lạ, bạn tiếp thu tiếng Anh qua danh lam, ẩm thực, lịch sử và phong vị quê hương. Càng quen thuộc, ngôn ngữ càng dễ ngấm.',
-      color: 'from-amber-500/20 to-emerald-500/10',
-      border: 'border-amber-500/30',
-      tag: 'Tâm lý học ngôn ngữ'
+      title: 'Chất Nền Giấy Điệp Tự Nhiên',
+      subtitle: 'Texture & Natural Ground',
+      description: 'Sắc trắng ngà và vàng nhạt của vỏ sò điệp nghiền mịn trộn hồ nếp, mang lại cảm giác mộc mạc, bảo vệ thị giác và gợi nhớ tranh mộc bản cổ truyền.',
+      tag: 'Bản Sắc Điệp',
+      bg: 'bg-[#F8E9CF]',
+      border: 'border-[#12332B]'
     },
     {
-      icon: '🏛️',
-      title: 'Từ Vựng Học Thuật Chuẩn CEFR (A2 - C1)',
-      subtitle: 'Academic Vocabulary in Cultural Context',
-      description: 'Mỗi từ vựng được trích xuất đều có câu ngữ cảnh gốc và phiên âm chuẩn. Giúp bạn tự tin giới thiệu di sản Việt Nam với bạn bè quốc tế bằng tiếng Anh chuẩn mực.',
-      color: 'from-emerald-500/20 to-teal-500/10',
-      border: 'border-emerald-500/30',
-      tag: 'Chuẩn học thuật'
+      icon: '🪵',
+      title: 'Nét Khắc Than Tre Đanh Gọn',
+      subtitle: 'Woodblock Outlines & Ink',
+      description: 'Thay vì các đường viền mỏng manh mờ nhạt, toàn bộ khung card và nút bấm sử dụng nét khắc dứt khoát mô phỏng nhát dao khắc trên phôi gỗ thị.',
+      tag: 'Nét Mộc Bản',
+      bg: 'bg-[#FFFDF9]',
+      border: 'border-[#12332B]'
     },
     {
-      icon: '🎧',
-      title: 'Luyện Nghe Shadowing AI & Flashcards 3D',
-      subtitle: 'Spaced Repetition System (1-3-7-30)',
-      description: 'Luyện tai nghe và khẩu hình với AI chuẩn bản xứ theo từng câu. Củng cố trí nhớ dài hạn bằng thẻ nhớ 2 mặt và thuật toán lặp ngắt quãng tự động.',
-      color: 'from-teal-500/20 to-blue-500/10',
-      border: 'border-teal-500/30',
-      tag: 'Ghi nhớ dài hạn'
+      icon: '🌿',
+      title: 'Mảng Màu Khoáng Thô Thuần Khiết',
+      subtitle: 'Flat Natural Mineral Pigments',
+      description: 'Màu vàng hoa hòe, xanh gỉ đồng, đỏ son vỏ vang, lam chàm và đen than tre. Các khối thông tin đổ màu phẳng tạo nhịp điệu dân gian rực rỡ.',
+      tag: 'Màu Tự Nhiên',
+      bg: 'bg-[#F8E9CF]',
+      border: 'border-[#12332B]'
     },
     {
-      icon: '🛡️',
-      title: 'Môi Trường Cảm Nghĩ "No-Judgment"',
-      subtitle: 'Safe Reflection & UGC Community',
-      description: 'Tuyệt đối không chấm điểm hay soi lỗi ngữ pháp bài viết cảm nghĩ. Tạo không gian an toàn 100% để bạn tự do viết và trở thành "Sứ giả văn hóa".',
-      color: 'from-purple-500/20 to-pink-500/10',
-      border: 'border-purple-500/30',
-      tag: 'Xóa bỏ áp lực'
+      icon: '📜',
+      title: 'Bố Cục Ước Lệ & Khoảng Trống',
+      subtitle: 'Composition & Negative Space',
+      description: 'Không gian ước lệ thoáng đãng tôn lên vẻ đẹp thanh thoát của tà áo dài, mái đình làng và chữ viết học thuật mà không nhồi nhét chi tiết.',
+      tag: 'Mỹ Học Dân Gian',
+      bg: 'bg-[#FFFDF9]',
+      border: 'border-[#12332B]'
     }
   ];
 
   return (
-    <section className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-[#FAF6EE]">
       <div className="text-center max-w-3xl mx-auto mb-16">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs font-bold text-amber-300 mb-4">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>TRIẾT LÝ SẢN PHẨM EDTECH</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[2px] bg-[#F8E9CF] border-2 border-[#12332B] text-xs font-bold text-[#12332B] mb-4 shadow-[2px_2px_0px_#12332B]">
+          <Sparkles className="w-3.5 h-3.5 text-[#EAA22E]" />
+          <span>TRIẾT LÝ THIẾT KẾ ĐÔNG HỒ ĐƯƠNG ĐẠI (DESIGN.MD)</span>
         </div>
-        <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight">
-          Tại Sao Nên Học Tiếng Anh Qua Ngữ Cảnh Văn Hóa Việt?
+        <h2 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-[#12332B] mb-4 tracking-tight">
+          Hội Họa Dân Gian &amp; Mỹ Thuật Truyền Thống
         </h2>
-        <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
-          Sự kết hợp hoàn hảo giữa tình yêu văn hóa dân tộc và phương pháp tiếp thu ngôn ngữ tự nhiên tiên tiến nhất.
+        <p className="text-[#4A635D] text-sm sm:text-base leading-relaxed">
+          Tái hiện hồn tranh mộc bản dân tộc trong một giao diện EdTech đương đại, tôn vinh tiếng Anh văn hóa Việt.
         </p>
       </div>
 
@@ -60,29 +60,29 @@ export const CulturalPillars: React.FC = () => {
         {pillars.map((p, index) => (
           <div
             key={index}
-            className={`p-6 rounded-3xl bg-gradient-to-br ${p.color} bg-slate-900/60 border ${p.border} backdrop-blur-xl flex flex-col justify-between hover:scale-[1.02] transition-transform duration-300 shadow-xl`}
+            className={`dongho-card p-6 flex flex-col justify-between ${p.bg} ${p.border}`}
           >
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-3xl">{p.icon}</span>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-950/80 text-slate-300 border border-slate-800">
+                <span className="dongho-tag bg-[#FAF6EE] text-[#12332B] text-[10px]">
                   {p.tag}
                 </span>
               </div>
-              <h3 className="font-serif font-bold text-lg text-slate-100 mb-1 leading-snug">
+              <h3 className="font-heading font-bold text-xl text-[#12332B] mb-1 leading-snug">
                 {p.title}
               </h3>
-              <p className="text-[11px] font-semibold text-emerald-400 mb-3">
+              <p className="text-xs font-bold text-[#1A7368] mb-3">
                 {p.subtitle}
               </p>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-[#4A635D] leading-relaxed">
                 {p.description}
               </p>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center gap-2 text-[11px] font-bold text-amber-300/90">
-              <span>Khám phá phương pháp</span>
-              <span>→</span>
+            <div className="mt-6 pt-4 border-t-2 border-[#12332B]/10 flex items-center justify-between text-xs font-bold text-[#12332B]">
+              <span>Xem chi tiết quy chuẩn</span>
+              <ArrowRight className="w-4 h-4 text-[#1A7368]" />
             </div>
           </div>
         ))}

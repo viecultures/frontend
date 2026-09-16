@@ -12,114 +12,113 @@ export const ProjectSpecsDrawer: React.FC<ProjectSpecsDrawerProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const docModules = [
+  const designSpecs = [
     {
-      code: 'BR-01',
-      name: 'Paragraph Pairing & Shadowing Audio',
-      desc: 'Hiển thị bài đọc song ngữ tiếng Anh - tiếng Việt khớp tỷ lệ 1:1 theo từng cặp đoạn văn. Tích hợp audio phát âm chuẩn bản xứ theo từng câu.',
-      badge: 'Đã hoàn thành Demo',
-      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+      title: '1. Chất Nền Giấy Điệp (Texture & Ground)',
+      color: '#FAF6EE & #F8E9CF',
+      desc: 'Nền giấy quét bột vỏ sò điệp nếp, loại bỏ màu trắng công nghiệp để tạo cảm giác mộc bản cổ truyền ấm áp.',
+      tag: 'Bản sắc'
     },
     {
-      code: 'BR-02',
-      name: 'Contextual Academic Vocab Extraction',
-      desc: 'Mỗi từ vựng bắt buộc đính kèm câu ngữ cảnh gốc (Context Sentence), phiên âm IPA, định nghĩa tiếng Việt và âm thanh phát âm.',
-      badge: 'Đã hoàn thành Demo',
-      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+      title: '2. Nét Khắc Than Tre (Woodblock Outlines)',
+      color: '#12332B (2px solid)',
+      desc: 'Viền đanh gọn dứt khoát như nhát dao khắc gỗ, bo góc rất nhẹ (2px - 4px), không bo tròn viên thuốc lạm dụng.',
+      tag: 'Nét khắc'
     },
     {
-      code: 'BR-03',
-      name: 'Safe Reflections Community (No-Judgment)',
-      desc: 'Xóa bỏ áp lực chấm điểm và soi lỗi ngữ pháp. Tích hợp Quick Vocab Toolbar chèn từ nhanh vào cảm nghĩ người học.',
-      badge: 'Đã hoàn thành Demo',
-      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+      title: '3. Bóng Đổ Cứng (Hard Cut-out Shadows)',
+      color: 'box-shadow: 4px 4px 0px #12332B',
+      desc: 'Bóng đổ dịch chuyển góc cứng mô phỏng các tấm mộc bản xếp chồng nhau khi in tranh.',
+      tag: 'Hiệu ứng'
     },
     {
-      code: 'BR-04',
-      name: 'Two-Sided Flashcard & Spaced Repetition',
-      desc: 'Thẻ 3D 2 mặt với cơ chế đánh giá nhị phân "Cần ôn lại" (Re-queue) và "Đã nhớ" theo chu kỳ 1 - 3 - 7 - 30 ngày.',
-      badge: 'Đã hoàn thành Demo',
-      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+      title: '4. Mảng Màu Khoáng Thô (Flat Natural Pigments)',
+      color: 'Xanh Sơn Mài (#1A7368) • Hồng Sen (#E58396) • Vàng Hoa Hòe (#EAA22E)',
+      desc: 'Màu tự nhiên từ lá tre, dành dành, gỉ đồng và vỏ sò điệp tạo nên bảng màu dân gian rực rỡ.',
+      tag: 'Bảng màu'
     },
     {
-      code: 'SPEC-01',
-      name: 'Multi-dimensional Filter Bar',
-      desc: 'Lọc bài học theo Ma trận 2 chiều: Chủ đề văn hóa (Ẩm thực, Di sản, Danh lam...) x Cấp độ CEFR (A2, B1, B2, C1).',
-      badge: 'Đã hoàn thành Demo',
-      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+      title: '5. Typography Thống Nhất',
+      color: 'Cormorant Garamond & Be Vietnam Pro',
+      desc: 'Phông tiêu đề mô phỏng nét khắc cổ điển kết hợp phông chữ sans-serif quốc dân chuẩn tiếng Việt.',
+      tag: 'Kiểu chữ'
     }
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-950/80 backdrop-blur-md">
-      <div className="w-full max-w-2xl h-full bg-slate-900 border-l border-slate-700/80 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-[#12332B]/75 backdrop-blur-sm">
+      <div className="w-full max-w-2xl h-full bg-[#FAF6EE] border-l-2 border-[#12332B] p-6 sm:p-8 flex flex-col justify-between overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300">
         
         {/* Header */}
         <div>
-          <div className="flex items-center justify-between pb-6 border-b border-slate-800">
+          <div className="flex items-center justify-between pb-6 border-b-2 border-[#12332B]">
             <div className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/40">
+              <span className="w-10 h-10 rounded-[3px] bg-[#EAA22E] text-[#12332B] flex items-center justify-center border-2 border-[#12332B] shadow-[2px_2px_0px_#12332B]">
                 <FileText className="w-5 h-5" />
               </span>
               <div>
-                <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                  Tài Liệu Kỹ Thuật & Nghiệp Vụ
+                <span className="dongho-tag bg-[#E58396] text-[#12332B] text-[10px]">
+                  Tài Liệu Thiết Kế (DESIGN.MD)
                 </span>
-                <h2 className="font-serif text-xl font-bold text-white">
-                  VN Culture Reader Project Specs
+                <h2 className="font-heading text-2xl font-bold text-[#12332B]">
+                  Hệ Thống Giao Diện Đông Hồ Đương Đại
                 </h2>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all"
+              className="p-2 rounded-[3px] border border-[#12332B] bg-[#FAF6EE] text-[#12332B] hover:bg-[#E58396] transition-all"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Description */}
+          {/* Description list */}
           <div className="py-6 space-y-4">
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Dự án được xây dựng dựa trên bộ tài liệu hoàn chỉnh tại thư mục <code className="px-2 py-0.5 rounded bg-slate-950 text-amber-300 text-xs">/document</code> với các nguyên tắc cốt lõi:
+            <p className="text-xs sm:text-sm text-[#4A635D] leading-relaxed">
+              Trang chủ được tái thiết kế tuân thủ nghiêm ngặt theo quy chuẩn <code className="px-2 py-0.5 rounded-[2px] bg-[#F8E9CF] text-[#12332B] border border-[#12332B] text-xs font-bold font-mono">document/design.md</code>:
             </p>
 
-            <div className="space-y-3.5">
-              {docModules.map((m, idx) => (
-                <div key={idx} className="bg-slate-950/70 p-4 rounded-2xl border border-slate-800 space-y-1.5">
+            <div className="space-y-3">
+              {designSpecs.map((item, idx) => (
+                <div key={idx} className="bg-[#FFFDF9] p-4 rounded-[3px] border-2 border-[#12332B] shadow-[3px_3px_0px_#12332B] space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-amber-300 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                      [{m.code}] {m.name}
+                    <span className="font-heading font-bold text-base text-[#12332B]">
+                      {item.title}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${m.badgeColor}`}>
-                      {m.badge}
+                    <span className="dongho-tag bg-[#F8E9CF] text-[#12332B] text-[10px]">
+                      {item.tag}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    {m.desc}
+                  <p className="text-xs font-mono font-bold text-[#1A7368]">
+                    {item.color}
+                  </p>
+                  <p className="text-xs text-[#4A635D] leading-relaxed">
+                    {item.desc}
                   </p>
                 </div>
               ))}
             </div>
 
-            <div className="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs space-y-1">
-              <strong className="block font-bold">✨ Video Banner Asset:</strong>
-              <p className="text-emerald-400/80">
-                Đã tích hợp file video <code>Lotus_leaves_swaying_in_breeze_20260916204003.webm</code> làm banner động trang chủ với hiệu ứng thị giác và tương phản chữ cao cấp.
+            <div className="p-4 rounded-[3px] bg-[#F8E9CF] border-2 border-[#12332B] text-[#12332B] text-xs space-y-1">
+              <strong className="block font-bold">✨ Tài Nguyên Đã Tích Hợp:</strong>
+              <p className="text-[#4A635D]">
+                • Logo: <code>src/assets/logo/logo.jpg</code><br/>
+                • Video Banner: <code>src/assets/banner.webm</code><br/>
+                • Hình ảnh tranh mộc bản &amp; di sản: <code>src/assets/pictures/</code>
               </p>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="pt-6 border-t border-slate-800">
+        <div className="pt-6 border-t-2 border-[#12332B]">
           <button
             onClick={onClose}
-            className="w-full py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs transition-all border border-slate-700"
+            className="dongho-btn dongho-btn-primary w-full py-3 text-xs font-bold"
           >
-            Đóng bảng đặc tả
+            Đóng bảng quy chuẩn thiết kế
           </button>
         </div>
 

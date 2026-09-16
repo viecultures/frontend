@@ -16,113 +16,111 @@ export const LessonCard: React.FC<LessonCardProps> = ({
   const getLevelBadge = (level: CEFRLevel) => {
     switch (level) {
       case 'A2':
-        return 'bg-blue-500/15 text-blue-300 border-blue-500/40';
+        return 'bg-[#59789F] text-white border-[#12332B]';
       case 'B1':
-        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40';
+        return 'bg-[#2A816F] text-white border-[#12332B]';
       case 'B2':
-        return 'bg-amber-500/15 text-amber-300 border-amber-500/40';
+        return 'bg-[#EAA22E] text-[#12332B] border-[#12332B]';
       case 'C1':
-        return 'bg-purple-500/15 text-purple-300 border-purple-500/40';
+        return 'bg-[#925E06] text-white border-[#12332B]';
     }
   };
 
   return (
-    <div className="group flex flex-col bg-slate-900/70 rounded-3xl border border-slate-800 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-950/40 transition-all duration-300 overflow-hidden">
+    <div className="dongho-card flex flex-col justify-between overflow-hidden bg-[#FFFDF9] group">
       
-      {/* Image Container with Badges */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950">
+      {/* Top Image Container with Woodcut Border */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden border-b-2 border-[#12332B] bg-[#F8E9CF]">
         <img
           src={lesson.imageUrl}
           alt={lesson.titleEn}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
         
-        {/* Subtle Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/30" />
-
         {/* Top Badges */}
-        <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between pointer-events-none">
-          {/* Level Band Badge */}
-          <span className={`px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider border backdrop-blur-md shadow-sm ${getLevelBadge(lesson.level)}`}>
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+          {/* Level Band Stamp */}
+          <span className={`dongho-tag shadow-[2px_2px_0px_#12332B] ${getLevelBadge(lesson.level)}`}>
             Band {lesson.level}
           </span>
 
-          {/* Category Pill */}
-          <span className="px-3 py-1 rounded-xl text-xs font-semibold bg-slate-950/80 text-slate-200 border border-slate-700/60 backdrop-blur-md">
+          {/* Category Tag */}
+          <span className="dongho-tag bg-[#FAF6EE] text-[#12332B] shadow-[2px_2px_0px_#12332B]">
             {lesson.categoryNameVi}
           </span>
         </div>
 
-        {/* Bottom stats inside image */}
-        <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between text-xs text-slate-300 font-medium">
-          <span className="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-lg backdrop-blur-md border border-slate-800">
-            <Clock className="w-3.5 h-3.5 text-amber-400" />
+        {/* Bottom stats pill */}
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-[#12332B] font-bold">
+          <span className="flex items-center gap-1.5 bg-[#FAF6EE]/95 px-2.5 py-1 rounded-[2px] border border-[#12332B] shadow-[1px_1px_0px_#12332B]">
+            <Clock className="w-3.5 h-3.5 text-[#EAA22E]" />
             {lesson.readTime}
           </span>
-          <span className="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-lg backdrop-blur-md border border-slate-800">
-            <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="flex items-center gap-1.5 bg-[#FAF6EE]/95 px-2.5 py-1 rounded-[2px] border border-[#12332B] shadow-[1px_1px_0px_#12332B]">
+            <Volume2 className="w-3.5 h-3.5 text-[#1A7368]" />
             AI Shadowing
           </span>
         </div>
       </div>
 
-      {/* Card Content Body */}
-      <div className="flex-1 p-6 flex flex-col justify-between">
+      {/* Card Body */}
+      <div className="p-5 flex-1 flex flex-col justify-between">
         <div>
           {/* English Title */}
           <h3 
             onClick={() => onOpenReader(lesson)}
-            className="font-serif font-bold text-lg text-slate-100 group-hover:text-amber-300 transition-colors line-clamp-2 cursor-pointer mb-1.5 leading-snug"
+            className="font-heading font-bold text-xl text-[#12332B] group-hover:text-[#1A7368] transition-colors line-clamp-2 cursor-pointer mb-1.5 leading-snug"
           >
             {lesson.titleEn}
           </h3>
 
-          {/* Vietnamese Subtitle */}
-          <p className="text-xs font-medium text-emerald-400/90 mb-3 line-clamp-1">
+          {/* Vietnamese Title */}
+          <p className="text-xs font-bold text-[#1A7368] mb-3 line-clamp-1">
             {lesson.titleVi}
           </p>
 
           {/* Summary */}
-          <p className="text-xs text-slate-400 leading-relaxed line-clamp-2 mb-4">
+          <p className="text-xs text-[#4A635D] leading-relaxed line-clamp-2 mb-4">
             {lesson.summary}
           </p>
         </div>
 
-        {/* Vocab count & actions footer */}
-        <div className="pt-4 border-t border-slate-800/80">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-4">
-            <span className="flex items-center gap-1.5 font-medium">
-              <span className="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+        {/* Card Footer */}
+        <div className="pt-4 border-t-2 border-[#12332B]/10">
+          <div className="flex items-center justify-between text-xs text-[#4A635D] mb-4 font-semibold">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#EAA22E] inline-block border border-[#12332B]"></span>
               {lesson.vocabularies.length} từ vựng học thuật
             </span>
-            <span className="flex items-center gap-1 text-slate-500">
-              <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500/20" />
-              {lesson.likes || 120} yêu thích
+            <span className="flex items-center gap-1 text-[#12332B]">
+              <Heart className="w-3.5 h-3.5 text-[#E58396] fill-[#E58396]" />
+              {lesson.likes || 140} yêu thích
             </span>
           </div>
 
-          {/* Buttons CTA */}
+          {/* Action Woodcut Buttons */}
           <div className="grid grid-cols-2 gap-2.5">
             <button
               onClick={() => onOpenReader(lesson)}
-              className="px-3.5 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 border border-emerald-500/40 hover:border-transparent font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
+              className="dongho-btn dongho-btn-primary py-2.5 text-xs font-bold"
             >
-              <BookOpen className="w-3.5 h-3.5" />
+              <BookOpen className="w-3.5 h-3.5 text-white" />
               <span>Đọc song ngữ</span>
             </button>
 
             <button
               onClick={() => onOpenFlashcards(lesson)}
-              className="px-3.5 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-400 text-amber-300 hover:text-slate-950 border border-amber-500/30 hover:border-transparent font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
+              className="dongho-btn dongho-btn-paper py-2.5 text-xs font-bold"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5 text-[#EAA22E]" />
               <span>Luyện Flashcards</span>
             </button>
           </div>
         </div>
 
       </div>
+
     </div>
   );
 };

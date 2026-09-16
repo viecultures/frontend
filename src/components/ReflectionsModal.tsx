@@ -17,20 +17,19 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
 }) => {
   const [reflections, setReflections] = useState<UserReflection[]>(MOCK_REFLECTIONS);
   const [newContent, setNewContent] = useState<string>('');
-  const selectedLessonTitle = lesson ? lesson.titleEn : 'The Imperial City of Hue';
+  const selectedLessonTitle = lesson ? lesson.titleEn : 'Dong Ho Folk Woodcut Paintings';
   const [usedVocabList, setUsedVocabList] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
 
-  // Available vocabularies for insertion
   const availableVocabs = lesson ? lesson.vocabularies : [
+    { word: 'quintessence' },
+    { word: 'aesthetics' },
+    { word: 'pigments' },
+    { word: 'auspicious' },
     { word: 'monumental' },
-    { word: 'epitome' },
     { word: 'geomancy' },
-    { word: 'intricate' },
-    { word: 'evocative' },
-    { word: 'transformation' },
+    { word: 'enduring' },
     { word: 'juxtaposition' },
-    { word: 'succulent' },
   ];
 
   const handleInsertVocab = (word: string) => {
@@ -58,7 +57,6 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
     e.preventDefault();
     if (!newContent.trim()) return;
 
-    // Detect used vocabs automatically from text
     const detectedVocabs = availableVocabs
       .map(v => v.word.toLowerCase())
       .filter(w => newContent.toLowerCase().includes(w));
@@ -69,7 +67,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
       lessonTitle: selectedLessonTitle,
       authorName: 'Bạn (Người học)',
       authorAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-      authorLevel: lesson?.level || 'B1',
+      authorLevel: lesson?.level || 'B2',
       content: newContent,
       usedVocab: Array.from(new Set([...usedVocabList, ...detectedVocabs])),
       createdAt: 'Vừa xong',
@@ -85,22 +83,22 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-xl overflow-y-auto">
-      <div className="relative w-full max-w-3xl bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#12332B]/75 backdrop-blur-sm overflow-y-auto">
+      <div className="relative w-full max-w-3xl bg-[#FAF6EE] border-2 border-[#12332B] rounded-[4px] shadow-[10px_10px_0px_#12332B] overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/70">
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#12332B] bg-[#F8E9CF]">
           <div className="flex items-center gap-3">
-            <span className="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center border border-teal-500/30">
+            <span className="w-10 h-10 rounded-[3px] bg-[#1A7368] text-white flex items-center justify-center border-2 border-[#12332B] shadow-[2px_2px_0px_#12332B]">
               <MessageSquare className="w-5 h-5" />
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs uppercase font-bold text-teal-400 tracking-wider">
-                  Cộng Đồng Cảm Nghĩ • No-Judgment Zone
+                <span className="dongho-tag bg-[#E58396] text-[#12332B] text-[10px]">
+                  Cảm Nghĩ Cộng Đồng • No-Judgment Zone
                 </span>
               </div>
-              <h2 className="font-serif font-bold text-base sm:text-lg text-slate-100">
+              <h2 className="font-heading font-bold text-lg sm:text-xl text-[#12332B]">
                 {lesson ? lesson.titleEn : 'Chia sẻ góc nhìn văn hóa của bạn'}
               </h2>
             </div>
@@ -108,44 +106,44 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all"
+            className="p-2 rounded-[3px] border border-[#12332B] bg-[#FAF6EE] text-[#12332B] hover:bg-[#E58396] transition-all"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* No-Judgment Safe Environment Banner */}
-        <div className="px-6 py-3 bg-gradient-to-r from-emerald-950/60 via-teal-950/40 to-slate-900 border-b border-teal-500/30 flex items-center gap-3">
-          <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
-          <p className="text-xs text-emerald-300/90 leading-tight">
-            <strong>Môi trường an toàn:</strong> Không áp dụng chấm điểm hay sửa lỗi ngữ pháp. Hãy tự tin dùng các từ vựng học thuật vừa học để diễn đạt suy nghĩ của bạn!
+        <div className="px-6 py-3 bg-[#E58396]/25 border-b-2 border-[#12332B] flex items-center gap-3">
+          <ShieldCheck className="w-5 h-5 text-[#1A7368] shrink-0" />
+          <p className="text-xs text-[#12332B] font-medium leading-tight">
+            <strong>Môi trường an toàn:</strong> Không chấm điểm hay soi lỗi ngữ pháp. Hãy tự tin dùng các từ vựng học thuật vừa học để diễn đạt góc nhìn văn hóa của bạn!
           </p>
         </div>
 
         {/* Scrollable Container */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-8">
+        <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-[#FAF6EE]">
           
           {/* Editor Form Card */}
-          <form onSubmit={handleSubmit} className="bg-slate-950/80 p-5 rounded-3xl border border-slate-800 space-y-4">
+          <form onSubmit={handleSubmit} className="bg-[#FFFDF9] p-5 rounded-[4px] border-2 border-[#12332B] shadow-[4px_4px_0px_#12332B] space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+              <span className="text-xs font-bold text-[#12332B] flex items-center gap-1.5 uppercase">
+                <Sparkles className="w-4 h-4 text-[#EAA22E]" />
                 Viết cảm nghĩ về bài đọc:
               </span>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-xs text-[#4A635D] font-medium">
                 Gợi ý: Click từ bên dưới để chèn nhanh
               </span>
             </div>
 
-            {/* Quick Vocab Insertion Toolbar (Specified in Screen Specs) */}
+            {/* Quick Vocab Insertion Toolbar */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <span className="text-[11px] font-semibold text-slate-400 shrink-0">Chèn từ:</span>
+              <span className="text-xs font-bold text-[#12332B] shrink-0">Chèn từ:</span>
               {availableVocabs.map((v, i) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => handleInsertVocab(v.word)}
-                  className="shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-400 hover:text-slate-950 transition-all flex items-center gap-1"
+                  className="shrink-0 px-2.5 py-1 rounded-[2px] text-xs font-bold bg-[#FAF6EE] text-[#12332B] border-2 border-[#12332B] shadow-[1.5px_1.5px_0px_#12332B] hover:bg-[#EAA22E] transition-all flex items-center gap-1"
                 >
                   <Plus className="w-3 h-3" />
                   <span>{v.word}</span>
@@ -158,17 +156,17 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
               <textarea
                 value={newContent}
                 onChange={(e) => setNewContent(e.target.value)}
-                placeholder="Chia sẻ cảm xúc của bạn bằng tiếng Anh hoặc suy nghĩ về bài đọc (ví dụ: I feel so proud learning about the monumental architecture of Hue Citadel...)"
+                placeholder="Chia sẻ cảm xúc của bạn (ví dụ: Learning about the quintessence of Dong Ho woodcut aesthetics makes me so proud...)"
                 rows={3}
-                className="w-full p-4 rounded-2xl bg-slate-900 border border-slate-700 text-slate-100 text-sm placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400/50 transition-all resize-none"
+                className="w-full p-4 rounded-[3px] bg-[#FAF6EE] border-2 border-[#12332B] text-[#12332B] text-sm placeholder-[#4A635D] focus:outline-none focus:bg-white focus:shadow-[2px_2px_0px_#12332B] transition-all resize-none font-medium"
               />
             </div>
 
             {/* Form Footer */}
             <div className="flex items-center justify-between pt-1">
-              <div className="text-[11px] text-slate-400">
+              <div className="text-xs text-[#4A635D]">
                 {usedVocabList.length > 0 ? (
-                  <span className="text-emerald-400 font-medium">
+                  <span className="text-[#1A7368] font-bold">
                     ✓ Đã dùng: {usedVocabList.join(', ')}
                   </span>
                 ) : (
@@ -179,7 +177,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
               <button
                 type="submit"
                 disabled={!newContent.trim()}
-                className="px-5 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-teal-500/20 transition-all"
+                className="dongho-btn dongho-btn-primary px-5 py-2.5 text-xs font-bold"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Đăng cảm nghĩ</span>
@@ -187,18 +185,18 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
             </div>
 
             {isSubmitted && (
-              <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs flex items-center gap-2 animate-fade-in">
+              <div className="p-3 bg-[#1A7368]/15 border-2 border-[#1A7368] rounded-[3px] text-[#1A7368] text-xs font-bold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Cảm nghĩ của bạn đã được đăng thành công lên bảng tin cộng đồng!</span>
               </div>
             )}
           </form>
 
-          {/* Community Reflections Feed */}
+          {/* Community Feed */}
           <div>
-            <h3 className="font-serif font-bold text-lg text-slate-200 mb-4 flex items-center gap-2">
+            <h3 className="font-heading font-bold text-2xl text-[#12332B] mb-4 flex items-center gap-2">
               <span>Bảng Tin Cảm Nghĩ Cộng Đồng</span>
-              <span className="text-xs font-sans font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-sans font-bold text-[#12332B] bg-[#F8E9CF] px-2.5 py-0.5 rounded-[2px] border border-[#12332B]">
                 {reflections.length} bài chia sẻ
               </span>
             </h3>
@@ -207,59 +205,57 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
               {reflections.map((item) => (
                 <div 
                   key={item.id}
-                  className="bg-slate-950/60 p-5 rounded-2xl border border-slate-800/80 hover:border-slate-700 transition-all"
+                  className="bg-[#FFFDF9] p-5 rounded-[4px] border-2 border-[#12332B] shadow-[3px_3px_0px_#12332B]"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <img
                         src={item.authorAvatar}
                         alt={item.authorName}
-                        className="w-9 h-9 rounded-full object-cover border border-slate-700"
+                        className="w-9 h-9 rounded-full object-cover border-2 border-[#12332B]"
                       />
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs text-slate-200">{item.authorName}</span>
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-300">
-                            {item.authorLevel}
+                          <span className="font-bold text-xs text-[#12332B]">{item.authorName}</span>
+                          <span className="dongho-tag bg-[#F8E9CF] text-[#12332B] text-[10px]">
+                            Band {item.authorLevel}
                           </span>
                         </div>
-                        <span className="text-[11px] text-slate-400">{item.createdAt} • Về "{item.lessonTitle}"</span>
+                        <span className="text-xs text-[#4A635D]">{item.createdAt} • Về "{item.lessonTitle}"</span>
                       </div>
                     </div>
 
-                    <button className="text-slate-600 hover:text-slate-400 p-1" title="Báo cáo vi phạm">
+                    <button className="text-[#4A635D] hover:text-[#E58396] p-1" title="Báo cáo vi phạm">
                       <Flag className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  {/* Content with highlighted academic vocabs */}
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3">
+                  <p className="text-sm text-[#12332B] leading-relaxed mb-3">
                     {item.content}
                   </p>
 
-                  {/* Badges of used vocabs & likes */}
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-900 text-xs">
+                  <div className="flex items-center justify-between pt-2 border-t border-[#12332B]/10 text-xs">
                     <div className="flex flex-wrap items-center gap-1.5">
                       {item.usedVocab.map((w, idx) => (
                         <span 
                           key={idx}
-                          className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-400/10 text-amber-300 border border-amber-400/20"
+                          className="px-2 py-0.5 rounded-[2px] text-[10px] font-bold bg-[#EAA22E] text-[#12332B] border border-[#12332B]"
                         >
-                          ✨ {w}
+                          ❖ {w}
                         </span>
                       ))}
                     </div>
 
                     <button
                       onClick={() => handleToggleLike(item.id)}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all ${
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] border border-[#12332B] transition-all ${
                         item.userLiked
-                          ? 'text-pink-400 bg-pink-500/15'
-                          : 'text-slate-400 hover:text-pink-400 hover:bg-slate-800'
+                          ? 'text-[#12332B] bg-[#E58396] shadow-[1px_1px_0px_#12332B]'
+                          : 'text-[#12332B] bg-[#FAF6EE] hover:bg-[#F8E9CF]'
                       }`}
                     >
-                      <Heart className={`w-3.5 h-3.5 ${item.userLiked ? 'fill-pink-400' : ''}`} />
-                      <span>{item.likes}</span>
+                      <Heart className={`w-3.5 h-3.5 ${item.userLiked ? 'fill-[#12332B]' : ''}`} />
+                      <span className="font-bold">{item.likes}</span>
                     </button>
                   </div>
                 </div>

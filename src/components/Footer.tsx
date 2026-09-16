@@ -1,88 +1,87 @@
 import React from 'react';
 import { Heart, Mail } from 'lucide-react';
+import logoImg from '../assets/logo/logo.jpg';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="w-full bg-slate-950 border-t border-slate-800/80 pt-16 pb-12 text-slate-400 text-xs">
+    <footer className="w-full bg-[#12332B] text-[#FAF6EE] border-t-4 border-[#EAA22E] pt-16 pb-12 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800/80">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-[#FAF6EE]/15">
           
-          {/* Col 1 & 2: Brand & Mission */}
+          {/* Col 1 & 2: Brand & Philosophy */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-emerald-600 to-amber-400 p-[2px]">
-                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                  <span className="text-lg">🪷</span>
-                </div>
+              <div className="w-10 h-10 rounded-[3px] border-2 border-[#EAA22E] overflow-hidden bg-white shrink-0 shadow-[2px_2px_0px_#EAA22E]">
+                <img src={logoImg} alt="VieCultures Logo" className="w-full h-full object-cover" />
               </div>
-              <span className="font-serif font-bold text-lg text-white">
-                VN Culture Reader
+              <span className="font-heading font-bold text-2xl text-[#FAF6EE]">
+                VieCultures
               </span>
             </div>
 
-            <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
-              Nền tảng EdTech học tiếng Anh học thuật qua ngữ cảnh văn hóa, lịch sử và danh lam Việt Nam. Nuôi dưỡng thế hệ "Sứ giả Văn hóa" tự tin kết nối bản sắc dân tộc ra thế giới.
+            <p className="text-[#FAF6EE]/80 text-xs leading-relaxed max-w-sm">
+              Cổng thông tin &amp; nền tảng học tiếng Anh theo phong cách mỹ thuật tranh khắc gỗ dân gian Đông Hồ. Tôn vinh vẻ đẹp văn hóa, di sản và đời sống Việt Nam.
             </p>
 
             <div className="flex items-center gap-2 pt-2">
-              <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold">
-                ✓ Chuẩn CEFR A2 - C1
+              <span className="dongho-tag bg-[#1A7368] text-white border-[#FAF6EE]">
+                ✓ Nền Giấy Điệp
               </span>
-              <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[11px] font-semibold">
-                ✓ Shadowing AI
+              <span className="dongho-tag bg-[#EAA22E] text-[#12332B] border-[#FAF6EE]">
+                ✓ Nét Mộc Bản Than Tre
               </span>
             </div>
           </div>
 
           {/* Col 3: Topics */}
           <div>
-            <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-4">
-              Chủ Đề Bài Đọc
+            <h4 className="font-heading font-bold text-base text-[#EAA22E] uppercase tracking-wider mb-4">
+              Chủ Đề Tiêu Biểu
             </h4>
-            <ul className="space-y-2.5">
-              <li><a href="#discovery" className="hover:text-amber-300 transition-colors">🏛️ Lịch sử & Cố đô Huế</a></li>
-              <li><a href="#discovery" className="hover:text-amber-300 transition-colors">🍜 Ẩm thực Bánh mì & Phở</a></li>
-              <li><a href="#discovery" className="hover:text-amber-300 transition-colors">⛰️ Kỳ quan Vịnh Hạ Long</a></li>
-              <li><a href="#discovery" className="hover:text-amber-300 transition-colors">🎋 Áo Dài & Đời sống Việt</a></li>
+            <ul className="space-y-2.5 font-medium text-[#FAF6EE]/85">
+              <li><a href="#discovery" className="hover:text-[#EAA22E] transition-colors">🎨 Tranh Dân Gian Đông Hồ</a></li>
+              <li><a href="#discovery" className="hover:text-[#EAA22E] transition-colors">🏛️ Đại Nội Cố Đô Huế</a></li>
+              <li><a href="#discovery" className="hover:text-[#EAA22E] transition-colors">🎋 Tà Áo Dài &amp; Lụa Tơ Tằm</a></li>
+              <li><a href="#discovery" className="hover:text-[#EAA22E] transition-colors">🍜 Bánh Mì &amp; Ẩm Thực Đường Phố</a></li>
             </ul>
           </div>
 
-          {/* Col 4: Core Modules */}
+          {/* Col 4: Core Features */}
           <div>
-            <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-4">
-              Tính Năng Cốt Lõi
+            <h4 className="font-heading font-bold text-base text-[#EAA22E] uppercase tracking-wider mb-4">
+              Phương Pháp EdTech
             </h4>
-            <ul className="space-y-2.5">
-              <li><span className="text-slate-300">📖 Song ngữ Cặp Đoạn</span></li>
-              <li><span className="text-slate-300">🎧 Shadowing Player AI</span></li>
-              <li><span className="text-slate-300">🎴 Flashcard 3D Nhị Phân</span></li>
-              <li><span className="text-slate-300">💬 Cảm Nghĩ No-Judgment</span></li>
+            <ul className="space-y-2.5 font-medium text-[#FAF6EE]/85">
+              <li><span>📖 Bài Đọc Song Ngữ Cặp Đoạn</span></li>
+              <li><span>🎧 Shadowing AI Từng Câu</span></li>
+              <li><span>🎴 Flashcard 3D Spaced Repetition</span></li>
+              <li><span>💬 Cảm Nghĩ No-Judgment Safe Zone</span></li>
             </ul>
           </div>
 
-          {/* Col 5: EdTech Philosophy */}
+          {/* Col 5: Contact */}
           <div>
-            <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-4">
-              Đồng Hành
+            <h4 className="font-heading font-bold text-base text-[#EAA22E] uppercase tracking-wider mb-4">
+              Liên Hệ &amp; Hợp Tác
             </h4>
-            <p className="text-slate-400 leading-relaxed mb-3">
-              Dự án chào đón sự đóng góp nội dung từ các thầy cô giáo, dịch giả và người yêu văn hóa Việt.
+            <p className="text-[#FAF6EE]/80 leading-relaxed mb-3">
+              Chào đón các nhà nghiên cứu văn hóa, nghệ nhân mộc bản và giáo viên tiếng Anh đồng hành.
             </p>
-            <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-              <Mail className="w-3.5 h-3.5" />
-              <span>contact@englishspace.vn</span>
+            <div className="flex items-center gap-2 text-[#EAA22E] font-bold">
+              <Mail className="w-4 h-4" />
+              <span>contact@viecultures.vn</span>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom copyright & cultural tribute */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500">
-          <p>© 2026 VN Culture Reader (EnglishSpace). Tự hào tôn vinh văn hóa Việt Nam.</p>
-          <p className="flex items-center gap-1.5">
-            <span>Thiết kế vì người học tiếng Anh Việt Nam</span>
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+        {/* Bottom copyright */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[#FAF6EE]/60 font-medium">
+          <p>© 2026 VieCultures. Thiết kế chuẩn phong cách tranh mộc bản dân gian Đông Hồ (design.md).</p>
+          <p className="flex items-center gap-1.5 text-[#FAF6EE]/80">
+            <span>Tự hào văn hóa &amp; mỹ thuật dân tộc Việt</span>
+            <Heart className="w-4 h-4 text-[#E58396] fill-[#E58396]" />
           </p>
         </div>
 
