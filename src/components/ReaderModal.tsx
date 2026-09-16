@@ -25,7 +25,6 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
   const [savedVocabIds, setSavedVocabIds] = useState<string[]>([]);
   const [showVietnameseMobile, setShowVietnameseMobile] = useState<Record<number, boolean>>({});
 
-  // Web Speech API helper
   const speakText = (text: string, rate: number = 1) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -76,7 +75,6 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
     }));
   };
 
-  // Helper to render text with interactive highlighted vocabularies in woodblock stamp style
   const renderInteractiveEnglishText = (text: string, highlightWords?: string[]) => {
     if (!highlightWords || highlightWords.length === 0) return text;
 
@@ -95,7 +93,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           <button
             key={index}
             onClick={() => matchingVocab && setSelectedVocab(matchingVocab)}
-            className="inline-block px-1.5 py-0.5 mx-0.5 rounded-[2px] font-bold text-[#12332B] bg-[#EAA22E] border border-[#12332B] shadow-[1.5px_1.5px_0px_#12332B] hover:bg-[#E58396] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all cursor-pointer"
+            className="inline-block px-2 py-0.5 mx-0.5 rounded-full font-semibold text-[#18221E] bg-[#FCE5B5] hover:bg-[#FFF0CE] hover:scale-105 transition-all cursor-pointer shadow-sm"
             title="Bấm để xem nghĩa học thuật & phát âm"
           >
             {part}
@@ -107,25 +105,25 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#12332B]/75 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
       
       {/* Modal Card Box */}
-      <div className="relative w-full max-w-5xl bg-[#FAF6EE] border-2 border-[#12332B] rounded-[4px] shadow-[10px_10px_0px_#12332B] overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-5xl bg-[#0D1C18]/95 border border-white/20 rounded-[24px] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#12332B] bg-[#F8E9CF]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-[3px] bg-[#1A7368] text-white flex items-center justify-center border-2 border-[#12332B] shadow-[2px_2px_0px_#12332B]">
+            <span className="w-10 h-10 rounded-full bg-white/10 text-[#F5D280] flex items-center justify-center border border-white/15">
               <BookOpen className="w-5 h-5" />
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="dongho-tag bg-[#E58396] text-[#12332B] text-[10px]">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold border border-emerald-500/30">
                   Song Ngữ Cặp Đoạn • Band {lesson.level}
                 </span>
-                <span className="text-xs font-bold text-[#4A635D]">• {lesson.categoryNameVi}</span>
+                <span className="text-xs text-white/60">• {lesson.categoryNameVi}</span>
               </div>
-              <h2 className="font-heading font-bold text-lg sm:text-xl text-[#12332B] line-clamp-1">
+              <h2 className="font-heading font-bold text-lg sm:text-xl text-white line-clamp-1">
                 {lesson.titleEn}
               </h2>
             </div>
@@ -134,14 +132,14 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => onOpenFlashcards(lesson)}
-              className="hidden sm:flex dongho-btn dongho-btn-accent text-xs px-3.5 py-1.5"
+              className="hidden sm:flex btn-pill-primary text-xs px-4 py-2"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Ôn Flashcards ({lesson.vocabularies.length})</span>
+              <span>Luyện Flashcards ({lesson.vocabularies.length})</span>
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-[3px] border border-[#12332B] bg-[#FAF6EE] text-[#12332B] hover:bg-[#E58396] transition-all"
+              className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
             >
               <X className="w-5 h-5" />
             </button>
@@ -149,41 +147,41 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
         </div>
 
         {/* Audio Shadowing Sticky Controller */}
-        <div className="px-6 py-3 bg-[#FAF6EE] border-b-2 border-[#12332B] flex flex-wrap items-center justify-between gap-4">
+        <div className="px-6 py-3.5 bg-black/30 border-b border-white/10 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={handlePlayEntireLesson}
-              className="dongho-btn dongho-btn-primary px-4 py-2 text-xs font-bold"
+              className="btn-pill-primary px-5 py-2 text-xs font-semibold"
             >
               {isPlayingAll ? (
                 <>
-                  <Pause className="w-4 h-4" />
+                  <Pause className="w-4 h-4 text-[#18221E]" />
                   <span>Tạm dừng</span>
                 </>
               ) : (
                 <>
-                  <Play className="w-4 h-4 fill-white" />
+                  <Play className="w-4 h-4 fill-[#18221E] text-[#18221E]" />
                   <span>Nghe toàn bài (Shadowing)</span>
                 </>
               )}
             </button>
 
-            <span className="text-xs font-medium text-[#4A635D] hidden sm:inline">
-              💡 Bấm nút "Nghe câu này" ở từng đoạn để luyện phát âm riêng biệt
+            <span className="text-xs text-white/60 hidden sm:inline">
+              💡 Bấm vào từng đoạn để nghe phát âm câu riêng biệt
             </span>
           </div>
 
           {/* Speed settings */}
-          <div className="flex items-center gap-2 bg-[#F8E9CF] px-2 py-1 rounded-[3px] border-2 border-[#12332B]">
-            <span className="text-xs font-bold text-[#12332B]">Tốc độ:</span>
+          <div className="flex items-center gap-2 bg-black/40 px-2 py-1 rounded-full border border-white/15">
+            <span className="text-xs text-white/60 font-medium">Tốc độ:</span>
             {[0.75, 1, 1.25].map(speed => (
               <button
                 key={speed}
                 onClick={() => setPlaybackSpeed(speed)}
-                className={`px-2 py-0.5 rounded-[2px] text-xs font-bold transition-all ${
+                className={`px-2.5 py-0.5 rounded-full text-xs font-semibold transition-all ${
                   playbackSpeed === speed
-                    ? 'bg-[#1A7368] text-white'
-                    : 'text-[#12332B] hover:bg-[#FAF6EE]'
+                    ? 'bg-[#FCE5B5] text-[#18221E]'
+                    : 'text-white/60 hover:text-white'
                 }`}
               >
                 {speed}x
@@ -192,22 +190,22 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           </div>
         </div>
 
-        {/* Reading Body: Paragraph Pairing (2 Columns on Desktop) */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#FAF6EE]">
+        {/* Reading Body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           
-          {/* Banner image with woodblock frame */}
-          <div className="relative rounded-[3px] overflow-hidden border-2 border-[#12332B] shadow-[4px_4px_0px_#12332B] aspect-[21/9] max-h-52 bg-[#F8E9CF]">
+          {/* Banner image with soft rounded corners */}
+          <div className="relative rounded-[20px] overflow-hidden border border-white/15 aspect-[21/9] max-h-52 bg-black/40">
             <img 
               src={lesson.imageUrl} 
               alt={lesson.titleEn}
               className="w-full h-full object-cover" 
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#12332B]/90 via-[#12332B]/30 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0D1C18] via-[#0D1C18]/40 to-transparent" />
+            <div className="absolute bottom-4 left-5 right-5">
               <h3 className="font-heading text-xl sm:text-2xl font-bold text-white mb-1">
                 {lesson.titleVi}
               </h3>
-              <p className="text-xs text-[#FAF6EE] line-clamp-1">{lesson.summary}</p>
+              <p className="text-xs text-white/80 line-clamp-1">{lesson.summary}</p>
             </div>
           </div>
 
@@ -216,19 +214,19 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
             {lesson.paragraphs.map((para, index) => (
               <div 
                 key={para.id} 
-                className={`p-5 rounded-[3px] border-2 transition-all ${
+                className={`p-6 rounded-[20px] border transition-all ${
                   activeSentenceId === para.id 
-                    ? 'bg-[#F8E9CF] border-[#1A7368] shadow-[4px_4px_0px_#1A7368]' 
-                    : 'bg-[#FFFDF9] border-[#12332B] shadow-[3px_3px_0px_#12332B]'
+                    ? 'bg-white/10 border-[#FCE5B5]/60 shadow-lg' 
+                    : 'bg-black/30 border-white/10 hover:border-white/20'
                 }`}
               >
-                <div className="flex items-center justify-between mb-3 text-xs font-bold text-[#12332B]">
-                  <span className="text-[#1A7368] uppercase">❖ ĐOẠN #{index + 1}</span>
+                <div className="flex items-center justify-between mb-3 text-xs font-semibold text-white/60">
+                  <span className="text-[#F5D280] uppercase tracking-wider">❖ ĐOẠN #{index + 1}</span>
                   <button
                     onClick={() => handlePlayParagraph(para.id, para.english)}
-                    className="dongho-btn dongho-btn-paper text-xs px-2.5 py-1"
+                    className="btn-pill-glass text-xs px-3 py-1"
                   >
-                    <Volume2 className="w-3.5 h-3.5 text-[#1A7368]" />
+                    <Volume2 className="w-3.5 h-3.5 text-[#F5D280]" />
                     <span>Nghe câu này</span>
                   </button>
                 </div>
@@ -237,26 +235,26 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
                   {/* English Column (Primary) */}
-                  <div className="text-[#12332B] text-base leading-relaxed">
+                  <div className="text-white text-base leading-relaxed">
                     {renderInteractiveEnglishText(para.english, para.highlightWords)}
                   </div>
 
                   {/* Vietnamese Column */}
-                  <div className="hidden md:block text-[#4A635D] text-base leading-relaxed pl-6 border-l-2 border-[#12332B]/20 bg-[#FAF6EE] p-4 rounded-[2px]">
+                  <div className="hidden md:block text-white/75 text-base leading-relaxed pl-6 border-l border-white/15 bg-black/20 p-4 rounded-[16px]">
                     {para.vietnamese}
                   </div>
 
                   {/* Mobile Toggle */}
-                  <div className="md:hidden mt-2 pt-2 border-t border-[#12332B]/20">
+                  <div className="md:hidden mt-2 pt-2 border-t border-white/10">
                     <button
                       onClick={() => toggleMobileTranslation(para.id)}
-                      className="text-xs text-[#1A7368] font-bold flex items-center gap-1"
+                      className="text-xs text-[#F5D280] font-semibold flex items-center gap-1"
                     >
                       <span>{showVietnameseMobile[para.id] ? 'Ẩn bản dịch tiếng Việt' : 'Xem bản dịch tiếng Việt'}</span>
                       <ChevronRight className={`w-3.5 h-3.5 transform transition-transform ${showVietnameseMobile[para.id] ? 'rotate-90' : ''}`} />
                     </button>
                     {showVietnameseMobile[para.id] && (
-                      <p className="mt-2 text-xs text-[#4A635D] leading-relaxed bg-[#FAF6EE] p-3 rounded-[2px] border border-[#12332B]">
+                      <p className="mt-2 text-xs text-white/75 leading-relaxed bg-black/40 p-3 rounded-[12px] border border-white/10">
                         {para.vietnamese}
                       </p>
                     )}
@@ -271,38 +269,38 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
 
         {/* Interactive Vocab Tooltip Drawer */}
         {selectedVocab && (
-          <div className="border-t-2 border-[#12332B] bg-[#F8E9CF] p-5 shadow-2xl">
+          <div className="border-t border-white/20 bg-black/70 backdrop-blur-xl p-5 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-1">
-                  <span className="font-heading font-bold text-2xl text-[#12332B]">
+                  <span className="font-heading font-bold text-2xl text-[#FCE5B5]">
                     {selectedVocab.word}
                   </span>
-                  <span className="text-xs font-mono font-bold text-[#12332B] bg-[#FAF6EE] px-2 py-0.5 rounded-[2px] border border-[#12332B]">
+                  <span className="text-xs font-mono text-white/70 bg-white/10 px-2 py-0.5 rounded-full border border-white/15">
                     {selectedVocab.ipa}
                   </span>
-                  <span className="text-xs italic font-bold text-[#1A7368]">
+                  <span className="text-xs italic text-emerald-300">
                     ({selectedVocab.pos})
                   </span>
-                  <span className="dongho-tag bg-[#EAA22E] text-[#12332B] text-[10px]">
+                  <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 text-[10px] font-semibold">
                     Band {selectedVocab.level}
                   </span>
                   <button
                     onClick={() => speakText(selectedVocab.word)}
-                    className="p-1 rounded-[2px] border border-[#12332B] bg-[#FAF6EE] text-[#12332B] hover:bg-[#EAA22E] transition-all"
+                    className="p-1 rounded-full bg-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-all"
                     title="Phát âm từ này"
                   >
                     <Volume2 className="w-4 h-4" />
                   </button>
                 </div>
 
-                <p className="text-sm font-bold text-[#12332B] mb-2">
+                <p className="text-sm font-semibold text-white mb-2">
                   👉 {selectedVocab.vietnameseMeaning}
                 </p>
 
-                <div className="text-xs text-[#12332B] bg-[#FAF6EE] p-3 rounded-[2px] border border-[#12332B]">
-                  <strong className="text-[#1A7368]">Ngữ cảnh gốc:</strong>{' '}
+                <div className="text-xs text-white/80 bg-black/40 p-3 rounded-[12px] border border-white/10">
+                  <strong className="text-[#F5D280]">Ngữ cảnh gốc:</strong>{' '}
                   <span className="italic">"{selectedVocab.contextSentence}"</span>
                 </div>
               </div>
@@ -311,16 +309,16 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
               <div className="flex flex-col items-end gap-2 shrink-0">
                 <button
                   onClick={() => setSelectedVocab(null)}
-                  className="p-1 text-[#12332B] hover:text-[#E58396]"
+                  className="p-1 text-white/60 hover:text-white"
                 >
                   <X className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => toggleSaveVocab(selectedVocab.id)}
-                  className={`dongho-btn text-xs px-3 py-1.5 ${
+                  className={`btn-pill-primary text-xs px-3.5 py-1.5 ${
                     savedVocabIds.includes(selectedVocab.id)
-                      ? 'dongho-btn-primary'
-                      : 'dongho-btn-paper'
+                      ? 'bg-emerald-400 text-slate-950'
+                      : ''
                   }`}
                 >
                   {savedVocabIds.includes(selectedVocab.id) ? (
@@ -330,7 +328,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
                     </>
                   ) : (
                     <>
-                      <BookmarkCheck className="w-3.5 h-3.5 text-[#1A7368]" />
+                      <BookmarkCheck className="w-3.5 h-3.5" />
                       <span>Lưu ôn Flashcard</span>
                     </>
                   )}
@@ -342,27 +340,27 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
         )}
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t-2 border-[#12332B] bg-[#F8E9CF] flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#4A635D]">
+        <div className="px-6 py-4 border-t border-white/10 bg-black/40 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-xs text-white/60">
             <span>Đã đọc xong bài?</span>
             <span>•</span>
-            <span className="text-[#1A7368] font-bold">Chuyển sang ôn tập Flashcards hoặc viết cảm nghĩ</span>
+            <span className="text-[#F5D280] font-medium">Chuyển sang ôn tập Flashcards hoặc viết cảm nghĩ</span>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => onOpenFlashcards(lesson)}
-              className="dongho-btn dongho-btn-accent px-4 py-2.5 text-xs font-bold"
+              className="btn-pill-primary px-5 py-2.5 text-xs font-semibold"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>Ôn Flashcards 2 mặt ({lesson.vocabularies.length})</span>
+              <Sparkles className="w-4 h-4 text-[#18221E]" />
+              <span>Ôn Flashcards ({lesson.vocabularies.length})</span>
             </button>
 
             <button
               onClick={() => onOpenReflections(lesson)}
-              className="dongho-btn dongho-btn-paper px-4 py-2.5 text-xs font-bold"
+              className="btn-pill-glass px-5 py-2.5 text-xs font-medium"
             >
-              <MessageSquare className="w-4 h-4 text-[#1A7368]" />
+              <MessageSquare className="w-4 h-4 text-[#F5D280]" />
               <span>Viết Cảm Nghĩ (No-Judgment)</span>
             </button>
           </div>

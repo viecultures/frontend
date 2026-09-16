@@ -14,61 +14,61 @@ export const ProjectSpecsDrawer: React.FC<ProjectSpecsDrawerProps> = ({
 
   const designSpecs = [
     {
-      title: '1. Chất Nền Giấy Điệp (Texture & Ground)',
-      color: '#FAF6EE & #F8E9CF',
-      desc: 'Nền giấy quét bột vỏ sò điệp nếp, loại bỏ màu trắng công nghiệp để tạo cảm giác mộc bản cổ truyền ấm áp.',
-      tag: 'Bản sắc'
+      title: '1. Unboxed Layout (Bố Cục Mở)',
+      color: 'Loại bỏ viền đen hộp bao quanh',
+      desc: 'Chữ được giải phóng hoàn toàn, hiển thị trực tiếp trên nền tranh/video với hiệu ứng đổ bóng mờ cực mịn (text-shadow: 0 2px 14px rgba(0,0,0,0.5)).',
+      tag: 'Bố cục'
     },
     {
-      title: '2. Nét Khắc Than Tre (Woodblock Outlines)',
-      color: '#12332B (2px solid)',
-      desc: 'Viền đanh gọn dứt khoát như nhát dao khắc gỗ, bo góc rất nhẹ (2px - 4px), không bo tròn viên thuốc lạm dụng.',
-      tag: 'Nét khắc'
+      title: '2. Soft Organic Forms (Pill Shapes)',
+      color: 'border-radius: 9999px (Pill Shape)',
+      desc: 'Nút bấm, nhãn tag, ô tìm kiếm đều dùng bo tròn viên thuốc mềm mại, loại bỏ góc vuông cứng nhắc.',
+      tag: 'Hình thái'
     },
     {
-      title: '3. Bóng Đổ Cứng (Hard Cut-out Shadows)',
-      color: 'box-shadow: 4px 4px 0px #12332B',
-      desc: 'Bóng đổ dịch chuyển góc cứng mô phỏng các tấm mộc bản xếp chồng nhau khi in tranh.',
+      title: '3. Atmospheric Glassmorphism',
+      color: 'backdrop-filter: blur(16px)',
+      desc: 'Khối chức năng nổi sử dụng chất liệu kính mờ bán trong suốt kết hợp đường viền mảnh 1px tinh tế.',
       tag: 'Hiệu ứng'
     },
     {
-      title: '4. Mảng Màu Khoáng Thô (Flat Natural Pigments)',
-      color: 'Xanh Sơn Mài (#1A7368) • Hồng Sen (#E58396) • Vàng Hoa Hòe (#EAA22E)',
-      desc: 'Màu tự nhiên từ lá tre, dành dành, gỉ đồng và vỏ sò điệp tạo nên bảng màu dân gian rực rỡ.',
+      title: '4. Hệ Màu Đương Đại (Golden Sun & Jade Silk)',
+      color: 'Sungold Cream (#FCE5B5) • Deep Jade Glass (rgba(18,42,34,0.65))',
+      desc: 'Màu vàng nắng lúa chín ấm kết hợp xanh ngọc bích sẫm của tà áo dài trong tranh.',
       tag: 'Bảng màu'
     },
     {
-      title: '5. Typography Thống Nhất',
-      color: 'Cormorant Garamond & Be Vietnam Pro',
-      desc: 'Phông tiêu đề mô phỏng nét khắc cổ điển kết hợp phông chữ sans-serif quốc dân chuẩn tiếng Việt.',
+      title: '5. Typography Tạp Chí Cao Cấp',
+      color: 'Playfair Display & Plus Jakarta Sans',
+      desc: 'Phông tiêu đề serif thanh lịch cổ điển kết hợp phông sans-serif hiện đại tròn trịa êm mắt.',
       tag: 'Kiểu chữ'
     }
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-[#12332B]/75 backdrop-blur-sm">
-      <div className="w-full max-w-2xl h-full bg-[#FAF6EE] border-l-2 border-[#12332B] p-6 sm:p-8 flex flex-col justify-between overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/80 backdrop-blur-md">
+      <div className="w-full max-w-2xl h-full bg-[#0D1C18]/95 border-l border-white/15 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300">
         
         {/* Header */}
         <div>
-          <div className="flex items-center justify-between pb-6 border-b-2 border-[#12332B]">
+          <div className="flex items-center justify-between pb-6 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-[3px] bg-[#EAA22E] text-[#12332B] flex items-center justify-center border-2 border-[#12332B] shadow-[2px_2px_0px_#12332B]">
+              <span className="w-10 h-10 rounded-full bg-white/10 text-[#F5D280] flex items-center justify-center border border-white/15">
                 <FileText className="w-5 h-5" />
               </span>
               <div>
-                <span className="dongho-tag bg-[#E58396] text-[#12332B] text-[10px]">
+                <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[#FCE5B5] text-[10px] font-medium border border-white/15">
                   Tài Liệu Thiết Kế (DESIGN.MD)
                 </span>
-                <h2 className="font-heading text-2xl font-bold text-[#12332B]">
-                  Hệ Thống Giao Diện Đông Hồ Đương Đại
+                <h2 className="font-heading text-2xl font-bold text-white mt-1">
+                  Modern Heritage Editorial System
                 </h2>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="p-2 rounded-[3px] border border-[#12332B] bg-[#FAF6EE] text-[#12332B] hover:bg-[#E58396] transition-all"
+              className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
             >
               <X className="w-5 h-5" />
             </button>
@@ -76,36 +76,36 @@ export const ProjectSpecsDrawer: React.FC<ProjectSpecsDrawerProps> = ({
 
           {/* Description list */}
           <div className="py-6 space-y-4">
-            <p className="text-xs sm:text-sm text-[#4A635D] leading-relaxed">
-              Trang chủ được tái thiết kế tuân thủ nghiêm ngặt theo quy chuẩn <code className="px-2 py-0.5 rounded-[2px] bg-[#F8E9CF] text-[#12332B] border border-[#12332B] text-xs font-bold font-mono">document/design.md</code>:
+            <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-normal">
+              Trang chủ được tái thiết kế tuân thủ nghiêm ngặt theo quy chuẩn cập nhật trong <code className="px-2 py-0.5 rounded-full bg-white/10 text-[#FCE5B5] border border-white/15 text-xs font-mono">document/design.md</code>:
             </p>
 
             <div className="space-y-3">
               {designSpecs.map((item, idx) => (
-                <div key={idx} className="bg-[#FFFDF9] p-4 rounded-[3px] border-2 border-[#12332B] shadow-[3px_3px_0px_#12332B] space-y-1.5">
+                <div key={idx} className="bg-black/40 p-4 rounded-[16px] border border-white/10 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-heading font-bold text-base text-[#12332B]">
+                    <span className="font-heading font-bold text-base text-white">
                       {item.title}
                     </span>
-                    <span className="dongho-tag bg-[#F8E9CF] text-[#12332B] text-[10px]">
+                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-white/80 text-[10px] font-medium">
                       {item.tag}
                     </span>
                   </div>
-                  <p className="text-xs font-mono font-bold text-[#1A7368]">
+                  <p className="text-xs font-mono font-medium text-[#F5D280]">
                     {item.color}
                   </p>
-                  <p className="text-xs text-[#4A635D] leading-relaxed">
+                  <p className="text-xs text-white/70 leading-relaxed font-normal">
                     {item.desc}
                   </p>
                 </div>
               ))}
             </div>
 
-            <div className="p-4 rounded-[3px] bg-[#F8E9CF] border-2 border-[#12332B] text-[#12332B] text-xs space-y-1">
-              <strong className="block font-bold">✨ Tài Nguyên Đã Tích Hợp:</strong>
-              <p className="text-[#4A635D]">
+            <div className="p-4 rounded-[16px] bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs space-y-1">
+              <strong className="block font-semibold">✨ Tài Nguyên Đã Tích Hợp:</strong>
+              <p className="text-white/75 font-normal">
                 • Logo: <code>src/assets/logo/logo.jpg</code><br/>
-                • Video Banner: <code>src/assets/banner.webm</code><br/>
+                • Video Banner: <code>src/assets/banner.webm</code> (Toàn màn hình, không hiển thị trình độ)<br/>
                 • Hình ảnh tranh mộc bản &amp; di sản: <code>src/assets/pictures/</code>
               </p>
             </div>
@@ -113,10 +113,10 @@ export const ProjectSpecsDrawer: React.FC<ProjectSpecsDrawerProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="pt-6 border-t-2 border-[#12332B]">
+        <div className="pt-6 border-t border-white/10">
           <button
             onClick={onClose}
-            className="dongho-btn dongho-btn-primary w-full py-3 text-xs font-bold"
+            className="btn-pill-primary w-full py-3 text-xs font-semibold"
           >
             Đóng bảng quy chuẩn thiết kế
           </button>

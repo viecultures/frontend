@@ -2,125 +2,151 @@
 
 @layer base {
   :root {
-    --font-heading: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
-    --font-body: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
-    /* Dong Ho Folk Woodblock Theme Variables */
-    --color-primary: #1A7368;
-    --color-primary-hover: #13584F;
-    --color-secondary: #E58396;
-    --color-accent: #EAA22E;
-    --color-accent-gold: #D9A441;
-    --color-bg: #FAF6EE;
-    --color-bg-warm: #F8E9CF;
-    --color-surface: #FFFDF9;
-    --color-text-main: #12332B;
-    --color-text-muted: #4A635D;
-    --color-border: #12332B;
-    --shadow-color: #12332B;
-    --radius-woodcut: 4px;
-    --border-width: 2px;
+    /* Modern Heritage Editorial & Atmospheric Glassmorphism Tokens */
+    --radius-pill: 9999px;
+    --radius-card: 20px;
+    --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Theme Tokens */
+    --btn-primary-bg: #FCE5B5;
+    --btn-primary-text: #18221E;
+    --btn-primary-hover: #FFF0CE;
+
+    --btn-glass-bg: rgba(18, 42, 34, 0.65);
+    --btn-glass-text: #FFFFFF;
+    --btn-glass-border: rgba(255, 255, 255, 0.25);
+    --btn-glass-hover: rgba(26, 60, 48, 0.85);
+
+    --pill-tag-bg: rgba(0, 0, 0, 0.45);
+    --pill-tag-text: #F5E8C7;
+    --pill-tag-border: rgba(255, 255, 255, 0.15);
+
+    --text-hero-main: #FFFFFF;
+    --text-hero-sub: #F7E5C3;
+    --text-hero-desc: rgba(255, 255, 255, 0.88);
+
+    --color-page-base: #0D1C18;
+    --color-jade-deep: #112720;
+    --color-gold-accent: #E2A93B;
   }
 
   body {
     margin: 0;
     padding: 0;
     font-family: var(--font-body);
-    background-color: var(--color-bg);
-    color: var(--color-text-main);
+    background-color: var(--color-page-base);
+    color: var(--text-hero-main);
     overflow-x: hidden;
-    background-image: radial-gradient(#12332b08 1px, transparent 1px);
-    background-size: 24px 24px;
   }
 
   h1, h2, h3, .font-heading {
     font-family: var(--font-heading);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 }
 
-/* Woodblock Card & Components (Dong Ho Aesthetic) */
-.dongho-card {
-  background-color: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-woodcut);
-  box-shadow: 4px 4px 0px var(--color-border);
-  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+/* Atmospheric Glassmorphism Card */
+.glass-card {
+  background: rgba(18, 42, 34, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-card);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: var(--transition-smooth);
 }
 
-.dongho-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px var(--color-border);
+.glass-card:hover {
+  background: rgba(22, 52, 42, 0.75);
+  border-color: rgba(252, 229, 181, 0.35);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
 }
 
-/* Woodblock Stamp Button */
-.dongho-btn {
+/* Glass Pill Tag */
+.glass-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  background-color: var(--pill-tag-bg);
+  border: 1px solid var(--pill-tag-border);
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--pill-tag-text);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+.glass-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #E27941;
+  box-shadow: 0 0 8px rgba(226, 121, 65, 0.8);
+}
+
+/* Primary Pill Button (Sungold Cream) */
+.btn-pill-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 10px;
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   font-family: var(--font-body);
-  font-weight: 700;
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-woodcut);
-  box-shadow: 3px 3px 0px var(--color-border);
-  transition: all 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 13px 30px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  border: none;
   cursor: pointer;
-  user-select: none;
+  box-shadow: 0 4px 20px rgba(252, 229, 181, 0.25);
+  transition: var(--transition-smooth);
 }
 
-.dongho-btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0px var(--color-border);
+.btn-pill-primary:hover {
+  background-color: var(--btn-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(252, 229, 181, 0.4);
 }
 
-.dongho-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px var(--color-border);
-}
-
-.dongho-btn-primary {
-  background-color: var(--color-primary);
-  color: #FAF6EE;
-}
-
-.dongho-btn-primary:hover {
-  background-color: var(--color-primary-hover);
-}
-
-.dongho-btn-secondary {
-  background-color: var(--color-secondary);
-  color: #12332B;
-}
-
-.dongho-btn-accent {
-  background-color: var(--color-accent);
-  color: #12332B;
-}
-
-.dongho-btn-paper {
-  background-color: #FFFDF9;
-  color: #12332B;
-}
-
-.dongho-btn-paper:hover {
-  background-color: #F8E9CF;
-}
-
-/* Folk Stamp Badge / Tag */
-.dongho-tag {
+/* Secondary Glass Pill Button */
+.btn-pill-glass {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.25rem 0.65rem;
-  border: 1.5px solid var(--color-border);
-  border-radius: 2px;
-  box-shadow: 2px 2px 0px var(--color-border);
+  justify-content: center;
+  gap: 10px;
+  background-color: var(--btn-glass-bg);
+  color: var(--btn-glass-text);
+  border: 1px solid var(--btn-glass-border);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 13px 28px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: var(--transition-smooth);
 }
 
-/* 3D Flip Card Utilities for Flashcards */
+.btn-pill-glass:hover {
+  background-color: var(--btn-glass-hover);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* 3D Flip Card Utilities */
 .perspective-1000 {
   perspective: 1000px;
 }
@@ -138,37 +164,21 @@
   transform: rotateY(180deg);
 }
 
-/* Decorative woodcut border lines */
-.woodcut-divider {
-  height: 2px;
-  background-color: var(--color-border);
-  position: relative;
-}
-
-.woodcut-divider::after {
-  content: '❖';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--color-bg);
-  padding: 0 12px;
-  color: var(--color-primary);
-  font-size: 14px;
-}
-
-/* Scrollbar */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FAF6EE;
+  background: #0D1C18;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1A7368;
-  border: 1px solid #12332B;
-  border-radius: 2px;
+  background: #24483E;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A695B;
 }
