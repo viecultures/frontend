@@ -1,138 +1,137 @@
 import React from 'react';
-import { Sparkles, BookOpen, Volume2, ShieldCheck, ArrowRight, Award } from 'lucide-react';
-import bannerVideo from '../assets/banner.webm';
+import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { HERO_ASSETS } from '../assets';
 
 interface HeroBannerProps {
   onStartReading: () => void;
   onStartFlashcard: () => void;
   onOpenSpecs: () => void;
+  onScrollToExplore: () => void;
 }
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({
   onStartReading,
   onStartFlashcard,
+  onScrollToExplore,
 }) => {
   return (
-    <section id="hero" className="relative w-full min-h-[96vh] flex items-center justify-center overflow-hidden">
+    <section id="hero" className="relative w-full bg-[#FBF7EE] border-b border-[#E8DFCB] overflow-hidden">
       
-      {/* 1. Full-screen Video Background with Cinematic Atmospheric Overlay */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover scale-105 filter brightness-[0.78] contrast-[1.08] transition-transform duration-1000"
-        >
-          <source src={bannerVideo} type="video/webm" />
-          Trình duyệt của bạn không hỗ trợ video.
-        </video>
+      {/* Background Subtle Accent Gradients */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#BFE3EA]/30 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+      <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#F6EEDC] rounded-full blur-2xl pointer-events-none" />
 
-        {/* Multi-layer atmospheric gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0D1C18] via-[#0D1C18]/45 to-[#0D1C18]/60" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#0D1C18]/30 to-[#0D1C18]/80" />
-      </div>
-
-      {/* 2. Unboxed Center Hero Content (Modern Heritage Editorial Style) */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center flex flex-col items-center">
-        
-        {/* Soft Glass Pill Tag */}
-        <div className="glass-pill mb-6 animate-fade-in shadow-lg">
-          <span className="glass-pill-dot" />
-          <span>HỌC TIẾNG ANH QUA VĂN HÓA &amp; NGHỆ THUẬT VIỆT</span>
-        </div>
-
-        {/* Main Editorial Headline */}
-        <h1 className="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white leading-[1.12] tracking-tight mb-4 drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
-          Thưởng Lãm Văn Hóa &amp;{' '}
-          <span className="text-[#F5D280] italic font-normal">
-            Bản Sắc Việt
-          </span>
-        </h1>
-
-        {/* Editorial Subtitle */}
-        <p className="font-heading italic text-xl sm:text-2xl md:text-3xl text-[#F7E5C3] mb-6 drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] font-normal">
-          “Tự hào bản sắc – Tiếp thu tự nhiên – Tự do chia sẻ”
-        </p>
-
-        {/* Lead Description */}
-        <p className="max-w-2xl text-base sm:text-lg text-white/90 leading-relaxed font-normal mb-10 text-balance drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
-          Khám phá tiếng Anh học thuật qua Cố đô Huế, Tranh Đông Hồ, Bánh mì Sài Gòn và tà Áo dài truyền thống với{' '}
-          <strong className="text-[#FCE5B5] font-semibold">Luyện nghe Shadowing AI</strong>,{' '}
-          <strong className="text-[#F5D280] font-semibold">Flashcard Spaced Repetition</strong> và{' '}
-          <strong className="text-emerald-300 font-semibold">Không gian Cảm nghĩ an toàn</strong>.
-        </p>
-
-        {/* Dual Button Group (Pill Shape from Design.md) */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-16 w-full max-w-lg">
-          <button
-            onClick={onStartReading}
-            className="btn-pill-primary flex-1 min-w-[220px]"
-          >
-            <BookOpen className="w-4 h-4 text-[#18221E]" />
-            <span>Bắt Đầu Học Ngay</span>
-            <ArrowRight className="w-4 h-4 text-[#18221E]" />
-          </button>
-
-          <button
-            onClick={onStartFlashcard}
-            className="btn-pill-glass flex-1 min-w-[200px]"
-          >
-            <Sparkles className="w-4 h-4 text-[#F5D280]" />
-            <span>Khám Phá Flashcards</span>
-          </button>
-        </div>
-
-        {/* 3. Atmospheric Glassmorphism Metrics Bar on Banner */}
-        <div className="w-full max-w-5xl glass-card p-5 sm:p-7 backdrop-blur-xl border border-white/20">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 divide-y lg:divide-y-0 lg:divide-x divide-white/15">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          
+          {/* CỘT TRÁI: Hero Content (from design.md) */}
+          <div className="lg:col-span-7 space-y-6">
             
-            {/* Metric 1 */}
-            <div className="flex flex-col items-center justify-center p-2 text-center">
-              <div className="font-heading font-bold text-2xl sm:text-3xl text-[#FCE5B5] mb-0.5">
-                100% Gốc
-              </div>
-              <span className="text-xs sm:text-sm font-semibold text-white">Ngữ Cảnh Là Số 1</span>
-              <span className="text-[11px] text-white/70 mt-0.5">Từ vựng luôn gắn câu gốc</span>
+            {/* Pill Tag */}
+            <div className="glass-pill shadow-sm">
+              <span className="glass-pill-dot" />
+              <span>NỀN TẢNG HỌC TIẾNG ANH QUA DI SẢN VIỆT</span>
             </div>
 
-            {/* Metric 2: Trình Độ CEFR */}
-            <div className="flex flex-col items-center justify-center p-2 text-center pt-4 sm:pt-2">
-              <div className="font-heading font-bold text-2xl sm:text-3xl text-[#F5D280] mb-0.5 flex items-center gap-1">
-                <Award className="w-5 h-5 text-[#F5D280]" />
-                <span>4 Bands</span>
-              </div>
-              <span className="text-xs sm:text-sm font-semibold text-white">Chuẩn CEFR A2 - C1</span>
-              <span className="text-[11px] text-white/70 mt-0.5">Đa dạng cấp độ bài học</span>
+            {/* Brand Title (H1) */}
+            <h1 className="font-heading font-bold text-5xl sm:text-6xl lg:text-7xl text-[#1E4B43] leading-[1.08] tracking-tight">
+              VieCultures
+            </h1>
+
+            {/* Tagline */}
+            <p className="font-heading text-2xl sm:text-3xl text-[#2C2523] font-semibold tracking-tight">
+              Gom từng từ nhỏ, hiểu một Việt Nam lớn.
+            </p>
+
+            {/* Sub-tagline */}
+            <p className="text-base sm:text-lg text-[#6B635B] font-normal leading-relaxed max-w-xl">
+              Học tiếng Anh qua văn hóa Việt Nam – Tiếp thu từ vựng học thuật tự nhiên qua nếp sống, truyền thuyết, ẩm thực và danh lam cổ tích ba miền.
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <button
+                onClick={onScrollToExplore}
+                className="btn-pill-primary px-8 py-3.5 text-sm font-semibold flex items-center gap-2 shadow-md"
+              >
+                <span>Bắt đầu khám phá</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={onStartReading}
+                className="btn-pill-glass px-6 py-3.5 text-sm font-semibold flex items-center gap-2"
+              >
+                <BookOpen className="w-4 h-4 text-[#1E4B43]" />
+                <span>Đọc thử song ngữ</span>
+              </button>
             </div>
 
-            {/* Metric 3 */}
-            <div className="flex flex-col items-center justify-center p-2 text-center pt-4 sm:pt-2">
-              <div className="font-heading font-bold text-2xl sm:text-3xl text-emerald-300 mb-0.5 flex items-center gap-1">
-                <Volume2 className="w-5 h-5 text-emerald-300" />
-                <span>Shadowing AI</span>
+            {/* Widget Discover (Khám phá nhanh sổ từ vựng) */}
+            <div 
+              onClick={onStartFlashcard}
+              className="inline-flex items-center gap-3.5 px-4 py-3 bg-[#FDFBF7] border border-[#E8DFCB] rounded-[14px] shadow-[0_4px_16px_rgba(30,75,67,0.06)] hover:border-[#D9B76A] hover:shadow-md transition-all cursor-pointer group"
+              title="Mở bộ Flashcard từ vựng văn hóa"
+            >
+              <div className="w-10 h-10 rounded-lg bg-[#F6EEDC] border border-[#E8DFCB] flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
+                <span>📖</span>
               </div>
-              <span className="text-xs sm:text-sm font-semibold text-white">Phát Âm Bản Xứ</span>
-              <span className="text-[11px] text-white/70 mt-0.5">Luyện tai nghe từng câu</span>
-            </div>
-
-            {/* Metric 4 */}
-            <div className="flex flex-col items-center justify-center p-2 text-center pt-4 sm:pt-2">
-              <div className="font-heading font-bold text-2xl sm:text-3xl text-[#E58396] mb-0.5 flex items-center gap-1">
-                <ShieldCheck className="w-5 h-5 text-[#E58396]" />
-                <span>No-Judgment</span>
+              <div className="text-left">
+                <span className="block text-[11px] uppercase tracking-wider text-[#6B635B] font-semibold">
+                  Discover
+                </span>
+                <strong className="block text-sm text-[#1E4B43] font-bold">
+                  Khám phá sổ từ vựng &rarr;
+                </strong>
               </div>
-              <span className="text-xs sm:text-sm font-semibold text-white">Viết Tự Do An Toàn</span>
-              <span className="text-[11px] text-white/70 mt-0.5">Không chấm điểm áp lực</span>
             </div>
 
           </div>
-        </div>
 
+          {/* CỘT PHẢI: Hero Visual & Trích Dẫn Thi Pháp (from design.md) */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
+            
+            {/* Trích Dẫn Nghệ Thuật (Decorative Quote) */}
+            <div className="w-full text-center lg:text-right mb-[-12px] z-20 pr-4">
+              <span className="font-decorative text-2xl sm:text-3xl text-[#D9B76A] font-bold drop-shadow-sm select-none">
+                “Small words, wonderful worlds”
+              </span>
+            </div>
+
+            {/* Khung Tranh Minh Họa Chính (Hero Visual Frame) */}
+            <div className="w-full max-w-md aspect-[4/3] rounded-[20px] overflow-hidden border-2 border-[#E8DFCB] bg-[#FDFBF7] shadow-xl relative group">
+              <img
+                src={HERO_ASSETS.illustration}
+                alt="Minh họa người phụ nữ Việt Nam và hoa sen"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              
+              {/* Bottom Visual Gradient Overlay & Caption */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1E4B43]/85 via-transparent to-transparent" />
+              
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white">
+                <div className="flex items-center gap-1.5 font-medium">
+                  <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
+                  <span>Di sản &amp; Văn hóa Việt</span>
+                </div>
+                <span className="bg-black/35 backdrop-blur-sm px-2.5 py-0.5 rounded-full border border-white/20 text-[11px]">
+                  Tà Áo Dài &amp; Sen Hồng
+                </span>
+              </div>
+            </div>
+
+            {/* Ghi chú thông tin về asset */}
+            <div className="mt-3 text-center">
+              <span className="text-[11px] text-[#6B635B] italic">
+                Cảm hứng nghệ thuật: Phụ nữ Việt Nam, tà áo dài &amp; quốc hoa sen
+              </span>
+            </div>
+
+          </div>
+
+        </div>
       </div>
 
-      {/* Subtle bottom transition to page base */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0D1C18] to-transparent pointer-events-none" />
     </section>
   );
 };

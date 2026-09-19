@@ -2,43 +2,48 @@
 
 @layer base {
   :root {
-    --font-heading: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
-    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Core Cultural Color Tokens (from document/design.md) */
+    --bg-primary: #fbf7ee;
+    --bg-secondary: #f6eedc;
+    --bg-banner: #bfe3ea;
+    --bg-card: #fdfbf7;
+    --bg-card-sub: #9fced8;
 
-    /* Modern Heritage Editorial & Atmospheric Glassmorphism Tokens */
+    --color-primary: #3d6e70;
+    --color-primary-dark: #1e4b43;
+    --color-teal-mountain: #6e9fa1;
+    --color-accent-gold: #d9b76a;
+    --color-accent-pink: #e8b7b2;
+    --color-accent-red: #a33b2e;
+    --divider-color: #e8dfcb;
+
+    --text-main: #2c2523;
+    --text-muted: #6b635b;
+    --text-on-dark: #ffffff;
+
+    /* Typography */
+    --font-heading: 'Playfair Display', 'Lora', Georgia, serif;
+    --font-body: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-decorative: 'Dancing Script', cursive;
+
+    /* Spacing, Radius & Shadows */
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
     --radius-pill: 9999px;
-    --radius-card: 20px;
+
+    --shadow-soft: 0 4px 20px rgba(30, 75, 67, 0.08);
+    --shadow-card: 0 6px 24px rgba(44, 37, 35, 0.06);
+    --shadow-hover: 0 12px 32px rgba(30, 75, 67, 0.12);
     --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-
-    /* Theme Tokens */
-    --btn-primary-bg: #FCE5B5;
-    --btn-primary-text: #18221E;
-    --btn-primary-hover: #FFF0CE;
-
-    --btn-glass-bg: rgba(18, 42, 34, 0.65);
-    --btn-glass-text: #FFFFFF;
-    --btn-glass-border: rgba(255, 255, 255, 0.25);
-    --btn-glass-hover: rgba(26, 60, 48, 0.85);
-
-    --pill-tag-bg: rgba(0, 0, 0, 0.45);
-    --pill-tag-text: #F5E8C7;
-    --pill-tag-border: rgba(255, 255, 255, 0.15);
-
-    --text-hero-main: #FFFFFF;
-    --text-hero-sub: #F7E5C3;
-    --text-hero-desc: rgba(255, 255, 255, 0.88);
-
-    --color-page-base: #0D1C18;
-    --color-jade-deep: #112720;
-    --color-gold-accent: #E2A93B;
   }
 
   html, body {
     margin: 0;
     padding: 0;
     font-family: var(--font-body);
-    background-color: var(--color-page-base);
-    color: var(--text-hero-main);
+    background-color: var(--bg-primary);
+    color: var(--text-main);
     overflow-x: hidden;
     cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, auto;
   }
@@ -51,24 +56,46 @@
     font-family: var(--font-heading);
     letter-spacing: -0.015em;
   }
+
+  .font-decorative {
+    font-family: var(--font-decorative);
+  }
 }
 
-/* Atmospheric Glassmorphism Card */
+/* ==========================================================================
+   CARD & PAPER SURFACES
+   ========================================================================== */
+
+/* Heritage Paper Card */
+.heritage-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--divider-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+}
+
+.heritage-card:hover {
+  border-color: var(--color-accent-gold);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Glass Card with Warm Heritage Palette */
 .glass-card {
-  background: rgba(18, 42, 34, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-card);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: rgba(253, 251, 247, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(232, 223, 203, 0.85);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   transition: var(--transition-smooth);
 }
 
 .glass-card:hover {
-  background: rgba(22, 52, 42, 0.75);
-  border-color: rgba(252, 229, 181, 0.35);
-  transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-accent-gold);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
 }
 
 /* Glass Pill Tag */
@@ -77,81 +104,103 @@
   align-items: center;
   gap: 8px;
   padding: 6px 18px;
-  background-color: var(--pill-tag-bg);
-  border: 1px solid var(--pill-tag-border);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--divider-color);
   border-radius: var(--radius-pill);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: var(--pill-tag-text);
+  color: var(--color-primary-dark);
   font-family: var(--font-body);
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.4px;
 }
 
 .glass-pill-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background-color: #E27941;
-  box-shadow: 0 0 8px rgba(226, 121, 65, 0.8);
+  background-color: var(--color-accent-red);
+  box-shadow: 0 0 6px rgba(163, 59, 46, 0.4);
 }
 
-/* Primary Pill Button (Sungold Cream) */
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+/* Primary Pill Button (Heritage Jade) */
 .btn-pill-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background-color: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
+  background-color: var(--color-primary-dark);
+  color: var(--text-on-dark);
   font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 600;
-  padding: 13px 30px;
+  padding: 12px 28px;
   border-radius: var(--radius-pill);
   text-decoration: none;
   border: none;
   cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
-  box-shadow: 0 4px 20px rgba(252, 229, 181, 0.25);
+  box-shadow: var(--shadow-soft);
   transition: var(--transition-smooth);
 }
 
 .btn-pill-primary:hover {
-  background-color: var(--btn-primary-hover);
+  background-color: var(--color-primary);
   transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(252, 229, 181, 0.4);
+  box-shadow: 0 6px 22px rgba(30, 75, 67, 0.22);
 }
 
-/* Secondary Glass Pill Button */
+/* Secondary / Outline Pill Button */
 .btn-pill-glass {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background-color: var(--btn-glass-bg);
-  color: var(--btn-glass-text);
-  border: 1px solid var(--btn-glass-border);
+  background-color: var(--bg-secondary);
+  color: var(--color-primary-dark);
+  border: 1px solid var(--divider-color);
   font-family: var(--font-body);
   font-size: 0.95rem;
-  font-weight: 500;
-  padding: 13px 28px;
+  font-weight: 600;
+  padding: 12px 26px;
   border-radius: var(--radius-pill);
   text-decoration: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
   transition: var(--transition-smooth);
 }
 
 .btn-pill-glass:hover {
-  background-color: var(--btn-glass-hover);
-  border-color: rgba(255, 255, 255, 0.45);
+  background-color: #f1e4cb;
+  border-color: var(--color-accent-gold);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
-/* 3D Flip Card Utilities */
+/* Card Button */
+.btn-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--color-primary-dark);
+  border: 1px solid var(--color-primary-dark);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-card:hover {
+  background-color: var(--color-primary-dark);
+  color: var(--text-on-dark);
+}
+
+/* ==========================================================================
+   3D FLIP CARD UTILITIES
+   ========================================================================== */
 .perspective-1000 {
   perspective: 1000px;
 }
@@ -169,21 +218,23 @@
   transform: rotateY(180deg);
 }
 
-/* Custom Scrollbar */
+/* ==========================================================================
+   CUSTOM SCROLLBAR
+   ========================================================================== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0D1C18;
+  background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #24483E;
+  background: var(--color-teal-mountain);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3A695B;
+  background: var(--color-primary);
 }

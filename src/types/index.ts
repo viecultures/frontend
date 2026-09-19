@@ -2,11 +2,16 @@ export type CEFRLevel = 'A2' | 'B1' | 'B2' | 'C1';
 
 export type Category = 
   | 'all'
-  | 'heritage'      // Lịch sử & Di sản
-  | 'cuisine'       // Ẩm thực
-  | 'landscapes'    // Danh lam thắng cảnh
-  | 'festivals'     // Lễ hội & Nghệ thuật
-  | 'traditions';   // Đời sống & Truyền thống
+  | 'van-hoa'       // Nếp sống & văn hóa
+  | 'truyen-thuyet'  // Truyền thuyết
+  | 'am-thuc'       // Ẩm thực
+  | 'le-hoi'        // Lễ hội & sắc màu
+  // Legacy aliases
+  | 'heritage'
+  | 'cuisine'
+  | 'landscapes'
+  | 'festivals'
+  | 'traditions';
 
 export interface VocabItem {
   id: string;

@@ -1,18 +1,16 @@
 import type { Lesson, UserReflection } from '../types';
-import picHue from '../assets/pictures/1789477888834_3466390194730922005_g2285579428170464438_97fb29714b65f3e4f91196487a1510be.jpg';
-import picDongHo from '../assets/pictures/1789477897671_3466390194730922005_g2285579428170464438_208c3b16036482dde07954a98eba6f37.jpg';
-import picAoDai from '../assets/pictures/1789477908863_3466390194730922005_g2285579428170464438_43e95faf8835448ecde377e2b7447d69.jpg';
 
 export const MOCK_LESSONS: Lesson[] = [
+  // 1. Lễ hội & sắc màu
   {
     id: 'dong-ho-paintings',
     titleEn: 'Dong Ho Folk Woodcut Paintings: The Soul of Vietnamese Traditional Art',
     titleVi: 'Tranh Dân Gian Đông Hồ: Hồn Cốt Mỹ Thuật Mộc Bản Dân Tộc',
-    category: 'festivals',
-    categoryNameVi: 'Nghệ thuật & Dân gian',
+    category: 'le-hoi',
+    categoryNameVi: 'Lễ hội & sắc màu',
     level: 'B2',
     readTime: '4 phút đọc',
-    imageUrl: picDongHo,
+    imageUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=80',
     summary: 'Nét khắc than củi đanh gọn, màu khoáng từ điệp sò, hoa hòe và tro lá tre tạo nên bức tranh dân gian tràn đầy sức sống.',
     featured: true,
     totalReads: 1890,
@@ -84,66 +82,70 @@ export const MOCK_LESSONS: Lesson[] = [
       }
     ]
   },
+
+  // 2. Truyền thuyết
   {
-    id: 'hue-citadel',
-    titleEn: 'The Imperial Citadel of Hue: Architectural Grandeur & Royal Geomancy',
-    titleVi: 'Đại Nội Cố Đô Huế: Kỳ Quan Kiến Trúc Hoàng Thành & Phong Thủy Cung Đình',
-    category: 'heritage',
-    categoryNameVi: 'Lịch sử & Di sản',
-    level: 'B2',
+    id: 'ha-long-bay',
+    titleEn: 'Ha Long Bay: The Legend of Descending Dragons and Emerald Karsts',
+    titleVi: 'Vịnh Hạ Long: Huyền Tích Rồng Mẹ Giáng Thế Giữa Làn Nước Ngọc Bích',
+    category: 'truyen-thuyet',
+    categoryNameVi: 'Truyền thuyết',
+    level: 'B1',
     readTime: '4 phút đọc',
-    imageUrl: picHue,
-    summary: 'Sự kết hợp hoàn mỹ giữa phong thủy phương Đông, tường thành ngọ môn và sông Hương thơ mộng.',
-    totalReads: 2410,
-    likes: 680,
+    imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
+    summary: 'Hàng ngàn đảo đá vôi kỳ vĩ nhô lên giữa vịnh biển ngọc bích, bắt nguồn từ truyền thuyết đàn rồng phun châu ngọc bảo vệ bờ cõi.',
+    totalReads: 1780,
+    likes: 490,
     paragraphs: [
       {
         id: 1,
-        english: 'Nestled along the tranquil banks of the Perfume River, the Imperial Citadel of Hue stands as a monumental testament to the Nguyen Dynasty. Recognized as a UNESCO World Heritage site, this complex embodies the epitome of Vietnamese monarchical architecture.',
-        vietnamese: 'Tọa lạc bên bờ sông Hương êm đềm, Đại Nội Huế sừng sững như một minh chứng hoành tráng cho triều đại nhà Nguyễn. Được UNESCO công nhận là Di sản Thế giới, quần thể này là hiện thân đỉnh cao của kiến trúc hoàng gia Việt Nam.',
-        highlightWords: ['monumental', 'epitome', 'monarchical']
+        english: 'Featuring thousands of limestone karsts and isles rising dramatically from tranquil emerald waters, Ha Long Bay is steeped in ancient mythology. According to folklore, the Jade Emperor sent Mother Dragon and her offspring to help the Vietnamese defend their homeland from foreign invaders.',
+        vietnamese: 'Với hàng ngàn đảo đá vôi nhô lên sừng sững giữa làn nước ngọc bích phẳng lặng, Vịnh Hạ Long thấm đẫm các huyền tích cổ xưa. Theo truyền thuyết dân gian, Ngọc Hoàng đã phái Rồng Mẹ cùng đàn con hạ phàm giúp người Việt chống giặc ngoại xâm.',
+        highlightWords: ['limestone', 'mythology', 'folklore']
       },
       {
         id: 2,
-        english: 'The citadel is meticulously designed according to Eastern geomancy and Confucian principles. Its majestic ramparts and intricate moats once shielded the Forbidden Purple City.',
-        vietnamese: 'Kinh thành được thiết kế tỉ mỉ theo các nguyên lý phong thủy phương Đông và Nho giáo. Những tường thành uy nghiêm và hào nước tinh xảo từng che chở cho Tử Cấm Thành.',
-        highlightWords: ['geomancy', 'ramparts', 'intricate']
+        english: 'The dragons incinerated enemy vessels with divine fire and scattered emerald jewels that instantly metamorphosed into formidable island ramparts across the gulf.',
+        vietnamese: 'Đoàn rồng thiêu rụi thuyền giặc bằng ngọn lửa thần và nhả ra vô số ngọc châu, ngay lập tức hóa thành những hòn đảo trùng điệp như bức trường thành vững chãi bảo vệ bờ cõi.',
+        highlightWords: ['incinerated', 'metamorphosed', 'ramparts']
       }
     ],
     vocabularies: [
       {
-        id: 'v1',
-        word: 'monumental',
-        ipa: '/ˌmɒnjuˈmentl/',
-        pos: 'adjective',
-        vietnameseMeaning: 'Hoành tráng, vĩ đại, mang tầm vóc lịch sử',
-        contextSentence: 'The Imperial Citadel of Hue stands as a monumental testament to the Nguyen Dynasty.',
-        highlightedWordInContext: 'monumental',
+        id: 'v-hl1',
+        word: 'folklore',
+        ipa: '/ˈfəʊklɔː/',
+        pos: 'noun',
+        vietnameseMeaning: 'Văn hóa dân gian, truyền thuyết truyền miệng của cộng đồng',
+        contextSentence: 'According to Vietnamese folklore, the Jade Emperor sent dragons to defend the land.',
+        highlightedWordInContext: 'folklore',
         level: 'B2',
-        usageNote: 'Dùng mô tả các công trình di tích hoặc dấu mốc lịch sử to lớn.'
+        usageNote: 'Dùng khi nói về các câu chuyện thần thoại dân gian lưu truyền từ đời này sang đời khác.'
       },
       {
-        id: 'v2',
-        word: 'geomancy',
-        ipa: '/ˈdʒiːəmænsi/',
-        pos: 'noun',
-        vietnameseMeaning: 'Thuật phong thủy, xem thế đất và dòng nước',
-        contextSentence: 'The citadel is meticulously designed according to Eastern geomancy and Confucian principles.',
-        highlightedWordInContext: 'geomancy',
+        id: 'v-hl2',
+        word: 'metamorphosed',
+        ipa: '/ˌmetəˈmɔːfəʊzd/',
+        pos: 'verb',
+        vietnameseMeaning: 'Biến hóa, chuyển thể một cách kỳ diệu',
+        contextSentence: 'The jewels instantly metamorphosed into formidable limestone islands.',
+        highlightedWordInContext: 'metamorphosed',
         level: 'C1',
-        usageNote: 'Thuật ngữ học thuật chỉ nghệ thuật sắp đặt không gian hài hòa với tự nhiên.'
+        usageNote: 'Từ vựng cao cấp miêu tả sự biến đổi kỳ ảo trong huyền sử văn học.'
       }
     ]
   },
+
+  // 3. Nếp sống & văn hóa
   {
     id: 'vietnamese-ao-dai',
     titleEn: 'Vietnamese Ao Dai & Silk Heritage: The Graceful Silhouette of Tradition',
     titleVi: 'Tà Áo Dài & Lụa Tơ Tằm: Dáng Vẻ Thanh Lịch Của Tinh Thần Dân Tộc',
-    category: 'traditions',
-    categoryNameVi: 'Đời sống & Truyền thống',
+    category: 'van-hoa',
+    categoryNameVi: 'Nếp sống & văn hóa',
     level: 'B1',
     readTime: '3 phút đọc',
-    imageUrl: picAoDai,
+    imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80',
     summary: 'Tà áo dài lụa tơ tằm thướt tha hòa cùng sắc sen ngọc, biểu trưng cho vẻ đẹp kín đáo và kiêu hãnh của phụ nữ Việt.',
     totalReads: 1650,
     likes: 490,
@@ -186,16 +188,18 @@ export const MOCK_LESSONS: Lesson[] = [
       }
     ]
   },
+
+  // 4. Ẩm thực
   {
     id: 'saigon-banh-mi',
     titleEn: 'Saigon Banh Mi: A Culinary Juxtaposition of French Baguette & Vietnamese Flavors',
     titleVi: 'Bánh Mì Sài Gòn: Sự Kết Hợp Tinh Tế Giữa Baguette Pháp & Hương Vị Việt',
-    category: 'cuisine',
+    category: 'am-thuc',
     categoryNameVi: 'Ẩm thực',
     level: 'B1',
     readTime: '3 phút đọc',
     imageUrl: 'https://images.unsplash.com/photo-1626804475297-41608ea09aeb?auto=format&fit=crop&w=1200&q=80',
-    summary: 'Nét sáng tạo của ẩm thực đường phố biến chiếc bánh mì giòn rụm thành biểu tượng thế giới.',
+    summary: 'Nét sáng tạo của ẩm thực đường phố biến chiếc bánh mì giòn rụm thành biểu tượng văn hóa ẩm thực thế giới.',
     totalReads: 2150,
     likes: 620,
     paragraphs: [
@@ -237,24 +241,79 @@ export const MOCK_LESSONS: Lesson[] = [
       }
     ]
   },
+
+  // 5. Nếp sống & di sản (Hue Citadel)
+  {
+    id: 'hue-citadel',
+    titleEn: 'The Imperial Citadel of Hue: Architectural Grandeur & Royal Geomancy',
+    titleVi: 'Đại Nội Cố Đô Huế: Kỳ Quan Kiến Trúc Hoàng Thành & Phong Thủy Cung Đình',
+    category: 'van-hoa',
+    categoryNameVi: 'Nếp sống & văn hóa',
+    level: 'B2',
+    readTime: '4 phút đọc',
+    imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+    summary: 'Sự kết hợp hoàn mỹ giữa phong thủy phương Đông, tường thành ngọ môn và sông Hương thơ mộng.',
+    totalReads: 2410,
+    likes: 680,
+    paragraphs: [
+      {
+        id: 1,
+        english: 'Nestled along the tranquil banks of the Perfume River, the Imperial Citadel of Hue stands as a monumental testament to the Nguyen Dynasty. Recognized as a UNESCO World Heritage site, this complex embodies the epitome of Vietnamese monarchical architecture.',
+        vietnamese: 'Tọa lạc bên bờ sông Hương êm đềm, Đại Nội Huế sừng sững như một minh chứng hoành tráng cho triều đại nhà Nguyễn. Được UNESCO công nhận là Di sản Thế giới, quần thể này là hiện thân đỉnh cao của kiến trúc hoàng gia Việt Nam.',
+        highlightWords: ['monumental', 'epitome', 'monarchical']
+      },
+      {
+        id: 2,
+        english: 'The citadel is meticulously designed according to Eastern geomancy and Confucian principles. Its majestic ramparts and intricate moats once shielded the Forbidden Purple City.',
+        vietnamese: 'Kinh thành được thiết kế tỉ mỉ theo các nguyên lý phong thủy phương Đông và Nho giáo. Những tường thành uy nghiêm và hào nước tinh xảo từng che chở cho Tử Cấm Thành.',
+        highlightWords: ['geomancy', 'ramparts', 'intricate']
+      }
+    ],
+    vocabularies: [
+      {
+        id: 'v1',
+        word: 'monumental',
+        ipa: '/ˌmɒnjuˈmentl/',
+        pos: 'adjective',
+        vietnameseMeaning: 'Hoành tráng, vĩ đại, mang tầm vóc lịch sử',
+        contextSentence: 'The Imperial Citadel of Hue stands as a monumental testament to the Nguyen Dynasty.',
+        highlightedWordInContext: 'monumental',
+        level: 'B2',
+        usageNote: 'Dùng mô tả các công trình di tích hoặc dấu mốc lịch sử to lớn.'
+      },
+      {
+        id: 'v2',
+        word: 'geomancy',
+        ipa: '/ˈdʒiːəmænsi/',
+        pos: 'noun',
+        vietnameseMeaning: 'Thuật phong thủy, xem thế đất và dòng nước',
+        contextSentence: 'The citadel is meticulously designed according to Eastern geomancy and Confucian principles.',
+        highlightedWordInContext: 'geomancy',
+        level: 'C1',
+        usageNote: 'Thuật ngữ học thuật chỉ nghệ thuật sắp đặt không gian hài hòa với tự nhiên.'
+      }
+    ]
+  },
+
+  // 6. Lễ hội & sắc màu (Hoi An Ancient Town)
   {
     id: 'hoi-an-ancient-town',
-    titleEn: 'Hoi An Ancient Town: Lanterns, Wooden Bridges and Heritage Shop-houses',
-    titleVi: 'Phố Cổ Hội An: Đèn Lồng Sắc Màu, Chùa Cầu Cổ Kính & Phố Mái Ngêu Phong',
-    category: 'heritage',
-    categoryNameVi: 'Lịch sử & Di sản',
+    titleEn: 'Hoi An Lantern Heritage: Ancient Colors along the Hoai River',
+    titleVi: 'Phố Cổ Hội An: Đèn Lồng Sắc Màu, Chùa Cầu Cổ Kính & Phố Mái Rêu Phong',
+    category: 'le-hoi',
+    categoryNameVi: 'Lễ hội & sắc màu',
     level: 'A2',
     readTime: '3 phút đọc',
     imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
-    summary: 'Thương cảng thế kỷ 16 với những ngôi nhà tường vàng mái ngói âm dương rêu phong bên dòng sông Hoài.',
+    summary: 'Thương cảng thế kỷ 16 với những ngôi nhà tường vàng mái ngói âm dương và những đêm hội thả đèn hoa đăng lung linh.',
     totalReads: 980,
     likes: 215,
     paragraphs: [
       {
         id: 1,
-        english: 'Hoi An was a prominent Asian trading port from the 15th to the 19th century. Merchants from Japan, China, and Europe came here to exchange silk, spices, and ceramics.',
-        vietnamese: 'Hội An từng là một thương cảng sầm uất của châu Á từ thế kỷ 15 đến thế kỷ 19. Các thương nhân từ khắp nơi đã đến đây để trao đổi lụa tơ tằm, gia vị và gốm sứ.',
-        highlightWords: ['prominent', 'merchants', 'ceramics']
+        english: 'Hoi An was a prominent Asian trading port from the 15th to the 19th century. On the fourteenth night of every lunar month, the entire town extinguishes electric lights to illuminate thousands of handmade silk lanterns.',
+        vietnamese: 'Hội An từng là một thương cảng sầm uất của châu Á từ thế kỷ 15 đến thế kỷ 19. Vào đêm rằm hàng tháng, cả phố cổ tắt hết đèn điện để thắp sáng hàng ngàn chiếc đèn lồng lụa thủ công rực rỡ.',
+        highlightWords: ['prominent', 'illuminate', 'handmade']
       }
     ],
     vocabularies: [
@@ -270,40 +329,6 @@ export const MOCK_LESSONS: Lesson[] = [
         usageNote: 'Mô tả vị trí nổi bật của nhân vật hoặc địa danh lịch sử.'
       }
     ]
-  },
-  {
-    id: 'ha-long-bay',
-    titleEn: 'Ha Long Bay: The Legend of Descending Dragons and Emerald Karsts',
-    titleVi: 'Vịnh Hạ Long: Huyền Tích Rồng Mẹ Giáng Thế Giữa Làn Nước Ngọc Bích',
-    category: 'landscapes',
-    categoryNameVi: 'Danh lam thắng cảnh',
-    level: 'B1',
-    readTime: '4 phút đọc',
-    imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
-    summary: 'Hàng ngàn đảo đá vôi kỳ vĩ nhô lên giữa vịnh biển ngọc bích phẳng lặng.',
-    totalReads: 1780,
-    likes: 490,
-    paragraphs: [
-      {
-        id: 1,
-        english: 'Featuring thousands of limestone karsts and isles rising dramatically from tranquil emerald waters, Ha Long Bay is a mesmerizing natural wonder of Southeast Asia.',
-        vietnamese: 'Với hàng ngàn đảo đá vôi nhô lên sừng sững giữa làn nước ngọc bích phẳng lặng, Vịnh Hạ Long là một kỳ quan thiên nhiên kỳ vĩ của đất nước.',
-        highlightWords: ['limestone', 'dramatically', 'mesmerizing']
-      }
-    ],
-    vocabularies: [
-      {
-        id: 'v9',
-        word: 'mesmerizing',
-        ipa: '/ˈmezməraɪzɪŋ/',
-        pos: 'adjective',
-        vietnameseMeaning: 'Mê hoặc, cuốn hút lòng người',
-        contextSentence: 'Ha Long Bay is a mesmerizing natural wonder of Southeast Asia.',
-        highlightedWordInContext: 'mesmerizing',
-        level: 'B2',
-        usageNote: 'Từ gợi cảm xúc mạnh mẽ khi miêu tả cảnh quan thiên nhiên tráng lệ.'
-      }
-    ]
   }
 ];
 
@@ -315,7 +340,7 @@ export const MOCK_REFLECTIONS: UserReflection[] = [
     authorName: 'Mai Linh (Hà Nội)',
     authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
     authorLevel: 'B2',
-    content: 'Learning about Dong Ho folk woodcut aesthetics in English feels so rewarding! The word "quintessence" and "pigments" helped me describe how artisans use bamboo soot and scallop shells to create Diep paper. I love the folk woodblock design of this website!',
+    content: 'Learning about Dong Ho folk woodcut aesthetics in English feels so rewarding! The word "quintessence" and "pigments" helped me describe how artisans use bamboo soot and scallop shells to create Diep paper. I love the warm heritage editorial design of this website!',
     usedVocab: ['quintessence', 'aesthetics', 'pigments'],
     createdAt: '1 giờ trước',
     likes: 32,
@@ -340,7 +365,7 @@ export const MOCK_REFLECTIONS: UserReflection[] = [
     authorName: 'Phương Thảo (TP.HCM)',
     authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
     authorLevel: 'B1',
-    content: 'The 3D flashcards with original context sentences helped words like "quintessential" stick immediately in my mind. The woodblock stamp button style is so uniquely Vietnamese!',
+    content: 'The 3D flashcards with original context sentences helped words like "quintessential" stick immediately in my mind. The warm paper style feels like reading a classic book!',
     usedVocab: ['quintessential', 'enduring'],
     createdAt: 'Hôm qua',
     likes: 45
