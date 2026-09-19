@@ -101,8 +101,41 @@ export const ProjectSpecsDrawer: React.FC<ProjectSpecsDrawerProps> = ({
               ))}
             </div>
 
-            <div className="p-4 rounded-[16px] bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs space-y-1">
-              <strong className="block font-semibold">✨ Tài Nguyên Đã Tích Hợp:</strong>
+            <div className="p-4 rounded-[16px] bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs space-y-2">
+              <strong className="block font-semibold text-emerald-300">✨ Layout Wireframe Prototypes (Đã áp dụng):</strong>
+              <p className="text-white/75 font-normal">
+                Các trang HTML/CSS wireframe từ thư mục <code>layout/</code> đã được tích hợp vào dự án:
+              </p>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <a href="./layout/index.html" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-black/40 border border-white/10 hover:border-[#F5D280] text-[#FCE5B5] font-medium text-[11px] flex items-center justify-between">
+                  <span>Trang Chủ (Index)</span>
+                  <span>↗</span>
+                </a>
+                <a href="./layout/reader-1.html" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-black/40 border border-white/10 hover:border-[#F5D280] text-[#FCE5B5] font-medium text-[11px] flex items-center justify-between">
+                  <span>Reader Layout 1 (Dual)</span>
+                  <span>↗</span>
+                </a>
+                <a href="./layout/reader-2.html" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-black/40 border border-white/10 hover:border-[#F5D280] text-[#FCE5B5] font-medium text-[11px] flex items-center justify-between">
+                  <span>Reader Layout 2 (Classic)</span>
+                  <span>↗</span>
+                </a>
+                <a href="./layout/discovery.html" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-black/40 border border-white/10 hover:border-[#F5D280] text-[#FCE5B5] font-medium text-[11px] flex items-center justify-between">
+                  <span>Discovery Catalog</span>
+                  <span>↗</span>
+                </a>
+                <a href="./layout/flashcards.html" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-black/40 border border-white/10 hover:border-[#F5D280] text-[#FCE5B5] font-medium text-[11px] flex items-center justify-between">
+                  <span>3D Flashcards</span>
+                  <span>↗</span>
+                </a>
+                <a href="./layout/community.html" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-black/40 border border-white/10 hover:border-[#F5D280] text-[#FCE5B5] font-medium text-[11px] flex items-center justify-between">
+                  <span>Community Page</span>
+                  <span>↗</span>
+                </a>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-[16px] bg-black/40 border border-white/10 text-xs space-y-1">
+              <strong className="block font-semibold text-white">✨ Tài Nguyên Đã Tích Hợp:</strong>
               <p className="text-white/75 font-normal">
                 • Logo: <code>src/assets/logo/logo.jpg</code><br/>
                 • Video Banner: <code>src/assets/banner.webm</code> (Toàn màn hình, không hiển thị trình độ)<br/>

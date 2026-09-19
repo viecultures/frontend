@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Themed Challenge - VN Culture Reader Layout</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .contest-hero-card {
+      background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+      color: white;
+      border-radius: var(--radius-md);
+      padding: 40px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .contest-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #c8b2a1;
+      color: #111827;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    .contest-title {
+      font-family: var(--font-serif);
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+
+    .prize-pool-box {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      padding: 18px 22px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 24px 0;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .gamification-pill {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .contest-entry-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .contest-entry-card:hover {
+      border-color: var(--color-border-dark);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .rank-tag {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .rank-tag.rank-1 {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .rank-tag.rank-2 {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+    }
+
+    .rank-tag.rank-3 {
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #ffedd5;
+    }
+
+    .vote-btn {
+      background: #ffffff;
+      border: 2px solid var(--color-border-dark);
+      color: var(--color-text-main);
+      padding: 10px 18px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .vote-btn:hover {
+      background: #fef2f2;
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+
+    .vote-btn.voted {
+      background: #dc2626;
+      border-color: #dc2626;
+      color: white;
+    }
+
+    .editor-card {
+      background: white;
+      border: 2px solid var(--color-border-dark);
+      padding: 28px;
+      margin-bottom: 36px;
+      display: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Gamification Shop Item Card */
+    .shop-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .shop-item-row:last-child {
+      border-bottom: none;
+    }
+
+    /* Floating Action Button (+ Submit Entry) */
+    .fab-create {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--color-border-dark);
+      color: white;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .fab-create:hover {
+      transform: scale(1.08);
+      background: var(--color-button-bg);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">VN Culture Reader</a>
+
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="discovery.html" class="nav-link">Discovery</a>
+        <!-- Reader Dropdown Menu -->
+        <div class="nav-item-dropdown">
+          <a href="reader-1.html" class="nav-link">Reader ▾</a>
+          <div class="dropdown-menu">
+            <a href="reader-1.html" class="dropdown-item">📖 Layout 1: Dual Book Card View</a>
+            <a href="reader-2.html" class="dropdown-item">📄 Layout 2: Classic Stacked View</a>
+          </div>
+        </div>
+        <a href="flashcards.html" class="nav-link">Flashcards</a>
+        <!-- Community Dropdown Menu -->
+        <div class="nav-item-dropdown">
+          <a href="community-2.html" class="nav-link active">Community ▾</a>
+          <div class="dropdown-menu">
+            <a href="community.html" class="dropdown-item">💬 Community 1: Member Reflections</a>
+            <a href="community-2.html" class="dropdown-item">🎯 Community 2: Weekly Topic Challenge</a>
+          </div>
+        </div>
+      </nav>
+
+      <div class="header-actions">
+        <div style="font-size: 13px; font-weight: 700; background: #ffffff; padding: 6px 14px; border: 1px solid var(--color-border-dark); border-radius: 9999px; display: inline-flex; align-items: center; gap: 6px;">
+          <span>💎 450 Xu</span> | <span>⚡ Lv.4 Sứ Giả</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="container" style="padding-top: 30px;">
+
+      <!-- ==========================================================================
+           WEEKLY THEMED CHALLENGE BANNER (Gamified Prompt Spotlight)
+           ========================================================================== -->
+      <div class="contest-hero-card">
+        <div class="contest-badge">
+          <span>🎯 THỬ THÁCH VIẾT THEO CHỦ ĐỀ • TUẦN 14/2026</span>
+        </div>
+        <h1 class="contest-title">Chủ Đề Tuần Này: "Kiến Trúc & Di Sản Cố Đô Huế"<br><span style="font-size: 22px; font-weight: 400; opacity: 0.85;">(Imperial Hue Architecture & Heritage Challenge)</span></h1>
+        <p style="font-size: 16px; opacity: 0.9; max-width: 780px; line-height: 1.6;">
+          Viết bài viết ngắn (100 - 300 từ) bằng tiếng Anh chia sẻ góc nhìn hoặc kỷ niệm của bạn về di sản Huế, ứng dụng ít nhất 3 từ vựng vừa học để tích lũy <strong>Xu Văn Hóa 💎</strong> và mở khóa tính năng độc quyền!
+        </p>
+
+        <!-- Gamification Rewards Box -->
+        <div class="prize-pool-box">
+          <div>
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; opacity: 0.8;">🎁 Phần thưởng Gamification tuần này:</span>
+            <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+              <span class="gamification-pill">💎 +100 Xu cho bài tham gia</span>
+              <span class="gamification-pill">💎 +500 Xu cho Top 3 bài hay nhất</span>
+              <span class="gamification-pill">🎖️ Huy hiệu "Sứ Giả Cố Đô"</span>
+            </div>
+          </div>
+          <div>
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; opacity: 0.8;">⏱️ Thời gian chủ đề tuần:</span>
+            <div style="font-size: 15px; font-weight: 700; color: #ffffff; margin-top: 4px;">
+              Còn 04 ngày để gửi bài & tích xu
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+          <button onclick="toggleContestForm()" class="btn-cta" style="padding: 14px 28px; font-size: 15px; background: #c8b2a1; color: #111827; border: none; font-weight: 700;">
+            ✍️ + Viết Bài Tham Gia (Nhận ngay +100 Xu 💎)
+          </button>
+          <a href="#gamification-shop" class="btn-outline" style="padding: 14px 24px; font-size: 15px; color: white; border-color: rgba(255,255,255,0.4);">
+            🛍️ Đổi Xu Mở Khóa Chức Năng
+          </a>
+        </div>
+      </div>
+
+
+      <!-- ==========================================================================
+           SUBMIT ENTRY FORM (Hidden by default, toggles open)
+           ========================================================================== -->
+      <div id="create-contest-entry" class="editor-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 14px;">
+          <div>
+            <span style="font-size: 12px; font-weight: 700; color: #059669; text-transform: uppercase;">🎁 Viết bài hoàn thành nhận ngay +100 Xu 💎</span>
+            <h2 style="font-family: var(--font-serif); font-size: 24px; font-weight: 700;">Gửi Bài Viết Theo Chủ Đề Tuần Này</h2>
+          </div>
+          <button onclick="toggleContestForm()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--color-text-muted); font-weight: 700;">✕</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">Góc nhìn bài viết:</label>
+            <select style="width: 100%; padding: 12px; border: 1px solid var(--color-border); font-family: var(--font-sans); font-size: 14px;">
+              <option>🏛️ Cảm Nhận Kiến Trúc & Di Sản (Architecture & Heritage)</option>
+              <option>📸 Kỷ Niệm Chuyến Đi & Ảnh Đẹp (Travel Photo Story)</option>
+              <option>🏮 Lịch Sử & Lễ Hội Cố Đô (History & Customs)</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">Tiêu đề bài viết:</label>
+            <input type="text" placeholder="Nhập tiêu đề cho bài viết của bạn..." style="width: 100%; padding: 12px; border: 1px solid var(--color-border); font-family: var(--font-sans); font-size: 14px;">
+          </div>
+        </div>
+
+        <!-- Vocab Checklist -->
+        <div style="margin-bottom: 16px; background: var(--color-surface); padding: 14px; border: 1px solid var(--color-border); border-radius: 6px;">
+          <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); display: block; margin-bottom: 8px;">
+            Đánh dấu các từ vựng bạn đưa vào bài (Ứng dụng 3+ từ để nhận thưởng Xu):
+          </span>
+          <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; font-weight: 600;">
+            <label><input type="checkbox" checked> architectural</label>
+            <label><input type="checkbox" checked> intangible</label>
+            <label><input type="checkbox"> promulgated</label>
+            <label><input type="checkbox" checked> fortress</label>
+            <label><input type="checkbox"> geomancy</label>
+          </div>
+        </div>
+
+        <!-- Textarea -->
+        <textarea id="contest-textarea" placeholder="Chia sẻ suy nghĩ hoặc câu chuyện của bạn bằng tiếng Anh..." style="width: 100%; height: 150px; padding: 16px; border: 1px solid var(--color-border); font-family: var(--font-sans); font-size: 15px; margin-bottom: 16px; resize: vertical; outline: none;"></textarea>
+
+        <!-- Optional Photo Attachment -->
+        <div class="img-placeholder img-placeholder-sm" style="height: 100px; margin-bottom: 20px; font-size: 0.95rem; border: 2px dashed var(--color-border); background: #fafafa;">
+          📸 Đính kèm hình ảnh di sản hoặc kỷ niệm của bạn (Tùy chọn)
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 12px; color: var(--color-text-subtle);">🌟 Không áp lực ngữ pháp • Khuyến khích thực hành từ vựng tự nhiên</span>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn-outline" onclick="toggleContestForm()">Hủy</button>
+            <button class="btn-cta" onclick="submitContestEntry()">🚀 Đăng Bài (+100 Xu 💎)</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ==========================================================================
+           COMMUNITY SHOWCASE FEED & GAMIFICATION SIDEBAR
+           ========================================================================== -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <h2 class="section-title" style="font-size: 26px; margin-bottom: 0;">Bài Viết Nổi Bật Theo Chủ Đề Tuần Này</h2>
+
+        <!-- Filter Tabs -->
+        <div style="display: flex; gap: 8px; background: #f3f4f6; padding: 4px; border-radius: 8px; border: 1px solid var(--color-border);">
+          <button class="mode-tab-btn active" style="padding: 6px 14px; font-size: 13px;">🔥 Yêu Thích Nhất</button>
+          <button class="mode-tab-btn" style="padding: 6px 14px; font-size: 13px;">⭐ Bài Mới Đăng</button>
+          <button class="mode-tab-btn" style="padding: 6px 14px; font-size: 13px;">🎖️ Top Sứ Giả Tuần</button>
+        </div>
+      </div>
+
+      <!-- Main Layout: 2/3 Entries List + 1/3 Gamification Shop & Milestones Sidebar -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+
+        <!-- Left: Topic Submissions -->
+        <div>
+
+          <!-- Entry 1 (Top Voted) -->
+          <div class="contest-entry-card">
+            <span class="rank-tag rank-1">🏆 TOP 1 CHỦ ĐỀ • 💎 +500 XU</span>
+
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+              <div class="img-placeholder img-placeholder-sm" style="width: 44px; height: 44px; min-height: 44px; border-radius: 50%; font-size: 0.8rem;">
+                AVATAR
+              </div>
+              <div>
+                <h4 style="font-size: 15px; font-weight: 700;">Trần Thanh Thảo <span style="font-size: 12px; color: #d97706;">🎖️ Sứ Giả Cố Đô</span></h4>
+                <span style="font-size: 12px; color: var(--color-text-subtle);">Thành viên tích cực • Huế, Việt Nam</span>
+              </div>
+            </div>
+
+            <h3 style="font-family: var(--font-serif); font-size: 20px; font-weight: 700; margin-bottom: 10px;">
+              "Ngo Mon Gate: Architectural Masterpiece of Imperial Hue"
+            </h3>
+
+            <p style="font-size: 15px; line-height: 1.7; color: var(--color-text-main); margin-bottom: 16px;">
+              Walking through Ngo Mon Gate, I felt the magnificent <strong style="border-bottom: 1px solid #000;">architectural</strong> harmony calculated by royal builders. The gate stands as a symbol of <strong style="border-bottom: 1px solid #000;">intangible</strong> pride passed down to generations...
+            </p>
+
+            <div class="img-placeholder" style="height: 250px; margin-bottom: 16px; font-size: 1.2rem;">
+              600X300 - User Photo: Ngo Mon Gate Sunrise
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding-top: 14px;">
+              <button class="vote-btn" onclick="voteEntry(this, 142)">
+                <span>❤️ Thả Tim Thích Bài</span>
+                <strong class="vote-count">(142)</strong>
+              </button>
+              <div style="font-size: 13px; color: var(--color-text-muted); display: flex; gap: 16px;">
+                <span>💬 28 Bình luận</span>
+                <span>🎁 +100 Xu Tích Lũy</span>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Entry 2 -->
+          <div class="contest-entry-card">
+            <span class="rank-tag rank-2">🥈 TOP 2 CHỦ ĐỀ • 💎 +300 XU</span>
+
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+              <div class="img-placeholder img-placeholder-sm" style="width: 44px; height: 44px; min-height: 44px; border-radius: 50%; font-size: 0.8rem;">
+                AVATAR
+              </div>
+              <div>
+                <h4 style="font-size: 15px; font-weight: 700;">Kenji Sato</h4>
+                <span style="font-size: 12px; color: var(--color-text-subtle);">Người học quốc tế • Tokyo, Japan</span>
+              </div>
+            </div>
+
+            <h3 style="font-family: var(--font-serif); font-size: 20px; font-weight: 700; margin-bottom: 10px;">
+              "Discovering Ancient Craftsmen of Old Citadel"
+            </h3>
+
+            <p style="font-size: 15px; line-height: 1.7; color: var(--color-text-main); margin-bottom: 16px;">
+              Ancient artisans <strong style="border-bottom: 1px solid #000;">promulgated</strong> traditional wood carving skills. They preserved a living <strong style="border-bottom: 1px solid #000;">fortress</strong> of Vietnamese art heritage...
+            </p>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding-top: 14px;">
+              <button class="vote-btn" onclick="voteEntry(this, 98)">
+                <span>❤️ Thả Tim Thích Bài</span>
+                <strong class="vote-count">(98)</strong>
+              </button>
+              <div style="font-size: 13px; color: var(--color-text-muted); display: flex; gap: 16px;">
+                <span>💬 14 Bình luận</span>
+                <span>🎁 +100 Xu Tích Lũy</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        <!-- Right Sidebar: Gamification Shop & Rewards -->
+        <div>
+
+          <!-- Gamification Shop Widget -->
+          <div id="gamification-shop" class="layout-card" style="padding: 20px; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <h3 class="card-title" style="font-size: 16px; margin: 0;">🛍️ Cửa Hàng Xu & Đổi Quà</h3>
+              <span style="font-size: 12px; font-weight: 700; color: #059669;">Ví: 💎 450 Xu</span>
+            </div>
+
+            <div class="shop-item-row">
+              <div>
+                <div style="font-size: 14px; font-weight: 700;">🎧 Mở Khóa Giọng Đọc AI Premium</div>
+                <div style="font-size: 12px; color: var(--color-text-muted);">Giọng đọc bản ngữ chuẩn Anh - Mỹ</div>
+              </div>
+              <button class="btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="redeemShop('Giọng Đọc Premium', 300)">💎 300 Xu</button>
+            </div>
+
+            <div class="shop-item-row">
+              <div>
+                <div style="font-size: 14px; font-weight: 700;">🎨 Giao Diện Đọc Sách Cổ Điển</div>
+                <div style="font-size: 12px; color: var(--color-text-muted);">Theme giấy da ngà vintage cho Reader</div>
+              </div>
+              <button class="btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="redeemShop('Giao Diện Paper Theme', 400)">💎 400 Xu</button>
+            </div>
+
+            <div class="shop-item-row">
+              <div>
+                <div style="font-size: 14px; font-weight: 700;">🎖️ Huy Hiệu "Cây Bút Di Sản"</div>
+                <div style="font-size: 12px; color: var(--color-text-muted);">Huy hiệu đặc biệt hiển thị trên Profile</div>
+              </div>
+              <button class="btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="redeemShop('Huy hiệu Cây Bút Di Sản', 200)">💎 200 Xu</button>
+            </div>
+          </div>
+
+          <!-- Milestones & Weekly Topics Progress -->
+          <div class="layout-card" style="padding: 20px; margin-bottom: 24px;">
+            <h3 class="card-title" style="font-size: 16px; margin-bottom: 12px;">🎯 Nhiệm Vụ & Cột Mốc Tích Xu</h3>
+            <ul style="list-style: none; font-size: 13px; color: var(--color-text-muted);">
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
+                <span>✍️ Viết 1 bài theo chủ đề tuần</span>
+                <strong style="color: #059669;">+100 Xu 💎</strong>
+              </li>
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
+                <span>❤️ Bài viết đạt 10+ lượt thích</span>
+                <strong style="color: #059669;">+150 Xu 💎</strong>
+              </li>
+              <li style="padding: 8px 0; display: flex; justify-content: space-between; align-items: center;">
+                <span>🔥 Tham gia 4 tuần liên tiếp</span>
+                <strong style="color: #d97706;">+500 Xu & Badge 🎖️</strong>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Floating Action Button (+ Write Post) -->
+  <button class="fab-create" onclick="toggleContestForm()" title="Viết bài tham gia thử thách tuần">
+    ✍️
+  </button>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 VN Culture Reader. Gamified Weekly Themed Writing Challenge Layout.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleContestForm() {
+      const form = document.getElementById('create-contest-entry');
+      if (form.style.display === 'block') {
+        form.style.display = 'none';
+      } else {
+        form.style.display = 'block';
+        form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function submitContestEntry() {
+      const text = document.getElementById('contest-textarea').value.trim();
+      if (text === '') {
+        alert('Vui lòng nhập nội dung bài viết của bạn!');
+        return;
+      }
+      alert('🎉 Chúc mừng! Bạn đã hoàn thành thử thách viết bài tuần này và nhận ngay +100 Xu Văn Hóa 💎!');
+      document.getElementById('contest-textarea').value = '';
+      toggleContestForm();
+    }
+
+    function voteEntry(btn, initialCount) {
+      if (!btn.classList.contains('voted')) {
+        btn.classList.add('voted');
+        const countSpan = btn.querySelector('.vote-count');
+        countSpan.innerText = '(' + (initialCount + 1) + ')';
+        btn.querySelector('span').innerText = '❤️ Đã Thích';
+        alert('❤️ Bạn đã thích bài viết này! Người viết nhận được +5 Xu thưởng.');
+      } else {
+        btn.classList.remove('voted');
+        const countSpan = btn.querySelector('.vote-count');
+        countSpan.innerText = '(' + initialCount + ')';
+        btn.querySelector('span').innerText = '❤️ Thả Tim Thích Bài';
+      }
+    }
+
+    function redeemShop(itemName, cost) {
+      alert(`🎉 Đổi thành công "${itemName}" với ${cost} Xu 💎! Tính năng đã được mở khóa cho tài khoản của bạn.`);
+    }
+  </script>
+
+</body>
+
+</html>
