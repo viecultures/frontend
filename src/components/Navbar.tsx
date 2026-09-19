@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Sparkles, FileText, Compass, Layout, MessageSquare, Trophy, Layers } from 'lucide-react';
+import { BookOpen, Sparkles, FileText, Compass, Layout, MessageSquare, Trophy, Layers, Home, User } from 'lucide-react';
 import logoImg from '../assets/logo/logo.jpg';
 
 interface NavbarProps {
@@ -24,7 +24,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Brand Logo & Editorial Identity */}
           <div
             className="flex items-center gap-3.5 cursor-pointer group"
-            onClick={() => onNavigateToSection('hero')}
+            onClick={() => onNavigateToSection('landing')}
           >
             <div className="relative w-11 h-11 rounded-full border border-white/25 overflow-hidden bg-white shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
               <img
@@ -46,13 +46,23 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Center Main Nav matching Wireframe Specification */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-white/85">
-            {/* 1. Home */}
+          <nav className="hidden lg:flex items-center gap-4 text-xs font-semibold uppercase tracking-wider text-white/85">
+            {/* 0. Landing */}
             <button
-              onClick={() => onNavigateToSection('hero')}
+              onClick={() => onNavigateToSection('landing')}
+              className={`transition-colors py-2 px-3 rounded-lg flex items-center gap-1.5 ${activeView === 'landing' ? 'text-[#FCE5B5] bg-white/10 font-bold border-b-2 border-[#FCE5B5]' : 'hover:text-[#FCE5B5]'
+                }`}
+            >
+              <span>Landing</span>
+            </button>
+
+            {/* 1. Home Dashboard */}
+            <button
+              onClick={() => onNavigateToSection('home')}
               className={`transition-colors py-2 px-3 rounded-lg flex items-center gap-1.5 ${activeView === 'home' ? 'text-[#FCE5B5] bg-white/10 font-bold border-b-2 border-[#FCE5B5]' : 'hover:text-[#FCE5B5]'
                 }`}
             >
+              <Home className="w-4 h-4 text-[#F5D280]" />
               <span>Home</span>
             </button>
 
@@ -168,6 +178,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => onNavigateToSection('login')}
+              className={`btn-pill-primary text-xs px-3.5 py-2 flex items-center gap-1.5 ${
+                activeView === 'login' ? 'ring-2 ring-[#FCE5B5]' : ''
+              }`}
+            >
+              <User className="w-4 h-4 text-[#18221E]" />
+              <span>Login</span>
+            </button>
             <a
               href="./layout/index.html"
               target="_blank"

@@ -15,6 +15,8 @@ import CommunityPage from './pages/CommunityPage';
 import CommunityContestPage from './pages/CommunityContestPage';
 import FlashcardStudyPage from './pages/FlashcardStudyPage';
 import BilingualReaderPage from './pages/BilingualReaderPage';
+import LoginPage from './pages/LoginPage';
+import HomePage from './pages/HomePage';
 
 import { MOCK_LESSONS } from './data/mockData';
 import type { Lesson, Category, CEFRLevel } from './types';
@@ -63,8 +65,14 @@ export function App() {
   const featuredLesson = MOCK_LESSONS[0]; // Dong Ho Folk Woodcut Paintings
 
   const handleNavigate = (sectionId: string) => {
-    if (sectionId === 'hero') {
+    if (sectionId === 'hero' || sectionId === 'landing') {
+      setActiveView('landing');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (sectionId === 'home') {
       setActiveView('home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (sectionId === 'login') {
+      setActiveView('login');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (sectionId === 'discovery') {
       setActiveView('discovery');
@@ -87,21 +95,30 @@ export function App() {
   return (
     <div className="min-h-screen bg-[#0D1C18] text-white flex flex-col selection:bg-[#FCE5B5] selection:text-[#18221E]">
       
-      {/* 1. Floating Glass Navbar */}
-      <Navbar
-        activeView={activeView}
-        onOpenDocs={() => setIsSpecsDrawerOpen(true)}
-        onNavigateToSection={handleNavigate}
-      />
+      {/* 1. Floating Glass Navbar (Hidden on Home & Login pages) */}
+      {activeView !== 'login' && activeView !== 'home' && (
+        <Navbar
+          activeView={activeView}
+          onOpenDocs={() => setIsSpecsDrawerOpen(true)}
+          onNavigateToSection={handleNavigate}
+        />
+      )}
 
       {/* View Switcher */}
+      {activeView === 'home' && <HomePage onNavigate={handleNavigate} />}
+      {activeView === 'login' && (
+        <LoginPage
+          onLoginSuccess={() => handleNavigate('home')}
+          onNavigate={handleNavigate}
+        />
+      )}
       {activeView === 'discovery' && <DiscoveryPage />}
       {activeView === 'community-1' && <CommunityPage />}
       {activeView === 'community-2' && <CommunityContestPage />}
       {activeView === 'flashcard-study' && <FlashcardStudyPage />}
       {activeView === 'bilingual-reader' && <BilingualReaderPage />}
 
-      {activeView === 'home' && (
+      {activeView === 'landing' && (
         <>
           {/* 2. Hero Section with Full-Screen Video Banner */}
           <HeroBanner
