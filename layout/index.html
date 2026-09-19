@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VN Culture Reader - Landing Page Layout</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">VN Culture Reader</a>
+
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link active">Landing</a>
+        <a href="home.html" class="nav-link">Home</a>
+        <a href="#featured-articles" class="nav-link">Top Articles</a>
+        <a href="#topics" class="nav-link">4 Topics</a>
+        <a href="#trusted-community" class="nav-link">Ambassadors</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <a href="login.html" class="nav-link">Login</a>
+        <a href="discovery.html" class="btn-cta">Bắt Đầu Học Miễn Phí</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- 1. HERO BANNER SECTION (Full Screen Size with Text Layer Overlay) -->
+    <section class="hero-full-screen">
+      <!-- Full Screen Background Image Placeholder -->
+      <div class="hero-bg-placeholder">
+        <div class="img-placeholder img-placeholder-lg" style="height: 100%; border: none;">
+          1920X1080 - Full Screen Hero Banner Artwork
+        </div>
+      </div>
+
+      <!-- Overlaid Text Layer Container -->
+      <div class="hero-text-layer">
+        <span
+          style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-muted); display: block; margin-bottom: 12px;">
+          Nền Tảng EdTech Tiên Phong Văn Hóa Việt
+        </span>
+        <h1>Nâng Tầm Tiếng Anh — Trở Thành Sứ Giả Văn Hóa Việt</h1>
+        <p>
+          Khám phá 500+ bài đọc song ngữ chuẩn học thuật (A2 - C1) về lịch sử, di sản, ẩm thực và đời sống Việt Nam. Kết
+          hợp Audio AI Shadowing và Flashcard lặp ngắt quãng.
+        </p>
+        <div style="display: flex; gap: 16px; justify-content: flex-start; flex-wrap: wrap;">
+          <a href="discovery.html" class="btn-cta" style="padding: 16px 36px; font-size: 16px;">Bắt Đầu Học Miễn Phí
+            →</a>
+          <a href="#interactive-demo" class="btn-outline" style="padding: 16px 32px; font-size: 16px;">Trải Nghiệm Bài
+            Đọc</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TOP ARTICLES SECTION (3D Coverflow Slider with Auto-Advance Every 3 Seconds) -->
+    <section id="featured-articles" class="coverflow-section">
+      <div class="container" style="padding-top: 0; padding-bottom: 0; text-align: center;">
+        <span
+          style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Curated
+          Weekly Selection</span>
+        <h2 class="section-title">Top Featured Articles (3D Coverflow)</h2>
+        <p class="section-subtitle" style="margin: 0 auto;">Auto-advancing every 3 seconds. Click any card to bring it
+          to focus.</p>
+
+        <!-- 3D Coverflow Slider Component -->
+        <div class="coverflow-container">
+          <div class="coverflow-track" id="coverflowTrack">
+
+            <!-- Article Card 1 -->
+            <div class="coverflow-card" data-index="0" data-state="far-prev">
+              <div class="img-placeholder" style="height: 280px; font-size: 1.5rem;">
+                553X450 - Article 1: Imperial Hue Architecture
+              </div>
+              <div class="card-body">
+                <span
+                  style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Heritage
+                  • Level B1</span>
+                <h3 class="card-title">Imperial Hue Citadel Gates</h3>
+                <p class="card-text">Explore 19th-century court architecture and geomancy design.</p>
+              </div>
+            </div>
+
+            <!-- Article Card 2 -->
+            <div class="coverflow-card" data-index="1" data-state="prev">
+              <div class="img-placeholder" style="height: 280px; font-size: 1.5rem;">
+                553X450 - Article 2: Saigon Banh Mi History
+              </div>
+              <div class="card-body">
+                <span
+                  style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Cuisine
+                  • Level B1</span>
+                <h3 class="card-title">The Story of Saigon Banh Mi</h3>
+                <p class="card-text">From French baguette to global culinary icon.</p>
+              </div>
+            </div>
+
+            <!-- Article Card 3 (Active Center Card) -->
+            <div class="coverflow-card" data-index="2" data-state="active">
+              <div class="img-placeholder" style="height: 280px; font-size: 1.5rem;">
+                553X450 - Article 3: Hoi An Lantern Traditions
+              </div>
+              <div class="card-body">
+                <span
+                  style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Heritage
+                  • Level B1</span>
+                <h3 class="card-title">Hoi An Lantern Festival</h3>
+                <p class="card-text">Full moon rituals and ancient silk craftsmanship along the river.</p>
+              </div>
+            </div>
+
+            <!-- Article Card 4 -->
+            <div class="coverflow-card" data-index="3" data-state="next">
+              <div class="img-placeholder" style="height: 280px; font-size: 1.5rem;">
+                553X450 - Article 4: Bat Trang Pottery
+              </div>
+              <div class="card-body">
+                <span
+                  style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Crafts
+                  • Level B2</span>
+                <h3 class="card-title">Bat Trang Ceramic Heritage</h3>
+                <p class="card-text">700 years of traditional pottery craftsmanship in Hanoi.</p>
+              </div>
+            </div>
+
+            <!-- Article Card 5 -->
+            <div class="coverflow-card" data-index="4" data-state="far-next">
+              <div class="img-placeholder" style="height: 280px; font-size: 1.5rem;">
+                553X450 - Article 5: Mu Cang Chai Rice Terraces
+              </div>
+              <div class="card-body">
+                <span
+                  style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Nature
+                  • Level B1</span>
+                <h3 class="card-title">Mu Cang Chai Rice Terraces</h3>
+                <p class="card-text">Highland harvest season and traditional agricultural wisdom.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Coverflow Navigation Dots -->
+        <div class="coverflow-controls" id="coverflowDots">
+          <div class="coverflow-dot" data-index="0"></div>
+          <div class="coverflow-dot" data-index="1"></div>
+          <div class="coverflow-dot active" data-index="2"></div>
+          <div class="coverflow-dot" data-index="3"></div>
+          <div class="coverflow-dot" data-index="4"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. TOPICS SECTION (The 4 Pillars of Cultural Content) -->
+    <section id="topics" class="container">
+      <div style="text-align: center; margin-bottom: 48px;">
+        <span
+          style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Content
+          Curriculum</span>
+        <h2 class="section-title">The 4 Core Topics (Pillars)</h2>
+        <p class="section-subtitle" style="margin: 0 auto;">Structured reading pathways designed to expand vocabulary
+          across major cultural domains.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+
+        <!-- Pillar 1 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260 - Topic 1
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Pillar
+              01</span>
+            <h3 class="card-title">History & Heritage</h3>
+            <p class="card-text">Dynastic history, UNESCO world heritage sites, ancient citadels, and independence
+              milestones.</p>
+          </div>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260 - Topic 2
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Pillar
+              02</span>
+            <h3 class="card-title">Cuisine & Coffee</h3>
+            <p class="card-text">Regional dishes, street food stories, egg coffee origin, and culinary vocabulary in
+              context.</p>
+          </div>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260 - Topic 3
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Pillar
+              03</span>
+            <h3 class="card-title">Arts & Craft Villages</h3>
+            <p class="card-text">Traditional silk weaving, lacquerware, ceramics, water puppetry, and folk music
+              history.</p>
+          </div>
+        </div>
+
+        <!-- Pillar 4 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260 - Topic 4
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Pillar
+              04</span>
+            <h3 class="card-title">Festivals & Beliefs</h3>
+            <p class="card-text">Tet holiday traditions, Mid-Autumn full moon folklore, ancestral customs, and village
+              rituals.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- INTERACTIVE READER DEMO SECTION (Value-Add Feature Preview) -->
+    <section id="interactive-demo" class="container"
+      style="border-top: 1px solid var(--color-border); padding-top: 60px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;">
+        <div>
+          <span
+            style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Interactive
+            Demo</span>
+          <h2 class="section-title">Try The Reader Overlay</h2>
+          <p class="section-subtitle">Click any underlined vocabulary word in the preview to inspect instant IPA
+            pronunciation, Vietnamese translation, and audio playback.</p>
+          <div style="display: flex; gap: 16px;">
+            <a href="reader.html" class="btn-cta">Open Full Reader Screen</a>
+          </div>
+        </div>
+
+        <!-- Live Tooltip Demo Placeholder Box -->
+        <div class="img-placeholder" style="height: 420px; font-size: 1.6rem;">
+          600X420 - Interactive Reader & Tooltip Overlay Mockup
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE DEMO 2: FLASHCARD & SPACED REPETITION PREVIEW -->
+    <section id="flashcard-demo" class="container"
+      style="border-top: 1px solid var(--color-border); padding-top: 60px; padding-bottom: 60px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;">
+
+        <!-- Live Interactive Flashcard Box -->
+        <div
+          style="background: white; border: 2px solid var(--color-border-dark); padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.06);">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 12px; font-weight: 700; color: var(--color-text-subtle);">
+            <span>🎯 LIVE DEMO: SPACED REPETITION CARD</span>
+            <span style="color: #059669;">18 / 25 Words (72%)</span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div
+            style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 9999px; overflow: hidden; margin-bottom: 24px;">
+            <div style="width: 72%; height: 100%; background: #059669; border-radius: 9999px;"></div>
+          </div>
+
+          <!-- Interactive Card -->
+          <div id="demo-card" onclick="toggleDemoCard()"
+            style="background: var(--color-surface); border: 1px solid var(--color-border); padding: 32px 20px; text-align: center; cursor: pointer; user-select: none; transition: transform 0.2s; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div id="demo-card-front">
+              <h3 style="font-family: var(--font-serif); font-size: 32px; font-weight: 700; margin-bottom: 8px;">
+                architectural</h3>
+              <p style="font-size: 13px; color: var(--color-text-subtle); margin-bottom: 12px;">/ˌɑːrkɪˈtektʃərəl/ •
+                adjective</p>
+              <p style="font-size: 13px; color: var(--color-text-muted); font-style: italic; max-width: 380px;">"The
+                Imperial Citadel represents an extraordinary <u>architectural</u> accomplishment."</p>
+            </div>
+            <div id="demo-card-back" style="display: none;">
+              <h3 style="font-size: 28px; font-weight: 700; color: #059669; margin-bottom: 8px;">Thuộc về kiến trúc</h3>
+              <p style="font-size: 13px; color: var(--color-text-main); font-weight: 600; max-width: 380px;">Định nghĩa:
+                Liên quan đến nghệ thuật thiết kế và xây dựng công trình di sản.</p>
+            </div>
+            <span style="font-size: 11px; color: var(--color-text-subtle); margin-top: 16px; display: block;">💡 Bấm vào
+              thẻ để lật xem đáp án Tiếng Việt</span>
+          </div>
+
+          <!-- Rating buttons -->
+          <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <button onclick="alert('🔴 Đã đánh dấu Cần Ôn Lại! Thẻ sẽ lặp lại sớm hơn.')"
+              style="flex: 1; padding: 12px; border: 1px solid #991b1b; color: #991b1b; background: white; font-weight: 700; font-size: 13px; cursor: pointer;">🔴
+              Cần Ôn Lại</button>
+            <button onclick="alert('🟢 Đã đánh dấu Đã Nhớ! Cập nhật tiến độ bài học.')"
+              style="flex: 1; padding: 12px; border: 1px solid #065f46; color: #065f46; background: white; font-weight: 700; font-size: 13px; cursor: pointer;">🟢
+              Đã Nhớ</button>
+          </div>
+        </div>
+
+        <div>
+          <span
+            style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Interactive
+            Demo 02</span>
+          <h2 class="section-title">Smart Flashcard & Spaced Repetition</h2>
+          <p class="section-subtitle">Hệ thống ghi nhớ từ vựng thông minh ứng dụng thuật toán lặp lại ngắt quãng (Spaced
+            Repetition System). Hỗ trợ 5 chế độ tập luyện: Lật thẻ, Trắc nghiệm, Gõ từ, Nối từ và Luyện nghe phát âm.
+          </p>
+          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <a href="flashcards.html" class="btn-cta" style="padding: 14px 28px; font-size: 15px;">Trải Nghiệm Flashcard
+              Đầy Đủ →</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Script for Live Demo Card Toggle -->
+    <script>
+      let isDemoFlipped = false;
+      function toggleDemoCard() {
+        isDemoFlipped = !isDemoFlipped;
+        const front = document.getElementById('demo-card-front');
+        const back = document.getElementById('demo-card-back');
+        if (isDemoFlipped) {
+          front.style.display = 'none';
+          back.style.display = 'block';
+        } else {
+          front.style.display = 'block';
+          back.style.display = 'none';
+        }
+      }
+    </script>
+
+    <!-- 4. TRUSTED SECTION (User Feedback, Testimonials & Cultural Ambassador Leaderboard) -->
+    <section id="trusted-community" class="container"
+      style="border-top: 1px solid var(--color-border); padding-top: 60px;">
+      <div style="text-align: center; margin-bottom: 48px;">
+        <span
+          style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Social
+          Proof & Community (mock, insert when have data)</span>
+        <h2 class="section-title">Trusted By Cultural Ambassadors</h2>
+        <p class="section-subtitle" style="margin: 0 auto;">Join thousands of learners sharing Vietnamese culture in
+          English globally.</p>
+      </div>
+
+      <!-- Stats Bar Wireframe -->
+      <div
+        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: center; margin-bottom: 48px; border: 1px solid var(--color-border-dark); padding: 32px; background: var(--color-surface);">
+        <div>
+          <h3 style="font-family: var(--font-serif); font-size: 42px; font-weight: 700;">500+</h3>
+          <p style="font-size: 14px; color: var(--color-text-muted);">Bilingual Cultural Articles</p>
+        </div>
+        <div>
+          <h3 style="font-family: var(--font-serif); font-size: 42px; font-weight: 700;">12,500+</h3>
+          <p style="font-size: 14px; color: var(--color-text-muted);">Active Ambassadors</p>
+        </div>
+        <div>
+          <h3 style="font-family: var(--font-serif); font-size: 42px; font-weight: 700;">150,000+</h3>
+          <p style="font-size: 14px; color: var(--color-text-muted);">Flashcard Repetitions</p>
+        </div>
+      </div>
+
+      <!-- Testimonials / Feedback Grid -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+
+        <!-- Feedback Card 1 -->
+        <div class="layout-card" style="padding: 24px;">
+          <p
+            style="font-size: 14px; line-height: 1.6; color: var(--color-text-main); margin-bottom: 16px; font-style: italic;">
+            "Reading about Saigon's coffee history in academic B2 English gave me the exact vocabulary I needed to
+            explain Vietnamese culture to my international colleagues!"
+          </p>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="img-placeholder img-placeholder-sm"
+              style="width: 40px; height: 40px; min-height: 40px; border-radius: 50%; font-size: 0.7rem;">
+              AVATAR
+            </div>
+            <div>
+              <h4 style="font-size: 14px; font-weight: 700;">Lê Thu Trang</h4>
+              <span style="font-size: 12px; color: var(--color-text-subtle);">English Teacher & Tour Guide</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feedback Card 2 -->
+        <div class="layout-card" style="padding: 24px;">
+          <p
+            style="font-size: 14px; line-height: 1.6; color: var(--color-text-main); margin-bottom: 16px; font-style: italic;">
+            "The Safe Reflections section is brilliant. Writing without fear of grammar correction or red pen grading
+            helped me build confidence writing in English."
+          </p>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="img-placeholder img-placeholder-sm"
+              style="width: 40px; height: 40px; min-height: 40px; border-radius: 50%; font-size: 0.7rem;">
+              AVATAR
+            </div>
+            <div>
+              <h4 style="font-size: 14px; font-weight: 700;">Nguyễn Quốc Bảo</h4>
+              <span style="font-size: 12px; color: var(--color-text-subtle);">University Student</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feedback Card 3 -->
+        <div class="layout-card" style="padding: 24px;">
+          <p
+            style="font-size: 14px; line-height: 1.6; color: var(--color-text-main); margin-bottom: 16px; font-style: italic;">
+            "As an expat living in Hanoi, this app helps me understand Vietnamese heritage while helping my local
+            friends practice natural English pronunciation!"
+          </p>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="img-placeholder img-placeholder-sm"
+              style="width: 40px; height: 40px; min-height: 40px; border-radius: 50%; font-size: 0.7rem;">
+              AVATAR
+            </div>
+            <div>
+              <h4 style="font-size: 14px; font-weight: 700;">Mark Henderson</h4>
+              <span style="font-size: 12px; color: var(--color-text-subtle);">Expat & Language Enthusiast</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5. CONTACT SECTION -->
+    <section id="contact" class="container" style="border-top: 1px solid var(--color-border); padding-top: 60px;">
+      <div
+        style="max-width: 680px; margin: 0 auto; border: 1px solid var(--color-border-dark); padding: 40px; background: white;">
+        <div style="text-align: center; margin-bottom: 28px;">
+          <span
+            style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Get In
+            Touch</span>
+          <h2 class="section-title" style="font-size: 28px;">Contact Team & Inquiries</h2>
+          <p class="section-subtitle" style="margin: 0 auto; font-size: 14px;">Have questions about our EdTech
+            curriculum or cultural content partnerships?</p>
+        </div>
+
+        <form onsubmit="event.preventDefault(); alert('Wireframe form submitted!');"
+          style="display: flex; flex-direction: column; gap: 16px;">
+          <div>
+            <label
+              style="font-size: 12px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px;">Your
+              Name</label>
+            <input type="text" placeholder="Enter your full name"
+              style="width: 100%; padding: 12px; border: 1px solid var(--color-border); font-family: var(--font-sans); font-size: 14px;"
+              required>
+          </div>
+          <div>
+            <label
+              style="font-size: 12px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px;">Email
+              Address</label>
+            <input type="email" placeholder="name@example.com"
+              style="width: 100%; padding: 12px; border: 1px solid var(--color-border); font-family: var(--font-sans); font-size: 14px;"
+              required>
+          </div>
+          <div>
+            <label
+              style="font-size: 12px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px;">Message
+              / Inquiry</label>
+            <textarea placeholder="Write your message here..."
+              style="width: 100%; height: 120px; padding: 12px; border: 1px solid var(--color-border); font-family: var(--font-sans); font-size: 14px;"
+              required></textarea>
+          </div>
+          <button type="submit" class="btn-cta" style="padding: 14px; font-size: 15px;">Send Message</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 6. FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="brand-logo" style="display: block; margin-bottom: 16px;">VN Culture Reader</a>
+          <p class="card-text" style="max-width: 320px;">Nền tảng EdTech học tiếng Anh qua ngữ cảnh văn hóa Việt Nam.
+            Nâng tầm vốn từ & trở thành sứ giả văn hóa.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="discovery.html">Discovery Feed</a></li>
+            <li><a href="reader.html">Bilingual Reader</a></li>
+            <li><a href="flashcards.html">Flashcards</a></li>
+            <li><a href="community.html">Community</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Topics</h4>
+          <ul class="footer-links">
+            <li><a href="#topics">History & Heritage</a></li>
+            <li><a href="#topics">Cuisine & Coffee</a></li>
+            <li><a href="#topics">Arts & Craft Villages</a></li>
+            <li><a href="#topics">Festivals & Beliefs</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Contact & Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#contact">Contact Support</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 VN Culture Reader. Landing Page Wireframe Prototype.</p>
+        <p>Pure HTML, CSS & Vanilla JS Coverflow</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 3D Coverflow Auto-Rotate Script (3 Seconds Interval) -->
+  <script>
+    (function () {
+      const cards = document.querySelectorAll('.coverflow-card');
+      const dots = document.querySelectorAll('.coverflow-dot');
+      let currentIndex = 2; // Center active card index
+      const totalCards = cards.length;
+
+      function updateCoverflow(index) {
+        currentIndex = index;
+
+        cards.forEach((card, i) => {
+          const cardIndex = parseInt(card.getAttribute('data-index'));
+          let state = '';
+
+          const diff = (cardIndex - currentIndex + totalCards) % totalCards;
+
+          if (diff === 0) {
+            state = 'active';
+          } else if (diff === 1 || diff === -(totalCards - 1)) {
+            state = 'next';
+          } else if (diff === 2 || diff === -(totalCards - 2)) {
+            state = 'far-next';
+          } else if (diff === totalCards - 1 || diff === -1) {
+            state = 'prev';
+          } else {
+            state = 'far-prev';
+          }
+
+          card.setAttribute('data-state', state);
+        });
+
+        dots.forEach((dot, i) => {
+          if (i === currentIndex) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+
+      // Card click events
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          const idx = parseInt(card.getAttribute('data-index'));
+          updateCoverflow(idx);
+        });
+      });
+
+      // Dot click events
+      dots.forEach(dot => {
+        dot.addEventListener('click', () => {
+          const idx = parseInt(dot.getAttribute('data-index'));
+          updateCoverflow(idx);
+        });
+      });
+
+      // Auto-advance every 3 seconds (3000ms)
+      setInterval(() => {
+        const nextIndex = (currentIndex + 1) % totalCards;
+        updateCoverflow(nextIndex);
+      }, 3000);
+
+    })();
+  </script>
+
+</body>
+
+</html>

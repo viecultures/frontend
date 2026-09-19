@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Dashboard - VN Culture Reader Wireframe</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" style="display: flex; align-items: center; gap: 10px;">
+        <span>VieCulture</span>
+        <span
+          style="font-size: 11px; padding: 3px 10px; border-radius: 999px; background: rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.2); font-family: var(--font-sans); font-weight: 700;">Study
+          Together</span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="home.html" class="nav-link active">Home</a>
+        <a href="discovery.html" class="nav-link">Discovery</a>
+
+        <!-- Reader Dropdown Menu -->
+        <div class="nav-item-dropdown">
+          <a href="reader-2.html" class="nav-link">Reader ▾</a>
+          <div class="dropdown-menu">
+            <a href="reader-1.html" class="dropdown-item">Layout 1: Dual Book Card View</a>
+            <a href="reader-2.html" class="dropdown-item">Layout 2: Classic Stacked View</a>
+          </div>
+        </div>
+
+        <a href="flashcards.html" class="nav-link">Flashcards</a>
+
+        <!-- Community Dropdown Menu -->
+        <div class="nav-item-dropdown">
+          <a href="community.html" class="nav-link">Community ▾</a>
+          <div class="dropdown-menu">
+            <a href="community.html" class="dropdown-item">Community 1: Member Reflections</a>
+            <a href="community-2.html" class="dropdown-item">Community 2: Cultural Contest Hub</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Header Action Icons Bar -->
+      <div class="header-icon-bar">
+        <a href="#" class="icon-btn-wireframe" title="Notifications">🔔</a>
+        <a href="community-2.html" class="icon-btn-wireframe" title="Achievements">🏆</a>
+        <a href="#" class="icon-btn-wireframe" title="Study Calendar">📅</a>
+        <a href="community-2.html" class="icon-btn-wireframe" title="Leaderboard & Stats">📊</a>
+        <a href="#" class="icon-btn-wireframe" title="Heritage Shop">🎒</a>
+        <a href="login.html" class="user-avatar-badge" title="Profile / Login">
+          <span class="crown-tag">👑</span>
+          <span>🤓</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Hero Study Room Dashboard Layout -->
+  <main>
+    <section class="hero-study-room">
+
+      <!-- Top Content Layer -->
+      <div class="hero-content-layer">
+
+        <div class="time-badge-pill">
+          <span>Morning</span>
+        </div>
+
+        <h1 class="user-greeting-title">Luan Ninh Dep Trai</h1>
+        <p class="user-greeting-sub">Chào mừng trở lại — cùng khởi động nhanh nhé!</p>
+
+        <!-- Quick Shortcut Practice Pills -->
+        <div class="quick-shortcuts-row">
+          <a href="flashcards.html" class="shortcut-pill-btn">
+            <span>🎙️</span> Luyện phát âm
+          </a>
+          <a href="reader-1.html" class="shortcut-pill-btn">
+            <span>✏️</span> Học ngữ pháp
+          </a>
+          <a href="flashcards.html" class="shortcut-pill-btn">
+            <span>📖</span> Học từ vựng
+          </a>
+          <a href="flashcards.html" class="shortcut-pill-btn">
+            <span>🚀</span> Ôn từ vựng
+          </a>
+          <a href="reader-2.html" class="shortcut-pill-btn">
+            <span>📄</span> Luyện đọc
+          </a>
+          <a href="discovery.html" class="shortcut-pill-btn">
+            <span>🎥</span> Xem video
+          </a>
+        </div>
+
+        <!-- Overlaid Desktop Widgets Grid -->
+        <div class="widgets-desk-grid">
+
+          <!-- Widget 1: Post-It Checklist (VIỆC HÔM NAY) -->
+          <div class="postit-checklist-card">
+            <div class="postit-tape"></div>
+            <div class="postit-title">VIỆC HÔM NAY</div>
+            <ul class="postit-checklist">
+              <li class="postit-check-item">
+                <input type="checkbox" id="task1">
+                <label for="task1">Trang home khi login</label>
+              </li>
+              <li class="postit-check-item">
+                <input type="checkbox" id="task2">
+                <label for="task2">Tái sử dụng khi mobile</label>
+              </li>
+              <li class="postit-check-item">
+                <input type="checkbox" id="task3">
+                <label for="task3">BG thay đổi theo thời gian</label>
+              </li>
+              <li class="postit-check-item">
+                <input type="checkbox" id="task4">
+                <label for="task4">Giảm ma sát khi muốn dùng chức năng</label>
+              </li>
+            </ul>
+            <div class="postit-mascot-sticker" title="Mascot companion">🐢</div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Bottom Dock Bar -->
+      <div class="bottom-study-dock">
+        <!-- Streak Card -->
+        <div class="dock-card">
+          <span style="font-size: 20px;">🔥</span>
+          <div>
+            <div class="dock-label">STREAK</div>
+            <div class="dock-value">2 Ngày</div>
+          </div>
+        </div>
+
+        <!-- Daily Challenge Card -->
+        <div class="dock-card">
+          <div>
+            <div class="dock-label">HẰNG NGÀY</div>
+            <div class="dock-value" style="font-size: 14px;">Thử thách ⏱️ <span
+                style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; margin-left: 4px;">13:40:27</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode Switcher Dock -->
+        <div class="mode-switcher-dock">
+          <button class="mode-dock-btn active">Study</button>
+          <button class="mode-dock-btn">Pomodoro</button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Right Floating Control Toolbar -->
+  <aside class="floating-side-toolbar">
+    <a href="discovery.html" class="side-toolbar-btn" title="Search catalog">🔍</a>
+    <a href="community.html" class="side-toolbar-btn" title="AI Companion">🤖</a>
+    <a href="community.html" class="side-toolbar-btn" title="Community Discussion">💬</a>
+    <a href="login.html" class="side-toolbar-btn" title="Settings & Tools">⚙️</a>
+  </aside>
+
+</body>
+
+</html>

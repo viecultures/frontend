@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reader Layout 1: Dual Book Card View - VN Culture Reader</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap">
+</head>
+
+<body style="background-color: #6a7138;">
+
+  <!-- Site Header -->
+  <header class="site-header" style="background: white; border-bottom: 1px solid var(--color-border);">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">VN Culture Reader</a>
+
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="discovery.html" class="nav-link">Discovery</a>
+
+        <!-- Reader Dropdown Menu -->
+        <div class="nav-item-dropdown">
+          <a href="reader-1.html" class="nav-link active">Reader ▾</a>
+          <div class="dropdown-menu">
+            <a href="reader-1.html" class="dropdown-item">📖 Layout 1: Dual Book Card View</a>
+            <a href="reader-2.html" class="dropdown-item">📄 Layout 2: Classic Stacked View</a>
+          </div>
+        </div>
+
+        <a href="flashcards.html" class="nav-link">Flashcards</a>
+        <a href="community.html" class="nav-link">Community</a>
+      </nav>
+
+      <div class="header-actions">
+      </div>
+    </div>
+  </header>
+
+  <!-- Reader Top Controls Toolbar (Matching Screenshot) -->
+  <div class="reader-top-toolbar">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <a href="discovery.html"
+        style="color: white; text-decoration: none; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        ← <span style="font-family: 'Fraunces', Georgia, serif; font-size: 20px; font-style: italic;">Reading</span>
+      </a>
+      <span style="font-size: 11px; opacity: 0.7; letter-spacing: 0.1em; text-transform: uppercase;">• THE VN CULTURE
+        DICTIONARY</span>
+    </div>
+
+    <!-- Right Controls Group (Font, Size, Vocab Count, Theme, Fullscreen) -->
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 11px; opacity: 0.8; text-transform: uppercase; font-weight: 700;">Font</span>
+        <select class="toolbar-select">
+          <option>Fraunces (Serif)</option>
+          <option>Playfair Display</option>
+          <option>Plus Jakarta Sans</option>
+        </select>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 6px;" class="toolbar-pill">
+        <span style="font-size: 11px; opacity: 0.8; text-transform: uppercase; font-weight: 700;">Cỡ Chữ</span>
+        <button style="background: none; border: none; color: white; cursor: pointer; font-weight: 700;">-</button>
+        <span style="font-family: monospace; font-weight: 700;">17</span>
+        <button style="background: none; border: none; color: white; cursor: pointer; font-weight: 700;">+</button>
+      </div>
+
+      <button id="openVocabDrawer" class="toolbar-pill" style="cursor: pointer;">
+        📖 <span>3 từ</span>
+      </button>
+
+      <button class="toolbar-pill">
+        🌙 <span>Tối</span>
+      </button>
+
+      <button class="toolbar-pill">
+        ⛶ <span>Toàn màn hình</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Olive Grid Canvas Container -->
+  <main class="reader-grid-canvas">
+
+    <!-- Dual Side-by-Side Floating Paper Sheets -->
+    <div class="dual-paper-container">
+
+      <!-- LEFT PAPER SHEET (ENGLISH) -->
+      <div class="paper-sheet">
+
+        <!-- Sheet Header -->
+        <div class="paper-sheet-header">
+          <div>
+            <span class="paper-tag" style="color: #2563eb;">ENGLISH</span>
+            <span style="font-size: 12px; color: #6b7280; margin-left: 8px;"></span>
+          </div>
+          <span
+            style="font-size: 11px; font-weight: 700; background: #eff6ff; color: #1d4ed8; padding: 4px 8px; border-radius: 4px;">EN</span>
+        </div>
+
+        <!-- English Title -->
+        <h1 class="paper-title" style="font-family: 'Fraunces', serif;">How to be disgustingly educated</h1>
+        <p
+          style="font-family: 'Fraunces', serif; font-size: 16px; font-style: italic; color: #4b5563; margin-bottom: 24px;">
+          A chaotic guide to becoming the most interesting person in the room
+        </p>
+
+        <!-- Image Placeholder Inside Card (Matching 553X450 reference image) -->
+        <div class="img-placeholder"
+          style="height: 380px; margin-bottom: 28px; background: #e5e7eb; border-radius: 8px;">
+          553X450 - Artwork Illustration
+        </div>
+
+        <!-- English Paragraphs with Dotted Underlined Vocab -->
+        <div class="paper-body-text" style="font-family: 'Fraunces', serif;">
+          <p>
+            Hello my <em>love</em>,
+          </p>
+
+          <p>
+            There’s a kind of person who’s so <span class="dotted-vocab">well-read</span>, so <span
+              class="dotted-vocab">frighteningly articulate</span>, so mentally juicy that you want to both date them
+            and punch them in the throat.
+          </p>
+
+          <p>
+            You know the type.
+          </p>
+
+          <p>
+            They quote Baldwin <span class="dotted-vocab">mid-conversation</span>.
+          </p>
+
+          <p>
+            They listen to podcasts at 1.5x speed while <span class="dotted-vocab">annotating a book</span>.
+          </p>
+
+          <p>
+            They drop phrases like <span class="dotted-vocab">“epistemic frameworks”</span> and somehow make it work.
+          </p>
+
+          <p>
+            This is your guide to becoming that person. Not for clout. Not for Instagram aesthetics. But for the <span
+              class="dotted-vocab">sheer, indecent pleasure</span> of being disgustingly educated.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- RIGHT PAPER SHEET (TIẾNG VIỆT) -->
+      <div class="paper-sheet">
+
+        <div class="paper-sheet-header">
+          <div>
+            <span class="paper-tag" style="color: #059669;">TIẾNG VIỆT</span>
+          </div>
+          <span
+            style="font-size: 11px; font-weight: 700; background: #ecfdf5; color: #047857; padding: 4px 8px; border-radius: 4px;">VI</span>
+        </div>
+
+        <!-- Vietnamese Title -->
+        <h1 class="paper-title" style="font-family: 'Fraunces', serif; font-style: italic;">Làm thế nào để trở nên cực
+          kỳ uyên bác</h1>
+        <p
+          style="font-family: 'Fraunces', serif; font-size: 16px; font-style: italic; color: #4b5563; margin-bottom: 24px;">
+          Hướng dẫn đầy ngẫu hứng để trở thành người thú vị nhất trong phòng
+        </p>
+
+        <!-- Image Placeholder Inside Card (Matching Left Card) -->
+        <div class="img-placeholder"
+          style="height: 380px; margin-bottom: 28px; background: #e5e7eb; border-radius: 8px;">
+          553X450 - Artwork Illustration
+        </div>
+
+        <!-- Vietnamese Translated Paragraphs -->
+        <div class="paper-body-text" style="font-family: 'Fraunces', serif;">
+          <p>
+            Chào <em>tình yêu</em> của em,
+          </p>
+
+          <p>
+            Có một kiểu người đọc nhiều đến thế, ăn nói sắc sảo đến đáng sợ, và có một bộ óc đầy chất xám đến vậy, khiến
+            anh vừa muốn hẹn hò lại vừa muốn đấm vào họng họ.
+          </p>
+
+          <p>
+            Anh biết kiểu người đó mà.
+          </p>
+
+          <p>
+            Họ trích dẫn Baldwin giữa cuộc trò chuyện.
+          </p>
+
+          <p>
+            Họ nghe podcast ở tốc độ 1.5x trong khi đang ghi chú một cuốn sách.
+          </p>
+
+          <p>
+            Họ buông những cụm từ như <em>“khung nhận thức luận”</em> và bằng cách nào đó vẫn khiến nó nghe thật hợp lý.
+          </p>
+
+          <p>
+            Đây là hướng dẫn để anh trở thành người đó. Không phải để gây chú ý. Không phải để sống ảo trên Instagram.
+            Mà vì niềm vui thuần túy, trần trụi khi được <em>uyen bác đến đáng ghét</em>.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Single Unified Card Container with Internal Vertical Divider -->
+    <div class="reader-bottom-single-card">
+      <div class="reader-bottom-grid">
+        
+        <!-- LEFT SIDE (2/3 Width): Reading Comprehension Quiz Section -->
+        <div class="reader-left-quiz">
+          <div style="margin-bottom: 24px; border-bottom: 1px solid var(--color-border); padding-bottom: 16px;">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); letter-spacing: 0.1em;">Reading
+              Check & Comprehension</span>
+            <h2 style="font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; margin-top: 4px;">Câu Hỏi Kiểm Tra Thấu Hiểu Bài Đọc</h2>
+          </div>
+
+          <!-- Question 1 -->
+          <div style="margin-bottom: 28px;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px;">
+              1. According to the article, what is the core secret to becoming "disgustingly educated"?
+            </h3>
+
+            <label class="quiz-option-label">
+              <input type="radio" name="q1" value="A">
+              <span>A. Memorizing 50 new vocabulary words every single morning for social media clout.</span>
+            </label>
+
+            <label class="quiz-option-label">
+              <input type="radio" name="q1" value="B">
+              <span>B. Cultivating a deep, genuine curiosity and annotations for the sheer pleasure of learning.</span>
+            </label>
+
+            <label class="quiz-option-label">
+              <input type="radio" name="q1" value="C">
+              <span>C. Listening to podcasts at 3.0x speed without taking any notes or reflection.</span>
+            </label>
+          </div>
+
+          <!-- Question 2 -->
+          <div style="margin-bottom: 28px;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px;">
+              2. What does the highlighted term <span class="dotted-vocab">"frighteningly articulate"</span> mean in context?
+            </h3>
+
+            <label class="quiz-option-label">
+              <input type="radio" name="q2" value="A">
+              <span>A. Có khả năng diễn đạt ý tưởng vô cùng sắc sảo, lưu loát và thuyết phục.</span>
+            </label>
+
+            <label class="quiz-option-label">
+              <input type="radio" name="q2" value="B">
+              <span>B. Nói chuyện quá nhanh khiến người nghe bị sợ hãi và ngợp.</span>
+            </label>
+
+            <label class="quiz-option-label">
+              <input type="radio" name="q2" value="C">
+              <span>C. Phát âm giọng bản xứ nhưng không nắm rõ ý nghĩa ngữ pháp.</span>
+            </label>
+          </div>
+
+          <!-- Submit Quiz Button -->
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <button class="btn-cta"
+              onclick="alert('Đáp án chính xác! Bạn đã hoàn thành 2/2 câu hỏi thấu hiểu bài đọc.')">Kiểm Tra Đáp Án</button>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE (1/3 Width): Next Steps & Practice Mode CTA Buttons -->
+        <div class="reader-right-practice">
+          <div>
+            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); letter-spacing: 0.1em;">Next Learning Steps</span>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; margin: 4px 0 16px;">Chế Độ Ôn Luyện</h3>
+            <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 24px;">
+              Lựa chọn chế độ thực hành tiếp theo để củng cố vốn từ vựng và kỹ năng nghe nói từ bài đọc này.
+            </p>
+
+            <!-- CTA Buttons Stack -->
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <a href="flashcards.html" class="btn-cta" style="text-align: center; border-radius: 6px;">📇 Ôn Tập Flashcard (3 từ) →</a>
+              <button class="btn-outline" style="text-align: center; border-radius: 6px;" onclick="alert('Đã mở chế độ Dictation (Luyện chép chính tả)!')">🎧 Luyện Chép Chính Tả (Dictation)</button>
+              <a href="community.html" class="btn-outline" style="text-align: center; border-radius: 6px;">✍️ Viết Bài Cảm Nghĩ (Reflection)</a>
+              <button class="btn-outline" style="text-align: center; border-radius: 6px;" onclick="alert('Đã lưu bài đọc vào Bộ sưu tập cá nhân!')">📚 Lưu Bài Đọc Vào Bộ Sưu Tập</button>
+            </div>
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border); font-size: 12px; color: var(--color-text-subtle);">
+            💡 Mẹo: Hoàn thành cả 4 chế độ để tăng điểm Sứ Giả Văn Hóa!
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RECOMMENDED ARTICLES (HORIZONTAL 3-CARDS ROW AT BOTTOM OF CARD) -->
+      <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--color-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); letter-spacing: 0.1em;">Continue Reading</span>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; margin-top: 2px;">Bài Đọc Đề Xuất (Recommended Articles)</h3>
+          </div>
+          <a href="discovery.html" style="font-size: 13px; font-weight: 700; color: var(--color-text-main); text-decoration: none;">Xem tất cả bài đọc →</a>
+        </div>
+
+        <!-- 3 Horizontal Cards Grid -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+
+          <!-- Card 1 -->
+          <a href="reader.html" style="display: flex; flex-direction: column; text-decoration: none; color: inherit; background: white; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+            <div class="img-placeholder img-placeholder-sm" style="height: 140px; font-size: 0.8rem;">
+              380X140 - Saigon Banh Mi
+            </div>
+            <div style="padding: 16px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+              <div>
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Cuisine • Level B1</span>
+                <h4 style="font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; margin: 6px 0 8px; line-height: 1.3;">The Story of Saigon Banh Mi</h4>
+                <p style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  From French baguette to global culinary icon: the history behind Vietnam's favorite street food.
+                </p>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding-top: 10px; font-size: 12px; color: var(--color-text-subtle);">
+                <span>5 min read • 8 Vocab</span>
+                <span style="font-weight: 700; color: var(--color-text-main);">Đọc ngay →</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Card 2 -->
+          <a href="reader.html" style="display: flex; flex-direction: column; text-decoration: none; color: inherit; background: white; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+            <div class="img-placeholder img-placeholder-sm" style="height: 140px; font-size: 0.8rem;">
+              380X140 - Hoi An Lanterns
+            </div>
+            <div style="padding: 16px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+              <div>
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Heritage • Level B1</span>
+                <h4 style="font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; margin: 6px 0 8px; line-height: 1.3;">Hoi An Lantern Festival</h4>
+                <p style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  Understanding full moon rituals, silk craftsmanship, and ancient architecture along the river.
+                </p>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding-top: 10px; font-size: 12px; color: var(--color-text-subtle);">
+                <span>7 min read • 10 Vocab</span>
+                <span style="font-weight: 700; color: var(--color-text-main);">Đọc ngay →</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Card 3 -->
+          <a href="reader.html" style="display: flex; flex-direction: column; text-decoration: none; color: inherit; background: white; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+            <div class="img-placeholder img-placeholder-sm" style="height: 140px; font-size: 0.8rem;">
+              380X140 - Bat Trang Pottery
+            </div>
+            <div style="padding: 16px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+              <div>
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Crafts • Level B2</span>
+                <h4 style="font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; margin: 6px 0 8px; line-height: 1.3;">Bat Trang Ceramic Heritage</h4>
+                <p style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  700 years of ceramic heritage in a traditional craft village on the Red River delta.
+                </p>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding-top: 10px; font-size: 12px; color: var(--color-text-subtle);">
+                <span>6 min read • 9 Vocab</span>
+                <span style="font-weight: 700; color: var(--color-text-main);">Đọc ngay →</span>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Right Slide-over Vocab Drawer Backdrop -->
+  <div id="drawerBackdrop" class="vocab-drawer-backdrop"></div>
+
+  <!-- Right Slide-over Vocab Drawer Menu (Menu phụ bên phải) -->
+  <div id="vocabDrawer" class="vocab-drawer">
+    <div class="drawer-header">
+      <div>
+        <h3 style="font-family: var(--font-serif); font-size: 18px; font-weight: 700;">Từ Vựng trong bài</h3>
+        <span style="font-size: 12px; color: var(--color-text-muted);">Lưu từ bài đọc: "How to be disgustingly
+          educated"</span>
+      </div>
+      <button id="closeVocabDrawer"
+        style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--color-text-main);">✕</button>
+    </div>
+
+    <div class="drawer-body">
+
+      <!-- Word 1 -->
+      <div class="layout-card" style="padding: 16px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <h4 style="font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700;">well-read</h4>
+          <span
+            style="font-size: 11px; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; font-weight: 600;">adj</span>
+        </div>
+        <p style="font-size: 12px; color: var(--color-text-subtle); font-style: italic; margin-bottom: 8px;">/ˌwel ˈred/
+        </p>
+        <p style="font-size: 14px; font-weight: 600; color: var(--color-text-main); margin-bottom: 8px;">Đọc nhiều, am
+          hiểu sâu rộng qua sách báo.</p>
+        <p style="font-size: 12px; color: var(--color-text-muted); font-style: italic;">
+          "There’s a kind of person who’s so <span style="text-decoration: underline;">well-read</span>..."
+        </p>
+      </div>
+
+      <!-- Word 2 -->
+      <div class="layout-card" style="padding: 16px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <h4 style="font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700;">articulate</h4>
+          <span
+            style="font-size: 11px; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; font-weight: 600;">adj</span>
+        </div>
+        <p style="font-size: 12px; color: var(--color-text-subtle); font-style: italic; margin-bottom: 8px;">
+          /ɑːrˈtɪk.jə.lət/</p>
+        <p style="font-size: 14px; font-weight: 600; color: var(--color-text-main); margin-bottom: 8px;">Ăn nói sắc sảo,
+          diễn đạt ý tưởng vô cùng lưu loát.</p>
+        <p style="font-size: 12px; color: var(--color-text-muted); font-style: italic;">
+          "...so frighteningly <span style="text-decoration: underline;">articulate</span>, so mentally juicy..."
+        </p>
+      </div>
+
+      <!-- Word 3 -->
+      <div class="layout-card" style="padding: 16px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <h4 style="font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700;">epistemic frameworks</h4>
+          <span
+            style="font-size: 11px; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; font-weight: 600;">noun</span>
+        </div>
+        <p style="font-size: 12px; color: var(--color-text-subtle); font-style: italic; margin-bottom: 8px;">
+          /ˌep.əˈstee.mɪk ˈfreɪm.wɜːrk/</p>
+        <p style="font-size: 14px; font-weight: 600; color: var(--color-text-main); margin-bottom: 8px;">Khung nhận thức
+          luận / Hệ thống lý thuyết tri thức.</p>
+        <p style="font-size: 12px; color: var(--color-text-muted); font-style: italic;">
+          "They drop phrases like <span style="text-decoration: underline;">epistemic frameworks</span>..."
+        </p>
+      </div>
+
+    </div>
+
+    <div class="drawer-footer" style="display: flex; flex-direction: column; gap: 10px;">
+      <button class="btn-outline" style="width: 100%; text-align: center; border-radius: 4px;" onclick="alert('Đã thêm 3 từ vựng vào Bộ sưu tập cá nhân!')">➕ Thêm Vào Bộ Sưu Tập</button>
+      <a href="flashcards.html" class="btn-cta" style="width: 100%; text-align: center; border-radius: 4px;">📇 Ôn Tập Flashcard (3 từ) →</a>
+    </div>
+  </div>
+
+  <!-- Site Footer -->
+  <footer class="site-footer" style="margin-top: 0; background: white;">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 VN Culture Reader. Reader Layout 1: Dual Book Card View.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Slide-over Vocab Drawer Interactive JS Toggle Script -->
+  <script>
+    (function () {
+      const openBtn = document.getElementById('openVocabDrawer');
+      const closeBtn = document.getElementById('closeVocabDrawer');
+      const drawer = document.getElementById('vocabDrawer');
+      const backdrop = document.getElementById('drawerBackdrop');
+
+      function openDrawer() {
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+      }
+
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('open');
+      }
+
+      if (openBtn) openBtn.addEventListener('click', openDrawer);
+      if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+      if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    })();
+  </script>
+
+</body>
+
+</html>
