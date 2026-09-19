@@ -41,7 +41,7 @@ export interface Lesson {
   categoryNameVi: string;
   level: CEFRLevel;
   readTime: string;
-  imageUrl: string;
+  imageUrl: string | null;
   summary: string;
   paragraphs: ParagraphPair[];
   vocabularies: VocabItem[];

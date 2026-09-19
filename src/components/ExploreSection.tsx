@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Image as ImageIcon } from 'lucide-react';
 import type { Category } from '../types';
 import { EXPLORE_CARDS_ASSETS } from '../assets';
 
@@ -13,10 +13,11 @@ export const ExploreSection: React.FC<ExploreSectionProps> = ({ onSelectCategory
     title: string;
     englishTitle: string;
     description: string;
-    image: string;
+    image: string | null;
     badge: string;
     tagline: string;
     expectedAsset: string;
+    assetDesc: string;
   }[] = [
     {
       id: 'van-hoa',
@@ -27,6 +28,7 @@ export const ExploreSection: React.FC<ExploreSectionProps> = ({ onSelectCategory
       badge: 'Phong Tục & Đời Sống',
       tagline: '12 bài đọc song ngữ',
       expectedAsset: EXPLORE_CARDS_ASSETS.vanHoa.expectedFile,
+      assetDesc: EXPLORE_CARDS_ASSETS.vanHoa.description,
     },
     {
       id: 'truyen-thuyet',
@@ -37,6 +39,7 @@ export const ExploreSection: React.FC<ExploreSectionProps> = ({ onSelectCategory
       badge: 'Huyền Sử Dân Gian',
       tagline: '8 câu chuyện sử thi',
       expectedAsset: EXPLORE_CARDS_ASSETS.truyenThuyet.expectedFile,
+      assetDesc: EXPLORE_CARDS_ASSETS.truyenThuyet.description,
     },
     {
       id: 'am-thuc',
@@ -47,6 +50,7 @@ export const ExploreSection: React.FC<ExploreSectionProps> = ({ onSelectCategory
       badge: 'Tinh Hoa Mỹ Vị',
       tagline: '15 bài đọc ẩm thực',
       expectedAsset: EXPLORE_CARDS_ASSETS.amThuc.expectedFile,
+      assetDesc: EXPLORE_CARDS_ASSETS.amThuc.description,
     },
     {
       id: 'le-hoi',
@@ -57,6 +61,7 @@ export const ExploreSection: React.FC<ExploreSectionProps> = ({ onSelectCategory
       badge: 'Lễ Hội Truyền Thống',
       tagline: '10 bài đọc lễ hội',
       expectedAsset: EXPLORE_CARDS_ASSETS.leHoi.expectedFile,
+      assetDesc: EXPLORE_CARDS_ASSETS.leHoi.description,
     },
   ];
 
@@ -86,14 +91,30 @@ export const ExploreSection: React.FC<ExploreSectionProps> = ({ onSelectCategory
             onClick={() => onSelectCategory(topic.id)}
           >
             <div>
-              {/* Card Media with rounded corner */}
-              <div className="relative aspect-[4/3] w-full rounded-[14px] overflow-hidden bg-[#F6EEDC] mb-4 border border-[#E8DFCB]">
-                <img
-                  src={topic.image}
-                  alt={topic.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
+              {/* Card Media: Hiển thị ảnh nếu có, hoặc khối placeholder xám chuẩn nếu chưa có file asset */}
+              <div className="relative aspect-[4/3] w-full rounded-[14px] overflow-hidden bg-[#E5E7EB] mb-4 border border-[#D1D5DB] flex flex-col items-center justify-center text-center p-3">
+                {topic.image ? (
+                  <img
+                    src={topic.image}
+                    alt={topic.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center bg-[#F3F4F6] border border-dashed border-[#9CA3AF] rounded-[10px]">
+                    <ImageIcon className="w-6 h-6 text-[#6B7280] mb-1.5" />
+                    <span className="text-[10px] uppercase font-bold text-[#374151] bg-[#E5E7EB] px-2 py-0.5 rounded-full mb-1">
+                      Cần ảnh asset
+                    </span>
+                    <code className="text-[11px] font-mono text-[#1F2937] font-semibold">
+                      {topic.expectedAsset}
+                    </code>
+                    <p className="text-[10px] text-[#6B7280] line-clamp-2 mt-1 leading-tight">
+                      {topic.assetDesc}
+                    </p>
+                  </div>
+                )}
+                
                 <div className="absolute top-2.5 left-2.5">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#FBF7EE]/90 text-[#1E4B43] border border-[#E8DFCB] shadow-xs backdrop-blur-xs">
                     {topic.badge}

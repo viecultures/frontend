@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { HERO_ASSETS } from '../assets';
 
 interface HeroBannerProps {
@@ -73,9 +73,17 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               className="inline-flex items-center gap-3.5 px-4 py-3 bg-[#FDFBF7] border border-[#E8DFCB] rounded-[14px] shadow-[0_4px_16px_rgba(30,75,67,0.06)] hover:border-[#D9B76A] hover:shadow-md transition-all cursor-pointer group"
               title="Mở bộ Flashcard từ vựng văn hóa"
             >
-              <div className="w-10 h-10 rounded-lg bg-[#F6EEDC] border border-[#E8DFCB] flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
-                <span>📖</span>
-              </div>
+              {HERO_ASSETS.iconBook ? (
+                <img 
+                  src={HERO_ASSETS.iconBook} 
+                  alt="Sổ từ vựng" 
+                  className="w-10 h-10 object-contain shrink-0 group-hover:scale-105 transition-transform" 
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-[#E5E7EB] border border-[#D1D5DB] flex flex-col items-center justify-center text-xs shrink-0 group-hover:scale-105 transition-transform" title="Cần ảnh asset: assets/icon-book.webp">
+                  <span className="text-sm">📖</span>
+                </div>
+              )}
               <div className="text-left">
                 <span className="block text-[11px] uppercase tracking-wider text-[#6B635B] font-semibold">
                   Discover
@@ -99,25 +107,36 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             </div>
 
             {/* Khung Tranh Minh Họa Chính (Hero Visual Frame) */}
-            <div className="w-full max-w-md aspect-[4/3] rounded-[20px] overflow-hidden border-2 border-[#E8DFCB] bg-[#FDFBF7] shadow-xl relative group">
-              <img
-                src={HERO_ASSETS.illustration}
-                alt="Minh họa người phụ nữ Việt Nam và hoa sen"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              
-              {/* Bottom Visual Gradient Overlay & Caption */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1E4B43]/85 via-transparent to-transparent" />
-              
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white">
-                <div className="flex items-center gap-1.5 font-medium">
-                  <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
-                  <span>Di sản &amp; Văn hóa Việt</span>
+            <div className="w-full max-w-md aspect-[4/3] rounded-[20px] overflow-hidden border-2 border-[#E8DFCB] bg-[#E5E7EB] shadow-xl relative group flex flex-col items-center justify-center">
+              {HERO_ASSETS.illustration ? (
+                <>
+                  <img
+                    src={HERO_ASSETS.illustration}
+                    alt="Minh họa người phụ nữ Việt Nam và hoa sen"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1E4B43]/85 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white">
+                    <div className="flex items-center gap-1.5 font-medium">
+                      <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
+                      <span>Di sản &amp; Văn hóa Việt</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="w-full h-full bg-[#F3F4F6] flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-[#9CA3AF]">
+                  <ImageIcon className="w-10 h-10 text-[#6B7280] mb-2" />
+                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-[#E5E7EB] text-[#1F2937] mb-2">
+                    Cần ảnh asset
+                  </span>
+                  <code className="text-sm font-mono font-semibold text-[#111827] mb-1">
+                    {HERO_ASSETS.expectedIllustration}
+                  </code>
+                  <p className="text-xs text-[#4B5563] max-w-xs leading-relaxed">
+                    Tranh minh họa người phụ nữ Việt Nam trong tà áo dài truyền thống và hoa sen (tỷ lệ 4:3)
+                  </p>
                 </div>
-                <span className="bg-black/35 backdrop-blur-sm px-2.5 py-0.5 rounded-full border border-white/20 text-[11px]">
-                  Tà Áo Dài &amp; Sen Hồng
-                </span>
-              </div>
+              )}
             </div>
 
             {/* Ghi chú thông tin về asset */}

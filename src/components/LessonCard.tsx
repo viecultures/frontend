@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Sparkles, Clock, Volume2, Heart } from 'lucide-react';
+import { BookOpen, Sparkles, Clock, Volume2, Heart, Image as ImageIcon } from 'lucide-react';
 import type { Lesson, CEFRLevel } from '../types';
 
 interface LessonCardProps {
@@ -29,14 +29,26 @@ export const LessonCard: React.FC<LessonCardProps> = ({
   return (
     <div className="heritage-card flex flex-col justify-between overflow-hidden group">
       
-      {/* Top Image Container */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#F6EEDC]">
-        <img
-          src={lesson.imageUrl}
-          alt={lesson.titleEn}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          loading="lazy"
-        />
+      {/* Top Image Container: Nếu có ảnh thì hiển thị, nếu không có hiển thị placeholder xám */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#E5E7EB]">
+        {lesson.imageUrl ? (
+          <img
+            src={lesson.imageUrl}
+            alt={lesson.titleEn}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-[#F3F4F6] border border-dashed border-[#9CA3AF]">
+            <ImageIcon className="w-6 h-6 text-[#6B7280] mb-1.5" />
+            <span className="text-[10px] uppercase font-bold text-[#374151] bg-[#E5E7EB] px-2 py-0.5 rounded-full mb-1">
+              Cần ảnh asset
+            </span>
+            <span className="text-xs text-[#4B5563] font-medium">
+              {lesson.titleVi}
+            </span>
+          </div>
+        )}
         
         {/* Top Badges */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">

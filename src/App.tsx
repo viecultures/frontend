@@ -140,21 +140,38 @@ export function App() {
               </div>
 
               {/* Right Visual Frame */}
-              <div className="lg:col-span-5 relative aspect-[4/3] rounded-[20px] overflow-hidden border border-[#E8DFCB] shadow-lg bg-[#F6EEDC]">
-                <img
-                  src={featuredLesson.imageUrl}
-                  alt={featuredLesson.titleEn}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1E4B43]/80 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white font-medium">
-                  <span className="bg-black/50 px-3 py-1 rounded-full border border-white/20 backdrop-blur-xs">
-                    🎨 Tranh Dân Gian Đông Hồ
-                  </span>
-                  <span className="bg-[#D9B76A]/90 text-[#1E4B43] px-3 py-1 rounded-full font-bold shadow-xs">
-                    Di Sản Mộc Bản
-                  </span>
-                </div>
+              <div className="lg:col-span-5 relative aspect-[4/3] rounded-[20px] overflow-hidden border border-[#D1D5DB] shadow-lg bg-[#E5E7EB] flex flex-col items-center justify-center">
+                {featuredLesson.imageUrl ? (
+                  <>
+                    <img
+                      src={featuredLesson.imageUrl}
+                      alt={featuredLesson.titleEn}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1E4B43]/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white font-medium">
+                      <span className="bg-black/50 px-3 py-1 rounded-full border border-white/20 backdrop-blur-xs">
+                        🎨 Tranh Dân Gian Đông Hồ
+                      </span>
+                      <span className="bg-[#D9B76A]/90 text-[#1E4B43] px-3 py-1 rounded-full font-bold shadow-xs">
+                        Di Sản Mộc Bản
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full bg-[#F3F4F6] flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-[#9CA3AF]">
+                    <span className="text-3xl mb-2">🎨</span>
+                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-[#E5E7EB] text-[#1F2937] mb-2">
+                      Cần ảnh asset
+                    </span>
+                    <code className="text-sm font-mono font-semibold text-[#111827] mb-1">
+                      assets/card-le-hoi.webp
+                    </code>
+                    <p className="text-xs text-[#4B5563] max-w-xs leading-relaxed">
+                      {featuredLesson.titleVi}
+                    </p>
+                  </div>
+                )}
               </div>
 
             </div>

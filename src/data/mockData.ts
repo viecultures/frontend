@@ -10,7 +10,7 @@ export const MOCK_LESSONS: Lesson[] = [
     categoryNameVi: 'Lễ hội & sắc màu',
     level: 'B2',
     readTime: '4 phút đọc',
-    imageUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=80',
+    imageUrl: null, // Cần ảnh asset: assets/card-le-hoi.webp
     summary: 'Nét khắc than củi đanh gọn, màu khoáng từ điệp sò, hoa hòe và tro lá tre tạo nên bức tranh dân gian tràn đầy sức sống.',
     featured: true,
     totalReads: 1890,
@@ -92,7 +92,7 @@ export const MOCK_LESSONS: Lesson[] = [
     categoryNameVi: 'Truyền thuyết',
     level: 'B1',
     readTime: '4 phút đọc',
-    imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
+    imageUrl: null, // Cần ảnh asset: assets/card-truyen-thuyet.webp
     summary: 'Hàng ngàn đảo đá vôi kỳ vĩ nhô lên giữa vịnh biển ngọc bích, bắt nguồn từ truyền thuyết đàn rồng phun châu ngọc bảo vệ bờ cõi.',
     totalReads: 1780,
     likes: 490,
@@ -145,7 +145,7 @@ export const MOCK_LESSONS: Lesson[] = [
     categoryNameVi: 'Nếp sống & văn hóa',
     level: 'B1',
     readTime: '3 phút đọc',
-    imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80',
+    imageUrl: null, // Cần ảnh asset: assets/card-van-hoa.webp
     summary: 'Tà áo dài lụa tơ tằm thướt tha hòa cùng sắc sen ngọc, biểu trưng cho vẻ đẹp kín đáo và kiêu hãnh của phụ nữ Việt.',
     totalReads: 1650,
     likes: 490,
@@ -198,7 +198,7 @@ export const MOCK_LESSONS: Lesson[] = [
     categoryNameVi: 'Ẩm thực',
     level: 'B1',
     readTime: '3 phút đọc',
-    imageUrl: 'https://images.unsplash.com/photo-1626804475297-41608ea09aeb?auto=format&fit=crop&w=1200&q=80',
+    imageUrl: null, // Cần ảnh asset: assets/card-am-thuc.webp
     summary: 'Nét sáng tạo của ẩm thực đường phố biến chiếc bánh mì giòn rụm thành biểu tượng văn hóa ẩm thực thế giới.',
     totalReads: 2150,
     likes: 620,
@@ -251,7 +251,7 @@ export const MOCK_LESSONS: Lesson[] = [
     categoryNameVi: 'Nếp sống & văn hóa',
     level: 'B2',
     readTime: '4 phút đọc',
-    imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+    imageUrl: null, // Cần ảnh asset: assets/card-van-hoa.webp
     summary: 'Sự kết hợp hoàn mỹ giữa phong thủy phương Đông, tường thành ngọ môn và sông Hương thơ mộng.',
     totalReads: 2410,
     likes: 680,
@@ -304,7 +304,7 @@ export const MOCK_LESSONS: Lesson[] = [
     categoryNameVi: 'Lễ hội & sắc màu',
     level: 'A2',
     readTime: '3 phút đọc',
-    imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+    imageUrl: null, // Cần ảnh asset: assets/card-le-hoi.webp
     summary: 'Thương cảng thế kỷ 16 với những ngôi nhà tường vàng mái ngói âm dương và những đêm hội thả đèn hoa đăng lung linh.',
     totalReads: 980,
     likes: 215,

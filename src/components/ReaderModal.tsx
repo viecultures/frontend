@@ -194,14 +194,18 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           
           {/* Banner image with soft rounded corners */}
-          <div className="relative rounded-[20px] overflow-hidden border border-white/15 aspect-[21/9] max-h-52 bg-black/40">
-            <img 
-              src={lesson.imageUrl} 
-              alt={lesson.titleEn}
-              className="w-full h-full object-cover" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D1C18] via-[#0D1C18]/40 to-transparent" />
-            <div className="absolute bottom-4 left-5 right-5">
+          <div className="relative rounded-[20px] overflow-hidden border border-white/15 aspect-[21/9] max-h-52 bg-[#1E4B43]/60 flex flex-col justify-end p-5">
+            {lesson.imageUrl && (
+              <>
+                <img 
+                  src={lesson.imageUrl} 
+                  alt={lesson.titleEn}
+                  className="absolute inset-0 w-full h-full object-cover" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0D1C18] via-[#0D1C18]/40 to-transparent" />
+              </>
+            )}
+            <div className="relative z-10">
               <h3 className="font-heading text-xl sm:text-2xl font-bold text-white mb-1">
                 {lesson.titleVi}
               </h3>
