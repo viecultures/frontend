@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discovery Catalog - VN Culture Reader Layout</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">VN Culture Reader</a>
+
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="discovery.html" class="nav-link active">Discovery</a>
+        <!-- Reader Dropdown Menu -->
+        <div class="nav-item-dropdown">
+          <a href="reader-1.html" class="nav-link">Reader ▾</a>
+          <div class="dropdown-menu">
+            <a href="reader-1.html" class="dropdown-item">📖 Layout 1: Dual Book Card View</a>
+            <a href="reader-2.html" class="dropdown-item">📄 Layout 2: Classic Stacked View</a>
+          </div>
+        </div>
+        <a href="flashcards.html" class="nav-link">Flashcards</a>
+        <a href="community.html" class="nav-link">Community</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="search-btn" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="container">
+      <!-- Title & Intro -->
+      <h1 class="section-title">Discovery Catalog</h1>
+      <p class="section-subtitle">Browse curated bilingual English stories across Vietnamese heritage, culinary
+        traditions, and folklore.</p>
+
+      <!-- Filter Bar Wireframe -->
+      <div
+        style="border: 1px solid var(--color-border); padding: 16px 24px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; background-color: var(--color-surface);">
+
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <span style="font-weight: 700; font-size: 13px; text-transform: uppercase;">Topic:</span>
+          <select
+            style="padding: 8px 16px; border: 1px solid var(--color-border); font-family: var(--font-sans); font-size: 14px; background: white;">
+            <option>All Topics</option>
+            <option>History & Heritage</option>
+            <option>Cuisine & Coffee</option>
+            <option>Arts & Crafts</option>
+            <option>Festivals & Beliefs</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <span style="font-weight: 700; font-size: 13px; text-transform: uppercase;">CEFR Level:</span>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-outline" style="padding: 6px 14px; font-size: 12px;">All</button>
+            <button class="btn-outline" style="padding: 6px 14px; font-size: 12px;">A2</button>
+            <button class="btn-cta" style="padding: 6px 14px; font-size: 12px;">B1</button>
+            <button class="btn-outline" style="padding: 6px 14px; font-size: 12px;">B2</button>
+            <button class="btn-outline" style="padding: 6px 14px; font-size: 12px;">C1</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Hero Featured Story Card -->
+      <div class="layout-card" style="margin-bottom: 48px; display: grid; grid-template-columns: 7fr 5fr;">
+        <div class="img-placeholder" style="height: 400px;">
+          700X400
+        </div>
+        <div class="card-body" style="padding: 40px; display: flex; flex-direction: column; justify-content: center;">
+          <span
+            style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 8px;">Featured
+            Story of the Week</span>
+          <h2 class="card-title" style="font-size: 28px; margin-bottom: 16px;">Exploring Imperial Hue Architecture
+            Through B1 English</h2>
+          <p class="card-text" style="margin-bottom: 24px;">Discover the citadel gates, royal tombs, and court cuisine
+            of the Nguyen Dynasty while building academic vocabulary.</p>
+          <div>
+            <a href="reader.html" class="btn-cta">Read Story Now</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lesson Card Grid -->
+      <h2 class="section-title" style="font-size: 24px; margin-bottom: 24px;">All Lessons (Recommended for B1)</h2>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+
+        <!-- Card 1 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Cuisine
+              • Level B1</span>
+            <h3 class="card-title" style="margin-top: 4px;">The Story of Saigon Banh Mi</h3>
+            <p class="card-text">From French baguette to global culinary icon: the history behind Vietnam's favorite
+              street food.</p>
+            <div
+              style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: var(--color-text-subtle);">5 min read • 8 Vocab words</span>
+              <a href="reader.html"
+                style="font-size: 13px; font-weight: 700; color: var(--color-text-main); text-decoration: none;">Read
+                →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Heritage
+              • Level B1</span>
+            <h3 class="card-title" style="margin-top: 4px;">Hoi An Lantern Festival Traditions</h3>
+            <p class="card-text">Understanding full moon rituals, silk craftsmanship, and ancient architecture along the
+              Thu Bon River.</p>
+            <div
+              style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: var(--color-text-subtle);">7 min read • 10 Vocab words</span>
+              <a href="reader.html"
+                style="font-size: 13px; font-weight: 700; color: var(--color-text-main); text-decoration: none;">Read
+                →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Crafts
+              • Level B2</span>
+            <h3 class="card-title" style="margin-top: 4px;">Bat Trang Pottery & Ceramic Arts</h3>
+            <p class="card-text">700 years of ceramic heritage in a traditional craft village on the Red River delta.
+            </p>
+            <div
+              style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: var(--color-text-subtle);">6 min read • 9 Vocab words</span>
+              <a href="reader.html"
+                style="font-size: 13px; font-weight: 700; color: var(--color-text-main); text-decoration: none;">Read
+                →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Nature
+              • Level B1</span>
+            <h3 class="card-title" style="margin-top: 4px;">Terraced Fields of Mu Cang Chai</h3>
+            <p class="card-text">Harvest season in the northern highlands and the agricultural wisdom of ethnic
+              communities.</p>
+            <div
+              style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: var(--color-text-subtle);">5 min read • 7 Vocab words</span>
+              <a href="reader.html"
+                style="font-size: 13px; font-weight: 700; color: var(--color-text-main); text-decoration: none;">Read
+                →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Cuisine
+              • Level B2</span>
+            <h3 class="card-title" style="margin-top: 4px;">Vietnamese Egg Coffee Legacy</h3>
+            <p class="card-text">How necessity birthed a famous coffee culture innovation in 1946 Old Quarter Hanoi.</p>
+            <div
+              style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: var(--color-text-subtle);">4 min read • 6 Vocab words</span>
+              <a href="reader.html"
+                style="font-size: 13px; font-weight: 700; color: var(--color-text-main); text-decoration: none;">Read
+                →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="layout-card">
+          <div class="img-placeholder img-placeholder-sm" style="height: 260px;">
+            380X260
+          </div>
+          <div class="card-body">
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Folklore
+              • Level B1</span>
+            <h3 class="card-title" style="margin-top: 4px;">Water Puppetry & Village Legends</h3>
+            <p class="card-text">Traditional performing arts rooted in flooded rice paddies of Northern Vietnam.</p>
+            <div
+              style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: var(--color-text-subtle);">8 min read • 11 Vocab words</span>
+              <a href="reader.html"
+                style="font-size: 13px; font-weight: 700; color: var(--color-text-main); text-decoration: none;">Read
+                →</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 VN Culture Reader. Discovery Catalog Wireframe Layout.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>
