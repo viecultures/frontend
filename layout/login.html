@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Register Layout - VN Culture Reader Wireframe</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">VN Culture Reader</a>
+
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="discovery.html" class="nav-link">Discovery</a>
+
+        <!-- Reader Dropdown Menu -->
+        <div class="nav-item-dropdown">
+          <a href="reader-2.html" class="nav-link">Reader ▾</a>
+          <div class="dropdown-menu">
+            <a href="reader-1.html" class="dropdown-item">📖 Layout 1: Dual Book Card View</a>
+            <a href="reader-2.html" class="dropdown-item">📄 Layout 2: Classic Stacked View</a>
+          </div>
+        </div>
+
+        <a href="flashcards.html" class="nav-link">Flashcards</a>
+
+        <!-- Community Dropdown Menu -->
+        <div class="nav-item-dropdown">
+          <a href="community.html" class="nav-link">Community ▾</a>
+          <div class="dropdown-menu">
+            <a href="community.html" class="dropdown-item">💬 Community 1: Member Reflections</a>
+            <a href="community-2.html" class="dropdown-item">🏆 Community 2: Cultural Contest Hub</a>
+          </div>
+        </div>
+      </nav>
+
+      <div class="header-actions">
+        <a href="login.html" class="btn-cta">Login / Sign In</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login & Register Wireframe Main Layout -->
+  <main class="auth-page-container">
+    <div class="auth-wrapper">
+
+      <!-- Left Column: Form Section -->
+      <div class="auth-form-side">
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchAuthTab('login')">Đăng Nhập / Sign In</button>
+          <button class="auth-tab" onclick="switchAuthTab('register')">Đăng Ký / Sign Up</button>
+        </div>
+
+        <h1 class="auth-header-title" id="form-title">Welcome Back</h1>
+        <p class="auth-header-sub" id="form-sub">Nhập tài khoản của bạn để tiếp tục hành trình học tiếng Anh di sản văn hóa.</p>
+
+        <form onsubmit="event.preventDefault(); alert('Wireframe Login Form Submitted!');">
+          <div class="form-group">
+            <label class="form-label" for="email">Email / Tên Đăng Nhập</label>
+            <input type="email" id="email" class="form-input" placeholder="student@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Mật Khẩu / Password</label>
+            <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+          </div>
+
+          <div class="form-row-flex">
+            <label class="checkbox-label">
+              <input type="checkbox" checked> Ghi nhớ đăng nhập
+            </label>
+            <a href="#" class="forgot-link">Quên mật khẩu?</a>
+          </div>
+
+          <button type="submit" class="btn-auth-submit" id="btn-submit-text">Đăng Nhập Ngay</button>
+        </form>
+
+        <div class="social-divider">
+          <span>Hoặc tiếp tục với</span>
+        </div>
+
+        <div class="social-buttons">
+          <button class="btn-social-wireframe" onclick="alert('Google Auth Clicked')">
+            <span>🌐 Google</span>
+          </button>
+          <button class="btn-social-wireframe" onclick="alert('Facebook Auth Clicked')">
+            <span>📘 Facebook</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: Info & Heritage Value Proposition -->
+      <div class="auth-info-side">
+        <div>
+          <span class="auth-info-badge">EDTECH VĂN HÓA DI SẢN</span>
+          <h2 class="auth-info-title">Nâng Tầm Tiếng Anh Qua Di Sản Việt Nam</h2>
+          <p class="auth-info-desc">Tạo tài khoản để theo dõi tiến độ học từ vựng 3D Flashcards, mở khóa bài đọc song ngữ AI và tham gia thử thách cảm nghĩ cộng đồng.</p>
+        </div>
+
+        <div>
+          <ul class="auth-feature-list">
+            <li class="auth-feature-item">✓ Lưu từ vựng học thuật & Spaced Repetition</li>
+            <li class="auth-feature-item">✓ Tra từ song ngữ thông minh & AI Shadowing</li>
+            <li class="auth-feature-item">✓ Nhận huy hiệu Sứ Giả Văn Hóa & Thưởng Xu</li>
+          </ul>
+
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border); font-size: 12px;">
+            <a href="index.html" style="color: var(--color-text-main); font-weight: 700; text-decoration: underline;">← Quay lại Trang Chủ Layout</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Interactive Tab Switcher Script -->
+  <script>
+    function switchAuthTab(type) {
+      const tabs = document.querySelectorAll('.auth-tab');
+      const formTitle = document.getElementById('form-title');
+      const formSub = document.getElementById('form-sub');
+      const btnSubmit = document.getElementById('btn-submit-text');
+
+      tabs.forEach(t => t.classList.remove('active'));
+
+      if (type === 'login') {
+        tabs[0].classList.add('active');
+        formTitle.textContent = 'Welcome Back';
+        formSub.textContent = 'Nhập tài khoản của bạn để tiếp tục hành trình học tiếng Anh di sản văn hóa.';
+        btnSubmit.textContent = 'Đăng Nhập Ngay';
+      } else {
+        tabs[1].classList.add('active');
+        formTitle.textContent = 'Tạo Tài Khoản Mới';
+        formSub.textContent = 'Bắt đầu học tiếng Anh qua câu chuyện nghệ thuật & di sản hoàn toàn miễn phí.';
+        btnSubmit.textContent = 'Đăng Ký Tài Khoản';
+      }
+    }
+  </script>
+</body>
+
+</html>
