@@ -49,11 +49,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const getBgImage = (time: 'Morning' | 'Afternoon' | 'Evening') => {
     switch (time) {
       case 'Morning':
-        return '/bg-morning.png';
+        return '/bg-morning.jpg';
       case 'Afternoon':
-        return '/bg-afternoon.png';
+        return '/bg-afternoon.jpg';
       case 'Evening':
-        return '/bg-evening.png';
+        return '/bg-evening.jpg';
     }
   };
 
@@ -328,8 +328,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     )}
                     <span
                       className={`text-xs sm:text-sm font-semibold transition-all ${task.completed
-                          ? 'line-through text-gray-500'
-                          : 'text-[#18221E] group-hover:text-amber-900'
+                        ? 'line-through text-gray-500'
+                        : 'text-[#18221E] group-hover:text-amber-900'
                         }`}
                     >
                       {task.label}
@@ -416,21 +416,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10">
               <button
                 onClick={() => setActiveDockMode('study')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  activeDockMode === 'study'
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${activeDockMode === 'study'
                     ? 'bg-[#FCE5B5] text-[#18221E] shadow-md'
                     : 'text-white/70 hover:text-white'
-                }`}
+                  }`}
               >
                 Study Mode
               </button>
               <button
                 onClick={() => setActiveDockMode('pomodoro')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  activeDockMode === 'pomodoro'
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${activeDockMode === 'pomodoro'
                     ? 'bg-[#FCE5B5] text-[#18221E] shadow-md'
                     : 'text-white/70 hover:text-white'
-                }`}
+                  }`}
               >
                 <span>Pomodoro</span>
                 {activeDockMode === 'pomodoro' && (
