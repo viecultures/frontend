@@ -3,7 +3,6 @@ import {
   Volume2,
   CheckCircle2,
   XCircle,
-  Flame,
   Sparkles,
   ChevronRight,
   Layers,
@@ -135,8 +134,8 @@ export default function FlashcardsPage() {
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
 
   // Review Ratings Counter
-  const [rememberedCount, setRememberedCount] = useState<number>(12);
-  const [reviewCount, setReviewCount] = useState<number>(7);
+  const [_rememberedCount, setRememberedCount] = useState<number>(12);
+  const [_reviewCount, setReviewCount] = useState<number>(7);
   const [reviewFeedback, setReviewFeedback] = useState<string | null>(null);
 
   // Multiple Choice Mode State
@@ -268,75 +267,96 @@ export default function FlashcardsPage() {
     <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
 
       {/* Header Banner */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-2 sm:py-4">
+
+        {/* Simplified Top Progress Bar */}
+        <div className="mb-3 p-3 rounded-2xl bg-[#F6EEDC] border border-[rgba(30,75,67,0.12)] shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-[#1E4B43]">
+            <span className="flex items-center gap-1.5">
+              🎯 Tiến độ học: <span className="text-[#059669] font-extrabold">{currentIndex + 1} / {FLASHCARDS_DATA.length}</span> từ
+            </span>
+            <span className="text-[#6E7E79]">
+              {Math.round(((currentIndex + 1) / FLASHCARDS_DATA.length) * 100)}%
+            </span>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full h-2 rounded-full bg-[#E8DFCB] overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-[#1E4B43] to-[#059669] rounded-full transition-all duration-500"
+              style={{ width: `${Math.round(((currentIndex + 1) / FLASHCARDS_DATA.length) * 100)}%` }}
+            />
+          </div>
+        </div>
+
         {/* Practice Mode Selector Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2 p-2 rounded-2xl bg-[#F6EEDC] border border-[rgba(30,75,67,0.12)] shadow-sm mb-8">
+        <div className="flex flex-wrap items-center justify-center gap-1.5 p-1.5 rounded-2xl bg-[#F6EEDC] border border-[rgba(30,75,67,0.12)] shadow-sm mb-3">
           <button
             onClick={() => setActiveMode("flip")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${activeMode === "flip"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeMode === "flip"
                 ? "bg-[#1E4B43] text-[#FBF7EE] shadow-sm border border-[#D9B76A]/60"
                 : "text-[#1E4B43] hover:bg-[#E8DFCB]"
               }`}
           >
             <Layers className="w-4 h-4 text-[#D9B76A]" />
-            <span>🃏 Lật Thẻ 3D</span>
+            <span>Lật Thẻ 3D</span>
           </button>
 
           <button
             onClick={() => setActiveMode("mc")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${activeMode === "mc"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeMode === "mc"
                 ? "bg-[#1E4B43] text-[#FBF7EE] shadow-sm border border-[#D9B76A]/60"
                 : "text-[#1E4B43] hover:bg-[#E8DFCB]"
               }`}
           >
             <Target className="w-4 h-4 text-[#D9B76A]" />
-            <span>🎯 Trắc Nghiệm</span>
+            <span>Trắc Nghiệm</span>
           </button>
 
           <button
             onClick={() => setActiveMode("spelling")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${activeMode === "spelling"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeMode === "spelling"
                 ? "bg-[#1E4B43] text-[#FBF7EE] shadow-sm border border-[#D9B76A]/60"
                 : "text-[#1E4B43] hover:bg-[#E8DFCB]"
               }`}
           >
             <PenTool className="w-4 h-4 text-[#D9B76A]" />
-            <span>✍️ Gõ Từ</span>
+            <span>Gõ Từ</span>
           </button>
 
           <button
             onClick={() => setActiveMode("match")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${activeMode === "match"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeMode === "match"
                 ? "bg-[#1E4B43] text-[#FBF7EE] shadow-sm border border-[#D9B76A]/60"
                 : "text-[#1E4B43] hover:bg-[#E8DFCB]"
               }`}
           >
             <Puzzle className="w-4 h-4 text-[#D9B76A]" />
-            <span>🧩 Nối Từ</span>
+            <span>Nối Từ</span>
           </button>
 
           <button
             onClick={() => setActiveMode("audio")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${activeMode === "audio"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeMode === "audio"
                 ? "bg-[#1E4B43] text-[#FBF7EE] shadow-sm border border-[#D9B76A]/60"
                 : "text-[#1E4B43] hover:bg-[#E8DFCB]"
               }`}
           >
             <Headphones className="w-4 h-4 text-[#D9B76A]" />
-            <span>🎧 Luyện Nghe</span>
+            <span>Luyện Nghe</span>
           </button>
         </div>
 
         {/* MODE 1: CLASSIC 3D FLIP CARD */}
         {activeMode === "flip" && (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-3 sm:space-y-4 animate-in fade-in duration-300">
             {/* Main Flashcard Container */}
             <div
               onClick={() => setIsFlipped((prev) => !prev)}
-              className="relative min-h-[380px] p-8 sm:p-12 rounded-3xl bg-[#FBF7EE] border-2 border-[#D9B76A]/60 shadow-[0_12px_35px_rgba(30,75,67,0.12)] flex flex-col justify-between text-center cursor-pointer transition-transform duration-300 hover:scale-[1.005] select-none"
+              className="relative min-h-[340px] sm:min-h-[380px] p-6 sm:p-10 rounded-3xl bg-[#FBF7EE] border-2 border-[#D9B76A]/60 shadow-[0_12px_35px_rgba(30,75,67,0.12)] flex flex-col justify-between text-center cursor-pointer transition-transform duration-300 hover:scale-[1.005] select-none"
             >
               {/* Top Card Info Bar */}
-              <div className="flex items-center justify-between text-xs font-bold text-[#6E7E79] uppercase tracking-wider">
+              <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-[#6E7E79] uppercase tracking-wider">
                 <span className="text-[#1E4B43]">
                   {isFlipped ? "Mặt Sau (Tiếng Việt)" : "Mặt Trước (Tiếng Anh)"}
                 </span>
@@ -347,9 +367,9 @@ export default function FlashcardsPage() {
 
               {/* Front Content */}
               {!isFlipped ? (
-                <div className="my-auto py-6">
+                <div className="my-auto py-4 sm:py-6">
                   <div className="flex items-center justify-center gap-3 mb-2">
-                    <h2 className="font-serif text-4xl sm:text-5xl font-bold text-[#1E4B43]">
+                    <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-[#1E4B43]">
                       {currentCard.word}
                     </h2>
                     <button
@@ -360,65 +380,65 @@ export default function FlashcardsPage() {
                       className="p-2 rounded-full bg-[#F6EEDC] text-[#1E4B43] hover:bg-[#E8DFCB] transition-colors"
                       title="Phát âm"
                     >
-                      <Volume2 className="w-5 h-5 text-[#D9B76A]" />
+                      <Volume2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#D9B76A]" />
                     </button>
                   </div>
-                  <p className="text-xs font-mono text-[#6E7E79] mb-4">
+                  <p className="text-xs sm:text-sm font-mono text-[#6E7E79] mb-4">
                     {currentCard.ipa} • {currentCard.pos}
                   </p>
-                  <p className="text-sm sm:text-base italic text-[#3F5550] max-w-lg mx-auto leading-relaxed bg-[#F6EEDC]/50 p-4 rounded-2xl border border-[rgba(30,75,67,0.08)]">
+                  <p className="text-sm sm:text-base italic text-[#3F5550] max-w-xl mx-auto leading-relaxed bg-[#F6EEDC]/50 p-4 sm:p-5 rounded-2xl border border-[rgba(30,75,67,0.08)]">
                     "{currentCard.contextEn}"
                   </p>
                 </div>
               ) : (
                 /* Back Content */
-                <div className="my-auto py-6">
-                  <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#059669] mb-3">
+                <div className="my-auto py-4 sm:py-6">
+                  <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#059669] mb-3">
                     {currentCard.viMeaning}
                   </h2>
-                  <p className="text-sm font-semibold text-[#1E4B43] max-w-md mx-auto leading-relaxed bg-[#ECFDF5] p-4 rounded-2xl border border-[#059669]/20">
+                  <p className="text-sm sm:text-base font-semibold text-[#1E4B43] max-w-lg mx-auto leading-relaxed bg-[#ECFDF5] p-4 sm:p-5 rounded-2xl border border-[#059669]/20">
                     Định nghĩa: {currentCard.viDefinition}
                   </p>
                 </div>
               )}
 
               {/* Bottom Prompt */}
-              <div className="text-xs font-semibold text-[#6E7E79] flex items-center justify-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
+              <div className="text-xs font-semibold text-[#6E7E79] flex items-center justify-center gap-1.5 pt-2">
+                <Sparkles className="w-4 h-4 text-[#D9B76A]" />
                 <span>
-                  Click vào thẻ hoặc bấm phím <kbd className="px-2 py-0.5 rounded bg-[#F6EEDC] border border-[rgba(30,75,67,0.2)] font-mono text-[11px]">Space</kbd> để lật thẻ
+                  Click vào thẻ hoặc bấm phím <kbd className="px-2 py-0.5 rounded bg-[#F6EEDC] border border-[rgba(30,75,67,0.2)] font-mono text-xs">Space</kbd> để lật thẻ
                 </span>
               </div>
             </div>
 
             {/* Review Feedback Toast */}
             {reviewFeedback && (
-              <div className="text-center text-sm font-bold text-[#1E4B43] animate-pulse">
+              <div className="text-center text-xs font-bold text-[#1E4B43] animate-pulse">
                 {reviewFeedback}
               </div>
             )}
 
             {/* Spaced Repetition Binary Rating Buttons */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => handleRateCard(false)}
-                className="py-4 px-6 rounded-2xl bg-[#FBF7EE] border-2 border-[#991B1B] text-[#991B1B] font-bold text-sm hover:bg-[#FEF2F2] transition-colors flex items-center justify-center gap-2 shadow-sm"
+                className="py-2.5 px-4 rounded-2xl bg-[#FBF7EE] border-2 border-[#991B1B] text-[#991B1B] font-bold text-xs sm:text-sm hover:bg-[#FEF2F2] transition-colors flex items-center justify-center gap-2 shadow-sm"
               >
-                <XCircle className="w-5 h-5" />
+                <XCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>🔴 Cần ôn lại (Needs Review)</span>
               </button>
 
               <button
                 onClick={() => handleRateCard(true)}
-                className="py-4 px-6 rounded-2xl bg-[#FBF7EE] border-2 border-[#059669] text-[#059669] font-bold text-sm hover:bg-[#ECFDF5] transition-colors flex items-center justify-center gap-2 shadow-sm"
+                className="py-2.5 px-4 rounded-2xl bg-[#FBF7EE] border-2 border-[#059669] text-[#059669] font-bold text-xs sm:text-sm hover:bg-[#ECFDF5] transition-colors flex items-center justify-center gap-2 shadow-sm"
               >
-                <CheckCircle2 className="w-5 h-5" />
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>🟢 Đã nhớ (Remembered)</span>
               </button>
             </div>
 
             {/* Keyboard Shortcuts Hint */}
-            <div className="text-center text-xs font-medium text-[#6E7E79]">
+            <div className="text-center text-[11px] font-medium text-[#6E7E79]">
               Phím tắt: <kbd className="px-1.5 py-0.5 rounded bg-[#F6EEDC]">← Mũi tên trái</kbd> (Cần ôn) |{" "}
               <kbd className="px-1.5 py-0.5 rounded bg-[#F6EEDC]">Space</kbd> (Lật) |{" "}
               <kbd className="px-1.5 py-0.5 rounded bg-[#F6EEDC]">Mũi tên phải →</kbd> (Đã nhớ)
@@ -653,8 +673,8 @@ export default function FlashcardsPage() {
                   key={opt}
                   onClick={() => handleSelectMC(idx)}
                   className={`w-full p-3.5 rounded-2xl border text-xs sm:text-sm font-bold transition-all ${mcSelected === idx && idx === currentCard.correctIndex
-                      ? "bg-[#ECFDF5] text-[#059669] border-[#059669]"
-                      : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                    ? "bg-[#ECFDF5] text-[#059669] border-[#059669]"
+                    : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
                     }`}
                 >
                   {opt}
@@ -663,45 +683,6 @@ export default function FlashcardsPage() {
             </div>
           </div>
         )}
-
-        {/* Progress Tracker Panel */}
-        <section className="mt-10 p-8 rounded-3xl bg-[#F6EEDC] border border-[rgba(30,75,67,0.12)] shadow-sm space-y-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-[rgba(30,75,67,0.10)]">
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#1E4B43] bg-[#1E4B43]/10 px-3 py-1 rounded-full">
-                🎯 Mục tiêu hôm nay: 18 / 25 từ
-              </span>
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#D9B76A]/20 text-xs font-bold text-[#1E4B43] border border-[#D9B76A]/40">
-                <Flame className="w-3.5 h-3.5 text-[#D9B76A] fill-[#D9B76A]" />
-                5 Ngày liên tiếp
-              </span>
-            </div>
-            <span className="text-xs font-bold text-[#059669]">
-              Còn lại 7 từ nữa để hoàn thành!
-            </span>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="w-full h-3 rounded-full bg-[#E8DFCB] overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-[#1E4B43] to-[#059669] rounded-full transition-all duration-500"
-              style={{ width: "72%" }}
-            />
-          </div>
-
-          {/* Detailed Status Breakdown Pills */}
-          <div className="grid grid-cols-3 gap-4 text-center text-xs font-bold">
-            <div className="p-3 rounded-2xl bg-[#ECFDF5] text-[#059669] border border-[#059669]/20">
-              <span>🟢 Đã nhớ:</span> <strong className="text-sm ml-1">{rememberedCount} từ</strong>
-            </div>
-            <div className="p-3 rounded-2xl bg-[#FEF3C7] text-[#D97706] border border-[#D97706]/20">
-              <span>🟡 Đang luyện:</span> <strong className="text-sm ml-1">6 từ</strong>
-            </div>
-            <div className="p-3 rounded-2xl bg-[#FEF2F2] text-[#991B1B] border border-[#991B1B]/20">
-              <span>🔴 Cần ôn lại:</span> <strong className="text-sm ml-1">{reviewCount} từ</strong>
-            </div>
-          </div>
-        </section>
       </div>
     </main>
   );

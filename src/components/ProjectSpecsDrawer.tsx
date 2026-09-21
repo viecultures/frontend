@@ -46,7 +46,7 @@ export const ProjectSpecsDrawer: React.FC<ProjectSpecsDrawerProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/80 backdrop-blur-md">
       <div className="w-full max-w-2xl h-full bg-[#0D1C18]/95 border-l border-white/15 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300">
         
         {/* Header */}

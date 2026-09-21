@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Sparkles, FileText, Compass, Layout, MessageSquare, Trophy, Layers, Home, User } from 'lucide-react';
+import { BookOpen, Sparkles, FileText, Compass, Layout, MessageSquare, Trophy, Layers, Home, User, MapPin } from 'lucide-react';
 import logoImg from '../assets/logo/logo.jpg';
 
 interface NavbarProps {
@@ -13,11 +13,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenDocs,
   onNavigateToSection,
 }) => {
+  const [isLandingDropdownOpen, setIsLandingDropdownOpen] = useState(false);
   const [isReaderDropdownOpen, setIsReaderDropdownOpen] = useState(false);
   const [isCommunityDropdownOpen, setIsCommunityDropdownOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#0D1C18]/90 border-b border-white/15 backdrop-blur-xl transition-all">
+    <header className="sticky top-0 z-50 w-full bg-[#0D1C18]/90 border-b border-white/15 backdrop-blur-xl transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
 
@@ -39,22 +40,63 @@ export const Navbar: React.FC<NavbarProps> = ({
                   VieCultures
                 </span>
               </div>
-              <p className="text-xs text-white/65 font-normal tracking-wide">
-                Học Tiếng Anh Qua Nghệ Thuật &amp; Di Sản
-              </p>
             </div>
           </div>
 
           {/* Center Main Nav matching Wireframe Specification */}
           <nav className="hidden lg:flex items-center gap-4 text-xs font-semibold uppercase tracking-wider text-white/85">
-            {/* 0. Landing */}
-            <button
-              onClick={() => onNavigateToSection('landing')}
-              className={`transition-colors py-2 px-3 rounded-lg flex items-center gap-1.5 ${activeView === 'landing' ? 'text-[#FCE5B5] bg-white/10 font-bold border-b-2 border-[#FCE5B5]' : 'hover:text-[#FCE5B5]'
-                }`}
+            {/* 0. Landing Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setIsLandingDropdownOpen(true)}
+              onMouseLeave={() => setIsLandingDropdownOpen(false)}
             >
-              <span>Landing</span>
-            </button>
+              <button
+                onClick={() => onNavigateToSection('landing')}
+                className={`transition-colors py-2 px-3 rounded-lg flex items-center gap-1.5 ${activeView === 'landing' || activeView === 'landing-2' || activeView === 'landing-3' ? 'text-[#FCE5B5] bg-white/10 font-bold border-b-2 border-[#FCE5B5]' : 'hover:text-[#FCE5B5]'
+                  }`}
+              >
+                <span>Landing ▾</span>
+              </button>
+
+              {/* Landing Dropdown Menu */}
+              {isLandingDropdownOpen && (
+                <div className="absolute top-full left-0 w-72 pt-2 z-50">
+                  <div className="bg-[#122A22] border border-white/20 rounded-xl shadow-2xl p-2 backdrop-blur-xl space-y-1">
+                    <button
+                      onClick={() => {
+                        onNavigateToSection('landing');
+                        setIsLandingDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium text-white/90 hover:bg-white/15 hover:text-[#FCE5B5] transition-colors flex items-center gap-2"
+                    >
+                      <Sparkles className="w-4 h-4 text-[#F5D280]" />
+                      <span>Landing 1: Hero Video Banner</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigateToSection('landing-2');
+                        setIsLandingDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium text-white/90 hover:bg-white/15 hover:text-[#FCE5B5] transition-colors flex items-center gap-2"
+                    >
+                      <Layers className="w-4 h-4 text-emerald-400" />
+                      <span>Landing 2: Wireframe Spec Layout</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigateToSection('landing-3');
+                        setIsLandingDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium text-white/90 hover:bg-white/15 hover:text-[#FCE5B5] transition-colors flex items-center gap-2"
+                    >
+                      <MapPin className="w-4 h-4 text-[#F5D280]" />
+                      <span>Landing 3: Bản Đồ Việt Nam Tương Tác</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* 1. Home Dashboard */}
             <button
@@ -180,9 +222,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => onNavigateToSection('login')}
-              className={`btn-pill-primary text-xs px-3.5 py-2 flex items-center gap-1.5 ${
-                activeView === 'login' ? 'ring-2 ring-[#FCE5B5]' : ''
-              }`}
+              className={`btn-pill-primary text-xs px-3.5 py-2 flex items-center gap-1.5 ${activeView === 'login' ? 'ring-2 ring-[#FCE5B5]' : ''
+                }`}
             >
               <User className="w-4 h-4 text-[#18221E]" />
               <span>Login</span>

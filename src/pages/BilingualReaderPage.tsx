@@ -140,7 +140,7 @@ export default function ReaderPage() {
     <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
 
       {/* Top Reader Toolbar Control Bar */}
-      <section className="bg-[#1E4B43] text-[#FBF7EE] border-b border-[#D9B76A]/30 py-3 px-6 sm:px-8 sticky top-[65px] z-40 shadow-md">
+      <section className="bg-[#1E4B43] text-[#FBF7EE] border-b border-[#D9B76A]/30 py-3 px-6 sm:px-8 sticky top-20 z-30 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Left Side: Back Link & Breadcrumbs */}
           <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
@@ -777,7 +777,7 @@ export default function ReaderPage() {
 
       {/* Vocabulary Slide-Over Drawer Modal */}
       {isVocabDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end">
+        <div className="fixed inset-0 z-[100] flex justify-end">
           {/* Backdrop Overlay */}
           <div
             onClick={() => setIsVocabDrawerOpen(false)}
