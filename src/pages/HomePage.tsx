@@ -239,7 +239,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           {/* User Greeting Header */}
           <div>
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]">
-              Luan Ninh Dep Trai
+              Luan Nin
             </h1>
             <p className="text-sm sm:text-base text-white/90 mt-2 font-medium drop-shadow-[0_1px_5px_rgba(0,0,0,0.85)]">
               Chào mừng trở lại — cùng khởi động nhanh nhé!
@@ -417,8 +417,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <button
                 onClick={() => setActiveDockMode('study')}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${activeDockMode === 'study'
-                    ? 'bg-[#FCE5B5] text-[#18221E] shadow-md'
-                    : 'text-white/70 hover:text-white'
+                  ? 'bg-[#FCE5B5] text-[#18221E] shadow-md'
+                  : 'text-white/70 hover:text-white'
                   }`}
               >
                 Study Mode
@@ -426,8 +426,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <button
                 onClick={() => setActiveDockMode('pomodoro')}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${activeDockMode === 'pomodoro'
-                    ? 'bg-[#FCE5B5] text-[#18221E] shadow-md'
-                    : 'text-white/70 hover:text-white'
+                  ? 'bg-[#FCE5B5] text-[#18221E] shadow-md'
+                  : 'text-white/70 hover:text-white'
                   }`}
               >
                 <span>Pomodoro</span>
