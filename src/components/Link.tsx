@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   href: string;
@@ -6,6 +7,8 @@ interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 
 export const Link: React.FC<LinkProps> = ({ href, children, onClick, className, ...props }) => {
+  const navigate = useNavigate();
+
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (onClick) onClick(e);
     if (href.startsWith('#')) {
@@ -16,14 +19,12 @@ export const Link: React.FC<LinkProps> = ({ href, children, onClick, className, 
       }
     } else if (href.startsWith('/') || href === '') {
       e.preventDefault();
-      let targetView = 'home';
-      if (href === '/discovery') targetView = 'discovery';
-      else if (href === '/community') targetView = 'community-1';
-      else if (href === '/community-2') targetView = 'community-2';
-      else if (href === '/flashcards') targetView = 'flashcards';
-      else if (href === '/reader') targetView = 'reader';
+      let targetPath = href;
+      if (href === '/flashcards' || href === '/flashcard-study-page') targetPath = '/flashcard-study';
+      else if (href === '/reader') targetPath = '/bilingual-reader';
 
-      window.dispatchEvent(new CustomEvent('app:navigate', { detail: targetView }));
+      window.dispatchEvent(new CustomEvent('app-navigate', { detail: targetPath }));
+      navigate(targetPath);
     }
   };
 

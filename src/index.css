@@ -1,192 +1,144 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
+/* Dark mode driven by a `.dark` class on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-heading: "Playfair Display", Georgia, serif;
+
+  --color-warm-ivory: #FBF7EE;
+  --color-rice-paper: #F6EEDC;
+  --color-heritage-green: #1E4B43;
+  --color-heritage-dark: #163D37;
+  --color-antique-gold: #D9B76A;
+  --color-sky-mist: #BFE3EA;
+  --color-horizon-blue: #9FCED8;
+  --color-mountain-teal: #6E9FA1;
+  --color-lotus-pink: #E8B7B2;
+  --color-mist-cloud: #E8DFCB;
+
+  --color-text-body: #3F5550;
+  --color-text-secondary: #6E7E79;
+  --color-text-muted: #8C9692;
+
+  --color-surface: #FBF7EE;
+  --color-surface-muted: #F6EEDC;
+  --color-surface-sunken: #E8DFCB;
+  --color-surface-hover: #E8DFCB;
+  --color-shell: rgba(251, 247, 238, 0.85);
+  --color-line: rgba(30, 75, 67, 0.12);
+
+  --color-ink: #163D37;
+  --color-ink-soft: #3F5550;
+  --color-ink-faint: #6E7E79;
+
+  --radius-card: 1.5rem;
+  --radius-inner: 1rem;
+  --radius-pill: 999px;
+}
+
+.dark {
+  --color-surface: #0b1a17;
+  --color-surface-muted: #122924;
+  --color-surface-sunken: #16332d;
+  --color-surface-hover: #1e453c;
+  --color-shell: rgba(11, 26, 23, 0.85);
+  --color-line: rgba(217, 183, 106, 0.2);
+
+  --color-ink: #FBF7EE;
+  --color-ink-soft: #d0deda;
+  --color-ink-faint: #98ada7;
+}
+
 @layer base {
-  :root {
-    --font-heading: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
-    --font-serif: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
-    --font-handwriting: 'Caveat', cursive;
-    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-
-    /* Modern Heritage Editorial & Atmospheric Glassmorphism Tokens */
-    --radius-pill: 9999px;
-    --radius-card: 20px;
-    --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-
-    /* Theme Tokens */
-    --btn-primary-bg: #FCE5B5;
-    --btn-primary-text: #18221E;
-    --btn-primary-hover: #FFF0CE;
-
-    --btn-glass-bg: rgba(18, 42, 34, 0.65);
-    --btn-glass-text: #FFFFFF;
-    --btn-glass-border: rgba(255, 255, 255, 0.25);
-    --btn-glass-hover: rgba(26, 60, 48, 0.85);
-
-    --pill-tag-bg: rgba(0, 0, 0, 0.45);
-    --pill-tag-text: #F5E8C7;
-    --pill-tag-border: rgba(255, 255, 255, 0.15);
-
-    --text-hero-main: #FFFFFF;
-    --text-hero-sub: #F7E5C3;
-    --text-hero-desc: rgba(255, 255, 255, 0.88);
-
-    --color-page-base: #0D1C18;
-    --color-jade-deep: #112720;
-    --color-gold-accent: #E2A93B;
+  * {
+    border-color: var(--color-line);
   }
 
-  html, body {
+  html,
+  body,
+  #root {
+    min-height: 100%;
     margin: 0;
-    padding: 0;
-    font-family: var(--font-body);
-    background-color: var(--color-page-base);
-    color: var(--text-hero-main);
-    overflow-x: hidden;
     cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, auto;
   }
 
-  a, button, [role="button"], input[type="button"], input[type="submit"], select, .cursor-pointer {
-    cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
+  body {
+    font-family: var(--font-sans);
+    color: #3F5550;
+    background-color: #FBF7EE;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .dark body {
+    background-color: #0b1a17;
+    color: #FBF7EE;
   }
 
   h1, h2, h3, .font-heading {
     font-family: var(--font-heading);
-    letter-spacing: -0.015em;
+  }
+
+  button,
+  a,
+  select,
+  summary,
+  label[for],
+  [role="button"],
+  [role="tab"],
+  .cursor-pointer {
+    cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  /* Smooth scrollbar styling */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(217, 183, 106, 0.4) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(217, 183, 106, 0.5);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(217, 183, 106, 0.8);
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 
-/* Atmospheric Glassmorphism Card */
-.glass-card {
-  background: rgba(18, 42, 34, 0.6);
+/* Glassmorphism utility aligned with Warm Ivory / Deep Heritage */
+.glass-panel {
+  background: rgba(251, 247, 238, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-card);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  transition: var(--transition-smooth);
+  border: 1px solid rgba(30, 75, 67, 0.12);
 }
 
-.glass-card:hover {
-  background: rgba(22, 52, 42, 0.75);
-  border-color: rgba(252, 229, 181, 0.35);
-  transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+.dark .glass-panel {
+  background: rgba(11, 26, 23, 0.88);
+  border: 1px solid rgba(217, 183, 106, 0.2);
 }
 
-/* Glass Pill Tag */
-.glass-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 18px;
-  background-color: var(--pill-tag-bg);
-  border: 1px solid var(--pill-tag-border);
-  border-radius: var(--radius-pill);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: var(--pill-tag-text);
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.4px;
+/* Traditional Vietnamese Motif background texture overlay */
+.vn-pattern-bg {
+  background-image: radial-gradient(rgba(30, 75, 67, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-.glass-pill-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #E27941;
-  box-shadow: 0 0 8px rgba(226, 121, 65, 0.8);
-}
-
-/* Primary Pill Button (Sungold Cream) */
-.btn-pill-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background-color: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 13px 30px;
-  border-radius: var(--radius-pill);
-  text-decoration: none;
-  border: none;
-  cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
-  box-shadow: 0 4px 20px rgba(252, 229, 181, 0.25);
-  transition: var(--transition-smooth);
-}
-
-.btn-pill-primary:hover {
-  background-color: var(--btn-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(252, 229, 181, 0.4);
-}
-
-/* Secondary Glass Pill Button */
-.btn-pill-glass {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background-color: var(--btn-glass-bg);
-  color: var(--btn-glass-text);
-  border: 1px solid var(--btn-glass-border);
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 500;
-  padding: 13px 28px;
-  border-radius: var(--radius-pill);
-  text-decoration: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
-  transition: var(--transition-smooth);
-}
-
-.btn-pill-glass:hover {
-  background-color: var(--btn-glass-hover);
-  border-color: rgba(255, 255, 255, 0.45);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-}
-
-/* 3D Flip Card Utilities */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-.transform-style-3d {
-  transform-style: preserve-3d;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.rotate-y-180 {
-  transform: rotateY(180deg);
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0D1C18;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #24483E;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #3A695B;
+.dark .vn-pattern-bg {
+  background-image: radial-gradient(rgba(217, 183, 106, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
 }

@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build 
+.dist
+
+
+# Environment variables
+.env
+docs
