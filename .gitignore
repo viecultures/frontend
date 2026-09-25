@@ -30,3 +30,4 @@ dist-ssr
 # Environment variables
 .env
 docs
+MEMORY.md

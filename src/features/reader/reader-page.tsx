@@ -15,6 +15,7 @@ import {
 import { AudioShadowingBar } from "./audio-shadowing-bar";
 import { BilingualReaderView } from "./bilingual-reader-view";
 import { ExtensiveReaderView } from "./extensive-reader-view";
+import { Footer } from "@/components/Footer";
 import {
   VOCAB_DATABASE,
   RECOMMENDED_ARTICLES,
@@ -153,7 +154,7 @@ export default function ReaderPage() {
       : "bg-[#FBF7EE] text-[#3F5550] border-[rgba(30,75,67,0.12)] shadow-xl";
 
   return (
-    <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43] pb-24">
+    <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
       {/* Top Reader Toolbar Control Bar (sticky at top 0) */}
       <section className="bg-[#1E4B43] text-[#FBF7EE] border-b border-[#D9B76A]/30 py-3 px-6 sm:px-8 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -397,6 +398,9 @@ export default function ReaderPage() {
           </div>
         </div>
       </section>
+
+      {/* Main Reader Footer */}
+      <Footer />
 
       {/* Vocabulary Slide-Over Drawer Modal */}
       {isVocabDrawerOpen && (

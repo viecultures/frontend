@@ -1,217 +1,91 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "@/components/Link";
 import {
   Search,
   BookOpen,
   Clock,
-  Sparkles,
   Bookmark,
   BookmarkCheck,
   Filter,
   ArrowRight,
-  Compass,
-  Award,
   Layers,
-  ChevronDown,
   RotateCcw,
+  LayoutGrid,
+  List,
+  Star,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  SlidersHorizontal,
+  Check,
 } from "lucide-react";
+import {
+  LESSONS_DATA,
+  type Lesson,
+  getCefrBadgeStyle,
+  TOPIC_OPTIONS,
+  CEFR_LEVELS,
+} from "@/data/discoveryData";
 
-// Catalog Lesson Interface
-interface Lesson {
-  id: string;
-  title: string;
-  vietnameseTitle: string;
-  category: "Heritage" | "Cuisine" | "Crafts" | "Nature" | "Folklore";
-  categoryVi: string;
-  cefrLevel: "A2" | "B1" | "B2" | "C1";
-  readTime: string;
-  vocabCount: number;
-  summary: string;
-  gradient: string;
-  iconSymbol: string;
-  featured?: boolean;
-  dateAdded: string;
-}
+// Helper function to remove Vietnamese diacritics / accents for smart search matching
+const removeAccents = (str: string) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
+};
 
-// Mock Dataset of Vietnamese Cultural Stories
-const LESSONS_DATA: Lesson[] = [
-  {
-    id: "imperial-hue",
-    title: "Exploring Imperial Hue Architecture Through B1 English",
-    vietnameseTitle: "Khám Phá Kiến Trúc Cung Đình Huế Qua Tiếng Anh B1",
-    category: "Heritage",
-    categoryVi: "Lịch Sử & Di Sản",
-    cefrLevel: "B1",
-    readTime: "8 phút đọc",
-    vocabCount: 12,
-    summary:
-      "Discover the citadel gates, royal tombs, and court cuisine of the Nguyen Dynasty while building academic vocabulary in historical architecture and conservation.",
-    gradient: "from-[#1E4B43] via-[#2A665B] to-[#163D37]",
-    iconSymbol: "🏛️",
-    featured: true,
-    dateAdded: "2026-03-15",
-  },
-  {
-    id: "saigon-banh-mi",
-    title: "The Story of Saigon Bánh Mì",
-    vietnameseTitle: "Hành Trình Bánh Mì Sài Gòn Ra Thế Giới",
-    category: "Cuisine",
-    categoryVi: "Ẩm Thực & Cà Phê",
-    cefrLevel: "B1",
-    readTime: "5 phút đọc",
-    vocabCount: 8,
-    summary:
-      "From French baguette to global culinary icon: trace the history behind Vietnam's favorite street food and learn key culinary descriptive adjectives.",
-    gradient: "from-[#D9B76A]/90 via-[#C59B48] to-[#9E7728]",
-    iconSymbol: "🥖",
-    dateAdded: "2026-03-10",
-  },
-  {
-    id: "hoi-an-lanterns",
-    title: "Hội An Lantern Festival Traditions",
-    vietnameseTitle: "Truyền Thống Đèn Lồng Phố Cổ Hội An",
-    category: "Heritage",
-    categoryVi: "Lịch Sử & Di Sản",
-    cefrLevel: "B1",
-    readTime: "7 phút đọc",
-    vocabCount: 10,
-    summary:
-      "Understand full moon rituals, silk craftsmanship, and ancient wooden architecture along the Thu Bồn River using rich descriptive storytelling.",
-    gradient: "from-[#E8B7B2]/90 via-[#D69690] to-[#B86E67]",
-    iconSymbol: "🏮",
-    dateAdded: "2026-03-12",
-  },
-  {
-    id: "bat-trang-pottery",
-    title: "Bát Tràng Pottery & Ceramic Arts",
-    vietnameseTitle: "Nghệ Thuật Gốm Sứ Làng Cổ Bát Tràng",
-    category: "Crafts",
-    categoryVi: "Nghệ Thuật & Làng Nghề",
-    cefrLevel: "B2",
-    readTime: "6 phút đọc",
-    vocabCount: 9,
-    summary:
-      "Explore 700 years of ceramic craftsmanship in a traditional village on the Red River delta while learning terminology for artisan techniques.",
-    gradient: "from-[#6E9FA1] via-[#528385] to-[#3B6668]",
-    iconSymbol: "🏺",
-    dateAdded: "2026-03-08",
-  },
-  {
-    id: "mu-cang-chai",
-    title: "Terraced Fields of Mù Cang Chải",
-    vietnameseTitle: "Ruộng Bậc Thang Mù Cang Chải Mùa Lúa Chín",
-    category: "Nature",
-    categoryVi: "Danh Thắng Thiên Nhiên",
-    cefrLevel: "B1",
-    readTime: "5 phút đọc",
-    vocabCount: 7,
-    summary:
-      "Journey through the golden harvest season in northern highlands and discover the ecological wisdom of ethnic minority communities.",
-    gradient: "from-[#2A665B] via-[#4A887C] to-[#1E4B43]",
-    iconSymbol: "🌾",
-    dateAdded: "2026-03-05",
-  },
-  {
-    id: "egg-coffee",
-    title: "Vietnamese Egg Coffee Legacy",
-    vietnameseTitle: "Huyền Thoại Cà Phê Trứng Hà Nội",
-    category: "Cuisine",
-    categoryVi: "Ẩm Thực & Cà Phê",
-    cefrLevel: "B2",
-    readTime: "4 phút đọc",
-    vocabCount: 6,
-    summary:
-      "How wartime necessity birthed a world-renowned coffee innovation in 1946 Old Quarter Hanoi. Practice narrative tenses and passive voice.",
-    gradient: "from-[#C59B48] via-[#A87E2D] to-[#78571B]",
-    iconSymbol: "☕",
-    dateAdded: "2026-03-14",
-  },
-  {
-    id: "water-puppetry",
-    title: "Water Puppetry & Village Legends",
-    vietnameseTitle: "Múa Rối Nước & Truyền Thuyết Làng Quê",
-    category: "Folklore",
-    categoryVi: "Lễ Hội & Tín Ngưỡng",
-    cefrLevel: "B1",
-    readTime: "8 phút đọc",
-    vocabCount: 11,
-    summary:
-      "Step into the flooded rice paddies of Northern Vietnam to discover a unique thousand-year-old performing art and folk mythology.",
-    gradient: "from-[#9FCED8] via-[#75B2C0] to-[#488E9E]",
-    iconSymbol: "🎭",
-    dateAdded: "2026-03-01",
-  },
-  {
-    id: "sword-lake-legend",
-    title: "The Legend of Sword Lake & Golden Turtle",
-    vietnameseTitle: "Sự Tích Hoàn Kiếm & Rùa Vàng",
-    category: "Folklore",
-    categoryVi: "Lễ Hội & Tín Ngưỡng",
-    cefrLevel: "A2",
-    readTime: "4 phút đọc",
-    vocabCount: 5,
-    summary:
-      "Revisit King Le Loi's mythical sword and the sacred turtle of Hanoi in accessible A2 English tailored for foundational learners.",
-    gradient: "from-[#E8B7B2] via-[#C88A84] to-[#995852]",
-    iconSymbol: "🐢",
-    dateAdded: "2026-02-28",
-  },
-  {
-    id: "ao-dai-weaving",
-    title: "The Art of Vietnamese Áo Dài Silk Weaving",
-    vietnameseTitle: "Nghệ Thuật Dệt Lụa & Áo Dài Truyền Thống",
-    category: "Crafts",
-    categoryVi: "Nghệ Thuật & Làng Nghề",
-    cefrLevel: "B2",
-    readTime: "7 phút đọc",
-    vocabCount: 10,
-    summary:
-      "Trace the evolution of the national garment from Royal court attire to modern high fashion, exploring textile and design terminology.",
-    gradient: "from-[#D9B76A] via-[#B89240] to-[#806120]",
-    iconSymbol: "👘",
-    dateAdded: "2026-03-03",
-  },
-  {
-    id: "trang-an-caves",
-    title: "Tràng An Landscape Complex & Cave Secrets",
-    vietnameseTitle: "Quần Thể Danh Thắng Tràng An & Bí Ẩn Hang Động",
-    category: "Nature",
-    categoryVi: "Danh Thắng Thiên Nhiên",
-    cefrLevel: "C1",
-    readTime: "9 phút đọc",
-    vocabCount: 14,
-    summary:
-      "Explore UNESCO dual heritage karst mountains, ancient temples, and subterranean rivers using advanced C1 academic vocabulary.",
-    gradient: "from-[#1E4B43] via-[#336F64] to-[#143630]",
-    iconSymbol: "⛰️",
-    dateAdded: "2026-03-16",
-  },
+const SORT_OPTIONS = [
+  { label: "Mới nhất", value: "recent" },
+  { label: "Nhiều từ vựng", value: "vocab" },
+  { label: "Đọc ngắn (< 6 phút)", value: "time_asc" },
+  { label: "Đọc sâu (> 8 phút)", value: "time_desc" },
 ];
 
 export default function DiscoveryPage() {
-  // State for filtering & searching
+  // State for filtering & layout
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopic, setSelectedTopic] = useState<string>("All");
   const [selectedCefr, setSelectedCefr] = useState<string>("All");
-  const [sortBy, setSortBy] = useState<"recent" | "vocab" | "time">("recent");
-  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
+  const [selectedReadTime, setSelectedReadTime] = useState<"All" | "short" | "medium" | "long">("All");
+  const [sortBy, setSortBy] = useState<"recent" | "vocab" | "time_asc" | "time_desc">("recent");
+  const [isSortOpen, setIsSortOpen] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({
+    "imperial-hue": true,
+  });
+  const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
+
+  // Dynamic items per page based on view mode (Grid = 12, List = 20)
+  const itemsPerPage = viewMode === "grid" ? 12 : 20;
+
+  // Reset pagination when filters or view mode change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedTopic, selectedCefr, selectedReadTime, searchQuery, sortBy, onlyBookmarked, viewMode]);
 
   // Toggle Favorite Bookmark
   const toggleBookmark = (id: string) => {
     setBookmarks((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Get Featured Story
-  const featuredStory = useMemo(
-    () => LESSONS_DATA.find((item) => item.featured) || LESSONS_DATA[0],
-    []
-  );
+  // Count per Topic
+  const topicCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: LESSONS_DATA.length };
+    LESSONS_DATA.forEach((lesson) => {
+      counts[lesson.category] = (counts[lesson.category] || 0) + 1;
+    });
+    return counts;
+  }, []);
 
-  // Filter & Sort Logic
+  // Smart Filter & Sort Logic
   const filteredLessons = useMemo(() => {
     return LESSONS_DATA.filter((lesson) => {
-      // Exclude featured story from main grid list to avoid duplication
-      if (lesson.id === featuredStory.id) return false;
+      // If filtering only bookmarked stories
+      if (onlyBookmarked && !bookmarks[lesson.id]) return false;
 
       // Filter by Topic
       const matchTopic =
@@ -221,16 +95,30 @@ export default function DiscoveryPage() {
       const matchCefr =
         selectedCefr === "All" || lesson.cefrLevel === selectedCefr;
 
-      // Filter by Search Query
+      // Filter by Reading Time Duration
+      const readMinutes = parseInt(lesson.readTime);
+      const matchTime =
+        selectedReadTime === "All" ||
+        (selectedReadTime === "short" && readMinutes < 6) ||
+        (selectedReadTime === "medium" && readMinutes >= 6 && readMinutes <= 8) ||
+        (selectedReadTime === "long" && readMinutes > 8);
+
+      // Smart Accent-Insensitive Search Query Matching
       const q = searchQuery.toLowerCase().trim();
+      const normalizedQ = removeAccents(q);
+
       const matchSearch =
         !q ||
         lesson.title.toLowerCase().includes(q) ||
+        removeAccents(lesson.title.toLowerCase()).includes(normalizedQ) ||
         lesson.vietnameseTitle.toLowerCase().includes(q) ||
+        removeAccents(lesson.vietnameseTitle.toLowerCase()).includes(normalizedQ) ||
         lesson.summary.toLowerCase().includes(q) ||
-        lesson.categoryVi.toLowerCase().includes(q);
+        removeAccents(lesson.summary.toLowerCase()).includes(normalizedQ) ||
+        lesson.categoryVi.toLowerCase().includes(q) ||
+        removeAccents(lesson.categoryVi.toLowerCase()).includes(normalizedQ);
 
-      return matchTopic && matchCefr && matchSearch;
+      return matchTopic && matchCefr && matchTime && matchSearch;
     }).sort((a, b) => {
       if (sortBy === "recent") {
         return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
@@ -238,251 +126,215 @@ export default function DiscoveryPage() {
       if (sortBy === "vocab") {
         return b.vocabCount - a.vocabCount;
       }
-      if (sortBy === "time") {
+      if (sortBy === "time_asc") {
         return parseInt(a.readTime) - parseInt(b.readTime);
+      }
+      if (sortBy === "time_desc") {
+        return parseInt(b.readTime) - parseInt(a.readTime);
       }
       return 0;
     });
-  }, [selectedTopic, selectedCefr, searchQuery, sortBy, featuredStory]);
+  }, [selectedTopic, selectedCefr, selectedReadTime, searchQuery, sortBy, onlyBookmarked, bookmarks]);
 
-  // Topic Options
-  const topicOptions = [
-    { label: "Tất cả chủ đề", value: "All" },
-    { label: "Lịch sử & Di sản", value: "Heritage" },
-    { label: "Ẩm thực & Cà phê", value: "Cuisine" },
-    { label: "Nghệ thuật & Làng nghề", value: "Crafts" },
-    { label: "Danh thắng Thiên nhiên", value: "Nature" },
-    { label: "Lễ hội & Tín ngưỡng", value: "Folklore" },
-  ];
+  // Pagination Calculation
+  const totalPages = Math.max(1, Math.ceil(filteredLessons.length / itemsPerPage));
+  const paginatedLessons = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredLessons.slice(start, start + itemsPerPage);
+  }, [filteredLessons, currentPage, itemsPerPage]);
 
-  // CEFR Levels
-  const cefrLevels = ["All", "A2", "B1", "B2", "C1"];
+  const resetAllFilters = () => {
+    setSelectedTopic("All");
+    setSelectedCefr("All");
+    setSelectedReadTime("All");
+    setSearchQuery("");
+    setOnlyBookmarked(false);
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters =
+    selectedTopic !== "All" ||
+    selectedCefr !== "All" ||
+    selectedReadTime !== "All" ||
+    searchQuery.trim() !== "" ||
+    onlyBookmarked;
 
   return (
-    <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
-
-      {/* Hero Header Section */}
-      <section className="relative pt-12 pb-10 bg-gradient-to-b from-[#F6EEDC]/60 via-[#FBF7EE] to-[#FBF7EE] border-b border-[rgba(30,75,67,0.08)] overflow-hidden">
-        {/* Subtle Background Pattern Decorative Accents */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#BFE3EA]/20 rounded-full blur-3xl -z-10 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#E8B7B2]/15 rounded-full blur-3xl -z-10 pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          {/* Tagline Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F6EEDC] border border-[#D9B76A]/60 shadow-sm text-xs font-semibold text-[#1E4B43] mb-4">
-            <Compass className="w-3.5 h-3.5 text-[#D9B76A]" />
-            <span>Thư Viện Bài Học Song Ngữ Văn Hóa Việt</span>
-          </div>
-
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1E4B43] tracking-tight leading-tight">
-                Discovery Catalog
-              </h1>
-              <p className="mt-3 text-base sm:text-lg text-[#3F5550] max-w-2xl leading-relaxed">
-                Khám phá kho tàng truyện kể song ngữ Anh - Việt qua di sản văn hóa, phong tục, ẩm thực và cảnh sắc Việt Nam. Trau dồi từ vựng IELTS & Academic theo trình độ CEFR.
-              </p>
-            </div>
-
-            {/* Quick Stats Pill */}
-            <div className="flex items-center gap-4 bg-[#FBF7EE] p-3 rounded-2xl border border-[rgba(30,75,67,0.12)] shadow-sm">
-              <div className="px-3 py-1.5 rounded-xl bg-[#1E4B43]/10 text-center">
-                <span className="block text-lg font-bold text-[#1E4B43]">
-                  {LESSONS_DATA.length}
-                </span>
-                <span className="text-[11px] font-semibold text-[#6E7E79] uppercase tracking-wider">
-                  Bài học
-                </span>
-              </div>
-              <div className="w-[1px] h-8 bg-[rgba(30,75,67,0.12)]" />
-              <div className="px-3 py-1.5 rounded-xl bg-[#D9B76A]/15 text-center">
-                <span className="block text-lg font-bold text-[#1E4B43]">4</span>
-                <span className="text-[11px] font-semibold text-[#6E7E79] uppercase tracking-wider">
-                  Cấp độ CEFR
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10">
-        {/* Featured Story Spotlight Banner */}
-        <section className="mb-14">
-          <div className="relative rounded-3xl overflow-hidden bg-[#1E4B43] text-[#FBF7EE] shadow-[0_10px_35px_-5px_rgba(30,75,67,0.25)] border border-[#D9B76A]/40 grid grid-cols-1 lg:grid-cols-12 group">
-            {/* Left Graphic Banner / Cover */}
-            <div className="lg:col-span-6 relative min-h-[280px] sm:min-h-[340px] lg:min-h-full bg-gradient-to-br from-[#2A665B] via-[#1E4B43] to-[#163D37] p-8 sm:p-12 flex flex-col justify-between overflow-hidden">
-              {/* Decorative Traditional Border Grid Overlay */}
-              <div className="absolute inset-3 border border-[#D9B76A]/30 rounded-2xl pointer-events-none" />
-              <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-[#D9B76A]/10 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="relative z-10 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#D9B76A] text-[#1E4B43]">
-                  <Sparkles className="w-3 h-3 fill-current" />
-                  Featured Story of the Week
-                </span>
-                <span className="text-3xl">{featuredStory.iconSymbol}</span>
-              </div>
-
-              <div className="relative z-10 my-auto py-6">
-                <span className="text-xs font-semibold uppercase tracking-widest text-[#BFE3EA]">
-                  {featuredStory.categoryVi} • Level {featuredStory.cefrLevel}
-                </span>
-                <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-[#FBF7EE] mt-2 leading-snug group-hover:text-[#D9B76A] transition-colors">
-                  {featuredStory.title}
-                </h2>
-                <p className="text-sm text-[#F6EEDC]/80 mt-1 italic font-light">
-                  {featuredStory.vietnameseTitle}
-                </p>
-              </div>
-
-              <div className="relative z-10 flex items-center gap-4 text-xs font-medium text-[#BFE3EA]">
-                <span className="inline-flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  {featuredStory.readTime}
-                </span>
-                <span>•</span>
-                <span className="inline-flex items-center gap-1">
-                  <BookOpen className="w-3.5 h-3.5" />
-                  {featuredStory.vocabCount} Từ vựng IELTS
-                </span>
-              </div>
-            </div>
-
-            {/* Right Story Description & Action Body */}
-            <div className="lg:col-span-6 p-8 sm:p-10 lg:p-12 bg-[#F6EEDC] text-[#3F5550] flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-[#D9B76A]/20">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#1E4B43] bg-[#1E4B43]/10 px-3 py-1 rounded-md">
-                    Chủ đề nổi bật
-                  </span>
-                  <button
-                    onClick={() => toggleBookmark(featuredStory.id)}
-                    className="p-2 rounded-full hover:bg-[#E8DFCB] transition-colors text-[#1E4B43]"
-                    title="Lưu bài học"
-                  >
-                    {bookmarks[featuredStory.id] ? (
-                      <BookmarkCheck className="w-5 h-5 text-[#1E4B43] fill-[#1E4B43]" />
-                    ) : (
-                      <Bookmark className="w-5 h-5 text-[#1E4B43]" />
-                    )}
-                  </button>
-                </div>
-
-                <p className="text-base text-[#3F5550] leading-relaxed mb-6">
-                  {featuredStory.summary}
-                </p>
-
-                <div className="p-4 rounded-xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.10)] mb-8">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#1E4B43] mb-2 flex items-center gap-1.5">
-                    <Award className="w-4 h-4 text-[#D9B76A]" />
-                    Mục tiêu đạt được sau bài học:
-                  </h4>
-                  <ul className="text-xs text-[#3F5550] space-y-1.5 list-disc list-inside">
-                    <li>Nắm vững từ vựng miêu tả kiến trúc di sản & quy hoạch hoàng gia.</li>
-                    <li>Luyện cấu trúc câu ghép miêu tả dòng lịch sử (Historical Timeline).</li>
-                    <li>Thực hành trả lời IELTS Speaking Part 2 chủ đề "A historic building".</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div>
-                <Link
-                  href="/#courses"
-                  className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full text-sm font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] shadow-[0_4px_16px_rgba(30,75,67,0.25)] hover:shadow-[0_6px_22px_rgba(30,75,67,0.35)] transition-all duration-300 hover:-translate-y-0.5 border border-[#D9B76A]/60 w-full sm:w-auto"
+    <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43] pt-6 pb-12">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        {/* Category Tabs Scrollbar */}
+        <section className="mb-6 overflow-x-auto pb-2 scrollbar-none">
+          <div className="flex items-center gap-2 min-w-max">
+            {TOPIC_OPTIONS.map((topic) => {
+              const isActive = selectedTopic === topic.value;
+              const count = topicCounts[topic.value] || 0;
+              return (
+                <button
+                  key={topic.value}
+                  onClick={() => setSelectedTopic(topic.value)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? "bg-[#1E4B43] text-[#FBF7EE] shadow-md border border-[#D9B76A]/50 scale-102"
+                      : "bg-[#F6EEDC] text-[#3F5550] hover:bg-[#E8DFCB] border border-[rgba(30,75,67,0.10)]"
+                  }`}
                 >
-                  <span>Đọc bài học ngay / Read Story Now</span>
-                  <ArrowRight className="w-4 h-4 text-[#D9B76A]" />
-                </Link>
-              </div>
-            </div>
+                  <span className="text-base">{topic.icon}</span>
+                  <span>{topic.label}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                      isActive
+                        ? "bg-[#D9B76A] text-[#1E4B43]"
+                        : "bg-[#E8DFCB] text-[#1E4B43]"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </section>
 
-        {/* Interactive Filter & Search Bar Toolbar */}
-        <section className="mb-10">
-          <div className="p-6 rounded-3xl bg-[#F6EEDC]/90 border border-[rgba(30,75,67,0.12)] shadow-[0_4px_20px_-4px_rgba(30,75,67,0.06)] backdrop-blur-sm space-y-5">
-            {/* Top Row: Search Input & Sort Selector */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              {/* Search Box */}
-              <div className="relative w-full md:max-w-md">
+        {/* Smart Filter & Search Toolbar */}
+        <section className="mb-8 relative z-30">
+          <div className="p-6 rounded-3xl bg-[#F6EEDC]/90 border border-[rgba(30,75,67,0.12)] shadow-[0_4px_20px_-4px_rgba(30,75,67,0.06)] backdrop-blur-sm space-y-5 relative z-30">
+            {/* Top Row: Search Input, Bookmarks, Sort & View Mode */}
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+              {/* Smart Search Box */}
+              <div className="relative flex-1 max-w-xl">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6E7E79]" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Tìm bài học (ví dụ: Bánh Mì, Huế, Cà Phê, Silk)..."
-                  className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.15)] text-sm text-[#1E4B43] placeholder-[#8C9692] focus:outline-none focus:ring-2 focus:ring-[#1E4B43]/20 focus:border-[#1E4B43] transition-all"
+                  placeholder="Tìm thông minh (gõ không dấu: banh mi, hue, son doong)..."
+                  className="w-full pl-11 pr-10 py-3 rounded-2xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.16)] text-sm text-[#1E4B43] placeholder-[#8C9692] focus:outline-none focus:ring-2 focus:ring-[#1E4B43]/30 focus:border-[#1E4B43] transition-all shadow-xs"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#8C9692] hover:text-[#1E4B43] px-2 py-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#8C9692] hover:text-[#1E4B43] p-1 rounded-full hover:bg-[#E8DFCB]"
+                    title="Xóa tìm kiếm"
                   >
-                    Xóa
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
-              {/* Topic Select Dropdown & Sort */}
-              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-                {/* Topic Dropdown */}
+              {/* Toolbar Controls */}
+              <div className="flex items-center gap-3 justify-between lg:justify-end flex-wrap">
+                {/* Bookmarked Filter Pill */}
+                <button
+                  onClick={() => setOnlyBookmarked(!onlyBookmarked)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
+                    onlyBookmarked
+                      ? "bg-[#1E4B43] text-[#FBF7EE] border-[#D9B76A]/60 shadow-sm"
+                      : "bg-[#FBF7EE] text-[#1E4B43] border-[rgba(30,75,67,0.18)] hover:bg-[#F6EEDC] shadow-xs hover:border-[#D9B76A]"
+                  }`}
+                >
+                  <Star className={`w-4 h-4 ${onlyBookmarked ? "fill-[#D9B76A] text-[#D9B76A]" : "text-[#D9B76A]"}`} />
+                  <span>Đã lưu</span>
+                </button>
+
+                {/* Custom React Floating Sort Dropdown Menu */}
                 <div className="relative">
-                  <select
-                    value={selectedTopic}
-                    onChange={(e) => setSelectedTopic(e.target.value)}
-                    className="appearance-none pl-4 pr-10 py-2.5 rounded-2xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.15)] text-xs font-bold text-[#1E4B43] focus:outline-none focus:ring-2 focus:ring-[#1E4B43]/20 cursor-pointer shadow-sm"
+                  <button
+                    type="button"
+                    onClick={() => setIsSortOpen((prev) => !prev)}
+                    className="flex items-center gap-2 bg-[#FBF7EE] px-4 py-2.5 rounded-2xl border border-[rgba(30,75,67,0.18)] text-xs font-bold text-[#1E4B43] shadow-xs hover:border-[#D9B76A] transition-all cursor-pointer"
                   >
-                    {topicOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1E4B43] pointer-events-none" />
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-[#D9B76A] shrink-0" />
+                    <span className="text-[#6E7E79]">Sắp xếp:</span>
+                    <span className="font-extrabold text-[#1E4B43]">
+                      {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}
+                    </span>
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 text-[#1E4B43] transition-transform duration-200 ${
+                        isSortOpen ? "rotate-180 text-[#D9B76A]" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isSortOpen && (
+                    <>
+                      {/* Invisible Backdrop Overlay to close on click outside */}
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setIsSortOpen(false)}
+                      />
+
+                      {/* Custom Floating Popover Dropdown Card */}
+                      <div className="absolute right-0 top-full mt-2 w-52 bg-[#FBF7EE] border border-[#D9B76A]/40 rounded-2xl shadow-xl z-50 p-1.5 space-y-1 backdrop-blur-md">
+                        {SORT_OPTIONS.map((opt) => {
+                          const isSelected = sortBy === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              onClick={() => {
+                                setSortBy(opt.value as any);
+                                setIsSortOpen(false);
+                              }}
+                              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
+                                isSelected
+                                  ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs"
+                                  : "text-[#3F5550] hover:bg-[#F6EEDC] hover:text-[#1E4B43]"
+                              }`}
+                            >
+                              <span>{opt.label}</span>
+                              {isSelected && (
+                                <Check className="w-3.5 h-3.5 text-[#D9B76A]" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                {/* Sort selector */}
-                <div className="flex items-center gap-1.5 bg-[#FBF7EE] p-1 rounded-2xl border border-[rgba(30,75,67,0.12)] text-xs font-semibold text-[#3F5550]">
-                  <span className="px-2 text-[#8C9692] hidden sm:inline">Xếp theo:</span>
+                {/* Grid / List View Toggle */}
+                <div className="flex items-center bg-[#FBF7EE] p-1 rounded-2xl border border-[rgba(30,75,67,0.18)] shadow-xs">
                   <button
-                    onClick={() => setSortBy("recent")}
-                    className={`px-3 py-1.5 rounded-xl transition-colors ${
-                      sortBy === "recent"
-                        ? "bg-[#1E4B43] text-[#FBF7EE]"
-                        : "hover:bg-[#F6EEDC] text-[#3F5550]"
+                    onClick={() => setViewMode("grid")}
+                    className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs cursor-pointer ${
+                      viewMode === "grid"
+                        ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs scale-102"
+                        : "text-[#6E7E79] hover:text-[#1E4B43] hover:bg-[#F6EEDC]"
                     }`}
+                    title="Chế độ lưới (Grid 12 bài/trang)"
                   >
-                    Mới nhất
+                    <LayoutGrid className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => setSortBy("vocab")}
-                    className={`px-3 py-1.5 rounded-xl transition-colors ${
-                      sortBy === "vocab"
-                        ? "bg-[#1E4B43] text-[#FBF7EE]"
-                        : "hover:bg-[#F6EEDC] text-[#3F5550]"
+                    onClick={() => setViewMode("list")}
+                    className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs cursor-pointer ${
+                      viewMode === "list"
+                        ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs scale-102"
+                        : "text-[#6E7E79] hover:text-[#1E4B43] hover:bg-[#F6EEDC]"
                     }`}
+                    title="Chế độ danh sách (List 20 bài/trang)"
                   >
-                    Nhiều từ vựng
+                    <List className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Row: CEFR Level Pills & Active Filters summary */}
-            <div className="pt-3 border-t border-[rgba(30,75,67,0.10)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* Middle Row: CEFR Level & Reading Time Duration Smart Filters */}
+            <div className="pt-3 border-t border-[rgba(30,75,67,0.10)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+              {/* CEFR Level Filter */}
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#1E4B43] flex items-center gap-1 mr-1">
                   <Filter className="w-3.5 h-3.5" />
                   Trình độ CEFR:
                 </span>
-                {cefrLevels.map((lvl) => (
+                {CEFR_LEVELS.map((lvl) => (
                   <button
                     key={lvl}
                     onClick={() => setSelectedCefr(lvl)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 ${
                       selectedCefr === lvl
-                        ? "bg-[#1E4B43] text-[#FBF7EE] shadow-sm border border-[#D9B76A]/50"
+                        ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs border border-[#D9B76A]/50"
                         : "bg-[#FBF7EE] text-[#1E4B43] hover:bg-[#E8DFCB] border border-[rgba(30,75,67,0.12)]"
                     }`}
                   >
@@ -491,34 +343,102 @@ export default function DiscoveryPage() {
                 ))}
               </div>
 
-              {/* Counter & Reset */}
-              <div className="flex items-center gap-3 text-xs font-semibold text-[#6E7E79]">
-                <span>
-                  Hiển thị <strong className="text-[#1E4B43]">{filteredLessons.length}</strong> bài học
+              {/* Reading Duration Filter */}
+              <div className="flex items-center gap-2 flex-wrap text-xs">
+                <span className="font-bold text-[#1E4B43] flex items-center gap-1 mr-1">
+                  <Clock className="w-3.5 h-3.5 text-[#D9B76A]" />
+                  Thời lượng:
                 </span>
-                {(selectedTopic !== "All" || selectedCefr !== "All" || searchQuery) && (
+                {[
+                  { label: "Tất cả", value: "All" },
+                  { label: "< 6 phút", value: "short" },
+                  { label: "6-8 phút", value: "medium" },
+                  { label: "> 8 phút", value: "long" },
+                ].map((dur) => (
                   <button
-                    onClick={() => {
-                      setSelectedTopic("All");
-                      setSelectedCefr("All");
-                      setSearchQuery("");
-                    }}
-                    className="inline-flex items-center gap-1 text-[#1E4B43] hover:underline underline-offset-2"
+                    key={dur.value}
+                    onClick={() => setSelectedReadTime(dur.value as any)}
+                    className={`px-3 py-1 rounded-xl font-bold transition-all ${
+                      selectedReadTime === dur.value
+                        ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs"
+                        : "bg-[#FBF7EE] text-[#3F5550] hover:bg-[#E8DFCB] border border-[rgba(30,75,67,0.10)]"
+                    }`}
                   >
-                    <RotateCcw className="w-3 h-3" />
-                    Đặt lại bộ lọc
+                    {dur.label}
                   </button>
-                )}
+                ))}
               </div>
             </div>
+
+            {/* Smart Active Filter Badges Bar */}
+            {hasActiveFilters && (
+              <div className="pt-3 border-t border-[rgba(30,75,67,0.10)] flex items-center justify-between gap-3 flex-wrap text-xs">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-bold text-[#6E7E79]">Bộ lọc đang chọn:</span>
+
+                  {selectedTopic !== "All" && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1E4B43] text-[#FBF7EE] font-bold">
+                      Chủ đề: {TOPIC_OPTIONS.find((t) => t.value === selectedTopic)?.label}
+                      <button onClick={() => setSelectedTopic("All")} className="hover:text-[#D9B76A]">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+
+                  {selectedCefr !== "All" && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1E4B43] text-[#FBF7EE] font-bold">
+                      CEFR: {selectedCefr}
+                      <button onClick={() => setSelectedCefr("All")} className="hover:text-[#D9B76A]">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+
+                  {selectedReadTime !== "All" && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1E4B43] text-[#FBF7EE] font-bold">
+                      Thời lượng: {selectedReadTime === "short" ? "< 6 phút" : selectedReadTime === "medium" ? "6-8 phút" : "> 8 phút"}
+                      <button onClick={() => setSelectedReadTime("All")} className="hover:text-[#D9B76A]">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+
+                  {searchQuery && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1E4B43] text-[#FBF7EE] font-bold">
+                      Từ khóa: "{searchQuery}"
+                      <button onClick={() => setSearchQuery("")} className="hover:text-[#D9B76A]">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+
+                  {onlyBookmarked && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1E4B43] text-[#FBF7EE] font-bold">
+                      ⭐️ Bài viết đã lưu
+                      <button onClick={() => setOnlyBookmarked(false)} className="hover:text-[#D9B76A]">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                </div>
+
+                <button
+                  onClick={resetAllFilters}
+                  className="inline-flex items-center gap-1 font-bold text-[#1E4B43] hover:underline underline-offset-2 ml-auto"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Đặt lại tất cả
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
-        {/* Lesson Catalog Cards Grid */}
-        <section className="mb-16">
+        {/* Lesson Catalog Display */}
+        <section className="mb-12 relative z-10">
           {filteredLessons.length === 0 ? (
             /* Empty State */
-            <div className="py-16 text-center rounded-3xl bg-[#F6EEDC]/50 border border-dashed border-[rgba(30,75,67,0.2)] p-8">
+            <div className="py-16 text-center rounded-3xl bg-[#F6EEDC]/60 border border-dashed border-[rgba(30,75,67,0.25)] p-8">
               <div className="w-16 h-16 rounded-full bg-[#E8DFCB] flex items-center justify-center mx-auto mb-4 text-[#1E4B43]">
                 <Layers className="w-8 h-8" />
               </div>
@@ -526,102 +446,235 @@ export default function DiscoveryPage() {
                 Không tìm thấy bài học phù hợp
               </h3>
               <p className="text-sm text-[#3F5550] mt-2 max-w-md mx-auto">
-                Không tìm thấy câu chuyện văn hóa nào khớp với từ khóa "{searchQuery}". Hãy thử tìm lại với từ khóa khác hoặc đặt lại bộ lọc.
+                {onlyBookmarked
+                  ? "Bạn chưa lưu bài học nào trong danh mục này."
+                  : `Không tìm thấy câu chuyện văn hóa nào khớp với các bộ lọc hiện tại.`}
               </p>
               <button
-                onClick={() => {
-                  setSelectedTopic("All");
-                  setSelectedCefr("All");
-                  setSearchQuery("");
-                }}
+                onClick={resetAllFilters}
                 className="mt-6 px-6 py-2.5 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] shadow-sm transition-all"
               >
                 Đặt lại tất cả bộ lọc
               </button>
             </div>
-          ) : (
-            /* Cards Grid */
+          ) : viewMode === "grid" ? (
+            /* Grid View Cards */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {filteredLessons.map((lesson) => (
-                <article
-                  key={lesson.id}
-                  className="group relative rounded-3xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.12)] shadow-[0_4px_20px_-4px_rgba(30,75,67,0.06)] hover:shadow-[0_12px_30px_-6px_rgba(30,75,67,0.14)] transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1"
-                >
-                  {/* Card Header Illustration Thumbnail */}
-                  <div
-                    className={`relative h-48 w-full bg-gradient-to-br ${lesson.gradient} p-6 flex flex-col justify-between overflow-hidden`}
+              {paginatedLessons.map((lesson) => {
+                const isBookmarked = !!bookmarks[lesson.id];
+                return (
+                  <article
+                    key={lesson.id}
+                    className="group relative rounded-3xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.12)] shadow-[0_4px_20px_-4px_rgba(30,75,67,0.06)] hover:shadow-[0_12px_32px_-6px_rgba(30,75,67,0.16)] transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1.5"
                   >
-                    {/* Pattern Overlay */}
-                    <div className="absolute inset-2 border border-[#D9B76A]/20 rounded-2xl pointer-events-none" />
+                    {/* Card Cover & Header Illustration */}
+                    <div
+                      className={`relative h-48 w-full bg-gradient-to-br ${lesson.gradient} p-6 flex flex-col justify-between overflow-hidden`}
+                    >
+                      {/* Traditional Border Grid Overlay */}
+                      <div className="absolute inset-2.5 border border-[#D9B76A]/25 rounded-2xl pointer-events-none" />
 
-                    {/* Top Badges */}
-                    <div className="relative z-10 flex items-center justify-between">
-                      <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FBF7EE]/90 backdrop-blur-sm text-[#1E4B43] border border-[rgba(30,75,67,0.15)]">
-                        {lesson.categoryVi}
-                      </span>
-                      <button
-                        onClick={() => toggleBookmark(lesson.id)}
-                        className="p-2 rounded-full bg-[#FBF7EE]/80 hover:bg-[#FBF7EE] text-[#1E4B43] transition-colors shadow-sm"
-                        aria-label="Bookmark lesson"
+                      {/* Top Category Badge & Bookmark Action */}
+                      <div className="relative z-10 flex items-center justify-between">
+                        <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FBF7EE]/90 backdrop-blur-sm text-[#1E4B43] border border-[rgba(30,75,67,0.15)] shadow-xs">
+                          {lesson.categoryVi}
+                        </span>
+                        <button
+                          onClick={() => toggleBookmark(lesson.id)}
+                          className="p-2 rounded-full bg-[#FBF7EE]/85 hover:bg-[#FBF7EE] text-[#1E4B43] transition-all shadow-xs hover:scale-110"
+                          aria-label="Bookmark lesson"
+                        >
+                          {isBookmarked ? (
+                            <BookmarkCheck className="w-4 h-4 text-[#1E4B43] fill-[#1E4B43]" />
+                          ) : (
+                            <Bookmark className="w-4 h-4 text-[#1E4B43]" />
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Center Emblem Symbol */}
+                      <div className="relative z-10 my-auto text-center">
+                        <span className="text-4xl filter drop-shadow-md transition-transform duration-300 group-hover:scale-115 inline-block">
+                          {lesson.iconSymbol}
+                        </span>
+                      </div>
+
+                      {/* Bottom CEFR & Duration Pills */}
+                      <div className="relative z-10 flex items-center justify-between text-[11px] font-bold tracking-wider uppercase">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-md border shadow-xs ${getCefrBadgeStyle(
+                            lesson.cefrLevel
+                          )}`}
+                        >
+                          CEFR {lesson.cefrLevel}
+                        </span>
+                        <span className="flex items-center gap-1 text-[#F6EEDC]">
+                          <Clock className="w-3.5 h-3.5" />
+                          {lesson.readTime}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="p-6 flex-1 flex flex-col justify-between bg-[#FBF7EE]">
+                      <div>
+                        <h3 className="font-serif text-xl font-bold text-[#1E4B43] leading-snug group-hover:text-[#D9B76A] transition-colors">
+                          {lesson.title}
+                        </h3>
+                        <p className="text-xs text-[#6E7E79] mt-1 font-medium italic">
+                          {lesson.vietnameseTitle}
+                        </p>
+                        <p className="text-xs text-[#3F5550] mt-3 line-clamp-3 leading-relaxed">
+                          {lesson.summary}
+                        </p>
+                      </div>
+
+                      {/* Card Footer Details */}
+                      <div className="mt-6 pt-4 border-t border-[rgba(30,75,67,0.10)] flex items-center justify-between text-xs">
+                        <span className="font-semibold text-[#6E7E79] flex items-center gap-1">
+                          <BookOpen className="w-3.5 h-3.5 text-[#1E4B43]" />
+                          {lesson.vocabCount} Từ vựng
+                        </span>
+                        <Link
+                          href={`/reader?story=${lesson.id}`}
+                          className="font-bold text-[#1E4B43] group-hover:text-[#D9B76A] inline-flex items-center gap-1 transition-colors"
+                        >
+                          <span>Đọc tiếp</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            /* List View Layout */
+            <div className="space-y-4">
+              {paginatedLessons.map((lesson) => {
+                const isBookmarked = !!bookmarks[lesson.id];
+                return (
+                  <article
+                    key={lesson.id}
+                    className="group rounded-2xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.12)] p-5 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-[#D9B76A]/60"
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <div
+                        className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${lesson.gradient} flex items-center justify-center shrink-0 shadow-xs border border-[#D9B76A]/30`}
                       >
-                        {bookmarks[lesson.id] ? (
-                          <BookmarkCheck className="w-4 h-4 text-[#1E4B43] fill-[#1E4B43]" />
-                        ) : (
-                          <Bookmark className="w-4 h-4 text-[#1E4B43]" />
-                        )}
-                      </button>
+                        <span className="text-2xl">{lesson.iconSymbol}</span>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getCefrBadgeStyle(
+                              lesson.cefrLevel
+                            )}`}
+                          >
+                            CEFR {lesson.cefrLevel}
+                          </span>
+                          <span className="text-[11px] font-bold text-[#1E4B43] bg-[#1E4B43]/10 px-2 py-0.5 rounded">
+                            {lesson.categoryVi}
+                          </span>
+                        </div>
+                        <h3 className="font-serif text-lg font-bold text-[#1E4B43] group-hover:text-[#D9B76A] transition-colors leading-snug">
+                          {lesson.title}
+                        </h3>
+                        <p className="text-xs text-[#6E7E79] italic">
+                          {lesson.vietnameseTitle}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Center Icon Emblem */}
-                    <div className="relative z-10 my-auto text-center">
-                      <span className="text-4xl filter drop-shadow-md transition-transform duration-300 group-hover:scale-110 inline-block">
-                        {lesson.iconSymbol}
-                      </span>
-                    </div>
+                    <div className="flex items-center gap-4 text-xs font-semibold text-[#3F5550] shrink-0 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-[rgba(30,75,67,0.10)]">
+                      <div className="flex items-center gap-3 text-[#6E7E79]">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" />
+                          {lesson.readTime}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <BookOpen className="w-3.5 h-3.5" />
+                          {lesson.vocabCount} từ vựng
+                        </span>
+                      </div>
 
-                    {/* Bottom CEFR & Duration Bar */}
-                    <div className="relative z-10 flex items-center justify-between text-[11px] font-bold text-[#FBF7EE] tracking-wider uppercase">
-                      <span className="px-2.5 py-0.5 rounded-md bg-[#D9B76A] text-[#1E4B43]">
-                        CEFR {lesson.cefrLevel}
-                      </span>
-                      <span className="flex items-center gap-1 text-[#F6EEDC]">
-                        <Clock className="w-3 h-3" />
-                        {lesson.readTime}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleBookmark(lesson.id)}
+                          className="p-2 rounded-xl bg-[#F6EEDC] hover:bg-[#E8DFCB] text-[#1E4B43] transition-colors"
+                        >
+                          {isBookmarked ? (
+                            <BookmarkCheck className="w-4 h-4 fill-[#1E4B43]" />
+                          ) : (
+                            <Bookmark className="w-4 h-4" />
+                          )}
+                        </button>
+                        <Link
+                          href={`/reader?story=${lesson.id}`}
+                          className="px-4 py-2 rounded-xl bg-[#1E4B43] hover:bg-[#163D37] text-[#FBF7EE] font-bold inline-flex items-center gap-1.5 transition-all shadow-xs"
+                        >
+                          <span>Đọc bài</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-[#D9B76A]" />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
 
-                  {/* Card Body */}
-                  <div className="p-6 flex-1 flex flex-col justify-between bg-[#FBF7EE]">
-                    <div>
-                      <h3 className="font-serif text-xl font-bold text-[#1E4B43] leading-snug group-hover:text-[#D9B76A] transition-colors">
-                        {lesson.title}
-                      </h3>
-                      <p className="text-xs text-[#6E7E79] mt-1 font-medium italic">
-                        {lesson.vietnameseTitle}
-                      </p>
-                      <p className="text-xs text-[#3F5550] mt-3 line-clamp-3 leading-relaxed">
-                        {lesson.summary}
-                      </p>
-                    </div>
+          {/* Pagination Controls */}
+          {filteredLessons.length > 0 && totalPages > 1 && (
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#F6EEDC]/80 border border-[rgba(30,75,67,0.12)]">
+              <div className="text-xs font-semibold text-[#6E7E79]">
+                Hiển thị <strong className="text-[#1E4B43]">{(currentPage - 1) * itemsPerPage + 1}</strong> - <strong className="text-[#1E4B43]">{Math.min(currentPage * itemsPerPage, filteredLessons.length)}</strong> trên tổng số <strong className="text-[#1E4B43]">{filteredLessons.length}</strong> bài học
+              </div>
 
-                    {/* Card Footer Details */}
-                    <div className="mt-6 pt-4 border-t border-[rgba(30,75,67,0.10)] flex items-center justify-between text-xs">
-                      <span className="font-semibold text-[#6E7E79] flex items-center gap-1">
-                        <BookOpen className="w-3.5 h-3.5 text-[#1E4B43]" />
-                        {lesson.vocabCount} Từ vựng
-                      </span>
-                      <Link
-                        href="/#courses"
-                        className="font-bold text-[#1E4B43] group-hover:text-[#D9B76A] inline-flex items-center gap-1 transition-colors"
-                      >
-                        <span>Đọc tiếp</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              ))}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setCurrentPage((prev) => Math.max(1, prev - 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.14)] text-[#1E4B43] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#E8DFCB] transition-all shadow-xs"
+                  title="Trang trước"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => {
+                        setCurrentPage(page);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className={`w-8 h-8 rounded-xl text-xs font-extrabold transition-all ${
+                        currentPage === page
+                          ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs border border-[#D9B76A]/50 scale-105"
+                          : "bg-[#FBF7EE] text-[#3F5550] hover:bg-[#E8DFCB] border border-[rgba(30,75,67,0.10)]"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.14)] text-[#1E4B43] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#E8DFCB] transition-all shadow-xs"
+                  title="Trang sau"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
         </section>
@@ -629,7 +682,7 @@ export default function DiscoveryPage() {
         {/* Poetic Heritage Banner CTA */}
         <section className="rounded-3xl bg-gradient-to-r from-[#F6EEDC] via-[#FBF7EE] to-[#F6EEDC] border border-[#D9B76A]/40 p-8 sm:p-12 text-center relative overflow-hidden shadow-sm">
           <div className="max-w-2xl mx-auto relative z-10">
-            <span className="text-2xl mb-2 block">🪷</span>
+            <span className="text-3xl mb-2 block">🪷</span>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1E4B43]">
               "Mỗi bài học là một chuyến du hành văn hóa"
             </h2>
