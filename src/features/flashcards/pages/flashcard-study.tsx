@@ -353,7 +353,7 @@ export default function FlashcardStudyPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-              {currentCard.options.map((opt, idx) => (
+              {currentCard.options?.map((opt, idx) => (
                 <button
                   key={opt}
                   onClick={() => setMcSelected(idx)}

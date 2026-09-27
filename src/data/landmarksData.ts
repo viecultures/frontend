@@ -18,7 +18,7 @@ export interface LandmarkArticle {
   bilingualTerms: { en: string; vi: string }[];
   speakingSentenceEn: string;
   speakingSentenceVi: string;
-  desc: string;
+  desc?: string;
 }
 
 export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
