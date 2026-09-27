@@ -10,7 +10,7 @@ import { FlashcardModal } from '@/features/flashcards/components/flashcard-modal
 import { ReflectionsModal } from '@/features/community/components/reflections-modal';
 
 // Feature Pages
-import LandingPage3 from '@/features/landing/pages/landing-3';
+import LandingPage from '@/features/landing/pages/landing';
 import LoginPage from '@/features/auth/pages/login';
 import HomePage from '@/features/home/pages/home';
 import DiscoveryPage from '@/features/discovery/pages/discovery';
@@ -76,7 +76,7 @@ export const App: React.FC = () => {
     switch (pathname) {
       case '/':
       case '/landing':
-        return 'landing-3';
+        return 'landing';
       case '/login':
         return 'login';
       case '/home':
@@ -99,7 +99,7 @@ export const App: React.FC = () => {
       case '/community-contest':
         return 'community-contest';
       default:
-        return 'landing-3';
+        return 'landing';
     }
   };
 
@@ -167,8 +167,8 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
-      {/* Navbar shown across application views (hidden on login, home dashboard, reader page, and flashcard layout) */}
-      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'dictionary' && activeView !== 'flashcard-study' && (
+      {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, and flashcard layout) */}
+      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'dictionary' && activeView !== 'flashcard-study' && (
         <Navbar
           activeView={activeView}
           isLoggedIn={isLoggedIn}
@@ -185,7 +185,7 @@ export const App: React.FC = () => {
           <Route
             path="/"
             element={
-              <LandingPage3
+              <LandingPage
                 onNavigate={handleNavigate}
               />
             }

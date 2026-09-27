@@ -12,7 +12,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  activeView = 'landing-3',
+  activeView = 'landing',
   isLoggedIn = false,
   user,
   onNavigateToSection,
@@ -26,7 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     } else {
-      onNavigateToSection('landing-3');
+      onNavigateToSection('landing');
       setTimeout(() => {
         document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -46,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Brand Logo & Editorial Identity */}
           <div
             className="flex items-center gap-3.5 cursor-pointer group"
-            onClick={() => onNavigateToSection(isLoggedIn ? 'home' : 'landing-3')}
+            onClick={() => onNavigateToSection(isLoggedIn ? 'home' : 'landing')}
           >
             <div className="relative w-11 h-11 rounded-full border border-[#D9B76A]/50 overflow-hidden bg-[#1E4B43] shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300 flex items-center justify-center text-[#FBF7EE] font-serif font-bold text-xl">
               🪷
@@ -69,8 +69,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => onNavigateToSection('home')}
                   className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'home'
-                      ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                      : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
+                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
+                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
                     }`}
                 >
                   <Home className="w-4 h-4 text-[#D9B76A]" />
@@ -81,8 +81,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => onNavigateToSection('discovery')}
                   className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'discovery'
-                      ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                      : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
+                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
+                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
                     }`}
                 >
                   <Compass className="w-4 h-4 text-[#D9B76A]" />
@@ -93,8 +93,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => onNavigateToSection('bilingual-reader')}
                   className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'bilingual-reader'
-                      ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                      : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
+                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
+                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
                     }`}
                 >
                   <BookOpen className="w-4 h-4 text-[#D9B76A]" />
@@ -105,8 +105,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => onNavigateToSection('dictionary')}
                   className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'dictionary' || activeView === 'flashcard-study'
-                      ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                      : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
+                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
+                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
                     }`}
                 >
                   <BookMarked className="w-4 h-4 text-[#D9B76A]" />
@@ -117,8 +117,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => onNavigateToSection('community')}
                   className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'community' || activeView === 'community-contest'
-                      ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                      : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
+                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
+                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
                     }`}
                 >
                   <Users className="w-4 h-4 text-[#D9B76A]" />
@@ -159,8 +159,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => onNavigateToSection('discovery')}
                   className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'discovery'
-                      ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                      : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
+                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
+                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
                     }`}
                 >
                   <Compass className="w-4 h-4 text-[#D9B76A]" />
@@ -196,8 +196,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={() => onNavigateToSection('login')}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${activeView === 'login'
-                    ? 'bg-[#D9B76A] text-[#163D37] ring-2 ring-[#D9B76A]'
-                    : 'bg-[#1E4B43] text-[#FBF7EE] hover:bg-[#163D37] border border-[#D9B76A]/40'
+                  ? 'bg-[#D9B76A] text-[#163D37] ring-2 ring-[#D9B76A]'
+                  : 'bg-[#1E4B43] text-[#FBF7EE] hover:bg-[#163D37] border border-[#D9B76A]/40'
                   }`}
               >
                 <User className="w-4 h-4 text-[#D9B76A]" />

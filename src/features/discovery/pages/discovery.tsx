@@ -19,6 +19,8 @@ import {
   ChevronDown,
   SlidersHorizontal,
   Check,
+  MapPin,
+  Sparkles,
 } from "lucide-react";
 import {
   LESSONS_DATA,
@@ -27,6 +29,8 @@ import {
   TOPIC_OPTIONS,
   CEFR_LEVELS,
 } from "@/data/discoveryData";
+import VietnamMapCarousel from "@/features/discovery/components/vietnam-map-carousel";
+import { VIETNAM_LANDMARKS } from "@/data/landmarksData";
 
 // Helper function to remove Vietnamese diacritics / accents for smart search matching
 const removeAccents = (str: string) => {
@@ -58,6 +62,21 @@ export default function DiscoveryPage() {
     "imperial-hue": true,
   });
   const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
+
+  // Interactive Map Spotlight State
+  const [activePinIndex, setActivePinIndex] = useState<number>(2);
+  const [isAutoTour, setIsAutoTour] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!isAutoTour) return;
+    const interval = setInterval(() => {
+      setActivePinIndex((prev) => (prev + 1) % VIETNAM_LANDMARKS.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [isAutoTour]);
+
+  const safePinIndex = Math.max(0, Math.min(activePinIndex, VIETNAM_LANDMARKS.length - 1));
+  const activeLandmark = VIETNAM_LANDMARKS[safePinIndex] || VIETNAM_LANDMARKS[0];
 
   // Dynamic items per page based on view mode (Grid = 12, List = 20)
   const itemsPerPage = viewMode === "grid" ? 12 : 20;
@@ -162,6 +181,130 @@ export default function DiscoveryPage() {
   return (
     <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43] pt-6 pb-12">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+
+        {/* INTERACTIVE VIETNAM MAP SPOTLIGHT SECTION FOR DISCOVERY HUB */}
+        <section className="mb-10 relative z-20">
+          {/* Header Title (Simple & Left-Aligned) */}
+          <div className="mb-4 text-left">
+            <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#1E4B43] flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-[#D9B76A]" />
+              Khám Phá Bản Đồ Di Sản
+            </h2>
+            <p className="text-xs text-[#6E7E79] mt-1">
+              Nhấp vào các tỉnh thành 📍 trên bản đồ để xem bài đọc tiêu điểm và học từ vựng di sản song ngữ.
+            </p>
+          </div>
+
+          {/* Seamless 4:6 Grid (40% Map : 60% Content) without Outer Card Container */}
+          <div
+            className="grid grid-cols-1 lg:grid-cols-10 gap-6 sm:gap-8 items-stretch"
+            onMouseEnter={() => setIsAutoTour(false)}
+            onMouseLeave={() => setIsAutoTour(true)}
+          >
+            {/* LEFT COLUMN: Map Container (40% Width) */}
+            <div className="lg:col-span-4 relative bg-[#122A22] border border-[rgba(30,75,67,0.2)] rounded-2xl p-2.5 shadow-md flex flex-col justify-between items-center h-full overflow-hidden min-h-[440px]">
+              <VietnamMapCarousel
+                activeIndex={activePinIndex}
+                onSelectLandmark={setActivePinIndex}
+                showRegionTabs={false}
+                showPoiInfoBox={false}
+              />
+            </div>
+
+            {/* RIGHT COLUMN: Landmark Article Content (60% Width - Direct Layout without Card Frame) */}
+            <div className="lg:col-span-6 flex flex-col justify-between h-full">
+
+              {/* Location Badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1E4B43]/10 border border-[rgba(30,75,67,0.15)] text-[#1E4B43] text-xs font-bold mb-3 w-fit">
+                <MapPin className="w-3.5 h-3.5 text-[#D9B76A]" />
+                <span>{activeLandmark.locationNameVi}</span>
+              </div>
+
+              {/* Feature Image Banner */}
+              <div className="relative h-40 sm:h-44 rounded-2xl overflow-hidden mb-3.5 border border-[rgba(30,75,67,0.15)] shadow-xs group">
+                <img
+                  src={activeLandmark.image}
+                  alt={activeLandmark.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1E4B43]/80 via-black/10 to-transparent" />
+
+                <div className="absolute top-3 left-3 flex gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#1E4B43] text-[#FBF7EE] shadow-xs">
+                    {activeLandmark.category}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#D9B76A] text-[#1E4B43] shadow-xs">
+                    Band {activeLandmark.level}
+                  </span>
+                </div>
+
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs font-medium text-[#FBF7EE]">
+                  <span className="bg-[#1E4B43]/90 px-3 py-0.5 rounded-full border border-white/20 backdrop-blur-md text-[11px]">
+                    ⏱️ {activeLandmark.readTime} đọc song ngữ
+                  </span>
+                  <span className="bg-[#D9B76A] text-[#1E4B43] px-3 py-0.5 rounded-full font-extrabold text-[11px] shadow-xs">
+                    🌟 Di Sản Tiêu Điểm
+                  </span>
+                </div>
+              </div>
+
+              {/* Article Titles */}
+              <div className="space-y-0.5 mb-2.5">
+                <h3 className="font-serif font-bold text-xl sm:text-2xl text-[#1E4B43] leading-snug">
+                  {activeLandmark.title}
+                </h3>
+                <p className="text-xs font-bold text-[#D9B76A]">
+                  {activeLandmark.titleVi}
+                </p>
+              </div>
+
+              {/* Bilingual Excerpt Box */}
+              <div className="space-y-1.5 mb-3 bg-[#F6EEDC] p-3.5 rounded-2xl border border-[rgba(30,75,67,0.12)] shadow-xs">
+                <p className="text-xs sm:text-sm text-[#1E4B43] leading-relaxed font-serif">
+                  "{activeLandmark.excerptEn}"
+                </p>
+                <p className="text-xs text-[#6E7E79] leading-relaxed italic border-t border-[rgba(30,75,67,0.08)] pt-1.5 font-sans">
+                  "{activeLandmark.excerptVi}"
+                </p>
+              </div>
+
+              {/* Vocabulary Pills */}
+              <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                <span className="text-xs font-extrabold text-[#1E4B43]/70">Từ vựng di sản:</span>
+                {activeLandmark.vocabHighlights.map((vocab, i) => (
+                  <span
+                    key={i}
+                    className="px-2.5 py-0.5 rounded-xl text-xs font-bold bg-[#1E4B43]/10 text-[#1E4B43] border border-[rgba(30,75,67,0.12)]"
+                  >
+                    ✨ {vocab}
+                  </span>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-[rgba(30,75,67,0.10)]">
+                <Link
+                  href={`/reader?story=${activeLandmark.id}`}
+                  className="px-5 py-2.5 text-xs font-extrabold flex items-center gap-2 rounded-full bg-[#1E4B43] text-[#FBF7EE] hover:bg-[#163D37] shadow-md hover:scale-102 transition-all"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>Đọc Song Ngữ &amp; AI Shadowing</span>
+                </Link>
+
+                <Link
+                  href={`/flashcards`}
+                  className="px-4 py-2.5 text-xs font-bold flex items-center gap-2 rounded-full bg-[#F6EEDC] text-[#1E4B43] border border-[rgba(30,75,67,0.2)] hover:bg-[#E8DFCB] transition-all"
+                >
+                  <Sparkles className="w-4 h-4 text-[#D9B76A]" />
+                  <span>Ôn Flashcard Địa Danh</span>
+                </Link>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
         {/* Category Tabs Scrollbar */}
         <section className="mb-6 overflow-x-auto pb-2 scrollbar-none">
           <div className="flex items-center gap-2 min-w-max">
@@ -172,20 +315,18 @@ export default function DiscoveryPage() {
                 <button
                   key={topic.value}
                   onClick={() => setSelectedTopic(topic.value)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                    isActive
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer ${isActive
                       ? "bg-[#1E4B43] text-[#FBF7EE] shadow-md border border-[#D9B76A]/50 scale-102"
                       : "bg-[#F6EEDC] text-[#3F5550] hover:bg-[#E8DFCB] border border-[rgba(30,75,67,0.10)]"
-                  }`}
+                    }`}
                 >
                   <span className="text-base">{topic.icon}</span>
                   <span>{topic.label}</span>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                      isActive
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${isActive
                         ? "bg-[#D9B76A] text-[#1E4B43]"
                         : "bg-[#E8DFCB] text-[#1E4B43]"
-                    }`}
+                      }`}
                   >
                     {count}
                   </span>
@@ -226,11 +367,10 @@ export default function DiscoveryPage() {
                 {/* Bookmarked Filter Pill */}
                 <button
                   onClick={() => setOnlyBookmarked(!onlyBookmarked)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
-                    onlyBookmarked
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${onlyBookmarked
                       ? "bg-[#1E4B43] text-[#FBF7EE] border-[#D9B76A]/60 shadow-sm"
                       : "bg-[#FBF7EE] text-[#1E4B43] border-[rgba(30,75,67,0.18)] hover:bg-[#F6EEDC] shadow-xs hover:border-[#D9B76A]"
-                  }`}
+                    }`}
                 >
                   <Star className={`w-4 h-4 ${onlyBookmarked ? "fill-[#D9B76A] text-[#D9B76A]" : "text-[#D9B76A]"}`} />
                   <span>Đã lưu</span>
@@ -249,9 +389,8 @@ export default function DiscoveryPage() {
                       {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}
                     </span>
                     <ChevronDown
-                      className={`w-3.5 h-3.5 text-[#1E4B43] transition-transform duration-200 ${
-                        isSortOpen ? "rotate-180 text-[#D9B76A]" : ""
-                      }`}
+                      className={`w-3.5 h-3.5 text-[#1E4B43] transition-transform duration-200 ${isSortOpen ? "rotate-180 text-[#D9B76A]" : ""
+                        }`}
                     />
                   </button>
 
@@ -274,11 +413,10 @@ export default function DiscoveryPage() {
                                 setSortBy(opt.value as any);
                                 setIsSortOpen(false);
                               }}
-                              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
-                                isSelected
+                              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${isSelected
                                   ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs"
                                   : "text-[#3F5550] hover:bg-[#F6EEDC] hover:text-[#1E4B43]"
-                              }`}
+                                }`}
                             >
                               <span>{opt.label}</span>
                               {isSelected && (
@@ -296,22 +434,20 @@ export default function DiscoveryPage() {
                 <div className="flex items-center bg-[#FBF7EE] p-1 rounded-2xl border border-[rgba(30,75,67,0.18)] shadow-xs">
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs cursor-pointer ${
-                      viewMode === "grid"
+                    className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs cursor-pointer ${viewMode === "grid"
                         ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs scale-102"
                         : "text-[#6E7E79] hover:text-[#1E4B43] hover:bg-[#F6EEDC]"
-                    }`}
+                      }`}
                     title="Chế độ lưới (Grid 12 bài/trang)"
                   >
                     <LayoutGrid className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs cursor-pointer ${
-                      viewMode === "list"
+                    className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs cursor-pointer ${viewMode === "list"
                         ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs scale-102"
                         : "text-[#6E7E79] hover:text-[#1E4B43] hover:bg-[#F6EEDC]"
-                    }`}
+                      }`}
                     title="Chế độ danh sách (List 20 bài/trang)"
                   >
                     <List className="w-4 h-4" />
@@ -332,11 +468,10 @@ export default function DiscoveryPage() {
                   <button
                     key={lvl}
                     onClick={() => setSelectedCefr(lvl)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 ${
-                      selectedCefr === lvl
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 ${selectedCefr === lvl
                         ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs border border-[#D9B76A]/50"
                         : "bg-[#FBF7EE] text-[#1E4B43] hover:bg-[#E8DFCB] border border-[rgba(30,75,67,0.12)]"
-                    }`}
+                      }`}
                   >
                     {lvl === "All" ? "Tất cả" : lvl}
                   </button>
@@ -358,11 +493,10 @@ export default function DiscoveryPage() {
                   <button
                     key={dur.value}
                     onClick={() => setSelectedReadTime(dur.value as any)}
-                    className={`px-3 py-1 rounded-xl font-bold transition-all ${
-                      selectedReadTime === dur.value
+                    className={`px-3 py-1 rounded-xl font-bold transition-all ${selectedReadTime === dur.value
                         ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs"
                         : "bg-[#FBF7EE] text-[#3F5550] hover:bg-[#E8DFCB] border border-[rgba(30,75,67,0.10)]"
-                    }`}
+                      }`}
                   >
                     {dur.label}
                   </button>
@@ -665,11 +799,10 @@ export default function DiscoveryPage() {
                         setCurrentPage(page);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className={`w-8 h-8 rounded-xl text-xs font-extrabold transition-all ${
-                        currentPage === page
+                      className={`w-8 h-8 rounded-xl text-xs font-extrabold transition-all ${currentPage === page
                           ? "bg-[#1E4B43] text-[#FBF7EE] shadow-xs border border-[#D9B76A]/50 scale-105"
                           : "bg-[#FBF7EE] text-[#3F5550] hover:bg-[#E8DFCB] border border-[rgba(30,75,67,0.10)]"
-                      }`}
+                        }`}
                     >
                       {page}
                     </button>
@@ -704,7 +837,7 @@ export default function DiscoveryPage() {
             </p>
             <div className="mt-6">
               <Link
-                href="/"
+                href="/home"
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-[#1E4B43] bg-[#FBF7EE] hover:bg-[#F6EEDC] border border-[#D9B76A] shadow-sm transition-all"
               >
                 <span>Quay về Trang Chủ VieCultures</span>

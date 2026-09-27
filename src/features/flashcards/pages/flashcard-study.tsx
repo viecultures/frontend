@@ -157,11 +157,10 @@ export default function FlashcardStudyPage() {
             {/* 1. Trộn thẻ */}
             <button
               onClick={toggleShuffle}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border transition-all cursor-pointer shadow-2xs ${
-                isShuffled
-                  ? "bg-[#1E4B43] text-[#FBF7EE] border-[#1E4B43]"
-                  : "bg-white text-[#1E4B43] border-[rgba(30,75,67,0.2)] hover:bg-[#F6EEDC]"
-              }`}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border transition-all cursor-pointer shadow-2xs ${isShuffled
+                ? "bg-[#1E4B43] text-[#FBF7EE] border-[#1E4B43]"
+                : "bg-white text-[#1E4B43] border-[rgba(30,75,67,0.2)] hover:bg-[#F6EEDC]"
+                }`}
             >
               <Shuffle className="w-3.5 h-3.5 text-[#059669]" />
               <span>{isShuffled ? "Đã trộn" : "Trộn thẻ"}</span>
@@ -180,14 +179,12 @@ export default function FlashcardStudyPage() {
                 className="sr-only"
               />
               <div
-                className={`w-7 h-4 flex items-center rounded-full p-0.5 transition-colors ${
-                  isAutoAudio ? "bg-[#059669]" : "bg-gray-300"
-                }`}
+                className={`w-7 h-4 flex items-center rounded-full p-0.5 transition-colors ${isAutoAudio ? "bg-[#059669]" : "bg-gray-300"
+                  }`}
               >
                 <div
-                  className={`bg-white w-3 h-3 rounded-full shadow-xs transform transition-transform ${
-                    isAutoAudio ? "translate-x-3" : "translate-x-0"
-                  }`}
+                  className={`bg-white w-3 h-3 rounded-full shadow-xs transform transition-transform ${isAutoAudio ? "translate-x-3" : "translate-x-0"
+                    }`}
                 />
               </div>
             </label>
@@ -231,11 +228,10 @@ export default function FlashcardStudyPage() {
         <div className="p-1.5 bg-white border border-[rgba(30,75,67,0.15)] rounded-2xl shadow-xs flex items-center justify-center gap-1 sm:gap-2 max-w-lg mx-auto w-full">
           <button
             onClick={() => setPlayerMode("flip")}
-            className={`flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-              playerMode === "flip"
-                ? "bg-[#1E4B43] text-white shadow-xs"
-                : "text-[#1E4B43] hover:bg-[#F6EEDC]/60"
-            }`}
+            className={`flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${playerMode === "flip"
+              ? "bg-[#1E4B43] text-white shadow-xs"
+              : "text-[#1E4B43] hover:bg-[#F6EEDC]/60"
+              }`}
           >
             <Layers className={`w-4 h-4 ${playerMode === "flip" ? "text-[#D9B76A]" : "text-[#1E4B43]"}`} />
             <span>Lật Thẻ 3D</span>
@@ -243,11 +239,10 @@ export default function FlashcardStudyPage() {
 
           <button
             onClick={() => setPlayerMode("mc")}
-            className={`flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-              playerMode === "mc"
-                ? "bg-[#1E4B43] text-white shadow-xs"
-                : "text-[#1E4B43] hover:bg-[#F6EEDC]/60"
-            }`}
+            className={`flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${playerMode === "mc"
+              ? "bg-[#1E4B43] text-white shadow-xs"
+              : "text-[#1E4B43] hover:bg-[#F6EEDC]/60"
+              }`}
           >
             <Target className={`w-4 h-4 ${playerMode === "mc" ? "text-[#D9B76A]" : "text-[#1E4B43]"}`} />
             <span>Trắc Nghiệm</span>
@@ -255,11 +250,10 @@ export default function FlashcardStudyPage() {
 
           <button
             onClick={() => setPlayerMode("spelling")}
-            className={`flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-              playerMode === "spelling"
-                ? "bg-[#1E4B43] text-white shadow-xs"
-                : "text-[#1E4B43] hover:bg-[#F6EEDC]/60"
-            }`}
+            className={`flex-1 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${playerMode === "spelling"
+              ? "bg-[#1E4B43] text-white shadow-xs"
+              : "text-[#1E4B43] hover:bg-[#F6EEDC]/60"
+              }`}
           >
             <PenTool className={`w-4 h-4 ${playerMode === "spelling" ? "text-[#D9B76A]" : "text-[#1E4B43]"}`} />
             <span>Gõ Từ</span>
@@ -363,13 +357,12 @@ export default function FlashcardStudyPage() {
                 <button
                   key={opt}
                   onClick={() => setMcSelected(idx)}
-                  className={`p-5 rounded-2xl border-2 text-left text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                    mcSelected === idx
-                      ? idx === currentCard.correctIndex
-                        ? "bg-[#ECFDF5] text-[#059669] border-[#059669] shadow-xs"
-                        : "bg-rose-50 text-rose-700 border-rose-400 shadow-xs"
-                      : "bg-[#F6EEDC]/50 text-[#1E4B43] border-[rgba(30,75,67,0.1)] hover:bg-[#F6EEDC] hover:border-[#1E4B43]/30"
-                  }`}
+                  className={`p-5 rounded-2xl border-2 text-left text-xs sm:text-sm font-bold transition-all cursor-pointer ${mcSelected === idx
+                    ? idx === currentCard.correctIndex
+                      ? "bg-[#ECFDF5] text-[#059669] border-[#059669] shadow-xs"
+                      : "bg-rose-50 text-rose-700 border-rose-400 shadow-xs"
+                    : "bg-[#F6EEDC]/50 text-[#1E4B43] border-[rgba(30,75,67,0.1)] hover:bg-[#F6EEDC] hover:border-[#1E4B43]/30"
+                    }`}
                 >
                   {opt}
                 </button>
@@ -462,9 +455,8 @@ export default function FlashcardStudyPage() {
                   setPlayerMode("mc");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
-                className={`p-4 rounded-2xl text-white space-y-3 shadow-md cursor-pointer transition-transform hover:scale-[1.02] flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-[#E67E22] to-[#D35400] ${
-                  playerMode === "mc" ? "ring-4 ring-amber-300" : ""
-                }`}
+                className={`p-4 rounded-2xl text-white space-y-3 shadow-md cursor-pointer transition-transform hover:scale-[1.02] flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-[#E67E22] to-[#D35400] ${playerMode === "mc" ? "ring-4 ring-amber-300" : ""
+                  }`}
               >
                 <div className="w-10 h-10 rounded-xl bg-white/95 text-[#D35400] flex items-center justify-center shadow-xs">
                   <Target className="w-5 h-5" />
@@ -488,96 +480,10 @@ export default function FlashcardStudyPage() {
                   <div className="w-10 h-10 rounded-xl bg-white/95 text-[#1E4B43] flex items-center justify-center shadow-xs">
                     <Headphones className="w-5 h-5" />
                   </div>
-                  <span className="px-1.5 py-0.5 rounded-md text-[8px] font-bold bg-white/20 text-white uppercase tracking-tighter">
-                    CÒN 10/10 HÔM NAY
-                  </span>
                 </div>
                 <div>
                   <h4 className="font-extrabold text-sm sm:text-base">Listening</h4>
                   <p className="text-[10px] text-emerald-100 font-medium">Nghe và gõ lại</p>
-                </div>
-              </div>
-
-              {/* 3. Điền vào chỗ trống - Terracotta/Red */}
-              <div
-                onClick={() => {
-                  setPlayerMode("mc");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="p-4 rounded-2xl text-white space-y-3 shadow-md cursor-pointer transition-transform hover:scale-[1.02] flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-[#E74C3C] to-[#C0392B]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-white/95 text-[#C0392B] flex items-center justify-center shadow-xs">
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded-md text-[8px] font-bold bg-white/20 text-white uppercase tracking-tighter">
-                    CÒN 10/10 HÔM NAY
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-sm sm:text-base">Điền vào chỗ trống</h4>
-                  <p className="text-[10px] text-rose-100 font-medium">Chọn từ điền câu</p>
-                </div>
-              </div>
-
-              {/* 4. Tidians - Purple */}
-              <div
-                onClick={() => {
-                  alert("Tính năng Tidians: Đặt câu & Luyện nói Tiếng Anh qua AI Voice sắp ra mắt!");
-                }}
-                className="p-4 rounded-2xl text-white space-y-3 shadow-md cursor-pointer transition-transform hover:scale-[1.02] flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-[#8E44AD] to-[#6C3483]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-white/95 text-[#6C3483] flex items-center justify-center shadow-xs">
-                    <Mic className="w-5 h-5" />
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded-md text-[8px] font-bold bg-white/20 text-white uppercase tracking-tighter flex items-center gap-0.5">
-                    <Lock className="w-2.5 h-2.5" />
-                    TIDIAN
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-sm sm:text-base">Tidians</h4>
-                  <p className="text-[10px] text-purple-100 font-medium">Đặt câu &amp; luyện nói</p>
-                </div>
-              </div>
-
-              {/* 5. Card Blast - Blue */}
-              <div
-                onClick={() => {
-                  setPlayerMode("spelling");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="p-4 rounded-2xl text-white space-y-3 shadow-md cursor-pointer transition-transform hover:scale-[1.02] flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-[#2980B9] to-[#1F618D]"
-              >
-                <div className="w-10 h-10 rounded-xl bg-white/95 text-[#1F618D] flex items-center justify-center shadow-xs">
-                  <Target className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-sm sm:text-base">Card Blast</h4>
-                  <p className="text-[10px] text-sky-100 font-medium">Gõ đáp án · bắn chữ rơi</p>
-                </div>
-              </div>
-
-              {/* 6. Tổng hợp - Pink/Magenta */}
-              <div
-                onClick={() => {
-                  setPlayerMode("flip");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="p-4 rounded-2xl text-white space-y-3 shadow-md cursor-pointer transition-transform hover:scale-[1.02] flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-[#D81B60] to-[#880E4F]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-white/95 text-[#880E4F] flex items-center justify-center shadow-xs">
-                    <Layers className="w-5 h-5" />
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded-md text-[8px] font-bold bg-white/20 text-white uppercase tracking-tighter">
-                    CÒN 10/10 HÔM NAY
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-sm sm:text-base">Tổng hợp</h4>
-                  <p className="text-[10px] text-pink-100 font-medium">Nhiều chế độ</p>
                 </div>
               </div>
             </div>
