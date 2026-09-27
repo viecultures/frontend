@@ -12,9 +12,9 @@ import {
   Columns,
   ArrowRight,
 } from "lucide-react";
-import { AudioShadowingBar } from "./audio-shadowing-bar";
-import { BilingualReaderView } from "./bilingual-reader-view";
-import { ExtensiveReaderView } from "./extensive-reader-view";
+import { AudioShadowingBar } from "../components/audio-shadowing-bar";
+import { BilingualReaderView } from "../components/bilingual-reader-view";
+import { ExtensiveReaderView } from "../components/extensive-reader-view";
 import { Footer } from "@/components/Footer";
 import {
   VOCAB_DATABASE,

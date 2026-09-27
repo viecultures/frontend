@@ -467,70 +467,74 @@ export default function DiscoveryPage() {
                     key={lesson.id}
                     className="group relative rounded-3xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.12)] shadow-[0_4px_20px_-4px_rgba(30,75,67,0.06)] hover:shadow-[0_12px_32px_-6px_rgba(30,75,67,0.16)] transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1.5"
                   >
-                    {/* Card Cover & Header Illustration */}
-                    <div
-                      className={`relative h-48 w-full bg-gradient-to-br ${lesson.gradient} p-6 flex flex-col justify-between overflow-hidden`}
-                    >
-                      {/* Traditional Border Grid Overlay */}
-                      <div className="absolute inset-2.5 border border-[#D9B76A]/25 rounded-2xl pointer-events-none" />
-
-                      {/* Top Category Badge & Bookmark Action */}
-                      <div className="relative z-10 flex items-center justify-between">
-                        <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FBF7EE]/90 backdrop-blur-sm text-[#1E4B43] border border-[rgba(30,75,67,0.15)] shadow-xs">
-                          {lesson.categoryVi}
-                        </span>
-                        <button
-                          onClick={() => toggleBookmark(lesson.id)}
-                          className="p-2 rounded-full bg-[#FBF7EE]/85 hover:bg-[#FBF7EE] text-[#1E4B43] transition-all shadow-xs hover:scale-110"
-                          aria-label="Bookmark lesson"
-                        >
-                          {isBookmarked ? (
-                            <BookmarkCheck className="w-4 h-4 text-[#1E4B43] fill-[#1E4B43]" />
-                          ) : (
-                            <Bookmark className="w-4 h-4 text-[#1E4B43]" />
-                          )}
-                        </button>
-                      </div>
-
-                      {/* Center Emblem Symbol */}
-                      <div className="relative z-10 my-auto text-center">
-                        <span className="text-4xl filter drop-shadow-md transition-transform duration-300 group-hover:scale-115 inline-block">
+                    {/* Card Cover (Clean Image without Overlay & Middle Icon) */}
+                    <div className="relative h-48 w-full bg-gradient-to-br from-[#1E4B43] to-[#163D37] overflow-hidden">
+                      {lesson.imageUrl ? (
+                        <img
+                          src={lesson.imageUrl}
+                          alt={lesson.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-4xl">
                           {lesson.iconSymbol}
-                        </span>
-                      </div>
-
-                      {/* Bottom CEFR & Duration Pills */}
-                      <div className="relative z-10 flex items-center justify-between text-[11px] font-bold tracking-wider uppercase">
-                        <span
-                          className={`px-2.5 py-0.5 rounded-md border shadow-xs ${getCefrBadgeStyle(
-                            lesson.cefrLevel
-                          )}`}
-                        >
-                          CEFR {lesson.cefrLevel}
-                        </span>
-                        <span className="flex items-center gap-1 text-[#F6EEDC]">
-                          <Clock className="w-3.5 h-3.5" />
-                          {lesson.readTime}
-                        </span>
-                      </div>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Card Body */}
+                    {/* Card Body & Metadata Section */}
                     <div className="p-6 flex-1 flex flex-col justify-between bg-[#FBF7EE]">
-                      <div>
-                        <h3 className="font-serif text-xl font-bold text-[#1E4B43] leading-snug group-hover:text-[#D9B76A] transition-colors">
-                          {lesson.title}
-                        </h3>
-                        <p className="text-xs text-[#6E7E79] mt-1 font-medium italic">
-                          {lesson.vietnameseTitle}
-                        </p>
-                        <p className="text-xs text-[#3F5550] mt-3 line-clamp-3 leading-relaxed">
-                          {lesson.summary}
-                        </p>
+                      <div className="space-y-3">
+                        {/* Metadata Row 1: Category Badge & Bookmark Button */}
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#1E4B43]/10 text-[#1E4B43] border border-[rgba(30,75,67,0.15)] shadow-xs">
+                            {lesson.categoryVi}
+                          </span>
+                          <button
+                            onClick={() => toggleBookmark(lesson.id)}
+                            className="p-1.5 rounded-full bg-[#E8DFCB]/60 hover:bg-[#E8DFCB] text-[#1E4B43] transition-all"
+                            aria-label="Bookmark lesson"
+                          >
+                            {isBookmarked ? (
+                              <BookmarkCheck className="w-4 h-4 text-[#1E4B43] fill-[#1E4B43]" />
+                            ) : (
+                              <Bookmark className="w-4 h-4 text-[#1E4B43]" />
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Story Title & Summary */}
+                        <div>
+                          <h3 className="font-serif text-xl font-bold text-[#1E4B43] leading-snug group-hover:text-[#D9B76A] transition-colors">
+                            {lesson.title}
+                          </h3>
+                          <p className="text-xs text-[#6E7E79] mt-1 font-medium italic">
+                            {lesson.vietnameseTitle}
+                          </p>
+                          <p className="text-xs text-[#3F5550] mt-2.5 line-clamp-3 leading-relaxed">
+                            {lesson.summary}
+                          </p>
+                        </div>
+
+                        {/* Metadata Row 2: CEFR Badge & Reading Time */}
+                        <div className="flex items-center justify-between text-[11px] font-bold tracking-wider uppercase pt-1">
+                          <span
+                            className={`px-2.5 py-0.5 rounded-md border shadow-xs ${getCefrBadgeStyle(
+                              lesson.cefrLevel
+                            )}`}
+                          >
+                            CEFR {lesson.cefrLevel}
+                          </span>
+                          <span className="flex items-center gap-1 text-[#6E7E79]">
+                            <Clock className="w-3.5 h-3.5 text-[#D9B76A]" />
+                            {lesson.readTime}
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Card Footer Details */}
-                      <div className="mt-6 pt-4 border-t border-[rgba(30,75,67,0.10)] flex items-center justify-between text-xs">
+                      {/* Card Footer: Vocab Count & Read Action */}
+                      <div className="mt-5 pt-4 border-t border-[rgba(30,75,67,0.10)] flex items-center justify-between text-xs">
                         <span className="font-semibold text-[#6E7E79] flex items-center gap-1">
                           <BookOpen className="w-3.5 h-3.5 text-[#1E4B43]" />
                           {lesson.vocabCount} Từ vựng
@@ -560,9 +564,18 @@ export default function DiscoveryPage() {
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <div
-                        className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${lesson.gradient} flex items-center justify-center shrink-0 shadow-xs border border-[#D9B76A]/30`}
+                        className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${lesson.gradient} flex items-center justify-center shrink-0 shadow-xs border border-[#D9B76A]/30 overflow-hidden relative`}
                       >
-                        <span className="text-2xl">{lesson.iconSymbol}</span>
+                        {lesson.imageUrl ? (
+                          <img
+                            src={lesson.imageUrl}
+                            alt={lesson.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span className="text-2xl">{lesson.iconSymbol}</span>
+                        )}
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap mb-1">

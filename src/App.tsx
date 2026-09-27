@@ -5,17 +5,20 @@ import { Footer } from './components/Footer';
 import { ProfileDrawer } from './components/ProfileDrawer';
 
 // Feature Modals
-import { ReaderModal } from '@/features/reader/reader-modal';
-import { FlashcardModal } from '@/features/flashcards/flashcard-modal';
-import { ReflectionsModal } from '@/features/community/reflections-modal';
+import { ReaderModal } from '@/features/reader/components/reader-modal';
+import { FlashcardModal } from '@/features/flashcards/components/flashcard-modal';
+import { ReflectionsModal } from '@/features/community/components/reflections-modal';
 
 // Feature Pages
-import LandingPage3 from '@/features/landing/landing-page-3';
-import LoginPage from '@/features/auth/login-page';
-import HomePage from '@/features/home/home-page';
-import DiscoveryPage from '@/features/discovery/discovery-page';
-import ReaderPage from '@/features/reader/reader-page';
-import FlashcardStudyPage from '@/features/flashcards/flashcard-study-page';
+import LandingPage3 from '@/features/landing/pages/landing-3';
+import LoginPage from '@/features/auth/pages/login';
+import HomePage from '@/features/home/pages/home';
+import DiscoveryPage from '@/features/discovery/pages/discovery';
+import ReaderPage from '@/features/reader/pages/reader';
+import DictionaryPage from '@/features/flashcards/pages/dictionary';
+import FlashcardStudyPage from '@/features/flashcards/pages/flashcard-study';
+import CommunityPage from '@/features/community/pages/community';
+import CommunityContestPage from '@/features/community/pages/community-contest';
 
 import type { Lesson } from '@/types';
 
@@ -84,8 +87,17 @@ export const App: React.FC = () => {
       case '/extensive-reader':
       case '/reader':
         return 'bilingual-reader';
+      case '/dictionary':
+      case '/flashcard-library':
+        return 'dictionary';
       case '/flashcard-study':
         return 'flashcard-study';
+      case '/community':
+      case '/community-1':
+        return 'community';
+      case '/community-2':
+      case '/community-contest':
+        return 'community-contest';
       default:
         return 'landing-3';
     }
@@ -114,8 +126,20 @@ export const App: React.FC = () => {
       case 'bilingual-reader':
         navigate('/bilingual-reader');
         break;
+      case 'dictionary':
+      case 'flashcard-library':
+        navigate('/dictionary');
+        break;
       case 'flashcard-study':
         navigate('/flashcard-study');
+        break;
+      case 'community':
+      case 'community-1':
+        navigate('/community');
+        break;
+      case 'community-2':
+      case 'community-contest':
+        navigate('/community-2');
         break;
       default:
         if (view.startsWith('/')) {
@@ -143,8 +167,8 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
-      {/* Navbar shown across application views (hidden on login, home dashboard, and reader page) */}
-      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && (
+      {/* Navbar shown across application views (hidden on login, home dashboard, reader page, and flashcard layout) */}
+      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'dictionary' && activeView !== 'flashcard-study' && (
         <Navbar
           activeView={activeView}
           isLoggedIn={isLoggedIn}
@@ -208,8 +232,32 @@ export const App: React.FC = () => {
             element={<Navigate to="/bilingual-reader?mode=extensive" replace />}
           />
           <Route
+            path="/dictionary"
+            element={<DictionaryPage />}
+          />
+          <Route
+            path="/flashcard-library"
+            element={<Navigate to="/dictionary" replace />}
+          />
+          <Route
             path="/flashcard-study"
             element={<FlashcardStudyPage />}
+          />
+          <Route
+            path="/community"
+            element={<CommunityPage />}
+          />
+          <Route
+            path="/community-1"
+            element={<Navigate to="/community" replace />}
+          />
+          <Route
+            path="/community-2"
+            element={<CommunityContestPage />}
+          />
+          <Route
+            path="/community-contest"
+            element={<Navigate to="/community-2" replace />}
           />
           <Route
             path="*"

@@ -16,7 +16,7 @@ import bannerVideo from '@/assets/banner.webm';
 import picHue from '@/assets/pictures/1789477888834_3466390194730922005_g2285579428170464438_97fb29714b65f3e4f91196487a1510be.jpg';
 import picDongHo from '@/assets/pictures/1789477897671_3466390194730922005_g2285579428170464438_208c3b16036482dde07954a98eba6f37.jpg';
 import picAoDai from '@/assets/pictures/1789477908863_3466390194730922005_g2285579428170464438_43e95faf8835448ecde377e2b7447d69.jpg';
-import VietnamMapCarousel from './vietnam-map-carousel';
+import VietnamMapCarousel from '../components/vietnam-map-carousel';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 
 interface LandingPage3Props {

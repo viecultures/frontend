@@ -1,7 +1,7 @@
-import { HeroBanner } from './hero-banner';
-import { FilterBar } from '../discovery/filter-bar';
-import { LessonCard } from '../discovery/lesson-card';
-import { CulturalPillars } from './cultural-pillars';
+import { HeroBanner } from '../components/hero-banner';
+import { FilterBar } from '../../discovery/components/filter-bar';
+import { LessonCard } from '../../discovery/components/lesson-card';
+import { CulturalPillars } from '../components/cultural-pillars';
 import { Sparkles, BookOpen, MessageSquare, ArrowRight, ShieldCheck, Heart } from 'lucide-react';
 import type { Lesson, Category, CEFRLevel } from '@/types';
 

@@ -19,7 +19,11 @@ import {
   Square,
   Clock,
   LogOut,
-  User
+  User,
+  BookMarked,
+  Layers,
+  Compass,
+  Users
 } from 'lucide-react';
 import { ProfileDropdown } from '@/components/ProfileDropdown';
 
@@ -278,54 +282,38 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
             </p>
           </div>
 
-          {/* Quick Practice Shortcut Pills Row */}
+          {/* Quick Practice Shortcut Pills Row matching actual system features */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
-              onClick={() => handleNavigate('flashcard-study')}
-              className="px-4 py-2.5 bg-[#122A22] border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-semibold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group"
+              onClick={() => handleNavigate('discovery')}
+              className="px-4 py-2.5 bg-[#122A22]/90 border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group cursor-pointer"
             >
-              <Mic className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <span>Luyện phát âm</span>
+              <Compass className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+              <span>Khám Phá Di Sản</span>
             </button>
 
             <button
               onClick={() => handleNavigate('bilingual-reader')}
-              className="px-4 py-2.5 bg-[#122A22] border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-semibold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group"
-            >
-              <FileText className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
-              <span>Học ngữ pháp</span>
-            </button>
-
-            <button
-              onClick={() => handleNavigate('flashcard-study')}
-              className="px-4 py-2.5 bg-[#122A22] border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-semibold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group"
+              className="px-4 py-2.5 bg-[#122A22]/90 border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" />
-              <span>Học từ vựng</span>
+              <span>Đọc Song Ngữ AI</span>
             </button>
 
             <button
-              onClick={() => handleNavigate('flashcard-study')}
-              className="px-4 py-2.5 bg-[#122A22] border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-semibold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group"
+              onClick={() => handleNavigate('dictionary')}
+              className="px-4 py-2.5 bg-[#122A22]/90 border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group cursor-pointer"
             >
-              <Rocket className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
-              <span>Ôn từ vựng</span>
+              <BookMarked className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span>Tủ Sách Từ Điển</span>
             </button>
 
             <button
-              onClick={() => handleNavigate('bilingual-reader')}
-              className="px-4 py-2.5 bg-[#122A22] border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-semibold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group"
+              onClick={() => handleNavigate('community')}
+              className="px-4 py-2.5 bg-[#122A22]/90 border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group cursor-pointer"
             >
-              <BookOpen className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <span>Luyện đọc</span>
-            </button>
-
-            <button
-              onClick={() => handleNavigate('discovery')}
-              className="px-4 py-2.5 bg-[#122A22] border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-semibold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group"
-            >
-              <Video className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
-              <span>Xem video</span>
+              <Users className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+              <span>Cộng Đồng Học Tập</span>
             </button>
           </div>
 

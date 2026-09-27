@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers } from 'lucide-react';
+import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked } from 'lucide-react';
 import { ProfileDropdown } from './ProfileDropdown';
 
 interface NavbarProps {
@@ -68,11 +68,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {/* 1. Home Dashboard / Study Room */}
                 <button
                   onClick={() => onNavigateToSection('home')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${
-                    activeView === 'home'
+                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'home'
                       ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
                       : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                  }`}
+                    }`}
                 >
                   <Home className="w-4 h-4 text-[#D9B76A]" />
                   <span>Phòng Học</span>
@@ -81,11 +80,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {/* 2. Discovery Catalog */}
                 <button
                   onClick={() => onNavigateToSection('discovery')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${
-                    activeView === 'discovery'
+                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'discovery'
                       ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
                       : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                  }`}
+                    }`}
                 >
                   <Compass className="w-4 h-4 text-[#D9B76A]" />
                   <span>Khám Phá</span>
@@ -94,27 +92,37 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {/* 3. Dual Reader */}
                 <button
                   onClick={() => onNavigateToSection('bilingual-reader')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${
-                    activeView === 'bilingual-reader'
+                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'bilingual-reader'
                       ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
                       : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                  }`}
+                    }`}
                 >
                   <BookOpen className="w-4 h-4 text-[#D9B76A]" />
                   <span>Đọc Song Ngữ</span>
                 </button>
 
-                {/* 4. SRS Flashcards */}
+                {/* 4. Kho Từ Vựng & Flashcards */}
                 <button
-                  onClick={() => onNavigateToSection('flashcard-study')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${
-                    activeView === 'flashcard-study'
+                  onClick={() => onNavigateToSection('dictionary')}
+                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'dictionary' || activeView === 'flashcard-study'
                       ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
                       : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                  }`}
+                    }`}
                 >
-                  <Sparkles className="w-4 h-4 text-[#D9B76A]" />
-                  <span>Thẻ Học SRS</span>
+                  <BookMarked className="w-4 h-4 text-[#D9B76A]" />
+                  <span>Kho Từ Vựng</span>
+                </button>
+
+                {/* 6. Community */}
+                <button
+                  onClick={() => onNavigateToSection('community')}
+                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'community' || activeView === 'community-contest'
+                      ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
+                      : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
+                    }`}
+                >
+                  <Users className="w-4 h-4 text-[#D9B76A]" />
+                  <span>Cộng Đồng</span>
                 </button>
               </>
             ) : (
@@ -150,11 +158,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {/* 4. Kho Bài Đọc */}
                 <button
                   onClick={() => onNavigateToSection('discovery')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${
-                    activeView === 'discovery'
+                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 ${activeView === 'discovery'
                       ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
                       : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                  }`}
+                    }`}
                 >
                   <Compass className="w-4 h-4 text-[#D9B76A]" />
                   <span>Kho Bài Đọc</span>
@@ -188,11 +195,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={() => onNavigateToSection('login')}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                  activeView === 'login'
+                className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${activeView === 'login'
                     ? 'bg-[#D9B76A] text-[#163D37] ring-2 ring-[#D9B76A]'
                     : 'bg-[#1E4B43] text-[#FBF7EE] hover:bg-[#163D37] border border-[#D9B76A]/40'
-                }`}
+                  }`}
               >
                 <User className="w-4 h-4 text-[#D9B76A]" />
                 <span>Đăng Nhập</span>

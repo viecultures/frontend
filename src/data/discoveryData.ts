@@ -11,6 +11,7 @@ export interface Lesson {
   summary: string;
   gradient: string;
   iconSymbol: string;
+  imageUrl?: string;
   featured?: boolean;
   dateAdded: string;
 }
@@ -30,6 +31,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Discover the citadel gates, royal tombs, and court cuisine of the Nguyen Dynasty while building academic vocabulary in historical architecture and conservation.",
     gradient: "from-[#1E4B43] via-[#2A665B] to-[#163D37]",
     iconSymbol: "🏛️",
+    imageUrl: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80",
     featured: true,
     dateAdded: "2026-03-15",
   },
@@ -46,6 +48,7 @@ export const LESSONS_DATA: Lesson[] = [
       "From French baguette to global culinary icon: trace the history behind Vietnam's favorite street food and learn key culinary descriptive adjectives.",
     gradient: "from-[#D9B76A]/90 via-[#C59B48] to-[#9E7728]",
     iconSymbol: "🥖",
+    imageUrl: "https://images.unsplash.com/photo-1626804475297-41608e074eb1?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-10",
   },
   {
@@ -61,6 +64,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Understand full moon rituals, silk craftsmanship, and ancient wooden architecture along the Thu Bồn River using rich descriptive storytelling.",
     gradient: "from-[#E8B7B2]/90 via-[#D69690] to-[#B86E67]",
     iconSymbol: "🏮",
+    imageUrl: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-12",
   },
   {
@@ -76,6 +80,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Explore 700 years of ceramic craftsmanship in a traditional village on the Red River delta while learning terminology for artisan techniques.",
     gradient: "from-[#6E9FA1] via-[#528385] to-[#3B6668]",
     iconSymbol: "🏺",
+    imageUrl: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-08",
   },
   {
@@ -91,6 +96,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Journey through the golden harvest season in northern highlands and discover the ecological wisdom of ethnic minority communities.",
     gradient: "from-[#2A665B] via-[#4A887C] to-[#1E4B43]",
     iconSymbol: "🌾",
+    imageUrl: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-05",
   },
   {
@@ -106,6 +112,7 @@ export const LESSONS_DATA: Lesson[] = [
       "How wartime necessity birthed a world-renowned coffee innovation in 1946 Old Quarter Hanoi. Practice narrative tenses and passive voice.",
     gradient: "from-[#C59B48] via-[#A87E2D] to-[#78571B]",
     iconSymbol: "☕",
+    imageUrl: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-14",
   },
   {
@@ -121,6 +128,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Step into the flooded rice paddies of Northern Vietnam to discover a unique thousand-year-old performing art and folk mythology.",
     gradient: "from-[#9FCED8] via-[#75B2C0] to-[#488E9E]",
     iconSymbol: "🎭",
+    imageUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-01",
   },
   {
@@ -136,6 +144,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Revisit King Le Loi's mythical sword and the sacred turtle of Hanoi in accessible A2 English tailored for foundational learners.",
     gradient: "from-[#E8B7B2] via-[#C88A84] to-[#995852]",
     iconSymbol: "🐢",
+    imageUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-02-28",
   },
   {
@@ -151,6 +160,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Trace the evolution of the national garment from Royal court attire to modern high fashion, exploring textile and design terminology.",
     gradient: "from-[#D9B76A] via-[#B89240] to-[#806120]",
     iconSymbol: "👘",
+    imageUrl: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-03",
   },
   {
@@ -166,6 +176,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Explore UNESCO dual heritage karst mountains, ancient temples, and subterranean rivers using advanced C1 academic vocabulary.",
     gradient: "from-[#1E4B43] via-[#336F64] to-[#143630]",
     iconSymbol: "⛰️",
+    imageUrl: "https://images.unsplash.com/photo-1540611025311-01df3cef54b5?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-16",
   },
   {
@@ -181,6 +192,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Descend into Phong Nha-Kẻ Bàng's underground jungle ecosystem, giant stalagmites, and subterranean clouds with C1 geological terms.",
     gradient: "from-[#1B3B36] via-[#2A5C54] to-[#0F2623]",
     iconSymbol: "🦇",
+    imageUrl: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-18",
   },
   {
@@ -196,6 +208,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Discover the delicate scenting ritual of West Lake lotus tea and mindfulness traditions passed down through generations in Hanoi.",
     gradient: "from-[#88A870] via-[#5D8045] to-[#395325]",
     iconSymbol: "🫖",
+    imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-17",
   },
   {
@@ -211,6 +224,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Uncover ancestor veneration, peach blossoms, lucky money envelope customs, and family reunion feasts in traditional lunar new year.",
     gradient: "from-[#C93B3B] via-[#9E2B2B] to-[#691818]",
     iconSymbol: "🧧",
+    imageUrl: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-19",
   },
   {
@@ -226,6 +240,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Discover natural mineral pigments, seashell paper (giấy điệp), and rustic folk humor depicted in historic Bac Ninh woodcut prints.",
     gradient: "from-[#C57B48] via-[#A85F2D] to-[#783E1B]",
     iconSymbol: "🎨",
+    imageUrl: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-20",
   },
   {
@@ -241,6 +256,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Sail between thousands of limestone islets, emerald sea waters, and ancient fishing villages while mastering natural geographic terms.",
     gradient: "from-[#2A665B] via-[#488E9E] to-[#1E4B43]",
     iconSymbol: "🐉",
+    imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-21",
   },
   {
@@ -256,6 +272,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Trace the century-old origin of beef broth infusion, star anise spices, and artisanal rice noodles in traditional street food stalls.",
     gradient: "from-[#C59B48] via-[#8C6422] to-[#5C3F11]",
     iconSymbol: "🍜",
+    imageUrl: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-22",
   },
   {
@@ -271,6 +288,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Uncover the mystery of mortarless brick construction techniques and Hindu iconography nestled in Quang Nam valley.",
     gradient: "from-[#8B4513] via-[#A0522D] to-[#5A2A0C]",
     iconSymbol: "🛕",
+    imageUrl: "https://images.unsplash.com/photo-1609831114674-d4b6ddfa8026?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-23",
   },
   {
@@ -286,6 +304,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Experience early morning boat trading, bamboo sample poles (cây bẹo), and tropical fruit orchards along the Mekong tributaries.",
     gradient: "from-[#3B7A57] via-[#2E5A44] to-[#18392B]",
     iconSymbol: "🚣",
+    imageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-24",
   },
   {
@@ -301,6 +320,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Discover antiphonal vocal duets, nón quai thao hats, and cultural hospitality of traditional village singing festivals.",
     gradient: "from-[#7A4B7A] via-[#5C325C] to-[#3B1C3B]",
     iconSymbol: "🎶",
+    imageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-25",
   },
   {
@@ -316,6 +336,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Explore dried palm leaf selection, bamboo stitching, and poetic poem-hats (nón bài thơ) from traditional villages in Hue.",
     gradient: "from-[#A89F68] via-[#7D7545] to-[#4F4A28]",
     iconSymbol: "👒",
+    imageUrl: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-26",
   },
   {
@@ -331,6 +352,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Immerse yourself in UNESCO intangible heritage, communal stilt houses, and spiritual musical rituals of ethnic minorities.",
     gradient: "from-[#8C3A2B] via-[#66281D] to-[#42160F]",
     iconSymbol: "🥁",
+    imageUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-27",
   },
   {
@@ -346,6 +368,7 @@ export const LESSONS_DATA: Lesson[] = [
       "Learn culinary vocabulary for minced pork, wood ear mushrooms, rice paper wrapping, and golden deep-frying techniques.",
     gradient: "from-[#B87D2B] via-[#875817] to-[#57360A]",
     iconSymbol: "🥟",
+    imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-28",
   },
 ];
