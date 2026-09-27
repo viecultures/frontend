@@ -9,13 +9,9 @@ import {
   Flame,
   MapPin,
   Navigation,
-  Globe,
-  FileText
+  Globe
 } from 'lucide-react';
 import bannerVideo from '@/assets/banner.webm';
-import picHue from '@/assets/pictures/1789477888834_3466390194730922005_g2285579428170464438_97fb29714b65f3e4f91196487a1510be.jpg';
-import picDongHo from '@/assets/pictures/1789477897671_3466390194730922005_g2285579428170464438_208c3b16036482dde07954a98eba6f37.jpg';
-import picAoDai from '@/assets/pictures/1789477908863_3466390194730922005_g2285579428170464438_43e95faf8835448ecde377e2b7447d69.jpg';
 import VietnamMapCarousel from '../components/vietnam-map-carousel';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 
@@ -37,7 +33,8 @@ export const LandingPage3: React.FC<LandingPage3Props> = ({ onNavigate }) => {
     return () => clearInterval(interval);
   }, [isAutoTour]);
 
-  const activeLandmark = VIETNAM_LANDMARKS[activePinIndex];
+  const safePinIndex = Math.max(0, Math.min(activePinIndex, VIETNAM_LANDMARKS.length - 1));
+  const activeLandmark = VIETNAM_LANDMARKS[safePinIndex] || VIETNAM_LANDMARKS[0];
 
   return (
     <div className="min-h-screen bg-[#0D1C18] text-[#FFFDF8] font-sans selection:bg-[#FCE5B5] selection:text-[#122A22]">
@@ -94,65 +91,49 @@ export const LandingPage3: React.FC<LandingPage3Props> = ({ onNavigate }) => {
       </section>
 
       {/* 2. VIETNAM INTERACTIVE MAP SPOTLIGHT SECTION */}
-      <section id="vietnam-map" className="py-20 px-4 sm:px-6 lg:px-8 border-b border-white/10 bg-[#0A1613]">
+      <section id="vietnam-map" className="py-5 sm:py-6 px-3 sm:px-4 lg:px-6 border-b border-white/10 bg-[#0A1613]">
         <div className="max-w-7xl mx-auto">
-          
-          <div className="text-center max-w-2xl mx-auto mb-12">
+
+          <div className="text-center max-w-2xl mx-auto mb-4">
             <span className="text-xs font-bold tracking-widest text-[#F5D280] uppercase flex items-center justify-center gap-1.5">
               <MapPin className="w-4 h-4 text-[#F5D280]" />
               OFFICIAL VIETNAM SVG MAP SPOTLIGHT
             </span>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mt-2 mb-3">
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white mt-1 mb-1">
               Bản Đồ Di Sản Việt Nam Chi Tiết
             </h2>
-            <p className="text-sm text-white/70">
-              Nhấp vào 5 điểm mốc di sản trên bản đồ để khám phá câu chuyện văn hóa và bài đọc song ngữ độc quyền.
+            <p className="text-xs text-white/70">
+              Nhấp vào các điểm mốc di sản 📍 trực tiếp trên bản đồ để khám phá câu chuyện văn hóa và bài đọc song ngữ độc quyền.
             </p>
           </div>
 
           <div
-            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
+            className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch"
             onMouseEnter={() => setIsAutoTour(false)}
             onMouseLeave={() => setIsAutoTour(true)}
           >
             {/* LEFT COLUMN: Official Vietnam Vector SVG Map Container */}
-            <div className="lg:col-span-5 relative bg-[#122A22] border border-white/20 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col justify-between items-center h-full overflow-hidden">
+            <div className="lg:col-span-6 relative bg-[#122A22] border border-white/20 rounded-2xl p-2 sm:p-3 shadow-2xl flex flex-col justify-between items-center h-full overflow-hidden min-h-[460px] sm:min-h-[500px]">
               <VietnamMapCarousel
                 activeIndex={activePinIndex}
                 onSelectLandmark={setActivePinIndex}
+                showRegionTabs={false}
+                showPoiInfoBox={false}
               />
-
-              {/* Landmark Pin Selection Pills Bar */}
-              <div className="w-full pt-4 mt-2 border-t border-white/10 flex flex-wrap items-center justify-center gap-1.5">
-                {VIETNAM_LANDMARKS.map((landmark, idx) => (
-                  <button
-                    key={landmark.id}
-                    onClick={() => setActivePinIndex(idx)}
-                    className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                      idx === activePinIndex
-                        ? 'bg-[#F5D280] text-[#122A22] shadow-md'
-                        : 'bg-white/10 text-white/75 hover:bg-white/20 hover:text-white'
-                    }`}
-                  >
-                    📍 {landmark.name}
-                  </button>
-                ))}
-              </div>
-
             </div>
 
             {/* RIGHT COLUMN: Active Landmark Spotlight Card */}
-            <div className="lg:col-span-7 h-full">
-              <div className="bg-[#122A22] border border-white/20 rounded-3xl p-6 sm:p-8 shadow-2xl text-left relative overflow-hidden animate-in fade-in slide-in-from-right-4 duration-500 h-full flex flex-col justify-between">
-                
+            <div className="lg:col-span-6 h-full">
+              <div className="bg-[#122A22] border border-white/20 rounded-2xl p-3 sm:p-4 shadow-2xl text-left relative overflow-hidden animate-in fade-in slide-in-from-right-4 duration-500 h-full flex flex-col justify-between">
+
                 {/* Location Header Badge */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0D1C18] border border-[#F5D280]/40 text-[#FCE5B5] text-xs font-bold mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D1C18] border border-[#F5D280]/40 text-[#FCE5B5] text-xs font-bold mb-2 w-fit">
                   <MapPin className="w-3.5 h-3.5 text-[#F5D280]" />
                   <span>{activeLandmark.locationNameVi}</span>
                 </div>
 
                 {/* Main Feature Image Banner */}
-                <div className="relative h-48 sm:h-56 rounded-2xl overflow-hidden mb-6 border border-white/15 group">
+                <div className="relative h-32 sm:h-36 rounded-xl overflow-hidden mb-3 border border-white/15 group">
                   <img
                     src={activeLandmark.image}
                     alt={activeLandmark.title}
@@ -160,52 +141,52 @@ export const LandingPage3: React.FC<LandingPage3Props> = ({ onNavigate }) => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#122A22] via-black/20 to-black/40" />
 
-                  <div className="absolute top-4 left-4 flex gap-2">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#0D1C18]/90 text-[#FCE5B5] border border-white/20 backdrop-blur-md">
+                  <div className="absolute top-2.5 left-2.5 flex gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#0D1C18]/90 text-[#FCE5B5] border border-white/20 backdrop-blur-md">
                       {activeLandmark.category}
                     </span>
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 backdrop-blur-md">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 backdrop-blur-md">
                       Band {activeLandmark.level}
                     </span>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-medium text-white/90">
-                    <span className="bg-black/60 px-3 py-1 rounded-full border border-white/15 backdrop-blur-md">
+                  <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-xs font-medium text-white/90">
+                    <span className="bg-black/60 px-2.5 py-0.5 rounded-full border border-white/15 backdrop-blur-md text-[11px]">
                       ⏱️ {activeLandmark.readTime} đọc song ngữ
                     </span>
-                    <span className="bg-amber-500/30 text-amber-200 px-3 py-1 rounded-full border border-amber-500/40 backdrop-blur-md font-semibold">
+                    <span className="bg-amber-500/30 text-amber-200 px-2.5 py-0.5 rounded-full border border-amber-500/40 backdrop-blur-md font-semibold text-[11px]">
                       🌟 Di Sản Tiêu Điểm
                     </span>
                   </div>
                 </div>
 
                 {/* Article Titles */}
-                <div className="space-y-1.5 mb-4">
-                  <h3 className="font-heading font-bold text-2xl sm:text-3xl text-white">
+                <div className="space-y-0.5 mb-2">
+                  <h3 className="font-heading font-bold text-lg sm:text-xl text-white">
                     {activeLandmark.title}
                   </h3>
-                  <p className="text-sm font-medium text-[#FCE5B5]">
+                  <p className="text-xs font-medium text-[#FCE5B5]">
                     {activeLandmark.titleVi}
                   </p>
                 </div>
 
                 {/* Bilingual Excerpt Box */}
-                <div className="space-y-3 mb-6 bg-[#0D1C18]/80 p-4 rounded-2xl border border-white/10">
+                <div className="space-y-1.5 mb-2.5 bg-[#0D1C18]/80 p-2.5 rounded-xl border border-white/10">
                   <p className="text-xs sm:text-sm text-white/90 leading-relaxed font-serif">
                     "{activeLandmark.excerptEn}"
                   </p>
-                  <p className="text-xs text-white/70 leading-relaxed italic border-t border-white/10 pt-2 font-sans">
+                  <p className="text-xs text-white/70 leading-relaxed italic border-t border-white/10 pt-1 font-sans">
                     "{activeLandmark.excerptVi}"
                   </p>
                 </div>
 
                 {/* Vocabulary Pills */}
-                <div className="flex flex-wrap items-center gap-2 mb-6">
+                <div className="flex flex-wrap items-center gap-1.5 mb-3">
                   <span className="text-xs font-bold text-white/60">Từ vựng di sản:</span>
                   {activeLandmark.vocabHighlights.map((vocab, i) => (
                     <span
                       key={i}
-                      className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+                      className="px-2 py-0.5 rounded-lg text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
                     >
                       ✨ {vocab}
                     </span>
@@ -213,20 +194,20 @@ export const LandingPage3: React.FC<LandingPage3Props> = ({ onNavigate }) => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-white/10">
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/10">
                   <button
                     onClick={() => onNavigate('bilingual-reader')}
-                    className="btn-pill-primary px-6 py-3.5 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-xl hover:scale-105 transition-transform"
+                    className="btn-pill-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5 shadow-xl hover:scale-105 transition-transform"
                   >
-                    <BookOpen className="w-4 h-4" />
+                    <BookOpen className="w-3.5 h-3.5" />
                     <span>Đọc Song Ngữ &amp; AI Shadowing</span>
                   </button>
 
                   <button
                     onClick={() => onNavigate('flashcard-study')}
-                    className="btn-pill-glass px-5 py-3.5 text-xs sm:text-sm font-semibold flex items-center gap-2"
+                    className="btn-pill-glass px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5"
                   >
-                    <Sparkles className="w-4 h-4 text-[#F5D280]" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#F5D280]" />
                     <span>Ôn Flashcard Địa Danh</span>
                   </button>
                 </div>
@@ -242,7 +223,7 @@ export const LandingPage3: React.FC<LandingPage3Props> = ({ onNavigate }) => {
       {/* 3. THE 4 CORE PILLARS SECTION */}
       <section id="topics" className="py-20 px-4 sm:px-6 lg:px-8 border-b border-white/10">
         <div className="max-w-7xl mx-auto">
-          
+
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-bold tracking-widest text-[#F5D280] uppercase">Content Curriculum</span>
             <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mt-2 mb-3">
@@ -349,7 +330,7 @@ export const LandingPage3: React.FC<LandingPage3Props> = ({ onNavigate }) => {
       <section id="interactive-demo" className="py-20 px-4 sm:px-6 lg:px-8 border-b border-white/10 bg-[#0A1613]">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             <div className="lg:col-span-5 space-y-6">
               <span className="text-xs font-bold tracking-widest text-[#F5D280] uppercase">Interactive Demo 01</span>
               <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white leading-tight">

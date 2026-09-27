@@ -4,6 +4,7 @@ import picAoDai from '@/assets/pictures/1789477908863_3466390194730922005_g22855
 
 export interface LandmarkArticle {
   id: string;
+  provinceId: string;
   name: string;
   region: string;
   locationNameVi: string;
@@ -18,11 +19,13 @@ export interface LandmarkArticle {
   image: string;
   readTime: string;
   vocabHighlights: string[];
+  desc: string;
 }
 
 export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
   {
     id: 'mu-cang-chai',
+    provinceId: 'lao-cai',
     name: 'Mù Cang Chải',
     region: 'Tây Bắc',
     locationNameVi: 'Mù Cang Chải • Yên Bái (Tây Bắc)',
@@ -36,10 +39,12 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     level: 'B1',
     image: picDongHo,
     readTime: '4 mins',
-    vocabHighlights: ['terraces', 'breathtaking', 'agricultural']
+    vocabHighlights: ['terraces', 'breathtaking', 'agricultural'],
+    desc: 'Ruộng bậc thang Mù Cang Chải • Kỳ quan lúa chín'
   },
   {
     id: 'hanoi-bat-trang',
+    provinceId: 'ha-noi',
     name: 'Hà Nội & Bát Tràng',
     region: 'Đồng Bằng Sông Hồng',
     locationNameVi: 'Hà Nội • Thủ Đô Nghìn Năm Văn Hiến',
@@ -53,10 +58,12 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     level: 'B2',
     image: picHue,
     readTime: '5 mins',
-    vocabHighlights: ['masterpieces', 'crackle glaze', 'motifs']
+    vocabHighlights: ['masterpieces', 'crackle glaze', 'motifs'],
+    desc: 'Thủ đô ngàn năm văn hiến • Gốm Bát Tràng'
   },
   {
     id: 'hue-citadel',
+    provinceId: 'hue',
     name: 'Cố Đô Huế',
     region: 'Bắc Trung Bộ',
     locationNameVi: 'Cố Đô Huế • Di Sản Triều Nguyễn',
@@ -70,13 +77,15 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     level: 'B1',
     image: picHue,
     readTime: '5 mins',
-    vocabHighlights: ['geomancy', 'pavilion', 'craftsmanship']
+    vocabHighlights: ['geomancy', 'pavilion', 'craftsmanship'],
+    desc: 'Di sản văn hóa cung đình Triều Nguyễn'
   },
   {
     id: 'hoi-an-lanterns',
+    provinceId: 'da-nang',
     name: 'Phố Cổ Hội An',
     region: 'Duyên Hải Nam Trung Bộ',
-    locationNameVi: 'Phố Cổ Hội An • Quảng Nam',
+    locationNameVi: 'Phố Cổ Hội An • Đà Nẵng & Quảng Nam',
     pinCoordinates: { x: 50, y: 54 },
     title: 'Hoi An Lantern Festival & Ancient Silk Craftsmanship',
     titleVi: 'Đêm Hội Hoa Đăng Hội An & Nghề Lụa Cổ Truyền',
@@ -87,11 +96,13 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     level: 'B1',
     image: picAoDai,
     readTime: '6 mins',
-    vocabHighlights: ['illuminating', 'hand-woven', 'folklore']
+    vocabHighlights: ['illuminating', 'hand-woven', 'folklore'],
+    desc: 'Phố cổ hoa đăng & Nghề dệt lụa'
   },
   {
     id: 'saigon-banh-mi',
-    name: 'Thành Phố Hồ Chí Minh',
+    provinceId: 'ho-chi-minh',
+    name: 'TP. Hồ Chí Minh',
     region: 'Nam Bộ',
     locationNameVi: 'Sài Gòn - TP. Hồ Chí Minh • Hòn Ngọc Viễn Đông',
     pinCoordinates: { x: 34, y: 79 },
@@ -104,6 +115,7 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     level: 'B1',
     image: picDongHo,
     readTime: '4 mins',
-    vocabHighlights: ['culinary', 'crispness', 'reinvented']
+    vocabHighlights: ['culinary', 'crispness', 'reinvented'],
+    desc: 'Bánh mì Sài Gòn & Hòn ngọc Viễn Đông'
   }
 ];

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  X, Volume2, Play, Pause, Sparkles, MessageSquare, 
-  BookOpen, BookmarkCheck, Check, ChevronRight 
+import {
+  X, Volume2, Play, Pause, Sparkles, MessageSquare,
+  BookOpen, BookmarkCheck, Check, ChevronRight
 } from 'lucide-react';
 import type { Lesson, VocabItem } from '@/types';
 
@@ -63,7 +63,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
   };
 
   const toggleSaveVocab = (vocabId: string) => {
-    setSavedVocabIds(prev => 
+    setSavedVocabIds(prev =>
       prev.includes(vocabId) ? prev.filter(id => id !== vocabId) : [...prev, vocabId]
     );
   };
@@ -85,8 +85,8 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
       const isHighlight = highlightWords.some(w => w.toLowerCase() === part.toLowerCase());
       if (isHighlight) {
         const matchingVocab = lesson.vocabularies.find(
-          (v: any) => v.word.toLowerCase() === part.toLowerCase() || 
-               v.highlightedWordInContext.toLowerCase() === part.toLowerCase()
+          (v: any) => v.word.toLowerCase() === part.toLowerCase() ||
+            v.highlightedWordInContext.toLowerCase() === part.toLowerCase()
         );
 
         return (
@@ -106,10 +106,10 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
-      
+
       {/* Modal Card Box */}
       <div className="relative w-full max-w-5xl bg-[#0D1C18]/95 border border-white/20 rounded-[24px] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-        
+
         {/* Top Header Bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40">
           <div className="flex items-center gap-3">
@@ -178,11 +178,10 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
               <button
                 key={speed}
                 onClick={() => setPlaybackSpeed(speed)}
-                className={`px-2.5 py-0.5 rounded-full text-xs font-semibold transition-all ${
-                  playbackSpeed === speed
+                className={`px-2.5 py-0.5 rounded-full text-xs font-semibold transition-all ${playbackSpeed === speed
                     ? 'bg-[#FCE5B5] text-[#18221E]'
                     : 'text-white/60 hover:text-white'
-                }`}
+                  }`}
               >
                 {speed}x
               </button>
@@ -192,13 +191,13 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
 
         {/* Reading Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          
+
           {/* Banner image with soft rounded corners */}
           <div className="relative rounded-[20px] overflow-hidden border border-white/15 aspect-[21/9] max-h-52 bg-black/40">
-            <img 
-              src={lesson.imageUrl} 
+            <img
+              src={lesson.imageUrl}
               alt={lesson.titleEn}
-              className="w-full h-full object-cover" 
+              className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0D1C18] via-[#0D1C18]/40 to-transparent" />
             <div className="absolute bottom-4 left-5 right-5">
@@ -212,13 +211,12 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           {/* Paragraphs List */}
           <div className="space-y-6">
             {lesson.paragraphs.map((para: any, index: number) => (
-              <div 
-                key={para.id} 
-                className={`p-6 rounded-[20px] border transition-all ${
-                  activeSentenceId === para.id 
-                    ? 'bg-white/10 border-[#FCE5B5]/60 shadow-lg' 
+              <div
+                key={para.id}
+                className={`p-6 rounded-[20px] border transition-all ${activeSentenceId === para.id
+                    ? 'bg-white/10 border-[#FCE5B5]/60 shadow-lg'
                     : 'bg-black/30 border-white/10 hover:border-white/20'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between mb-3 text-xs font-semibold text-white/60">
                   <span className="text-[#F5D280] uppercase tracking-wider">❖ ĐOẠN #{index + 1}</span>
@@ -233,7 +231,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
 
                 {/* Dual Column Layout for Desktop */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
+
                   {/* English Column (Primary) */}
                   <div className="text-white text-base leading-relaxed">
                     {renderInteractiveEnglishText(para.english, para.highlightWords)}
@@ -271,7 +269,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
         {selectedVocab && (
           <div className="border-t border-white/20 bg-black/70 backdrop-blur-xl p-5 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
-              
+
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-1">
                   <span className="font-heading font-bold text-2xl text-[#FCE5B5]">
@@ -315,11 +313,10 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
                 </button>
                 <button
                   onClick={() => toggleSaveVocab(selectedVocab.id)}
-                  className={`btn-pill-primary text-xs px-3.5 py-1.5 ${
-                    savedVocabIds.includes(selectedVocab.id)
+                  className={`btn-pill-primary text-xs px-3.5 py-1.5 ${savedVocabIds.includes(selectedVocab.id)
                       ? 'bg-emerald-400 text-slate-950'
                       : ''
-                  }`}
+                    }`}
                 >
                   {savedVocabIds.includes(selectedVocab.id) ? (
                     <>
@@ -365,7 +362,6 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );
