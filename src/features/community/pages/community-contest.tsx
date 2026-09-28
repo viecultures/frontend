@@ -1,29 +1,12 @@
 import { useState } from "react";
+import type { ContestEntry } from "../types";
 import {
-  Trophy,
-  Award,
-  Send,
-  Heart,
-  ShoppingBag,
-  X,
-  User,
-} from "lucide-react";
-
-interface ContestEntry {
-  id: string;
-  rankTag?: string;
-  rankClass?: string;
-  authorName: string;
-  authorBadge?: string;
-  authorSub: string;
-  title: string;
-  excerpt: string;
-  votesCount: number;
-  commentsCount: number;
-  rewardCoins: number;
-  userVoted?: boolean;
-  imageCaption?: string;
-}
+  ContestHeroBanner,
+  ContestEntryEditor,
+  ContestEntryCard,
+  GamificationShopCard,
+  GamificationMilestonesCard,
+} from "../components";
 
 const INITIAL_CONTEST_ENTRIES: ContestEntry[] = [
   {
@@ -89,11 +72,15 @@ export default function Community2Page() {
   // Redeem Gamification Shop Item
   const handleRedeem = (itemName: string, cost: number) => {
     if (userCoins < cost) {
-      alert(`⚠️ Bạn cần ${cost} Xu 💎 để đổi quà này (Ví hiện có: ${userCoins} Xu). Hãy viết bài tham gia thử thách để tích lũy thêm!`);
+      alert(
+        `⚠️ Bạn cần ${cost} Xu 💎 để đổi quà này (Ví hiện có: ${userCoins} Xu). Hãy viết bài tham gia thử thách để tích lũy thêm!`
+      );
       return;
     }
     setUserCoins((prev) => prev - cost);
-    alert(`🎉 Chúc mừng! Bạn đã đổi thành công "${itemName}" với ${cost} Xu 💎! Tính năng đã được mở khóa cho tài khoản của bạn.`);
+    alert(
+      `🎉 Chúc mừng! Bạn đã đổi thành công "${itemName}" với ${cost} Xu 💎! Tính năng đã được mở khóa cho tài khoản của bạn.`
+    );
   };
 
   // Submit Contest Entry
@@ -127,188 +114,31 @@ export default function Community2Page() {
 
   return (
     <main className="min-h-screen bg-warm-ivory text-text-body relative selection:bg-sky-mist selection:text-heritage-green">
-
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10">
         {/* Weekly Themed Challenge Spotlight Banner */}
-        <section className="mb-10 rounded-3xl bg-gradient-to-br from-[#16221F] via-heritage-green to-[#143630] text-warm-ivory p-8 sm:p-12 border-2 border-antique-gold/60 shadow-2xl relative overflow-hidden">
-          {/* Subtle Background Particle Accents */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-antique-gold/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 max-w-4xl space-y-4">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-antique-gold text-heritage-green text-xs font-bold uppercase tracking-wider shadow-sm">
-              <Trophy className="w-3.5 h-3.5 fill-current" />
-              Thử Thách Viết Theo Chủ Đề • Tuần 14/2026
-            </span>
-
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-warm-ivory">
-              Chủ Đề Tuần Này: "Kiến Trúc & Di Sản Cố Đô Huế"
-              <span className="block text-lg sm:text-xl font-normal text-sky-mist mt-1 font-sans">
-                (Imperial Hue Architecture & Heritage Challenge)
-              </span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-rice-paper/90 leading-relaxed max-w-3xl">
-              Viết bài viết ngắn (100 – 300 từ) bằng tiếng Anh chia sẻ góc nhìn hoặc kỷ niệm của bạn về di sản Huế, ứng dụng ít nhất 3 từ vựng vừa học để tích lũy <strong className="text-antique-gold">Xu Văn Hóa 💎</strong> và mở khóa tính năng độc quyền!
-            </p>
-
-            {/* Prize Pool & Timer Box */}
-            <div className="p-5 rounded-2xl bg-warm-ivory/10 border border-antique-gold/40 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-4 my-6">
-              <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
-                  🎁 Phần thưởng Gamification tuần này:
-                </span>
-                <div className="flex flex-wrap gap-2 text-xs font-bold">
-                  <span className="px-3 py-1 rounded-full bg-warm-ivory/20 border border-white/20">
-                    💎 +100 Xu cho bài tham gia
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-antique-gold/30 border border-antique-gold/50 text-warm-ivory">
-                    💎 +500 Xu cho Top 3
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-[#E8B7B2]/30 border border-[#E8B7B2]/40 text-warm-ivory">
-                    🎖️ Huy hiệu "Sứ Giả Cố Đô"
-                  </span>
-                </div>
-              </div>
-
-              <div className="text-right">
-                <span className="text-xs font-bold uppercase tracking-wider text-sky-mist block">
-                  ⏱️ Thời gian chủ đề:
-                </span>
-                <span className="text-sm font-bold text-warm-ivory">
-                  Còn 04 ngày để gửi bài & tích xu
-                </span>
-              </div>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <button
-                onClick={() => {
-                  setIsFormOpen(true);
-                  window.scrollTo({ top: 400, behavior: "smooth" });
-                }}
-                className="px-7 py-3.5 rounded-full text-xs font-bold text-heritage-green bg-antique-gold hover:bg-[#c9a657] shadow-lg transition-all border border-warm-ivory/40 flex items-center gap-2"
-              >
-                <span>✍️ + Viết Bài Tham Gia (Nhận ngay +100 Xu 💎)</span>
-              </button>
-
-              <a
-                href="#gamification-shop"
-                className="px-6 py-3.5 rounded-full text-xs font-bold text-warm-ivory bg-warm-ivory/10 hover:bg-warm-ivory/20 border border-white/30 transition-all flex items-center gap-2 focus-ring"
-              >
-                <span>🛍️ Đổi Xu Mở Khóa Chức Năng</span>
-              </a>
-            </div>
-          </div>
-        </section>
+        <ContestHeroBanner
+          onOpenForm={() => {
+            setIsFormOpen(true);
+            window.scrollTo({ top: 400, behavior: "smooth" });
+          }}
+        />
 
         {/* Submit Entry Form (Toggleable) */}
-        {isFormOpen && (
-          <div className="mb-10 p-8 sm:p-10 rounded-3xl bg-rice-paper border-2 border-antique-gold/60 shadow-xl space-y-6 animate-in fade-in duration-300">
-            <div className="flex items-center justify-between pb-4 border-b border-heritage-green/12">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#059669]">
-                  🎁 Hoàn thành bài viết nhận ngay +100 Xu 💎
-                </span>
-                <h2 className="font-serif text-2xl font-bold text-heritage-green mt-0.5">
-                  Gửi Bài Viết Theo Chủ Đề Tuần Này
-                </h2>
-              </div>
-              <button
-                onClick={() => setIsFormOpen(false)}
-                className="p-1.5 rounded-full hover:bg-mist-cloud text-heritage-green transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        <ContestEntryEditor
+          isOpen={isFormOpen}
+          onClose={() => setIsFormOpen(false)}
+          entryTitle={entryTitle}
+          onChangeTitle={setEntryTitle}
+          entryText={entryText}
+          onChangeText={setEntryText}
+          selectedVocab={selectedVocab}
+          onToggleVocab={(word, checked) =>
+            setSelectedVocab((prev) => ({ ...prev, [word]: checked }))
+          }
+          onSubmit={handleSubmitEntry}
+        />
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-heritage-green uppercase mb-1.5">
-                  Góc nhìn bài viết:
-                </label>
-                <select className="w-full px-4 py-2.5 rounded-xl bg-warm-ivory border border-heritage-green/15 text-xs font-bold text-heritage-green focus:outline-none focus-ring">
-                  <option>🏛️ Cảm Nhận Kiến Trúc & Di Sản (Architecture & Heritage)</option>
-                  <option>📸 Kỷ Niệm Chuyến Đi & Ảnh Đẹp (Travel Photo Story)</option>
-                  <option>🏮 Lịch Sử & Lễ Hội Cố Đô (History & Customs)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-heritage-green uppercase mb-1.5">
-                  Tiêu đề bài viết:
-                </label>
-                <input
-                  type="text"
-                  value={entryTitle}
-                  onChange={(e) => setEntryTitle(e.target.value)}
-                  placeholder="Nhập tiêu đề cho bài viết của bạn..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-warm-ivory border border-heritage-green/15 text-xs font-bold text-heritage-green focus:outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Vocab Checklist */}
-            <div className="p-4 rounded-2xl bg-warm-ivory border border-heritage-green/10 space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
-                Đánh dấu các từ vựng bạn đưa vào bài (Ứng dụng 3+ từ để nhận thưởng Xu):
-              </span>
-              <div className="flex flex-wrap gap-4 text-xs font-bold text-heritage-green">
-                {["architectural", "intangible", "promulgated", "fortress", "geomancy"].map(
-                  (word) => (
-                    <label key={word} className="inline-flex items-center gap-1.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={!!selectedVocab[word]}
-                        onChange={(e) =>
-                          setSelectedVocab({
-                            ...selectedVocab,
-                            [word]: e.target.checked,
-                          })
-                        }
-                        className="accent-heritage-green w-4 h-4 rounded"
-                      />
-                      <span>{word}</span>
-                    </label>
-                  )
-                )}
-              </div>
-            </div>
-
-            {/* Textarea */}
-            <textarea
-              value={entryText}
-              onChange={(e) => setEntryText(e.target.value)}
-              placeholder="Chia sẻ suy nghĩ hoặc câu chuyện của bạn bằng tiếng Anh..."
-              className="w-full h-36 p-4 rounded-2xl bg-warm-ivory border border-heritage-green/15 text-sm text-heritage-green focus:outline-none focus:ring-2 focus:ring-heritage-green/20 leading-relaxed"
-            />
-
-            {/* Actions */}
-            <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-text-secondary italic">
-                🌟 Không áp lực ngữ pháp • Khuyến khích thực hành từ vựng tự nhiên
-              </span>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setIsFormOpen(false)}
-                  className="px-5 py-2.5 rounded-full text-xs font-bold text-heritage-green bg-warm-ivory border border-heritage-green/12 hover:bg-mist-cloud"
-                >
-                  Hủy
-                </button>
-                <button
-                  onClick={handleSubmitEntry}
-                  className="px-6 py-2.5 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm border border-antique-gold/60 inline-flex items-center gap-1.5 focus-ring"
-                >
-                  <Send className="w-3.5 h-3.5 text-antique-gold" />
-                  <span>🚀 Đăng Bài (+100 Xu 💎)</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Layout: Main Feed (2/3) + Gamification Shop & Rewards Sidebar (1/3) */}
+        {/* Layout: Main Feed (8/12) + Shop/Milestones Sidebar (4/12) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left 8 Cols: Submissions Showcase */}
           <div className="lg:col-span-8 space-y-6">
@@ -318,191 +148,32 @@ export default function Community2Page() {
               </h2>
 
               <div className="flex items-center gap-1 bg-rice-paper p-1 rounded-xl border border-heritage-green/12 text-xs font-bold">
-                <button className="px-3 py-1.5 rounded-lg bg-heritage-green text-warm-ivory focus-ring">
+                <button className="px-3 py-1.5 rounded-lg bg-heritage-green text-warm-ivory focus-ring cursor-pointer">
                   🔥 Yêu thích nhất
                 </button>
-                <button className="px-3 py-1.5 rounded-lg text-heritage-green hover:bg-mist-cloud focus-ring">
+                <button className="px-3 py-1.5 rounded-lg text-heritage-green hover:bg-mist-cloud focus-ring cursor-pointer">
                   ⭐ Mới đăng
                 </button>
               </div>
             </div>
 
             {entries.map((entry) => (
-              <article
+              <ContestEntryCard
                 key={entry.id}
-                className="relative p-6 sm:p-8 rounded-3xl bg-warm-ivory border border-heritage-green/12 shadow-md space-y-4"
-              >
-                {/* Rank Tag if available */}
-                {entry.rankTag && (
-                  <span
-                    className={`absolute top-6 right-6 px-3.5 py-1 rounded-full text-xs font-bold border ${entry.rankClass}`}
-                  >
-                    {entry.rankTag}
-                  </span>
-                )}
-
-                {/* Author Info */}
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-heritage-green text-antique-gold font-bold text-sm flex items-center justify-center border border-antique-gold">
-                    <User className="w-5 h-5 text-antique-gold" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-sm text-heritage-green">
-                        {entry.authorName}
-                      </h4>
-                      {entry.authorBadge && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E]">
-                          {entry.authorBadge}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-xs text-text-secondary font-medium">
-                      {entry.authorSub}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Entry Title & Excerpt */}
-                <h3 className="font-serif text-xl font-bold text-heritage-green leading-snug">
-                  "{entry.title}"
-                </h3>
-                <p className="text-sm text-text-body leading-relaxed">
-                  {entry.excerpt}
-                </p>
-
-                {/* Image Placeholder */}
-                <div className="h-52 w-full rounded-2xl bg-gradient-to-br from-heritage-green via-[#2A665B] to-antique-gold p-6 text-white flex flex-col justify-between overflow-hidden shadow-inner border border-antique-gold/30">
-                  <div className="text-xs font-semibold text-antique-gold uppercase">
-                    Photo Entry
-                  </div>
-                  <div className="text-center my-auto">
-                    <span className="text-3xl block mb-1">📸🏛️</span>
-                    <span className="font-serif text-sm font-bold text-warm-ivory">
-                      {entry.imageCaption}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Footer Vote Action */}
-                <div className="pt-4 border-t border-heritage-green/10 flex items-center justify-between">
-                  <button
-                    onClick={() => handleVote(entry.id)}
-                    className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold border transition-all ${
-                      entry.userVoted
-                        ? "bg-[#DC2626] text-white border-[#DC2626] shadow-sm"
-                        : "bg-warm-ivory text-heritage-green border-heritage-green/20 hover:bg-[#FEF2F2] hover:border-[#DC2626]"
-                    }`}
-                  >
-                    <Heart className={`w-4 h-4 ${entry.userVoted ? "fill-white" : ""}`} />
-                    <span>{entry.userVoted ? "❤️ Đã thích bài" : "❤️ Thả tim thích bài"}</span>
-                    <strong>({entry.votesCount})</strong>
-                  </button>
-
-                  <div className="text-xs font-semibold text-text-secondary flex items-center gap-4">
-                    <span>💬 {entry.commentsCount} Bình luận</span>
-                    <span className="text-[#059669]">🎁 +100 Xu tích lũy</span>
-                  </div>
-                </div>
-              </article>
+                entry={entry}
+                onVote={handleVote}
+              />
             ))}
           </div>
 
           {/* Right 4 Cols: Gamification Shop & Milestones */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Gamification Shop Card */}
-            <div
-              id="gamification-shop"
-              className="p-6 rounded-3xl bg-rice-paper border border-heritage-green/12 space-y-5 shadow-sm"
-            >
-              <div className="flex items-center justify-between pb-3 border-b border-heritage-green/10">
-                <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-antique-gold" />
-                  Cửa Hàng Xu & Đổi Quà
-                </h3>
-                <span className="text-xs font-bold text-[#059669]">
-                  Ví: 💎 {userCoins} Xu
-                </span>
-              </div>
-
-              {/* Item 1 */}
-              <div className="space-y-1.5 pb-3 border-b border-heritage-green/10">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-heritage-green">
-                    🎧 Giọng Đọc AI Premium
-                  </h4>
-                  <button
-                    onClick={() => handleRedeem("Giọng Đọc Premium", 300)}
-                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-heritage-green text-warm-ivory hover:bg-heritage-dark"
-                  >
-                    💎 300 Xu
-                  </button>
-                </div>
-                <p className="text-[11px] text-text-secondary">
-                  Mở khóa giọng đọc bản ngữ chuẩn Anh - Mỹ cho toàn bộ bài học.
-                </p>
-              </div>
-
-              {/* Item 2 */}
-              <div className="space-y-1.5 pb-3 border-b border-heritage-green/10">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-heritage-green">
-                    🎨 Giao Diện Paper Vintage Theme
-                  </h4>
-                  <button
-                    onClick={() => handleRedeem("Giao Diện Paper Theme", 400)}
-                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-heritage-green text-warm-ivory hover:bg-heritage-dark"
-                  >
-                    💎 400 Xu
-                  </button>
-                </div>
-                <p className="text-[11px] text-text-secondary">
-                  Theme giấy da ngà hoài cổ sang trọng cho giao diện Reader.
-                </p>
-              </div>
-
-              {/* Item 3 */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-heritage-green">
-                    🎖️ Huy Hiệu "Cây Bút Di Sản"
-                  </h4>
-                  <button
-                    onClick={() => handleRedeem("Huy hiệu Cây Bút Di Sản", 200)}
-                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-heritage-green text-warm-ivory hover:bg-heritage-dark"
-                  >
-                    💎 200 Xu
-                  </button>
-                </div>
-                <p className="text-[11px] text-text-secondary">
-                  Huy hiệu đặc biệt hiển thị trên trang Profile và góc bình luận.
-                </p>
-              </div>
-            </div>
-
-            {/* Milestones Card */}
-            <div className="p-6 rounded-3xl bg-warm-ivory border border-heritage-green/12 space-y-4 shadow-sm">
-              <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
-                <Award className="w-4 h-4 text-antique-gold" />
-                Nhiệm Vụ & Cột Mốc Tích Xu
-              </h3>
-
-              <ul className="text-xs space-y-3">
-                <li className="flex items-center justify-between pb-2 border-b border-heritage-green/10">
-                  <span>✍️ Viết 1 bài theo chủ đề tuần</span>
-                  <strong className="text-[#059669]">+100 Xu 💎</strong>
-                </li>
-                <li className="flex items-center justify-between pb-2 border-b border-heritage-green/10">
-                  <span>❤️ Bài viết đạt 10+ lượt thích</span>
-                  <strong className="text-[#059669]">+150 Xu 💎</strong>
-                </li>
-                <li className="flex items-center justify-between">
-                  <span>🔥 Tham gia 4 tuần liên tiếp</span>
-                  <strong className="text-[#D97706]">+500 Xu & Badge 🎖️</strong>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <aside className="lg:col-span-4 space-y-6">
+            <GamificationShopCard
+              userCoins={userCoins}
+              onRedeem={handleRedeem}
+            />
+            <GamificationMilestonesCard />
+          </aside>
         </div>
       </div>
 
@@ -512,7 +183,7 @@ export default function Community2Page() {
           setIsFormOpen(true);
           window.scrollTo({ top: 380, behavior: "smooth" });
         }}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-heritage-green text-warm-ivory font-bold text-xl shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-antique-gold z-40"
+        className="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-heritage-green text-warm-ivory font-bold text-xl shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-antique-gold z-40 cursor-pointer"
         title="Viết bài dự thi chủ đề tuần"
       >
         ✍️

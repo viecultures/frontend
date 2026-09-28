@@ -4,19 +4,20 @@ import {
   BookMarked,
   PlusCircle,
   Sparkles,
-  Gamepad2,
-  User,
   Menu,
   X,
   Plus,
-  Volume2,
+  BookOpen,
+  ArrowRight,
 } from "lucide-react";
 
 interface FlashcardSidebarLayoutProps {
   children: React.ReactNode;
 }
 
-export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({ children }) => {
+export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
+  children,
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -53,24 +54,25 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({ 
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF7EE] text-[#3F5550] flex flex-col lg:flex-row font-sans selection:bg-[#BFE3EA]">
-      {/* Mobile Top Header (Visible on mobile/tablet screens) */}
-      <div className="lg:hidden sticky top-0 z-40 bg-[#163D37] text-[#FBF7EE] px-4 py-3 flex items-center justify-between border-b border-[#D9B76A]/30 shadow-sm">
+    <div className="min-h-screen bg-warm-ivory text-text-body flex flex-col lg:flex-row font-sans selection:bg-sky-mist selection:text-heritage-green">
+      {/* Mobile Top Header */}
+      <header className="lg:hidden sticky top-0 z-40 bg-heritage-dark text-warm-ivory px-4 py-3 flex items-center justify-between border-b border-antique-gold/30 shadow-sm">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-[#1E4B43] border border-[#D9B76A] flex items-center justify-center font-serif text-lg">
-            🪷
+          <div className="w-9 h-9 rounded-xl bg-heritage-green border border-antique-gold flex items-center justify-center shadow-xs">
+            <BookOpen className="w-4 h-4 text-antique-gold" />
           </div>
-          <span className="font-serif font-bold text-lg text-[#FBF7EE]">
-            Vie<span className="text-[#D9B76A]">Cultures Vocab</span>
+          <span className="font-serif font-bold text-lg text-warm-ivory">
+            Vie<span className="text-antique-gold">Cultures Vocab</span>
           </span>
         </div>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-xl bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/40"
+          className="p-2 rounded-xl bg-heritage-green text-warm-ivory border border-antique-gold/40 cursor-pointer focus-ring"
+          aria-label={isMobileMenuOpen ? "Đóng menu" : "Mở menu"}
         >
           {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
-      </div>
+      </header>
 
       {/* Mobile Drawer Overlay */}
       {isMobileMenuOpen && (
@@ -80,152 +82,167 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({ 
         />
       )}
 
-      {/* LEFT NAVIGATION SIDEBAR (HeyWord Style Left Sidebar) */}
+      {/* LEFT NAVIGATION SIDEBAR */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-40 h-screen w-64 shrink-0 bg-[#FBF7EE] border-r-2 border-[rgba(30,75,67,0.12)] p-5 flex flex-col justify-between transition-transform duration-300 ${isMobileMenuOpen ? "translate-x-0 bg-[#FBF7EE]" : "-translate-x-full lg:translate-x-0"
-          }`}
+        className={`fixed lg:sticky top-0 left-0 z-40 h-screen w-64 shrink-0 bg-surface border-r border-line p-5 flex flex-col justify-between transition-transform duration-300 ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
       >
         <div className="space-y-6">
           {/* Top Brand Identity */}
           <div
             onClick={() => handleNav("/home")}
-            className="flex items-center gap-3 pb-4 border-b border-[rgba(30,75,67,0.12)] cursor-pointer group"
+            className="flex items-center gap-3 pb-4 border-b border-line cursor-pointer group"
           >
-            <div className="w-11 h-11 rounded-2xl bg-[#1E4B43] border-2 border-[#D9B76A] flex items-center justify-center text-[#FBF7EE] text-xl font-serif shadow-md shrink-0 group-hover:scale-105 transition-transform">
-              🪷
+            <div className="w-11 h-11 rounded-2xl bg-heritage-green border-2 border-antique-gold flex items-center justify-center text-warm-ivory shadow-md shrink-0 group-hover:scale-105 transition-transform">
+              <BookOpen className="w-5 h-5 text-antique-gold" />
             </div>
             <div>
-              <h2 className="font-serif font-extrabold text-base text-[#1E4B43] group-hover:text-[#059669] transition-colors">VieCultures</h2>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#059669]">
+              <h2 className="font-serif font-bold text-base text-heritage-green group-hover:text-heritage-dark transition-colors">
+                VieCultures
+              </h2>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-antique-gold block">
                 Kho Từ Vựng &amp; SRS
               </span>
             </div>
           </div>
 
-          {/* Sidebar Menu Items (HeyWord Order & Style) */}
-          <nav className="space-y-1.5">
-            {/* TAB 1: THƯ VIỆN (Library / Dictionary) */}
+          {/* Sidebar Menu Items */}
+          <nav className="space-y-1.5" aria-label="Điều hướng Flashcards">
+            {/* TAB 1: THƯ VIỆN */}
             <button
               onClick={() => handleNav("/dictionary")}
-              className={`w-full px-4 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-3 transition-all cursor-pointer ${currentPath === "/dictionary" || currentPath === "/flashcard-library"
-                ? "bg-[#ECFDF5] text-[#059669] border border-[#059669]/40 shadow-xs"
-                : "text-[#3F5550] hover:bg-[#F6EEDC] hover:text-[#1E4B43]"
-                }`}
+              className={`w-full px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer focus-ring ${
+                currentPath === "/dictionary" || currentPath === "/flashcard-library"
+                  ? "bg-rice-paper text-heritage-green border border-antique-gold/50 shadow-xs"
+                  : "text-text-body hover:bg-rice-paper/60 hover:text-heritage-green"
+              }`}
             >
-              <BookMarked className="w-5 h-5 text-[#059669]" />
+              <BookMarked className="w-5 h-5 text-antique-gold" />
               <span>Thư viện từ vựng</span>
             </button>
 
-            {/* TAB 2: THÊM TỪ (Add Word / Custom Vocabulary) */}
+            {/* TAB 2: THÊM TỪ */}
             <button
               onClick={handleOpenAddWord}
-              className="w-full px-4 py-3 rounded-2xl text-xs font-extrabold text-[#1E4B43] hover:bg-[#F6EEDC] flex items-center gap-3 transition-all cursor-pointer"
+              className="w-full px-4 py-3 rounded-2xl text-xs font-bold text-heritage-green hover:bg-rice-paper/60 flex items-center gap-3 transition-all cursor-pointer focus-ring"
             >
-              <PlusCircle className="w-5 h-5 text-[#D9B76A]" />
+              <PlusCircle className="w-5 h-5 text-antique-gold" />
               <span>Thêm từ mới</span>
             </button>
 
-            {/* TAB 3: ÔN TẬP SRS (Flashcards Study Player) */}
+            {/* TAB 3: ÔN TẬP SRS */}
             <button
               onClick={() => handleNav("/flashcard-study")}
-              className={`w-full px-4 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-3 transition-all cursor-pointer ${currentPath === "/flashcard-study" && !location.search.includes("mode=match")
-                ? "bg-[#ECFDF5] text-[#059669] border border-[#059669]/40 shadow-xs"
-                : "text-[#3F5550] hover:bg-[#F6EEDC] hover:text-[#1E4B43]"
-                }`}
+              className={`w-full px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer focus-ring ${
+                currentPath === "/flashcard-study" && !location.search.includes("mode=match")
+                  ? "bg-rice-paper text-heritage-green border border-antique-gold/50 shadow-xs"
+                  : "text-text-body hover:bg-rice-paper/60 hover:text-heritage-green"
+              }`}
             >
-              <Sparkles className="w-5 h-5 text-[#D9B76A]" />
+              <Sparkles className="w-5 h-5 text-antique-gold" />
               <span>Ôn tập SRS</span>
             </button>
           </nav>
         </div>
 
-        {/* Bottom Community / Extension Promotion Box */}
-        <div className="p-4 rounded-3xl bg-[#1E4B43] text-[#FBF7EE] space-y-2 border border-[#D9B76A]/40 shadow-md">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[#D9B76A]">
+        {/* Bottom Community Promotion Box */}
+        <div className="p-4 rounded-3xl bg-gradient-to-br from-heritage-green to-heritage-dark text-warm-ivory space-y-2 border border-antique-gold/40 shadow-md">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-antique-gold">
             <Sparkles className="w-4 h-4" />
             <span>Cộng đồng Học tập</span>
           </div>
-          <p className="text-[11px] text-[#BFE3EA] leading-relaxed">
+          <p className="text-[11px] text-sky-mist leading-relaxed">
             Hơn 200+ bộ thẻ di sản được đóng góp bởi các Đại Sứ Văn Hóa.
           </p>
           <button
             onClick={() => handleNav("/community")}
-            className="w-full py-2 rounded-xl bg-[#D9B76A] hover:bg-[#C59B48] text-[#1E4B43] font-extrabold text-xs transition-colors cursor-pointer"
+            className="w-full py-2 rounded-xl bg-antique-gold hover:bg-antique-bright text-heritage-dark font-bold text-xs transition-colors cursor-pointer shadow-xs flex items-center justify-center gap-1 focus-ring"
           >
-            Tham gia ngay →
+            <span>Tham gia ngay</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </aside>
 
       {/* RIGHT MAIN CONTENT AREA */}
-      <div className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 w-full">
+      <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 w-full">
         {children}
-      </div>
+      </main>
 
-      {/* THÊM TỪ MỚI MODAL (ADD WORD MODAL) */}
+      {/* THÊM TỪ MỚI MODAL */}
       {isAddWordModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-surface rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4 border border-line animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-line">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#ECFDF5] text-[#059669] flex items-center justify-center font-bold">
-                  <Plus className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-xl bg-rice-paper text-heritage-green flex items-center justify-center font-bold border border-antique-gold/40">
+                  <Plus className="w-4 h-4 text-heritage-green" />
                 </div>
-                <h3 className="font-serif text-lg font-bold text-[#1E4B43]">Thêm Từ Vựng Cá Nhân</h3>
+                <h3 className="font-serif text-lg font-bold text-heritage-green">
+                  Thêm Từ Vựng Cá Nhân
+                </h3>
               </div>
               <button
                 onClick={() => setIsAddWordModalOpen(false)}
-                className="p-1 rounded-full hover:bg-gray-100 text-gray-500 cursor-pointer"
+                className="p-1 rounded-full hover:bg-rice-paper text-text-secondary hover:text-heritage-green cursor-pointer focus-ring"
+                aria-label="Đóng form"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs font-bold text-[#6E7E79]">
+            <div className="space-y-3 text-xs font-bold text-text-secondary">
               <div>
-                <label className="block mb-1">Từ tiếng Anh (English Word):</label>
+                <label className="block mb-1 text-heritage-green">
+                  Từ tiếng Anh (English Word):
+                </label>
                 <input
                   type="text"
                   value={newWord}
                   onChange={(e) => setNewWord(e.target.value)}
                   placeholder="Vd: Heritage, Citadel, Baguette..."
-                  className="w-full px-4 py-2.5 rounded-2xl bg-[#F6EEDC]/60 border border-[rgba(30,75,67,0.2)] text-xs text-[#1E4B43] font-bold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-rice-paper/60 border border-heritage-green/20 text-xs text-heritage-green font-bold focus:outline-none focus:border-heritage-green focus:ring-2 focus:ring-antique-gold/40"
                 />
               </div>
 
               <div>
-                <label className="block mb-1">Nghĩa tiếng Việt (Vietnamese Meaning):</label>
+                <label className="block mb-1 text-heritage-green">
+                  Nghĩa tiếng Việt (Vietnamese Meaning):
+                </label>
                 <input
                   type="text"
                   value={newMeaning}
                   onChange={(e) => setNewMeaning(e.target.value)}
                   placeholder="Vd: Di sản văn hóa..."
-                  className="w-full px-4 py-2.5 rounded-2xl bg-[#F6EEDC]/60 border border-[rgba(30,75,67,0.2)] text-xs text-[#1E4B43] font-bold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-rice-paper/60 border border-heritage-green/20 text-xs text-heritage-green font-bold focus:outline-none focus:border-heritage-green focus:ring-2 focus:ring-antique-gold/40"
                 />
               </div>
 
               <div>
-                <label className="block mb-1">Câu ngữ cảnh ví dụ (Context Sentence):</label>
+                <label className="block mb-1 text-heritage-green">
+                  Câu ngữ cảnh ví dụ (Context Sentence):
+                </label>
                 <textarea
                   value={newContext}
                   onChange={(e) => setNewContext(e.target.value)}
                   placeholder="Vd: The Hue Citadel is a UNESCO heritage site..."
                   rows={2}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-[#F6EEDC]/60 border border-[rgba(30,75,67,0.2)] text-xs text-[#1E4B43] font-bold focus:outline-none resize-none"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-rice-paper/60 border border-heritage-green/20 text-xs text-heritage-green font-bold focus:outline-none focus:border-heritage-green focus:ring-2 focus:ring-antique-gold/40 resize-none"
                 />
               </div>
             </div>
 
-            <div className="pt-2 flex justify-end gap-2">
+            <div className="pt-2 border-t border-line flex justify-end gap-2">
               <button
                 onClick={() => setIsAddWordModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-[#6E7E79] hover:bg-gray-100 cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-text-secondary hover:text-heritage-green hover:bg-rice-paper cursor-pointer focus-ring"
               >
                 Hủy
               </button>
               <button
                 onClick={handleSaveWord}
-                className="px-5 py-2 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold cursor-pointer shadow-xs"
+                className="px-5 py-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory text-xs font-bold cursor-pointer shadow-xs border border-antique-gold/40 focus-ring"
               >
                 Lưu vào thư viện
               </button>

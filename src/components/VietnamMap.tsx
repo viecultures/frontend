@@ -6,8 +6,8 @@ import {
   type ProvinceMapItem,
 } from '@/data/vietnamMapData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
-import { useVietnamMap, type RegionKey } from '@/utils/useVietnamMap';
 import { getProvinceSpecialty } from '@/utils/vietnamMapUtils';
+import { useVietnamMap, type RegionKey } from '@/utils/useVietnamMap';
 
 export interface VietnamMapProps {
   selectedProvinceId?: string | null;
@@ -82,8 +82,8 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
                     setActiveRegion(tab.key);
                   }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 focus-ring-dark ${isActive
-                      ? `${tab.colorClass} shadow-md scale-102`
-                      : 'text-[#FBF7EE]/70 hover:text-[#FBF7EE] hover:bg-white/10'
+                    ? `${tab.colorClass} shadow-md scale-102`
+                    : 'text-[#FBF7EE]/70 hover:text-[#FBF7EE] hover:bg-white/10'
                     }`}
                 >
                   <span>{tab.label}</span>
@@ -109,10 +109,10 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
               <div className="flex items-center gap-2 flex-wrap justify-center">
                 <span
                   className={`w-2.5 h-2.5 rounded-full ${hoveredProvince.region === 'north'
-                      ? 'bg-rose-500'
-                      : hoveredProvince.region === 'central'
-                        ? 'bg-amber-400'
-                        : 'bg-emerald-400'
+                    ? 'bg-rose-500'
+                    : hoveredProvince.region === 'central'
+                      ? 'bg-amber-400'
+                      : 'bg-emerald-400'
                     } animate-pulse`}
                 />
                 <span className="text-sm font-bold flex items-center gap-1">
