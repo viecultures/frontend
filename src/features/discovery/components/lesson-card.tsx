@@ -39,7 +39,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({
         />
         
         {/* Subtle Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0D1C18] via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-heritage-forest via-transparent to-black/20" />
 
         {/* Top Badges */}
         <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between pointer-events-none">
@@ -57,7 +57,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({
         {/* Bottom stats pill */}
         <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between text-xs text-white/80 font-medium">
           <span className="flex items-center gap-1.5 bg-black/60 px-2.5 py-1 rounded-full border border-white/10 backdrop-blur-md">
-            <Clock className="w-3.5 h-3.5 text-[#F5D280]" />
+            <Clock className="w-3.5 h-3.5 text-antique-rich" />
             {lesson.readTime}
           </span>
           <span className="flex items-center gap-1.5 bg-black/60 px-2.5 py-1 rounded-full border border-white/10 backdrop-blur-md">
@@ -73,7 +73,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({
           {/* English Title */}
           <h3 
             onClick={() => onOpenReader(lesson)}
-            className="font-heading font-bold text-xl text-white group-hover:text-[#FCE5B5] transition-colors line-clamp-2 cursor-pointer mb-1.5 leading-snug"
+            className="font-heading font-bold text-xl text-white group-hover:text-antique-bright transition-colors line-clamp-2 cursor-pointer mb-1.5 leading-snug"
           >
             {lesson.titleEn}
           </h3>
@@ -93,7 +93,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({
         <div className="pt-4 border-t border-white/10">
           <div className="flex items-center justify-between text-xs text-white/60 mb-4 font-normal">
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#F5D280] inline-block"></span>
+              <span className="w-2 h-2 rounded-full bg-antique-rich inline-block"></span>
               {lesson.vocabularies.length} từ vựng học thuật
             </span>
             <span className="flex items-center gap-1 text-white/70">
@@ -108,7 +108,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({
               onClick={() => onOpenReader(lesson)}
               className="btn-pill-primary py-2.5 text-xs font-semibold"
             >
-              <BookOpen className="w-3.5 h-3.5 text-[#18221E]" />
+              <BookOpen className="w-3.5 h-3.5 text-heritage-forest" />
               <span>Đọc song ngữ</span>
             </button>
 
@@ -116,7 +116,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({
               onClick={() => onOpenFlashcards(lesson)}
               className="btn-pill-glass py-2.5 text-xs font-medium"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#F5D280]" />
+              <Sparkles className="w-3.5 h-3.5 text-antique-rich" />
               <span>Flashcards</span>
             </button>
           </div>

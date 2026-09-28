@@ -31,6 +31,7 @@ import {
 } from "@/data/discoveryData";
 import VietnamMapCarousel from "@/features/discovery/components/vietnam-map-carousel";
 import { VIETNAM_LANDMARKS } from "@/data/landmarksData";
+import { ArticleCardSkeleton } from "@/components/ui/skeleton";
 
 // Helper function to remove Vietnamese diacritics / accents for smart search matching
 const removeAccents = (str: string) => {
@@ -62,6 +63,14 @@ export default function DiscoveryPage() {
     "imperial-hue": true,
   });
   const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Smooth brief transition skeleton when changing major filters
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 220);
+    return () => clearTimeout(timer);
+  }, [selectedTopic, selectedCefr, selectedReadTime, sortBy]);
 
   // Interactive Map Spotlight State
   const [activePinIndex, setActivePinIndex] = useState<number>(2);
@@ -570,7 +579,14 @@ export default function DiscoveryPage() {
 
         {/* Lesson Catalog Display */}
         <section className="mb-12 relative z-10">
-          {filteredLessons.length === 0 ? (
+          {isLoading ? (
+            /* Loading Shimmer Skeletons (Rice-paper tone) */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <ArticleCardSkeleton key={idx} />
+              ))}
+            </div>
+          ) : filteredLessons.length === 0 ? (
             /* Empty State */
             <div className="py-16 text-center rounded-3xl bg-rice-paper/60 border border-dashed border-heritage-green/25 p-8">
               <div className="w-16 h-16 rounded-full bg-mist-cloud flex items-center justify-center mx-auto mb-4 text-heritage-green">

@@ -231,10 +231,12 @@ export default function CommunityPage() {
         )}
 
         {/* ── Layout: Feed (8/12) + Sidebar (4/12) ───────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Mobile: 1 cột (sidebar ẩn xuống dưới)                              */}
+        {/* md+: feed 8/12 + sidebar 4/12 song song                             */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
 
-          {/* Main Feed Column */}
-          <div className="lg:col-span-8 space-y-6">
+          {/* Main Feed Column — full-width on mobile, 8/12 on md+ */}
+          <div className="md:col-span-8 space-y-6">
             <h2 className="font-serif text-xl font-bold text-heritage-green mb-4">
               Bài Viết Cảm Nhận Mới Nhất Từ Cộng Đồng
             </h2>
@@ -324,8 +326,8 @@ export default function CommunityPage() {
             ))}
           </div>
 
-          {/* Right Sidebar */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* Right Sidebar — ẩn trên mobile, hiện từ md+ */}
+          <div className="hidden md:block md:col-span-4 space-y-6">
 
             {/* Guidelines Card */}
             <div className="p-6 rounded-3xl bg-rice-paper border border-line space-y-4">

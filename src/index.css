@@ -75,6 +75,13 @@
   --radius-card: 1.5rem;
   --radius-inner: 1rem;
   --radius-pill: 999px;
+
+  /* ── Reader Theme Colors ─────────────────────────────── */
+  /* Paper / Olive / Dark — 3 reading themes in reader.tsx  */
+  --color-reader-olive:      #545C2D;  /* olive theme canvas bg           */
+  --color-reader-dark-bg:    #141C1A;  /* dark theme canvas bg            */
+  --color-reader-dark-sheet: #1E2925;  /* dark theme article sheet bg     */
+  --color-reader-text:       #2C3B37;  /* paper/light article text color  */
 }
 
 /* ── Dark Mode Surface & Ink overrides ─────────────────── */
@@ -192,9 +199,9 @@
   border: 1px solid rgba(217, 183, 106, 0.14);
 }
 
-/* Level 2 — Navigation / Header / Sticky Toolbar
-   Cần đọc rõ chữ khi scroll qua content phía sau.
-   Dùng cho: Navbar, sticky filter bar, bottom dock */
+/* Level 2 — Sticky Toolbar trên light surface
+   Cần đọc rõ chữ khi scroll qua content phía sau (dùng trên trang nền sáng).
+   Dùng cho: sticky filter bar, floating panel trên nền cream */
 .glass-nav {
   background: var(--glass-nav-bg-light);
   backdrop-filter: blur(var(--glass-nav-blur));
@@ -206,6 +213,17 @@
   background: var(--glass-nav-bg-dark);
   border: 1px solid rgba(217, 183, 106, 0.18);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Level 2 Dark — Navbar / Header luôn dark (bất kể page light/dark mode)
+   Dùng cho: Navbar chính, bottom dock trên Home, dark sticky bar
+   ⚠️  KHÔNG dùng glass-nav cho dark navbar — sẽ bị ivory background */
+.glass-nav-dark {
+  background: rgba(22, 61, 55, 0.95);   /* heritage-dark/95 */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(217, 183, 106, 0.20);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 /* Level 3 — Modal / Dropdown / Toast / Popover

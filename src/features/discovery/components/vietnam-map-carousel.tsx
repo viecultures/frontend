@@ -44,8 +44,8 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
 
       {/* Quick Landmark Info Box (Optional) */}
       {showPoiInfoBox && (
-        <div className="mt-2 w-full text-center p-2.5 px-4 bg-[#122A22]/90 border border-[#D9B76A]/60 rounded-2xl shadow-xl backdrop-blur-md transition-all shrink-0">
-          <div className="text-xs font-bold text-[#FCE5B5] tracking-wide uppercase flex items-center justify-center gap-1.5">
+        <div className="mt-2 w-full text-center p-2.5 px-4 bg-heritage-forest/90 border border-antique-gold/60 rounded-2xl shadow-xl backdrop-blur-md transition-all shrink-0">
+          <div className="text-xs font-bold text-antique-bright tracking-wide uppercase flex items-center justify-center gap-1.5">
             <span>📍 {currentLandmark.name}</span>
           </div>
           <div className="text-xs text-white/80 mt-0.5 font-medium">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked } from 'lucide-react';
 import { ProfileDropdown } from './ProfileDropdown';
 
@@ -33,6 +33,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenProfile,
 }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+  const hoverScale = shouldReduceMotion ? 1 : 1.03;
+  const tapScale = shouldReduceMotion ? 1 : 0.97;
 
   const scrollToAnchor = (anchorId: string) => {
     const el = document.getElementById(anchorId);
@@ -52,16 +55,16 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    // glass-nav = Level 2 glass hierarchy (blur 20px, opacity 92%)
-    // nền heritage-dark tối với border gold mờ — readable khi scroll
-    <header className="glass-nav sticky top-0 z-50 w-full border-b border-antique-gold/25 transition-all">
+    // Navbar luôn dark theme (heritage-dark) bất kể page đang light/dark
+    // Dùng bg token trực tiếp thay vì glass-nav (glass-nav mặc định light ivory)
+    <header className="sticky top-0 z-50 w-full bg-heritage-dark/95 backdrop-blur-xl border-b border-antique-gold/25 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
 
           {/* ── Brand Logo ──────────────────────────────────────────────── */}
           <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
+            whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
             className="flex items-center gap-3.5 cursor-pointer group focus-ring-dark rounded-xl"
             onClick={() => onNavigateToSection(isLoggedIn ? 'home' : 'landing')}
           >
@@ -86,8 +89,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               /* LOGGED IN: Functional App Pages */
               <>
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => onNavigateToSection('home')}
                   className={navLinkClass(activeView === 'home')}
                   aria-current={activeView === 'home' ? 'page' : undefined}
@@ -97,8 +100,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => onNavigateToSection('discovery')}
                   className={navLinkClass(activeView === 'discovery')}
                   aria-current={activeView === 'discovery' ? 'page' : undefined}
@@ -108,8 +111,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => onNavigateToSection('bilingual-reader')}
                   className={navLinkClass(activeView === 'bilingual-reader')}
                   aria-current={activeView === 'bilingual-reader' ? 'page' : undefined}
@@ -119,8 +122,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => onNavigateToSection('dictionary')}
                   className={navLinkClass(
                     activeView === 'dictionary' || activeView === 'flashcard-study'
@@ -136,8 +139,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => onNavigateToSection('community')}
                   className={navLinkClass(
                     activeView === 'community' || activeView === 'community-contest'
@@ -156,8 +159,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               /* LOGGED OUT: Landing Page anchor navigation */
               <>
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => scrollToAnchor('vietnam-map')}
                   className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
                 >
@@ -166,8 +169,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => scrollToAnchor('topics')}
                   className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
                 >
@@ -176,8 +179,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => scrollToAnchor('interactive-demo')}
                   className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
                 >
@@ -186,8 +189,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => onNavigateToSection('discovery')}
                   className={navLinkClass(activeView === 'discovery')}
                   aria-current={activeView === 'discovery' ? 'page' : undefined}
@@ -226,8 +229,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             ) : (
               <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: hoverScale }}
+                whileTap={{ scale: tapScale }}
                 onClick={() => onNavigateToSection('login')}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer focus-ring-dark ${
                   activeView === 'login'

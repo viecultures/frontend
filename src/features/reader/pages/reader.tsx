@@ -145,8 +145,8 @@ export default function ReaderPage() {
 
   const vocabBtnClass =
     themeMode === "dark"
-      ? "border-b-2 border-dashed border-[#D9B76A] bg-[#D9B76A]/30 font-semibold text-[#D9B76A] hover:bg-[#D9B76A]/45 px-1 rounded transition-colors cursor-pointer shadow-xs"
-      : "border-b-2 border-dashed border-[#D9B76A] bg-[#D9B76A]/15 font-semibold text-[#1E4B43] px-1 rounded hover:bg-[#D9B76A]/30 transition-colors cursor-pointer";
+      ? "ink-underline border-b-2 border-dashed border-antique-gold bg-antique-gold/30 font-semibold text-antique-gold hover:bg-antique-gold/45 px-1 rounded transition-colors cursor-pointer shadow-xs focus-ring-dark"
+      : "ink-underline border-b-2 border-dashed border-antique-gold bg-antique-gold/15 font-semibold text-heritage-green px-1 rounded hover:bg-antique-gold/30 transition-colors cursor-pointer focus-ring";
 
   const bottomCardBgClass =
     themeMode === "dark"

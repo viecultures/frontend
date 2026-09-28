@@ -87,12 +87,12 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-[#0D1C18]/95 border border-white/20 rounded-[24px] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-2xl bg-heritage-forest/95 border border-white/20 rounded-[24px] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Top Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-white/10 text-[#F5D280] flex items-center justify-center border border-white/15">
+            <span className="w-10 h-10 rounded-full bg-white/10 text-antique-rich flex items-center justify-center border border-white/15">
               <Sparkles className="w-5 h-5" />
             </span>
             <div>
@@ -109,7 +109,7 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
+            className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all focus-ring-dark"
           >
             <X className="w-5 h-5" />
           </button>
@@ -123,12 +123,12 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
               <span>•</span>
               <span className="text-emerald-300 font-semibold">Đã nhớ: {masteredCount}</span>
               <span>•</span>
-              <span className="text-[#F5D280] font-semibold">Cần ôn: {reviewCount}</span>
+              <span className="text-antique-rich font-semibold">Cần ôn: {reviewCount}</span>
             </div>
 
             <div className="w-32 bg-white/10 h-2 rounded-full overflow-hidden">
               <div 
-                className="bg-gradient-to-r from-[#FCE5B5] to-emerald-400 h-full transition-all duration-300"
+                className="bg-gradient-to-r from-antique-bright to-emerald-400 h-full transition-all duration-300"
                 style={{ width: `${((currentIndex) / queue.length) * 100}%` }}
               />
             </div>
@@ -150,7 +150,7 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
               >
                 
                 {/* FRONT OF CARD */}
-                <div className="absolute inset-0 backface-hidden w-full h-full bg-gradient-to-br from-[#122A22] to-[#0A1613] border border-white/20 rounded-[20px] p-8 flex flex-col justify-between shadow-2xl text-center">
+                <div className="absolute inset-0 backface-hidden w-full h-full bg-gradient-to-br from-heritage-forest to-[#0A1613] border border-white/20 rounded-[20px] p-8 flex flex-col justify-between shadow-2xl text-center">
                   <div className="flex items-center justify-between text-xs text-white/70">
                     <span className="px-3 py-1 rounded-full bg-white/10 border border-white/15 font-medium">
                       MẶT 1: TỪ VỰNG &amp; NGỮ CẢNH
@@ -161,7 +161,7 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
                   </div>
 
                   <div className="my-6">
-                    <h3 className="font-heading font-bold text-4xl sm:text-5xl text-[#FCE5B5] tracking-tight mb-2 drop-shadow-md">
+                    <h3 className="font-heading font-bold text-4xl sm:text-5xl text-antique-bright tracking-tight mb-2 drop-shadow-md">
                       {currentCard?.word}
                     </h3>
                     <p className="text-xs font-mono text-white/60 italic">
@@ -171,7 +171,7 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
 
                   {/* Context Sentence */}
                   <div className="bg-black/40 p-4 rounded-[16px] border border-white/10 text-left">
-                    <div className="text-xs font-semibold text-[#F5D280] mb-1 flex items-center gap-1">
+                    <div className="text-xs font-semibold text-antique-rich mb-1 flex items-center gap-1">
                       <Lightbulb className="w-3.5 h-3.5" /> Câu ngữ cảnh gốc trong bài đọc:
                     </div>
                     <p className="text-xs sm:text-sm text-white/90 italic leading-relaxed">
@@ -180,13 +180,13 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
                   </div>
 
                   <div className="text-xs text-white/60 flex items-center justify-center gap-1.5 pt-2">
-                    <RotateCw className="w-3.5 h-3.5 text-[#F5D280]" />
+                    <RotateCw className="w-3.5 h-3.5 text-antique-rich" />
                     <span>Bấm hoặc nhấn <kbd className="px-2 py-0.5 bg-white/10 rounded-full text-white font-mono text-[11px]">Space</kbd> để lật thẻ</span>
                   </div>
                 </div>
 
                 {/* BACK OF CARD */}
-                <div className="absolute inset-0 backface-hidden rotate-y-180 w-full h-full bg-gradient-to-br from-[#16382D] to-[#0D1C18] border border-emerald-400/40 rounded-[20px] p-8 flex flex-col justify-between shadow-2xl text-center">
+                <div className="absolute inset-0 backface-hidden rotate-y-180 w-full h-full bg-gradient-to-br from-[#16382D] to-heritage-forest border border-emerald-400/40 rounded-[20px] p-8 flex flex-col justify-between shadow-2xl text-center">
                   <div className="flex items-center justify-between text-xs text-white/70">
                     <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-medium border border-emerald-500/30">
                       MẶT 2: GIẢI NGHĨA &amp; PHÁT ÂM
@@ -196,9 +196,9 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
                         e.stopPropagation();
                         speakWord(currentCard?.word);
                       }}
-                      className="btn-pill-glass text-xs px-3 py-1"
+                      className="btn-pill-glass text-xs px-3 py-1 focus-ring"
                     >
-                      <Volume2 className="w-4 h-4 text-[#F5D280]" />
+                      <Volume2 className="w-4 h-4 text-antique-rich" />
                       <span>Nghe AI</span>
                     </button>
                   </div>
@@ -220,7 +220,7 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
                   {/* Spaced Repetition Indicator */}
                   <div className="bg-black/40 p-3 rounded-[14px] border border-white/10 text-xs text-white/80 flex items-center justify-around">
                     <div className="flex items-center gap-1">
-                      <Zap className="w-3.5 h-3.5 text-[#F5D280]" />
+                      <Zap className="w-3.5 h-3.5 text-antique-rich" />
                       <span>Chu kỳ lặp: <strong>1 ngày ➔ 3 ngày ➔ 7 ngày</strong></span>
                     </div>
                   </div>
@@ -252,7 +252,7 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
                   <div className="text-xs text-white/60">Từ đã ghi nhớ</div>
                 </div>
                 <div className="bg-black/40 p-4 rounded-[16px] border border-white/10">
-                  <div className="text-2xl font-bold text-[#FCE5B5]">1 Ngày</div>
+                  <div className="text-2xl font-bold text-antique-bright">1 Ngày</div>
                   <div className="text-xs text-white/60">Lần nhắc ôn kế tiếp</div>
                 </div>
               </div>
@@ -260,14 +260,14 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => onOpenReflections(lesson)}
-                  className="btn-pill-primary w-full py-3.5 text-xs font-semibold"
+                  className="btn-pill-primary w-full py-3.5 text-xs font-semibold focus-ring"
                 >
                   <span>Viết Cảm Nghĩ Bằng Từ Vừa Học</span>
-                  <ArrowRight className="w-4 h-4 text-[#18221E]" />
+                  <ArrowRight className="w-4 h-4 text-heritage-forest" />
                 </button>
                 <button
                   onClick={handleRestart}
-                  className="btn-pill-glass w-full py-3 text-xs font-medium"
+                  className="btn-pill-glass w-full py-3 text-xs font-medium focus-ring"
                 >
                   <RotateCcw className="w-4 h-4" />
                   <span>Ôn tập lại từ đầu</span>
@@ -283,7 +283,7 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
           <div className="px-6 py-4 border-t border-white/10 bg-black/40 flex items-center justify-between gap-4">
             <button
               onClick={handleNeedsReview}
-              className="flex-1 py-3.5 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/30 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all"
+              className="flex-1 py-3.5 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/30 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all focus-ring"
             >
               <RotateCcw className="w-4 h-4" />
               <span>🔴 Cần ôn lại (← Phím Trái)</span>
@@ -291,7 +291,7 @@ export const FlashcardModal: React.FC<FlashcardModalProps> = ({
 
             <button
               onClick={handleMastered}
-              className="flex-1 py-3.5 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-500/30 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all"
+              className="flex-1 py-3.5 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-500/30 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all focus-ring"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>🟢 Đã nhớ (Phím Phải →)</span>

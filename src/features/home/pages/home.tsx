@@ -507,8 +507,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
         </div>
       </div>
 
-      {/* Right Floating Control Toolbar */}
-      <aside className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 bg-heritage-forest/90 border border-white/20 p-2 rounded-2xl backdrop-blur-xl shadow-2xl">
+      {/* Right Floating Toolbar — desktop only (lg+)
+          Mobile/tablet: ẩn, bottom dock đã đủ dùng */}
+      <aside className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-40 flex-col gap-2 bg-heritage-forest/90 border border-white/20 p-2 rounded-2xl backdrop-blur-xl shadow-2xl" aria-label="Thanh công cụ nhanh">
         <button
           onClick={() => handleNavigate('discovery')}
           className="p-3 rounded-xl hover:bg-antique-bright text-white/80 hover:text-heritage-forest hover:scale-105 transition-all relative group"

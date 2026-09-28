@@ -84,12 +84,12 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-3xl bg-[#0D1C18]/95 border border-white/20 rounded-[24px] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-3xl bg-heritage-forest/95 border border-white/20 rounded-[24px] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Top Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-white/10 text-[#F5D280] flex items-center justify-center border border-white/15">
+            <span className="w-10 h-10 rounded-full bg-white/10 text-antique-rich flex items-center justify-center border border-white/15">
               <MessageSquare className="w-5 h-5" />
             </span>
             <div>
@@ -106,7 +106,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
+            className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all focus-ring-dark"
           >
             <X className="w-5 h-5" />
           </button>
@@ -127,7 +127,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
           <form onSubmit={handleSubmit} className="bg-black/40 p-5 rounded-[20px] border border-white/15 space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-white/90 flex items-center gap-1.5 uppercase">
-                <Sparkles className="w-4 h-4 text-[#F5D280]" />
+                <Sparkles className="w-4 h-4 text-antique-rich" />
                 Viết cảm nghĩ về bài đọc:
               </span>
               <span className="text-xs text-white/60 font-normal">
@@ -143,7 +143,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
                   key={i}
                   type="button"
                   onClick={() => handleInsertVocab(v.word)}
-                  className="shrink-0 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-[#FCE5B5] border border-white/15 hover:bg-[#FCE5B5] hover:text-[#18221E] transition-all flex items-center gap-1"
+                  className="shrink-0 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-antique-bright border border-white/15 hover:bg-antique-bright hover:text-heritage-forest transition-all flex items-center gap-1"
                 >
                   <Plus className="w-3 h-3" />
                   <span>{v.word}</span>
@@ -158,7 +158,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
                 onChange={(e) => setNewContent(e.target.value)}
                 placeholder="Chia sẻ cảm xúc của bạn (ví dụ: Learning about the quintessence of Vietnamese art makes me feel so proud...)"
                 rows={3}
-                className="w-full p-4 rounded-[16px] bg-black/50 border border-white/15 text-white text-sm placeholder-white/40 focus:outline-none focus:border-[#FCE5B5] transition-all resize-none"
+                className="w-full p-4 rounded-[16px] bg-black/50 border border-white/15 text-white text-sm placeholder-white/40 focus:outline-none focus:border-antique-bright transition-all resize-none"
               />
             </div>
 
@@ -166,7 +166,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
             <div className="flex items-center justify-between pt-1">
               <div className="text-xs text-white/60">
                 {usedVocabList.length > 0 ? (
-                  <span className="text-[#FCE5B5] font-medium">
+                  <span className="text-antique-bright font-medium">
                     ✓ Đã dùng: {usedVocabList.join(', ')}
                   </span>
                 ) : (
@@ -177,9 +177,9 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
               <button
                 type="submit"
                 disabled={!newContent.trim()}
-                className="btn-pill-primary px-5 py-2.5 text-xs font-semibold"
+                className="btn-pill-primary px-5 py-2.5 text-xs font-semibold focus-ring"
               >
-                <Send className="w-3.5 h-3.5 text-[#18221E]" />
+                <Send className="w-3.5 h-3.5 text-heritage-forest" />
                 <span>Đăng cảm nghĩ</span>
               </button>
             </div>
@@ -225,7 +225,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
                       </div>
                     </div>
 
-                    <button className="text-white/40 hover:text-white/80 p-1" title="Báo cáo vi phạm">
+                    <button className="text-white/40 hover:text-white/80 p-1 focus-ring" title="Báo cáo vi phạm">
                       <Flag className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -239,7 +239,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
                       {item.usedVocab.map((w: string, idx: number) => (
                         <span 
                           key={idx}
-                          className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#FCE5B5]/15 text-[#FCE5B5] border border-[#FCE5B5]/30"
+                          className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-antique-bright/15 text-antique-bright border border-antique-bright/30"
                         >
                           ✨ {w}
                         </span>

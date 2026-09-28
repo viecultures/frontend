@@ -45,7 +45,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Tìm bài đọc (Tranh Đông Hồ, Đại Nội Huế, Áo Dài, Bánh mì...)"
-            className="w-full pl-12 pr-12 py-3.5 bg-black/40 border border-white/15 rounded-full text-white placeholder-white/50 text-sm font-normal focus:outline-none focus:border-[#FCE5B5] focus:bg-black/60 transition-all"
+            className="w-full pl-12 pr-12 py-3.5 bg-black/40 border border-white/15 rounded-full text-white placeholder-white/50 text-sm font-normal focus:outline-none focus:border-antique-bright focus:bg-black/60 transition-all"
           />
           {searchQuery && (
             <button
@@ -60,7 +60,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         {/* CEFR Level Filter Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
           <span className="text-xs font-semibold text-white/70 flex items-center gap-1 shrink-0 mr-1 uppercase">
-            <Award className="w-4 h-4 text-[#F5D280]" /> Trình độ:
+            <Award className="w-4 h-4 text-antique-rich" /> Trình độ:
           </span>
           <div className="flex items-center bg-black/40 p-1 rounded-full border border-white/15">
             {levels.map((lvl) => (
@@ -69,7 +69,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 onClick={() => onSelectLevel(lvl)}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                   selectedLevel === lvl
-                    ? 'bg-[#FCE5B5] text-[#18221E] shadow-sm'
+                    ? 'bg-antique-bright text-heritage-forest shadow-sm'
                     : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
               >
@@ -84,7 +84,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       {/* Category Tabs in Pill Shapes */}
       <div className="flex items-center gap-2.5 overflow-x-auto mt-6 pt-6 border-t border-white/10 scrollbar-none">
         <span className="text-xs font-semibold text-white/70 flex items-center gap-1 shrink-0 mr-1 uppercase">
-          <Layers className="w-4 h-4 text-[#F5D280]" /> Chủ đề:
+          <Layers className="w-4 h-4 text-antique-rich" /> Chủ đề:
         </span>
         {categories.map((cat) => {
           const isActive = selectedCategory === cat.id;
@@ -94,7 +94,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               onClick={() => onSelectCategory(cat.id)}
               className={`shrink-0 px-4 py-2 rounded-full text-xs sm:text-sm font-medium flex items-center gap-2 border transition-all ${
                 isActive
-                  ? 'bg-[#FCE5B5] text-[#18221E] font-semibold border-[#FCE5B5] shadow-md'
+                  ? 'bg-antique-bright text-heritage-forest font-semibold border-antique-bright shadow-md'
                   : 'bg-white/5 text-white/80 border-white/10 hover:bg-white/10 hover:text-white'
               }`}
             >

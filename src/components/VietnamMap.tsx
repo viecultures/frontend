@@ -7,6 +7,7 @@ import {
 } from '@/data/vietnamMapData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { useVietnamMap, type RegionKey } from '@/utils/useVietnamMap';
+import { getProvinceSpecialty } from '@/utils/vietnamMapUtils';
 
 export interface VietnamMapProps {
   selectedProvinceId?: string | null;
@@ -61,17 +62,16 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
       ref={containerRef}
       {...containerProps}
       onClick={() => resetToAll()}
-      className={`relative flex flex-col items-center justify-between overflow-hidden select-none w-full h-full ${
-        zoomScale > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''
-      } ${className}`}
+      className={`relative flex flex-col items-center justify-between overflow-hidden select-none w-full h-full ${zoomScale > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''
+        } ${className}`}
     >
       {/* 1. Region Tabs Bar Header */}
       {showRegionTabs && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="w-full z-30 flex items-center justify-center p-2 bg-[#0D1C18]/90 border-b border-[#D9B76A]/30 backdrop-blur-md shrink-0"
+          className="w-full z-30 flex items-center justify-center p-2 bg-heritage-forest/90 border-b border-antique-gold/30 backdrop-blur-md shrink-0"
         >
-          <div className="flex items-center gap-1.5 bg-[#122A22] border border-[#D9B76A]/40 p-1 rounded-2xl shadow-lg">
+          <div className="flex items-center gap-1.5 bg-heritage-forest border border-antique-gold/40 p-1 rounded-2xl shadow-lg">
             {REGION_TABS.map((tab) => {
               const isActive = activeRegion === tab.key;
               return (
@@ -81,17 +81,15 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
                     e.stopPropagation();
                     setActiveRegion(tab.key);
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                    isActive
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 focus-ring-dark ${isActive
                       ? `${tab.colorClass} shadow-md scale-102`
                       : 'text-[#FBF7EE]/70 hover:text-[#FBF7EE] hover:bg-white/10'
-                  }`}
+                    }`}
                 >
                   <span>{tab.label}</span>
                   <span
-                    className={`text-[9.5px] px-1.5 py-0.2 rounded-full ${
-                      isActive ? 'bg-black/30 text-white' : 'bg-white/10 text-[#FCE5B5]'
-                    }`}
+                    className={`text-[9.5px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-black/30 text-white' : 'bg-white/10 text-antique-bright'
+                      }`}
                   >
                     {tab.count}
                   </span>
@@ -102,46 +100,61 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
         </div>
       )}
 
-      {/* 2. Tooltip on Hover */}
-      {hoveredProvince && (
-        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-20 pointer-events-none animate-in fade-in zoom-in duration-150">
-          <div className="px-4 py-2 rounded-2xl bg-[#0D1C18]/95 border border-[#D9B76A]/60 text-[#FBF7EE] text-xs font-bold shadow-2xl flex flex-col items-center gap-0.5 backdrop-blur-md">
-            <div className="flex items-center gap-2">
-              <span
-                className={`w-2.5 h-2.5 rounded-full animate-ping ${
-                  hoveredProvince.region === 'north'
-                    ? 'bg-[#EF4444]'
-                    : hoveredProvince.region === 'central'
-                    ? 'bg-[#F59E0B]'
-                    : 'bg-[#10B981]'
-                }`}
-              />
-              <span className="text-sm font-bold">{hoveredProvince.name}</span>
-              <span className="text-[10px] text-[#F5D280] font-medium">
-                ({hoveredProvince.regionName})
-              </span>
+      {/* 2. Tooltip on Hover with Cultural Highlights */}
+      {hoveredProvince && (() => {
+        const specialty = getProvinceSpecialty(hoveredProvince.id);
+        return (
+          <div className="absolute top-14 left-1/2 -translate-x-1/2 z-20 pointer-events-none animate-in fade-in zoom-in duration-150 max-w-xs sm:max-w-sm text-center">
+            <div className="px-4 py-2.5 rounded-2xl bg-heritage-forest/95 border border-antique-gold/60 text-warm-ivory text-xs font-bold shadow-2xl flex flex-col items-center gap-1.5 backdrop-blur-md">
+              <div className="flex items-center gap-2 flex-wrap justify-center">
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${hoveredProvince.region === 'north'
+                      ? 'bg-rose-500'
+                      : hoveredProvince.region === 'central'
+                        ? 'bg-amber-400'
+                        : 'bg-emerald-400'
+                    } animate-pulse`}
+                />
+                <span className="text-sm font-bold flex items-center gap-1">
+                  <span>{specialty?.icon || '📍'}</span>
+                  <span>{hoveredProvince.name}</span>
+                </span>
+                <span className="text-[10px] text-antique-rich font-medium">
+                  ({hoveredProvince.regionName})
+                </span>
+                {specialty?.heritageType && (
+                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-antique-gold/20 text-antique-bright border border-antique-gold/40">
+                    {specialty.heritageType}
+                  </span>
+                )}
+              </div>
+              {specialty?.highlight && (
+                <div className="text-[11px] text-warm-ivory/90 font-normal leading-tight px-1">
+                  {specialty.highlight}
+                </div>
+              )}
+              {hoveredProvince.mergeInfo && (
+                <span className="text-[9.5px] text-white/50 font-normal">
+                  {hoveredProvince.mergeInfo}
+                </span>
+              )}
             </div>
-            {hoveredProvince.mergeInfo && (
-              <span className="text-[10.5px] text-[#FCE5B5]/90 font-normal">
-                {hoveredProvince.mergeInfo}
-              </span>
-            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* 3. Floating Zoom & Control Buttons Toolbar */}
       {showControls && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute bottom-4 right-4 z-20 flex flex-col items-center gap-1.5 bg-[#0D1C18]/90 border border-[#D9B76A]/40 p-1.5 rounded-2xl shadow-xl backdrop-blur-md"
+          className="absolute bottom-4 right-4 z-20 flex flex-col items-center gap-1.5 bg-heritage-forest/90 border border-antique-gold/40 p-1.5 rounded-2xl shadow-xl backdrop-blur-md"
         >
           <button
             onClick={(e) => {
               e.stopPropagation();
               zoomIn();
             }}
-            className="p-2 rounded-xl text-[#FBF7EE] hover:bg-white/10 hover:text-[#F5D280] transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-warm-ivory hover:bg-white/10 hover:text-antique-rich transition-colors cursor-pointer focus-ring-dark"
             title="Phóng to (+)"
           >
             <ZoomIn className="w-4 h-4" />
@@ -151,7 +164,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
               e.stopPropagation();
               zoomOut();
             }}
-            className="p-2 rounded-xl text-[#FBF7EE] hover:bg-white/10 hover:text-[#F5D280] transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-warm-ivory hover:bg-white/10 hover:text-antique-rich transition-colors cursor-pointer focus-ring-dark"
             title="Thu nhỏ (-)"
           >
             <ZoomOut className="w-4 h-4" />
@@ -162,7 +175,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
                 e.stopPropagation();
                 resetZoom();
               }}
-              className="p-2 rounded-xl text-[#F5D280] hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-antique-rich hover:bg-white/10 transition-colors cursor-pointer focus-ring-dark"
               title="Đặt lại toàn bộ bản đồ (Toàn Quốc)"
             >
               <RotateCcw className="w-4 h-4" />
@@ -247,9 +260,8 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
                   }}
                   onMouseEnter={() => setHoveredId(p.id)}
                   onMouseLeave={() => setHoveredId(null)}
-                  className={`cursor-pointer transition-all duration-200 ${
-                    isDimmed ? 'opacity-20 grayscale-[80%]' : 'opacity-95 hover:opacity-100'
-                  }`}
+                  className={`cursor-pointer transition-all duration-200 ${isDimmed ? 'opacity-20 grayscale-[80%]' : 'opacity-95 hover:opacity-100'
+                    }`}
                   style={{
                     vectorEffect: 'non-scaling-stroke',
                     filter: dropShadow,
@@ -328,15 +340,13 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
                   y={p.cy}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className={`text-[8.5px] sm:text-[9.5px] font-bold transition-all duration-200 ${
-                    isDimmed ? 'opacity-15' : 'opacity-100'
-                  } ${
-                    isSelected
+                  className={`text-[8.5px] sm:text-[9.5px] font-bold transition-all duration-200 ${isDimmed ? 'opacity-15' : 'opacity-100'
+                    } ${isSelected
                       ? 'fill-[#FFFFFF] font-black text-[11px]'
                       : isHovered
-                      ? 'fill-[#FCE5B5] font-bold text-[10px]'
-                      : 'fill-[#FFFDF8]'
-                  }`}
+                        ? 'fill-[#FCE5B5] font-bold text-[10px]'
+                        : 'fill-[#FFFDF8]'
+                    }`}
                   style={{
                     paintOrder: 'stroke',
                     stroke: '#0D1C18',
@@ -371,9 +381,8 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
                       e.stopPropagation();
                       selectProvince(p);
                     }}
-                    className={`cursor-pointer transition-opacity duration-300 ${
-                      isDimmed ? 'opacity-25 grayscale-[70%]' : 'opacity-100'
-                    }`}
+                    className={`cursor-pointer transition-opacity duration-300 ${isDimmed ? 'opacity-25 grayscale-[70%]' : 'opacity-100'
+                      }`}
                   >
                     {/* Animated Radar Pulsing Aura Ring */}
                     <circle

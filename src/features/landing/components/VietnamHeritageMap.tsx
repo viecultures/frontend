@@ -69,7 +69,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
   };
 
   return (
-    <div className="relative w-full h-[580px] sm:h-[660px] lg:h-[720px] bg-[#FBF7EE] dark:bg-[#102B26] overflow-hidden select-none px-2 sm:px-4 transition-colors duration-300">
+    <div className="relative w-full h-[580px] sm:h-[660px] lg:h-[720px] bg-warm-ivory dark:bg-[#102B26] overflow-hidden select-none px-2 sm:px-4 transition-colors duration-300">
       {/* S-shaped Map SVG Viewport */}
       <div
         className="w-full h-full flex items-center justify-center transition-transform duration-300 ease-out origin-center"
@@ -182,7 +182,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                 x="355"
                 y="306"
                 textAnchor="middle"
-                className="text-[7.5px] font-semibold fill-[#1E4B43] dark:fill-[#D9B76A] tracking-wider select-none"
+                className="text-[7.5px] font-semibold fill-heritage-green dark:fill-antique-gold tracking-wider select-none"
               >
                 Q.Đ HOÀNG SA
               </text>
@@ -200,7 +200,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                 x="350"
                 y="570"
                 textAnchor="middle"
-                className="text-[7.5px] font-semibold fill-[#1E4B43] dark:fill-[#D9B76A] tracking-wider select-none"
+                className="text-[7.5px] font-semibold fill-heritage-green dark:fill-antique-gold tracking-wider select-none"
               >
                 Q.Đ TRƯỜNG SA
               </text>
@@ -217,7 +217,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
               x="138"
               y="635"
               textAnchor="middle"
-              className="text-[6.5px] font-medium fill-[#1E4B43] dark:fill-[#D9B76A]"
+              className="text-[6.5px] font-medium fill-heritage-green dark:fill-antique-gold"
             >
               Phú Quốc
             </text>
@@ -237,7 +237,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
               x="195"
               y="95"
               textAnchor="middle"
-              className="text-[8px] font-semibold tracking-widest uppercase fill-[#1E4B43]/70 dark:fill-[#FBF7EE]/60"
+              className="text-[8px] font-semibold tracking-widest uppercase fill-heritage-green/70 dark:fill-warm-ivory/60"
             >
               BẮC BỘ
             </text>
@@ -245,7 +245,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
               x="235"
               y="340"
               textAnchor="middle"
-              className="text-[8px] font-semibold tracking-widest uppercase fill-[#1E4B43]/70 dark:fill-[#FBF7EE]/60"
+              className="text-[8px] font-semibold tracking-widest uppercase fill-heritage-green/70 dark:fill-warm-ivory/60"
             >
               TRUNG BỘ
             </text>
@@ -253,7 +253,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
               x="235"
               y="595"
               textAnchor="middle"
-              className="text-[8px] font-semibold tracking-widest uppercase fill-[#1E4B43]/70 dark:fill-[#FBF7EE]/60"
+              className="text-[8px] font-semibold tracking-widest uppercase fill-heritage-green/70 dark:fill-warm-ivory/60"
             >
               NAM BỘ
             </text>
@@ -314,10 +314,10 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                     textAnchor={site.x > 240 ? 'end' : 'start'}
                     className={`text-[8.5px] font-semibold tracking-tight transition-colors select-none ${
                       isSelected
-                        ? 'fill-[#1E4B43] dark:fill-[#D9B76A] font-bold'
+                        ? 'fill-heritage-green dark:fill-antique-gold font-bold'
                         : isHovered
-                        ? 'fill-[#1E4B43] dark:fill-[#FBF7EE]'
-                        : 'fill-[#1E4B43]/85 dark:fill-[#FBF7EE]/80'
+                        ? 'fill-heritage-green dark:fill-warm-ivory'
+                        : 'fill-heritage-green/85 dark:fill-warm-ivory/80'
                     }`}
                   >
                     {site.name.split('–')[0].trim()}
@@ -336,20 +336,20 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="absolute pointer-events-none z-30 bg-[#1E4B43] text-[#FBF7EE] px-3.5 py-2.5 rounded-2xl text-xs shadow-xl space-y-1 border border-[#D9B76A]/40 max-w-[220px]"
+            className="absolute pointer-events-none z-30 bg-heritage-green text-warm-ivory px-3.5 py-2.5 rounded-2xl text-xs shadow-xl space-y-1 border border-antique-gold/40 max-w-[220px]"
             style={{
               left: `${(hoveredSite.x / VIETNAM_MAP_DIMENSIONS.width) * 100}%`,
               top: `${(hoveredSite.y / VIETNAM_MAP_DIMENSIONS.height) * 100}%`,
               transform: 'translate(-50%, -125%)',
             }}
           >
-            <div className="font-semibold text-sm text-[#FBF7EE]">
+            <div className="font-semibold text-sm text-warm-ivory">
               {hoveredSite.name}
             </div>
-            <p className="text-[11px] text-[#BFE3EA] line-clamp-1 italic">
+            <p className="text-[11px] text-sky-mist line-clamp-1 italic">
               {hoveredSite.englishTitle}
             </p>
-            <div className="flex items-center justify-between text-[10px] text-[#D9B76A] pt-0.5">
+            <div className="flex items-center justify-between text-[10px] text-antique-gold pt-0.5">
               <span>{hoveredSite.category}</span>
               <span className="font-mono font-semibold">{hoveredSite.cefrLevel} Level</span>
             </div>
@@ -365,20 +365,20 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 25, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-            className="absolute top-4 right-4 max-h-[92%] w-[92%] sm:w-[380px] z-30 bg-[#FBF7EE]/95 dark:bg-[#143731]/95 backdrop-blur-md rounded-3xl border border-[#D9B76A]/50 shadow-2xl p-5 sm:p-6 overflow-y-auto flex flex-col space-y-5 text-[#1E4B43] dark:text-[#FBF7EE]"
+            className="absolute top-4 right-4 max-h-[92%] w-[92%] sm:w-[380px] z-30 bg-warm-ivory/95 dark:bg-[#143731]/95 backdrop-blur-md rounded-3xl border border-antique-gold/50 shadow-2xl p-5 sm:p-6 overflow-y-auto flex flex-col space-y-5 text-heritage-green dark:text-warm-ivory"
           >
             {/* Header & Close Button */}
-            <div className="flex items-start justify-between gap-3 border-b border-[#E8DFCB] dark:border-[#1E4B43] pb-3">
+            <div className="flex items-start justify-between gap-3 border-b border-mist-cloud dark:border-heritage-green pb-3">
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#6E9FA1] dark:text-[#9FCED8]">
+                <div className="flex items-center gap-2 text-xs font-semibold text-mountain-teal dark:text-[#9FCED8]">
                   <span>{activeSite.region}</span>
                   <span aria-hidden="true">·</span>
-                  <span className="text-[#D9B76A] font-bold">{activeSite.category}</span>
+                  <span className="text-antique-gold font-bold">{activeSite.category}</span>
                 </div>
-                <h3 className="font-display text-2xl text-[#1E4B43] dark:text-[#FBF7EE] font-normal leading-tight">
+                <h3 className="font-display text-2xl text-heritage-green dark:text-warm-ivory font-normal leading-tight">
                   {activeSite.name}
                 </h3>
-                <p className="text-xs font-medium text-[#1E4B43]/70 dark:text-[#9FCED8] italic">
+                <p className="text-xs font-medium text-heritage-green/70 dark:text-[#9FCED8] italic">
                   {activeSite.englishTitle}
                 </p>
               </div>
@@ -389,7 +389,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                   setInternalSelectedSite(null);
                   if (onSelectSite) onSelectSite(null);
                 }}
-                className="p-1.5 rounded-full hover:bg-[#E8DFCB] dark:hover:bg-[#1E4B43] text-[#1E4B43] dark:text-[#FBF7EE] transition-colors cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-mist-cloud dark:hover:bg-heritage-green text-heritage-green dark:text-warm-ivory transition-colors cursor-pointer focus-ring"
                 aria-label="Đóng bảng chi tiết"
               >
                 <X className="w-4 h-4" />
@@ -397,30 +397,30 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
             </div>
 
             {/* Cultural Insight Paragraph */}
-            <div className="space-y-1.5 text-xs sm:text-sm text-[#1E4B43]/85 dark:text-[#FBF7EE]/85 font-light leading-relaxed">
+            <div className="space-y-1.5 text-xs sm:text-sm text-heritage-green/85 dark:text-warm-ivory/85 font-light leading-relaxed">
               <p>{activeSite.culturalInsight}</p>
             </div>
 
             {/* Model Presentation Snippet with Audio Button */}
-            <div className="p-4 rounded-2xl bg-[#BFE3EA]/40 dark:bg-[#102B26]/80 border border-[#9FCED8]/60 dark:border-[#1E4B43] space-y-3">
+            <div className="p-4 rounded-2xl bg-sky-mist/40 dark:bg-[#102B26]/80 border border-[#9FCED8]/60 dark:border-heritage-green space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-[#1E4B43] dark:text-[#D9B76A] uppercase tracking-wide flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
+                <span className="text-xs font-semibold text-heritage-green dark:text-antique-gold uppercase tracking-wide flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
                   <span>Mẫu Thuyết Trình Quốc Tế</span>
                 </span>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-[#D9B76A]/20 text-[#1E4B43] dark:text-[#D9B76A] font-semibold">
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-antique-gold/20 text-heritage-green dark:text-antique-gold font-semibold">
                   {activeSite.cefrLevel}
                 </span>
               </div>
 
-              <p className="text-xs font-serif italic text-[#1E4B43] dark:text-[#FBF7EE] leading-relaxed">
+              <p className="text-xs font-serif italic text-heritage-green dark:text-warm-ivory leading-relaxed">
                 &ldquo;{activeSite.presentationSnippet}&rdquo;
               </p>
 
               <button
                 type="button"
                 onClick={() => handlePlaySpeech(activeSite.presentationSnippet, activeSite.id)}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#1E4B43] hover:bg-[#163832] text-[#FBF7EE] dark:bg-[#D9B76A] dark:hover:bg-[#c6a355] dark:text-[#102B26] text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl bg-heritage-green hover:bg-[#163832] text-warm-ivory dark:bg-antique-gold dark:hover:bg-[#c6a355] dark:text-[#102B26] text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer focus-ring"
               >
                 {playingWord === activeSite.id ? (
                   <>
@@ -438,9 +438,9 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
 
             {/* Core Cultural Collocations List */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs font-semibold text-[#1E4B43] dark:text-[#D9B76A]">
+              <div className="flex items-center justify-between text-xs font-semibold text-heritage-green dark:text-antique-gold">
                 <span>TỪ VỰNG & COLLOCATION BẢN SẮC</span>
-                <span className="text-[11px] font-normal text-[#6E9FA1]">Chạm vào để nghe</span>
+                <span className="text-[11px] font-normal text-mountain-teal">Chạm vào để nghe</span>
               </div>
 
               <div className="space-y-2">
@@ -451,14 +451,14 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                   return (
                     <div
                       key={vocab.word}
-                      className="p-3 rounded-xl bg-white/70 dark:bg-[#102B26]/60 border border-[#E8DFCB] dark:border-[#1E4B43]/50 flex flex-col space-y-1.5"
+                      className="p-3 rounded-xl bg-white/70 dark:bg-[#102B26]/60 border border-mist-cloud dark:border-heritage-green/50 flex flex-col space-y-1.5"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="space-y-0.5">
-                          <span className="text-sm font-semibold text-[#1E4B43] dark:text-[#D9B76A]">
+                          <span className="text-sm font-semibold text-heritage-green dark:text-antique-gold">
                             {vocab.word}
                           </span>
-                          <span className="text-xs text-[#6E9FA1] block font-mono">
+                          <span className="text-xs text-mountain-teal block font-mono">
                             {vocab.ipa}
                           </span>
                         </div>
@@ -466,18 +466,18 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                         <button
                           type="button"
                           onClick={() => handlePlaySpeech(vocab.word, itemKey)}
-                          className="p-1.5 rounded-lg bg-[#BFE3EA]/50 dark:bg-[#1E4B43] hover:bg-[#BFE3EA] text-[#1E4B43] dark:text-[#D9B76A] transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg bg-sky-mist/50 dark:bg-heritage-green hover:bg-sky-mist text-heritage-green dark:text-antique-gold transition-colors cursor-pointer focus-ring"
                           title="Nghe phát âm từ này"
                         >
                           <Volume2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      <p className="text-xs text-[#1E4B43]/85 dark:text-[#FBF7EE]/80">
+                      <p className="text-xs text-heritage-green/85 dark:text-warm-ivory/80">
                         {vocab.meaning}
                       </p>
 
-                      <div className="text-[11px] text-[#6E9FA1] dark:text-[#9FCED8] italic font-serif">
+                      <div className="text-[11px] text-mountain-teal dark:text-[#9FCED8] italic font-serif">
                         &bull; Collocation: {vocab.collocation}
                       </div>
                     </div>

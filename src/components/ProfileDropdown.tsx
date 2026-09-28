@@ -39,12 +39,12 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.96 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 top-full mt-2.5 w-64 bg-[#F6EEDC] dark:bg-[#122A22] border-2 border-[#D9B76A] rounded-2xl p-3.5 shadow-[0_10px_35px_rgba(30,75,67,0.3)] z-50 text-[#3F5550] dark:text-[#FBF7EE] space-y-3"
+            className="absolute right-0 top-full mt-2.5 w-64 bg-rice-paper dark:bg-heritage-forest border-2 border-antique-gold rounded-2xl p-3.5 shadow-[0_10px_35px_heritage-green/30] z-50 text-text-body dark:text-warm-ivory space-y-3"
           >
             {/* Header: User Info & Master Badges */}
-            <div className="pb-3 border-b border-[#1E4B43]/15 dark:border-white/10 space-y-2">
+            <div className="pb-3 border-b border-heritage-green/15 dark:border-white/10 space-y-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-full bg-[#1E4B43] border border-[#D9B76A] flex items-center justify-center shadow-sm shrink-0 overflow-hidden p-1">
+                <div className="w-10 h-10 rounded-full bg-heritage-green border border-antique-gold flex items-center justify-center shadow-sm shrink-0 overflow-hidden p-1">
                   {user?.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? (
                     <img src={user.avatar} alt={user.name} className="w-full h-full object-cover rounded-full" />
                   ) : (
@@ -57,10 +57,10 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                 </div>
 
                 <div className="overflow-hidden">
-                  <h3 className="font-heading font-bold text-sm text-[#163D37] dark:text-[#FBF7EE] tracking-tight truncate">
+                  <h3 className="font-heading font-bold text-sm text-heritage-dark dark:text-warm-ivory tracking-tight truncate">
                     {user?.name || 'luanninh2005'}
                   </h3>
-                  <p className="text-[11px] text-[#6E7E79] dark:text-[#9FCED8] font-medium truncate">
+                  <p className="text-[11px] text-text-secondary dark:text-[#9FCED8] font-medium truncate">
                     {user?.email || 'student@viecultures.com'}
                   </p>
                 </div>
@@ -68,10 +68,10 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
 
               {/* Badges adhering to Master Color System */}
               <div className="flex items-center gap-2 pt-0.5">
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#BFE3EA] text-[#163D37] border border-[#9FCED8]">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-mist text-heritage-dark border border-[#9FCED8]">
                   Starter
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FCE5B5] text-[#163D37] border border-[#D9B76A]">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-antique-bright text-heritage-dark border border-antique-gold">
                   👑 2 ngày Premium
                 </span>
               </div>
@@ -84,13 +84,13 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleItemClick(undefined, 'home')}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#FBF7EE] dark:bg-[#1E4B43]/70 hover:bg-[#E8DFCB] dark:hover:bg-[#1E4B43] border border-[#1E4B43]/15 dark:border-white/10 hover:border-[#D9B76A] text-xs font-bold text-[#1E4B43] dark:text-[#FBF7EE] flex items-center justify-between transition-colors shadow-sm group cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-green/70 hover:bg-mist-cloud dark:hover:bg-heritage-green border border-heritage-green/15 dark:border-white/10 hover:border-antique-gold text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
               >
                 <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-[#D9B76A]" />
+                  <User className="w-4 h-4 text-antique-gold" />
                   <span>Hồ sơ cá nhân</span>
                 </div>
-                <ChevronRight className="w-3.5 h-3.5 text-[#1E4B43]/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-[#D9B76A] transition-all" />
+                <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
               </motion.button>
 
               {/* 2. Cài đặt */}
@@ -98,23 +98,23 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleItemClick(() => alert('Cài đặt tài khoản đang được hoàn thiện!'))}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#FBF7EE] dark:bg-[#1E4B43]/70 hover:bg-[#E8DFCB] dark:hover:bg-[#1E4B43] border border-[#1E4B43]/15 dark:border-white/10 hover:border-[#D9B76A] text-xs font-bold text-[#1E4B43] dark:text-[#FBF7EE] flex items-center justify-between transition-colors shadow-sm group cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-green/70 hover:bg-mist-cloud dark:hover:bg-heritage-green border border-heritage-green/15 dark:border-white/10 hover:border-antique-gold text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
               >
                 <div className="flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-[#D9B76A]" />
+                  <Settings className="w-4 h-4 text-antique-gold" />
                   <span>Cài đặt</span>
                 </div>
-                <ChevronRight className="w-3.5 h-3.5 text-[#1E4B43]/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-[#D9B76A] transition-all" />
+                <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
               </motion.button>
             </div>
 
             {/* 3. Đăng xuất */}
-            <div className="pt-1.5 border-t border-[#1E4B43]/15 dark:border-white/10">
+            <div className="pt-1.5 border-t border-heritage-green/15 dark:border-white/10">
               <motion.button
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleItemClick(onLogout)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#E8B7B2]/30 hover:bg-[#E8B7B2]/50 dark:bg-rose-500/20 dark:hover:bg-rose-500/30 border border-[#E8B7B2] dark:border-rose-500/40 text-xs font-bold text-[#991B1B] dark:text-rose-200 flex items-center justify-between transition-colors group cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl bg-[#E8B7B2]/30 hover:bg-[#E8B7B2]/50 dark:bg-rose-500/20 dark:hover:bg-rose-500/30 border border-[#E8B7B2] dark:border-rose-500/40 text-xs font-bold text-[#991B1B] dark:text-rose-200 flex items-center justify-between transition-colors group cursor-pointer focus-ring"
               >
                 <div className="flex items-center gap-2">
                   <LogOut className="w-4 h-4 text-[#B91C1C] dark:text-rose-400" />
