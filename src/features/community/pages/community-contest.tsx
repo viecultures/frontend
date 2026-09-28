@@ -126,55 +126,55 @@ export default function Community2Page() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
+    <main className="min-h-screen bg-warm-ivory text-text-body relative selection:bg-sky-mist selection:text-heritage-green">
 
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10">
         {/* Weekly Themed Challenge Spotlight Banner */}
-        <section className="mb-10 rounded-3xl bg-gradient-to-br from-[#16221F] via-[#1E4B43] to-[#143630] text-[#FBF7EE] p-8 sm:p-12 border-2 border-[#D9B76A]/60 shadow-2xl relative overflow-hidden">
+        <section className="mb-10 rounded-3xl bg-gradient-to-br from-[#16221F] via-heritage-green to-[#143630] text-warm-ivory p-8 sm:p-12 border-2 border-antique-gold/60 shadow-2xl relative overflow-hidden">
           {/* Subtle Background Particle Accents */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-[#D9B76A]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-80 h-80 bg-antique-gold/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 max-w-4xl space-y-4">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D9B76A] text-[#1E4B43] text-xs font-bold uppercase tracking-wider shadow-sm">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-antique-gold text-heritage-green text-xs font-bold uppercase tracking-wider shadow-sm">
               <Trophy className="w-3.5 h-3.5 fill-current" />
               Thử Thách Viết Theo Chủ Đề • Tuần 14/2026
             </span>
 
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-[#FBF7EE]">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-warm-ivory">
               Chủ Đề Tuần Này: "Kiến Trúc & Di Sản Cố Đô Huế"
-              <span className="block text-lg sm:text-xl font-normal text-[#BFE3EA] mt-1 font-sans">
+              <span className="block text-lg sm:text-xl font-normal text-sky-mist mt-1 font-sans">
                 (Imperial Hue Architecture & Heritage Challenge)
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base text-[#F6EEDC]/90 leading-relaxed max-w-3xl">
-              Viết bài viết ngắn (100 – 300 từ) bằng tiếng Anh chia sẻ góc nhìn hoặc kỷ niệm của bạn về di sản Huế, ứng dụng ít nhất 3 từ vựng vừa học để tích lũy <strong className="text-[#D9B76A]">Xu Văn Hóa 💎</strong> và mở khóa tính năng độc quyền!
+            <p className="text-sm sm:text-base text-rice-paper/90 leading-relaxed max-w-3xl">
+              Viết bài viết ngắn (100 – 300 từ) bằng tiếng Anh chia sẻ góc nhìn hoặc kỷ niệm của bạn về di sản Huế, ứng dụng ít nhất 3 từ vựng vừa học để tích lũy <strong className="text-antique-gold">Xu Văn Hóa 💎</strong> và mở khóa tính năng độc quyền!
             </p>
 
             {/* Prize Pool & Timer Box */}
-            <div className="p-5 rounded-2xl bg-[#FBF7EE]/10 border border-[#D9B76A]/40 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-4 my-6">
+            <div className="p-5 rounded-2xl bg-warm-ivory/10 border border-antique-gold/40 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-4 my-6">
               <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
+                <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
                   🎁 Phần thưởng Gamification tuần này:
                 </span>
                 <div className="flex flex-wrap gap-2 text-xs font-bold">
-                  <span className="px-3 py-1 rounded-full bg-[#FBF7EE]/20 border border-white/20">
+                  <span className="px-3 py-1 rounded-full bg-warm-ivory/20 border border-white/20">
                     💎 +100 Xu cho bài tham gia
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-[#D9B76A]/30 border border-[#D9B76A]/50 text-[#FBF7EE]">
+                  <span className="px-3 py-1 rounded-full bg-antique-gold/30 border border-antique-gold/50 text-warm-ivory">
                     💎 +500 Xu cho Top 3
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-[#E8B7B2]/30 border border-[#E8B7B2]/40 text-[#FBF7EE]">
+                  <span className="px-3 py-1 rounded-full bg-[#E8B7B2]/30 border border-[#E8B7B2]/40 text-warm-ivory">
                     🎖️ Huy hiệu "Sứ Giả Cố Đô"
                   </span>
                 </div>
               </div>
 
               <div className="text-right">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#BFE3EA] block">
+                <span className="text-xs font-bold uppercase tracking-wider text-sky-mist block">
                   ⏱️ Thời gian chủ đề:
                 </span>
-                <span className="text-sm font-bold text-[#FBF7EE]">
+                <span className="text-sm font-bold text-warm-ivory">
                   Còn 04 ngày để gửi bài & tích xu
                 </span>
               </div>
@@ -187,14 +187,14 @@ export default function Community2Page() {
                   setIsFormOpen(true);
                   window.scrollTo({ top: 400, behavior: "smooth" });
                 }}
-                className="px-7 py-3.5 rounded-full text-xs font-bold text-[#1E4B43] bg-[#D9B76A] hover:bg-[#c9a657] shadow-lg transition-all border border-[#FBF7EE]/40 flex items-center gap-2"
+                className="px-7 py-3.5 rounded-full text-xs font-bold text-heritage-green bg-antique-gold hover:bg-[#c9a657] shadow-lg transition-all border border-warm-ivory/40 flex items-center gap-2"
               >
                 <span>✍️ + Viết Bài Tham Gia (Nhận ngay +100 Xu 💎)</span>
               </button>
 
               <a
                 href="#gamification-shop"
-                className="px-6 py-3.5 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#FBF7EE]/10 hover:bg-[#FBF7EE]/20 border border-white/30 transition-all flex items-center gap-2"
+                className="px-6 py-3.5 rounded-full text-xs font-bold text-warm-ivory bg-warm-ivory/10 hover:bg-warm-ivory/20 border border-white/30 transition-all flex items-center gap-2 focus-ring"
               >
                 <span>🛍️ Đổi Xu Mở Khóa Chức Năng</span>
               </a>
@@ -204,19 +204,19 @@ export default function Community2Page() {
 
         {/* Submit Entry Form (Toggleable) */}
         {isFormOpen && (
-          <div className="mb-10 p-8 sm:p-10 rounded-3xl bg-[#F6EEDC] border-2 border-[#D9B76A]/60 shadow-xl space-y-6 animate-in fade-in duration-300">
-            <div className="flex items-center justify-between pb-4 border-b border-[rgba(30,75,67,0.12)]">
+          <div className="mb-10 p-8 sm:p-10 rounded-3xl bg-rice-paper border-2 border-antique-gold/60 shadow-xl space-y-6 animate-in fade-in duration-300">
+            <div className="flex items-center justify-between pb-4 border-b border-heritage-green/12">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-[#059669]">
                   🎁 Hoàn thành bài viết nhận ngay +100 Xu 💎
                 </span>
-                <h2 className="font-serif text-2xl font-bold text-[#1E4B43] mt-0.5">
+                <h2 className="font-serif text-2xl font-bold text-heritage-green mt-0.5">
                   Gửi Bài Viết Theo Chủ Đề Tuần Này
                 </h2>
               </div>
               <button
                 onClick={() => setIsFormOpen(false)}
-                className="p-1.5 rounded-full hover:bg-[#E8DFCB] text-[#1E4B43] transition-colors"
+                className="p-1.5 rounded-full hover:bg-mist-cloud text-heritage-green transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -225,10 +225,10 @@ export default function Community2Page() {
             {/* Inputs Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#1E4B43] uppercase mb-1.5">
+                <label className="block text-xs font-bold text-heritage-green uppercase mb-1.5">
                   Góc nhìn bài viết:
                 </label>
-                <select className="w-full px-4 py-2.5 rounded-xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.15)] text-xs font-bold text-[#1E4B43] focus:outline-none">
+                <select className="w-full px-4 py-2.5 rounded-xl bg-warm-ivory border border-heritage-green/15 text-xs font-bold text-heritage-green focus:outline-none focus-ring">
                   <option>🏛️ Cảm Nhận Kiến Trúc & Di Sản (Architecture & Heritage)</option>
                   <option>📸 Kỷ Niệm Chuyến Đi & Ảnh Đẹp (Travel Photo Story)</option>
                   <option>🏮 Lịch Sử & Lễ Hội Cố Đô (History & Customs)</option>
@@ -236,7 +236,7 @@ export default function Community2Page() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#1E4B43] uppercase mb-1.5">
+                <label className="block text-xs font-bold text-heritage-green uppercase mb-1.5">
                   Tiêu đề bài viết:
                 </label>
                 <input
@@ -244,17 +244,17 @@ export default function Community2Page() {
                   value={entryTitle}
                   onChange={(e) => setEntryTitle(e.target.value)}
                   placeholder="Nhập tiêu đề cho bài viết của bạn..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.15)] text-xs font-bold text-[#1E4B43] focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-warm-ivory border border-heritage-green/15 text-xs font-bold text-heritage-green focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Vocab Checklist */}
-            <div className="p-4 rounded-2xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.10)] space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#6E7E79] block">
+            <div className="p-4 rounded-2xl bg-warm-ivory border border-heritage-green/10 space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
                 Đánh dấu các từ vựng bạn đưa vào bài (Ứng dụng 3+ từ để nhận thưởng Xu):
               </span>
-              <div className="flex flex-wrap gap-4 text-xs font-bold text-[#1E4B43]">
+              <div className="flex flex-wrap gap-4 text-xs font-bold text-heritage-green">
                 {["architectural", "intangible", "promulgated", "fortress", "geomancy"].map(
                   (word) => (
                     <label key={word} className="inline-flex items-center gap-1.5 cursor-pointer">
@@ -267,7 +267,7 @@ export default function Community2Page() {
                             [word]: e.target.checked,
                           })
                         }
-                        className="accent-[#1E4B43] w-4 h-4 rounded"
+                        className="accent-heritage-green w-4 h-4 rounded"
                       />
                       <span>{word}</span>
                     </label>
@@ -281,26 +281,26 @@ export default function Community2Page() {
               value={entryText}
               onChange={(e) => setEntryText(e.target.value)}
               placeholder="Chia sẻ suy nghĩ hoặc câu chuyện của bạn bằng tiếng Anh..."
-              className="w-full h-36 p-4 rounded-2xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.15)] text-sm text-[#1E4B43] focus:outline-none focus:ring-2 focus:ring-[#1E4B43]/20 leading-relaxed"
+              className="w-full h-36 p-4 rounded-2xl bg-warm-ivory border border-heritage-green/15 text-sm text-heritage-green focus:outline-none focus:ring-2 focus:ring-heritage-green/20 leading-relaxed"
             />
 
             {/* Actions */}
             <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-[#6E7E79] italic">
+              <span className="text-xs text-text-secondary italic">
                 🌟 Không áp lực ngữ pháp • Khuyến khích thực hành từ vựng tự nhiên
               </span>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setIsFormOpen(false)}
-                  className="px-5 py-2.5 rounded-full text-xs font-bold text-[#1E4B43] bg-[#FBF7EE] border border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                  className="px-5 py-2.5 rounded-full text-xs font-bold text-heritage-green bg-warm-ivory border border-heritage-green/12 hover:bg-mist-cloud"
                 >
                   Hủy
                 </button>
                 <button
                   onClick={handleSubmitEntry}
-                  className="px-6 py-2.5 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] shadow-sm border border-[#D9B76A]/60 inline-flex items-center gap-1.5"
+                  className="px-6 py-2.5 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm border border-antique-gold/60 inline-flex items-center gap-1.5 focus-ring"
                 >
-                  <Send className="w-3.5 h-3.5 text-[#D9B76A]" />
+                  <Send className="w-3.5 h-3.5 text-antique-gold" />
                   <span>🚀 Đăng Bài (+100 Xu 💎)</span>
                 </button>
               </div>
@@ -313,15 +313,15 @@ export default function Community2Page() {
           {/* Left 8 Cols: Submissions Showcase */}
           <div className="lg:col-span-8 space-y-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-serif text-2xl font-bold text-[#1E4B43]">
+              <h2 className="font-serif text-2xl font-bold text-heritage-green">
                 Bài Viết Nổi Bật Theo Chủ Đề Tuần Này
               </h2>
 
-              <div className="flex items-center gap-1 bg-[#F6EEDC] p-1 rounded-xl border border-[rgba(30,75,67,0.12)] text-xs font-bold">
-                <button className="px-3 py-1.5 rounded-lg bg-[#1E4B43] text-[#FBF7EE]">
+              <div className="flex items-center gap-1 bg-rice-paper p-1 rounded-xl border border-heritage-green/12 text-xs font-bold">
+                <button className="px-3 py-1.5 rounded-lg bg-heritage-green text-warm-ivory focus-ring">
                   🔥 Yêu thích nhất
                 </button>
-                <button className="px-3 py-1.5 rounded-lg text-[#1E4B43] hover:bg-[#E8DFCB]">
+                <button className="px-3 py-1.5 rounded-lg text-heritage-green hover:bg-mist-cloud focus-ring">
                   ⭐ Mới đăng
                 </button>
               </div>
@@ -330,7 +330,7 @@ export default function Community2Page() {
             {entries.map((entry) => (
               <article
                 key={entry.id}
-                className="relative p-6 sm:p-8 rounded-3xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.12)] shadow-md space-y-4"
+                className="relative p-6 sm:p-8 rounded-3xl bg-warm-ivory border border-heritage-green/12 shadow-md space-y-4"
               >
                 {/* Rank Tag if available */}
                 {entry.rankTag && (
@@ -343,12 +343,12 @@ export default function Community2Page() {
 
                 {/* Author Info */}
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-[#1E4B43] text-[#D9B76A] font-bold text-sm flex items-center justify-center border border-[#D9B76A]">
-                    <User className="w-5 h-5 text-[#D9B76A]" />
+                  <div className="w-11 h-11 rounded-full bg-heritage-green text-antique-gold font-bold text-sm flex items-center justify-center border border-antique-gold">
+                    <User className="w-5 h-5 text-antique-gold" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-sm text-[#1E4B43]">
+                      <h4 className="font-bold text-sm text-heritage-green">
                         {entry.authorName}
                       </h4>
                       {entry.authorBadge && (
@@ -357,41 +357,41 @@ export default function Community2Page() {
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-[#6E7E79] font-medium">
+                    <span className="text-xs text-text-secondary font-medium">
                       {entry.authorSub}
                     </span>
                   </div>
                 </div>
 
                 {/* Entry Title & Excerpt */}
-                <h3 className="font-serif text-xl font-bold text-[#1E4B43] leading-snug">
+                <h3 className="font-serif text-xl font-bold text-heritage-green leading-snug">
                   "{entry.title}"
                 </h3>
-                <p className="text-sm text-[#3F5550] leading-relaxed">
+                <p className="text-sm text-text-body leading-relaxed">
                   {entry.excerpt}
                 </p>
 
                 {/* Image Placeholder */}
-                <div className="h-52 w-full rounded-2xl bg-gradient-to-br from-[#1E4B43] via-[#2A665B] to-[#D9B76A] p-6 text-white flex flex-col justify-between overflow-hidden shadow-inner border border-[#D9B76A]/30">
-                  <div className="text-xs font-semibold text-[#D9B76A] uppercase">
+                <div className="h-52 w-full rounded-2xl bg-gradient-to-br from-heritage-green via-[#2A665B] to-antique-gold p-6 text-white flex flex-col justify-between overflow-hidden shadow-inner border border-antique-gold/30">
+                  <div className="text-xs font-semibold text-antique-gold uppercase">
                     Photo Entry
                   </div>
                   <div className="text-center my-auto">
                     <span className="text-3xl block mb-1">📸🏛️</span>
-                    <span className="font-serif text-sm font-bold text-[#FBF7EE]">
+                    <span className="font-serif text-sm font-bold text-warm-ivory">
                       {entry.imageCaption}
                     </span>
                   </div>
                 </div>
 
                 {/* Footer Vote Action */}
-                <div className="pt-4 border-t border-[rgba(30,75,67,0.10)] flex items-center justify-between">
+                <div className="pt-4 border-t border-heritage-green/10 flex items-center justify-between">
                   <button
                     onClick={() => handleVote(entry.id)}
                     className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold border transition-all ${
                       entry.userVoted
                         ? "bg-[#DC2626] text-white border-[#DC2626] shadow-sm"
-                        : "bg-[#FBF7EE] text-[#1E4B43] border-[rgba(30,75,67,0.2)] hover:bg-[#FEF2F2] hover:border-[#DC2626]"
+                        : "bg-warm-ivory text-heritage-green border-heritage-green/20 hover:bg-[#FEF2F2] hover:border-[#DC2626]"
                     }`}
                   >
                     <Heart className={`w-4 h-4 ${entry.userVoted ? "fill-white" : ""}`} />
@@ -399,7 +399,7 @@ export default function Community2Page() {
                     <strong>({entry.votesCount})</strong>
                   </button>
 
-                  <div className="text-xs font-semibold text-[#6E7E79] flex items-center gap-4">
+                  <div className="text-xs font-semibold text-text-secondary flex items-center gap-4">
                     <span>💬 {entry.commentsCount} Bình luận</span>
                     <span className="text-[#059669]">🎁 +100 Xu tích lũy</span>
                   </div>
@@ -413,11 +413,11 @@ export default function Community2Page() {
             {/* Gamification Shop Card */}
             <div
               id="gamification-shop"
-              className="p-6 rounded-3xl bg-[#F6EEDC] border border-[rgba(30,75,67,0.12)] space-y-5 shadow-sm"
+              className="p-6 rounded-3xl bg-rice-paper border border-heritage-green/12 space-y-5 shadow-sm"
             >
-              <div className="flex items-center justify-between pb-3 border-b border-[rgba(30,75,67,0.10)]">
-                <h3 className="font-serif text-base font-bold text-[#1E4B43] flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-[#D9B76A]" />
+              <div className="flex items-center justify-between pb-3 border-b border-heritage-green/10">
+                <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
+                  <ShoppingBag className="w-4 h-4 text-antique-gold" />
                   Cửa Hàng Xu & Đổi Quà
                 </h3>
                 <span className="text-xs font-bold text-[#059669]">
@@ -426,37 +426,37 @@ export default function Community2Page() {
               </div>
 
               {/* Item 1 */}
-              <div className="space-y-1.5 pb-3 border-b border-[rgba(30,75,67,0.10)]">
+              <div className="space-y-1.5 pb-3 border-b border-heritage-green/10">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-[#1E4B43]">
+                  <h4 className="text-xs font-bold text-heritage-green">
                     🎧 Giọng Đọc AI Premium
                   </h4>
                   <button
                     onClick={() => handleRedeem("Giọng Đọc Premium", 300)}
-                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-[#1E4B43] text-[#FBF7EE] hover:bg-[#163D37]"
+                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-heritage-green text-warm-ivory hover:bg-heritage-dark"
                   >
                     💎 300 Xu
                   </button>
                 </div>
-                <p className="text-[11px] text-[#6E7E79]">
+                <p className="text-[11px] text-text-secondary">
                   Mở khóa giọng đọc bản ngữ chuẩn Anh - Mỹ cho toàn bộ bài học.
                 </p>
               </div>
 
               {/* Item 2 */}
-              <div className="space-y-1.5 pb-3 border-b border-[rgba(30,75,67,0.10)]">
+              <div className="space-y-1.5 pb-3 border-b border-heritage-green/10">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-[#1E4B43]">
+                  <h4 className="text-xs font-bold text-heritage-green">
                     🎨 Giao Diện Paper Vintage Theme
                   </h4>
                   <button
                     onClick={() => handleRedeem("Giao Diện Paper Theme", 400)}
-                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-[#1E4B43] text-[#FBF7EE] hover:bg-[#163D37]"
+                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-heritage-green text-warm-ivory hover:bg-heritage-dark"
                   >
                     💎 400 Xu
                   </button>
                 </div>
-                <p className="text-[11px] text-[#6E7E79]">
+                <p className="text-[11px] text-text-secondary">
                   Theme giấy da ngà hoài cổ sang trọng cho giao diện Reader.
                 </p>
               </div>
@@ -464,35 +464,35 @@ export default function Community2Page() {
               {/* Item 3 */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-[#1E4B43]">
+                  <h4 className="text-xs font-bold text-heritage-green">
                     🎖️ Huy Hiệu "Cây Bút Di Sản"
                   </h4>
                   <button
                     onClick={() => handleRedeem("Huy hiệu Cây Bút Di Sản", 200)}
-                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-[#1E4B43] text-[#FBF7EE] hover:bg-[#163D37]"
+                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-heritage-green text-warm-ivory hover:bg-heritage-dark"
                   >
                     💎 200 Xu
                   </button>
                 </div>
-                <p className="text-[11px] text-[#6E7E79]">
+                <p className="text-[11px] text-text-secondary">
                   Huy hiệu đặc biệt hiển thị trên trang Profile và góc bình luận.
                 </p>
               </div>
             </div>
 
             {/* Milestones Card */}
-            <div className="p-6 rounded-3xl bg-[#FBF7EE] border border-[rgba(30,75,67,0.12)] space-y-4 shadow-sm">
-              <h3 className="font-serif text-base font-bold text-[#1E4B43] flex items-center gap-2">
-                <Award className="w-4 h-4 text-[#D9B76A]" />
+            <div className="p-6 rounded-3xl bg-warm-ivory border border-heritage-green/12 space-y-4 shadow-sm">
+              <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
+                <Award className="w-4 h-4 text-antique-gold" />
                 Nhiệm Vụ & Cột Mốc Tích Xu
               </h3>
 
               <ul className="text-xs space-y-3">
-                <li className="flex items-center justify-between pb-2 border-b border-[rgba(30,75,67,0.10)]">
+                <li className="flex items-center justify-between pb-2 border-b border-heritage-green/10">
                   <span>✍️ Viết 1 bài theo chủ đề tuần</span>
                   <strong className="text-[#059669]">+100 Xu 💎</strong>
                 </li>
-                <li className="flex items-center justify-between pb-2 border-b border-[rgba(30,75,67,0.10)]">
+                <li className="flex items-center justify-between pb-2 border-b border-heritage-green/10">
                   <span>❤️ Bài viết đạt 10+ lượt thích</span>
                   <strong className="text-[#059669]">+150 Xu 💎</strong>
                 </li>
@@ -512,7 +512,7 @@ export default function Community2Page() {
           setIsFormOpen(true);
           window.scrollTo({ top: 380, behavior: "smooth" });
         }}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-[#1E4B43] text-[#FBF7EE] font-bold text-xl shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-[#D9B76A] z-40"
+        className="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-heritage-green text-warm-ivory font-bold text-xl shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-antique-gold z-40"
         title="Viết bài dự thi chủ đề tuần"
       >
         ✍️

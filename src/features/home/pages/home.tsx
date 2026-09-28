@@ -134,7 +134,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
   };
 
   return (
-    <div className="min-h-screen bg-[#0A1612] text-white flex flex-col justify-between relative overflow-hidden selection:bg-[#FCE5B5] selection:text-[#18221E]">
+    <div className="min-h-screen bg-heritage-forest text-white flex flex-col justify-between relative overflow-hidden selection:bg-antique-bright selection:text-heritage-forest">
 
       {/* Dynamic Background Image layer based on time of day (Clear & Sharp, no blur) */}
       <div
@@ -150,7 +150,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
             className="flex items-center gap-2 text-white font-heading font-bold text-lg hover:opacity-80 transition-opacity"
             title="Quay về Trang chủ Landing"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#FCE5B5] to-[#E5A93C] flex items-center justify-center text-[#18221E] shadow-md font-black text-sm">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-antique-bright to-[#E5A93C] flex items-center justify-center text-heritage-forest shadow-md font-black text-sm">
               V
             </div>
             <span className="tracking-tight">VieCultures</span>
@@ -162,10 +162,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
         </div>
 
         {/* Header Icon Quick Links Wireframe */}
-        <div className="flex items-center gap-2 sm:gap-3 bg-[#122A22]/80 backdrop-blur-md p-1.5 rounded-full border border-white/15 shadow-lg">
+        <div className="flex items-center gap-2 sm:gap-3 bg-heritage-forest/80 backdrop-blur-md p-1.5 rounded-full border border-white/15 shadow-lg">
           <button
             onClick={() => alert('Thông báo: Bạn có 2 bài ôn tập từ vựng mới hôm nay!')}
-            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-[#FCE5B5] transition-all relative"
+            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-bright transition-all relative"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
@@ -173,28 +173,28 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
           </button>
           <button
             onClick={() => handleNavigate('community-2')}
-            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-[#FCE5B5] transition-all"
+            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-bright transition-all"
             title="Achievements & Contest Hub"
           >
-            <Trophy className="w-4 h-4 text-[#F5D280]" />
+            <Trophy className="w-4 h-4 text-antique-rich" />
           </button>
           <button
             onClick={() => alert('Lịch học: Chuỗi 2 ngày đang được duy trì!')}
-            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-[#FCE5B5] transition-all"
+            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-bright transition-all"
             title="Study Calendar"
           >
             <Calendar className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleNavigate('community-2')}
-            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-[#FCE5B5] transition-all"
+            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-bright transition-all"
             title="Leaderboard & Stats"
           >
             <BarChart3 className="w-4 h-4" />
           </button>
           <button
             onClick={() => alert('Heritage Shop: Đã mở khóa Huy hiệu Sứ Giả!')}
-            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-[#FCE5B5] transition-all"
+            className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-bright transition-all"
             title="Heritage Shop"
           >
             <ShoppingBag className="w-4 h-4" />
@@ -207,7 +207,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
                   setIsProfileOpen(!isProfileOpen);
                   if (onOpenProfile) onOpenProfile();
                 }}
-                className="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#1E4B43] border border-[#D9B76A]/60 shadow-lg hover:scale-105 active:scale-95 transition-all group overflow-hidden p-0.5"
+                className="relative flex items-center justify-center w-8 h-8 rounded-full bg-heritage-green border border-antique-gold/60 shadow-lg hover:scale-105 active:scale-95 transition-all group overflow-hidden p-0.5"
                 title="Mở Profile Menu"
               >
                 {user?.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? (
@@ -234,7 +234,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
           ) : (
             <button
               onClick={() => handleNavigate('login')}
-              className="flex items-center gap-1.5 pl-3 pr-3 py-1 bg-[#FCE5B5] text-[#18221E] rounded-full text-xs font-bold hover:brightness-105 transition-all shadow-sm"
+              className="flex items-center gap-1.5 pl-3 pr-3 py-1 bg-antique-bright text-heritage-forest rounded-full text-xs font-bold hover:brightness-105 transition-all shadow-sm"
               title="Đăng nhập"
             >
               <User className="w-3.5 h-3.5" />
@@ -252,8 +252,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
           {/* Time Badge Pill & Mode Switcher */}
           <div className="flex flex-wrap items-center gap-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 border border-white/20 text-xs font-semibold text-[#FCE5B5] backdrop-blur-md shadow-md">
-              <span className="w-2 h-2 rounded-full bg-[#FCE5B5] animate-ping" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 border border-white/20 text-xs font-semibold text-antique-bright backdrop-blur-md shadow-md">
+              <span className="w-2 h-2 rounded-full bg-antique-bright animate-ping" />
               <span>{getTimeLabel(timeOfDay)}</span>
             </div>
 
@@ -261,7 +261,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
             <div className="flex items-center gap-1 bg-black/40 p-1 rounded-full border border-white/15 backdrop-blur-md text-[11px] shadow-md">
               <button
                 onClick={() => setTimeOfDay('Morning')}
-                className={`px-2.5 py-0.5 rounded-full transition-all font-medium ${timeOfDay === 'Morning' ? 'bg-[#FCE5B5] text-[#18221E] font-bold shadow' : 'text-white/70 hover:text-white'
+                className={`px-2.5 py-0.5 rounded-full transition-all font-medium ${timeOfDay === 'Morning' ? 'bg-antique-bright text-heritage-forest font-bold shadow' : 'text-white/70 hover:text-white'
                   }`}
                 title="Đổi background Sáng"
               >
@@ -269,7 +269,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
               </button>
               <button
                 onClick={() => setTimeOfDay('Afternoon')}
-                className={`px-2.5 py-0.5 rounded-full transition-all font-medium ${timeOfDay === 'Afternoon' ? 'bg-[#FCE5B5] text-[#18221E] font-bold shadow' : 'text-white/70 hover:text-white'
+                className={`px-2.5 py-0.5 rounded-full transition-all font-medium ${timeOfDay === 'Afternoon' ? 'bg-antique-bright text-heritage-forest font-bold shadow' : 'text-white/70 hover:text-white'
                   }`}
                 title="Đổi background Trưa"
               >
@@ -277,7 +277,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
               </button>
               <button
                 onClick={() => setTimeOfDay('Evening')}
-                className={`px-2.5 py-0.5 rounded-full transition-all font-medium ${timeOfDay === 'Evening' ? 'bg-[#FCE5B5] text-[#18221E] font-bold shadow' : 'text-white/70 hover:text-white'
+                className={`px-2.5 py-0.5 rounded-full transition-all font-medium ${timeOfDay === 'Evening' ? 'bg-antique-bright text-heritage-forest font-bold shadow' : 'text-white/70 hover:text-white'
                   }`}
                 title="Đổi background Tối"
               >
@@ -292,7 +292,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
                 href="https://unsplash.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#FCE5B5] hover:underline font-medium"
+                className="text-antique-bright hover:underline font-medium focus-ring-dark"
               >
                 Unsplash
               </a>
@@ -314,33 +314,33 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
               onClick={() => handleNavigate('discovery')}
-              className="px-4 py-2.5 bg-[#122A22]/95 border border-white/25 hover:border-[#FCE5B5] hover:bg-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-[#18221E] transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
+              className="px-4 py-2.5 bg-heritage-forest/95 border border-white/25 hover:border-antique-bright hover:bg-antique-bright rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-heritage-forest transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
             >
-              <Compass className="w-4 h-4 text-amber-400 group-hover:text-[#18221E] group-hover:scale-110 transition-transform" />
+              <Compass className="w-4 h-4 text-amber-400 group-hover:text-heritage-forest group-hover:scale-110 transition-transform" />
               <span>Khám Phá Di Sản</span>
             </button>
 
             <button
               onClick={() => handleNavigate('bilingual-reader')}
-              className="px-4 py-2.5 bg-[#122A22]/95 border border-white/25 hover:border-[#FCE5B5] hover:bg-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-[#18221E] transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
+              className="px-4 py-2.5 bg-heritage-forest/95 border border-white/25 hover:border-antique-bright hover:bg-antique-bright rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-heritage-forest transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
             >
-              <BookOpen className="w-4 h-4 text-sky-400 group-hover:text-[#18221E] group-hover:scale-110 transition-transform" />
+              <BookOpen className="w-4 h-4 text-sky-400 group-hover:text-heritage-forest group-hover:scale-110 transition-transform" />
               <span>Đọc Song Ngữ AI</span>
             </button>
 
             <button
               onClick={() => handleNavigate('dictionary')}
-              className="px-4 py-2.5 bg-[#122A22]/95 border border-white/25 hover:border-[#FCE5B5] hover:bg-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-[#18221E] transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
+              className="px-4 py-2.5 bg-heritage-forest/95 border border-white/25 hover:border-antique-bright hover:bg-antique-bright rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-heritage-forest transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
             >
-              <BookMarked className="w-4 h-4 text-emerald-400 group-hover:text-[#18221E] group-hover:scale-110 transition-transform" />
+              <BookMarked className="w-4 h-4 text-emerald-400 group-hover:text-heritage-forest group-hover:scale-110 transition-transform" />
               <span>Tủ Sách Từ Điển</span>
             </button>
 
             <button
               onClick={() => handleNavigate('community')}
-              className="px-4 py-2.5 bg-[#122A22]/95 border border-white/25 hover:border-[#FCE5B5] hover:bg-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-[#18221E] transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
+              className="px-4 py-2.5 bg-heritage-forest/95 border border-white/25 hover:border-antique-bright hover:bg-antique-bright rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-heritage-forest transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
             >
-              <Users className="w-4 h-4 text-purple-400 group-hover:text-[#18221E] group-hover:scale-110 transition-transform" />
+              <Users className="w-4 h-4 text-purple-400 group-hover:text-heritage-forest group-hover:scale-110 transition-transform" />
               <span>Cộng Đồng Học Tập</span>
             </button>
           </div>
@@ -350,7 +350,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6">
 
             {/* Widget 1: Post-It Checklist Card */}
-            <div className="bg-[#FFFDF5] text-[#18221E] p-6 rounded-2xl border-2 border-amber-200/80 shadow-2xl relative rotate-[-0.5deg] hover:rotate-0 transition-transform duration-300">
+            <div className="bg-[#FFFDF5] text-heritage-forest p-6 rounded-2xl border-2 border-amber-200/80 shadow-2xl relative rotate-[-0.5deg] hover:rotate-0 transition-transform duration-300">
               {/* Tape Accent */}
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-amber-200/60 rounded backdrop-blur-sm border border-amber-300/40 shadow-sm" />
 
@@ -378,7 +378,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
                     <span
                       className={`text-xs sm:text-sm font-semibold transition-all ${task.completed
                         ? 'line-through text-gray-500'
-                        : 'text-[#18221E] group-hover:text-amber-900'
+                        : 'text-heritage-forest group-hover:text-amber-900'
                         }`}
                     >
                       {task.label}
@@ -389,7 +389,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
               {/* Mascot Sticker */}
               <div
-                className="absolute -bottom-3 -right-3 w-12 h-12 rounded-full bg-[#122A22] border-2 border-[#FCE5B5] flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform overflow-hidden p-1.5"
+                className="absolute -bottom-3 -right-3 w-12 h-12 rounded-full bg-heritage-forest border-2 border-antique-bright flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform overflow-hidden p-1.5"
                 title="Mascot Companion VieCulture Turtle"
               >
                 <img
@@ -402,13 +402,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
             </div>
 
             {/* Widget 2: Study Recommendation Card */}
-            <div className="bg-[#122A22]/90 border border-white/20 p-6 rounded-2xl backdrop-blur-xl shadow-2xl flex flex-col justify-between">
+            <div className="bg-heritage-forest/90 border border-white/20 p-6 rounded-2xl backdrop-blur-xl shadow-2xl flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2.5 py-1 rounded-full border border-emerald-500/30">
                     Gợi ý hôm nay
                   </span>
-                  <Sparkles className="w-4 h-4 text-[#FCE5B5]" />
+                  <Sparkles className="w-4 h-4 text-antique-bright" />
                 </div>
                 <h3 className="font-heading text-lg font-bold text-white mb-2">
                   Tranh Dân Gian Đông Hồ &amp; Mộc Bản
@@ -421,7 +421,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
               <div className="pt-4 flex items-center gap-3">
                 <button
                   onClick={() => handleNavigate('bilingual-reader')}
-                  className="flex-1 py-2 px-3 bg-[#FCE5B5] text-[#18221E] rounded-xl text-xs font-bold hover:brightness-105 transition-all text-center"
+                  className="flex-1 py-2 px-3 bg-antique-bright text-heritage-forest rounded-xl text-xs font-bold hover:brightness-105 transition-all text-center"
                 >
                   Đọc ngay (5 phút)
                 </button>
@@ -439,7 +439,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
         <div className="flex items-center gap-3">
 
           {/* Unified Floating Bottom Control Dock Container */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-[#122A22]/90 border border-white/20 backdrop-blur-xl shadow-2xl p-2 rounded-2xl w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-heritage-forest/90 border border-white/20 backdrop-blur-xl shadow-2xl p-2 rounded-2xl w-full sm:w-auto">
             {/* Streak Sub-card */}
             <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-black/40 rounded-xl border border-white/10">
               <span className="text-xl">🔥</span>
@@ -471,7 +471,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
               <button
                 onClick={() => setActiveDockMode('study')}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${activeDockMode === 'study'
-                  ? 'bg-[#FCE5B5] text-[#18221E] shadow-md'
+                  ? 'bg-antique-bright text-heritage-forest shadow-md'
                   : 'text-white/70 hover:text-white'
                   }`}
               >
@@ -480,7 +480,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
               <button
                 onClick={() => setActiveDockMode('pomodoro')}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${activeDockMode === 'pomodoro'
-                  ? 'bg-[#FCE5B5] text-[#18221E] shadow-md'
+                  ? 'bg-antique-bright text-heritage-forest shadow-md'
                   : 'text-white/70 hover:text-white'
                   }`}
               >
@@ -508,10 +508,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
       </div>
 
       {/* Right Floating Control Toolbar */}
-      <aside className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 bg-[#122A22]/90 border border-white/20 p-2 rounded-2xl backdrop-blur-xl shadow-2xl">
+      <aside className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 bg-heritage-forest/90 border border-white/20 p-2 rounded-2xl backdrop-blur-xl shadow-2xl">
         <button
           onClick={() => handleNavigate('discovery')}
-          className="p-3 rounded-xl hover:bg-[#FCE5B5] text-white/80 hover:text-[#18221E] hover:scale-105 transition-all relative group"
+          className="p-3 rounded-xl hover:bg-antique-bright text-white/80 hover:text-heritage-forest hover:scale-105 transition-all relative group"
           title="Search catalog"
         >
           <Search className="w-5 h-5" />
@@ -522,10 +522,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
         <button
           onClick={() => handleNavigate('community-1')}
-          className="p-3 rounded-xl hover:bg-[#FCE5B5] text-white/80 hover:text-[#18221E] hover:scale-105 transition-all relative group"
+          className="p-3 rounded-xl hover:bg-antique-bright text-white/80 hover:text-heritage-forest hover:scale-105 transition-all relative group"
           title="AI Companion"
         >
-          <Bot className="w-5 h-5 text-emerald-400 group-hover:text-[#18221E] transition-colors" />
+          <Bot className="w-5 h-5 text-emerald-400 group-hover:text-heritage-forest transition-colors" />
           <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-black text-white text-[10px] font-semibold rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
             Trợ lý AI Companion
           </span>
@@ -533,7 +533,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
         <button
           onClick={() => handleNavigate('community-1')}
-          className="p-3 rounded-xl hover:bg-[#FCE5B5] text-white/80 hover:text-[#18221E] hover:scale-105 transition-all relative group"
+          className="p-3 rounded-xl hover:bg-antique-bright text-white/80 hover:text-heritage-forest hover:scale-105 transition-all relative group"
           title="Community Discussion"
         >
           <MessageSquare className="w-5 h-5" />
@@ -544,7 +544,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
         <button
           onClick={() => handleNavigate('login')}
-          className="p-3 rounded-xl hover:bg-[#FCE5B5] text-white/80 hover:text-[#18221E] hover:scale-105 transition-all relative group"
+          className="p-3 rounded-xl hover:bg-antique-bright text-white/80 hover:text-heritage-forest hover:scale-105 transition-all relative group"
           title="Settings & Tools"
         >
           <Settings className="w-5 h-5" />

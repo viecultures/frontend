@@ -108,21 +108,38 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
               A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions
             </p>
 
-            {/* Artwork Banner Canvas */}
-            <div className="relative h-64 sm:h-72 w-full rounded-2xl bg-gradient-to-br from-[#1E4B43] via-[#2A665B] to-[#D9B76A] p-6 text-white flex flex-col justify-between overflow-hidden mb-8 shadow-inner border border-[#D9B76A]/40">
-              <div className="absolute inset-2 border border-[#D9B76A]/40 rounded-xl pointer-events-none" />
-              <div className="flex items-center justify-between text-xs font-semibold text-[#D9B76A] uppercase tracking-wider">
-                <span>Cultural Essay</span>
-                <span>Level B2–C1 • Extensive Mode</span>
-              </div>
-              <div className="text-center my-auto">
-                <span className="text-5xl block mb-2">🌸🧧✨</span>
-                <span className="font-serif text-lg font-bold text-[#FBF7EE]">
-                  Tết Nguyên Đán Heritage
+            {/* Traditional Vietnamese Tết Artwork Banner */}
+            <div className="relative h-64 sm:h-72 w-full rounded-2xl overflow-hidden mb-8 shadow-md border border-[#D9B76A]/40 group">
+              <img
+                src="https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80"
+                alt="Tết Nguyên Đán Traditional Holiday"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/20" />
+              <div className="absolute inset-2 border border-[#D9B76A]/30 rounded-xl pointer-events-none" />
+
+              <div className="absolute top-4 left-4 right-4 flex items-center justify-between text-xs font-bold text-[#D9B76A] uppercase tracking-wider">
+                <span className="bg-[#1E4B43]/80 backdrop-blur-xs px-2.5 py-1 rounded-md border border-[#D9B76A]/40 text-[#FBF7EE]">
+                  Cultural Essay
+                </span>
+                <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A]">
+                  Level B2–C1 • Extensive Mode
                 </span>
               </div>
-              <div className="text-right text-[11px] text-[#BFE3EA]">
-                Artwork Illustration • VieCultures Edition
+
+              <div className="absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-white">
+                <div>
+                  <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
+                    Vietnamese Lunar New Year
+                  </span>
+                  <h3 className="font-serif text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
+                    Tết Nguyên Đán Heritage
+                  </h3>
+                </div>
+                <div className="text-[11px] text-[#BFE3EA] font-sans opacity-90 text-left sm:text-right">
+                  VieCultures Cultural Reader
+                </div>
               </div>
             </div>
 

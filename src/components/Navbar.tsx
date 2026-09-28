@@ -12,6 +12,18 @@ interface NavbarProps {
   onOpenProfile?: () => void;
 }
 
+// ─── Nav link class helpers ────────────────────────────────────────────────────
+const NAV_LINK_BASE =
+  'transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer focus-ring-dark';
+
+const navLinkClass = (isActive: boolean) =>
+  `${NAV_LINK_BASE} ${
+    isActive
+      ? 'bg-heritage-green text-warm-ivory border border-antique-gold/50 shadow-sm font-bold'
+      : 'text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50'
+  }`;
+
+// ─── Component ─────────────────────────────────────────────────────────────────
 export const Navbar: React.FC<NavbarProps> = ({
   activeView = 'landing',
   isLoggedIn = false,
@@ -40,171 +52,168 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#163D37]/95 border-b border-[#D9B76A]/25 backdrop-blur-xl transition-all">
+    // glass-nav = Level 2 glass hierarchy (blur 20px, opacity 92%)
+    // nền heritage-dark tối với border gold mờ — readable khi scroll
+    <header className="glass-nav sticky top-0 z-50 w-full border-b border-antique-gold/25 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
 
-          {/* Brand Logo & Editorial Identity */}
+          {/* ── Brand Logo ──────────────────────────────────────────────── */}
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center gap-3.5 cursor-pointer group"
+            className="flex items-center gap-3.5 cursor-pointer group focus-ring-dark rounded-xl"
             onClick={() => onNavigateToSection(isLoggedIn ? 'home' : 'landing')}
           >
-            <div className="relative w-11 h-11 rounded-full border border-[#D9B76A]/50 overflow-hidden bg-[#1E4B43] shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300 flex items-center justify-center text-[#FBF7EE] font-serif font-bold text-xl">
+            <div className="relative w-11 h-11 rounded-full border border-antique-gold/50 overflow-hidden bg-heritage-green shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300 flex items-center justify-center text-warm-ivory font-serif font-bold text-xl">
               🪷
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-serif font-bold text-2xl tracking-tight text-[#FBF7EE] group-hover:text-[#D9B76A] transition-colors">
-                  Vie<span className="text-[#D9B76A]">Cultures</span>
+                <span className="font-serif font-bold text-2xl tracking-tight text-warm-ivory group-hover:text-antique-gold transition-colors">
+                  Vie<span className="text-antique-gold">Cultures</span>
                 </span>
               </div>
             </div>
           </motion.div>
 
-          {/* Center Main Nav Links */}
-          <nav className="hidden lg:flex items-center gap-2 text-xs font-semibold tracking-wider text-[#FBF7EE]/90">
+          {/* ── Center Nav Links (desktop only) ─────────────────────────── */}
+          <nav
+            className="hidden lg:flex items-center gap-2 text-xs font-semibold tracking-wider text-warm-ivory/90"
+            aria-label="Điều hướng chính"
+          >
             {isLoggedIn ? (
-              /* LOGGED IN NAVBAR: Functional App Pages */
+              /* LOGGED IN: Functional App Pages */
               <>
-                {/* 1. Home Dashboard / Study Room */}
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onNavigateToSection('home')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer ${activeView === 'home'
-                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                    }`}
+                  className={navLinkClass(activeView === 'home')}
+                  aria-current={activeView === 'home' ? 'page' : undefined}
                 >
-                  <Home className="w-4 h-4 text-[#D9B76A]" />
+                  <Home className="w-4 h-4 text-antique-gold" />
                   <span>Phòng Học</span>
                 </motion.button>
 
-                {/* 2. Discovery Catalog */}
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onNavigateToSection('discovery')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer ${activeView === 'discovery'
-                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                    }`}
+                  className={navLinkClass(activeView === 'discovery')}
+                  aria-current={activeView === 'discovery' ? 'page' : undefined}
                 >
-                  <Compass className="w-4 h-4 text-[#D9B76A]" />
+                  <Compass className="w-4 h-4 text-antique-gold" />
                   <span>Khám Phá</span>
                 </motion.button>
 
-                {/* 3. Dual Reader */}
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onNavigateToSection('bilingual-reader')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer ${activeView === 'bilingual-reader'
-                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                    }`}
+                  className={navLinkClass(activeView === 'bilingual-reader')}
+                  aria-current={activeView === 'bilingual-reader' ? 'page' : undefined}
                 >
-                  <BookOpen className="w-4 h-4 text-[#D9B76A]" />
+                  <BookOpen className="w-4 h-4 text-antique-gold" />
                   <span>Đọc Song Ngữ</span>
                 </motion.button>
 
-                {/* 4. Kho Từ Vựng & Flashcards */}
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onNavigateToSection('dictionary')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer ${activeView === 'dictionary' || activeView === 'flashcard-study'
-                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                    }`}
+                  className={navLinkClass(
+                    activeView === 'dictionary' || activeView === 'flashcard-study'
+                  )}
+                  aria-current={
+                    activeView === 'dictionary' || activeView === 'flashcard-study'
+                      ? 'page'
+                      : undefined
+                  }
                 >
-                  <BookMarked className="w-4 h-4 text-[#D9B76A]" />
+                  <BookMarked className="w-4 h-4 text-antique-gold" />
                   <span>Kho Từ Vựng</span>
                 </motion.button>
 
-                {/* 6. Community */}
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onNavigateToSection('community')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer ${activeView === 'community' || activeView === 'community-contest'
-                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                    }`}
+                  className={navLinkClass(
+                    activeView === 'community' || activeView === 'community-contest'
+                  )}
+                  aria-current={
+                    activeView === 'community' || activeView === 'community-contest'
+                      ? 'page'
+                      : undefined
+                  }
                 >
-                  <Users className="w-4 h-4 text-[#D9B76A]" />
+                  <Users className="w-4 h-4 text-antique-gold" />
                   <span>Cộng Đồng</span>
                 </motion.button>
               </>
             ) : (
-              /* LOGGED OUT (LANDING PAGE) NAVBAR: Landing Page Navigation */
+              /* LOGGED OUT: Landing Page anchor navigation */
               <>
-                {/* 1. Bản Đồ Di Sản */}
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => scrollToAnchor('vietnam-map')}
-                  className="transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 hover:text-[#D9B76A] hover:bg-[#1E4B43]/50 cursor-pointer"
+                  className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
                 >
-                  <MapPin className="w-4 h-4 text-[#D9B76A]" />
+                  <MapPin className="w-4 h-4 text-antique-gold" />
                   <span>Bản Đồ Di Sản</span>
                 </motion.button>
 
-                {/* 2. Chủ Đề Văn Hóa */}
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => scrollToAnchor('topics')}
-                  className="transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 hover:text-[#D9B76A] hover:bg-[#1E4B43]/50 cursor-pointer"
+                  className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
                 >
-                  <Layers className="w-4 h-4 text-[#D9B76A]" />
+                  <Layers className="w-4 h-4 text-antique-gold" />
                   <span>Chủ Đề Văn Hóa</span>
                 </motion.button>
 
-                {/* 3. Đọc Thử Song Ngữ */}
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => scrollToAnchor('interactive-demo')}
-                  className="transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 hover:text-[#D9B76A] hover:bg-[#1E4B43]/50 cursor-pointer"
+                  className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
                 >
-                  <BookOpen className="w-4 h-4 text-[#D9B76A]" />
+                  <BookOpen className="w-4 h-4 text-antique-gold" />
                   <span>Đọc Thử Song Ngữ</span>
                 </motion.button>
 
-                {/* 4. Kho Bài Đọc */}
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onNavigateToSection('discovery')}
-                  className={`transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer ${activeView === 'discovery'
-                    ? 'bg-[#1E4B43] text-[#FBF7EE] border border-[#D9B76A]/50 shadow-sm font-bold'
-                    : 'hover:text-[#D9B76A] hover:bg-[#1E4B43]/50'
-                    }`}
+                  className={navLinkClass(activeView === 'discovery')}
+                  aria-current={activeView === 'discovery' ? 'page' : undefined}
                 >
-                  <Compass className="w-4 h-4 text-[#D9B76A]" />
+                  <Compass className="w-4 h-4 text-antique-gold" />
                   <span>Kho Bài Đọc</span>
                 </motion.button>
               </>
             )}
           </nav>
 
-          {/* Right Header Actions */}
+          {/* ── Right Actions ────────────────────────────────────────────── */}
           <div className="flex items-center gap-2.5">
             {isLoggedIn ? (
-              /* Inline Profile Dropdown attached underneath avatar */
               <div className="relative">
                 <motion.button
                   whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.94 }}
                   onClick={handleProfileClick}
-                  className="relative flex items-center justify-center w-10 h-10 rounded-full bg-[#1E4B43] border border-[#D9B76A]/60 shadow-lg cursor-pointer group"
+                  className="relative flex items-center justify-center w-10 h-10 rounded-full bg-heritage-green border border-antique-gold/60 shadow-lg cursor-pointer group focus-ring-dark"
                   title="Mở Profile Menu"
+                  aria-label="Mở menu hồ sơ cá nhân"
+                  aria-expanded={isProfileOpen}
                 >
                   <span className="text-lg">{user?.avatar || '🐢'}</span>
-                  <span className="absolute -top-1 -right-1 text-xs select-none">👑</span>
+                  <span className="absolute -top-1 -right-1 text-xs select-none" aria-hidden="true">👑</span>
                 </motion.button>
 
                 <ProfileDropdown
@@ -220,12 +229,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => onNavigateToSection('login')}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${activeView === 'login'
-                  ? 'bg-[#D9B76A] text-[#163D37] ring-2 ring-[#D9B76A]'
-                  : 'bg-[#1E4B43] text-[#FBF7EE] hover:bg-[#163D37] border border-[#D9B76A]/40'
-                  }`}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer focus-ring-dark ${
+                  activeView === 'login'
+                    ? 'bg-antique-gold text-heritage-dark ring-2 ring-antique-gold'
+                    : 'bg-heritage-green text-warm-ivory hover:bg-heritage-dark border border-antique-gold/40'
+                }`}
+                aria-label="Đăng nhập vào VieCultures"
               >
-                <User className="w-4 h-4 text-[#D9B76A]" />
+                <User className="w-4 h-4 text-antique-gold" />
                 <span>Đăng Nhập</span>
               </motion.button>
             )}

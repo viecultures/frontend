@@ -4,25 +4,39 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  /* ── Typography ─────────────────────────────────────── */
   --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", Georgia, serif;
   --font-heading: "Playfair Display", Georgia, serif;
 
+  /* ── Brand Colors ───────────────────────────────────── */
   --color-warm-ivory: #FBF7EE;
   --color-rice-paper: #F6EEDC;
   --color-heritage-green: #1E4B43;
   --color-heritage-dark: #163D37;
+  --color-heritage-forest: #122A22;  /* deepest forest — Home/Auth dark bg */
+
+  /* Gold scale — role-based:
+     antique-gold  → borders, icons, dividers (muted)
+     antique-bright → active states, CTA label on dark bg (vivid)
+     antique-rich  → icon fills, large accent (mid) */
   --color-antique-gold: #D9B76A;
+  --color-antique-bright: #FCE5B5;
+  --color-antique-rich: #F5D280;
+
+  /* Supplementary palette */
   --color-sky-mist: #BFE3EA;
   --color-horizon-blue: #9FCED8;
   --color-mountain-teal: #6E9FA1;
   --color-lotus-pink: #E8B7B2;
   --color-mist-cloud: #E8DFCB;
 
+  /* ── Semantic Text ──────────────────────────────────── */
   --color-text-body: #3F5550;
   --color-text-secondary: #6E7E79;
   --color-text-muted: #8C9692;
 
+  /* ── Semantic Surfaces (light mode defaults) ────────── */
   --color-surface: #FBF7EE;
   --color-surface-muted: #F6EEDC;
   --color-surface-sunken: #E8DFCB;
@@ -30,15 +44,40 @@
   --color-shell: rgba(251, 247, 238, 0.85);
   --color-line: rgba(30, 75, 67, 0.12);
 
+  /* ── Ink (text on any surface) ──────────────────────── */
   --color-ink: #163D37;
   --color-ink-soft: #3F5550;
   --color-ink-faint: #6E7E79;
 
+  /* ── Glass Elevation Opacity Scale ─────────────────── */
+  /* Level 1 — Card/Tile: hòa vào nền, blur nhẹ           */
+  --glass-card-bg-light: rgba(251, 247, 238, 0.65);
+  --glass-card-bg-dark:  rgba(18, 42, 34, 0.65);
+  --glass-card-blur: 12px;
+  /* Level 2 — Nav/Header: đọc rõ khi scroll              */
+  --glass-nav-bg-light: rgba(251, 247, 238, 0.92);
+  --glass-nav-bg-dark:  rgba(11, 26, 23, 0.92);
+  --glass-nav-blur: 20px;
+  /* Level 3 — Modal/Dropdown: nổi hẳn lên trên           */
+  --glass-elevated-bg-light: rgba(251, 247, 238, 0.97);
+  --glass-elevated-bg-dark:  rgba(22, 61, 55, 0.97);
+  --glass-elevated-blur: 32px;
+
+  /* ── Opacity Scale — mục đích rõ ràng ──────────────── */
+  --opacity-subtle:      0.08;  /* border mờ, divider                */
+  --opacity-soft:        0.15;  /* hover fill nhẹ                    */
+  --opacity-medium:      0.40;  /* icon muted, placeholder            */
+  --opacity-glass-card:  0.65;  /* nền card glass                    */
+  --opacity-glass-nav:   0.92;  /* nền navbar/header                 */
+  --opacity-glass-modal: 0.97;  /* nền modal/dialog                  */
+
+  /* ── Border Radius ──────────────────────────────────── */
   --radius-card: 1.5rem;
   --radius-inner: 1rem;
   --radius-pill: 999px;
 }
 
+/* ── Dark Mode Surface & Ink overrides ─────────────────── */
 .dark {
   --color-surface: #0b1a17;
   --color-surface-muted: #122924;
@@ -52,6 +91,9 @@
   --color-ink-faint: #98ada7;
 }
 
+/* ═══════════════════════════════════════════════════════
+   BASE LAYER
+═══════════════════════════════════════════════════════ */
 @layer base {
   * {
     border-color: var(--color-line);
@@ -67,20 +109,21 @@
 
   body {
     font-family: var(--font-sans);
-    color: #3F5550;
-    background-color: #FBF7EE;
+    color: var(--color-text-body);
+    background-color: var(--color-surface);
     -webkit-font-smoothing: antialiased;
   }
 
   .dark body {
-    background-color: #0b1a17;
-    color: #FBF7EE;
+    background-color: var(--color-surface);
+    color: var(--color-ink);
   }
 
   h1, h2, h3, .font-heading {
     font-family: var(--font-heading);
   }
 
+  /* ── Interactive cursor ─────────────────────────────── */
   button,
   a,
   select,
@@ -97,47 +140,208 @@
     cursor: not-allowed;
   }
 
-  /* Smooth scrollbar styling */
+  /* ── Scrollbar ──────────────────────────────────────── */
   * {
     scrollbar-width: thin;
     scrollbar-color: rgba(217, 183, 106, 0.4) transparent;
   }
 
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-thumb {
     background: rgba(217, 183, 106, 0.5);
     border-radius: 999px;
   }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(217, 183, 106, 0.8);
+  ::-webkit-scrollbar-thumb:hover { background: rgba(217, 183, 106, 0.8); }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* ── Text selection ─────────────────────────────────── */
+  ::selection {
+    background-color: var(--color-sky-mist);
+    color: var(--color-heritage-green);
   }
-  ::-webkit-scrollbar-track {
-    background: transparent;
+
+  /* ── Prefers Reduced Motion ─────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-/* Glassmorphism utility aligned with Warm Ivory / Deep Heritage */
+/* ═══════════════════════════════════════════════════════
+   GLASS HIERARCHY — 3 Elevation Levels
+═══════════════════════════════════════════════════════ */
+
+/* Level 1 — Card / Tile
+   Hòa nhẹ vào nền, chỉ cần phân biệt với background.
+   Dùng cho: ArticleCard, Widget, FeatureCard */
+.glass-card {
+  background: var(--glass-card-bg-light);
+  backdrop-filter: blur(var(--glass-card-blur));
+  -webkit-backdrop-filter: blur(var(--glass-card-blur));
+  border: 1px solid rgba(30, 75, 67, 0.12);
+  box-shadow: 0 2px 8px rgba(30, 75, 67, 0.06);
+}
+.dark .glass-card {
+  background: var(--glass-card-bg-dark);
+  border: 1px solid rgba(217, 183, 106, 0.14);
+}
+
+/* Level 2 — Navigation / Header / Sticky Toolbar
+   Cần đọc rõ chữ khi scroll qua content phía sau.
+   Dùng cho: Navbar, sticky filter bar, bottom dock */
+.glass-nav {
+  background: var(--glass-nav-bg-light);
+  backdrop-filter: blur(var(--glass-nav-blur));
+  -webkit-backdrop-filter: blur(var(--glass-nav-blur));
+  border: 1px solid rgba(30, 75, 67, 0.10);
+  box-shadow: 0 4px 16px rgba(30, 75, 67, 0.08);
+}
+.dark .glass-nav {
+  background: var(--glass-nav-bg-dark);
+  border: 1px solid rgba(217, 183, 106, 0.18);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Level 3 — Modal / Dropdown / Toast / Popover
+   Phải nổi hẳn lên khỏi nền, ngăn tương tác layer dưới.
+   Dùng cho: Modal, Dropdown menu, Tooltip lớn */
+.glass-elevated {
+  background: var(--glass-elevated-bg-light);
+  backdrop-filter: blur(var(--glass-elevated-blur));
+  -webkit-backdrop-filter: blur(var(--glass-elevated-blur));
+  border: 1px solid rgba(30, 75, 67, 0.18);
+  box-shadow:
+    0 8px 32px rgba(30, 75, 67, 0.12),
+    0 2px 8px rgba(30, 75, 67, 0.08);
+}
+.dark .glass-elevated {
+  background: var(--glass-elevated-bg-dark);
+  border: 1px solid rgba(217, 183, 106, 0.28);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(217, 183, 106, 0.1);
+}
+
+/* Legacy alias — giữ .glass-panel tương thích, trỏ về Level 2 */
 .glass-panel {
-  background: rgba(251, 247, 238, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--glass-nav-bg-light);
+  backdrop-filter: blur(var(--glass-nav-blur));
+  -webkit-backdrop-filter: blur(var(--glass-nav-blur));
   border: 1px solid rgba(30, 75, 67, 0.12);
 }
-
 .dark .glass-panel {
-  background: rgba(11, 26, 23, 0.88);
+  background: var(--glass-nav-bg-dark);
   border: 1px solid rgba(217, 183, 106, 0.2);
 }
 
-/* Traditional Vietnamese Motif background texture overlay */
+/* ═══════════════════════════════════════════════════════
+   FOCUS RING — Accessibility WCAG 2.1 AA
+   Viền vàng đồng tinh tế, visible cho keyboard navigators
+═══════════════════════════════════════════════════════ */
+.focus-ring {
+  @apply focus-visible:outline-none
+         focus-visible:ring-2
+         focus-visible:ring-antique-gold
+         focus-visible:ring-offset-2
+         focus-visible:ring-offset-surface;
+}
+
+/* Focus ring cho dark context (nền tối) */
+.focus-ring-dark {
+  @apply focus-visible:outline-none
+         focus-visible:ring-2
+         focus-visible:ring-antique-bright
+         focus-visible:ring-offset-2
+         focus-visible:ring-offset-heritage-forest;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SKELETON LOADING — Giấy dó shimmer
+   Tông cream, không phải grey thông thường
+═══════════════════════════════════════════════════════ */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(246, 238, 220, 0.6) 0%,     /* rice-paper */
+    rgba(251, 247, 238, 0.9) 40%,    /* warm-ivory bright center */
+    rgba(246, 238, 220, 0.6) 80%,    /* rice-paper */
+    rgba(232, 223, 203, 0.5) 100%    /* mist-cloud */
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius-inner);
+}
+
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(18, 42, 34, 0.7) 0%,
+    rgba(30, 69, 60, 0.9) 40%,
+    rgba(18, 42, 34, 0.7) 80%,
+    rgba(22, 51, 45, 0.6) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; background: rgba(246, 238, 220, 0.6); }
+  .dark .skeleton { animation: none; background: rgba(18, 42, 34, 0.7); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CALLIGRAPHY UNDERLINE — Thư pháp / Ink hover effect
+   Dùng cho vocab words trong Reader, bilingual excerpts
+═══════════════════════════════════════════════════════ */
+.ink-underline {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+.ink-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--color-antique-gold),
+    var(--color-antique-bright),
+    var(--color-antique-gold)
+  );
+  border-radius: 999px;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ink-underline:hover::after,
+.ink-underline:focus-visible::after {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ink-underline::after { transition: none; width: 100%; opacity: 0.5; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   VIETNAMESE PATTERN BACKGROUND
+   Dot-grid mô phỏng họa tiết truyền thống
+═══════════════════════════════════════════════════════ */
 .vn-pattern-bg {
   background-image: radial-gradient(rgba(30, 75, 67, 0.08) 1px, transparent 1px);
   background-size: 20px 20px;
 }
-
 .dark .vn-pattern-bg {
   background-image: radial-gradient(rgba(217, 183, 106, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;

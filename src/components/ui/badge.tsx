@@ -17,7 +17,7 @@ export const Badge: React.FC<BadgeProps> = ({ className, variant = "gold", child
     gold: "bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30",
     bamboo: "bg-emerald-500/15 text-emerald-900 dark:text-emerald-300 border border-emerald-500/30",
     lacquer: "bg-rose-500/15 text-rose-900 dark:text-rose-300 border border-rose-500/30",
-    outline: "border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300"
+    outline: "border border-heritage-green/25 dark:border-antique-gold/30 text-heritage-dark dark:text-ink"
   };
 
   return (
