@@ -26,6 +26,7 @@ import {
   Users
 } from 'lucide-react';
 import { ProfileDropdown } from '@/components/ProfileDropdown';
+import { SetNewTabModal } from '../components/SetNewTabModal';
 
 interface HomePageProps {
   onNavigate?: (view: string) => void;
@@ -47,6 +48,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
   const [activeDockMode, setActiveDockMode] = useState<'study' | 'pomodoro'>('study');
   const [pomoSeconds, setPomoSeconds] = useState(25 * 60);
   const [isPomoRunning, setIsPomoRunning] = useState(false);
+  
+  // Set as Default New Tab Modal & Preference
+  const [isSetNewTabModalOpen, setIsSetNewTabModalOpen] = useState(false);
+  const [isDefaultNewTab, setIsDefaultNewTab] = useState(() => {
+    return localStorage.getItem('vie_default_start') === 'home';
+  });
+
+  const handleSetDefaultNewTab = () => {
+    localStorage.setItem('vie_default_start', 'home');
+    setIsDefaultNewTab(true);
+    setIsSetNewTabModalOpen(true);
+  };
 
   // Time of day detection (Morning: 5-11, Afternoon: 12-17, Evening: 18-4)
   const [timeOfDay, setTimeOfDay] = useState<'Morning' | 'Afternoon' | 'Evening'>('Morning');
@@ -141,6 +154,23 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>Phòng Học Văn Hóa</span>
           </div>
+
+          {/* Set as New Tab Button */}
+          <button
+            onClick={handleSetDefaultNewTab}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-md active:scale-95 border ${
+              isDefaultNewTab
+                ? 'bg-[#163D37]/90 text-[#FCE5B5] border-[#D9B76A]/60 hover:bg-[#1E4B43]'
+                : 'bg-gradient-to-r from-[#D9B76A]/25 to-[#c9a657]/30 text-[#FCE5B5] border-[#D9B76A]/50 hover:bg-[#D9B76A]/40'
+            }`}
+            title="Đặt làm giao diện mặc định khi mở tab mới trên trình duyệt"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
+            <span className="hidden sm:inline">
+              {isDefaultNewTab ? 'Tab Mới: Đã Bật' : 'Đặt Làm Tab Mới'}
+            </span>
+            <span className="sm:hidden">New Tab</span>
+          </button>
         </div>
 
         {/* Header Icon Quick Links Wireframe */}
@@ -519,6 +549,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
           </span>
         </button>
       </aside>
+
+      {/* Set as New Tab Guide Modal */}
+      <SetNewTabModal
+        isOpen={isSetNewTabModalOpen}
+        onClose={() => setIsSetNewTabModalOpen(false)}
+        homeUrl={typeof window !== 'undefined' ? `${window.location.origin}/home` : 'http://localhost:5173/home'}
+      />
 
     </div>
   );

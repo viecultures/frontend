@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, Volume2, VolumeX, Sparkles, Clock, User, ChevronRight } from 'lucide-react';
 import { EDITORIAL_ARTICLES } from '@/data/vietnamCultureData';
-import { speakEnglish } from '@/utils/sampleSpeech';
+import { speakEnglish, stopSpeaking } from '@/utils/sampleSpeech';
 
 export const EditorialStoriesSection: React.FC = () => {
   const [activeArticleIndex, setActiveArticleIndex] = useState(0);
@@ -18,9 +18,7 @@ export const EditorialStoriesSection: React.FC = () => {
 
   const handlePlayWordSpeech = (term: string) => {
     if (isPlayingAudio) {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopSpeaking();
       setIsPlayingAudio(false);
     } else {
       setIsPlayingAudio(true);

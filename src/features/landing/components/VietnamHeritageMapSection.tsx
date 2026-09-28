@@ -5,7 +5,7 @@ import { VietnamMap } from '@/components/VietnamMap';
 import type { ProvinceMapItem } from '@/data/vietnamMapData';
 import { HERITAGE_SITES, REGIONS_DATA } from '@/data/vietnamCultureData';
 import type { CulturalHeritageSite } from '@/types/sampleTypes';
-import { speakEnglish } from '@/utils/sampleSpeech';
+import { speakEnglish, stopSpeaking } from '@/utils/sampleSpeech';
 
 export const VietnamHeritageMapSection: React.FC = () => {
   const [selectedSite, setSelectedSite] = useState<CulturalHeritageSite | null>(
@@ -20,9 +20,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
 
   const handlePlayAudio = (phrase: string) => {
     if (isPlayingAudio) {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopSpeaking();
       setIsPlayingAudio(false);
     } else {
       setIsPlayingAudio(true);

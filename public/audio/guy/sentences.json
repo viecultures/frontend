@@ -1,0 +1,64 @@
+{
+  "voiceId": "guy",
+  "voiceName": "Guy",
+  "edgeVoice": "en-US-GuyNeural",
+  "fullAudioUrl": "/audio/guy/disgustingly_educated_full.mp3",
+  "sentences": [
+    {
+      "id": "p1",
+      "index": 0,
+      "audioUrl": "/audio/guy/sentence_1.mp3",
+      "sentenceEn": "Hello my love,",
+      "sentenceVi": "Chào tình yêu của em,",
+      "duration": 0.0
+    },
+    {
+      "id": "p2",
+      "index": 1,
+      "audioUrl": "/audio/guy/sentence_2.mp3",
+      "sentenceEn": "There's a kind of person who's so well-read, so frighteningly articulate, so mentally juicy that you want to both date them and punch them in the throat.",
+      "sentenceVi": "Có một kiểu người đọc nhiều đến thế, ăn nói sắc sảo đến đáng sợ, và có một bộ óc đầy chất xám đến vậy, khiến anh vừa muốn hẹn hò lại vừa muốn đấm vào họng họ.",
+      "duration": 0.0
+    },
+    {
+      "id": "p3",
+      "index": 2,
+      "audioUrl": "/audio/guy/sentence_3.mp3",
+      "sentenceEn": "You know the type.",
+      "sentenceVi": "Anh biết kiểu người đó mà.",
+      "duration": 0.0
+    },
+    {
+      "id": "p4",
+      "index": 3,
+      "audioUrl": "/audio/guy/sentence_4.mp3",
+      "sentenceEn": "They quote Baldwin mid-conversation.",
+      "sentenceVi": "Họ trích dẫn Baldwin giữa cuộc trò chuyện.",
+      "duration": 0.0
+    },
+    {
+      "id": "p5",
+      "index": 4,
+      "audioUrl": "/audio/guy/sentence_5.mp3",
+      "sentenceEn": "They listen to podcasts at 1.5x speed while annotating a book.",
+      "sentenceVi": "Họ nghe podcast ở tốc độ 1.5x trong khi đang ghi chú một cuốn sách.",
+      "duration": 0.0
+    },
+    {
+      "id": "p6",
+      "index": 5,
+      "audioUrl": "/audio/guy/sentence_6.mp3",
+      "sentenceEn": "They drop phrases like epistemic frameworks and somehow make it work.",
+      "sentenceVi": "Họ buông những cụm từ như 'khung nhận thức luận' và bằng cách nào đó vẫn khiến nó nghe thật hợp lý.",
+      "duration": 0.0
+    },
+    {
+      "id": "p7",
+      "index": 6,
+      "audioUrl": "/audio/guy/sentence_7.mp3",
+      "sentenceEn": "This is your guide to becoming that person. Not for clout. Not for Instagram aesthetics. But for the sheer, indecent pleasure of being disgustingly educated.",
+      "sentenceVi": "Đây là hướng dẫn để anh trở thành người đó. Không phải để gây chú ý. Không phải để sống ảo trên Instagram. Mà vì niềm vui thuần túy, trần trụi khi được uyên bác đến đáng ghét.",
+      "duration": 0.0
+    }
+  ]
+}

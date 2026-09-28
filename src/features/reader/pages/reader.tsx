@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import Link from "@/components/Link";
 import {
@@ -11,14 +11,19 @@ import {
   X,
   Columns,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import { AudioShadowingBar } from "../components/audio-shadowing-bar";
 import { BilingualReaderView } from "../components/bilingual-reader-view";
 import { ExtensiveReaderView } from "../components/extensive-reader-view";
+import { VoiceCustomizerModal } from "../components/voice-customizer-modal";
 import { Footer } from "@/components/Footer";
 import {
   VOCAB_DATABASE,
   RECOMMENDED_ARTICLES,
+  ARTICLE_BILINGUAL_DATA,
+  AVAILABLE_VOICES,
+  getVoiceAudioUrl,
   type VocabItem,
 } from "@/data/readerData";
 
@@ -68,38 +73,144 @@ export default function ReaderPage() {
   const [q2Answer, setQ2Answer] = useState<string>("");
   const [quizSubmitted, setQuizSubmitted] = useState<boolean>(false);
 
-  // Audio Shadowing Bar states
+  // Audio Shadowing Player States (Real Neural TTS & Multi-Voice)
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const [isRepeatLoop, setIsRepeatLoop] = useState<boolean>(false);
-  const [currentSentenceEn] = useState<string>(
-    "There's a kind of person who's so well-read, so frighteningly articulate, so mentally juicy..."
-  );
+  const [activeSentenceIndex, setActiveSentenceIndex] = useState<number | null>(null);
+  const [hoveredSentenceIndex, setHoveredSentenceIndex] = useState<number | null>(null);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+
+  // Customizable Voice State (Ryan, Jenny, Guy, Sonia)
+  const [selectedVoiceId, setSelectedVoiceId] = useState<string>(() => {
+    return localStorage.getItem("vie_preferred_voice") || "ryan";
+  });
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState<boolean>(false);
+
+  // Initialize HTML5 Audio Element for high quality Neural TTS playback
+  useEffect(() => {
+    const audio = new Audio();
+    audioRef.current = audio;
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration || 0);
+    };
+    const handleEnded = () => {
+      if (isRepeatLoop) {
+        audio.currentTime = 0;
+        audio.play().catch(console.error);
+      } else {
+        setIsPlaying(false);
+      }
+    };
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+
+    return () => {
+      audio.pause();
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+    };
+  }, [isRepeatLoop]);
+
+  // Sync playback speed with HTML5 audio
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackSpeed;
+    }
+  }, [playbackSpeed]);
+
+  const playAudioUrl = (url: string) => {
+    if (!audioRef.current) return;
+    const isDifferent = !audioRef.current.src.endsWith(url);
+    if (isDifferent) {
+      audioRef.current.src = url;
+      audioRef.current.load();
+    }
+    audioRef.current.playbackRate = playbackSpeed;
+    audioRef.current.play().catch((err) => {
+      console.warn("Audio playback failed:", err);
+    });
+  };
 
   const handleTogglePlay = () => {
+    if (!audioRef.current) return;
     if (isPlaying) {
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
-      setIsPlaying(false);
+      audioRef.current.pause();
     } else {
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(currentSentenceEn);
-        utterance.rate = playbackSpeed;
-        utterance.lang = "en-US";
-        utterance.onend = () => {
-          if (isRepeatLoop) {
-            window.speechSynthesis.speak(utterance);
-          } else {
-            setIsPlaying(false);
-          }
-        };
-        setIsPlaying(true);
-        window.speechSynthesis.speak(utterance);
+      if (activeSentenceIndex !== null) {
+        playAudioUrl(getVoiceAudioUrl(selectedVoiceId, "sentence", activeSentenceIndex));
+      } else {
+        playAudioUrl(getVoiceAudioUrl(selectedVoiceId, "full"));
       }
     }
   };
+
+  const handleSelectSentence = (index: number) => {
+    if (activeSentenceIndex === index && isPlaying) {
+      audioRef.current?.pause();
+      return;
+    }
+    setActiveSentenceIndex(index);
+    playAudioUrl(getVoiceAudioUrl(selectedVoiceId, "sentence", index));
+  };
+
+  const handleSelectVoice = (voiceId: string) => {
+    setSelectedVoiceId(voiceId);
+    localStorage.setItem("vie_preferred_voice", voiceId);
+
+    // If currently playing, seamlessly hot-swap audio with new voice
+    if (audioRef.current) {
+      const wasPlaying = isPlaying;
+      const curTime = audioRef.current.currentTime;
+      const newUrl = getVoiceAudioUrl(
+        voiceId,
+        activeSentenceIndex !== null ? "sentence" : "full",
+        activeSentenceIndex ?? 0
+      );
+      audioRef.current.src = newUrl;
+      audioRef.current.load();
+      audioRef.current.currentTime = curTime;
+      audioRef.current.playbackRate = playbackSpeed;
+      if (wasPlaying) {
+        audioRef.current.play().catch(console.error);
+      }
+    }
+  };
+
+  const handleSeek = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = seconds;
+      setCurrentTime(seconds);
+    }
+  };
+
+  const currentSentenceEn =
+    activeSentenceIndex !== null && ARTICLE_BILINGUAL_DATA.paragraphs[activeSentenceIndex]
+      ? ARTICLE_BILINGUAL_DATA.paragraphs[activeSentenceIndex].enText
+      : "Toàn bài đọc: " + ARTICLE_BILINGUAL_DATA.titleEn;
+
+  const activeVoiceConfig =
+    AVAILABLE_VOICES.find((v) => v.id === selectedVoiceId) || AVAILABLE_VOICES[0];
+
+  const playingModeTitle =
+    activeSentenceIndex !== null
+      ? `Câu ${activeSentenceIndex + 1} / ${ARTICLE_BILINGUAL_DATA.paragraphs.length} (${activeVoiceConfig.name} - ${activeVoiceConfig.genderLabel})`
+      : `Toàn bài đọc (${activeVoiceConfig.name} - ${activeVoiceConfig.genderLabel})`;
 
   // Toggle Vocabulary Drawer
   const openVocab = (key: string) => {
@@ -169,8 +280,19 @@ export default function ReaderPage() {
             </Link>
           </div>
 
-          {/* Right Controls: Reading Mode Toggle, Font Family, Font Size, Vocab Drawer, Theme Toggle */}
+          {/* Right Controls: Reading Mode Toggle, Font Family, Font Size, Voice Customizer, Theme Toggle */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-semibold">
+            {/* Tùy chỉnh Giọng đọc AI */}
+            <button
+              onClick={() => setIsVoiceModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#163D37] border border-[#D9B76A]/40 text-[#FCE5B5] hover:bg-[#1E4B43] hover:border-[#D9B76A] transition-all cursor-pointer font-bold text-xs shadow-xs"
+              title="Nhấp để tùy chỉnh giọng đọc AI (Jenny, Guy, Sonia, Ryan)"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
+              <span>{activeVoiceConfig.flag} {activeVoiceConfig.name}</span>
+              <span className="text-[10px] text-[#BFE3EA] hidden sm:inline">({activeVoiceConfig.genderLabel})</span>
+            </button>
+
             {/* Phông chữ (Serif vs Sans) */}
             <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40 text-xs font-bold">
               <button
@@ -305,6 +427,12 @@ export default function ReaderPage() {
             onToggleRepeatLoop={() => setIsRepeatLoop(!isRepeatLoop)}
             currentSentenceEn={currentSentenceEn}
             themeMode={themeMode}
+            currentTime={currentTime}
+            duration={duration}
+            onSeek={handleSeek}
+            playingModeTitle={playingModeTitle}
+            selectedVoiceId={selectedVoiceId}
+            onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
           />
 
           {/* Main Reading Views: Bilingual View vs Extensive Reading View */}
@@ -326,6 +454,11 @@ export default function ReaderPage() {
               setQ2Answer={setQ2Answer}
               quizSubmitted={quizSubmitted}
               setQuizSubmitted={setQuizSubmitted}
+              activeSentenceIndex={activeSentenceIndex}
+              isPlayingSentence={isPlaying}
+              onSelectSentence={handleSelectSentence}
+              hoveredIndex={hoveredSentenceIndex}
+              setHoveredIndex={setHoveredSentenceIndex}
             />
           ) : (
             <ExtensiveReaderView
@@ -514,6 +647,16 @@ export default function ReaderPage() {
           </div>
         </div>
       )}
+
+      {/* Voice Customizer Modal */}
+      <VoiceCustomizerModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        selectedVoiceId={selectedVoiceId}
+        onSelectVoice={handleSelectVoice}
+        playbackSpeed={playbackSpeed}
+        onChangeSpeed={(speed) => setPlaybackSpeed(speed)}
+      />
     </main>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Volume2, VolumeX, ArrowDown, BookOpen, Compass, Sparkles } from 'lucide-react';
 import { AnimatedNumber } from './AnimatedNumber';
-import { speakEnglish } from '@/utils/sampleSpeech';
+import { speakEnglish, stopSpeaking } from '@/utils/sampleSpeech';
 
 export const HeroSection: React.FC = () => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -12,9 +12,7 @@ export const HeroSection: React.FC = () => {
 
   const handleToggleAudio = () => {
     if (isPlayingAudio) {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopSpeaking();
       setIsPlayingAudio(false);
     } else {
       setIsPlayingAudio(true);

@@ -19,6 +19,11 @@ interface BilingualReaderViewProps {
   setQ2Answer: (val: string) => void;
   quizSubmitted: boolean;
   setQuizSubmitted: (val: boolean) => void;
+  activeSentenceIndex?: number | null;
+  isPlayingSentence?: boolean;
+  onSelectSentence?: (index: number) => void;
+  hoveredIndex?: number | null;
+  setHoveredIndex?: (index: number | null) => void;
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
@@ -38,11 +43,16 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   setQ2Answer,
   quizSubmitted,
   setQuizSubmitted,
+  activeSentenceIndex = null,
+  isPlayingSentence = false,
+  onSelectSentence,
+  hoveredIndex = null,
+  setHoveredIndex,
 }) => {
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* BILINGUAL MODE: Dual Paper Sheets (English Original + Vietnamese Translation) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* LEFT PAPER SHEET (ENGLISH) */}
         <div
           className={`p-8 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 ${paperSheetBgClass}`}
@@ -50,9 +60,14 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           <div>
             {/* Header Tag */}
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-[#2563EB] bg-[#EFF6FF] px-3 py-1 rounded-md">
-                ENGLISH ORIGINAL
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-[#2563EB] bg-[#EFF6FF] px-3 py-1 rounded-md">
+                  ENGLISH ORIGINAL
+                </span>
+                <span className="text-[11px] font-semibold text-[#1E4B43]/70 hidden sm:inline">
+                  (Nhấp vào câu để nghe giọng Neural TTS)
+                </span>
+              </div>
               <span className="text-xs font-bold bg-[#2563EB] text-white px-2.5 py-0.5 rounded">
                 EN
               </span>
@@ -87,75 +102,244 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               </div>
             </div>
 
-            {/* Paragraphs with Dotted Vocab Highlights */}
+            {/* Paragraphs with Dotted Vocab Highlights & Sentence Audio Click */}
             <div
-              className={`space-y-4 leading-relaxed ${paperBodyTextColor} ${fontFamily === "serif" ? "font-serif" : "font-sans"
+              className={`space-y-3 leading-relaxed ${paperBodyTextColor} ${fontFamily === "serif" ? "font-serif" : "font-sans"
                 }`}
               style={{ fontSize: `${fontSize}px` }}
             >
-              <p>
-                Hello my <em>love</em>,
-              </p>
+              {/* Paragraph 0 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(0)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(0)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border relative group ${
+                  activeSentenceIndex === 0
+                    ? "bg-[#D9B76A]/20 border-[#D9B76A] shadow-sm"
+                    : hoveredIndex === 0
+                    ? "bg-[#1E4B43]/10 border-[#1E4B43]/20"
+                    : "border-transparent hover:bg-[#1E4B43]/5"
+                }`}
+                title="Bấm để nghe phát âm câu này"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 0 ? "bg-[#D9B76A] text-[#1E4B43]" : "bg-black/5 text-gray-500 group-hover:bg-[#1E4B43]/20"
+                  }`}>
+                    {activeSentenceIndex === 0 && isPlayingSentence ? "▶ 1" : "1"}
+                  </span>
+                  <p className="flex-1">
+                    Hello my <em>love</em>,
+                  </p>
+                </div>
+              </div>
 
-              <p>
-                There’s a kind of person who’s so{" "}
-                <button
-                  onClick={() => openVocab("well-read")}
-                  className={vocabBtnClass}
-                  title="Nhấp để xem từ vựng"
-                >
-                  well-read
-                </button>
-                , so{" "}
-                <button
-                  onClick={() => openVocab("frighteningly-articulate")}
-                  className={vocabBtnClass}
-                  title="Nhấp để xem từ vựng"
-                >
-                  frighteningly articulate
-                </button>
-                , so mentally juicy that you want to both date them and punch them in the throat.
-              </p>
+              {/* Paragraph 1 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(1)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(1)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border relative group ${
+                  activeSentenceIndex === 1
+                    ? "bg-[#D9B76A]/20 border-[#D9B76A] shadow-sm"
+                    : hoveredIndex === 1
+                    ? "bg-[#1E4B43]/10 border-[#1E4B43]/20"
+                    : "border-transparent hover:bg-[#1E4B43]/5"
+                }`}
+                title="Bấm để nghe phát âm câu này"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 1 ? "bg-[#D9B76A] text-[#1E4B43]" : "bg-black/5 text-gray-500 group-hover:bg-[#1E4B43]/20"
+                  }`}>
+                    {activeSentenceIndex === 1 && isPlayingSentence ? "▶ 2" : "2"}
+                  </span>
+                  <p className="flex-1">
+                    There’s a kind of person who’s so{" "}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openVocab("well-read");
+                      }}
+                      className={vocabBtnClass}
+                      title="Nhấp để xem từ vựng"
+                    >
+                      well-read
+                    </button>
+                    , so{" "}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openVocab("frighteningly-articulate");
+                      }}
+                      className={vocabBtnClass}
+                      title="Nhấp để xem từ vựng"
+                    >
+                      frighteningly articulate
+                    </button>
+                    , so mentally juicy that you want to both date them and punch them in the throat.
+                  </p>
+                </div>
+              </div>
 
-              <p>You know the type.</p>
+              {/* Paragraph 2 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(2)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(2)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border relative group ${
+                  activeSentenceIndex === 2
+                    ? "bg-[#D9B76A]/20 border-[#D9B76A] shadow-sm"
+                    : hoveredIndex === 2
+                    ? "bg-[#1E4B43]/10 border-[#1E4B43]/20"
+                    : "border-transparent hover:bg-[#1E4B43]/5"
+                }`}
+                title="Bấm để nghe phát âm câu này"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 2 ? "bg-[#D9B76A] text-[#1E4B43]" : "bg-black/5 text-gray-500 group-hover:bg-[#1E4B43]/20"
+                  }`}>
+                    {activeSentenceIndex === 2 && isPlayingSentence ? "▶ 3" : "3"}
+                  </span>
+                  <p className="flex-1">You know the type.</p>
+                </div>
+              </div>
 
-              <p>They quote Baldwin mid-conversation.</p>
+              {/* Paragraph 3 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(3)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(3)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border relative group ${
+                  activeSentenceIndex === 3
+                    ? "bg-[#D9B76A]/20 border-[#D9B76A] shadow-sm"
+                    : hoveredIndex === 3
+                    ? "bg-[#1E4B43]/10 border-[#1E4B43]/20"
+                    : "border-transparent hover:bg-[#1E4B43]/5"
+                }`}
+                title="Bấm để nghe phát âm câu này"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 3 ? "bg-[#D9B76A] text-[#1E4B43]" : "bg-black/5 text-gray-500 group-hover:bg-[#1E4B43]/20"
+                  }`}>
+                    {activeSentenceIndex === 3 && isPlayingSentence ? "▶ 4" : "4"}
+                  </span>
+                  <p className="flex-1">They quote Baldwin mid-conversation.</p>
+                </div>
+              </div>
 
-              <p>
-                They listen to podcasts at 1.5x speed while{" "}
-                <button
-                  onClick={() => openVocab("annotating-a-book")}
-                  className={vocabBtnClass}
-                  title="Nhấp để xem từ vựng"
-                >
-                  annotating a book
-                </button>
-                .
-              </p>
+              {/* Paragraph 4 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(4)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(4)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border relative group ${
+                  activeSentenceIndex === 4
+                    ? "bg-[#D9B76A]/20 border-[#D9B76A] shadow-sm"
+                    : hoveredIndex === 4
+                    ? "bg-[#1E4B43]/10 border-[#1E4B43]/20"
+                    : "border-transparent hover:bg-[#1E4B43]/5"
+                }`}
+                title="Bấm để nghe phát âm câu này"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 4 ? "bg-[#D9B76A] text-[#1E4B43]" : "bg-black/5 text-gray-500 group-hover:bg-[#1E4B43]/20"
+                  }`}>
+                    {activeSentenceIndex === 4 && isPlayingSentence ? "▶ 5" : "5"}
+                  </span>
+                  <p className="flex-1">
+                    They listen to podcasts at 1.5x speed while{" "}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openVocab("annotating-a-book");
+                      }}
+                      className={vocabBtnClass}
+                      title="Nhấp để xem từ vựng"
+                    >
+                      annotating a book
+                    </button>
+                    .
+                  </p>
+                </div>
+              </div>
 
-              <p>
-                They drop phrases like{" "}
-                <button
-                  onClick={() => openVocab("epistemic-frameworks")}
-                  className={vocabBtnClass}
-                  title="Nhấp để xem từ vựng"
-                >
-                  “epistemic frameworks”
-                </button>{" "}
-                and somehow make it work.
-              </p>
+              {/* Paragraph 5 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(5)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(5)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border relative group ${
+                  activeSentenceIndex === 5
+                    ? "bg-[#D9B76A]/20 border-[#D9B76A] shadow-sm"
+                    : hoveredIndex === 5
+                    ? "bg-[#1E4B43]/10 border-[#1E4B43]/20"
+                    : "border-transparent hover:bg-[#1E4B43]/5"
+                }`}
+                title="Bấm để nghe phát âm câu này"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 5 ? "bg-[#D9B76A] text-[#1E4B43]" : "bg-black/5 text-gray-500 group-hover:bg-[#1E4B43]/20"
+                  }`}>
+                    {activeSentenceIndex === 5 && isPlayingSentence ? "▶ 6" : "6"}
+                  </span>
+                  <p className="flex-1">
+                    They drop phrases like{" "}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openVocab("epistemic-frameworks");
+                      }}
+                      className={vocabBtnClass}
+                      title="Nhấp để xem từ vựng"
+                    >
+                      “epistemic frameworks”
+                    </button>{" "}
+                    and somehow make it work.
+                  </p>
+                </div>
+              </div>
 
-              <p>
-                This is your guide to becoming that person. Not for clout. Not for Instagram aesthetics. But for the{" "}
-                <button
-                  onClick={() => openVocab("indecent-pleasure")}
-                  className={vocabBtnClass}
-                  title="Nhấp để xem từ vựng"
-                >
-                  sheer, indecent pleasure
-                </button>{" "}
-                of being disgustingly educated.
-              </p>
+              {/* Paragraph 6 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(6)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(6)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border relative group ${
+                  activeSentenceIndex === 6
+                    ? "bg-[#D9B76A]/20 border-[#D9B76A] shadow-sm"
+                    : hoveredIndex === 6
+                    ? "bg-[#1E4B43]/10 border-[#1E4B43]/20"
+                    : "border-transparent hover:bg-[#1E4B43]/5"
+                }`}
+                title="Bấm để nghe phát âm câu này"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 6 ? "bg-[#D9B76A] text-[#1E4B43]" : "bg-black/5 text-gray-500 group-hover:bg-[#1E4B43]/20"
+                  }`}>
+                    {activeSentenceIndex === 6 && isPlayingSentence ? "▶ 7" : "7"}
+                  </span>
+                  <p className="flex-1">
+                    This is your guide to becoming that person. Not for clout. Not for Instagram aesthetics. But for the{" "}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openVocab("indecent-pleasure");
+                      }}
+                      className={vocabBtnClass}
+                      title="Nhấp để xem từ vựng"
+                    >
+                      sheer, indecent pleasure
+                    </button>{" "}
+                    of being disgustingly educated.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -204,35 +388,189 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               </div>
             </div>
 
-            {/* Vietnamese Translated Paragraphs */}
+            {/* Vietnamese Translated Paragraphs with Synchronized Pairing Highlight */}
             <div
-              className={`space-y-4 leading-relaxed ${paperBodyTextColor} ${fontFamily === "serif" ? "font-serif" : "font-sans"
+              className={`space-y-3 leading-relaxed ${paperBodyTextColor} ${fontFamily === "serif" ? "font-serif" : "font-sans"
                 }`}
               style={{ fontSize: `${fontSize}px` }}
             >
-              <p>
-                Chào <em>tình yêu</em> của em,
-              </p>
+              {/* Vi Paragraph 0 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(0)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(0)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border ${
+                  activeSentenceIndex === 0
+                    ? "bg-[#059669]/15 border-[#059669] shadow-sm"
+                    : hoveredIndex === 0
+                    ? "bg-[#059669]/10 border-[#059669]/20"
+                    : "border-transparent hover:bg-[#059669]/5"
+                }`}
+                title="Đoạn dịch tiếng Việt tương ứng (Bấm để nghe âm thanh câu)"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 0 ? "bg-[#059669] text-white" : "bg-black/5 text-gray-500"
+                  }`}>
+                    1
+                  </span>
+                  <p className="flex-1">
+                    Chào <em>tình yêu</em> của em,
+                  </p>
+                </div>
+              </div>
 
-              <p>
-                Có một kiểu người đọc nhiều đến thế, ăn nói sắc sảo đến đáng sợ, và có một bộ óc đầy chất xám đến vậy, khiến anh vừa muốn hẹn hò lại vừa muốn đấm vào họng họ.
-              </p>
+              {/* Vi Paragraph 1 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(1)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(1)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border ${
+                  activeSentenceIndex === 1
+                    ? "bg-[#059669]/15 border-[#059669] shadow-sm"
+                    : hoveredIndex === 1
+                    ? "bg-[#059669]/10 border-[#059669]/20"
+                    : "border-transparent hover:bg-[#059669]/5"
+                }`}
+                title="Đoạn dịch tiếng Việt tương ứng (Bấm để nghe âm thanh câu)"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 1 ? "bg-[#059669] text-white" : "bg-black/5 text-gray-500"
+                  }`}>
+                    2
+                  </span>
+                  <p className="flex-1">
+                    Có một kiểu người đọc nhiều đến thế, ăn nói sắc sảo đến đáng sợ, và có một bộ óc đầy chất xám đến vậy, khiến anh vừa muốn hẹn hò lại vừa muốn đấm vào họng họ.
+                  </p>
+                </div>
+              </div>
 
-              <p>Anh biết kiểu người đó mà.</p>
+              {/* Vi Paragraph 2 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(2)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(2)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border ${
+                  activeSentenceIndex === 2
+                    ? "bg-[#059669]/15 border-[#059669] shadow-sm"
+                    : hoveredIndex === 2
+                    ? "bg-[#059669]/10 border-[#059669]/20"
+                    : "border-transparent hover:bg-[#059669]/5"
+                }`}
+                title="Đoạn dịch tiếng Việt tương ứng (Bấm để nghe âm thanh câu)"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 2 ? "bg-[#059669] text-white" : "bg-black/5 text-gray-500"
+                  }`}>
+                    3
+                  </span>
+                  <p className="flex-1">Anh biết kiểu người đó mà.</p>
+                </div>
+              </div>
 
-              <p>Họ trích dẫn Baldwin giữa cuộc trò chuyện.</p>
+              {/* Vi Paragraph 3 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(3)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(3)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border ${
+                  activeSentenceIndex === 3
+                    ? "bg-[#059669]/15 border-[#059669] shadow-sm"
+                    : hoveredIndex === 3
+                    ? "bg-[#059669]/10 border-[#059669]/20"
+                    : "border-transparent hover:bg-[#059669]/5"
+                }`}
+                title="Đoạn dịch tiếng Việt tương ứng (Bấm để nghe âm thanh câu)"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 3 ? "bg-[#059669] text-white" : "bg-black/5 text-gray-500"
+                  }`}>
+                    4
+                  </span>
+                  <p className="flex-1">Họ trích dẫn Baldwin giữa cuộc trò chuyện.</p>
+                </div>
+              </div>
 
-              <p>
-                Họ nghe podcast ở tốc độ 1.5x trong khi đang ghi chú một cuốn sách.
-              </p>
+              {/* Vi Paragraph 4 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(4)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(4)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border ${
+                  activeSentenceIndex === 4
+                    ? "bg-[#059669]/15 border-[#059669] shadow-sm"
+                    : hoveredIndex === 4
+                    ? "bg-[#059669]/10 border-[#059669]/20"
+                    : "border-transparent hover:bg-[#059669]/5"
+                }`}
+                title="Đoạn dịch tiếng Việt tương ứng (Bấm để nghe âm thanh câu)"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 4 ? "bg-[#059669] text-white" : "bg-black/5 text-gray-500"
+                  }`}>
+                    5
+                  </span>
+                  <p className="flex-1">
+                    Họ nghe podcast ở tốc độ 1.5x trong khi đang ghi chú một cuốn sách.
+                  </p>
+                </div>
+              </div>
 
-              <p>
-                Họ buông những cụm từ như <em>“khung nhận thức luận”</em> và bằng cách nào đó vẫn khiến nó nghe thật hợp lý.
-              </p>
+              {/* Vi Paragraph 5 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(5)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(5)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border ${
+                  activeSentenceIndex === 5
+                    ? "bg-[#059669]/15 border-[#059669] shadow-sm"
+                    : hoveredIndex === 5
+                    ? "bg-[#059669]/10 border-[#059669]/20"
+                    : "border-transparent hover:bg-[#059669]/5"
+                }`}
+                title="Đoạn dịch tiếng Việt tương ứng (Bấm để nghe âm thanh câu)"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 5 ? "bg-[#059669] text-white" : "bg-black/5 text-gray-500"
+                  }`}>
+                    6
+                  </span>
+                  <p className="flex-1">
+                    Họ buông những cụm từ như <em>“khung nhận thức luận”</em> và bằng cách nào đó vẫn khiến nó nghe thật hợp lý.
+                  </p>
+                </div>
+              </div>
 
-              <p>
-                Đây là hướng dẫn để anh trở thành người đó. Không phải để gây chú ý. Không phải để sống ảo trên Instagram. Mà vì niềm vui thuần túy, trần trụi khi được <em>uyên bác đến đáng ghét</em>.
-              </p>
+              {/* Vi Paragraph 6 */}
+              <div
+                onClick={() => onSelectSentence && onSelectSentence(6)}
+                onMouseEnter={() => setHoveredIndex && setHoveredIndex(6)}
+                onMouseLeave={() => setHoveredIndex && setHoveredIndex(null)}
+                className={`p-2.5 rounded-xl transition-all cursor-pointer border ${
+                  activeSentenceIndex === 6
+                    ? "bg-[#059669]/15 border-[#059669] shadow-sm"
+                    : hoveredIndex === 6
+                    ? "bg-[#059669]/10 border-[#059669]/20"
+                    : "border-transparent hover:bg-[#059669]/5"
+                }`}
+                title="Đoạn dịch tiếng Việt tương ứng (Bấm để nghe âm thanh câu)"
+              >
+                <div className="flex items-start gap-2">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold mt-1 shrink-0 ${
+                    activeSentenceIndex === 6 ? "bg-[#059669] text-white" : "bg-black/5 text-gray-500"
+                  }`}>
+                    7
+                  </span>
+                  <p className="flex-1">
+                    Đây là hướng dẫn để anh trở thành người đó. Không phải để gây chú ý. Không phải để sống ảo trên Instagram. Mà vì niềm vui thuần túy, trần trụi khi được <em>uyên bác đến đáng ghét</em>.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

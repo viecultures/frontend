@@ -185,14 +185,22 @@ export const App: React.FC = () => {
           <Route
             path="/"
             element={
-              <LandingPage
-                onNavigate={handleNavigate}
-              />
+              localStorage.getItem('vie_default_start') === 'home' && !new URLSearchParams(location.search).has('landing') ? (
+                <Navigate to="/home" replace />
+              ) : (
+                <LandingPage
+                  onNavigate={handleNavigate}
+                />
+              )
             }
           />
           <Route
             path="/landing"
-            element={<Navigate to="/" replace />}
+            element={
+              <LandingPage
+                onNavigate={handleNavigate}
+              />
+            }
           />
           <Route
             path="/login"

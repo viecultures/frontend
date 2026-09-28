@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AlertCircle, CheckCircle2, Volume2, VolumeX, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
 import { CULTURAL_NUANCES } from '@/data/vietnamCultureData';
-import { speakEnglish } from '@/utils/sampleSpeech';
+import { speakEnglish, stopSpeaking } from '@/utils/sampleSpeech';
 
 export const CulturalNuanceExplorer: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
@@ -19,9 +19,7 @@ export const CulturalNuanceExplorer: React.FC = () => {
 
   const handlePlayAudio = (phrase: string) => {
     if (isPlayingAudio) {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopSpeaking();
       setIsPlayingAudio(false);
     } else {
       setIsPlayingAudio(true);
