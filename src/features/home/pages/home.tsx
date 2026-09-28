@@ -61,13 +61,30 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
   const getBgImage = (time: 'Morning' | 'Afternoon' | 'Evening') => {
     switch (time) {
       case 'Morning':
-        return '/bg-morning.jpg';
+        // Bình minh non nước Tràng An - Ninh Bình
+        return 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=2400&q=80';
       case 'Afternoon':
-        return '/bg-afternoon.jpg';
+        // Nắng vàng rực rỡ phố cổ Hội An (Quảng Nam, Việt Nam)
+        return 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=2400&q=80';
+
       case 'Evening':
-        return '/bg-evening.jpg';
+        // Vietnam at night: Đêm lung linh ánh đèn Sài Gòn (TP. Hồ Chí Minh, Việt Nam)
+        return 'https://images.unsplash.com/photo-1536086845112-89de23aa4772?auto=format&fit=crop&w=2400&q=80';
     }
   };
+
+  const getBgLocation = (time: 'Morning' | 'Afternoon' | 'Evening') => {
+    switch (time) {
+      case 'Morning':
+        return 'Bình minh Tràng An (Ninh Bình)';
+      case 'Afternoon':
+        return 'Nắng vàng Phố Cổ (Hội An)';
+      case 'Evening':
+        return 'Đêm Sài Gòn Hoa Lệ (TP. Hồ Chí Minh)';
+    }
+  };
+
+
 
   const getTimeLabel = (time: 'Morning' | 'Afternoon' | 'Evening') => {
     switch (time) {
@@ -79,6 +96,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
         return 'Buổi Tối (Evening)';
     }
   };
+
 
   // Pomodoro countdown timer
   useEffect(() => {
@@ -189,12 +207,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
                   setIsProfileOpen(!isProfileOpen);
                   if (onOpenProfile) onOpenProfile();
                 }}
-                className="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#1E4B43] border border-[#D9B76A]/60 shadow-lg hover:scale-105 active:scale-95 transition-all group"
+                className="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#1E4B43] border border-[#D9B76A]/60 shadow-lg hover:scale-105 active:scale-95 transition-all group overflow-hidden p-0.5"
                 title="Mở Profile Menu"
               >
-                <span className="text-base">{user?.avatar || '🐸'}</span>
+                {user?.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? (
+                  <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+                ) : (
+                  <img
+                    src="/favicon/android-chrome-192x192.png"
+                    alt="VieCulture Turtle Mascot"
+                    className="w-full h-full object-contain"
+                  />
+                )}
                 <span className="absolute -top-1 -right-1 text-[10px] select-none">👑</span>
               </button>
+
 
               <ProfileDropdown
                 isOpen={isProfileOpen}
@@ -260,7 +287,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
             {/* Unsplash Image Source Credit */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 border border-white/15 text-[11px] text-white/70 backdrop-blur-md">
-              <span>📷 Nguồn ảnh:</span>
+              <span>📷 {getBgLocation(timeOfDay)}:</span>
               <a
                 href="https://unsplash.com"
                 target="_blank"
@@ -270,6 +297,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
                 Unsplash
               </a>
             </div>
+
           </div>
 
           {/* User Greeting Header */}
@@ -286,36 +314,37 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
               onClick={() => handleNavigate('discovery')}
-              className="px-4 py-2.5 bg-[#122A22]/90 border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group cursor-pointer"
+              className="px-4 py-2.5 bg-[#122A22]/95 border border-white/25 hover:border-[#FCE5B5] hover:bg-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-[#18221E] transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
             >
-              <Compass className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+              <Compass className="w-4 h-4 text-amber-400 group-hover:text-[#18221E] group-hover:scale-110 transition-transform" />
               <span>Khám Phá Di Sản</span>
             </button>
 
             <button
               onClick={() => handleNavigate('bilingual-reader')}
-              className="px-4 py-2.5 bg-[#122A22]/90 border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group cursor-pointer"
+              className="px-4 py-2.5 bg-[#122A22]/95 border border-white/25 hover:border-[#FCE5B5] hover:bg-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-[#18221E] transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
             >
-              <BookOpen className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" />
+              <BookOpen className="w-4 h-4 text-sky-400 group-hover:text-[#18221E] group-hover:scale-110 transition-transform" />
               <span>Đọc Song Ngữ AI</span>
             </button>
 
             <button
               onClick={() => handleNavigate('dictionary')}
-              className="px-4 py-2.5 bg-[#122A22]/90 border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group cursor-pointer"
+              className="px-4 py-2.5 bg-[#122A22]/95 border border-white/25 hover:border-[#FCE5B5] hover:bg-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-[#18221E] transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
             >
-              <BookMarked className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <BookMarked className="w-4 h-4 text-emerald-400 group-hover:text-[#18221E] group-hover:scale-110 transition-transform" />
               <span>Tủ Sách Từ Điển</span>
             </button>
 
             <button
               onClick={() => handleNavigate('community')}
-              className="px-4 py-2.5 bg-[#122A22]/90 border border-white/20 hover:border-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/90 hover:text-[#FCE5B5] hover:bg-white/10 transition-all flex items-center gap-2 shadow-md group cursor-pointer"
+              className="px-4 py-2.5 bg-[#122A22]/95 border border-white/25 hover:border-[#FCE5B5] hover:bg-[#FCE5B5] rounded-full text-xs sm:text-sm font-bold text-white/95 hover:text-[#18221E] transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(252,229,181,0.45)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer"
             >
-              <Users className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+              <Users className="w-4 h-4 text-purple-400 group-hover:text-[#18221E] group-hover:scale-110 transition-transform" />
               <span>Cộng Đồng Học Tập</span>
             </button>
           </div>
+
 
           {/* Overlaid Desktop Widgets Grid (Post-It Checklist Card) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6">
@@ -360,11 +389,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
               {/* Mascot Sticker */}
               <div
-                className="absolute -bottom-3 -right-3 w-12 h-12 rounded-full bg-[#122A22] border-2 border-[#FCE5B5] flex items-center justify-center text-2xl shadow-lg cursor-pointer hover:scale-110 transition-transform"
+                className="absolute -bottom-3 -right-3 w-12 h-12 rounded-full bg-[#122A22] border-2 border-[#FCE5B5] flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform overflow-hidden p-1.5"
                 title="Mascot Companion VieCulture Turtle"
               >
-                🐢
+                <img
+                  src="/favicon/android-chrome-192x192.png"
+                  alt="VieCulture Turtle Mascot"
+                  className="w-full h-full object-contain drop-shadow-sm"
+                />
               </div>
+
             </div>
 
             {/* Widget 2: Study Recommendation Card */}
@@ -477,7 +511,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
       <aside className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 bg-[#122A22]/90 border border-white/20 p-2 rounded-2xl backdrop-blur-xl shadow-2xl">
         <button
           onClick={() => handleNavigate('discovery')}
-          className="p-3 rounded-xl hover:bg-white/15 text-white/80 hover:text-[#FCE5B5] transition-all relative group"
+          className="p-3 rounded-xl hover:bg-[#FCE5B5] text-white/80 hover:text-[#18221E] hover:scale-105 transition-all relative group"
           title="Search catalog"
         >
           <Search className="w-5 h-5" />
@@ -488,10 +522,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
         <button
           onClick={() => handleNavigate('community-1')}
-          className="p-3 rounded-xl hover:bg-white/15 text-white/80 hover:text-[#FCE5B5] transition-all relative group"
+          className="p-3 rounded-xl hover:bg-[#FCE5B5] text-white/80 hover:text-[#18221E] hover:scale-105 transition-all relative group"
           title="AI Companion"
         >
-          <Bot className="w-5 h-5 text-emerald-400" />
+          <Bot className="w-5 h-5 text-emerald-400 group-hover:text-[#18221E] transition-colors" />
           <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-black text-white text-[10px] font-semibold rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
             Trợ lý AI Companion
           </span>
@@ -499,7 +533,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
         <button
           onClick={() => handleNavigate('community-1')}
-          className="p-3 rounded-xl hover:bg-white/15 text-white/80 hover:text-[#FCE5B5] transition-all relative group"
+          className="p-3 rounded-xl hover:bg-[#FCE5B5] text-white/80 hover:text-[#18221E] hover:scale-105 transition-all relative group"
           title="Community Discussion"
         >
           <MessageSquare className="w-5 h-5" />
@@ -510,7 +544,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
 
         <button
           onClick={() => handleNavigate('login')}
-          className="p-3 rounded-xl hover:bg-white/15 text-white/80 hover:text-[#FCE5B5] transition-all relative group"
+          className="p-3 rounded-xl hover:bg-[#FCE5B5] text-white/80 hover:text-[#18221E] hover:scale-105 transition-all relative group"
           title="Settings & Tools"
         >
           <Settings className="w-5 h-5" />
@@ -519,6 +553,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, isLoggedIn = fal
           </span>
         </button>
       </aside>
+
 
     </div>
   );

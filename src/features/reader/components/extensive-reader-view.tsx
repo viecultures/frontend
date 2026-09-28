@@ -52,7 +52,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
               />
             </div>
             <span className="flex items-center gap-1">
-              Highlight nội dung
+              Highlight từ vựng trọng tâm
               <span title="Bật/tắt đánh dấu từ vựng và câu hỏi trong bài đọc">
                 <Info className="w-3.5 h-3.5 text-[#BFE3EA] hover:text-white cursor-pointer" />
               </span>
@@ -68,7 +68,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
               : "bg-[#E2E8F0] text-[#475569] hover:bg-[#CBD5E1]"
               }`}
           >
-            Part 1
+            Phần 1: Nguồn gốc & Phong tục
           </button>
           <button
             onClick={() => setActivePart("part6")}
@@ -77,7 +77,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
               : "bg-[#E2E8F0] text-[#475569] hover:bg-[#CBD5E1]"
               }`}
           >
-            Part 2
+            Phần 2: Ẩm thực & Ba miền
           </button>
         </div>
       </div>
@@ -90,7 +90,10 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
             {/* Header Tag */}
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
               <span className="text-xs font-bold bg-[#2563EB] text-white px-2.5 py-0.5 rounded">
-                EN
+                EN • EXTENSIVE
+              </span>
+              <span className="text-xs font-semibold text-[#D9B76A]">
+                ~370 words • B2–C1
               </span>
             </div>
 
@@ -99,10 +102,10 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
               className={`${fontFamily === "serif" ? "font-serif" : "font-sans"
                 } text-2xl sm:text-3xl font-bold ${paperTitleColor} leading-snug mb-3`}
             >
-              How to be disgustingly educated
+              Tết: Renewal, Remembrance and Regional Flavours
             </h1>
             <p className={`font-serif italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
-              A chaotic guide to becoming the most interesting person in the room
+              A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions
             </p>
 
             {/* Artwork Banner Canvas */}
@@ -110,12 +113,12 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
               <div className="absolute inset-2 border border-[#D9B76A]/40 rounded-xl pointer-events-none" />
               <div className="flex items-center justify-between text-xs font-semibold text-[#D9B76A] uppercase tracking-wider">
                 <span>Cultural Essay</span>
-                <span>Level B1-B2 • Extensive Mode</span>
+                <span>Level B2–C1 • Extensive Mode</span>
               </div>
               <div className="text-center my-auto">
-                <span className="text-5xl block mb-2">📚✨</span>
+                <span className="text-5xl block mb-2">🌸🧧✨</span>
                 <span className="font-serif text-lg font-bold text-[#FBF7EE]">
-                  The Intellectual Journey
+                  Tết Nguyên Đán Heritage
                 </span>
               </div>
               <div className="text-right text-[11px] text-[#BFE3EA]">
@@ -130,67 +133,151 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
               style={{ fontSize: `${fontSize}px` }}
             >
               <p>
-                Hello my <em>love</em>,
-              </p>
-
-              <p>
-                There’s a kind of person who’s so{" "}
+                Tết Nguyên Đán, often called simply Tết, is described as the most important and{" "}
                 <button
-                  onClick={() => openVocab("well-read")}
+                  onClick={() => openVocab("sacred")}
                   className={isHighlightEnabled ? vocabBtnClass : ""}
                   title="Nhấp để xem từ vựng"
                 >
-                  well-read
-                </button>
-                , so{" "}
-                <button
-                  onClick={() => openVocab("frighteningly-articulate")}
-                  className={isHighlightEnabled ? vocabBtnClass : ""}
-                  title="Nhấp để xem từ vựng"
-                >
-                  frighteningly articulate
-                </button>
-                , so mentally juicy that you want to both date them and punch them in the throat.
-              </p>
-
-              <p>You know the type.</p>
-
-              <p>They quote Baldwin mid-conversation.</p>
-
-              <p>
-                They listen to podcasts at 1.5x speed while{" "}
-                <button
-                  onClick={() => openVocab("annotating-a-book")}
-                  className={isHighlightEnabled ? vocabBtnClass : ""}
-                  title="Nhấp để xem từ vựng"
-                >
-                  annotating a book
-                </button>
-                .
-              </p>
-
-              <p>
-                They drop phrases like{" "}
-                <button
-                  onClick={() => openVocab("epistemic-frameworks")}
-                  className={isHighlightEnabled ? vocabBtnClass : ""}
-                  title="Nhấp để xem từ vựng"
-                >
-                  “epistemic frameworks”
+                  sacred
                 </button>{" "}
-                and somehow make it work.
-              </p>
-
-              <p>
-                This is your guide to becoming that person. Not for clout. Not for Instagram aesthetics. But for the{" "}
+                holiday in Vietnamese culture. It marks the{" "}
                 <button
-                  onClick={() => openVocab("indecent-pleasure")}
+                  onClick={() => openVocab("passage")}
                   className={isHighlightEnabled ? vocabBtnClass : ""}
                   title="Nhấp để xem từ vựng"
                 >
-                  sheer, indecent pleasure
+                  passage from the old year to the new one
+                </button>
+                , but its meaning goes further. According to the article, Tết stands for{" "}
+                <button
+                  onClick={() => openVocab("family-reunion")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  family reunion
+                </button>
+                , respect for ancestors, and hope for a better future.
+              </p>
+
+              <p>
+                The article traces Tết back to the ancient{" "}
+                <button
+                  onClick={() => openVocab("agricultural-civilization")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  agricultural civilization
                 </button>{" "}
-                of being disgustingly educated.
+                of East Asia, where the cycle of the seasons played a central role in daily life. Tết takes place when winter{" "}
+                <button
+                  onClick={() => openVocab("give-way-to")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  gives way to
+                </button>{" "}
+                spring and plants begin to grow again, which{" "}
+                <button
+                  onClick={() => openVocab("symbolize")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  symbolizes
+                </button>{" "}
+                a new beginning. A{" "}
+                <button
+                  onClick={() => openVocab("folk-legend")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  folk legend
+                </button>{" "}
+                also says that the festival is a time for descendants to remember their ancestors and pray for a good harvest. Over time, Tết{" "}
+                <button
+                  onClick={() => openVocab("absorb-influences")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  absorbed influences
+                </button>{" "}
+                from Chinese culture during the period of Chinese rule, yet it kept its own identity.
+              </p>
+
+              <p>
+                Traditional customs follow three stages. Before Tết, people clean their houses, prepare a{" "}
+                <button
+                  onClick={() => openVocab("five-fruit-tray")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  five-fruit tray
+                </button>
+                , and wrap bánh chưng or bánh tét together. During the holiday, families hold{" "}
+                <button
+                  onClick={() => openVocab("ancestor-worship")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  ancestor worship
+                </button>{" "}
+                ceremonies, exchange New Year wishes, give{" "}
+                <button
+                  onClick={() => openVocab("li-xi")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  lì xì
+                </button>{" "}
+                to children, and visit pagodas. Afterwards, people take part in spring festivals to wish for good luck. Although the way Vietnamese people celebrate has changed, the article argues that the{" "}
+                <button
+                  onClick={() => openVocab("core-values")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  core values
+                </button>{" "}
+                of togetherness, gratitude, and hope remain the soul of the holiday.
+              </p>
+
+              <p>
+                Food carries cultural and spiritual meaning as well. Bánh chưng and bánh tét, which the article calls symbols of earth and sky, express gratitude to ancestors. Bánh chưng is usually made in the North, whereas bánh tét is more common in the Centre and the South.{" "}
+                <button
+                  onClick={() => openVocab("dua-hanh")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  Dưa hành
+                </button>{" "}
+                balances rich, protein-heavy dishes, and thịt kho tàu with duck eggs represents fullness and{" "}
+                <button
+                  onClick={() => openVocab("prosperity")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  prosperity
+                </button>
+                . Mứt Tết, made from coconut, ginger, or kumquat, stands for sweetness and a good start.
+              </p>
+
+              <p>
+                Finally, the{" "}
+                <button
+                  onClick={() => openVocab("atmosphere")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  atmosphere
+                </button>{" "}
+                of Tết{" "}
+                <button
+                  onClick={() => openVocab("differ-from-region-to-region")}
+                  className={isHighlightEnabled ? vocabBtnClass : ""}
+                  title="Nhấp để xem từ vựng"
+                >
+                  differs from region to region
+                </button>
+                . In the North, it is linked to peach blossoms, bánh chưng, and solemn customs, with a busy Tết market and a nostalgic mood. The Central region celebrates in a simpler but equally warm way, with yellow mai flowers, red couplets, and dishes such as nem chua and tré. In the South, Tết feels lively and open, with mai flowers, red watermelons, flower markets, and folk games.
               </p>
             </div>
           </div>
@@ -200,7 +287,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
         <div className="lg:col-span-3 space-y-4">
           <div className="p-3.5 rounded-2xl bg-[#1E4B43]/30 border border-[#D9B76A]/30 mb-2">
             <h3 className="font-heading font-bold text-xs text-[#FBF7EE] flex items-center justify-between">
-              <span>Câu Hỏi Luyện Tập</span>
+              <span>Câu Hỏi Luyện Tập Đọc Hiểu</span>
             </h3>
           </div>
 
@@ -296,7 +383,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
           >
             <span className="flex items-center gap-2.5">
               <Layers className="w-4 h-4 text-[#D9B76A]" />
-              Ôn Tập Flashcards (5 từ bài đọc)
+              Ôn Tập Flashcards (16 từ bài đọc)
             </span>
             <ArrowRight className="w-4 h-4 text-[#D9B76A] group-hover:translate-x-1 transition-transform" />
           </Link>

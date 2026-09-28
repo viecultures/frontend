@@ -73,7 +73,7 @@ export default function ReaderPage() {
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const [isRepeatLoop, setIsRepeatLoop] = useState<boolean>(false);
   const [currentSentenceEn] = useState<string>(
-    "There's a kind of person who's so well-read, so frighteningly articulate, so mentally juicy..."
+    "Tết Nguyên Đán, often called simply Tết, is described as the most important and sacred holiday in Vietnamese culture."
   );
 
   const handleTogglePlay = () => {
@@ -247,13 +247,13 @@ export default function ReaderPage() {
             {/* Từ vựng bài đọc Button */}
             <button
               onClick={() => {
-                setSelectedVocab(VOCAB_DATABASE["well-read"]);
+                setSelectedVocab(VOCAB_DATABASE["sacred"]);
                 setIsVocabDrawerOpen(true);
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D9B76A] text-[#1E4B43] font-bold shadow-sm hover:bg-[#c9a657] transition-colors"
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>5 từ vựng</span>
+              <span>16 từ vựng</span>
             </button>
 
             {/* Theme Toggle */}
@@ -421,7 +421,7 @@ export default function ReaderPage() {
                     Từ Vựng Bài Đọc
                   </h3>
                   <span className="text-xs text-[#6E7E79]">
-                    "How to be disgustingly educated"
+                    "Tết: Renewal, Remembrance and Regional Flavours"
                   </span>
                 </div>
                 <button

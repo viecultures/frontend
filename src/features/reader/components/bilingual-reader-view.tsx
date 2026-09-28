@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "@/components/Link";
 import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight } from "lucide-react";
+import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
 
 interface BilingualReaderViewProps {
   themeMode: "olive" | "paper" | "dark";
@@ -63,10 +64,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               className={`${fontFamily === "serif" ? "font-serif" : "font-sans"
                 } text-2xl sm:text-3xl font-bold ${paperTitleColor} leading-snug mb-3`}
             >
-              How to be disgustingly educated
+              Tết: Renewal, Remembrance and Regional Flavours
             </h1>
             <p className={`font-serif italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
-              A chaotic guide to becoming the most interesting person in the room
+              A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions
             </p>
 
             {/* Artwork Banner Canvas */}
@@ -74,12 +75,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               <div className="absolute inset-2 border border-[#D9B76A]/40 rounded-xl pointer-events-none" />
               <div className="flex items-center justify-between text-xs font-semibold text-[#D9B76A] uppercase tracking-wider">
                 <span>Cultural Essay</span>
-                <span>Level B1-B2</span>
+                <span>Level B2–C1 (~370 words)</span>
               </div>
               <div className="text-center my-auto">
-                <span className="text-5xl block mb-2">📚✨</span>
+                <span className="text-5xl block mb-2">🌸🧧✨</span>
                 <span className="font-serif text-lg font-bold text-[#FBF7EE]">
-                  The Intellectual Journey
+                  Tết Nguyên Đán Heritage
                 </span>
               </div>
               <div className="text-right text-[11px] text-[#BFE3EA]">
@@ -94,67 +95,151 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               style={{ fontSize: `${fontSize}px` }}
             >
               <p>
-                Hello my <em>love</em>,
-              </p>
-
-              <p>
-                There’s a kind of person who’s so{" "}
+                Tết Nguyên Đán, often called simply Tết, is described as the most important and{" "}
                 <button
-                  onClick={() => openVocab("well-read")}
+                  onClick={() => openVocab("sacred")}
                   className={vocabBtnClass}
                   title="Nhấp để xem từ vựng"
                 >
-                  well-read
-                </button>
-                , so{" "}
-                <button
-                  onClick={() => openVocab("frighteningly-articulate")}
-                  className={vocabBtnClass}
-                  title="Nhấp để xem từ vựng"
-                >
-                  frighteningly articulate
-                </button>
-                , so mentally juicy that you want to both date them and punch them in the throat.
-              </p>
-
-              <p>You know the type.</p>
-
-              <p>They quote Baldwin mid-conversation.</p>
-
-              <p>
-                They listen to podcasts at 1.5x speed while{" "}
-                <button
-                  onClick={() => openVocab("annotating-a-book")}
-                  className={vocabBtnClass}
-                  title="Nhấp để xem từ vựng"
-                >
-                  annotating a book
-                </button>
-                .
-              </p>
-
-              <p>
-                They drop phrases like{" "}
-                <button
-                  onClick={() => openVocab("epistemic-frameworks")}
-                  className={vocabBtnClass}
-                  title="Nhấp để xem từ vựng"
-                >
-                  “epistemic frameworks”
+                  sacred
                 </button>{" "}
-                and somehow make it work.
-              </p>
-
-              <p>
-                This is your guide to becoming that person. Not for clout. Not for Instagram aesthetics. But for the{" "}
+                holiday in Vietnamese culture. It marks the{" "}
                 <button
-                  onClick={() => openVocab("indecent-pleasure")}
+                  onClick={() => openVocab("passage")}
                   className={vocabBtnClass}
                   title="Nhấp để xem từ vựng"
                 >
-                  sheer, indecent pleasure
+                  passage from the old year to the new one
+                </button>
+                , but its meaning goes further. According to the article, Tết stands for{" "}
+                <button
+                  onClick={() => openVocab("family-reunion")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  family reunion
+                </button>
+                , respect for ancestors, and hope for a better future.
+              </p>
+
+              <p>
+                The article traces Tết back to the ancient{" "}
+                <button
+                  onClick={() => openVocab("agricultural-civilization")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  agricultural civilization
                 </button>{" "}
-                of being disgustingly educated.
+                of East Asia, where the cycle of the seasons played a central role in daily life. Tết takes place when winter{" "}
+                <button
+                  onClick={() => openVocab("give-way-to")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  gives way to
+                </button>{" "}
+                spring and plants begin to grow again, which{" "}
+                <button
+                  onClick={() => openVocab("symbolize")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  symbolizes
+                </button>{" "}
+                a new beginning. A{" "}
+                <button
+                  onClick={() => openVocab("folk-legend")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  folk legend
+                </button>{" "}
+                also says that the festival is a time for descendants to remember their ancestors and pray for a good harvest. Over time, Tết{" "}
+                <button
+                  onClick={() => openVocab("absorb-influences")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  absorbed influences
+                </button>{" "}
+                from Chinese culture during the period of Chinese rule, yet it kept its own identity.
+              </p>
+
+              <p>
+                Traditional customs follow three stages. Before Tết, people clean their houses, prepare a{" "}
+                <button
+                  onClick={() => openVocab("five-fruit-tray")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  five-fruit tray
+                </button>
+                , and wrap bánh chưng or bánh tét together. During the holiday, families hold{" "}
+                <button
+                  onClick={() => openVocab("ancestor-worship")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  ancestor worship
+                </button>{" "}
+                ceremonies, exchange New Year wishes, give{" "}
+                <button
+                  onClick={() => openVocab("li-xi")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  lì xì
+                </button>{" "}
+                to children, and visit pagodas. Afterwards, people take part in spring festivals to wish for good luck. Although the way Vietnamese people celebrate has changed, the article argues that the{" "}
+                <button
+                  onClick={() => openVocab("core-values")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  core values
+                </button>{" "}
+                of togetherness, gratitude, and hope remain the soul of the holiday.
+              </p>
+
+              <p>
+                Food carries cultural and spiritual meaning as well. Bánh chưng and bánh tét, which the article calls symbols of earth and sky, express gratitude to ancestors. Bánh chưng is usually made in the North, whereas bánh tét is more common in the Centre and the South.{" "}
+                <button
+                  onClick={() => openVocab("dua-hanh")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  Dưa hành
+                </button>{" "}
+                balances rich, protein-heavy dishes, and thịt kho tàu with duck eggs represents fullness and{" "}
+                <button
+                  onClick={() => openVocab("prosperity")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  prosperity
+                </button>
+                . Mứt Tết, made from coconut, ginger, or kumquat, stands for sweetness and a good start.
+              </p>
+
+              <p>
+                Finally, the{" "}
+                <button
+                  onClick={() => openVocab("atmosphere")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  atmosphere
+                </button>{" "}
+                of Tết{" "}
+                <button
+                  onClick={() => openVocab("differ-from-region-to-region")}
+                  className={vocabBtnClass}
+                  title="Nhấp để xem từ vựng"
+                >
+                  differs from region to region
+                </button>
+                . In the North, it is linked to peach blossoms, bánh chưng, and solemn customs, with a busy Tết market and a nostalgic mood. The Central region celebrates in a simpler but equally warm way, with yellow mai flowers, red couplets, and dishes such as nem chua and tré. In the South, Tết feels lively and open, with mai flowers, red watermelons, flower markets, and folk games.
               </p>
             </div>
           </div>
@@ -180,10 +265,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               className={`${fontFamily === "serif" ? "font-serif" : "font-sans"
                 } text-2xl sm:text-3xl font-bold ${paperTitleColor} italic leading-snug mb-3`}
             >
-              Làm thế nào để trở nên cực kỳ uyên bác
+              Tết: Sự đổi mới, lòng tưởng nhớ và hương vị các vùng miền
             </h1>
             <p className={`font-serif italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
-              Hướng dẫn đầy ngẫu hứng để trở thành người thú vị nhất trong phòng
+              Khám phá văn hóa về sự đổi mới, lòng tri ân tổ tiên và phong vị ẩm thực ba miền
             </p>
 
             {/* Artwork Banner Canvas (Vietnamese Side) */}
@@ -191,12 +276,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               <div className="absolute inset-2 border border-[#D9B76A]/40 rounded-xl pointer-events-none" />
               <div className="flex items-center justify-between text-xs font-semibold text-[#D9B76A] uppercase tracking-wider">
                 <span>Tản Văn Văn Hóa</span>
-                <span>Trình Độ B1-B2</span>
+                <span>Trình Độ B2–C1</span>
               </div>
               <div className="text-center my-auto">
-                <span className="text-5xl block mb-2">🌿📖</span>
+                <span className="text-5xl block mb-2">🌿🎍🎋</span>
                 <span className="font-serif text-lg font-bold text-[#FBF7EE]">
-                  Hành Trình Uyên Bác
+                  Phong Vị Tết Cổ Truyền
                 </span>
               </div>
               <div className="text-right text-[11px] text-[#BFE3EA]">
@@ -211,27 +296,23 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               style={{ fontSize: `${fontSize}px` }}
             >
               <p>
-                Chào <em>tình yêu</em> của em,
+                Tết Nguyên Đán, thường được gọi đơn giản là Tết, được mô tả là ngày lễ quan trọng và thiêng liêng nhất trong văn hóa Việt Nam. Tết đánh dấu sự chuyển giao từ năm cũ sang năm mới, nhưng ý nghĩa của nó còn sâu xa hơn thế. Theo bài viết, Tết tượng trưng cho sự đoàn viên gia đình, lòng kính trọng tổ tiên và hy vọng về một tương lai tốt đẹp hơn.
               </p>
 
               <p>
-                Có một kiểu người đọc nhiều đến thế, ăn nói sắc sảo đến đáng sợ, và có một bộ óc đầy chất xám đến vậy, khiến anh vừa muốn hẹn hò lại vừa muốn đấm vào họng họ.
-              </p>
-
-              <p>Anh biết kiểu người đó mà.</p>
-
-              <p>Họ trích dẫn Baldwin giữa cuộc trò chuyện.</p>
-
-              <p>
-                Họ nghe podcast ở tốc độ 1.5x trong khi đang ghi chú một cuốn sách.
+                Bài viết truy nguồn gốc của Tết về nền văn minh nông nghiệp lâu đời của người Á Đông, nơi vòng quay của các mùa đóng vai trò trung tâm trong đời sống hằng ngày. Tết diễn ra khi mùa đông nhường chỗ cho mùa xuân và cây cối bắt đầu sinh trưởng trở lại, điều này tượng trưng cho một khởi đầu mới. Một truyền thuyết dân gian cũng kể rằng Tết là dịp để con cháu tưởng nhớ tổ tiên và cầu mong mùa màng bội thu. Theo thời gian, Tết tiếp nhận những ảnh hưởng từ văn hóa Trung Hoa trong thời kỳ Bắc thuộc, nhưng vẫn giữ được bản sắc riêng.
               </p>
 
               <p>
-                Họ buông những cụm từ như <em>“khung nhận thức luận”</em> và bằng cách nào đó vẫn khiến nó nghe thật hợp lý.
+                Các phong tục truyền thống diễn ra theo ba giai đoạn. Trước Tết, mọi người dọn dẹp nhà cửa, bày mâm ngũ quả và cùng nhau gói bánh chưng hoặc bánh tét. Trong Tết, các gia đình cúng gia tiên, chúc Tết, lì xì cho trẻ em và đi chùa. Sau Tết, mọi người tham gia các lễ hội xuân để cầu may mắn. Dù cách người Việt đón Tết đã thay đổi, bài viết cho rằng những giá trị cốt lõi như sự sum họp, lòng biết ơn và hy vọng vẫn là linh hồn của ngày lễ.
               </p>
 
               <p>
-                Đây là hướng dẫn để anh trở thành người đó. Không phải để gây chú ý. Không phải để sống ảo trên Instagram. Mà vì niềm vui thuần túy, trần trụi khi được <em>uyên bác đến đáng ghét</em>.
+                Ẩm thực cũng mang ý nghĩa văn hóa và tâm linh. Bánh chưng và bánh tét, mà bài viết gọi là biểu tượng của đất và trời, thể hiện lòng biết ơn tổ tiên. Bánh chưng thường được làm ở miền Bắc, trong khi bánh tét phổ biến hơn ở miền Trung và miền Nam. Dưa hành giúp cân bằng các món nhiều đạm, còn thịt kho tàu với trứng vịt thể hiện sự tròn đầy và sung túc. Mứt Tết, làm từ dừa, gừng hoặc quất, biểu trưng cho sự ngọt ngào và một khởi đầu tốt đẹp.
+              </p>
+
+              <p>
+                Cuối cùng, không khí Tết khác nhau giữa các vùng miền. Ở miền Bắc, Tết gắn với hoa đào, bánh chưng và những phong tục trang trọng, với phiên chợ Tết nhộn nhịp và không khí hoài niệm. Miền Trung đón Tết giản dị hơn nhưng không kém phần ấm cúng, với hoa mai vàng, câu đối đỏ và các món như nem chua, tré. Ở miền Nam, Tết sôi động và phóng khoáng, với hoa mai, dưa hấu đỏ, chợ hoa và các trò chơi dân gian.
               </p>
             </div>
           </div>
@@ -254,123 +335,66 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           {/* Quiz Q1 */}
           <div className="mb-8">
             <h3 className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"}`}>
-              1. According to the article, what is the core secret to becoming "disgustingly educated"?
+              {READER_QUIZ_QUESTIONS[0]?.question}
             </h3>
 
             <div className="space-y-2.5">
-              <label
-                className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === "A"
-                    ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                    : themeMode === "dark"
-                      ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
-                      : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                  }`}
-              >
-                <input
-                  type="radio"
-                  name="q1"
-                  value="A"
-                  checked={q1Answer === "A"}
-                  onChange={() => setQ1Answer("A")}
-                  className="mt-1 accent-[#D9B76A]"
-                />
-                <span className="text-xs sm:text-sm">
-                  A. Memorizing 50 new vocabulary words every single morning for social media clout.
-                </span>
-              </label>
-
-              <label
-                className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === "B"
-                    ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                    : themeMode === "dark"
-                      ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
-                      : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                  }`}
-              >
-                <input
-                  type="radio"
-                  name="q1"
-                  value="B"
-                  checked={q1Answer === "B"}
-                  onChange={() => setQ1Answer("B")}
-                  className="mt-1 accent-[#D9B76A]"
-                />
-                <span className="text-xs sm:text-sm">
-                  B. Cultivating a deep, genuine curiosity and annotations for the sheer pleasure of learning.
-                </span>
-              </label>
-
-              <label
-                className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === "C"
-                    ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                    : themeMode === "dark"
-                      ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
-                      : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                  }`}
-              >
-                <input
-                  type="radio"
-                  name="q1"
-                  value="C"
-                  checked={q1Answer === "C"}
-                  onChange={() => setQ1Answer("C")}
-                  className="mt-1 accent-[#D9B76A]"
-                />
-                <span className="text-xs sm:text-sm">
-                  C. Listening to podcasts at 3.0x speed without taking any notes or reflection.
-                </span>
-              </label>
+              {READER_QUIZ_QUESTIONS[0]?.options.map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === opt.value
+                      ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
+                      : themeMode === "dark"
+                        ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
+                        : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
+                    }`}
+                >
+                  <input
+                    type="radio"
+                    name="q1"
+                    value={opt.value}
+                    checked={q1Answer === opt.value}
+                    onChange={() => setQ1Answer(opt.value)}
+                    className="mt-1 accent-[#D9B76A]"
+                  />
+                  <span className="text-xs sm:text-sm">
+                    {opt.label}
+                  </span>
+                </label>
+              ))}
             </div>
           </div>
 
           {/* Quiz Q2 */}
           <div className="mb-8">
             <h3 className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"}`}>
-              2. What does the highlighted term <span className="underline decoration-[#D9B76A] font-serif font-semibold">"frighteningly articulate"</span> mean in context?
+              {READER_QUIZ_QUESTIONS[1]?.question}
             </h3>
 
             <div className="space-y-2.5">
-              <label
-                className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q2Answer === "A"
-                    ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                    : themeMode === "dark"
-                      ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
-                      : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                  }`}
-              >
-                <input
-                  type="radio"
-                  name="q2"
-                  value="A"
-                  checked={q2Answer === "A"}
-                  onChange={() => setQ2Answer("A")}
-                  className="mt-1 accent-[#D9B76A]"
-                />
-                <span className="text-xs sm:text-sm">
-                  A. Có khả năng diễn đạt ý tưởng vô cùng sắc sảo, lưu loát và thuyết phục.
-                </span>
-              </label>
-
-              <label
-                className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q2Answer === "B"
-                    ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                    : themeMode === "dark"
-                      ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
-                      : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                  }`}
-              >
-                <input
-                  type="radio"
-                  name="q2"
-                  value="B"
-                  checked={q2Answer === "B"}
-                  onChange={() => setQ2Answer("B")}
-                  className="mt-1 accent-[#D9B76A]"
-                />
-                <span className="text-xs sm:text-sm">
-                  B. Nói chuyện quá nhanh khiến người nghe bị sợ hãi và ngợp.
-                </span>
-              </label>
+              {READER_QUIZ_QUESTIONS[1]?.options.map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q2Answer === opt.value
+                      ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
+                      : themeMode === "dark"
+                        ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
+                        : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
+                    }`}
+                >
+                  <input
+                    type="radio"
+                    name="q2"
+                    value={opt.value}
+                    checked={q2Answer === opt.value}
+                    onChange={() => setQ2Answer(opt.value)}
+                    className="mt-1 accent-[#D9B76A]"
+                  />
+                  <span className="text-xs sm:text-sm">
+                    {opt.label}
+                  </span>
+                </label>
+              ))}
             </div>
           </div>
 
@@ -385,7 +409,11 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
             {quizSubmitted && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ECFDF5] text-[#047857] text-xs font-bold border border-[#059669]/30">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Chính xác! Bạn đạt 2/2 câu hỏi thấu hiểu.</span>
+                <span>
+                  {q1Answer === READER_QUIZ_QUESTIONS[0]?.correctValue && q2Answer === READER_QUIZ_QUESTIONS[1]?.correctValue
+                    ? "Chính xác! Bạn đạt 2/2 câu hỏi thấu hiểu."
+                    : "Bạn đã hoàn thành bài kiểm tra thấu hiểu."}
+                </span>
               </div>
             )}
           </div>
@@ -413,7 +441,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               >
                 <span className="flex items-center gap-2">
                   <Layers className="w-4 h-4 text-[#D9B76A]" />
-                  Ôn Tập Flashcards (5 từ bài đọc)
+                  Ôn Tập Flashcards (16 từ bài đọc)
                 </span>
                 <ArrowRight className="w-4 h-4 text-[#D9B76A] group-hover:translate-x-1 transition-transform" />
               </Link>
