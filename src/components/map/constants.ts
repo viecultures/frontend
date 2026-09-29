@@ -15,27 +15,27 @@ export const DEFAULT_REGION_TABS: RegionTabItem[] = [
     key: 'north',
     label: 'Miền Bắc',
     count: '15 Tỉnh',
-    badgeClass: 'bg-rose-950/40 text-rose-200',
-    activeClass: 'bg-rose-700 text-warm-ivory shadow-rose-900/40 shadow-md scale-102',
+    badgeClass: 'bg-[#7A2E33]/40 text-lotus-pink',
+    activeClass: 'bg-[#7A2E33] text-warm-ivory shadow-md scale-102 font-bold border border-lotus-pink/40',
   },
   {
     key: 'central',
     label: 'Miền Trung',
     count: '11 Tỉnh',
-    badgeClass: 'bg-amber-950/40 text-amber-200',
-    activeClass: 'bg-amber-600 text-warm-ivory shadow-amber-900/40 shadow-md scale-102',
+    badgeClass: 'bg-[#8F681B]/40 text-antique-bright',
+    activeClass: 'bg-[#8F681B] text-warm-ivory shadow-md scale-102 font-bold border border-antique-gold/40',
   },
   {
     key: 'south',
     label: 'Miền Nam',
     count: '8 Tỉnh',
-    badgeClass: 'bg-emerald-950/40 text-emerald-200',
-    activeClass: 'bg-emerald-700 text-warm-ivory shadow-emerald-900/40 shadow-md scale-102',
+    badgeClass: 'bg-[#184D43]/40 text-sky-mist',
+    activeClass: 'bg-[#184D43] text-warm-ivory shadow-md scale-102 font-bold border border-sky-mist/40',
   },
 ];
 
 /**
- * Region color palette configuration (Heritage Dark & Gold palette)
+ * Region color palette configuration (VieCultures System Design Tokens)
  */
 export interface RegionPalette {
   fill: string;
@@ -46,33 +46,33 @@ export interface RegionPalette {
 
 export const REGION_PALETTES: Record<RegionKey | 'default', RegionPalette> = {
   all: {
-    fill: '#1E4B43',
-    hover: '#D9B76A',
-    selected: '#F5D280',
-    stroke: '#FCE5B5',
+    fill: '#1E4B43', // heritage-green
+    hover: '#D9B76A', // antique-gold
+    selected: '#F5D280', // antique-rich
+    stroke: '#D9B76A', // antique-gold
   },
   north: {
-    fill: '#881337', // Deep Ruby / Rose Burgundy
-    hover: '#BE123C',
-    selected: '#E11D48',
-    stroke: '#FECDD3',
+    fill: '#7A2E33', // Deep Heritage Terracotta / Lotus-tint
+    hover: '#9C3D44',
+    selected: '#F5D280', // antique-rich
+    stroke: '#E8B7B2', // lotus-pink
   },
   central: {
-    fill: '#92400E', // Bronze Amber / Ochre Gold
-    hover: '#B45309',
-    selected: '#D97706',
-    stroke: '#FDE68A',
+    fill: '#8F681B', // Deep Antique Gold / Ochre
+    hover: '#B88726',
+    selected: '#F5D280', // antique-rich
+    stroke: '#FCE5B5', // antique-bright
   },
   south: {
-    fill: '#065F46', // Deep Forest Emerald
-    hover: '#047857',
-    selected: '#059669',
-    stroke: '#A7F3D0',
+    fill: '#184D43', // Deep Heritage Forest Teal
+    hover: '#276F61',
+    selected: '#F5D280', // antique-rich
+    stroke: '#BFE3EA', // sky-mist
   },
   default: {
     fill: '#1E4B43',
     hover: '#D9B76A',
     selected: '#F5D280',
-    stroke: '#FCE5B5',
+    stroke: '#D9B76A',
   },
 };

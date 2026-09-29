@@ -50,7 +50,10 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
         </div>
 
         {/* RIGHT COLUMN: Landmark Article Content (60% Width) */}
-        <div className="lg:col-span-6 flex flex-col justify-between h-auto lg:h-[520px]">
+        <div
+          key={activeLandmark.id}
+          className="lg:col-span-6 flex flex-col justify-between h-auto lg:h-[520px] animate-in fade-in duration-300"
+        >
           {/* Location Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-heritage-green/10 border border-heritage-green/15 text-heritage-green text-xs font-bold mb-3 w-fit">
             <MapPin className="w-3.5 h-3.5 text-antique-gold" />

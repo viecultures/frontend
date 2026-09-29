@@ -32,6 +32,8 @@ export interface VietnamMapProps {
   showSeaLayer?: boolean;
   /** Show province text labels */
   showLabels?: boolean;
+  /** Show floating cultural tooltip on hover (defaults to false) */
+  showTooltip?: boolean;
   /** Optional custom children to overlay on the map */
   children?: React.ReactNode;
 }
@@ -84,6 +86,8 @@ export interface MapPoiLayerProps {
   landmarks: LandmarkPoiItem[];
   provinces: ProvinceMapItem[];
   selectedProvinceId: string | null;
+  hoveredProvinceId?: string | null;
   activeRegion: RegionKey;
   onSelectLandmarkProvince: (province: ProvinceMapItem) => void;
+  onHoverLandmarkProvince?: (provinceId: string | null) => void;
 }

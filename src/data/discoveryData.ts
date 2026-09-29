@@ -389,14 +389,14 @@ export const getCefrBadgeStyle = (level: string) => {
   }
 };
 
-// Topic Options with Icons
+// Topic Options with Semantic Icon Identifiers
 export const TOPIC_OPTIONS = [
-  { label: "Tất cả bài học", value: "All", icon: "📚" },
-  { label: "Lịch sử & Di sản", value: "Heritage", icon: "🏛️" },
-  { label: "Ẩm thực & Cà phê", value: "Cuisine", icon: "🥖" },
-  { label: "Nghệ thuật & Làng nghề", value: "Crafts", icon: "🏺" },
-  { label: "Danh thắng Thiên nhiên", value: "Nature", icon: "🌾" },
-  { label: "Lễ hội & Tín ngưỡng", value: "Folklore", icon: "🎭" },
+  { label: "Tất cả bài học", value: "All", icon: "all" },
+  { label: "Lịch sử & Di sản", value: "Heritage", icon: "heritage" },
+  { label: "Ẩm thực & Cà phê", value: "Cuisine", icon: "cuisine" },
+  { label: "Nghệ thuật & Làng nghề", value: "Crafts", icon: "crafts" },
+  { label: "Danh thắng Thiên nhiên", value: "Nature", icon: "nature" },
+  { label: "Lễ hội & Tín ngưỡng", value: "Folklore", icon: "folklore" },
 ];
 
 // CEFR Levels

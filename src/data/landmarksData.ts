@@ -4,7 +4,8 @@ export interface LandmarkArticle {
   name: string;
   region: 'north' | 'central' | 'south';
   locationNameVi: string;
-  pinCoordinates: { x: number; y: number };
+  pinCoordinates?: { x: number; y: number };
+  offset?: { dx: number; dy: number };
   title: string;
   titleVi: string;
   subtitle: string;
@@ -26,10 +27,10 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
   {
     id: 'hanoi-ca-tru',
     provinceId: 'ha-noi',
-    name: 'Hà Nội & Ca Trù',
+    name: 'Phố Cổ & Ca Trù',
     region: 'north',
     locationNameVi: 'Hà Nội • Phố Cổ & Ca Trù Nghìn Năm',
-    pinCoordinates: { x: 31, y: 16 },
+    offset: { dx: -6, dy: -4 },
     title: 'Hanoi Old Quarter & Ca Tru Chamber Music Heritage',
     titleVi: 'Phố Cổ Hà Nội & Ca Trù Nghìn Năm Văn Hiến',
     subtitle: 'Preserving ancient guild streets and UNESCO-recognized chamber singing.',
@@ -47,6 +48,30 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     speakingSentenceEn: 'Hanoi Old Quarter is famous for its 36 guild streets and ancient Ca Tru chamber music performances.',
     speakingSentenceVi: 'Phố cổ Hà Nội nổi tiếng với 36 phố phường và các buổi biểu diễn Ca Trù di sản cổ truyền.',
     desc: 'Thủ đô ngàn năm văn hiến • Phố cổ & Ca trù'
+  },
+  {
+    id: 'hanoi-hoang-thanh',
+    provinceId: 'ha-noi',
+    name: 'Hoàng Thành Thăng Long',
+    region: 'north',
+    locationNameVi: 'Hà Nội • Hoàng Thành Thăng Long (UNESCO)',
+    offset: { dx: 6, dy: 5 },
+    title: 'Imperial Citadel of Thang Long Heritage',
+    titleVi: 'Hoàng Thành Thăng Long: Dấu Ấn Đế Đô',
+    subtitle: 'Over a thousand years of political power and monumental archaeology.',
+    excerptEn: 'Standing as a resilient testament to over a millennium of Vietnamese history, the Imperial Citadel preserves ancient relics from the Ly, Tran, and Le dynasties.',
+    excerptVi: 'Là minh chứng hào hùng cho hơn một thiên niên kỷ lịch sử dân tộc, Hoàng thành Thăng Long lưu giữ tầng tầng di tích của các triều đại Lý, Trần, Lê.',
+    category: 'Heritage',
+    level: 'B2',
+    image: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80',
+    readTime: '5 mins',
+    vocabHighlights: ['monumental', 'millennium', 'archaeology'],
+    bilingualTerms: [
+      { en: 'Imperial relic precinct', vi: 'Khu di tích hoàng thành cổ' },
+      { en: 'Centuries of dynastic rule', vi: 'Hàng thế kỷ triều đại kế thừa' }
+    ],
+    speakingSentenceEn: 'The Imperial Citadel of Thang Long is an outstanding UNESCO world cultural heritage site in Hanoi.',
+    speakingSentenceVi: 'Hoàng thành Thăng Long là di sản văn hóa thế giới UNESCO đặc sắc tại trung tâm thủ đô Hà Nội.'
   },
   {
     id: 'trang-an',
@@ -125,10 +150,10 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
   {
     id: 'hue-citadel',
     provinceId: 'hue',
-    name: 'Cố Đô Huế',
+    name: 'Đại Nội Huế',
     region: 'central',
     locationNameVi: 'Cố Đô Huế • Nhã Nhạc Hoàng Cung',
-    pinCoordinates: { x: 44, y: 48 },
+    offset: { dx: -5, dy: -3 },
     title: 'Imperial Hue Court Architecture & Royal Nha Nhac',
     titleVi: 'Cổng Thành Hoàng Cung & Nhã Nhạc Cố Đô Huế',
     subtitle: 'Nguyen Dynasty imperial citadel and UNESCO royal court music.',
@@ -147,12 +172,36 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     speakingSentenceVi: 'Cố đô Huế nổi tiếng với kiến trúc hoàng thành thế kỷ 19 và di sản Nhã nhạc cung đình UNESCO.'
   },
   {
+    id: 'hue-thien-mu',
+    provinceId: 'hue',
+    name: 'Chùa Thiên Mụ',
+    region: 'central',
+    locationNameVi: 'Huế • Chùa Thiên Mụ & Sông Hương',
+    offset: { dx: 6, dy: 4 },
+    title: 'Thien Mu Pagoda: Spiritual Icon of the Perfume River',
+    titleVi: 'Chùa Thiên Mụ & Tháp Phước Duyên Bên Dòng Sông Hương',
+    subtitle: 'Seven-tiered octagonal pagoda echoing across misty waters.',
+    excerptEn: 'Perched on Ha Khe hill overlooking the serene Perfume River, the iconic octagonal tower of Thien Mu Pagoda has inspired poets and monks for centuries.',
+    excerptVi: 'Tọa lạc trên đồi Hà Khê soi bóng xuống dòng sông Hương thơ mộng, tháp Phước Duyên bát giác chùa Thiên Mụ là biểu tượng tâm linh bất hủ của xứ Huế.',
+    category: 'Heritage',
+    level: 'B1',
+    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+    readTime: '4 mins',
+    vocabHighlights: ['octagonal tower', 'serene', 'monastic'],
+    bilingualTerms: [
+      { en: 'Octagonal pagoda tower', vi: 'Tháp chùa hình bát giác' },
+      { en: 'Spiritual sanctuary', vi: 'Chốn thanh tịnh tâm linh' }
+    ],
+    speakingSentenceEn: 'Thien Mu Pagoda is the oldest and most revered pagoda in the ancient city of Hue.',
+    speakingSentenceVi: 'Chùa Thiên Mụ là ngôi chùa cổ kính và tôn nghiêm bậc nhất của cố đô Huế.'
+  },
+  {
     id: 'hoi-an-lanterns',
     provinceId: 'da-nang',
     name: 'Phố Cổ Hội An',
     region: 'central',
     locationNameVi: 'Phố Cổ Hội An • Đà Nẵng & Quảng Nam',
-    pinCoordinates: { x: 50, y: 54 },
+    offset: { dx: 3, dy: 2 },
     title: 'Hoi An Ancient Lantern Alleys & Silk Craftsmanship',
     titleVi: 'Đêm Hội Hoa Đăng Hội An & Nghề Dệt Lụa Cổ Truyền',
     subtitle: 'Full moon silk lantern festival along the Hoai River.',
@@ -176,7 +225,7 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     name: 'Tây Nguyên Cồng Chiêng',
     region: 'central',
     locationNameVi: 'Tây Nguyên • Không Gian Văn Hóa Cồng Chiêng',
-    pinCoordinates: { x: 48, y: 68 },
+    offset: { dx: 0, dy: 0 },
     title: 'Central Highlands Gong Culture & Communal Houses',
     titleVi: 'Tây Nguyên: Không Gian Văn Hóa Cồng Chiêng & Nhà Rông',
     subtitle: 'Sacred bronze gong ensembles echo through mountain forests.',
@@ -199,10 +248,10 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
   {
     id: 'saigon-icon',
     provinceId: 'ho-chi-minh',
-    name: 'Sài Gòn - TP. Hồ Chí Minh',
+    name: 'Chợ Bến Thành & Bánh Mì',
     region: 'south',
-    locationNameVi: 'Sài Gòn • TP. Hồ Chí Minh (Hòn Ngọc Viễn Đông)',
-    pinCoordinates: { x: 34, y: 79 },
+    locationNameVi: 'Sài Gòn • Trung Tâm Bến Thành & Bánh Mì',
+    offset: { dx: -5, dy: 3 },
     title: 'Saigon Urban Pulse: Colonial Landmarks & Banh Mi Culture',
     titleVi: 'Sài Gòn: Nhịp Sống Đô Thị & Văn Hóa Bánh Mì',
     subtitle: 'Dynamic economic hub blending French colonial icons with street food dynamism.',
@@ -221,12 +270,36 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     speakingSentenceVi: 'Sài Gòn là thành phố lớn nhất Việt Nam, nổi tiếng với ẩm thực đường phố sôi động và di sản lịch sử.'
   },
   {
+    id: 'saigon-cu-chi',
+    provinceId: 'ho-chi-minh',
+    name: 'Địa Đạo Củ Chi',
+    region: 'south',
+    locationNameVi: 'Sài Gòn • Địa Đạo Củ Chi Di Tích Lịch Sử',
+    offset: { dx: 6, dy: -6 },
+    title: 'Cu Chi Tunnels: Underground Historic Wonder',
+    titleVi: 'Địa Đạo Củ Chi: Kỳ Tích Trong Lòng Đất',
+    subtitle: 'Immense subterranean labyrinth reflecting wartime resilience.',
+    excerptEn: 'Spanning hundreds of kilometers beneath the jungle floor, the intricate Cu Chi tunnel network housed whole communities during wartime defense.',
+    excerptVi: 'Trải dài hàng trăm kilomet dưới lòng đất, hệ thống địa đạo Củ Chi kỳ vĩ từng là căn cứ bảo vệ quân dân trong những năm tháng kháng chiến oanh liệt.',
+    category: 'Heritage',
+    level: 'B2',
+    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
+    readTime: '5 mins',
+    vocabHighlights: ['subterranean', 'resilience', 'labyrinth'],
+    bilingualTerms: [
+      { en: 'Underground tunnel network', vi: 'Mạng lưới hầm địa đạo' },
+      { en: 'Wartime resilience', vi: 'Ý chí kiên cường thời chiến' }
+    ],
+    speakingSentenceEn: 'Cu Chi Tunnels is an astonishing subterranean historic system located northwest of Ho Chi Minh City.',
+    speakingSentenceVi: 'Địa đạo Củ Chi là một công trình lịch sử ngầm kỳ vĩ nằm ở phía tây bắc TP. Hồ Chí Minh.'
+  },
+  {
     id: 'cai-rang-floating-market',
     provinceId: 'can-tho',
     name: 'Chợ Nổi Cái Răng',
     region: 'south',
     locationNameVi: 'Cần Thơ • Chợ Nổi Cái Răng & Sông Nước Mekong',
-    pinCoordinates: { x: 26, y: 88 },
+    offset: { dx: -5, dy: 3 },
     title: 'Cai Rang Floating Market & Mekong Riverine Commerce',
     titleVi: 'Chợ Nổi Cái Răng & Văn Hóa Sông Nước Miền Tây',
     subtitle: 'Bustling dawn trading boats on the waterways of the Mekong Delta.',
@@ -245,12 +318,36 @@ export const VIETNAM_LANDMARKS: LandmarkArticle[] = [
     speakingSentenceVi: 'Chợ nổi Cái Răng ở Cần Thơ là chợ nổi bán buôn lớn nhất vùng đồng bằng sông Cửu Long.'
   },
   {
+    id: 'can-tho-binh-thuy',
+    provinceId: 'can-tho',
+    name: 'Nhà Cổ Bình Thủy',
+    region: 'south',
+    locationNameVi: 'Cần Thơ • Nhà Cổ Bình Thủy Thế Kỷ 19',
+    offset: { dx: 6, dy: -4 },
+    title: 'Binh Thuy Ancient House: French-Vietnamese Heritage Estate',
+    titleVi: 'Nhà Cổ Bình Thủy: Di Sản Kiến Trúc Đông Dương',
+    subtitle: 'Exquisite 1870 French-Vietnamese aristocratic mansion.',
+    excerptEn: 'Built in 1870 by the Duong family, Binh Thuy Ancient House seamlessly fuses ornate French colonial neoclassical architecture with traditional Southern Vietnamese woodwork.',
+    excerptVi: 'Xây dựng năm 1870 bởi dòng họ Dương, nhà cổ Bình Thủy kết hợp tinh tế giữa kiến trúc tân cổ điển Pháp với nghệ thuật chạm khắc gỗ cổ truyền Nam Bộ.',
+    category: 'Heritage',
+    level: 'B2',
+    image: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80',
+    readTime: '4 mins',
+    vocabHighlights: ['aristocratic', 'neoclassical', 'woodwork'],
+    bilingualTerms: [
+      { en: 'French colonial neoclassical', vi: 'Kiến trúc tân cổ điển Pháp' },
+      { en: 'Ornate wooden carving', vi: 'Nghệ thuật chạm khắc gỗ tinh xảo' }
+    ],
+    speakingSentenceEn: 'Binh Thuy Ancient House is a prime architectural treasure of Can Tho and the entire Mekong Delta.',
+    speakingSentenceVi: 'Nhà cổ Bình Thủy là kiệt tác di sản kiến trúc tiêu biểu của Cần Thơ và miền Tây Nam Bộ.'
+  },
+  {
     id: 'don-ca-tai-tu',
     provinceId: 'tien-giang',
     name: 'Đờn Ca Tài Tử',
     region: 'south',
     locationNameVi: 'Đồng Bằng Sông Cửu Long • Đờn Ca Tài Tử',
-    pinCoordinates: { x: 30, y: 84 },
+    offset: { dx: 0, dy: 0 },
     title: 'Don Ca Tai Tu: Southern Folk Music & Moon Lute Melodies',
     titleVi: 'Đờn Ca Tài Tử: Âm Nhạc Dân Gian Nam Bộ',
     subtitle: 'Soulful southern improvisational folk music along peaceful canals.',

@@ -17,15 +17,6 @@ export const Footer: React.FC = () => {
             <p className="text-warm-ivory/70 text-xs leading-relaxed max-w-sm font-normal">
               Cổng thông tin &amp; trải nghiệm học tiếng Anh văn hóa Việt Nam phong cách Vietnamese Heritage Editorial &amp; Glassmorphism.
             </p>
-
-            <div className="flex items-center gap-2 pt-1">
-              <span className="px-3 py-1 rounded-full bg-heritage-green text-antique-gold border border-antique-gold/30 text-[11px] font-medium">
-                ✓ Heritage Light Palette
-              </span>
-              <span className="px-3 py-1 rounded-full bg-heritage-green text-[#9FCED8] border border-antique-gold/30 text-[11px] font-medium">
-                ✓ Dual Reader Engine
-              </span>
-            </div>
           </div>
 
           {/* Col 3: Topics */}
@@ -51,7 +42,7 @@ export const Footer: React.FC = () => {
               <li><span>Shadowing AI Từng Câu</span></li>
               <li><span>Flashcard 3D Spaced Repetition</span></li>
               <li><Link href="/community" className="hover:text-antique-gold transition-colors focus-ring">Cảm Nghĩ No-Judgment Safe Zone</Link></li>
-              <li><Link href="/community-2" className="hover:text-antique-gold transition-colors focus-ring">Thử Thách Văn Hóa &amp; Tích Xu 💎</Link></li>
+              <li><Link href="/community-2" className="hover:text-antique-gold transition-colors focus-ring">Thử Thách Văn Hóa &amp; Tích Xu </Link></li>
             </ul>
           </div>
 
@@ -73,7 +64,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom copyright */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-warm-ivory/50 font-normal">
-          <p>© 2026 VieCultures.</p>
+          <p>© 2026 VieCultures</p>
           <p className="flex items-center gap-1.5 text-warm-ivory/70">
             <span>Tự hào văn hóa &amp; nghệ thuật Việt Nam</span>
           </p>

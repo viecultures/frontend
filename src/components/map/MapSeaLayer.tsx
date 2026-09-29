@@ -11,12 +11,12 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
       <text
         x="365"
         y="285"
-        fill="#FCE5B5"
-        fontSize="9"
+        fill="#BFE3EA"
+        fontSize="9.5"
         fontWeight="700"
-        letterSpacing="2px"
+        letterSpacing="3px"
         textAnchor="middle"
-        opacity="0.65"
+        opacity="0.4"
       >
         VỊNH BẮC BỘ
       </text>
@@ -25,12 +25,12 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
       <text
         x="580"
         y="660"
-        fill="#FCE5B5"
+        fill="#BFE3EA"
         fontSize="13"
         fontWeight="700"
-        letterSpacing="5px"
+        letterSpacing="6px"
         textAnchor="middle"
-        opacity="0.75"
+        opacity="0.45"
       >
         BIỂN ĐÔNG
       </text>
@@ -44,7 +44,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
               cx={pt.cx}
               cy={pt.cy}
               r={pt.r}
-              fill="#F59E0B"
+              fill="#F5D280"
               className="opacity-95 animate-pulse"
             />
           ))}
@@ -53,10 +53,10 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
             y1={island.y}
             x2={island.x}
             y2={island.y + 24}
-            stroke="#F59E0B"
+            stroke="#D9B76A"
             strokeWidth="1.2"
             strokeDasharray="2,2"
-            className="opacity-75"
+            className="opacity-80"
           />
           <rect
             x={island.x - 45}
@@ -64,8 +64,8 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
             width={90}
             height={20}
             rx={4}
-            fill="#0D1C18"
-            stroke="#F59E0B"
+            fill="#122A22"
+            stroke="#D9B76A"
             strokeWidth="1"
           />
           <text

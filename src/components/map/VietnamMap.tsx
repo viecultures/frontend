@@ -26,6 +26,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
   showPoiPins = true,
   showSeaLayer = true,
   showLabels = true,
+  showTooltip = false,
   children,
 }) => {
   const {
@@ -74,11 +75,13 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
         />
       )}
 
-      {/* 2. Floating Tooltip with Cultural Specialty on Hover */}
-      <MapTooltip
-        province={hoveredProvince || null}
-        specialty={hoveredSpecialty}
-      />
+      {/* 2. Floating Tooltip with Cultural Specialty (Optional, disabled by default) */}
+      {showTooltip && (
+        <MapTooltip
+          province={hoveredProvince || null}
+          specialty={hoveredSpecialty}
+        />
+      )}
 
       {/* 3. Floating Zoom & Control Toolbar */}
       {showControls && (
@@ -145,8 +148,10 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
               landmarks={VIETNAM_LANDMARKS}
               provinces={VIETNAM_34_PROVINCES}
               selectedProvinceId={effectiveSelectedId}
+              hoveredProvinceId={hoveredProvince?.id || null}
               activeRegion={activeRegion}
               onSelectLandmarkProvince={selectProvince}
+              onHoverLandmarkProvince={setHoveredId}
             />
           )}
         </svg>

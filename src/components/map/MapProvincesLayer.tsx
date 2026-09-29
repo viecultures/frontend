@@ -29,12 +29,12 @@ export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
           currentFill = palette.selected;
           currentStroke = '#FFFFFF';
           strokeWidth = '2.5px';
-          dropShadow = 'drop-shadow(0 0 16px rgba(255,255,255,0.95))';
+          dropShadow = 'drop-shadow(0 0 16px rgba(245,210,128,0.95))';
         } else if (isHovered) {
           currentFill = palette.hover;
           currentStroke = '#FFFFFF';
           strokeWidth = '2px';
-          dropShadow = 'drop-shadow(0 0 12px rgba(253,230,138,0.9))';
+          dropShadow = 'drop-shadow(0 0 12px rgba(217,183,106,0.85))';
         }
 
         return (

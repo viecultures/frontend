@@ -32,7 +32,7 @@ export const MapLabelsLayer: React.FC<MapLabelsLayerProps> = ({
             }`}
             style={{
               paintOrder: 'stroke',
-              stroke: '#0D1C18',
+              stroke: '#122A22',
               strokeWidth: '2.5px',
               strokeLinejoin: 'round',
             }}
