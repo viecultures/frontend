@@ -96,11 +96,12 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
       <div
         id="vietnam-map-viewport"
         style={transformStyle}
-        className="w-full flex-1 min-h-0 flex items-center justify-center relative p-2"
+        className="w-full h-full flex-1 min-h-0 flex items-center justify-center relative p-1 overflow-hidden"
       >
         <svg
           viewBox={currentViewBox}
-          className="w-full h-full max-h-full filter drop-shadow-[0_14px_40px_rgba(0,0,0,0.7)] overflow-visible transition-all duration-500 ease-out"
+          preserveAspectRatio="xMidYMid meet"
+          className="w-full h-full max-h-full max-w-full object-contain filter drop-shadow-[0_14px_40px_rgba(0,0,0,0.7)] transition-all duration-500 ease-out"
         >
           {/* Backdrop Rect to catch clicks outside provinces */}
           <rect

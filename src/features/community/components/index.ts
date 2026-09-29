@@ -2,6 +2,7 @@ export { CommunityHeader } from "./CommunityHeader";
 export { CommunityPostEditor } from "./CommunityPostEditor";
 export { CommunityPostCard } from "./CommunityPostCard";
 export { CommunitySidebar } from "./CommunitySidebar";
+export { CommunityDetailModal } from "./CommunityDetailModal";
 export { ContestHeroBanner } from "./ContestHeroBanner";
 export { ContestEntryEditor } from "./ContestEntryEditor";
 export { ContestEntryCard } from "./ContestEntryCard";

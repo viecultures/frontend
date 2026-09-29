@@ -10,6 +10,7 @@ import {
   BookOpen,
   ArrowRight,
 } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 
 interface FlashcardSidebarLayoutProps {
   children: React.ReactNode;
@@ -57,14 +58,7 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
     <div className="min-h-screen bg-warm-ivory text-text-body flex flex-col lg:flex-row font-sans selection:bg-sky-mist selection:text-heritage-green">
       {/* Mobile Top Header */}
       <header className="lg:hidden sticky top-0 z-40 bg-heritage-dark text-warm-ivory px-4 py-3 flex items-center justify-between border-b border-antique-gold/30 shadow-sm">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-heritage-green border border-antique-gold flex items-center justify-center shadow-xs">
-            <BookOpen className="w-4 h-4 text-antique-gold" />
-          </div>
-          <span className="font-serif font-bold text-lg text-warm-ivory">
-            Vie<span className="text-antique-gold">Cultures Vocab</span>
-          </span>
-        </div>
+        <BrandLogo size="sm" theme="dark" suffix="Vocab" />
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 rounded-xl bg-heritage-green text-warm-ivory border border-antique-gold/40 cursor-pointer focus-ring"
@@ -90,21 +84,15 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
       >
         <div className="space-y-6">
           {/* Top Brand Identity */}
-          <div
-            onClick={() => handleNav("/home")}
-            className="flex items-center gap-3 pb-4 border-b border-line cursor-pointer group"
-          >
-            <div className="w-11 h-11 rounded-2xl bg-heritage-green border-2 border-antique-gold flex items-center justify-center text-warm-ivory shadow-md shrink-0 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-5 h-5 text-antique-gold" />
-            </div>
-            <div>
-              <h2 className="font-serif font-bold text-base text-heritage-green group-hover:text-heritage-dark transition-colors">
-                VieCultures
-              </h2>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-antique-gold block">
-                Kho Từ Vựng &amp; SRS
-              </span>
-            </div>
+          <div className="pb-4 border-b border-line">
+            <BrandLogo
+              size="md"
+              theme="light"
+              onClick={() => handleNav("/home")}
+            />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-antique-gold block mt-1 pl-13">
+              Kho Từ Vựng &amp; SRS
+            </span>
           </div>
 
           {/* Sidebar Menu Items */}

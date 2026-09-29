@@ -10,18 +10,18 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
 }) => {
   return (
     <aside
-      className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-40 flex-col gap-2 bg-heritage-forest/90 border border-white/20 p-2 rounded-2xl backdrop-blur-xl shadow-2xl"
+      className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-40 flex-col gap-2 bg-heritage-dark/85 border border-white/20 p-2 rounded-2xl backdrop-blur-xl shadow-2xl"
       aria-label="Thanh công cụ nhanh"
     >
       <button
         type="button"
         onClick={() => onNavigate('discovery')}
-        className="p-3 rounded-xl hover:bg-antique-bright text-white/80 hover:text-heritage-forest hover:scale-105 transition-all relative group cursor-pointer"
-        title="Search catalog"
+        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        title="Tìm kiếm bài đọc"
         aria-label="Tìm kiếm bài đọc"
       >
         <Search className="w-5 h-5" />
-        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-black text-white text-[10px] font-semibold rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
           Tìm kiếm bài đọc
         </span>
       </button>
@@ -29,12 +29,12 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
       <button
         type="button"
         onClick={() => onNavigate('community-1')}
-        className="p-3 rounded-xl hover:bg-antique-bright text-white/80 hover:text-heritage-forest hover:scale-105 transition-all relative group cursor-pointer"
-        title="AI Companion"
+        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        title="Trợ lý AI Companion"
         aria-label="Trợ lý AI Companion"
       >
-        <Bot className="w-5 h-5 text-emerald-400 group-hover:text-heritage-forest transition-colors" />
-        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-black text-white text-[10px] font-semibold rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+        <Bot className="w-5 h-5 text-emerald-400 group-hover:text-heritage-dark transition-colors" />
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
           Trợ lý AI Companion
         </span>
       </button>
@@ -42,12 +42,12 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
       <button
         type="button"
         onClick={() => onNavigate('community-1')}
-        className="p-3 rounded-xl hover:bg-antique-bright text-white/80 hover:text-heritage-forest hover:scale-105 transition-all relative group cursor-pointer"
-        title="Community Discussion"
+        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        title="Cộng đồng Thảo luận"
         aria-label="Cộng đồng thảo luận"
       >
         <MessageSquare className="w-5 h-5" />
-        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-black text-white text-[10px] font-semibold rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
           Cộng đồng Thảo luận
         </span>
       </button>
@@ -55,12 +55,12 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
       <button
         type="button"
         onClick={() => onNavigate('login')}
-        className="p-3 rounded-xl hover:bg-antique-bright text-white/80 hover:text-heritage-forest hover:scale-105 transition-all relative group cursor-pointer"
-        title="Settings & Tools"
+        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        title="Cài đặt & Tài khoản"
         aria-label="Cài đặt & Tài khoản"
       >
         <Settings className="w-5 h-5" />
-        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-black text-white text-[10px] font-semibold rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
           Cài đặt &amp; Tài khoản
         </span>
       </button>

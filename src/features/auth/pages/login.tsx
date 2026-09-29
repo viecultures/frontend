@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Sparkles, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { BrandLogo } from '@/components/BrandLogo';
 
 interface LoginPageProps {
   onLoginSuccess?: (userData?: { email?: string; name?: string }) => void;
@@ -65,6 +66,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
         {/* ── Left Column: Form ──────────────────────────────────────────── */}
         <div className="lg:col-span-7 p-6 sm:p-8 lg:px-12 lg:py-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/10 overflow-y-auto">
           <div className="max-w-md w-full mx-auto my-auto space-y-4">
+            {/* Unified Brand Logo */}
+            <div className="mb-2">
+              <BrandLogo
+                size="md"
+                theme="dark"
+                onClick={() => handleNavigate('landing')}
+                className="focus-ring-dark rounded-xl"
+              />
+            </div>
 
             {/* Tab Switcher */}
             <div

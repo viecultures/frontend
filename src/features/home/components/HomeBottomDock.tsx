@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, Flame, Play, Pause, RotateCcw, Award } from 'lucide-react';
 
 interface HomeBottomDockProps {
   activeDockMode: 'study' | 'pomodoro';
@@ -7,6 +7,7 @@ interface HomeBottomDockProps {
   pomoSeconds: number;
   isPomoRunning: boolean;
   onTogglePomo: () => void;
+  onResetPomo?: () => void;
 }
 
 export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
@@ -15,6 +16,7 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
   pomoSeconds,
   isPomoRunning,
   onTogglePomo,
+  onResetPomo,
 }) => {
   const formatPomoTime = (totalSec: number) => {
     const m = Math.floor(totalSec / 60);
@@ -26,24 +28,28 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-6 relative z-10">
       <div className="flex items-center gap-3">
         {/* Unified Floating Bottom Control Dock Container */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-heritage-forest/90 border border-white/20 backdrop-blur-xl shadow-2xl p-2 rounded-2xl w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-heritage-dark/85 border border-white/20 backdrop-blur-xl shadow-2xl p-2 rounded-2xl w-full sm:w-auto">
           {/* Streak Sub-card */}
           <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-black/40 rounded-xl border border-white/10">
-            <span className="text-xl">🔥</span>
+            <div className="p-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              <Flame className="w-4 h-4 fill-amber-400" />
+            </div>
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-amber-300">STREAK</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-amber-300">CHUỖI HỌC TẬP</div>
               <div className="text-xs font-extrabold text-white">2 Ngày Liên Tiếp</div>
             </div>
           </div>
 
           {/* Daily Challenge Sub-card */}
           <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-black/40 rounded-xl border border-white/10">
-            <Clock className="w-4 h-4 text-emerald-400" />
+            <div className="p-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <Clock className="w-4 h-4" />
+            </div>
             <div>
               <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">THỬ THÁCH HẰNG NGÀY</div>
               <div className="text-xs font-bold text-white flex items-center gap-2">
                 <span>Còn lại</span>
-                <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-[11px] font-mono border border-emerald-500/30">
+                <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-[11px] font-mono border border-emerald-500/30 font-bold">
                   13:40:27
                 </span>
               </div>
@@ -58,39 +64,54 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
             <button
               type="button"
               onClick={() => onSelectDockMode('study')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer focus-ring ${
                 activeDockMode === 'study'
-                  ? 'bg-antique-bright text-heritage-forest shadow-md'
-                  : 'text-white/70 hover:text-white'
+                  ? 'bg-antique-gold text-heritage-dark shadow-md'
+                  : 'text-white/80 hover:text-white'
               }`}
             >
               Study Mode
             </button>
+
             <button
               type="button"
               onClick={() => onSelectDockMode('pomodoro')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer focus-ring ${
                 activeDockMode === 'pomodoro'
-                  ? 'bg-antique-bright text-heritage-forest shadow-md'
-                  : 'text-white/70 hover:text-white'
+                  ? 'bg-antique-gold text-heritage-dark shadow-md'
+                  : 'text-white/80 hover:text-white'
               }`}
             >
               <span>Pomodoro</span>
               {activeDockMode === 'pomodoro' && (
-                <span className="font-mono text-[11px] bg-black/20 px-1.5 py-0.5 rounded">
+                <span className="font-mono text-[11px] bg-heritage-dark/30 px-1.5 py-0.5 rounded text-heritage-dark font-bold">
                   {formatPomoTime(pomoSeconds)}
                 </span>
               )}
             </button>
 
             {activeDockMode === 'pomodoro' && (
-              <button
-                type="button"
-                onClick={onTogglePomo}
-                className="px-2.5 py-1 bg-emerald-500 text-white rounded-lg text-[11px] font-bold hover:bg-emerald-600 transition-all ml-1 cursor-pointer"
-              >
-                {isPomoRunning ? 'Pause' : 'Start'}
-              </button>
+              <div className="flex items-center gap-1 ml-1">
+                <button
+                  type="button"
+                  onClick={onTogglePomo}
+                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+                >
+                  {isPomoRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                  <span>{isPomoRunning ? 'Tạm dừng' : 'Bắt đầu'}</span>
+                </button>
+
+                {onResetPomo && (
+                  <button
+                    type="button"
+                    onClick={onResetPomo}
+                    className="p-1 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                    title="Đặt lại 25 phút"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>

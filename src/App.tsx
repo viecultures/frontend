@@ -40,7 +40,7 @@ export const App: React.FC = () => {
         // ignore parse error
       }
     }
-    return { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: '🐢' };
+    return { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
   });
 
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
@@ -49,7 +49,7 @@ export const App: React.FC = () => {
     const newUser = {
       name: userData?.name || (userData?.email ? userData.email.split('@')[0] : 'Ninh Thiên Luân'),
       email: userData?.email || 'luanninh@viecultures.com',
-      avatar: '🐢',
+      avatar: 'NL',
     };
     setIsLoggedIn(true);
     setUser(newUser);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heart, Mail } from 'lucide-react';
 import Link from './Link';
-import logoImg from '../assets/logo/logo.jpg';
+import { BrandLogo } from './BrandLogo';
 
 export const Footer: React.FC = () => {
   return (
@@ -12,13 +12,7 @@ export const Footer: React.FC = () => {
 
           {/* Col 1 & 2: Brand & Philosophy */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full border border-antique-gold/40 overflow-hidden bg-heritage-green shrink-0 shadow-md flex items-center justify-center text-warm-ivory font-serif font-bold text-lg">
-              </div>
-              <span className="font-serif font-bold text-2xl text-warm-ivory">
-                Vie<span className="text-antique-gold">Cultures</span>
-              </span>
-            </div>
+            <BrandLogo size="md" theme="dark" />
 
             <p className="text-warm-ivory/70 text-xs leading-relaxed max-w-sm font-normal">
               Cổng thông tin &amp; trải nghiệm học tiếng Anh văn hóa Việt Nam phong cách Vietnamese Heritage Editorial &amp; Glassmorphism.

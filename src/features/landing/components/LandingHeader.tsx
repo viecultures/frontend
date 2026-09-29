@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrandLogo } from '@/components/BrandLogo';
 
 interface LandingHeaderProps {
   onNavigate?: (view: string) => void;
@@ -25,22 +26,12 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
     <header className="sticky top-0 z-50 w-full bg-heritage-dark/95 border-b border-antique-gold/25 backdrop-blur-xl transition-all shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo */}
-        <div
-          className="flex items-center gap-3 cursor-pointer group focus-ring-dark rounded-xl"
+        <BrandLogo
+          size="md"
+          theme="dark"
           onClick={handleLogoClick}
-          role="button"
-          tabIndex={0}
-          aria-label="Về đầu trang VieCultures"
-        >
-          <div className="w-10 h-10 rounded-full border border-antique-gold/50 bg-heritage-green flex items-center justify-center text-xl shadow-md group-hover:scale-105 transition-transform">
-            🪷
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="font-serif font-bold text-2xl text-warm-ivory tracking-tight group-hover:text-antique-gold transition-colors">
-              Vie<span className="text-antique-gold">Cultures</span>
-            </span>
-          </div>
-        </div>
+          className="focus-ring-dark rounded-xl"
+        />
 
         {/* Quick Jump Links (Desktop) */}
         <nav

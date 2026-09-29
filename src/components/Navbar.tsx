@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked } from 'lucide-react';
+import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
 
 interface NavbarProps {
@@ -65,19 +66,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <motion.div
             whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
             whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-            className="flex items-center gap-3.5 cursor-pointer group focus-ring-dark rounded-xl"
+            className="cursor-pointer focus-ring-dark rounded-xl"
             onClick={() => onNavigateToSection(isLoggedIn ? 'home' : 'landing')}
           >
-            <div className="relative w-11 h-11 rounded-full border border-antique-gold/50 overflow-hidden bg-heritage-green shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300 flex items-center justify-center text-warm-ivory font-serif font-bold text-xl">
-              🪷
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-serif font-bold text-2xl tracking-tight text-warm-ivory group-hover:text-antique-gold transition-colors">
-                  Vie<span className="text-antique-gold">Cultures</span>
-                </span>
-              </div>
-            </div>
+            <BrandLogo size="md" theme="dark" />
           </motion.div>
 
           {/* ── Center Nav Links (desktop only) ─────────────────────────── */}

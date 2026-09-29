@@ -1,4 +1,5 @@
 import React from 'react';
+import { MapPin } from 'lucide-react';
 import { VietnamMap } from '@/components/VietnamMap';
 import { type ProvinceMapItem } from '@/data/vietnamMapData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
@@ -33,20 +34,21 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
   };
 
   return (
-    <div className="relative w-full flex-1 flex flex-col items-center justify-center min-h-0 select-none">
+    <div className="relative w-full h-full flex flex-col items-center justify-center min-h-0 select-none overflow-hidden">
       {/* 34-Province SVG Vector Vietnam Map */}
       <VietnamMap
         selectedProvinceId={currentLandmark.provinceId}
         onSelectProvince={handleSelectProvince}
         showRegionTabs={showRegionTabs}
-        className="w-full h-full max-h-[540px] flex-1 min-h-0"
+        className="w-full h-full flex-1 min-h-0"
       />
 
       {/* Quick Landmark Info Box (Optional) */}
       {showPoiInfoBox && (
         <div className="mt-2 w-full text-center p-2.5 px-4 bg-heritage-forest/90 border border-antique-gold/60 rounded-2xl shadow-xl backdrop-blur-md transition-all shrink-0">
           <div className="text-xs font-bold text-antique-bright tracking-wide uppercase flex items-center justify-center gap-1.5">
-            <span>📍 {currentLandmark.name}</span>
+            <MapPin className="w-3.5 h-3.5 text-antique-gold" />
+            <span>{currentLandmark.name}</span>
           </div>
           <div className="text-xs text-white/80 mt-0.5 font-medium">
             {currentLandmark.desc || currentLandmark.subtitle}
