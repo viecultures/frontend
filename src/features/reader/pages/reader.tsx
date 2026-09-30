@@ -21,7 +21,7 @@ export default function ReaderPage() {
   // Reader Control States
   const [fontSize, setFontSize] = useState<number>(17);
   const [fontFamily, setFontFamily] = useState<"serif" | "sans">("serif");
-  const [themeMode, setThemeMode] = useState<"olive" | "paper" | "dark">("paper");
+  const [themeMode, setThemeMode] = useState<"paper" | "dark">("paper");
 
   // Initial mode reads from URL query ?mode=extensive
   const initialMode =
@@ -114,17 +114,13 @@ export default function ReaderPage() {
 
   // Dynamic style helpers based on themeMode
   const canvasBgClass =
-    themeMode === "olive"
-      ? "bg-[#545C2D] text-[#FBF7EE]"
-      : themeMode === "dark"
+    themeMode === "dark"
       ? "bg-[#141C1A] text-[#E8DFCB]"
       : "bg-[#F6EEDC] text-[#3F5550]";
 
   const paperSheetBgClass =
     themeMode === "dark"
       ? "bg-[#1E2925] text-[#FBF7EE] border-[#D9B76A]/35 shadow-[0_12px_45px_rgba(0,0,0,0.6)]"
-      : themeMode === "olive"
-      ? "bg-[#FBF7EE] text-[#2C3B37] border-[rgba(30,75,67,0.12)] shadow-[0_12px_40px_rgba(0,0,0,0.18)]"
       : "bg-[#FBF7EE] text-[#2C3B37] border-[rgba(30,75,67,0.12)] shadow-md";
 
   const paperTitleColor =
@@ -167,7 +163,7 @@ export default function ReaderPage() {
         onChangeThemeMode={setThemeMode}
       />
 
-      {/* Main Olive Canvas Container */}
+      {/* Main Canvas Container */}
       <section
         className={`py-8 px-4 sm:px-8 transition-colors duration-300 ${canvasBgClass}`}
       >

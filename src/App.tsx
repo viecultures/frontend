@@ -26,43 +26,19 @@ export const App: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // User authentication state (persisted in localStorage)
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    return localStorage.getItem('vie_is_logged_in') === 'true';
-  });
-
-  const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(() => {
-    const saved = localStorage.getItem('vie_user');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        // ignore parse error
-      }
-    }
-    return { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
-  });
-
+  const defaultUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
+  const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(defaultUser);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
 
-  const handleLoginSuccess = (userData?: { email?: string; name?: string }) => {
-    const newUser = {
-      name: userData?.name || (userData?.email ? userData.email.split('@')[0] : 'Ninh Thiên Luân'),
-      email: userData?.email || 'luanninh@viecultures.com',
-      avatar: 'NL',
-    };
+  const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    setUser(newUser);
-    localStorage.setItem('vie_is_logged_in', 'true');
-    localStorage.setItem('vie_user', JSON.stringify(newUser));
+    setUser(defaultUser);
     navigate('/home');
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setUser(null);
-    localStorage.setItem('vie_is_logged_in', 'false');
-    localStorage.removeItem('vie_user');
     navigate('/');
   };
 

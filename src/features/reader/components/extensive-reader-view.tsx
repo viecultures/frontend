@@ -4,7 +4,7 @@ import { Info, Layers, Headphones, PenTool, ArrowRight, ChevronRight } from "luc
 import { EXTENSIVE_QUESTIONS } from "@/data/readerData";
 
 interface ExtensiveReaderViewProps {
-  themeMode: "olive" | "paper" | "dark";
+  themeMode: "paper" | "dark";
   fontFamily: "serif" | "sans";
   fontSize: number;
   paperSheetBgClass: string;

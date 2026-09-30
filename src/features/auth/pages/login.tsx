@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Sparkles, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, Sparkles, ArrowLeft, CheckCircle2, Crown, Globe } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
 
 interface LoginPageProps {
@@ -40,7 +40,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (onLoginSuccess) {
-      onLoginSuccess({ email, name: fullName || (email ? email.split('@')[0] : 'Ninh Thiên Luân') });
+      onLoginSuccess();
     } else {
       handleNavigate('home');
     }
@@ -227,22 +227,30 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
 
             {/* Social Buttons */}
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: '🌐 Google', name: 'Google Student', email: 'google.student@viecultures.com' },
-                { label: '📘 Facebook', name: 'Facebook Student', email: 'facebook.student@viecultures.com' },
-              ].map(({ label, name, email: socialEmail }) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => {
-                    if (onLoginSuccess) onLoginSuccess({ email: socialEmail, name });
-                    else handleNavigate('home');
-                  }}
-                  className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark"
-                >
-                  <span>{label}</span>
-                </button>
-              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  if (onLoginSuccess) onLoginSuccess();
+                  else handleNavigate('home');
+                }}
+                className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark"
+              >
+                <Globe className="w-4 h-4 text-sky-mist" />
+                <span>Google</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (onLoginSuccess) onLoginSuccess();
+                  else handleNavigate('home');
+                }}
+                className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark"
+              >
+                <svg className="w-4 h-4 fill-sky-mist" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                <span>Facebook</span>
+              </button>
             </div>
           </div>
 
@@ -295,8 +303,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
 
             <div className="pt-4 border-t border-white/10 relative z-10">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-antique-bright/20 border border-antique-bright/40 flex items-center justify-center text-base" aria-hidden="true">
-                  👑
+                <div className="w-9 h-9 rounded-full bg-antique-bright/20 border border-antique-bright/40 flex items-center justify-center text-base text-antique-bright" aria-hidden="true">
+                  <Crown className="w-5 h-5 text-antique-bright" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-white">VieCultures Ambassador Program</p>

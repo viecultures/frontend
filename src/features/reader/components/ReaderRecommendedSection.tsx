@@ -4,7 +4,7 @@ import type { RecommendedArticle } from "@/data/readerData";
 
 interface ReaderRecommendedSectionProps {
   articles: RecommendedArticle[];
-  themeMode: "olive" | "paper" | "dark";
+  themeMode: "paper" | "dark";
 }
 
 export function ReaderRecommendedSection({

@@ -69,7 +69,6 @@ export const Footer: React.FC = () => {
             <span>Tự hào văn hóa &amp; nghệ thuật Việt Nam</span>
           </p>
         </div>
-
       </div>
     </footer>
   );

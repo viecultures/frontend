@@ -10,8 +10,8 @@ interface ReaderToolbarProps {
   onChangeReadingMode: (mode: "bilingual" | "extensive") => void;
   onOpenVocabList: () => void;
   vocabCount: number;
-  themeMode: "olive" | "paper" | "dark";
-  onChangeThemeMode: (theme: "olive" | "paper" | "dark") => void;
+  themeMode: "paper" | "dark";
+  onChangeThemeMode: (theme: "paper" | "dark") => void;
 }
 
 export function ReaderToolbar({
@@ -139,17 +139,6 @@ export function ReaderToolbar({
             >
               <Moon className="w-3 h-3 inline mr-1" />
               Tối
-            </button>
-            <button
-              onClick={() => onChangeThemeMode("olive")}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
-                themeMode === "olive"
-                  ? "bg-[#545C2D] text-[#FBF7EE]"
-                  : "text-[#BFE3EA]"
-              }`}
-              title="Khung Olive"
-            >
-              Olive
             </button>
             <button
               onClick={() => onChangeThemeMode("paper")}
