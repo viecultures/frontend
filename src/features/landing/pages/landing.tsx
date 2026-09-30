@@ -2,11 +2,12 @@ import React from 'react';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { LandingHeader } from '../components/LandingHeader';
 import { LandingHeroBanner } from '../components/LandingHeroBanner';
-import { HeritageMethodologySection } from '../components/HeritageMethodologySection';
-import { VietnamHeritageMapSection } from '../components/VietnamHeritageMapSection';
-import { CuratedStoriesSection } from '../components/CuratedStoriesSection';
-import { LearningMethodSection } from '../components/LearningMethodSection';
-import { RoadmapHeritageSection } from '../components/RoadmapHeritageSection';
+import { CoverflowArticlesSection } from '../components/CoverflowArticlesSection';
+import { FourTopicsSection } from '../components/FourTopicsSection';
+import { InteractiveReaderDemoSection } from '../components/InteractiveReaderDemoSection';
+import { InteractiveFlashcardDemoSection } from '../components/InteractiveFlashcardDemoSection';
+import { AmbassadorCommunitySection } from '../components/AmbassadorCommunitySection';
+import { ContactSection } from '../components/ContactSection';
 
 interface LandingPageProps {
   onNavigate?: (view: string) => void;
@@ -32,39 +33,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   return (
     <ThemeProvider>
       <div className="w-full min-h-screen bg-surface text-heritage-green font-sans antialiased selection:bg-sky-mist selection:text-heritage-green transition-colors duration-300">
-        {/* 1. Header Navigation Bar */}
+        {/* Site Header */}
         <LandingHeader
           onNavigate={handleNavigate}
           onScrollToSegment={scrollToSegment}
         />
 
         <main className="w-full overflow-x-hidden">
-          {/* 2. Hero Video Banner Section */}
+          {/* 1. Hero Banner Section (Full Screen Size with Text Layer Overlay) */}
           <LandingHeroBanner
-            onScrollToExplore={() => scrollToSegment('lo-trinh-hoc')}
+            onNavigate={handleNavigate}
+            onScrollToDemo={() => scrollToSegment('interactive-demo')}
           />
 
-          {/* 3. Heritage Immersion Methodology */}
-          <div id="lo-trinh-hoc">
-            <HeritageMethodologySection onNavigate={handleNavigate} />
+          {/* 2. Top Articles Section (3D Coverflow Slider with Auto-Advance Every 3 Seconds) */}
+          <div id="featured-articles">
+            <CoverflowArticlesSection onNavigate={handleNavigate} />
           </div>
 
-          {/* 4. Interactive Vietnam S-shaped Map & Heritage Vocabulary */}
-          <div id="ban-do-di-san">
-            <VietnamHeritageMapSection />
+          {/* 3. Topics Section (The 4 Core Topics Pillars) */}
+          <div id="topics">
+            <FourTopicsSection onNavigate={handleNavigate} />
           </div>
 
-          {/* 5. Curated Stories Magazine Showcase */}
-          <div id="tap-chi-di-san">
-            <CuratedStoriesSection onNavigate={handleNavigate} />
+          {/* 4. Interactive Reader Demo Section (Value-Add Feature Preview) */}
+          <div id="interactive-demo">
+            <InteractiveReaderDemoSection onNavigate={handleNavigate} />
           </div>
 
-          {/* 6. Learning Method & 4-Stage Pathway */}
-          <LearningMethodSection />
+          {/* 5. Interactive Flashcard & Spaced Repetition Preview */}
+          <div id="flashcard-demo">
+            <InteractiveFlashcardDemoSection onNavigate={handleNavigate} />
+          </div>
 
-          {/* 7. Roadmap & VIP Newsletter Enrollment */}
-          <div id="cam-nhan-hoc-vien">
-            <RoadmapHeritageSection />
+          {/* 6. Trusted Section (User Feedback, Testimonials & Cultural Ambassador Community) */}
+          <div id="trusted-community">
+            <AmbassadorCommunitySection />
+          </div>
+
+          {/* 7. Contact Section */}
+          <div id="contact">
+            <ContactSection />
           </div>
         </main>
       </div>

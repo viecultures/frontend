@@ -1,75 +1,166 @@
 import React from 'react';
-import { Heart, Mail } from 'lucide-react';
-import Link from './Link';
 import { BrandLogo } from './BrandLogo';
 
 export const Footer: React.FC = () => {
+  const handleNav = (view: string) => {
+    window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
+  };
+
+  const handleScrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <footer className="w-full bg-heritage-dark text-warm-ivory/80 border-t border-antique-gold/20 pt-14 pb-10 text-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-10 border-b border-antique-gold/15">
-
-          {/* Col 1 & 2: Brand & Philosophy */}
+    <footer className="w-full bg-heritage-dark text-warm-ivory border-t border-antique-gold/30 pt-16 pb-12 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+          {/* Brand & Description */}
           <div className="lg:col-span-2 space-y-4">
-            <BrandLogo size="md" theme="dark" />
-
-            <p className="text-warm-ivory/70 text-xs leading-relaxed max-w-sm font-normal">
-              Cổng thông tin &amp; trải nghiệm học tiếng Anh văn hóa Việt Nam phong cách Vietnamese Heritage Editorial &amp; Glassmorphism.
+            <BrandLogo size="md" theme="dark" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
+            <p className="text-xs sm:text-sm text-warm-ivory/80 leading-relaxed max-w-sm font-normal">
+              Nền tảng EdTech học tiếng Anh qua ngữ cảnh văn hóa Việt Nam. Nâng tầm vốn từ &amp; trở thành sứ giả văn hóa.
             </p>
           </div>
 
-          {/* Col 3: Topics */}
-          <div>
-            <h4 className="font-serif font-bold text-sm text-antique-gold uppercase tracking-wider mb-3">
-              Chủ Đề Tiêu Biểu
+          {/* Col 1: Navigation */}
+          <div className="space-y-3">
+            <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-antique-gold">
+              Navigation
             </h4>
-            <ul className="space-y-2 font-normal text-warm-ivory/75">
-              <li><span className="hover:text-antique-gold transition-colors cursor-pointer">Tranh Dân Gian Đông Hồ</span></li>
-              <li><span className="hover:text-antique-gold transition-colors cursor-pointer">Đại Nội Cố Đô Huế</span></li>
-              <li><span className="hover:text-antique-gold transition-colors cursor-pointer">Tà Áo Dài &amp; Lụa Tơ Tằm</span></li>
-              <li><span className="hover:text-antique-gold transition-colors cursor-pointer">Bánh Mì &amp; Ẩm Thực Đường Phố</span></li>
+            <ul className="space-y-2 text-xs text-warm-ivory/80 font-medium">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleNav('home')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  Home
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleNav('discovery')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  Discovery Feed
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleNav('bilingual-reader')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  Bilingual Reader
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleNav('dictionary')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  Flashcards
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleNav('community')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  Community
+                </button>
+              </li>
             </ul>
           </div>
 
-          {/* Col 4: Core Features */}
-          <div>
-            <h4 className="font-serif font-bold text-sm text-antique-gold uppercase tracking-wider mb-3">
-              Phương Pháp EdTech
+          {/* Col 2: Topics */}
+          <div className="space-y-3">
+            <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-antique-gold">
+              Topics
             </h4>
-            <ul className="space-y-2 font-normal text-warm-ivory/75">
-              <li><span>Bài Đọc Song Ngữ Cặp Đoạn</span></li>
-              <li><span>Shadowing AI Từng Câu</span></li>
-              <li><span>Flashcard 3D Spaced Repetition</span></li>
-              <li><Link href="/community" className="hover:text-antique-gold transition-colors focus-ring">Cảm Nghĩ No-Judgment Safe Zone</Link></li>
-              <li><Link href="/community-2" className="hover:text-antique-gold transition-colors focus-ring">Thử Thách Văn Hóa &amp; Tích Xu </Link></li>
+            <ul className="space-y-2 text-xs text-warm-ivory/80 font-medium">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleScrollTo('topics')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  History &amp; Heritage
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleScrollTo('topics')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  Cuisine &amp; Coffee
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleScrollTo('topics')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  Arts &amp; Craft Villages
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleScrollTo('topics')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  Festivals &amp; Beliefs
+                </button>
+              </li>
             </ul>
           </div>
 
-          {/* Col 5: Contact */}
-          <div>
-            <h4 className="font-serif font-bold text-sm text-antique-gold uppercase tracking-wider mb-3">
-              Liên Hệ &amp; Hợp Tác
+          {/* Col 3: Contact & Legal */}
+          <div className="space-y-3">
+            <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-antique-gold">
+              Contact &amp; Legal
             </h4>
-            <p className="text-warm-ivory/70 leading-relaxed mb-3 font-normal">
-              Chào đón các nhà nghiên cứu văn hóa, dịch giả và người yêu văn hóa Việt đồng hành.
-            </p>
-            <div className="flex items-center gap-2 text-antique-gold font-medium">
-              <Mail className="w-4 h-4" />
-              <span>contact@viecultures.vn</span>
-            </div>
+            <ul className="space-y-2 text-xs text-warm-ivory/80 font-medium">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleScrollTo('contact')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  Contact Support
+                </button>
+              </li>
+              <li>
+                <span className="hover:text-antique-bright transition-colors cursor-pointer">
+                  Privacy Policy
+                </span>
+              </li>
+              <li>
+                <span className="hover:text-antique-bright transition-colors cursor-pointer">
+                  Terms of Service
+                </span>
+              </li>
+            </ul>
           </div>
-
         </div>
 
-        {/* Bottom copyright */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-warm-ivory/50 font-normal">
-          <p>© 2026 VieCultures</p>
-          <p className="flex items-center gap-1.5 text-warm-ivory/70">
-            <span>Tự hào văn hóa &amp; nghệ thuật Việt Nam</span>
-          </p>
+        {/* Bottom copyright row */}
+        <div className="pt-8 border-t border-antique-gold/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-warm-ivory/60 font-medium">
+          <p>&copy; 2026 VieCultures • VN Culture Reader. All rights reserved.</p>
+          <p>Nâng Tầm Tiếng Anh — Trở Thành Sứ Giả Văn Hóa Việt</p>
         </div>
       </div>
     </footer>
   );
 };
+
+export default Footer;

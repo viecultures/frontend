@@ -173,7 +173,7 @@ export default function ReaderPage() {
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             playbackSpeed={playbackSpeed}
-            onChangeSpeed={(speed) => setPlaybackSpeed(speed)}
+            onChangeSpeed={(speed: number) => setPlaybackSpeed(speed)}
             isRepeatLoop={isRepeatLoop}
             onToggleRepeatLoop={() => setIsRepeatLoop(!isRepeatLoop)}
             currentSentenceEn={currentSentenceEn}
