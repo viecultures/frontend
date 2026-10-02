@@ -44,6 +44,26 @@ const DEMO_CARDS: FlashcardDemoItem[] = [
     definition: 'Khả năng phục hồi và trường tồn mạnh mẽ trước những biến cố lịch sử.',
     collocation: 'cultural resilience, extraordinary resilience',
   },
+  {
+    id: '4',
+    word: 'intangible',
+    ipa: '/ɪnˈtæn.dʒə.bəl/',
+    pos: 'adjective',
+    example: 'Nha Nhac Court Music is recognized worldwide as an intangible cultural heritage.',
+    meaning: 'Phi vật thể, tinh thần',
+    definition: 'Tài sản văn hóa vô hình truyền thừa qua âm nhạc, nghi lễ và tri thức dân gian.',
+    collocation: 'intangible cultural heritage, intangible legacy',
+  },
+  {
+    id: '5',
+    word: 'syncretism',
+    ipa: '/ˈsɪŋ.krə.tɪ.zəm/',
+    pos: 'noun',
+    example: 'Saigon banh mi is a prime example of culinary syncretism between French and Vietnamese tastes.',
+    meaning: 'Sự dung hợp văn hóa',
+    definition: 'Quá trình hòa quyện, tiếp biến tinh hoa văn hóa khác nhau tạo nên bản sắc độc đáo.',
+    collocation: 'culinary syncretism, cultural syncretism',
+  },
 ];
 
 interface InteractiveFlashcardDemoSectionProps {
@@ -107,7 +127,7 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
   return (
     <section
       id="flashcard-demo"
-      className="py-24 px-4 sm:px-6 lg:px-8 bg-surface border-t border-line"
+      className="py-24 sm:py-28 px-4 sm:px-6 lg:px-8 bg-surface border-t border-line"
     >
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         {/* Left Column: Live Interactive Flashcard Box */}
@@ -117,10 +137,10 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
             <div className="flex items-center justify-between text-xs font-bold">
               <div className="flex items-center gap-2 text-text-muted">
                 <Target className="w-4 h-4 text-emerald-600" />
-                <span className="uppercase tracking-wider">LIVE DEMO: SPACED REPETITION CARD</span>
+                <span className="uppercase tracking-wider">TRẢI NGHIỆM THẺ NHỚ THÔNG MINH</span>
               </div>
               <span className="text-emerald-700 font-mono font-bold">
-                {activeCardIndex + 18} / 25 Words (76%)
+                {activeCardIndex + 18} / 25 Từ vựng (76%)
               </span>
             </div>
 
@@ -256,13 +276,13 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rice-paper text-heritage-green border border-antique-gold/40 text-xs font-bold shadow-xs">
               <Brain className="w-3.5 h-3.5 text-antique-gold" />
               <span className="uppercase tracking-widest text-[11px] font-extrabold">
-                Interactive Demo 02
+                HỆ THỐNG GHI NHỚ DÀI HẠN
               </span>
             </div>
 
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main tracking-tight">
-              Smart Flashcard &amp; <br />
-              <span className="italic text-antique-gold font-serif">Spaced Repetition</span>
+              Thẻ Nhớ Thông Minh &amp; <br />
+              <span className="italic text-antique-gold font-serif">Lặp Ngắt Quãng SM-2</span>
             </h2>
 
             <p className="text-sm sm:text-base text-text-muted leading-relaxed font-normal">

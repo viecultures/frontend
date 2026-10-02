@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowRight, BookOpen, ChevronDown, Volume2, VolumeX, Sparkles } from 'lucide-react';
-import { speakEnglish } from '@/utils/sampleSpeech';
+import React from 'react';
+import { ArrowRight, BookOpen, ChevronDown, Sparkles } from 'lucide-react';
 import bannerVideo from '@/assets/banner.webm';
 
 interface LandingHeroBannerProps {
@@ -12,11 +11,6 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
   onNavigate,
   onScrollToDemo,
 }) => {
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-
-  const sampleQuote =
-    'Vietnam is a 4,000-year-old river of resilience, architectural mastery, and shared bowls of fragrant broth.';
-
   const handleStartLearning = () => {
     if (onNavigate) {
       onNavigate('discovery');
@@ -31,18 +25,6 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
     } else {
       const el = document.getElementById('interactive-demo');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleToggleAudio = () => {
-    if (isPlayingAudio) {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-      setIsPlayingAudio(false);
-    } else {
-      setIsPlayingAudio(true);
-      speakEnglish(sampleQuote, () => setIsPlayingAudio(false));
     }
   };
 
@@ -70,32 +52,31 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
       />
 
       {/* Hero Typography Container */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-10 lg:px-16 py-8 sm:py-12 lg:py-14 flex flex-col items-start justify-center">
-        <div className="max-w-2xl lg:max-w-3xl space-y-4 sm:space-y-5">
+      <div className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 flex flex-col items-start justify-center">
+        <div className="max-w-2xl lg:max-w-3xl space-y-5 sm:space-y-6">
           {/* Sub-kicker */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-antique-gold/40 text-antique-bright text-[11px] sm:text-xs font-bold uppercase tracking-widest shadow-md">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-antique-gold/40 text-antique-bright text-[11px] sm:text-xs font-bold uppercase tracking-widest shadow-md">
             <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
             <span>NỀN TẢNG EDTECH TIÊN PHONG VĂN HÓA VIỆT</span>
           </div>
 
           {/* Main Title */}
-          <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-warm-ivory leading-[1.18] tracking-tight drop-shadow-2xl">
-            Nâng Tầm Tiếng Anh — <br className="hidden sm:inline" />
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-warm-ivory leading-[1.15] tracking-tight drop-shadow-2xl">
+            Nâng Tầm Tiếng Anh — <br />
             <span className="text-antique-gold italic font-serif">Trở Thành Sứ Giả Văn Hóa Việt</span>
           </h1>
 
           {/* Description */}
-          <p className="text-xs sm:text-sm lg:text-base text-warm-ivory/90 leading-relaxed max-w-2xl font-normal drop-shadow-md">
+          <p className="text-sm sm:text-base lg:text-lg text-warm-ivory/85 leading-relaxed max-w-2xl font-normal drop-shadow-md">
             Khám phá 500+ bài đọc song ngữ chuẩn học thuật (A2 - C1) về lịch sử, di sản, ẩm thực và đời sống Việt Nam. Kết hợp Audio AI Shadowing và Flashcard lặp ngắt quãng.
           </p>
 
-
           {/* Action Buttons */}
-          <div className="pt-1 flex flex-wrap items-center gap-3.5">
+          <div className="pt-2 flex flex-wrap items-center gap-4">
             <button
               type="button"
               onClick={handleStartLearning}
-              className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-antique-bright via-antique-rich to-antique-gold text-heritage-forest font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl hover:brightness-105 active:scale-[0.98] flex items-center gap-2 cursor-pointer focus-ring-dark"
+              className="px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl bg-gradient-to-r from-antique-bright via-antique-rich to-antique-gold text-heritage-forest font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl hover:brightness-105 active:scale-[0.98] flex items-center gap-2 cursor-pointer focus-ring-dark"
             >
               <span>Bắt Đầu Học Miễn Phí</span>
               <ArrowRight className="w-4 h-4" />
@@ -104,7 +85,7 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
             <button
               type="button"
               onClick={handleScrollToInteractiveDemo}
-              className="px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-warm-ivory border border-white/30 font-bold text-xs sm:text-sm uppercase tracking-wider transition-all backdrop-blur-md flex items-center gap-2 cursor-pointer focus-ring-dark"
+              className="px-6 sm:px-7 py-3.5 sm:py-4 rounded-xl bg-black/30 hover:bg-black/45 text-warm-ivory border border-white/30 font-bold text-xs sm:text-sm uppercase tracking-wider transition-all backdrop-blur-md flex items-center gap-2 cursor-pointer focus-ring-dark"
             >
               <BookOpen className="w-4 h-4 text-antique-gold" />
               <span>Trải Nghiệm Bài Đọc</span>
@@ -120,10 +101,10 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
           const el = document.getElementById('featured-articles');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
         }}
-        className="hidden md:flex absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex-col items-center gap-1 cursor-pointer text-warm-ivory/70 hover:text-warm-ivory transition-colors group"
+        className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex-col items-center gap-1.5 cursor-pointer text-warm-ivory/70 hover:text-warm-ivory transition-colors group"
         aria-label="Cuộn xuống xem bài đọc tiêu biểu"
       >
-        <span className="text-[9px] font-bold tracking-widest text-antique-gold uppercase font-sans">
+        <span className="text-[10px] font-bold tracking-widest text-antique-gold uppercase font-sans">
           Khám phá thêm
         </span>
         <div className="w-7 h-7 rounded-full bg-white/10 border border-warm-ivory/20 flex items-center justify-center backdrop-blur-md group-hover:border-antique-gold transition-colors animate-bounce">

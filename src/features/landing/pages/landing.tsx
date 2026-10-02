@@ -4,9 +4,11 @@ import { LandingHeader } from '../components/LandingHeader';
 import { LandingHeroBanner } from '../components/LandingHeroBanner';
 import { CoverflowArticlesSection } from '../components/CoverflowArticlesSection';
 import { FourTopicsSection } from '../components/FourTopicsSection';
+import { VietnamHeritageMapSection } from '../components/VietnamHeritageMapSection';
+import { HeritageMethodologySection } from '../components/HeritageMethodologySection';
 import { InteractiveReaderDemoSection } from '../components/InteractiveReaderDemoSection';
 import { InteractiveFlashcardDemoSection } from '../components/InteractiveFlashcardDemoSection';
-import { AmbassadorCommunitySection } from '../components/AmbassadorCommunitySection';
+import { LandingFaqSection } from '../components/LandingFaqSection';
 import { ContactSection } from '../components/ContactSection';
 
 interface LandingPageProps {
@@ -56,25 +58,41 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             <FourTopicsSection onNavigate={handleNavigate} />
           </div>
 
-          {/* 4. Interactive Reader Demo Section (Value-Add Feature Preview) */}
-          <div id="interactive-demo">
-            <InteractiveReaderDemoSection onNavigate={handleNavigate} />
+          {/* 4. Interactive 34-Province Vietnam Heritage Map & 3-Region Corridor */}
+          <div id="ban-do-di-san">
+            <VietnamHeritageMapSection />
           </div>
 
-          {/* 5. Interactive Flashcard & Spaced Repetition Preview */}
+          {/* 5. 4-Pillars Heritage Methodology */}
+          <div id="methodology">
+            <HeritageMethodologySection onNavigate={handleNavigate} />
+          </div>
+
+          {/* 6. Interactive Reader Demo Section (Value-Add Feature Preview) */}
+          {/* <div id="interactive-demo">
+            <InteractiveReaderDemoSection onNavigate={handleNavigate} />
+          </div> */}
+
+          {/* 7. Interactive Flashcard & Spaced Repetition Preview */}
           <div id="flashcard-demo">
             <InteractiveFlashcardDemoSection onNavigate={handleNavigate} />
           </div>
 
-          {/* 6. Trusted Section (User Feedback, Testimonials & Cultural Ambassador Community) */}
+          {/* 8. Trusted Section (User Feedback, Testimonials & Cultural Ambassador Community)
           <div id="trusted-community">
             <AmbassadorCommunitySection />
+          </div> */}
+
+          {/* 9. Frequently Asked Questions Section */}
+          <div id="faq">
+            <LandingFaqSection />
           </div>
 
-          {/* 7. Contact Section */}
+          {/* 10. Contact Section */}
           <div id="contact">
             <ContactSection />
           </div>
+
         </main>
       </div>
     </ThemeProvider>

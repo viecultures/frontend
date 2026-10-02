@@ -131,8 +131,9 @@ export const CuratedStoriesSection: React.FC<CuratedStoriesSectionProps> = ({ on
               {/* Card Footer Actions */}
               <div className="p-6 pt-0 border-t border-line mt-2">
                 <div className="pt-4 flex items-center justify-between text-xs font-bold">
-                  <span className="text-mountain-teal">
-                    💎 {story.vocabCount} từ vựng học thuật
+                  <span className="text-mountain-teal flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
+                    <span>{story.vocabCount} từ vựng học thuật</span>
                   </span>
 
                   <button
