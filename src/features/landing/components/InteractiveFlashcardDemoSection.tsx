@@ -155,10 +155,18 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
             {/* 3D Flip Card Container */}
             <div
               onClick={handleToggleFlip}
-              className="group relative w-full min-h-[220px] p-6 rounded-2xl bg-surface border-2 border-line hover:border-antique-gold/60 text-center flex flex-col justify-between items-center cursor-pointer select-none transition-all duration-300 shadow-sm hover:shadow-md"
+              className="group relative w-full min-h-[220px] p-6 rounded-2xl bg-surface border-2 border-line hover:border-antique-gold/60 text-center flex flex-col justify-between items-center cursor-pointer select-none transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden"
             >
+              {/* Corner Watermark SVG */}
+              <div className="absolute top-0 right-0 w-24 h-24 pointer-events-none opacity-20 overflow-hidden">
+                <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-antique-gold" strokeWidth="1.2">
+                  <path d="M100 0 C70 10 40 40 30 70 C20 100 0 100 0 100" strokeDasharray="3 3" />
+                  <circle cx="80" cy="20" r="10" fill="#E8B7B2" fillOpacity="0.4" />
+                </svg>
+              </div>
+
               {/* Card Switch Arrows */}
-              <div className="w-full flex items-center justify-between text-xs text-text-muted pb-2 border-b border-line/40">
+              <div className="w-full flex items-center justify-between text-xs text-text-muted pb-2 border-b border-line/40 relative z-10">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -190,7 +198,7 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
 
               {!isFlipped ? (
                 /* Card Front (English) */
-                <div className="space-y-2 py-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="space-y-2 py-4 animate-in fade-in zoom-in-95 duration-200 relative z-10">
                   <div className="flex items-center justify-center gap-2">
                     <h3 className="font-serif text-3xl sm:text-4xl font-bold text-text-main">
                       {currentCard.word}
@@ -219,7 +227,7 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
                 </div>
               ) : (
                 /* Card Back (Vietnamese Meaning & Definition) */
-                <div className="space-y-2 py-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="space-y-2 py-4 animate-in fade-in zoom-in-95 duration-200 relative z-10">
                   <h3 className="font-serif text-2xl sm:text-3xl font-bold text-emerald-700">
                     {currentCard.meaning}
                   </h3>
@@ -233,7 +241,7 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
               )}
 
               {/* Card Flip Hint */}
-              <div className="pt-2 border-t border-line/40 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-text-muted">
+              <div className="pt-2 border-t border-line/40 w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-text-muted relative z-10">
                 <RotateCw className="w-3.5 h-3.5 text-antique-gold" />
                 <span>Bấm vào thẻ để lật xem {isFlipped ? 'từ vựng Tiếng Anh' : 'đáp án Tiếng Việt'}</span>
               </div>

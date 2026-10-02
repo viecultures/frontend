@@ -100,7 +100,7 @@ export const FourTopicsSection: React.FC<FourTopicsSectionProps> = ({ onNavigate
             <div
               key={pillar.pillarNumber}
               onClick={() => handleTopicClick(pillar.categoryKey)}
-              className="group bg-white rounded-3xl border border-line overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-400 flex flex-col justify-between cursor-pointer"
+              className="group bg-white rounded-3xl border border-line hover:border-antique-gold/50 overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-400 flex flex-col justify-between cursor-pointer relative"
             >
               <div>
                 {/* Image Placeholder / Artwork Header */}
@@ -125,18 +125,26 @@ export const FourTopicsSection: React.FC<FourTopicsSectionProps> = ({ onNavigate
                   </div>
                 </div>
 
-                {/* Card Body */}
-                <div className="p-6 sm:p-7 space-y-2.5">
-                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-mountain-teal">
+                {/* Card Body with Corner Watercolor SVG Watermark */}
+                <div className="p-6 sm:p-7 space-y-2.5 relative overflow-hidden">
+                  {/* Subtle Corner Motif SVG */}
+                  <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden pointer-events-none opacity-15 group-hover:opacity-30 transition-opacity">
+                    <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-antique-gold" strokeWidth="1.2">
+                      <path d="M100 0 C70 10 40 40 30 70 C20 100 0 100 0 100" />
+                      <circle cx="80" cy="20" r="10" fill="#E8B7B2" fillOpacity="0.4" />
+                    </svg>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-mountain-teal relative z-10">
                     {pillar.icon}
                     <span>{pillar.title}</span>
                   </div>
 
-                  <h3 className="font-serif text-lg sm:text-xl font-bold text-text-main group-hover:text-heritage-green transition-colors leading-snug">
+                  <h3 className="font-serif text-lg sm:text-xl font-bold text-text-main group-hover:text-heritage-green transition-colors leading-snug relative z-10">
                     {pillar.vietnameseTitle}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-text-muted leading-relaxed font-normal">
+                  <p className="text-xs sm:text-sm text-text-muted leading-relaxed font-normal relative z-10">
                     {pillar.description}
                   </p>
                 </div>

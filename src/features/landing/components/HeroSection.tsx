@@ -7,7 +7,7 @@ import { speakEnglish } from '@/utils/sampleSpeech';
 export const HeroSection: React.FC = () => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
-  const sampleEnglishStory = 
+  const sampleEnglishStory =
     "Vietnam is not merely a war or a map coordinate; it is a four-thousand-year-old river of resilience, poetry, and shared bowls of fragrant broth under morning mist.";
 
   const handleToggleAudio = () => {
@@ -85,11 +85,10 @@ export const HeroSection: React.FC = () => {
           <button
             type="button"
             onClick={handleToggleAudio}
-            className={`px-5 py-3 rounded-2xl flex items-center gap-2.5 font-medium text-sm transition-all duration-200 cursor-pointer shrink-0 shadow-xs ${
-              isPlayingAudio
+            className={`px-5 py-3 rounded-2xl flex items-center gap-2.5 font-medium text-sm transition-all duration-200 cursor-pointer shrink-0 shadow-xs ${isPlayingAudio
                 ? 'bg-[#E8B7B2] text-heritage-green'
                 : 'bg-heritage-green hover:bg-[#143731] text-warm-ivory dark:bg-antique-gold dark:text-[#102B26] dark:hover:bg-[#c6a355]'
-            }`}
+              }`}
           >
             {isPlayingAudio ? (
               <>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight, BookOpen, ChevronDown, Sparkles } from 'lucide-react';
-import bannerVideo from '@/assets/banner.webm';
+import bannerVideo from '@/assets/hero-banner-v3.mp4';
 
 interface LandingHeroBannerProps {
   onNavigate?: (view: string) => void;
@@ -54,15 +54,10 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
       {/* Hero Typography Container */}
       <div className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 flex flex-col items-start justify-center">
         <div className="max-w-2xl lg:max-w-3xl space-y-5 sm:space-y-6">
-          {/* Sub-kicker */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-antique-gold/40 text-antique-bright text-[11px] sm:text-xs font-bold uppercase tracking-widest shadow-md">
-            <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
-            <span>NỀN TẢNG EDTECH TIÊN PHONG VĂN HÓA VIỆT</span>
-          </div>
 
           {/* Main Title */}
-          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-warm-ivory leading-[1.15] tracking-tight drop-shadow-2xl">
-            Nâng Tầm Tiếng Anh — <br />
+          <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-warm-ivory leading-[1.15] tracking-tight drop-shadow-2xl">
+            Nâng Tầm Tiếng Anh<br />
             <span className="text-antique-gold italic font-serif">Trở Thành Sứ Giả Văn Hóa Việt</span>
           </h1>
 

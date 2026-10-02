@@ -6,7 +6,6 @@ import { CoverflowArticlesSection } from '../components/CoverflowArticlesSection
 import { FourTopicsSection } from '../components/FourTopicsSection';
 import { VietnamHeritageMapSection } from '../components/VietnamHeritageMapSection';
 import { HeritageMethodologySection } from '../components/HeritageMethodologySection';
-import { InteractiveReaderDemoSection } from '../components/InteractiveReaderDemoSection';
 import { InteractiveFlashcardDemoSection } from '../components/InteractiveFlashcardDemoSection';
 import { LandingFaqSection } from '../components/LandingFaqSection';
 import { ContactSection } from '../components/ContactSection';
@@ -17,12 +16,90 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
+  const [activeSegment, setActiveSegment] = React.useState<string>(() => {
+    const hash = window.location.hash.replace('#', '');
+    return hash || 'hero';
+  });
+
   const scrollToSegment = (elementId: string) => {
+    setActiveSegment(elementId);
+    if (elementId === 'hero') {
+      window.history.pushState(null, '', window.location.pathname);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    window.history.pushState(null, '', `#${elementId}`);
     const el = document.getElementById(elementId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  // Handle deep-linking from initial URL hash & popstate
+  React.useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      const target = hash || 'hero';
+      setActiveSegment(target);
+      const el = document.getElementById(target);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('popstate', handleHashChange);
+
+    // Initial hash scroll
+    const initialHash = window.location.hash.replace('#', '');
+    if (initialHash) {
+      setActiveSegment(initialHash);
+      setTimeout(() => {
+        const el = document.getElementById(initialHash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 150);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, []);
+
+  // IntersectionObserver to auto-sync active navbar item as user scrolls
+  React.useEffect(() => {
+    const sectionIds = ['hero', 'featured-articles', 'topics', 'ban-do-di-san', 'methodology', 'interactive-demo', 'trusted-community', 'faq', 'contact'];
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+            const id = entry.target.id;
+            // Map sub-sections to closest navbar item if needed
+            let navTarget = id;
+            if (id === 'methodology' || id === 'interactive-demo' || id === 'flashcard-demo') {
+              navTarget = 'ban-do-di-san';
+            }
+            setActiveSegment(navTarget);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '-10% 0px -50% 0px',
+        threshold: [0.3],
+      }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   const handleNavigate = (view: string) => {
     if (onNavigate) {
@@ -39,14 +116,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         <LandingHeader
           onNavigate={handleNavigate}
           onScrollToSegment={scrollToSegment}
+          activeSegment={activeSegment}
         />
 
         <main className="w-full overflow-x-hidden">
           {/* 1. Hero Banner Section (Full Screen Size with Text Layer Overlay) */}
-          <LandingHeroBanner
-            onNavigate={handleNavigate}
-            onScrollToDemo={() => scrollToSegment('interactive-demo')}
-          />
+          <div id="hero">
+            <LandingHeroBanner
+              onNavigate={handleNavigate}
+              onScrollToDemo={() => scrollToSegment('interactive-demo')}
+            />
+          </div>
 
           {/* 2. Top Articles Section (3D Coverflow Slider with Auto-Advance Every 3 Seconds) */}
           <div id="featured-articles">
@@ -68,22 +148,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             <HeritageMethodologySection onNavigate={handleNavigate} />
           </div>
 
-          {/* 6. Interactive Reader Demo Section (Value-Add Feature Preview) */}
-          {/* <div id="interactive-demo">
-            <InteractiveReaderDemoSection onNavigate={handleNavigate} />
-          </div> */}
-
           {/* 7. Interactive Flashcard & Spaced Repetition Preview */}
           <div id="flashcard-demo">
             <InteractiveFlashcardDemoSection onNavigate={handleNavigate} />
           </div>
 
-          {/* 8. Trusted Section (User Feedback, Testimonials & Cultural Ambassador Community)
-          <div id="trusted-community">
-            <AmbassadorCommunitySection />
-          </div> */}
-
-          {/* 9. Frequently Asked Questions Section */}
+          {/* 8. Frequently Asked Questions Section */}
           <div id="faq">
             <LandingFaqSection />
           </div>

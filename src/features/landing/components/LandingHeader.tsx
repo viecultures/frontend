@@ -5,16 +5,26 @@ import { BrandLogo } from '@/components/BrandLogo';
 interface LandingHeaderProps {
   onNavigate?: (view: string) => void;
   onScrollToSegment: (elementId: string) => void;
+  activeSegment?: string;
 }
 
 export const LandingHeader: React.FC<LandingHeaderProps> = ({
   onNavigate,
   onScrollToSegment,
+  activeSegment = 'hero',
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const navLinks = [
+    { name: 'Trang Chủ', segment: 'hero' },
+    { name: 'Bài Viết', segment: 'featured-articles' },
+    { name: 'Chủ Đề', segment: 'topics' },
+    { name: 'Chức năng', segment: 'ban-do-di-san' },
+    { name: 'Liên Hệ', segment: 'contact' },
+  ];
+
   const handleLogoClick = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    onScrollToSegment('hero');
   };
 
   const handleNavClick = (view: string) => {
@@ -42,46 +52,37 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
           className="focus-ring rounded-xl cursor-pointer"
         />
 
-        {/* Desktop Navigation (Streamlined 5 Core Items) */}
+        {/* Desktop Navigation with Minimalist Heritage-Green Underline */}
         <nav
-          className="hidden lg:flex items-center gap-6 xl:gap-8 text-xs font-bold tracking-wide text-text-main"
+          className="hidden lg:flex items-center gap-7 xl:gap-9 text-[13px] font-bold tracking-wide"
           aria-label="Điều hướng Landing Page"
         >
-          <button
-            type="button"
-            onClick={handleLogoClick}
-            className="text-heritage-green hover:text-mountain-teal transition-colors cursor-pointer py-1.5 border-b-2 border-heritage-green"
-          >
-            Trang Chủ
-          </button>
-          <button
-            type="button"
-            onClick={() => handleScrollClick('featured-articles')}
-            className="hover:text-mountain-teal text-text-muted transition-colors cursor-pointer py-1.5"
-          >
-            Bài Viết
-          </button>
-          <button
-            type="button"
-            onClick={() => handleScrollClick('topics')}
-            className="hover:text-mountain-teal text-text-muted transition-colors cursor-pointer py-1.5"
-          >
-            Chủ Đề
-          </button>
-          <button
-            type="button"
-            onClick={() => handleScrollClick('ban-do-di-san')}
-            className="hover:text-mountain-teal text-text-muted transition-colors cursor-pointer py-1.5"
-          >
-            Chức năng
-          </button>
-          <button
-            type="button"
-            onClick={() => handleScrollClick('contact')}
-            className="hover:text-mountain-teal text-text-muted transition-colors cursor-pointer py-1.5"
-          >
-            Liên Hệ
-          </button>
+          {navLinks.map((link) => {
+            const isActive = activeSegment === link.segment;
+            return (
+              <button
+                key={link.segment}
+                type="button"
+                onClick={() => handleScrollClick(link.segment)}
+                className={`relative py-1.5 px-0.5 transition-all duration-200 cursor-pointer font-bold select-none group bg-transparent border-0 outline-none ${
+                  isActive
+                    ? 'text-heritage-green font-extrabold'
+                    : 'text-text-muted hover:text-heritage-green'
+                }`}
+              >
+                <span>{link.name}</span>
+
+                {/* Solid Heritage-Green Underline Accent */}
+                <span
+                  className={`absolute left-0 right-0 -bottom-1 h-[2px] rounded-full bg-heritage-green transition-all duration-300 ease-out ${
+                    isActive
+                      ? 'w-full opacity-100'
+                      : 'w-0 group-hover:w-full opacity-0 group-hover:opacity-100'
+                  }`}
+                />
+              </button>
+            );
+          })}
         </nav>
 
         {/* Right Actions */}
@@ -136,70 +137,25 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-surface border-b border-line px-6 py-5 space-y-4 shadow-xl animate-in slide-in-from-top duration-200">
-          <div className="flex flex-col space-y-2 text-sm font-bold text-text-main">
-            <button
-              type="button"
-              onClick={handleLogoClick}
-              className="text-left text-heritage-green py-1.5 border-b border-line/40"
-            >
-              Trang Chủ
-            </button>
-            <button
-              type="button"
-              onClick={() => handleScrollClick('featured-articles')}
-              className="text-left text-text-muted hover:text-heritage-green py-1.5 border-b border-line/40"
-            >
-              Bài Viết Tiêu Biểu
-            </button>
-            <button
-              type="button"
-              onClick={() => handleScrollClick('topics')}
-              className="text-left text-text-muted hover:text-heritage-green py-1.5 border-b border-line/40"
-            >
-              4 Trụ Cột Chủ Đề
-            </button>
-            <button
-              type="button"
-              onClick={() => handleScrollClick('ban-do-di-san')}
-              className="text-left text-text-muted hover:text-heritage-green py-1.5 border-b border-line/40"
-            >
-              Bản Đồ Di Sản Chữ S
-            </button>
-            <button
-              type="button"
-              onClick={() => handleScrollClick('methodology')}
-              className="text-left text-text-muted hover:text-heritage-green py-1.5 border-b border-line/40"
-            >
-              Phương Pháp Độc Bản
-            </button>
-            <button
-              type="button"
-              onClick={() => handleScrollClick('interactive-demo')}
-              className="text-left text-text-muted hover:text-heritage-green py-1.5 border-b border-line/40"
-            >
-              Trải Nghiệm Đọc &amp; Flashcard
-            </button>
-            <button
-              type="button"
-              onClick={() => handleScrollClick('trusted-community')}
-              className="text-left text-text-muted hover:text-heritage-green py-1.5 border-b border-line/40"
-            >
-              Cộng Đồng Đại Sứ
-            </button>
-            <button
-              type="button"
-              onClick={() => handleScrollClick('faq')}
-              className="text-left text-text-muted hover:text-heritage-green py-1.5 border-b border-line/40"
-            >
-              Câu Hỏi Thường Gặp
-            </button>
-            <button
-              type="button"
-              onClick={() => handleScrollClick('contact')}
-              className="text-left text-text-muted hover:text-heritage-green py-1.5"
-            >
-              Liên Hệ Đội Ngũ
-            </button>
+          <div className="flex flex-col space-y-1.5 text-sm font-bold">
+            {navLinks.map((link) => {
+              const isActive = activeSegment === link.segment;
+              return (
+                <button
+                  key={link.segment}
+                  type="button"
+                  onClick={() => handleScrollClick(link.segment)}
+                  className={`text-left py-2 px-3 rounded-lg transition-colors border-b border-line/30 flex items-center justify-between ${
+                    isActive
+                      ? 'text-heritage-green bg-antique-gold/20 font-extrabold shadow-xs'
+                      : 'text-text-muted hover:text-heritage-green hover:bg-mist-cloud/40'
+                  }`}
+                >
+                  <span>{link.name}</span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-antique-gold" />}
+                </button>
+              );
+            })}
           </div>
 
           <div className="pt-4 border-t border-line flex flex-col gap-3">

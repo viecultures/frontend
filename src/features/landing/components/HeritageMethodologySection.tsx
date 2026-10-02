@@ -114,43 +114,68 @@ export const HeritageMethodologySection: React.FC<HeritageMethodologySectionProp
           </p>
         </div>
 
-        {/* ── Step Selector Tabs Row ────────────────────────────────────── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
-          {METHODOLOGY_STEPS.map((step, idx) => {
-            const isActive = activeStepIndex === idx;
-            return (
-              <button
-                key={step.id}
-                type="button"
-                onClick={() => setActiveStepIndex(idx)}
-                className={`p-3.5 sm:p-4 rounded-xl text-left transition-all duration-200 border cursor-pointer focus-ring flex flex-col justify-between space-y-2.5 ${
-                  isActive
-                    ? 'bg-heritage-green text-warm-ivory border-antique-gold shadow-md'
-                    : 'bg-surface text-heritage-green border-line hover:border-antique-gold/40 hover:bg-mist-cloud/40'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className={`font-mono text-[10px] font-extrabold px-2 py-0.5 rounded ${
-                    isActive ? 'bg-black/30 text-antique-bright' : 'bg-rice-paper text-heritage-green'
-                  }`}>
-                    {step.stepNumber}
-                  </span>
-                  <span className={isActive ? 'text-antique-bright' : 'text-heritage-green'}>
-                    {step.icon}
-                  </span>
-                </div>
+        {/* ── Step Selector Tabs Row with Journey Connecting Curve ─────── */}
+        <div className="relative">
+          {/* Subtle Decorative Golden Dashed Curved Ribbon (Desktop) */}
+          <div className="hidden lg:block absolute top-[28px] left-[8%] right-[8%] h-12 pointer-events-none z-0">
+            <svg
+              viewBox="0 0 1000 60"
+              fill="none"
+              className="w-full h-full stroke-antique-gold/35"
+              strokeWidth="2"
+              strokeDasharray="6 8"
+            >
+              <path d="M 50 30 C 180 5, 220 55, 350 30 C 480 5, 520 55, 650 30 C 780 5, 820 55, 950 30" />
+            </svg>
+          </div>
 
-                <div>
-                  <h3 className={`font-serif text-xs sm:text-sm font-bold ${isActive ? 'text-warm-ivory' : 'text-heritage-green'}`}>
-                    {step.title}
-                  </h3>
-                  <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isActive ? 'text-sky-mist' : 'text-text-secondary'}`}>
-                    {step.subtitle}
-                  </p>
-                </div>
-              </button>
-            );
-          })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 relative z-10">
+            {METHODOLOGY_STEPS.map((step, idx) => {
+              const isActive = activeStepIndex === idx;
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  onClick={() => setActiveStepIndex(idx)}
+                  className={`p-3.5 sm:p-4 rounded-xl text-left transition-all duration-200 border cursor-pointer focus-ring flex flex-col justify-between space-y-2.5 relative overflow-hidden ${
+                    isActive
+                      ? 'bg-heritage-green text-warm-ivory border-antique-gold shadow-md scale-[1.02]'
+                      : 'bg-surface text-heritage-green border-line hover:border-antique-gold/40 hover:bg-mist-cloud/40'
+                  }`}
+                >
+                  {/* Subtle Corner Motif for active tab */}
+                  {isActive && (
+                    <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden pointer-events-none opacity-20">
+                      <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-antique-gold" strokeWidth="1.5">
+                        <path d="M100 0 C70 10 40 40 30 70 C20 100 0 100 0 100" />
+                        <circle cx="80" cy="20" r="10" fill="#E8B7B2" fillOpacity="0.5" />
+                      </svg>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between relative z-10">
+                    <span className={`font-mono text-[10px] font-extrabold px-2 py-0.5 rounded ${
+                      isActive ? 'bg-black/30 text-antique-bright' : 'bg-rice-paper text-heritage-green'
+                    }`}>
+                      {step.stepNumber}
+                    </span>
+                    <span className={isActive ? 'text-antique-bright' : 'text-heritage-green'}>
+                      {step.icon}
+                    </span>
+                  </div>
+
+                  <div className="relative z-10">
+                    <h3 className={`font-serif text-xs sm:text-sm font-bold ${isActive ? 'text-warm-ivory' : 'text-heritage-green'}`}>
+                      {step.title}
+                    </h3>
+                    <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isActive ? 'text-sky-mist' : 'text-text-secondary'}`}>
+                      {step.subtitle}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* ── Active Step Detailed Showcase Panel ───────────────────────── */}
@@ -159,7 +184,7 @@ export const HeritageMethodologySection: React.FC<HeritageMethodologySectionProp
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="rounded-2xl bg-surface border border-antique-gold/30 p-6 sm:p-8 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center"
+          className="rounded-2xl bg-surface border border-antique-gold/30 p-6 sm:p-8 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center relative overflow-hidden"
         >
           {/* Left Column: Storytelling & Key Points (7/12) */}
           <div className="lg:col-span-7 space-y-4">
@@ -192,9 +217,39 @@ export const HeritageMethodologySection: React.FC<HeritageMethodologySectionProp
             </ul>
           </div>
 
-          {/* Right Column: Visual Callout Box (5/12) */}
-          <div className="lg:col-span-5 p-5 sm:p-6 rounded-xl bg-heritage-forest text-warm-ivory border border-antique-gold/40 shadow-inner space-y-4">
-            <div className="flex items-center justify-between border-b border-antique-gold/20 pb-2.5">
+          {/* Right Column: Visual Callout Box with Corner Lotus Watermark (5/12) */}
+          <div className="lg:col-span-5 p-5 sm:p-6 rounded-xl bg-heritage-forest text-warm-ivory border border-antique-gold/40 shadow-inner space-y-4 relative overflow-hidden">
+            {/* Top-Right Corner Lotus Watermark SVG */}
+            <div className="absolute top-0 right-0 w-36 h-36 pointer-events-none opacity-25 overflow-hidden">
+              <svg viewBox="0 0 160 160" fill="none" className="w-full h-full">
+                <defs>
+                  <linearGradient id="lotusHeritageGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#F6EEDC" />
+                    <stop offset="60%" stopColor="#D9B76A" />
+                    <stop offset="100%" stopColor="#6E9FA1" stopOpacity="0.8" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M160 0 C120 20 80 60 70 110 C60 160 30 160 0 160"
+                  stroke="#D9B76A"
+                  strokeWidth="1.5"
+                  strokeDasharray="4 4"
+                />
+                <path
+                  d="M160 20 C130 35 115 65 110 100 C130 95 155 70 160 20 Z"
+                  fill="url(#lotusHeritageGrad)"
+                  opacity="0.6"
+                />
+                <path
+                  d="M130 0 C110 25 105 55 110 80 C135 65 150 40 160 10 Z"
+                  fill="#BFE3EA"
+                  opacity="0.4"
+                />
+                <circle cx="125" cy="55" r="4" fill="#D9B76A" />
+              </svg>
+            </div>
+
+            <div className="flex items-center justify-between border-b border-antique-gold/20 pb-2.5 relative z-10">
               <span className="text-[10px] font-bold uppercase tracking-wider text-antique-bright">
                 TRIẾT LÝ PHƯƠNG PHÁP VIECULTURES
               </span>
@@ -203,11 +258,11 @@ export const HeritageMethodologySection: React.FC<HeritageMethodologySectionProp
               </span>
             </div>
 
-            <blockquote className="font-serif italic text-xs sm:text-sm text-warm-ivory leading-relaxed">
+            <blockquote className="font-serif italic text-xs sm:text-sm text-warm-ivory leading-relaxed relative z-10">
               &ldquo;Ngôn ngữ không chỉ là công cụ giao tiếp; đó là chiếc cầu nối lưu giữ và tái hiện tâm hồn của cả một dân tộc.&rdquo;
             </blockquote>
 
-            <div className="pt-2 border-t border-antique-gold/20 flex items-center justify-between text-[11px] text-sky-mist">
+            <div className="pt-2 border-t border-antique-gold/20 flex items-center justify-between text-[11px] text-sky-mist relative z-10">
               <span>Được cố vấn bởi chuyên gia văn hóa</span>
               <span className="text-antique-gold font-bold">100% Thuần Việt &amp; Học Thuật</span>
             </div>
