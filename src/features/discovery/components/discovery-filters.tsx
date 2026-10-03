@@ -22,7 +22,7 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
   audioOnly,
   onToggleAudioOnly
 }) => {
-  const cefrLevels = ["All", "A2", "B1", "B2", "C1"];
+  const cefrLevels = ["All", "Level 1", "Level 2", "Level 3"];
   const categories = ["All", "History", "Heritage", "Culinary Arts", "Traditional Arts"];
 
   return (
@@ -41,10 +41,10 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
 
       {/* Filter Row */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-amber-500/10 pt-3">
-        {/* CEFR Level Tabs */}
+        {/* Level Tabs */}
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-zinc-500 flex items-center gap-1 mr-1">
-            <Filter className="w-3.5 h-3.5 text-amber-600" /> CEFR:
+            <Filter className="w-3.5 h-3.5 text-amber-600" /> Trình độ:
           </span>
           <div className="flex gap-1 bg-amber-500/10 p-1 rounded-xl">
             {cefrLevels.map((lvl) => (

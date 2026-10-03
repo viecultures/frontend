@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/cn";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: "cefr-a2" | "cefr-b1" | "cefr-b2" | "cefr-c1" | "gold" | "bamboo" | "lacquer" | "outline";
+  variant?: "level-1" | "level-2" | "level-3" | "cefr-a2" | "cefr-b1" | "cefr-b2" | "cefr-c1" | "gold" | "bamboo" | "lacquer" | "outline";
   children: React.ReactNode;
 }
 
@@ -10,6 +10,9 @@ export const Badge: React.FC<BadgeProps> = ({ className, variant = "gold", child
   const base = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide transition-colors";
 
   const variants = {
+    "level-1": "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40",
+    "level-2": "bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-300/40",
+    "level-3": "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300/40",
     "cefr-a2": "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40",
     "cefr-b1": "bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-300/40",
     "cefr-b2": "bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-400/40",

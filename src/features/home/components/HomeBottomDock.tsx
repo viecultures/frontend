@@ -1,5 +1,5 @@
-import React from 'react';
-import { Clock, Flame, Play, Pause, RotateCcw, Award } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Clock, Flame, Play, Pause, RotateCcw } from 'lucide-react';
 
 interface HomeBottomDockProps {
   activeDockMode: 'study' | 'pomodoro';
@@ -10,6 +10,27 @@ interface HomeBottomDockProps {
   onResetPomo?: () => void;
 }
 
+// Calculate remaining time until next midnight (00:00:00) in GMT+7 (Asia/Ho_Chi_Minh)
+function getDailyChallengeCountdownGMT7(): string {
+  const now = new Date();
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
+  const vnNow = new Date(utcMs + 7 * 60 * 60 * 1000);
+
+  const vnMidnight = new Date(vnNow);
+  vnMidnight.setHours(24, 0, 0, 0);
+
+  const diffMs = Math.max(0, vnMidnight.getTime() - vnNow.getTime());
+  const totalSec = Math.floor(diffMs / 1000);
+
+  const hours = Math.floor(totalSec / 3600);
+  const minutes = Math.floor((totalSec % 3600) / 60);
+  const seconds = totalSec % 60;
+
+  return `${hours.toString().padStart(2, '0')}:${minutes
+    .toString()
+    .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
 export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
   activeDockMode,
   onSelectDockMode,
@@ -18,6 +39,16 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
   onTogglePomo,
   onResetPomo,
 }) => {
+  const [dailyCountdown, setDailyCountdown] = useState<string>(() => getDailyChallengeCountdownGMT7());
+
+  // Real-time ticker for Daily Challenge countdown (resets at 00:00 GMT+7)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDailyCountdown(getDailyChallengeCountdownGMT7());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const formatPomoTime = (totalSec: number) => {
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
@@ -41,7 +72,10 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
           </div>
 
           {/* Daily Challenge Sub-card */}
-          <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-black/40 rounded-xl border border-white/10">
+          <div
+            className="flex items-center gap-2.5 px-3.5 py-1.5 bg-black/40 rounded-xl border border-white/10"
+            title="Đếm ngược đến 00:00 GMT+7 (Làm mới thử thách hằng ngày)"
+          >
             <div className="p-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
               <Clock className="w-4 h-4" />
             </div>
@@ -50,7 +84,7 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
               <div className="text-xs font-bold text-white flex items-center gap-2">
                 <span>Còn lại</span>
                 <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-[11px] font-mono border border-emerald-500/30 font-bold">
-                  13:40:27
+                  {dailyCountdown}
                 </span>
               </div>
             </div>

@@ -5,7 +5,7 @@ export interface Lesson {
   vietnameseTitle: string;
   category: "Heritage" | "Cuisine" | "Crafts" | "Nature" | "Folklore";
   categoryVi: string;
-  cefrLevel: "A2" | "B1" | "B2" | "C1";
+  cefrLevel: "Level 1" | "Level 2" | "Level 3" | "A2" | "B1" | "B2" | "C1";
   readTime: string;
   vocabCount: number;
   summary: string;
@@ -20,11 +20,11 @@ export interface Lesson {
 export const LESSONS_DATA: Lesson[] = [
   {
     id: "imperial-hue",
-    title: "Exploring Imperial Hue Architecture Through B1 English",
-    vietnameseTitle: "Khám Phá Kiến Trúc Cung Đình Huế Qua Tiếng Anh B1",
+    title: "Exploring Imperial Hue Architecture Through Level 2 English",
+    vietnameseTitle: "Khám Phá Kiến Trúc Cung Đình Huế Qua Tiếng Anh Level 2",
     category: "Heritage",
     categoryVi: "Lịch Sử & Di Sản",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "8 phút đọc",
     vocabCount: 12,
     summary:
@@ -41,7 +41,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Hành Trình Bánh Mì Sài Gòn Ra Thế Giới",
     category: "Cuisine",
     categoryVi: "Ẩm Thực & Cà Phê",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "5 phút đọc",
     vocabCount: 8,
     summary:
@@ -57,7 +57,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Truyền Thống Đèn Lồng Phố Cổ Hội An",
     category: "Heritage",
     categoryVi: "Lịch Sử & Di Sản",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "7 phút đọc",
     vocabCount: 10,
     summary:
@@ -73,7 +73,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Nghệ Thuật Gốm Sứ Làng Cổ Bát Tràng",
     category: "Crafts",
     categoryVi: "Nghệ Thuật & Làng Nghề",
-    cefrLevel: "B2",
+    cefrLevel: "Level 2",
     readTime: "6 phút đọc",
     vocabCount: 9,
     summary:
@@ -89,7 +89,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Ruộng Bậc Thang Mù Cang Chải Mùa Lúa Chín",
     category: "Nature",
     categoryVi: "Danh Thắng Thiên Nhiên",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "5 phút đọc",
     vocabCount: 7,
     summary:
@@ -105,7 +105,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Huyền Thoại Cà Phê Trứng Hà Nội",
     category: "Cuisine",
     categoryVi: "Ẩm Thực & Cà Phê",
-    cefrLevel: "B2",
+    cefrLevel: "Level 2",
     readTime: "4 phút đọc",
     vocabCount: 6,
     summary:
@@ -121,7 +121,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Múa Rối Nước & Truyền Thuyết Làng Quê",
     category: "Folklore",
     categoryVi: "Lễ Hội & Tín Ngưỡng",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "8 phút đọc",
     vocabCount: 11,
     summary:
@@ -137,11 +137,11 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Sự Tích Hoàn Kiếm & Rùa Vàng",
     category: "Folklore",
     categoryVi: "Lễ Hội & Tín Ngưỡng",
-    cefrLevel: "A2",
+    cefrLevel: "Level 1",
     readTime: "4 phút đọc",
     vocabCount: 5,
     summary:
-      "Revisit King Le Loi's mythical sword and the sacred turtle of Hanoi in accessible A2 English tailored for foundational learners.",
+      "Revisit King Le Loi's mythical sword and the sacred turtle of Hanoi in accessible Level 1 English tailored for foundational learners.",
     gradient: "from-[#E8B7B2] via-[#C88A84] to-[#995852]",
     iconSymbol: "🐢",
     imageUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80",
@@ -153,7 +153,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Nghệ Thuật Dệt Lụa & Áo Dài Truyền Thống",
     category: "Crafts",
     categoryVi: "Nghệ Thuật & Làng Nghề",
-    cefrLevel: "B2",
+    cefrLevel: "Level 2",
     readTime: "7 phút đọc",
     vocabCount: 10,
     summary:
@@ -169,11 +169,11 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Quần Thể Danh Thắng Tràng An & Bí Ẩn Hang Động",
     category: "Nature",
     categoryVi: "Danh Thắng Thiên Nhiên",
-    cefrLevel: "C1",
+    cefrLevel: "Level 3",
     readTime: "9 phút đọc",
     vocabCount: 14,
     summary:
-      "Explore UNESCO dual heritage karst mountains, ancient temples, and subterranean rivers using advanced C1 academic vocabulary.",
+      "Explore UNESCO dual heritage karst mountains, ancient temples, and subterranean rivers using advanced Level 3 academic vocabulary.",
     gradient: "from-[#1E4B43] via-[#336F64] to-[#143630]",
     iconSymbol: "⛰️",
     imageUrl: "https://images.unsplash.com/photo-1540611025311-01df3cef54b5?auto=format&fit=crop&w=800&q=80",
@@ -185,11 +185,11 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Sơn Đoòng: Hành Trình Thám Hiểm Hang Động Lớn Nhất Thế Giới",
     category: "Nature",
     categoryVi: "Danh Thắng Thiên Nhiên",
-    cefrLevel: "C1",
+    cefrLevel: "Level 3",
     readTime: "10 phút đọc",
     vocabCount: 16,
     summary:
-      "Descend into Phong Nha-Kẻ Bàng's underground jungle ecosystem, giant stalagmites, and subterranean clouds with C1 geological terms.",
+      "Descend into Phong Nha-Kẻ Bàng's underground jungle ecosystem, giant stalagmites, and subterranean clouds with Level 3 geological terms.",
     gradient: "from-[#1B3B36] via-[#2A5C54] to-[#0F2623]",
     iconSymbol: "🦇",
     imageUrl: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80",
@@ -201,7 +201,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Nghệ Thuật Thưởng Trà Sen Tây Hồ Tinh Tế",
     category: "Cuisine",
     categoryVi: "Ẩm Thực & Cà Phê",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "6 phút đọc",
     vocabCount: 8,
     summary:
@@ -217,7 +217,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Tết Nguyên Đán: Phong Tục & Nghi Lễ Mùa Xuân",
     category: "Folklore",
     categoryVi: "Lễ Hội & Tín Ngưỡng",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "8 phút đọc",
     vocabCount: 12,
     summary:
@@ -233,7 +233,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Tranh Dân Gian Đông Hồ Dùng Màu Tự Nhiên",
     category: "Crafts",
     categoryVi: "Nghệ Thuật & Làng Nghề",
-    cefrLevel: "A2",
+    cefrLevel: "Level 1",
     readTime: "5 phút đọc",
     vocabCount: 7,
     summary:
@@ -249,7 +249,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Vịnh Hạ Long: Truyền Thuyết Rồng Đáp Xuống Biển",
     category: "Nature",
     categoryVi: "Danh Thắng Thiên Nhiên",
-    cefrLevel: "B2",
+    cefrLevel: "Level 2",
     readTime: "7 phút đọc",
     vocabCount: 10,
     summary:
@@ -265,7 +265,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Phở Hà Nội: Linh Hồn Ẩm Thực Đất Kinh Kỳ",
     category: "Cuisine",
     categoryVi: "Ẩm Thực & Cà Phê",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "6 phút đọc",
     vocabCount: 9,
     summary:
@@ -281,7 +281,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Thánh Địa Mỹ Sơn: Ngôi Đền Gạch Cổ Vương Quốc Chăm Pa",
     category: "Heritage",
     categoryVi: "Lịch Sử & Di Sản",
-    cefrLevel: "B2",
+    cefrLevel: "Level 2",
     readTime: "8 phút đọc",
     vocabCount: 12,
     summary:
@@ -297,7 +297,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Chợ Nổi Cái Răng & Nhịp Sống Sông Nước Miền Tây",
     category: "Nature",
     categoryVi: "Danh Thắng Thiên Nhiên",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "6 phút đọc",
     vocabCount: 8,
     summary:
@@ -313,7 +313,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Dân Ca Quan Họ Bắc Ninh & Tình Người Đất Kinh Bắc",
     category: "Folklore",
     categoryVi: "Lễ Hội & Tín Ngưỡng",
-    cefrLevel: "B1",
+    cefrLevel: "Level 2",
     readTime: "7 phút đọc",
     vocabCount: 10,
     summary:
@@ -329,7 +329,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Nón Lá: Biểu Tượng Duyên Dáng Của Làng Nghề Việt",
     category: "Crafts",
     categoryVi: "Nghệ Thuật & Làng Nghề",
-    cefrLevel: "A2",
+    cefrLevel: "Level 1",
     readTime: "5 phút đọc",
     vocabCount: 6,
     summary:
@@ -345,7 +345,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Không Gian Văn Hóa Cồng Chiêng Tây Nguyên Sacred",
     category: "Heritage",
     categoryVi: "Lịch Sử & Di Sản",
-    cefrLevel: "B2",
+    cefrLevel: "Level 2",
     readTime: "9 phút đọc",
     vocabCount: 13,
     summary:
@@ -361,7 +361,7 @@ export const LESSONS_DATA: Lesson[] = [
     vietnameseTitle: "Nem Rán Truyền Thống: Món Ăn Không Thể Thiếu Ngày Tết",
     category: "Cuisine",
     categoryVi: "Ẩm Thực & Cà Phê",
-    cefrLevel: "A2",
+    cefrLevel: "Level 1",
     readTime: "4 phút đọc",
     vocabCount: 5,
     summary:
@@ -373,15 +373,17 @@ export const LESSONS_DATA: Lesson[] = [
   },
 ];
 
-// Helper to get CEFR Badge Styles
+// Helper to get Level Badge Styles
 export const getCefrBadgeStyle = (level: string) => {
   switch (level) {
+    case "Level 1":
     case "A2":
       return "bg-emerald-600/90 text-emerald-50 border-emerald-400/40";
+    case "Level 2":
     case "B1":
-      return "bg-cyan-700/90 text-cyan-50 border-cyan-400/40";
     case "B2":
-      return "bg-[#D9B76A] text-[#1E4B43] border-[#B89240]";
+      return "bg-cyan-700/90 text-cyan-50 border-cyan-400/40";
+    case "Level 3":
     case "C1":
       return "bg-rose-700/90 text-rose-50 border-rose-400/40";
     default:
@@ -399,8 +401,9 @@ export const TOPIC_OPTIONS = [
   { label: "Lễ hội & Tín ngưỡng", value: "Folklore", icon: "folklore" },
 ];
 
-// CEFR Levels
-export const CEFR_LEVELS = ["All", "A2", "B1", "B2", "C1"];
+// Level Options
+export const CEFR_LEVELS = ["All", "Level 1", "Level 2", "Level 3"];
+export const LEVEL_OPTIONS = CEFR_LEVELS;
 
 // Quick Search Tags
 export const QUICK_SEARCH_TAGS = [

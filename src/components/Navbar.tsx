@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked } from 'lucide-react';
+import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Settings } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
+import { useSettings } from '@/context/SettingsContext';
 
 interface NavbarProps {
   activeView?: string;
@@ -33,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   onOpenProfile,
 }) => {
+  const { openSettings } = useSettings();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const hoverScale = shouldReduceMotion ? 1 : 1.03;
@@ -196,6 +198,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* ── Right Actions ────────────────────────────────────────────── */}
           <div className="flex items-center gap-2.5">
+            <motion.button
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.94 }}
+              onClick={openSettings}
+              className="w-10 h-10 rounded-xl bg-heritage-green/60 hover:bg-heritage-green border border-antique-gold/40 flex items-center justify-center text-warm-ivory/80 hover:text-antique-gold transition-all cursor-pointer focus-ring-dark"
+              title="Cài đặt Trang chủ (Màu sắc & Hình nền)"
+              aria-label="Cài đặt Trang chủ"
+            >
+              <Settings className="w-4 h-4" />
+            </motion.button>
+
             {isLoggedIn ? (
               <div className="relative">
                 <motion.button

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, Settings, LogOut, ChevronRight, ExternalLink } from 'lucide-react';
+import { useSettings } from '@/context/SettingsContext';
 
 interface ProfileDropdownProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
   onLogout,
   onNavigate,
 }) => {
+  const { openSettings } = useSettings();
   const handleItemClick = (action?: () => void, view?: string) => {
     onClose();
     if (action) {
@@ -93,16 +95,16 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                 <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
               </motion.button>
 
-              {/* 2. Cài đặt */}
+              {/* 2. Cài đặt Trang chủ */}
               <motion.button
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => handleItemClick(() => alert('Cài đặt tài khoản đang được hoàn thiện!'))}
+                onClick={() => handleItemClick(openSettings)}
                 className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-green/70 hover:bg-mist-cloud dark:hover:bg-heritage-green border border-heritage-green/15 dark:border-white/10 hover:border-antique-gold text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
               >
                 <div className="flex items-center gap-2">
                   <Settings className="w-4 h-4 text-antique-gold" />
-                  <span>Cài đặt</span>
+                  <span>Cài đặt Trang chủ</span>
                 </div>
                 <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
               </motion.button>

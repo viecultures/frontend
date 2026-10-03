@@ -351,7 +351,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
             </p>
             <div className="flex items-center justify-between text-[10px] text-antique-gold pt-0.5">
               <span>{hoveredSite.category}</span>
-              <span className="font-mono font-semibold">{hoveredSite.cefrLevel} Level</span>
+              <span className="font-mono font-semibold">{hoveredSite.cefrLevel}</span>
             </div>
           </motion.div>
         )}

@@ -12,7 +12,7 @@ export interface CulturalArticle {
   title: string;
   titleVi: string;
   category: "History" | "Heritage" | "Culinary Arts" | "Traditional Arts";
-  cefr: "A2" | "B1" | "B2" | "C1";
+  cefr: "Level 1" | "Level 2" | "Level 3" | "A2" | "B1" | "B2" | "C1";
   readTimeMinutes: number;
   hasAudio: boolean;
   coverImage: string;
@@ -58,7 +58,7 @@ export const SAMPLE_ARTICLES: CulturalArticle[] = [
     title: "The Culinary Soul of Hanoi: The Heritage of Phở",
     titleVi: "Hồn Thực Khách Hà Thành: Di Sản Phở Việt",
     category: "Culinary Arts",
-    cefr: "B1",
+    cefr: "Level 2",
     readTimeMinutes: 6,
     hasAudio: true,
     coverImage: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80",
@@ -115,7 +115,7 @@ export const SAMPLE_ARTICLES: CulturalArticle[] = [
     title: "Áo Dài: The Thread of Grace and National Pride",
     titleVi: "Áo Dài: Sợi Chỉ Thướt Tha Và Tự Hào Dân Tộc",
     category: "Heritage",
-    cefr: "B2",
+    cefr: "Level 2",
     readTimeMinutes: 8,
     hasAudio: true,
     coverImage: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80",
@@ -145,7 +145,7 @@ export const SAMPLE_ARTICLES: CulturalArticle[] = [
     title: "Echoes of Eternity: Dong Son Bronze Drums",
     titleVi: "Tiếng Vọng Ngàn Năm: Trống Đồng Đông Sơn",
     category: "History",
-    cefr: "C1",
+    cefr: "Level 3",
     readTimeMinutes: 10,
     hasAudio: true,
     coverImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
@@ -174,7 +174,7 @@ export const SAMPLE_ARTICLES: CulturalArticle[] = [
     title: "Dancing on Water: The Magic of Water Puppetry",
     titleVi: "Múa Trên Làn Nước: Phép Thuật Múa Rối Nước",
     category: "Traditional Arts",
-    cefr: "A2",
+    cefr: "Level 1",
     readTimeMinutes: 5,
     hasAudio: true,
     coverImage: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80",

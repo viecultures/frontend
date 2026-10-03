@@ -135,7 +135,7 @@ export const LearningMethodSection: React.FC = () => {
 
               <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-sky-mist">
                 <span>Chuẩn đầu ra kiểm định</span>
-                <span className="text-antique-bright font-bold">CEFR B1 - C1</span>
+                <span className="text-antique-bright font-bold">Level 1 - 3</span>
               </div>
             </div>
           </div>

@@ -302,7 +302,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
               ? "border-[#D9B76A]/40 bg-[#D9B76A]/15 text-[#D9B76A]"
               : "border-[#1E4B43]/30 bg-[#1E4B43]/10 text-[#1E4B43]"
           }`}>
-            B2–C1
+            Level 2–3
           </span>
         </div>
 

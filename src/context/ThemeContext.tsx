@@ -1,54 +1,37 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React from 'react';
+import { useSettings, type ThemeMode } from './SettingsContext';
 
 export type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
   theme: Theme;
+  themeMode: ThemeMode;
   isDark: boolean;
   toggleTheme: () => void;
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: ThemeMode) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>('light');
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.style.colorScheme = 'dark';
-    } else {
-      root.classList.remove('dark');
-      root.style.colorScheme = 'light';
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, isDark: theme === 'dark', toggleTheme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <>{children}</>;
 };
 
 export const useTheme = (): ThemeContextType => {
-  const context = useContext(ThemeContext);
-  if (!context) {
+  try {
+    const { theme, resolvedTheme, isDark, setTheme } = useSettings();
+    return {
+      theme: resolvedTheme,
+      themeMode: theme,
+      isDark,
+      toggleTheme: () => setTheme(isDark ? 'light' : 'dark'),
+      setTheme: (newTheme: ThemeMode) => setTheme(newTheme),
+    };
+  } catch {
     return {
       theme: 'dark',
+      themeMode: 'dark',
       isDark: true,
-      toggleTheme: () => { },
-      setTheme: () => { },
+      toggleTheme: () => {},
+      setTheme: () => {},
     };
   }
-  return context;
 };

@@ -299,7 +299,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   {
     id: "banh-mi",
     category: "Cuisine",
-    level: "B1",
+    level: "Level 2",
     title: "The Story of Saigon Bánh Mì",
     description: "From French baguette to global culinary icon: the history behind Vietnam's favorite street food.",
     readTime: "5 min read",
@@ -309,7 +309,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   {
     id: "hoi-an",
     category: "Heritage",
-    level: "B1",
+    level: "Level 2",
     title: "Hội An Lantern Festival Traditions",
     description: "Understanding full moon rituals, silk craftsmanship, and ancient wooden architecture along the Thu Bồn river.",
     readTime: "7 min read",
@@ -319,7 +319,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   {
     id: "bat-trang",
     category: "Crafts",
-    level: "B2",
+    level: "Level 2",
     title: "Bát Tràng Pottery & Ceramic Arts",
     description: "700 years of ceramic heritage in a traditional craft village on the Red River delta.",
     readTime: "6 min read",

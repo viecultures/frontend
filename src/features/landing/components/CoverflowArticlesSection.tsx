@@ -18,7 +18,7 @@ const COVERFLOW_ARTICLES: CoverflowArticle[] = [
   {
     id: 'imperial-hue',
     category: 'Di sản UNESCO',
-    level: 'CEFR B2',
+    level: 'Level 2',
     title: 'Imperial Hue Citadel & Court Architecture',
     vietnameseTitle: 'Kiến Trúc Cung Đình & Phong Thủy Triều Nguyễn',
     description: 'Explore 19th-century royal bastions, sacred geomancy design, and dynastic resilience along the Perfume River.',
@@ -30,7 +30,7 @@ const COVERFLOW_ARTICLES: CoverflowArticle[] = [
   {
     id: 'saigon-banh-mi',
     category: 'Ẩm thực & Phong vị',
-    level: 'CEFR B1',
+    level: 'Level 2',
     title: 'The Story of Saigon Banh Mi',
     vietnameseTitle: 'Hành Trình Bánh Mì Sài Gòn & Di Sản Ẩm Thực',
     description: 'From colonial French baguette to global culinary icon: the crispy crust, aromatic pâté, and Vietnamese herb harmony.',
@@ -42,7 +42,7 @@ const COVERFLOW_ARTICLES: CoverflowArticle[] = [
   {
     id: 'hoi-an-lanterns',
     category: 'Di sản UNESCO',
-    level: 'CEFR B1',
+    level: 'Level 2',
     title: 'Hoi An Full-Moon Lantern Festival',
     vietnameseTitle: 'Lễ Hội Đèn Lồng & Đêm Rằm Sông Hoài',
     description: 'Ancient merchant port traditions, ancestral silk weaving, and vibrant lantern processions reflecting on peaceful waters.',
@@ -54,7 +54,7 @@ const COVERFLOW_ARTICLES: CoverflowArticle[] = [
   {
     id: 'bat-trang-pottery',
     category: 'Nghệ thuật Làng nghề',
-    level: 'CEFR B2',
+    level: 'Level 2',
     title: 'Bat Trang 700-Year Ceramic Heritage',
     vietnameseTitle: 'Gốm Sứ Bát Tràng & Tinh Hoa Men Rạn Cổ',
     description: 'Seven centuries of master pottery kilns, distinctive crackle glaze techniques, and artisanal clay mastery along the Red River.',
@@ -66,7 +66,7 @@ const COVERFLOW_ARTICLES: CoverflowArticle[] = [
   {
     id: 'mu-cang-chai',
     category: 'Phong cảnh & Lễ hội',
-    level: 'CEFR B1',
+    level: 'Level 2',
     title: 'Mu Cang Chai Golden Rice Terraces',
     vietnameseTitle: 'Ruộng Bậc Thang Mù Cang Chải Vàng Óng',
     description: 'Highland ethnic H’Mong agricultural ingenuity, cascading golden slopes, and seasonal harvest rituals in the Northwest.',
@@ -78,7 +78,7 @@ const COVERFLOW_ARTICLES: CoverflowArticle[] = [
   {
     id: 'dong-ho-paintings',
     category: 'Nghệ thuật Làng nghề',
-    level: 'CEFR B2',
+    level: 'Level 2',
     title: 'Dong Ho Folk Woodcut Paintings',
     vietnameseTitle: 'Tranh Khắc Gỗ Đông Hồ & Giấy Điệp Dân Gian',
     description: 'Folk woodcut printing on scallop-shell coated Do paper, conveying profound wishes of prosperity, harmony, and filial piety.',

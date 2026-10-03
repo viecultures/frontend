@@ -168,8 +168,8 @@ export default function CommunityContestPage() {
     <main className="min-h-screen bg-surface text-text-body relative selection:bg-sky-mist selection:text-heritage-green">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 px-5 py-3 rounded-2xl bg-heritage-green text-warm-ivory shadow-xl border border-antique-gold/40 flex items-center gap-2 text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-200">
-          <Check className="w-4 h-4 text-antique-gold" />
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap">
+          <Check className="w-4 h-4 text-antique-gold shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}

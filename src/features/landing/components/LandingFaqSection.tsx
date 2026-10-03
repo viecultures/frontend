@@ -14,7 +14,7 @@ const FAQS: FaqItem[] = [
     id: 'faq-1',
     question: 'VieCultures khác biệt gì so với các ứng dụng học tiếng Anh truyền thống?',
     answer:
-      'Thay vì học qua các bài đọc mẫu phương Tây xa lạ, VieCultures kết hợp 100% ngữ liệu di sản văn hóa Việt Nam (ẩm thực, làng nghề, lịch sử triều đại, phong tục) với chuẩn tiếng Anh học thuật quốc tế (CEFR A2 - C1). Người học vừa nâng cao phản xạ tiếng Anh, vừa sở hữu vốn collocations chuẩn xác để tự hào chia sẻ văn hóa Việt với bạn bè thế giới.',
+      'Thay vì học qua các bài đọc mẫu phương Tây xa lạ, VieCultures kết hợp 100% ngữ liệu di sản văn hóa Việt Nam (ẩm thực, làng nghề, lịch sử triều đại, phong tục) với chuẩn tiếng Anh học thuật quốc tế (Level 1 - 3). Người học vừa nâng cao phản xạ tiếng Anh, vừa sở hữu vốn collocations chuẩn xác để tự hào chia sẻ văn hóa Việt với bạn bè thế giới.',
     category: 'Phương pháp',
     icon: <BookOpen className="w-4 h-4 text-antique-gold" />,
   },

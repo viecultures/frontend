@@ -13,16 +13,20 @@ export const LessonCard: React.FC<LessonCardProps> = ({
   onOpenReader,
   onOpenFlashcards,
 }) => {
-  const getLevelBadge = (level: CEFRLevel) => {
+  const getLevelBadge = (level: CEFRLevel | string) => {
     switch (level) {
+      case 'Level 1':
       case 'A2':
-        return 'bg-blue-500/20 text-blue-200 border-blue-400/30';
-      case 'B1':
         return 'bg-emerald-500/20 text-emerald-200 border-emerald-400/30';
+      case 'Level 2':
+      case 'B1':
       case 'B2':
-        return 'bg-amber-500/20 text-amber-200 border-amber-400/30';
+        return 'bg-sky-500/20 text-sky-200 border-sky-400/30';
+      case 'Level 3':
       case 'C1':
         return 'bg-purple-500/20 text-purple-200 border-purple-400/30';
+      default:
+        return 'bg-amber-500/20 text-amber-200 border-amber-400/30';
     }
   };
 
@@ -45,7 +49,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({
         <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between pointer-events-none">
           {/* Level Band Stamp */}
           <span className={`px-3 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border backdrop-blur-md ${getLevelBadge(lesson.level)}`}>
-            Band {lesson.level}
+            {lesson.level}
           </span>
 
           {/* Category Tag */}

@@ -32,7 +32,17 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex items-center gap-2">
-            <Badge variant={`cefr-${article.cefr.toLowerCase()}` as any}>
+            <Badge
+              variant={
+                article.cefr === "Level 1"
+                  ? "level-1"
+                  : article.cefr === "Level 2"
+                  ? "level-2"
+                  : article.cefr === "Level 3"
+                  ? "level-3"
+                  : (`cefr-${article.cefr.toLowerCase()}` as any)
+              }
+            >
               {article.cefr}
             </Badge>
             <Badge variant="gold">{article.category}</Badge>

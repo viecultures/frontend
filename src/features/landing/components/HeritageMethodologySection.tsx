@@ -45,7 +45,7 @@ const METHODOLOGY_STEPS: MethodologyStep[] = [
     title: 'Đọc Sâu & AI Audio Shadowing',
     subtitle: 'Đọc Song Ngữ & Luyện Âm Chuẩn Xác',
     icon: <BookOpen className="w-6 h-6 text-antique-gold" />,
-    desc: 'Đắm mình trong các bài đọc song ngữ chuẩn học thuật (CEFR B1 - C1). Tra từ vựng chỉ bằng 1 chạm, nghe phát âm bản xứ và luyện nhại giọng chuẩn ngữ điệu.',
+    desc: 'Đắm mình trong các bài đọc song ngữ chuẩn học thuật (Level 1 - 3). Tra từ vựng chỉ bằng 1 chạm, nghe phát âm bản xứ và luyện nhại giọng chuẩn ngữ điệu.',
     highlights: [
       'Chế độ đọc Song Ngữ (Bilingual) & Đọc Sâu (Extensive)',
       'Gạch chân thư pháp tra từ vựng kèm phiên âm IPA',

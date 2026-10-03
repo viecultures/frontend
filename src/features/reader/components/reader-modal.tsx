@@ -119,7 +119,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold border border-emerald-500/30">
-                  Song Ngữ Cặp Đoạn • Band {lesson.level}
+                  Song Ngữ Cặp Đoạn • {lesson.level}
                 </span>
                 <span className="text-xs text-white/60">• {lesson.categoryNameVi}</span>
               </div>
@@ -282,7 +282,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
                     ({selectedVocab.pos})
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 text-[10px] font-semibold">
-                    Band {selectedVocab.level}
+                    {selectedVocab.level}
                   </span>
                   <button
                     onClick={() => speakText(selectedVocab.word)}

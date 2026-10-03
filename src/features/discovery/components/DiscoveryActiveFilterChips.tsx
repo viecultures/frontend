@@ -59,12 +59,12 @@ export const DiscoveryActiveFilterChips: React.FC<DiscoveryActiveFilterChipsProp
 
         {selectedCefr !== 'All' && (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-heritage-green text-warm-ivory font-bold shadow-xs border border-antique-gold/40">
-            <span>CEFR: {selectedCefr}</span>
+            <span>Trình độ: {selectedCefr}</span>
             <button
               type="button"
               onClick={onClearCefr}
               className="hover:text-antique-gold cursor-pointer p-0.5"
-              title="Xóa lọc CEFR"
+              title="Xóa lọc trình độ"
             >
               <X className="w-3 h-3" />
             </button>

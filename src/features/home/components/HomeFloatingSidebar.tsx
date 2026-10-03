@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Bot, MessageSquare, Settings } from 'lucide-react';
+import { useSettings } from '@/context/SettingsContext';
 
 interface HomeFloatingSidebarProps {
   onNavigate: (view: string) => void;
@@ -8,6 +9,8 @@ interface HomeFloatingSidebarProps {
 export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
   onNavigate,
 }) => {
+  const { openSettings } = useSettings();
+
   return (
     <aside
       className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-40 flex-col gap-2 bg-heritage-dark/85 border border-white/20 p-2 rounded-2xl backdrop-blur-xl shadow-2xl"
@@ -54,14 +57,14 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
 
       <button
         type="button"
-        onClick={() => onNavigate('login')}
+        onClick={openSettings}
         className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
-        title="Cài đặt & Tài khoản"
-        aria-label="Cài đặt & Tài khoản"
+        title="Cài đặt Trang chủ (Màu sắc & Hình nền)"
+        aria-label="Cài đặt Trang chủ"
       >
         <Settings className="w-5 h-5" />
         <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
-          Cài đặt &amp; Tài khoản
+          Cài đặt Trang chủ
         </span>
       </button>
     </aside>

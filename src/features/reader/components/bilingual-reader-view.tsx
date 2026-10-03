@@ -6,7 +6,6 @@ import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
 
 interface BilingualReaderViewProps {
   themeMode: "paper" | "dark";
-  fontFamily: "serif" | "sans";
   fontSize: number;
   paperSheetBgClass: string;
   paperTitleColor: string;
@@ -25,7 +24,6 @@ interface BilingualReaderViewProps {
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   themeMode,
-  fontFamily,
   fontSize,
   paperSheetBgClass,
   paperTitleColor,
@@ -158,12 +156,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
     }
   };
 
-  // Recalculate sync when font size or family reflows
+  // Recalculate sync when font size reflows
   useEffect(() => {
     if (leftSheetRef.current && rightSheetRef.current && isScrollSyncEnabled) {
       handleScroll("left");
     }
-  }, [fontSize, fontFamily, isScrollSyncEnabled, handleScroll]);
+  }, [fontSize, isScrollSyncEnabled, handleScroll]);
 
   const isDark = themeMode === "dark";
 
@@ -222,13 +220,11 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
             {/* English Title & Subtitle */}
             <h1
-              className={`${
-                fontFamily === "serif" ? "font-serif" : "font-sans"
-              } text-2xl sm:text-3xl font-bold ${paperTitleColor} leading-snug mb-3`}
+              className={`font-sans text-2xl sm:text-3xl font-bold ${paperTitleColor} leading-snug mb-3`}
             >
               Tết: Renewal, Remembrance and Regional Flavours
             </h1>
-            <p className={`font-serif italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
+            <p className={`font-sans italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
               A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions
             </p>
 
@@ -248,7 +244,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                   Cultural Essay
                 </span>
                 <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A]">
-                  Level B2–C1 (~370 words)
+                  Level 2–3 (~370 words)
                 </span>
               </div>
 
@@ -257,7 +253,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                   <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
                     Vietnamese Lunar New Year
                   </span>
-                  <h3 className="font-serif text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
+                  <h3 className="font-sans text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
                     Tết Nguyên Đán Heritage
                   </h3>
                 </div>
@@ -269,9 +265,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
             {/* Paragraphs with Dotted Vocab Highlights */}
             <div
-              className={`space-y-5 leading-relaxed ${paperBodyTextColor} ${
-                fontFamily === "serif" ? "font-serif" : "font-sans"
-              }`}
+              className={`space-y-5 leading-relaxed ${paperBodyTextColor} font-sans`}
               style={{ fontSize: `${fontSize}px` }}
             >
               <p>
@@ -444,13 +438,11 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
             {/* Vietnamese Title & Subtitle */}
             <h1
-              className={`${
-                fontFamily === "serif" ? "font-serif" : "font-sans"
-              } text-2xl sm:text-3xl font-bold ${paperTitleColor} italic leading-snug mb-3`}
+              className={`font-sans text-2xl sm:text-3xl font-bold ${paperTitleColor} italic leading-snug mb-3`}
             >
               Tết: Sự đổi mới, lòng tưởng nhớ và hương vị các vùng miền
             </h1>
-            <p className={`font-serif italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
+            <p className={`font-sans italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
               Khám phá văn hóa về sự đổi mới, lòng tri ân tổ tiên và phong vị ẩm thực ba miền
             </p>
 
@@ -470,7 +462,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                   Tản Văn Văn Hóa
                 </span>
                 <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A]">
-                  Trình Độ B2–C1
+                  Trình Độ: Level 2–3
                 </span>
               </div>
 
@@ -479,7 +471,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                   <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
                     Phong Tục & Ẩm Thực
                   </span>
-                  <h3 className="font-serif text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
+                  <h3 className="font-sans text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
                     Phong Vị Tết Cổ Truyền
                   </h3>
                 </div>
@@ -491,9 +483,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
             {/* Vietnamese Translated Paragraphs */}
             <div
-              className={`space-y-5 leading-relaxed ${paperBodyTextColor} ${
-                fontFamily === "serif" ? "font-serif" : "font-sans"
-              }`}
+              className={`space-y-5 leading-relaxed ${paperBodyTextColor} font-sans`}
               style={{ fontSize: `${fontSize}px` }}
             >
               <p>

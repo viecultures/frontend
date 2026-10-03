@@ -2,8 +2,6 @@ import Link from "@/components/Link";
 import { ArrowLeft, Columns, BookOpen, Moon, Sun } from "lucide-react";
 
 interface ReaderToolbarProps {
-  fontFamily: "serif" | "sans";
-  onChangeFontFamily: (font: "serif" | "sans") => void;
   fontSize: number;
   onChangeFontSize: (updater: (prev: number) => number) => void;
   readingMode: "bilingual" | "extensive";
@@ -15,8 +13,6 @@ interface ReaderToolbarProps {
 }
 
 export function ReaderToolbar({
-  fontFamily,
-  onChangeFontFamily,
   fontSize,
   onChangeFontSize,
   readingMode,
@@ -40,33 +36,8 @@ export function ReaderToolbar({
           </Link>
         </div>
 
-        {/* Right Controls: Reading Mode Toggle, Font Family, Font Size, Vocab Drawer, Theme Toggle */}
+        {/* Right Controls: Reading Mode Toggle, Font Size, Vocab Drawer, Theme Toggle */}
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-semibold">
-          {/* Phông chữ (Serif vs Sans) */}
-          <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40 text-xs font-bold">
-            <button
-              onClick={() => onChangeFontFamily("serif")}
-              className={`px-2.5 py-1 rounded-lg font-serif transition-all cursor-pointer ${
-                fontFamily === "serif"
-                  ? "bg-[#D9B76A] text-[#1E4B43] shadow-xs font-bold"
-                  : "text-[#BFE3EA] hover:text-[#FBF7EE]"
-              }`}
-              title="Phông chữ Serif (Playfair)"
-            >
-              Aa Serif
-            </button>
-            <button
-              onClick={() => onChangeFontFamily("sans")}
-              className={`px-2.5 py-1 rounded-lg font-sans transition-all cursor-pointer ${
-                fontFamily === "sans"
-                  ? "bg-[#D9B76A] text-[#1E4B43] shadow-xs font-bold"
-                  : "text-[#BFE3EA] hover:text-[#FBF7EE]"
-              }`}
-              title="Phông chữ Sans (Plus Jakarta)"
-            >
-              Aa Sans
-            </button>
-          </div>
 
           {/* Cỡ chữ (Icon A⁻ / A⁺) */}
           <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40">

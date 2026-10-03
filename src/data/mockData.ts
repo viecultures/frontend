@@ -10,7 +10,7 @@ export const MOCK_LESSONS: Lesson[] = [
     titleVi: 'Tranh Dân Gian Đông Hồ: Hồn Cốt Mỹ Thuật Mộc Bản Dân Tộc',
     category: 'festivals',
     categoryNameVi: 'Nghệ thuật & Dân gian',
-    level: 'B2',
+    level: 'Level 2',
     readTime: '4 phút đọc',
     imageUrl: picDongHo,
     summary: 'Nét khắc than củi đanh gọn, màu khoáng từ điệp sò, hoa hòe và tro lá tre tạo nên bức tranh dân gian tràn đầy sức sống.',
@@ -46,7 +46,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Tinh hoa, phần tinh túy nhất của một nền văn hóa',
         contextSentence: 'Dong Ho folk woodcut paintings embody the quintessence of Vietnamese rural philosophy.',
         highlightedWordInContext: 'quintessence',
-        level: 'C1',
+        level: 'Level 3',
         usageNote: 'Thường dùng trong văn viết học thuật: "the quintessence of Vietnamese culture".'
       },
       {
@@ -57,7 +57,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Mỹ học, tính thẩm mỹ, quan niệm về cái đẹp',
         contextSentence: 'Reflecting traditional cultural aesthetics and woodcut craftsmanship.',
         highlightedWordInContext: 'aesthetics',
-        level: 'B2',
+        level: 'Level 2',
         usageNote: 'Dùng khi thảo luận về nghệ thuật tạo hình, kiến trúc hoặc thời trang.'
       },
       {
@@ -68,7 +68,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Sắc tố, phẩm màu tự nhiên (khoáng thô, thảo mộc)',
         contextSentence: 'The artisans rely entirely on natural mineral pigments from plants and seashells.',
         highlightedWordInContext: 'pigments',
-        level: 'B2',
+        level: 'Level 2',
         usageNote: 'Chỉ các chất màu lấy từ thiên nhiên dùng trong hội họa truyền thống.'
       },
       {
@@ -79,7 +79,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Cát tường, mang lại may mắn và điềm lành',
         contextSentence: 'These woodcuts convey auspicious blessings for prosperity and joy.',
         highlightedWordInContext: 'auspicious',
-        level: 'C1',
+        level: 'Level 3',
         usageNote: 'Thường dùng trong các dịp lễ tết, sự kiện văn hóa đầu xuân: "an auspicious start".'
       }
     ]
@@ -90,7 +90,7 @@ export const MOCK_LESSONS: Lesson[] = [
     titleVi: 'Đại Nội Cố Đô Huế: Kỳ Quan Kiến Trúc Hoàng Thành & Phong Thủy Cung Đình',
     category: 'heritage',
     categoryNameVi: 'Lịch sử & Di sản',
-    level: 'B2',
+    level: 'Level 2',
     readTime: '4 phút đọc',
     imageUrl: picHue,
     summary: 'Sự kết hợp hoàn mỹ giữa phong thủy phương Đông, tường thành ngọ môn và sông Hương thơ mộng.',
@@ -119,7 +119,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Hoành tráng, vĩ đại, mang tầm vóc lịch sử',
         contextSentence: 'The Imperial Citadel of Hue stands as a monumental testament to the Nguyen Dynasty.',
         highlightedWordInContext: 'monumental',
-        level: 'B2',
+        level: 'Level 2',
         usageNote: 'Dùng mô tả các công trình di tích hoặc dấu mốc lịch sử to lớn.'
       },
       {
@@ -130,7 +130,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Thuật phong thủy, xem thế đất và dòng nước',
         contextSentence: 'The citadel is meticulously designed according to Eastern geomancy and Confucian principles.',
         highlightedWordInContext: 'geomancy',
-        level: 'C1',
+        level: 'Level 3',
         usageNote: 'Thuật ngữ học thuật chỉ nghệ thuật sắp đặt không gian hài hòa với tự nhiên.'
       }
     ]
@@ -141,7 +141,7 @@ export const MOCK_LESSONS: Lesson[] = [
     titleVi: 'Tà Áo Dài & Lụa Tơ Tằm: Dáng Vẻ Thanh Lịch Của Tinh Thần Dân Tộc',
     category: 'traditions',
     categoryNameVi: 'Đời sống & Truyền thống',
-    level: 'B1',
+    level: 'Level 2',
     readTime: '3 phút đọc',
     imageUrl: picAoDai,
     summary: 'Tà áo dài lụa tơ tằm thướt tha hòa cùng sắc sen ngọc, biểu trưng cho vẻ đẹp kín đáo và kiêu hãnh của phụ nữ Việt.',
@@ -170,7 +170,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Tiêu biểu nhất, chuẩn mực tinh túy nhất',
         contextSentence: 'The Ao Dai is widely celebrated as the quintessential national attire of Vietnam.',
         highlightedWordInContext: 'quintessential',
-        level: 'C1',
+        level: 'Level 3',
         usageNote: 'Từ học thuật cao cấp mô tả đặc trưng hoàn hảo nhất của một nét văn hóa.'
       },
       {
@@ -181,7 +181,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Trường tồn, bền bỉ cùng thời gian',
         contextSentence: 'To remain an enduring cultural emblem of Vietnamese identity.',
         highlightedWordInContext: 'enduring',
-        level: 'B2',
+        level: 'Level 2',
         usageNote: 'Dùng mô tả các giá trị văn hóa không bị phai mờ qua năm tháng.'
       }
     ]
@@ -192,7 +192,7 @@ export const MOCK_LESSONS: Lesson[] = [
     titleVi: 'Bánh Mì Sài Gòn: Sự Kết Hợp Tinh Tế Giữa Baguette Pháp & Hương Vị Việt',
     category: 'cuisine',
     categoryNameVi: 'Ẩm thực',
-    level: 'B1',
+    level: 'Level 2',
     readTime: '3 phút đọc',
     imageUrl: 'https://images.unsplash.com/photo-1626804475297-41608ea09aeb?auto=format&fit=crop&w=1200&q=80',
     summary: 'Nét sáng tạo của ẩm thực đường phố biến chiếc bánh mì giòn rụm thành biểu tượng thế giới.',
@@ -221,7 +221,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Sự đặt cạnh nhau để tạo nên sự hòa quyện tương phản',
         contextSentence: 'Its harmonious juxtaposition of savory liver pâté and pickled daikon.',
         highlightedWordInContext: 'juxtaposition',
-        level: 'C1',
+        level: 'Level 3',
         usageNote: 'Từ vựng đắt giá khi miêu tả sự giao thoa văn hóa hoặc nghệ thuật ẩm thực.'
       },
       {
@@ -232,7 +232,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Mọng nước, thơm ngon, đậm đà',
         contextSentence: 'Savory liver pâté, succulent roasted meats, and fresh herbs.',
         highlightedWordInContext: 'succulent',
-        level: 'B2',
+        level: 'Level 2',
         usageNote: 'Tính từ cao cấp trong ẩm thực thay cho "delicious".'
       }
     ]
@@ -243,7 +243,7 @@ export const MOCK_LESSONS: Lesson[] = [
     titleVi: 'Phố Cổ Hội An: Đèn Lồng Sắc Màu, Chùa Cầu Cổ Kính & Phố Mái Ngêu Phong',
     category: 'heritage',
     categoryNameVi: 'Lịch sử & Di sản',
-    level: 'A2',
+    level: 'Level 1',
     readTime: '3 phút đọc',
     imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
     summary: 'Thương cảng thế kỷ 16 với những ngôi nhà tường vàng mái ngói âm dương rêu phong bên dòng sông Hoài.',
@@ -266,7 +266,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Nổi bật, quan trọng, giữ vị trí then chốt',
         contextSentence: 'Hoi An was a prominent Asian trading port in the 16th century.',
         highlightedWordInContext: 'prominent',
-        level: 'A2',
+        level: 'Level 1',
         usageNote: 'Mô tả vị trí nổi bật của nhân vật hoặc địa danh lịch sử.'
       }
     ]
@@ -277,7 +277,7 @@ export const MOCK_LESSONS: Lesson[] = [
     titleVi: 'Vịnh Hạ Long: Huyền Tích Rồng Mẹ Giáng Thế Giữa Làn Nước Ngọc Bích',
     category: 'landscapes',
     categoryNameVi: 'Danh lam thắng cảnh',
-    level: 'B1',
+    level: 'Level 2',
     readTime: '4 phút đọc',
     imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
     summary: 'Hàng ngàn đảo đá vôi kỳ vĩ nhô lên giữa vịnh biển ngọc bích phẳng lặng.',
@@ -300,7 +300,7 @@ export const MOCK_LESSONS: Lesson[] = [
         vietnameseMeaning: 'Mê hoặc, cuốn hút lòng người',
         contextSentence: 'Ha Long Bay is a mesmerizing natural wonder of Southeast Asia.',
         highlightedWordInContext: 'mesmerizing',
-        level: 'B2',
+        level: 'Level 2',
         usageNote: 'Từ gợi cảm xúc mạnh mẽ khi miêu tả cảnh quan thiên nhiên tráng lệ.'
       }
     ]
@@ -314,7 +314,7 @@ export const MOCK_REFLECTIONS: UserReflection[] = [
     lessonTitle: 'Dong Ho Folk Woodcut Paintings',
     authorName: 'Mai Linh (Hà Nội)',
     authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-    authorLevel: 'B2',
+    authorLevel: 'Level 2',
     content: 'Learning about Dong Ho folk woodcut aesthetics in English feels so rewarding! The word "quintessence" and "pigments" helped me describe how artisans use bamboo soot and scallop shells to create Diep paper. I love the folk woodblock design of this website!',
     usedVocab: ['quintessence', 'aesthetics', 'pigments'],
     createdAt: '1 giờ trước',
@@ -327,7 +327,7 @@ export const MOCK_REFLECTIONS: UserReflection[] = [
     lessonTitle: 'The Imperial Citadel of Hue',
     authorName: 'Hoàng Long (Huế)',
     authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
-    authorLevel: 'B2',
+    authorLevel: 'Level 2',
     content: 'The bilingual paired reading makes it so intuitive to explain our royal geomancy and monarchical architecture to foreign friends. Best of all, I can practice writing my reflection freely without being graded or judged!',
     usedVocab: ['monumental', 'geomancy'],
     createdAt: '3 giờ trước',
@@ -339,7 +339,7 @@ export const MOCK_REFLECTIONS: UserReflection[] = [
     lessonTitle: 'Vietnamese Ao Dai & Silk Heritage',
     authorName: 'Phương Thảo (TP.HCM)',
     authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
-    authorLevel: 'B1',
+    authorLevel: 'Level 2',
     content: 'The 3D flashcards with original context sentences helped words like "quintessential" stick immediately in my mind. The woodblock stamp button style is so uniquely Vietnamese!',
     usedVocab: ['quintessential', 'enduring'],
     createdAt: 'Hôm qua',

@@ -22,7 +22,7 @@ export interface CulturalHeritageSite {
   }[];
   presentationSnippet: string;
   culturalInsight: string;
-  cefrLevel: 'B1' | 'B2' | 'C1';
+  cefrLevel: 'Level 1' | 'Level 2' | 'Level 3' | 'B1' | 'B2' | 'C1';
 }
 
 export interface RegionSummary {
@@ -43,7 +43,7 @@ export interface CulturalNuanceItem {
   literalTranslation: string; // Bad translation (dịch máy ngô nghê)
   whyLiteralFails: string;
   nuancedEnglishPhrase: string; // Elegant international English
-  cefrLevel: 'B2' | 'C1';
+  cefrLevel: 'Level 1' | 'Level 2' | 'Level 3' | 'B2' | 'C1';
   ipa: string;
   contextUsage: string;
   culturalStory: string;

@@ -1,4 +1,5 @@
-export type CEFRLevel = 'A2' | 'B1' | 'B2' | 'C1';
+export type Level = 'Level 1' | 'Level 2' | 'Level 3';
+export type CEFRLevel = Level | 'A2' | 'B1' | 'B2' | 'C1';
 
 export type Category = 
   | 'all'

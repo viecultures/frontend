@@ -37,7 +37,7 @@ export const HeroSection: React.FC = () => {
         <div className="flex items-center gap-2 text-xs sm:text-sm font-medium tracking-wide text-mountain-teal dark:text-[#9FCED8]">
           <span className="uppercase">EdTech Tiên Phong Về Ngôn Ngữ Di Sản</span>
           <span aria-hidden="true" className="text-antique-gold">·</span>
-          <span>CEFR B1 – C1 Cultural Mastery</span>
+          <span>Level 1 – Level 3 Cultural Mastery</span>
           <span aria-hidden="true" className="text-antique-gold">·</span>
           <span>Bản đồ Di sản Tương tác</span>
         </div>

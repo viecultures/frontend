@@ -7,6 +7,7 @@ import { HomeWidgetsGrid, type TaskItem } from '../components/HomeWidgetsGrid';
 import { HomeBottomDock } from '../components/HomeBottomDock';
 import { HomeFloatingSidebar } from '../components/HomeFloatingSidebar';
 import { Check } from 'lucide-react';
+import { useSettings } from '@/context/SettingsContext';
 
 interface HomePageProps {
   onNavigate?: (view: string) => void;
@@ -23,6 +24,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   onLogout,
   onOpenProfile,
 }) => {
+  const { activeBackground, backgroundMode, currentTimePeriod } = useSettings();
   const [tasks, setTasks] = useState<TaskItem[]>([
     { id: 'task1', label: 'Đọc bài di sản Hoàng Thành Huế (5 phút)', completed: true },
     { id: 'task2', label: 'Ôn tập 10 thẻ Flashcard SRS', completed: true },
@@ -35,41 +37,9 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [isPomoRunning, setIsPomoRunning] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Time of day detection (Morning: 5-11, Afternoon: 12-17, Evening: 18-4)
-  const [timeOfDay, setTimeOfDay] = useState<'Morning' | 'Afternoon' | 'Evening'>('Morning');
-
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
-  };
-
-  useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) setTimeOfDay('Morning');
-    else if (hour >= 12 && hour < 18) setTimeOfDay('Afternoon');
-    else setTimeOfDay('Evening');
-  }, []);
-
-  const getBgImage = (time: 'Morning' | 'Afternoon' | 'Evening') => {
-    switch (time) {
-      case 'Morning':
-        return 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=2400&q=80';
-      case 'Afternoon':
-        return 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=2400&q=80';
-      case 'Evening':
-        return 'https://images.unsplash.com/photo-1536086845112-89de23aa4772?auto=format&fit=crop&w=2400&q=80';
-    }
-  };
-
-  const getBgLocation = (time: 'Morning' | 'Afternoon' | 'Evening') => {
-    switch (time) {
-      case 'Morning':
-        return 'Bình minh Tràng An (Ninh Bình)';
-      case 'Afternoon':
-        return 'Nắng vàng Phố Cổ (Hội An)';
-      case 'Evening':
-        return 'Đêm Sài Gòn Hoa Lệ (TP. Hồ Chí Minh)';
-    }
   };
 
   // Pomodoro countdown timer
@@ -118,20 +88,29 @@ export const HomePage: React.FC<HomePageProps> = ({
     }
   };
 
+  const isGradient = activeBackground.url.startsWith('linear-gradient');
+
   return (
     <div className="min-h-screen bg-heritage-dark text-white flex flex-col justify-between relative overflow-hidden selection:bg-antique-gold selection:text-heritage-dark">
       {/* 1. Dynamic Background Image Layer with Ambient Overlay */}
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-all duration-700 z-0"
-        style={{ backgroundImage: `url(${getBgImage(timeOfDay)})` }}
-      />
+      {isGradient ? (
+        <div
+          className="absolute inset-0 transition-all duration-700 z-0"
+          style={{ background: activeBackground.url }}
+        />
+      ) : (
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-all duration-700 z-0"
+          style={{ backgroundImage: `url(${activeBackground.url})` }}
+        />
+      )}
       {/* Ambient Depth Tint */}
       <div className="absolute inset-0 bg-gradient-to-b from-heritage-dark/80 via-heritage-dark/40 to-heritage-dark/90 z-0 pointer-events-none" />
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 px-5 py-3 rounded-2xl bg-heritage-green text-warm-ivory shadow-2xl border border-antique-gold/40 flex items-center gap-2 text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-200">
-          <Check className="w-4 h-4 text-antique-gold" />
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap">
+          <Check className="w-4 h-4 text-antique-gold shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -176,7 +155,15 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* 6. Subtle Photo Location Credit (Bottom-Right Corner) */}
       <div className="fixed bottom-2.5 right-4 z-20 text-[11px] text-white/40 select-none pointer-events-none hidden sm:block tracking-wide font-normal">
-        Ảnh: {getBgLocation(timeOfDay)}
+        {backgroundMode === 'auto'
+          ? `Nền tự động (${
+              currentTimePeriod === 'morning'
+                ? 'Buổi Sáng'
+                : currentTimePeriod === 'afternoon'
+                ? 'Buổi Chiều'
+                : 'Buổi Tối'
+            }): ${activeBackground.name}`
+          : `Nền: ${activeBackground.name}`}
       </div>
     </div>
   );

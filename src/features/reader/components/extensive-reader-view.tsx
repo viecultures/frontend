@@ -5,7 +5,6 @@ import { EXTENSIVE_QUESTIONS } from "@/data/readerData";
 
 interface ExtensiveReaderViewProps {
   themeMode: "paper" | "dark";
-  fontFamily: "serif" | "sans";
   fontSize: number;
   paperSheetBgClass: string;
   paperTitleColor: string;
@@ -18,7 +17,6 @@ interface ExtensiveReaderViewProps {
 
 export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
   themeMode,
-  fontFamily,
   fontSize,
   paperSheetBgClass,
   paperTitleColor,
@@ -93,18 +91,17 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                 EN • EXTENSIVE
               </span>
               <span className="text-xs font-semibold text-[#D9B76A]">
-                ~370 words • B2–C1
+                ~370 words • Level 2–3
               </span>
             </div>
 
             {/* English Title & Subtitle */}
             <h1
-              className={`${fontFamily === "serif" ? "font-serif" : "font-sans"
-                } text-2xl sm:text-3xl font-bold ${paperTitleColor} leading-snug mb-3`}
+              className={`font-sans text-2xl sm:text-3xl font-bold ${paperTitleColor} leading-snug mb-3`}
             >
               Tết: Renewal, Remembrance and Regional Flavours
             </h1>
-            <p className={`font-serif italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
+            <p className={`font-sans italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
               A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions
             </p>
 
@@ -124,7 +121,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                   Cultural Essay
                 </span>
                 <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A]">
-                  Level B2–C1 • Extensive Mode
+                  Level 2–3 • Extensive Mode
                 </span>
               </div>
 
@@ -133,7 +130,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                   <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
                     Vietnamese Lunar New Year
                   </span>
-                  <h3 className="font-serif text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
+                  <h3 className="font-sans text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
                     Tết Nguyên Đán Heritage
                   </h3>
                 </div>
@@ -145,8 +142,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
 
             {/* Paragraphs with Vocab Highlights */}
             <div
-              className={`space-y-4 leading-relaxed ${paperBodyTextColor} ${fontFamily === "serif" ? "font-serif" : "font-sans"
-                }`}
+              className={`space-y-4 leading-relaxed ${paperBodyTextColor} font-sans`}
               style={{ fontSize: `${fontSize}px` }}
             >
               <p>

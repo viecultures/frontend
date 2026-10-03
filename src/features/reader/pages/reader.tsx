@@ -20,7 +20,6 @@ export default function ReaderPage() {
 
   // Reader Control States
   const [fontSize, setFontSize] = useState<number>(17);
-  const [fontFamily, setFontFamily] = useState<"serif" | "sans">("serif");
   const [themeMode, setThemeMode] = useState<"paper" | "dark">("paper");
 
   // Initial mode reads from URL query ?mode=extensive
@@ -148,8 +147,6 @@ export default function ReaderPage() {
     <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
       {/* Top Reader Toolbar Control Bar (sticky at top 0) */}
       <ReaderToolbar
-        fontFamily={fontFamily}
-        onChangeFontFamily={setFontFamily}
         fontSize={fontSize}
         onChangeFontSize={setFontSize}
         readingMode={readingMode}
@@ -184,7 +181,6 @@ export default function ReaderPage() {
           {readingMode === "bilingual" ? (
             <BilingualReaderView
               themeMode={themeMode}
-              fontFamily={fontFamily}
               fontSize={fontSize}
               paperSheetBgClass={paperSheetBgClass}
               paperTitleColor={paperTitleColor}
@@ -203,7 +199,6 @@ export default function ReaderPage() {
           ) : (
             <ExtensiveReaderView
               themeMode={themeMode}
-              fontFamily={fontFamily}
               fontSize={fontSize}
               paperSheetBgClass={paperSheetBgClass}
               paperTitleColor={paperTitleColor}

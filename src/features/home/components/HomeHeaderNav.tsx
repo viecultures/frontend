@@ -8,9 +8,11 @@ import {
   User,
   Sparkles,
   Crown,
+  Settings,
 } from 'lucide-react';
 import { ProfileDropdown } from '@/components/ProfileDropdown';
 import { BrandLogo } from '@/components/BrandLogo';
+import { useSettings } from '@/context/SettingsContext';
 
 interface HomeHeaderNavProps {
   isLoggedIn: boolean;
@@ -29,6 +31,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
   onOpenProfile,
   onShowToast,
 }) => {
+  const { openSettings } = useSettings();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleActionToast = (msg: string) => {
@@ -99,6 +102,16 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
           aria-label="Cửa hàng"
         >
           <ShoppingBag className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={openSettings}
+          className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-gold transition-all cursor-pointer focus-ring"
+          title="Cài đặt Trang chủ (Màu sắc & Hình nền)"
+          aria-label="Cài đặt Trang chủ"
+        >
+          <Settings className="w-4 h-4" />
         </button>
 
         {isLoggedIn ? (

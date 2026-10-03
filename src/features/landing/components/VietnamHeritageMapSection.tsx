@@ -88,7 +88,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
                         y: prov.cy,
                         established: 'Di sản Quốc gia',
                         unescoStatus: 'Địa danh Văn hóa tiêu biểu',
-                        cefrLevel: 'B2',
+                        cefrLevel: 'Level 2',
                         culturalInsight: `Khám phá các giá trị văn hóa, di tích lịch sử và cảnh quan di sản tiêu biểu tại ${prov.name}.`,
                         presentationSnippet: `Welcome to ${prov.name}, a region renowned for its rich cultural traditions and historic heritage.`,
                         vocabularyList: [
@@ -130,7 +130,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
                           <span>{selectedSite.region} • {selectedSite.province}</span>
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-heritage-green text-warm-ivory shadow-xs">
-                          Chuẩn {selectedSite.cefrLevel}
+                          {selectedSite.cefrLevel}
                         </span>
                       </div>
 

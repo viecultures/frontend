@@ -188,13 +188,13 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
           </div>
         </div>
 
-        {/* Middle Row: CEFR Level & Reading Time Duration Smart Filters */}
+        {/* Middle Row: Level & Reading Time Duration Smart Filters */}
         <div className="pt-3 border-t border-heritage-green/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          {/* CEFR Level Filter */}
+          {/* Level Filter */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-bold uppercase tracking-wider text-heritage-green flex items-center gap-1 mr-1">
               <Filter className="w-3.5 h-3.5" />
-              Trình độ CEFR:
+              Trình độ:
             </span>
             {CEFR_LEVELS.map((lvl) => (
               <button

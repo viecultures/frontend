@@ -74,7 +74,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
                 {activeLandmark.category}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-antique-gold text-heritage-green shadow-xs">
-                Band {activeLandmark.level}
+                {activeLandmark.level}
               </span>
             </div>
 

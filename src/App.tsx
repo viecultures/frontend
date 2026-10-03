@@ -8,6 +8,7 @@ import { ProfileDrawer } from './components/ProfileDrawer';
 import { ReaderModal } from '@/features/reader/components/reader-modal';
 import { FlashcardModal } from '@/features/flashcards/components/flashcard-modal';
 import { ReflectionsModal } from '@/features/community/components/reflections-modal';
+import { SettingsModal } from './components/SettingsModal';
 
 // Feature Pages
 import LandingPage from '@/features/landing/pages/landing';
@@ -253,6 +254,9 @@ export const App: React.FC = () => {
         onLogout={handleLogout}
         onNavigate={handleNavigate}
       />
+
+      {/* GLOBAL SETTINGS MODAL */}
+      <SettingsModal />
 
       {/* MODAL 1: Paragraph Pairing Bilingual Reader */}
       {activeReaderLesson && (

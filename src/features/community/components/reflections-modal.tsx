@@ -67,7 +67,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
       lessonTitle: selectedLessonTitle,
       authorName: 'Bạn (Người học)',
       authorAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-      authorLevel: lesson?.level || 'B2',
+      authorLevel: lesson?.level || 'Level 2',
       content: newContent,
       usedVocab: Array.from(new Set([...usedVocabList, ...detectedVocabs])),
       createdAt: 'Vừa xong',
@@ -218,7 +218,7 @@ export const ReflectionsModal: React.FC<ReflectionsModalProps> = ({
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-xs text-white">{item.authorName}</span>
                           <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 text-[10px] font-semibold border border-purple-500/30">
-                            Band {item.authorLevel}
+                            {item.authorLevel}
                           </span>
                         </div>
                         <span className="text-xs text-white/50">{item.createdAt} • Về "{item.lessonTitle}"</span>

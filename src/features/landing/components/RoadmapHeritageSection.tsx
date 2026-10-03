@@ -96,7 +96,7 @@ export const RoadmapHeritageSection: React.FC = () => {
 
             <div className="flex items-center gap-1.5">
               <Award className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>Biên soạn bởi chuyên gia CEFR</span>
+              <span>Biên soạn chuẩn 3 cấp độ (Level 1 - 3)</span>
             </div>
           </div>
 

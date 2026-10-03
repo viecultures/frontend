@@ -29,12 +29,12 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     { id: 'traditions', label: 'Đời sống & Truyền thống', icon: '🎋' },
   ];
 
-  const levels: (CEFRLevel | 'all')[] = ['all', 'A2', 'B1', 'B2', 'C1'];
+  const levels: (CEFRLevel | 'all')[] = ['all', 'Level 1', 'Level 2', 'Level 3'];
 
   return (
     <div className="w-full glass-card p-6 sm:p-8 mb-10 border border-white/15">
       
-      {/* Top row: Search & CEFR Band */}
+      {/* Top row: Search & Level Band */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5">
         
         {/* Search Input with soft pill shape */}

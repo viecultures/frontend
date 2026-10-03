@@ -135,14 +135,14 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                     </p>
                   </div>
 
-                  {/* CEFR Badge & Reading Time */}
+                  {/* Level Badge & Reading Time */}
                   <div className="flex items-center justify-between text-[11px] font-bold tracking-wider uppercase pt-2">
                     <span
                       className={`px-2.5 py-0.5 rounded-md border shadow-xs ${getCefrBadgeStyle(
                         lesson.cefrLevel
                       )}`}
                     >
-                      CEFR {lesson.cefrLevel}
+                      {lesson.cefrLevel}
                     </span>
                     <span className="flex items-center gap-1.5 text-text-secondary font-medium">
                       <Clock className="w-3.5 h-3.5 text-antique-gold shrink-0" />
@@ -205,7 +205,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                       lesson.cefrLevel
                     )}`}
                   >
-                    CEFR {lesson.cefrLevel}
+                    {lesson.cefrLevel}
                   </span>
                   <span className="text-[11px] font-bold text-heritage-green bg-heritage-green/10 px-2 py-0.5 rounded border border-heritage-green/15">
                     {lesson.categoryVi}
