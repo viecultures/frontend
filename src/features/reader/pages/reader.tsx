@@ -83,9 +83,13 @@ export default function ReaderPage() {
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
 
-  // Customizable Voice State (Ryan, Jenny, Guy, Sonia)
+  // Customizable Google Gemini Voice State (Puck, Charon, Kore, Aoede, Fenrir)
   const [selectedVoiceId, setSelectedVoiceId] = useState<string>(() => {
-    return localStorage.getItem("vie_preferred_voice") || "ryan";
+    const saved = localStorage.getItem("vie_preferred_voice");
+    if (saved && AVAILABLE_VOICES.some((v) => v.id === saved)) {
+      return saved;
+    }
+    return "puck";
   });
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState<boolean>(false);
 
@@ -143,7 +147,12 @@ export default function ReaderPage() {
     }
     audioRef.current.playbackRate = playbackSpeed;
     audioRef.current.play().catch((err) => {
-      console.warn("Audio playback failed:", err);
+      console.warn("Audio playback failed for", url, err);
+      if (url.endsWith(".wav") && audioRef.current) {
+        audioRef.current.src = url.replace(".wav", ".mp3");
+        audioRef.current.playbackRate = playbackSpeed;
+        audioRef.current.play().catch(console.error);
+      }
     });
   };
 
@@ -282,15 +291,23 @@ export default function ReaderPage() {
 
           {/* Right Controls: Reading Mode Toggle, Font Family, Font Size, Voice Customizer, Theme Toggle */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-semibold">
+            {/* Sinh Voice Gemini Action Button */}
+            <button
+              onClick={() => setIsVoiceModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#D9B76A] to-[#FCE5B5] text-[#1E4B43] hover:brightness-110 active:scale-95 transition-all cursor-pointer font-bold text-xs shadow-md"
+              title="Sinh giọng đọc cho bài đọc này bằng Google Gemini AI"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#1E4B43] fill-[#1E4B43]" />
+              <span>Sinh Voice Gemini</span>
+            </button>
+
             {/* Tùy chỉnh Giọng đọc AI */}
             <button
               onClick={() => setIsVoiceModalOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#163D37] border border-[#D9B76A]/40 text-[#FCE5B5] hover:bg-[#1E4B43] hover:border-[#D9B76A] transition-all cursor-pointer font-bold text-xs shadow-xs"
-              title="Nhấp để tùy chỉnh giọng đọc AI (Jenny, Guy, Sonia, Ryan)"
+              title="Tùy chỉnh giọng đọc Google Gemini AI (Puck, Charon, Kore, Aoede, Fenrir)"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
               <span>{activeVoiceConfig.flag} {activeVoiceConfig.name}</span>
-              <span className="text-[10px] text-[#BFE3EA] hidden sm:inline">({activeVoiceConfig.genderLabel})</span>
             </button>
 
             {/* Phông chữ (Serif vs Sans) */}
@@ -459,6 +476,7 @@ export default function ReaderPage() {
               onSelectSentence={handleSelectSentence}
               hoveredIndex={hoveredSentenceIndex}
               setHoveredIndex={setHoveredSentenceIndex}
+              onOpenGeminiGenerator={() => setIsVoiceModalOpen(true)}
             />
           ) : (
             <ExtensiveReaderView
@@ -656,6 +674,9 @@ export default function ReaderPage() {
         onSelectVoice={handleSelectVoice}
         playbackSpeed={playbackSpeed}
         onChangeSpeed={(speed) => setPlaybackSpeed(speed)}
+        onVoiceGenerated={(newAudioUrl) => {
+          playAudioUrl(newAudioUrl);
+        }}
       />
     </main>
   );

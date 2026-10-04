@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "@/components/Link";
-import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight, Sparkles } from "lucide-react";
 
 interface BilingualReaderViewProps {
   themeMode: "olive" | "paper" | "dark";
@@ -24,6 +24,7 @@ interface BilingualReaderViewProps {
   onSelectSentence?: (index: number) => void;
   hoveredIndex?: number | null;
   setHoveredIndex?: (index: number | null) => void;
+  onOpenGeminiGenerator?: () => void;
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
@@ -48,6 +49,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   onSelectSentence,
   hoveredIndex = null,
   setHoveredIndex,
+  onOpenGeminiGenerator,
 }) => {
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
@@ -59,18 +61,30 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
         >
           <div>
             {/* Header Tag */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-[#2563EB] bg-[#EFF6FF] px-3 py-1 rounded-md">
                   ENGLISH ORIGINAL
                 </span>
                 <span className="text-[11px] font-semibold text-[#1E4B43]/70 hidden sm:inline">
-                  (Nhấp vào câu để nghe giọng Neural TTS)
+                  (Google Gemini Neural Voice)
                 </span>
               </div>
-              <span className="text-xs font-bold bg-[#2563EB] text-white px-2.5 py-0.5 rounded">
-                EN
-              </span>
+              <div className="flex items-center gap-2">
+                {onOpenGeminiGenerator && (
+                  <button
+                    onClick={onOpenGeminiGenerator}
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-[#D9B76A]/20 to-[#D9B76A]/40 hover:from-[#D9B76A] hover:to-[#E2C37D] text-[#1E4B43] border border-[#D9B76A] text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    title="Sinh giọng đọc bài này bằng Google Gemini API"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
+                    <span>Sinh Voice Gemini</span>
+                  </button>
+                )}
+                <span className="text-xs font-bold bg-[#2563EB] text-white px-2.5 py-0.5 rounded">
+                  EN
+                </span>
+              </div>
             </div>
 
             {/* English Title & Subtitle */}

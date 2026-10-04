@@ -221,19 +221,19 @@ export const ARTICLE_BILINGUAL_DATA: {
   titleVi: "Làm thế nào để trở nên cực kỳ uyên bác",
   subtitleEn: "A chaotic guide to becoming the most interesting person in the room",
   subtitleVi: "Hướng dẫn đầy ngẫu hứng để trở thành người thú vị nhất trong phòng",
-  fullAudioUrl: "/audio/ryan/disgustingly_educated_full.mp3",
+  fullAudioUrl: "/audio/puck/disgustingly_educated_full.wav",
   paragraphs: [
     {
       id: "p1",
       index: 0,
-      audioUrl: "/audio/ryan/sentence_1.mp3",
+      audioUrl: "/audio/puck/sentence_1.wav",
       enText: "Hello my love,",
       viText: "Chào tình yêu của em,",
     },
     {
       id: "p2",
       index: 1,
-      audioUrl: "/audio/ryan/sentence_2.mp3",
+      audioUrl: "/audio/puck/sentence_2.wav",
       enText: "There’s a kind of person who’s so well-read, so frighteningly articulate, so mentally juicy that you want to both date them and punch them in the throat.",
       viText: "Có một kiểu người đọc nhiều đến thế, ăn nói sắc sảo đến đáng sợ, và có một bộ óc đầy chất xám đến vậy, khiến anh vừa muốn hẹn hò lại vừa muốn đấm vào họng họ.",
       vocabIds: ["well-read", "frighteningly-articulate"],
@@ -241,21 +241,21 @@ export const ARTICLE_BILINGUAL_DATA: {
     {
       id: "p3",
       index: 2,
-      audioUrl: "/audio/ryan/sentence_3.mp3",
+      audioUrl: "/audio/puck/sentence_3.wav",
       enText: "You know the type.",
       viText: "Anh biết kiểu người đó mà.",
     },
     {
       id: "p4",
       index: 3,
-      audioUrl: "/audio/ryan/sentence_4.mp3",
+      audioUrl: "/audio/puck/sentence_4.wav",
       enText: "They quote Baldwin mid-conversation.",
       viText: "Họ trích dẫn Baldwin giữa cuộc trò chuyện.",
     },
     {
       id: "p5",
       index: 4,
-      audioUrl: "/audio/ryan/sentence_5.mp3",
+      audioUrl: "/audio/puck/sentence_5.wav",
       enText: "They listen to podcasts at 1.5x speed while annotating a book.",
       viText: "Họ nghe podcast ở tốc độ 1.5x trong khi đang ghi chú một cuốn sách.",
       vocabIds: ["annotating-a-book"],
@@ -263,7 +263,7 @@ export const ARTICLE_BILINGUAL_DATA: {
     {
       id: "p6",
       index: 5,
-      audioUrl: "/audio/ryan/sentence_6.mp3",
+      audioUrl: "/audio/puck/sentence_6.wav",
       enText: "They drop phrases like “epistemic frameworks” and somehow make it work.",
       viText: "Họ buông những cụm từ như “khung nhận thức luận” và bằng cách nào đó vẫn khiến nó nghe thật hợp lý.",
       vocabIds: ["epistemic-frameworks"],
@@ -271,7 +271,7 @@ export const ARTICLE_BILINGUAL_DATA: {
     {
       id: "p7",
       index: 6,
-      audioUrl: "/audio/ryan/sentence_7.mp3",
+      audioUrl: "/audio/puck/sentence_7.wav",
       enText: "This is your guide to becoming that person. Not for clout. Not for Instagram aesthetics. But for the sheer, indecent pleasure of being disgustingly educated.",
       viText: "Đây là hướng dẫn để anh trở thành người đó. Không phải để gây chú ý. Không phải để sống ảo trên Instagram. Mà vì niềm vui thuần túy, trần trụi khi được uyên bác đến đáng ghét.",
       vocabIds: ["indecent-pleasure"],
@@ -293,57 +293,68 @@ export interface AIVoiceConfig {
 
 export const AVAILABLE_VOICES: AIVoiceConfig[] = [
   {
-    id: "ryan",
-    name: "Ryan",
+    id: "puck",
+    name: "Puck (Gemini)",
     gender: "Male",
-    genderLabel: "Nam Anh",
-    accent: "en-GB",
-    flag: "🇬🇧",
-    edgeVoice: "en-GB-RyanNeural",
-    toneDesc: "Học thuật, điềm đạm (Mặc định)",
-    description: "Giọng Nam Anh phong cách học thuật, truyền tải cảm xúc văn chương và bình luận sâu sắc.",
-  },
-  {
-    id: "jenny",
-    name: "Jenny",
-    gender: "Female",
-    genderLabel: "Nữ Mỹ",
+    genderLabel: "Nam Mỹ (Google Gemini)",
     accent: "en-US",
     flag: "🇺🇸",
-    edgeVoice: "en-US-JennyNeural",
-    toneDesc: "Ấm áp, chuẩn giáo dục",
-    description: "Giọng Nữ chuẩn Mỹ, phát âm rõ ràng, nhịp điệu sư phạm tự nhiên, rất thích hợp luyện nghe Shadowing.",
+    edgeVoice: "Puck",
+    toneDesc: "Trầm ấm, đĩnh đạc (Mặc định)",
+    description: "Giọng Nam chuẩn Mỹ từ Google Gemini AI, âm sắc tự nhiên, nhả chữ rõ ràng, phong cách sư phạm chuẩn mực cho Shadowing.",
   },
   {
-    id: "guy",
-    name: "Guy",
+    id: "charon",
+    name: "Charon (Gemini)",
     gender: "Male",
-    genderLabel: "Nam Mỹ",
-    accent: "en-US",
-    flag: "🇺🇸",
-    edgeVoice: "en-US-GuyNeural",
-    toneDesc: "Trầm ấm, nam tính",
-    description: "Giọng Nam chuẩn Mỹ, âm sắc dày, độ cộng hưởng tốt, phong cách phóng sự văn hóa sâu lắng.",
-  },
-  {
-    id: "sonia",
-    name: "Sonia",
-    gender: "Female",
-    genderLabel: "Nữ Anh",
+    genderLabel: "Nam Anh (Google Gemini)",
     accent: "en-GB",
     flag: "🇬🇧",
-    edgeVoice: "en-GB-SoniaNeural",
-    toneDesc: "Quý phái, sắc sảo",
-    description: "Giọng Nữ chuẩn Received Pronunciation (Anh - Anh), thanh thoát, sang trọng và chuẩn mực.",
+    edgeVoice: "Charon",
+    toneDesc: "Học thuật, điềm đạm",
+    description: "Giọng Nam chuẩn Anh từ Google Gemini AI, phong cách học thuật, truyền tải cảm xúc văn chương và bình luận sâu sắc.",
+  },
+  {
+    id: "kore",
+    name: "Kore (Gemini)",
+    gender: "Female",
+    genderLabel: "Nữ Mỹ (Google Gemini)",
+    accent: "en-US",
+    flag: "🇺🇸",
+    edgeVoice: "Kore",
+    toneDesc: "Nhẹ nhàng, truyền cảm",
+    description: "Giọng Nữ chuẩn Mỹ từ Google Gemini AI, trong trẻo, tự nhiên, nhịp điệu bài giảng êm dịu và dễ nghe.",
+  },
+  {
+    id: "aoede",
+    name: "Aoede (Gemini)",
+    gender: "Female",
+    genderLabel: "Nữ Anh (Google Gemini)",
+    accent: "en-GB",
+    flag: "🇬🇧",
+    edgeVoice: "Aoede",
+    toneDesc: "Quý phái, thanh lịch",
+    description: "Giọng Nữ chuẩn Received Pronunciation (Anh - Anh) từ Google Gemini AI, thanh thoát, sang trọng và chuẩn mực.",
+  },
+  {
+    id: "fenrir",
+    name: "Fenrir (Gemini)",
+    gender: "Male",
+    genderLabel: "Nam Mỹ (Google Gemini)",
+    accent: "en-US",
+    flag: "🇺🇸",
+    edgeVoice: "Fenrir",
+    toneDesc: "Rõ âm, dứt khoát",
+    description: "Giọng Nam chuẩn Mỹ từ Google Gemini AI, âm lượng dày, dứt khoát, phong cách phóng sự văn hóa sâu lắng.",
   },
 ];
 
 export function getVoiceAudioUrl(voiceId: string, type: "full" | "sentence", sentenceIndex?: number): string {
   if (type === "full") {
-    return `/audio/${voiceId}/disgustingly_educated_full.mp3`;
+    return `/audio/${voiceId}/disgustingly_educated_full.wav`;
   }
   const idx = (sentenceIndex ?? 0) + 1;
-  return `/audio/${voiceId}/sentence_${idx}.mp3`;
+  return `/audio/${voiceId}/sentence_${idx}.wav`;
 }
 
 

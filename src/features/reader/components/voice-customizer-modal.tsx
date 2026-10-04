@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Check, Volume2, Sparkles, User, Play, Pause } from 'lucide-react';
-import { AVAILABLE_VOICES, type AIVoiceConfig } from '@/data/readerData';
+import { X, Check, Volume2, Sparkles, User, Play, Pause, Loader2, Wand2 } from 'lucide-react';
+import { AVAILABLE_VOICES, ARTICLE_BILINGUAL_DATA, type AIVoiceConfig } from '@/data/readerData';
+import { requestGeminiVoiceGeneration } from '../services/geminiVoiceApi';
 
 interface VoiceCustomizerModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface VoiceCustomizerModalProps {
   onSelectVoice: (voiceId: string) => void;
   playbackSpeed: number;
   onChangeSpeed: (speed: number) => void;
+  onVoiceGenerated?: (newAudioUrl: string) => void;
 }
 
 export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
@@ -18,11 +20,21 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
   onSelectVoice,
   playbackSpeed,
   onChangeSpeed,
+  onVoiceGenerated,
 }) => {
   const [previewingVoiceId, setPreviewingVoiceId] = useState<string | null>(null);
   const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateResult, setGenerateResult] = useState<{
+    success: boolean;
+    message: string;
+    audioUrl?: string;
+  } | null>(null);
 
   if (!isOpen) return null;
+
+  const selectedVoiceConfig =
+    AVAILABLE_VOICES.find((v) => v.id === selectedVoiceId) || AVAILABLE_VOICES[0];
 
   const handlePreview = (voice: AIVoiceConfig, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -39,8 +51,8 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
       previewAudio.pause();
     }
 
-    // Play sentence 1 sample for preview
-    const sampleUrl = `/audio/${voice.id}/sentence_1.mp3`;
+    // Play sentence 1 sample for preview (using Gemini .wav or .mp3)
+    const sampleUrl = `/audio/${voice.id}/sentence_1.wav`;
     const audio = new Audio(sampleUrl);
     setPreviewAudio(audio);
     setPreviewingVoiceId(voice.id);
@@ -50,8 +62,18 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
       setPreviewAudio(null);
     };
     audio.onerror = () => {
-      setPreviewingVoiceId(null);
-      setPreviewAudio(null);
+      // Fallback to mp3 if wav not found
+      const fallbackAudio = new Audio(`/audio/${voice.id}/sentence_1.mp3`);
+      setPreviewAudio(fallbackAudio);
+      fallbackAudio.onended = () => {
+        setPreviewingVoiceId(null);
+        setPreviewAudio(null);
+      };
+      fallbackAudio.onerror = () => {
+        setPreviewingVoiceId(null);
+        setPreviewAudio(null);
+      };
+      fallbackAudio.play().catch(console.error);
     };
     audio.play().catch(console.error);
   };
@@ -65,6 +87,46 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
     onSelectVoice(voiceId);
   };
 
+  const handleGenerateLive = async () => {
+    setIsGenerating(true);
+    setGenerateResult(null);
+
+    // Full article text from ARTICLE_BILINGUAL_DATA
+    const articleText = ARTICLE_BILINGUAL_DATA.paragraphs.map((p) => p.enText).join(" ");
+    const filename = `${selectedVoiceId}_article_${Date.now()}.wav`;
+
+    try {
+      const res = await requestGeminiVoiceGeneration(
+        articleText,
+        selectedVoiceConfig.edgeVoice,
+        filename
+      );
+
+      if (res.success && res.audioUrl) {
+        setGenerateResult({
+          success: true,
+          message: `Sinh giọng đọc thành công cho bài đọc với giọng ${selectedVoiceConfig.name}!`,
+          audioUrl: res.audioUrl,
+        });
+        if (onVoiceGenerated) {
+          onVoiceGenerated(res.audioUrl);
+        }
+      } else {
+        setGenerateResult({
+          success: false,
+          message: res.message || "Không thể sinh voice từ Gemini API",
+        });
+      }
+    } catch (err: any) {
+      setGenerateResult({
+        success: false,
+        message: err.message || "Lỗi kết nối tới backend Spring Boot (cần bật backend trên cổng 8080)",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const speeds = [0.75, 1.0, 1.25];
 
   return (
@@ -74,14 +136,14 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
         <div className="flex items-center justify-between p-6 pb-4 border-b border-white/10 bg-gradient-to-r from-[#1E4B43] to-[#14332D]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#D9B76A]/20 border border-[#D9B76A] flex items-center justify-center text-[#D9B76A] shadow-inner">
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-5 h-5 text-[#D9B76A]" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-[#FBF7EE] font-serif">
-                Tùy Chỉnh Giọng Đọc AI (Edge Neural TTS)
+                Tùy Chỉnh Giọng Đọc AI (Google Gemini Neural Voice)
               </h2>
               <p className="text-xs text-[#BFE3EA]">
-                Chọn âm sắc và chất giọng AI bản xứ phù hợp nhất với phong cách luyện nghe của bạn
+                Chất giọng Google Gemini AI thế hệ mới với ngữ điệu tự nhiên, sống động và truyền cảm
               </p>
             </div>
           </div>
@@ -98,13 +160,69 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
 
         {/* Content Body */}
         <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+          {/* Interactive Google Gemini Live Generator for this Reading */}
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-[#1E4B43] to-[#142E28] border-2 border-[#D9B76A]/40 space-y-3 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#D9B76A] animate-pulse" />
+                <span className="text-xs font-extrabold uppercase tracking-wider text-[#D9B76A]">
+                  Sinh Giọng Đọc Gemini Trực Tiếp Cho Bài Này
+                </span>
+              </div>
+              <span className="text-[10px] font-mono bg-[#D9B76A]/20 text-[#D9B76A] px-2 py-0.5 rounded-full border border-[#D9B76A]/30">
+                Google Gemini API
+              </span>
+            </div>
+
+            <p className="text-xs text-[#E8DFCB]/90 leading-relaxed">
+              Bấm nút bên dưới để gửi toàn bộ văn bản bài đọc tới <strong>Google Gemini API</strong> để sinh file âm thanh mới với giọng <strong>{selectedVoiceConfig.name}</strong>.
+            </p>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleGenerateLive}
+                disabled={isGenerating}
+                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#D9B76A] via-[#E2C37D] to-[#D9B76A] text-[#1E4B43] font-bold text-xs shadow-md hover:shadow-lg hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-[#1E4B43]" />
+                    <span>Đang gọi Google Gemini API sinh giọng...</span>
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="w-4 h-4 text-[#1E4B43]" />
+                    <span>⚡ Bấm để sinh giọng đọc bài này bằng Gemini ({selectedVoiceConfig.name})</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {generateResult && (
+              <div
+                className={`p-3 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
+                  generateResult.success
+                    ? 'bg-emerald-950/70 border border-emerald-500/50 text-emerald-200'
+                    : 'bg-red-950/70 border border-red-500/50 text-red-200'
+                }`}
+              >
+                <span>{generateResult.message}</span>
+                {generateResult.success && generateResult.audioUrl && (
+                  <span className="text-[11px] font-mono text-emerald-400 font-bold">
+                    ✓ Đã cập nhật phát ngay!
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Voice Cards Grid */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold uppercase tracking-wider text-[#D9B76A]">
-                Danh Sách Giọng Đọc Neural Bản Xứ:
+                Danh Sách Giọng Đọc Google Gemini:
               </span>
-              <span className="text-[11px] text-white/60">4 Giọng Studio Có Sẵn</span>
+              <span className="text-[11px] text-white/60">5 Giọng Studio Có Sẵn</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -118,8 +236,8 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
                     onClick={() => handleSelect(voice.id)}
                     className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative group flex flex-col justify-between ${
                       isSelected
-                        ? "bg-[#D9B76A]/20 border-[#D9B76A] shadow-lg shadow-[#D9B76A]/10"
-                        : "bg-white/5 border-white/10 hover:border-[#D9B76A]/40 hover:bg-white/10"
+                        ? 'bg-[#D9B76A]/20 border-[#D9B76A] shadow-lg shadow-[#D9B76A]/10'
+                        : 'bg-white/5 border-white/10 hover:border-[#D9B76A]/40 hover:bg-white/10'
                     }`}
                   >
                     <div>
@@ -161,17 +279,17 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
                         onClick={(e) => handlePreview(voice, e)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
                           isPreviewing
-                            ? "bg-[#D9B76A] text-[#1E4B43] shadow-md animate-pulse"
-                            : "bg-white/10 hover:bg-white/20 text-[#FBF7EE]"
+                            ? 'bg-[#D9B76A] text-[#1E4B43] shadow-md animate-pulse'
+                            : 'bg-white/10 hover:bg-white/20 text-[#FBF7EE]'
                         }`}
                         title="Nghe thử một câu mẫu bằng giọng này"
                       >
                         {isPreviewing ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 fill-current" />}
-                        <span>{isPreviewing ? "Đang phát..." : "Nghe thử"}</span>
+                        <span>{isPreviewing ? 'Đang phát...' : 'Nghe thử'}</span>
                       </button>
 
-                      <span className="text-[10px] text-white/50 font-mono">
-                        {voice.edgeVoice.split("-")[2]?.replace("Neural", "")}
+                      <span className="text-[10px] text-[#D9B76A]/70 font-mono font-semibold">
+                        Gemini {voice.edgeVoice}
                       </span>
                     </div>
                   </div>
@@ -192,11 +310,11 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
                   onClick={() => onChangeSpeed(s)}
                   className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${
                     playbackSpeed === s
-                      ? "bg-[#D9B76A] text-[#1E4B43] border-[#D9B76A] shadow-md"
-                      : "bg-black/30 border-white/10 text-white/80 hover:bg-white/10 hover:text-white"
+                      ? 'bg-[#D9B76A] text-[#1E4B43] border-[#D9B76A] shadow-md'
+                      : 'bg-black/30 border-white/10 text-white/80 hover:bg-white/10 hover:text-white'
                   }`}
                 >
-                  {s}x {s === 0.75 ? "• Chậm" : s === 1.0 ? "• Chuẩn" : "• Nhanh"}
+                  {s}x {s === 0.75 ? '• Chậm' : s === 1.0 ? '• Chuẩn' : '• Nhanh'}
                 </button>
               ))}
             </div>
@@ -206,7 +324,7 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
         {/* Footer */}
         <div className="p-4 px-6 border-t border-white/10 bg-[#0E1E19] flex items-center justify-between">
           <span className="text-[11px] text-white/50">
-            Tự động lưu lựa chọn của bạn vào bộ nhớ trình duyệt.
+            Giọng đọc được sinh trực tiếp bằng Google Gemini AI (không dùng local TTS).
           </span>
           <button
             onClick={() => {
@@ -215,11 +333,10 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
             }}
             className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#D9B76A] to-[#c9a657] text-[#1E4B43] font-bold text-xs hover:shadow-lg transition-all"
           >
-            Áp Dụng & Đóng
+            Đóng
           </button>
         </div>
       </div>
     </div>
   );
 };
-export default VoiceCustomizerModal;

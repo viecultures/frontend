@@ -8,12 +8,12 @@
 
 let activeAudio: HTMLAudioElement | null = null;
 
-// Helper to get currently active/preferred voice ID (defaults to 'ryan')
+// Helper to get currently active/preferred voice ID (defaults to 'puck' Google Gemini)
 export function getActiveVoiceId(): string {
   if (typeof window !== "undefined") {
-    return localStorage.getItem("vie_preferred_voice") || "ryan";
+    return localStorage.getItem("vie_preferred_voice") || "puck";
   }
-  return "ryan";
+  return "puck";
 }
 
 // Map sentence text to sentence file index
@@ -31,9 +31,9 @@ const SENTENCE_INDEX_MAP: Record<string, number> = {
 
 // Static pre-generated audio map
 const PRE_RENDERED_AUDIO_MAP: Record<string, string> = {
-  // Hero section sample story (recorded in Ryan's voice)
+  // Hero section sample story (Google Gemini Neural voice)
   "Vietnam is not merely a war or a map coordinate; it is a four-thousand-year-old river of resilience, poetry, and shared bowls of fragrant broth under morning mist.":
-    "/audio/hero_sample_story.mp3",
+    "/audio/hero_sample_story.wav",
 };
 
 /**
@@ -145,9 +145,9 @@ export function speakEnglish(text: string, onEnd?: () => void) {
 
   if (!mappedUrl && SENTENCE_INDEX_MAP[cleanText]) {
     const idx = SENTENCE_INDEX_MAP[cleanText];
-    mappedUrl = `/audio/${activeVoice}/sentence_${idx}.mp3`;
+    mappedUrl = `/audio/${activeVoice}/sentence_${idx}.wav`;
   } else if (!mappedUrl && cleanText === "How to be disgustingly educated") {
-    mappedUrl = `/audio/${activeVoice}/disgustingly_educated_full.mp3`;
+    mappedUrl = `/audio/${activeVoice}/disgustingly_educated_full.wav`;
   }
 
   if (mappedUrl) {
@@ -158,6 +158,23 @@ export function speakEnglish(text: string, onEnd?: () => void) {
       if (onEnd) onEnd();
     };
     audio.onerror = () => {
+      // Try mp3 fallback if wav failed
+      if (mappedUrl.endsWith(".wav")) {
+        const mp3Audio = new Audio(mappedUrl.replace(".wav", ".mp3"));
+        activeAudio = mp3Audio;
+        mp3Audio.onended = () => {
+          activeAudio = null;
+          if (onEnd) onEnd();
+        };
+        mp3Audio.onerror = () => {
+          activeAudio = null;
+          fallbackBrowserSpeech(cleanText, onEnd);
+        };
+        mp3Audio.play().catch(() => {
+          fallbackBrowserSpeech(cleanText, onEnd);
+        });
+        return;
+      }
       activeAudio = null;
       fallbackBrowserSpeech(cleanText, onEnd);
     };

@@ -34,7 +34,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
   duration,
   onSeek,
   playingModeTitle,
-  selectedVoiceId = "ryan",
+  selectedVoiceId = "puck",
   onOpenVoiceModal,
 }) => {
   const currentVoice = AVAILABLE_VOICES.find((v) => v.id === selectedVoiceId) || AVAILABLE_VOICES[0];
