@@ -20,6 +20,7 @@ interface BilingualReaderViewProps {
   setQ2Answer: (val: string) => void;
   quizSubmitted: boolean;
   setQuizSubmitted: (val: boolean) => void;
+  selectedLevel?: "Level 1" | "Level 2" | "Level 3";
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
@@ -37,6 +38,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   setQ2Answer,
   quizSubmitted,
   setQuizSubmitted,
+  selectedLevel = "Level 2",
 }) => {
   // ── Proportional Scroll Sync Refs & State ─────────────────────────────────
   const leftSheetRef = useRef<HTMLDivElement>(null);
@@ -266,8 +268,9 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 <span className="bg-[#1E4B43]/80 backdrop-blur-xs px-2.5 py-1 rounded-md border border-[#D9B76A]/40 text-[#FBF7EE]">
                   Cultural Essay
                 </span>
-                <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A]">
-                  Level 2–3 (~370 words)
+                <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A] flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${selectedLevel === 'Level 1' ? 'bg-emerald-400' : selectedLevel === 'Level 2' ? 'bg-cyan-400' : 'bg-rose-400'}`} />
+                  <span>{selectedLevel} ({selectedLevel === 'Level 1' ? '~220' : selectedLevel === 'Level 2' ? '~370' : '~520'} words)</span>
                 </span>
               </div>
 

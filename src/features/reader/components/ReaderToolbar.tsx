@@ -1,5 +1,5 @@
 import Link from "@/components/Link";
-import { ArrowLeft, Columns, BookOpen, Moon, Sun } from "lucide-react";
+import { ArrowLeft, Columns, BookOpen, Moon, Sun, Layers } from "lucide-react";
 
 interface ReaderToolbarProps {
   fontSize: number;
@@ -10,6 +10,8 @@ interface ReaderToolbarProps {
   vocabCount: number;
   themeMode: "paper" | "dark";
   onChangeThemeMode: (theme: "paper" | "dark") => void;
+  selectedLevel?: "Level 1" | "Level 2" | "Level 3";
+  onChangeLevel?: (lvl: "Level 1" | "Level 2" | "Level 3") => void;
 }
 
 export function ReaderToolbar({
@@ -21,6 +23,8 @@ export function ReaderToolbar({
   vocabCount,
   themeMode,
   onChangeThemeMode,
+  selectedLevel = "Level 2",
+  onChangeLevel,
 }: ReaderToolbarProps) {
   return (
     <section className="bg-[#1E4B43] text-[#FBF7EE] border-b border-[#D9B76A]/30 py-3 px-6 sm:px-8 sticky top-0 z-30 shadow-md">
@@ -38,6 +42,31 @@ export function ReaderToolbar({
 
         {/* Right Controls: Reading Mode Toggle, Font Size, Vocab Drawer, Theme Toggle */}
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-semibold">
+
+          {/* Level Selector: Level 1 • Level 2 • Level 3 */}
+          {onChangeLevel && (
+            <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40 text-xs font-bold">
+              {(['Level 1', 'Level 2', 'Level 3'] as const).map((lvl) => (
+                <button
+                  key={lvl}
+                  type="button"
+                  onClick={() => onChangeLevel(lvl)}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                    selectedLevel === lvl
+                      ? lvl === 'Level 1'
+                        ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                        : lvl === 'Level 2'
+                        ? 'bg-cyan-700 text-white shadow-xs font-bold'
+                        : 'bg-rose-700 text-white shadow-xs font-bold'
+                      : 'text-[#BFE3EA] hover:text-[#FBF7EE]'
+                  }`}
+                  title={`Chuyển sang ${lvl}`}
+                >
+                  {lvl}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Cỡ chữ (Icon A⁻ / A⁺) */}
           <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40">

@@ -29,6 +29,14 @@ export default function ReaderPage() {
     initialMode
   );
 
+  // Initial level reads from URL query ?level=Level 1/2/3
+  const levelParam = searchParams.get("level");
+  const initialLevel: "Level 1" | "Level 2" | "Level 3" =
+    levelParam === "Level 1" || levelParam === "Level 3" ? levelParam : "Level 2";
+  const [selectedLevel, setSelectedLevel] = useState<"Level 1" | "Level 2" | "Level 3">(
+    initialLevel
+  );
+
   // Sync state if URL searchParams change externally
   useEffect(() => {
     const modeParam = searchParams.get("mode");
@@ -36,6 +44,14 @@ export default function ReaderPage() {
       setReadingMode("extensive");
     } else if (modeParam !== "extensive" && readingMode !== "bilingual") {
       setReadingMode("bilingual");
+    }
+
+    const currentLvl = searchParams.get("level");
+    if (
+      (currentLvl === "Level 1" || currentLvl === "Level 2" || currentLvl === "Level 3") &&
+      currentLvl !== selectedLevel
+    ) {
+      setSelectedLevel(currentLvl);
     }
   }, [searchParams]);
 
@@ -49,6 +65,18 @@ export default function ReaderPage() {
         } else {
           next.delete("mode");
         }
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  const handleLevelChange = (newLevel: "Level 1" | "Level 2" | "Level 3") => {
+    setSelectedLevel(newLevel);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("level", newLevel);
         return next;
       },
       { replace: true }
@@ -151,6 +179,8 @@ export default function ReaderPage() {
         onChangeFontSize={setFontSize}
         readingMode={readingMode}
         onChangeReadingMode={handleModeChange}
+        selectedLevel={selectedLevel}
+        onChangeLevel={handleLevelChange}
         onOpenVocabList={() => {
           setSelectedVocab(VOCAB_DATABASE["sacred"]);
           setIsVocabDrawerOpen(true);
@@ -195,6 +225,7 @@ export default function ReaderPage() {
               setQ2Answer={setQ2Answer}
               quizSubmitted={quizSubmitted}
               setQuizSubmitted={setQuizSubmitted}
+              selectedLevel={selectedLevel}
             />
           ) : (
             <ExtensiveReaderView
@@ -207,6 +238,7 @@ export default function ReaderPage() {
               vocabBtnClass={vocabBtnClass}
               bottomCardBgClass={bottomCardBgClass}
               openVocab={openVocab}
+              selectedLevel={selectedLevel}
             />
           )}
 

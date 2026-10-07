@@ -13,6 +13,7 @@ interface ExtensiveReaderViewProps {
   vocabBtnClass: string;
   bottomCardBgClass: string;
   openVocab: (key: string) => void;
+  selectedLevel?: "Level 1" | "Level 2" | "Level 3";
 }
 
 export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
@@ -25,6 +26,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
   vocabBtnClass,
   bottomCardBgClass,
   openVocab,
+  selectedLevel = "Level 2",
 }) => {
   const [isHighlightEnabled, setIsHighlightEnabled] = useState<boolean>(true);
   const [activePart, setActivePart] = useState<"part5" | "part6">("part6");
@@ -90,8 +92,9 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
               <span className="text-xs font-bold bg-[#2563EB] text-white px-2.5 py-0.5 rounded">
                 EN • EXTENSIVE
               </span>
-              <span className="text-xs font-semibold text-[#D9B76A]">
-                ~370 words • Level 2–3
+              <span className="text-xs font-semibold text-[#D9B76A] flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full ${selectedLevel === 'Level 1' ? 'bg-emerald-400' : selectedLevel === 'Level 2' ? 'bg-cyan-400' : 'bg-rose-400'}`} />
+                <span>{selectedLevel} ({selectedLevel === 'Level 1' ? '~220' : selectedLevel === 'Level 2' ? '~370' : '~520'} words)</span>
               </span>
             </div>
 
@@ -121,7 +124,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                   Cultural Essay
                 </span>
                 <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A]">
-                  Level 2–3 • Extensive Mode
+                  {selectedLevel} • Extensive Mode
                 </span>
               </div>
 
