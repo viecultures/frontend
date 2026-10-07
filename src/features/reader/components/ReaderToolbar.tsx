@@ -53,11 +53,7 @@ export function ReaderToolbar({
                   onClick={() => onChangeLevel(lvl)}
                   className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                     selectedLevel === lvl
-                      ? lvl === 'Level 1'
-                        ? 'bg-emerald-600 text-white shadow-xs font-bold'
-                        : lvl === 'Level 2'
-                        ? 'bg-cyan-700 text-white shadow-xs font-bold'
-                        : 'bg-rose-700 text-white shadow-xs font-bold'
+                      ? 'bg-emerald-600 text-white shadow-xs font-bold ring-1 ring-antique-gold/60'
                       : 'text-[#BFE3EA] hover:text-[#FBF7EE]'
                   }`}
                   title={`Chuyển sang ${lvl}`}

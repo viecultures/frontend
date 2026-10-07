@@ -14,6 +14,7 @@ interface ExtensiveReaderViewProps {
   bottomCardBgClass: string;
   openVocab: (key: string) => void;
   selectedLevel?: "Level 1" | "Level 2" | "Level 3";
+  onChangeLevel?: (lvl: "Level 1" | "Level 2" | "Level 3") => void;
 }
 
 export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
@@ -27,61 +28,17 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
   bottomCardBgClass,
   openVocab,
   selectedLevel = "Level 2",
+  onChangeLevel,
 }) => {
   const [isHighlightEnabled, setIsHighlightEnabled] = useState<boolean>(true);
   const [activePart, setActivePart] = useState<"part5" | "part6">("part6");
   const [extensiveAnswers, setExtensiveAnswers] = useState<Record<string, string>>({});
   const [focusedQuestionId, setFocusedQuestionId] = useState<string | null>(null);
 
+  const isDark = themeMode === "dark";
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Sub-toolbar: Highlight Toggle & Part 1 / Part 2 Tags */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[#1E2925]/80 border border-[#D9B76A]/30 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsHighlightEnabled(!isHighlightEnabled)}
-            className="flex items-center gap-2 text-xs font-bold text-[#FBF7EE] cursor-pointer group select-none"
-          >
-            <div
-              className={`w-9 h-5 rounded-full p-0.5 transition-colors ${isHighlightEnabled ? "bg-[#2563EB]" : "bg-white/20"
-                }`}
-            >
-              <div
-                className={`w-4 h-4 rounded-full bg-white transition-transform ${isHighlightEnabled ? "translate-x-4" : "translate-x-0"
-                  }`}
-              />
-            </div>
-            <span className="flex items-center gap-1">
-              Highlight từ vựng trọng tâm
-              <span title="Bật/tắt đánh dấu từ vựng và câu hỏi trong bài đọc">
-                <Info className="w-3.5 h-3.5 text-[#BFE3EA] hover:text-white cursor-pointer" />
-              </span>
-            </span>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs font-bold">
-          <button
-            onClick={() => setActivePart("part5")}
-            className={`px-3.5 py-1.5 rounded-full font-semibold transition-all ${activePart === "part5"
-              ? "bg-[#2563EB] text-white shadow-sm"
-              : "bg-[#E2E8F0] text-[#475569] hover:bg-[#CBD5E1]"
-              }`}
-          >
-            Phần 1: Nguồn gốc & Phong tục
-          </button>
-          <button
-            onClick={() => setActivePart("part6")}
-            className={`px-3.5 py-1.5 rounded-full font-semibold transition-all ${activePart === "part6"
-              ? "bg-[#2563EB] text-white shadow-sm"
-              : "bg-[#E2E8F0] text-[#475569] hover:bg-[#CBD5E1]"
-              }`}
-          >
-            Phần 2: Ẩm thực & Ba miền
-          </button>
-        </div>
-      </div>
-
       {/* Extensive Reading Grid: Passage (7 cols / 70%) + Side-by-Side Questions (3 cols / 30%) */}
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start">
         {/* Left 7 Cols (70% Area): Extended Article Reading Passage */}
@@ -89,11 +46,14 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
           <div>
             {/* Header Tag */}
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
-              <span className="text-xs font-bold bg-[#2563EB] text-white px-2.5 py-0.5 rounded">
+              <span className={`text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-md border ${isDark
+                ? "text-[#D9B76A] bg-[#D9B76A]/15 border-[#D9B76A]/30"
+                : "text-heritage-green bg-heritage-green/10 border-heritage-green/15"
+                }`}>
                 EN • EXTENSIVE
               </span>
               <span className="text-xs font-semibold text-[#D9B76A] flex items-center gap-1.5">
-                <span className={`w-2 h-2 rounded-full ${selectedLevel === 'Level 1' ? 'bg-emerald-400' : selectedLevel === 'Level 2' ? 'bg-cyan-400' : 'bg-rose-400'}`} />
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
                 <span>{selectedLevel} ({selectedLevel === 'Level 1' ? '~220' : selectedLevel === 'Level 2' ? '~370' : '~520'} words)</span>
               </span>
             </div>
@@ -323,7 +283,10 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                   }`}
               >
                 <div className="flex items-center gap-2 mb-2.5">
-                  <span className="w-6 h-6 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-mono font-extrabold text-[11px] shadow-sm">
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center font-mono font-extrabold text-[11px] shadow-xs ${isDark
+                    ? "bg-[#D9B76A] text-[#141C1A]"
+                    : "bg-heritage-green text-warm-ivory"
+                    }`}>
                     {q.num}
                   </span>
                   <span className="text-[11px] font-bold text-[#D9B76A] truncate">

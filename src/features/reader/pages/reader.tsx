@@ -205,6 +205,7 @@ export default function ReaderPage() {
             onToggleRepeatLoop={() => setIsRepeatLoop(!isRepeatLoop)}
             currentSentenceEn={currentSentenceEn}
             themeMode={themeMode}
+            selectedLevel={selectedLevel}
           />
 
           {/* Main Reading Views: Bilingual View vs Extensive Reading View */}
@@ -226,6 +227,7 @@ export default function ReaderPage() {
               quizSubmitted={quizSubmitted}
               setQuizSubmitted={setQuizSubmitted}
               selectedLevel={selectedLevel}
+              onChangeLevel={handleLevelChange}
             />
           ) : (
             <ExtensiveReaderView
@@ -239,6 +241,7 @@ export default function ReaderPage() {
               bottomCardBgClass={bottomCardBgClass}
               openVocab={openVocab}
               selectedLevel={selectedLevel}
+              onChangeLevel={handleLevelChange}
             />
           )}
 

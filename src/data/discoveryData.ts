@@ -549,22 +549,9 @@ export const LESSONS_DATA: Lesson[] = [
   },
 ];
 
-// Helper to get Level Badge Styles
-export const getCefrBadgeStyle = (level: string) => {
-  switch (level) {
-    case "Level 1":
-    case "A2":
-      return "bg-emerald-600/90 text-emerald-50 border-emerald-400/40";
-    case "Level 2":
-    case "B1":
-    case "B2":
-      return "bg-cyan-700/90 text-cyan-50 border-cyan-400/40";
-    case "Level 3":
-    case "C1":
-      return "bg-rose-700/90 text-rose-50 border-rose-400/40";
-    default:
-      return "bg-slate-700 text-slate-100 border-slate-500/40";
-  }
+// Helper to get Level Badge Styles (Unified Heritage Green Color)
+export const getCefrBadgeStyle = (_level?: string) => {
+  return "bg-heritage-green text-warm-ivory border-heritage-green/30";
 };
 
 // Topic Options with Semantic Icon Identifiers

@@ -51,11 +51,10 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
               <button
                 key={lvl}
                 onClick={() => onSelectCefr(lvl)}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
-                  selectedCefr === lvl
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${selectedCefr === lvl
                     ? "bg-amber-600 text-white shadow-xs"
                     : "text-zinc-600 dark:text-zinc-300 hover:text-amber-800 dark:hover:text-amber-300"
-                }`}
+                  }`}
               >
                 {lvl}
               </button>
@@ -69,11 +68,10 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
             <button
               key={cat}
               onClick={() => onSelectCategory(cat)}
-              className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors border ${
-                selectedCategory === cat
+              className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors border ${selectedCategory === cat
                   ? "bg-amber-100 dark:bg-zinc-800 border-amber-500 text-amber-900 dark:text-amber-300 font-bold"
                   : "border-amber-500/20 text-zinc-600 dark:text-zinc-400 hover:bg-amber-500/10"
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -83,11 +81,10 @@ export const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({
         {/* Audio Only Switch */}
         <button
           onClick={onToggleAudioOnly}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors ${
-            audioOnly
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors ${audioOnly
               ? "bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border-emerald-500/40"
               : "border-amber-500/20 text-zinc-600 dark:text-zinc-400 hover:bg-amber-500/10"
-          }`}
+            }`}
         >
           <Volume2 className="w-3.5 h-3.5 text-emerald-600" /> Audio Available
         </button>
