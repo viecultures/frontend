@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import { ProfileDrawer } from './components/ProfileDrawer';
 
 // Feature Modals
 import { ReaderModal } from '@/features/reader/components/reader-modal';
@@ -30,7 +29,6 @@ export const App: React.FC = () => {
   const defaultUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
   const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(defaultUser);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
-  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -152,7 +150,6 @@ export const App: React.FC = () => {
           user={user}
           onNavigateToSection={handleNavigate}
           onLogout={handleLogout}
-          onOpenProfile={() => setIsProfileDrawerOpen(true)}
         />
       )}
 
@@ -188,7 +185,6 @@ export const App: React.FC = () => {
                 isLoggedIn={isLoggedIn}
                 user={user}
                 onLogout={handleLogout}
-                onOpenProfile={() => setIsProfileDrawerOpen(true)}
               />
             }
           />
@@ -245,15 +241,6 @@ export const App: React.FC = () => {
 
       {/* Footer (hidden on login, home dashboard, and reader page) */}
       {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && <Footer />}
-
-      {/* PROFILE DRAWER MODAL (EngDaily Style) */}
-      <ProfileDrawer
-        isOpen={isProfileDrawerOpen}
-        onClose={() => setIsProfileDrawerOpen(false)}
-        user={user}
-        onLogout={handleLogout}
-        onNavigate={handleNavigate}
-      />
 
       {/* GLOBAL SETTINGS MODAL */}
       <SettingsModal />

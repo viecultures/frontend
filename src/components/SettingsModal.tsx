@@ -12,7 +12,7 @@ import {
 import {
   useSettings,
   BACKGROUND_PRESETS,
-  ACCENT_COLOR_PRESETS,
+  // ACCENT_COLOR_PRESETS,
   getAutoTimeOfDayBackgroundId,
 } from '@/context/SettingsContext';
 
@@ -108,69 +108,6 @@ export const SettingsModal: React.FC = () => {
           {/* Unified Scrollable Form Content */}
           <div className="overflow-y-auto pr-1 py-4 space-y-6 custom-scrollbar">
 
-            {/* 1. Color Theme */}
-            <div className="space-y-2.5">
-              <h3 className="text-sm font-bold text-white/90 tracking-wide">
-                Color Theme
-              </h3>
-              <div className="flex items-center flex-wrap gap-2.5 pt-0.5">
-                {ACCENT_COLOR_PRESETS.map((color) => {
-                  const isSelected =
-                    settings.accentColor.toLowerCase() === color.hex.toLowerCase();
-
-                  return (
-                    <button
-                      key={color.id}
-                      type="button"
-                      onClick={() => {
-                        setAccentColor(color.hex);
-                        triggerToast();
-                      }}
-                      title={color.name}
-                      className={`w-10 h-10 rounded-2xl transition-all cursor-pointer relative flex items-center justify-center border-2 p-1 ${
-                        isSelected
-                          ? 'border-white scale-105 shadow-lg shadow-black/40 ring-2 ring-white/30'
-                          : 'border-white/10 hover:border-white/40 hover:scale-105 opacity-90 hover:opacity-100 bg-[#25282c]'
-                      }`}
-                    >
-                      <div
-                        className="w-full h-full rounded-xl flex items-center justify-center shadow-inner overflow-hidden"
-                        style={{
-                          background: color.secondary
-                            ? `linear-gradient(135deg, ${color.secondary} 0%, ${color.hex} 100%)`
-                            : color.hex,
-                        }}
-                      >
-                        {isSelected && <Check className="w-4 h-4 text-white drop-shadow-md stroke-[3]" />}
-                      </div>
-                    </button>
-                  );
-                })}
-
-                {/* Custom Color Trigger Button */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => colorInputRef.current?.click()}
-                    style={{ backgroundColor: settings.accentColor }}
-                    className="px-3.5 py-2.5 rounded-2xl text-xs font-bold text-white shadow-md hover:brightness-110 transition-all flex items-center gap-1.5 cursor-pointer border border-white/20"
-                    title="Chọn màu tuỳ chỉnh"
-                  >
-                    <Palette className="w-3.5 h-3.5" />
-                    <span>Tuỳ chỉnh</span>
-                  </button>
-                  <input
-                    ref={colorInputRef}
-                    type="color"
-                    value={settings.accentColor}
-                    onChange={handleCustomColorChange}
-                    className="sr-only"
-                    aria-label="Chọn màu tùy chỉnh"
-                  />
-                </div>
-              </div>
-            </div>
-
             {/* 2. Background (Auto, None, Morning, Afternoon, Night) */}
             <div className="space-y-2.5">
               <h3 className="text-sm font-bold text-white/90 tracking-wide">
@@ -185,11 +122,10 @@ export const SettingsModal: React.FC = () => {
                     setBackgroundMode('auto');
                     triggerToast();
                   }}
-                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative flex flex-col items-center justify-center p-2 border overflow-hidden ${
-                    isAutoActive
-                      ? 'border-white bg-[#282d30] shadow-xl ring-2 ring-white/30'
-                      : 'border-white/10 bg-[#202326] hover:bg-[#282b2f] hover:border-white/30'
-                  }`}
+                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative flex flex-col items-center justify-center p-2 border overflow-hidden ${isAutoActive
+                    ? 'border-white bg-[#282d30] shadow-xl ring-2 ring-white/30'
+                    : 'border-white/10 bg-[#202326] hover:bg-[#282b2f] hover:border-white/30'
+                    }`}
                 >
                   <span className="text-sm font-bold text-white tracking-wide">Auto</span>
                   <span className="text-[10px] text-white/50 mt-0.5 font-medium flex items-center gap-1">
@@ -214,11 +150,10 @@ export const SettingsModal: React.FC = () => {
                     setBackground('minimal-none');
                     triggerToast();
                   }}
-                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative flex flex-col items-center justify-center p-2 border overflow-hidden ${
-                    !isAutoActive && settings.backgroundId === 'minimal-none'
-                      ? 'border-white bg-[#282d30] shadow-xl ring-2 ring-white/30'
-                      : 'border-white/10 bg-[#202326] hover:bg-[#282b2f] hover:border-white/30'
-                  }`}
+                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative flex flex-col items-center justify-center p-2 border overflow-hidden ${!isAutoActive && settings.backgroundId === 'minimal-none'
+                    ? 'border-white bg-[#282d30] shadow-xl ring-2 ring-white/30'
+                    : 'border-white/10 bg-[#202326] hover:bg-[#282b2f] hover:border-white/30'
+                    }`}
                 >
                   <span className="text-sm font-bold text-white tracking-wide">None</span>
                   <span className="text-[10px] text-white/50 mt-0.5 font-medium">Tối giản</span>
@@ -241,11 +176,10 @@ export const SettingsModal: React.FC = () => {
                     triggerToast();
                   }}
                   title="Sáng: Non nước Tràng An"
-                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative overflow-hidden group border ${
-                    (!isAutoActive && settings.backgroundId === 'lofi-morning') || (isAutoActive && autoActiveId === 'lofi-morning')
-                      ? 'border-white shadow-xl ring-2 ring-white/30'
-                      : 'border-white/10 hover:border-white/30 opacity-90 hover:opacity-100'
-                  }`}
+                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative overflow-hidden group border ${(!isAutoActive && settings.backgroundId === 'lofi-morning') || (isAutoActive && autoActiveId === 'lofi-morning')
+                    ? 'border-white shadow-xl ring-2 ring-white/30'
+                    : 'border-white/10 hover:border-white/30 opacity-90 hover:opacity-100'
+                    }`}
                 >
                   <img
                     src={morningPreset.thumbnailUrl || morningPreset.url}
@@ -276,11 +210,10 @@ export const SettingsModal: React.FC = () => {
                     triggerToast();
                   }}
                   title="Trưa: Đại nội Huế"
-                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative overflow-hidden group border ${
-                    (!isAutoActive && settings.backgroundId === 'lofi-afternoon') || (isAutoActive && autoActiveId === 'lofi-afternoon')
-                      ? 'border-white shadow-xl ring-2 ring-white/30'
-                      : 'border-white/10 hover:border-white/30 opacity-90 hover:opacity-100'
-                  }`}
+                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative overflow-hidden group border ${(!isAutoActive && settings.backgroundId === 'lofi-afternoon') || (isAutoActive && autoActiveId === 'lofi-afternoon')
+                    ? 'border-white shadow-xl ring-2 ring-white/30'
+                    : 'border-white/10 hover:border-white/30 opacity-90 hover:opacity-100'
+                    }`}
                 >
                   <img
                     src={afternoonPreset.thumbnailUrl || afternoonPreset.url}
@@ -311,11 +244,10 @@ export const SettingsModal: React.FC = () => {
                     triggerToast();
                   }}
                   title="Tối: Sài Gòn về đêm"
-                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative overflow-hidden group border ${
-                    (!isAutoActive && settings.backgroundId === 'lofi-night') || (isAutoActive && autoActiveId === 'lofi-night')
-                      ? 'border-white shadow-xl ring-2 ring-white/30'
-                      : 'border-white/10 hover:border-white/30 opacity-90 hover:opacity-100'
-                  }`}
+                  className={`aspect-[16/10] rounded-2xl transition-all cursor-pointer relative overflow-hidden group border ${(!isAutoActive && settings.backgroundId === 'lofi-night') || (isAutoActive && autoActiveId === 'lofi-night')
+                    ? 'border-white shadow-xl ring-2 ring-white/30'
+                    : 'border-white/10 hover:border-white/30 opacity-90 hover:opacity-100'
+                    }`}
                 >
                   <img
                     src={nightPreset.thumbnailUrl || nightPreset.url}
@@ -359,11 +291,10 @@ export const SettingsModal: React.FC = () => {
                         setBackground(preset.id);
                         triggerToast();
                       }}
-                      className={`aspect-[16/10] rounded-2xl overflow-hidden group transition-all cursor-pointer relative border ${
-                        isSelected
-                          ? 'border-white scale-[1.02] shadow-xl ring-2 ring-white/30'
-                          : 'border-white/10 hover:border-white/30 opacity-85 hover:opacity-100'
-                      }`}
+                      className={`aspect-[16/10] rounded-2xl overflow-hidden group transition-all cursor-pointer relative border ${isSelected
+                        ? 'border-white scale-[1.02] shadow-xl ring-2 ring-white/30'
+                        : 'border-white/10 hover:border-white/30 opacity-85 hover:opacity-100'
+                        }`}
                       title={preset.name}
                     >
                       {/* Background image / gradient */}

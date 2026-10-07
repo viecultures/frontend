@@ -41,7 +41,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   // ── Proportional Scroll Sync Refs & State ─────────────────────────────────
   const leftSheetRef = useRef<HTMLDivElement>(null);
   const rightSheetRef = useRef<HTMLDivElement>(null);
-  const isSyncingRef = useRef<boolean>(false);
+  const activeScrollerRef = useRef<"left" | "right" | null>(null);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState<boolean>(true);
 
   // ── In-Place Dictionary Popup State ───────────────────────────────────────
@@ -57,7 +58,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
   // Handle Proportional Scroll Sync
   const handleScroll = useCallback((source: "left" | "right") => {
-    if (!isScrollSyncEnabled || isSyncingRef.current) return;
+    if (!isScrollSyncEnabled) return;
+
+    // If another pane is actively driving the scroll, ignore echo scroll events
+    if (activeScrollerRef.current && activeScrollerRef.current !== source) {
+      return;
+    }
 
     const sourceEl = source === "left" ? leftSheetRef.current : rightSheetRef.current;
     const targetEl = source === "left" ? rightSheetRef.current : leftSheetRef.current;
@@ -69,14 +75,19 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
     if (sourceMaxScroll <= 0 || targetMaxScroll <= 0) return;
 
-    const scrollRatio = sourceEl.scrollTop / sourceMaxScroll;
+    // Lock the active source driver
+    activeScrollerRef.current = source;
 
-    isSyncingRef.current = true;
+    const scrollRatio = sourceEl.scrollTop / sourceMaxScroll;
     targetEl.scrollTop = scrollRatio * targetMaxScroll;
 
-    requestAnimationFrame(() => {
-      isSyncingRef.current = false;
-    });
+    // Reset lock once scrolling settles
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    scrollTimeoutRef.current = setTimeout(() => {
+      activeScrollerRef.current = null;
+    }, 120);
   }, [isScrollSyncEnabled]);
 
   // Handle click on predetermined vocab word
@@ -156,6 +167,15 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
     }
   };
 
+  // Cleanup sync timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Recalculate sync when font size reflows
   useEffect(() => {
     if (leftSheetRef.current && rightSheetRef.current && isScrollSyncEnabled) {
@@ -203,9 +223,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
         {/* ── LEFT PAPER SHEET (ENGLISH ORIGINAL) ─────────────────────────── */}
         <div
           ref={leftSheetRef}
+          onMouseEnter={() => { activeScrollerRef.current = "left"; }}
+          onTouchStart={() => { activeScrollerRef.current = "left"; }}
+          onWheel={() => { activeScrollerRef.current = "left"; }}
           onScroll={() => handleScroll("left")}
           onMouseUp={handleTextSelection}
-          className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] scroll-smooth ${paperSheetBgClass}`}
+          className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] ${paperSheetBgClass}`}
         >
           <div>
             {/* Header Tag */}
@@ -422,8 +445,11 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
         {/* ── RIGHT PAPER SHEET (TIẾNG VIỆT TRANSLATION) ────────────────────── */}
         <div
           ref={rightSheetRef}
+          onMouseEnter={() => { activeScrollerRef.current = "right"; }}
+          onTouchStart={() => { activeScrollerRef.current = "right"; }}
+          onWheel={() => { activeScrollerRef.current = "right"; }}
           onScroll={() => handleScroll("right")}
-          className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] scroll-smooth ${paperSheetBgClass}`}
+          className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] ${paperSheetBgClass}`}
         >
           <div>
             {/* Header Tag */}

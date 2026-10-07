@@ -123,16 +123,6 @@ export const BACKGROUND_PRESETS: BackgroundPreset[] = [
   },
 ];
 
-export const ACCENT_COLOR_PRESETS = [
-  { id: 'lime', name: 'Xanh Lá Non (Lime)', hex: '#84CC16', secondary: '#A3E635' },
-  { id: 'purple', name: 'Tím Lavender (Violet)', hex: '#8B5CF6', secondary: '#C084FC' },
-  { id: 'cyan', name: 'Xanh Cyan (Sky)', hex: '#06B6D4', secondary: '#38BDF8' },
-  { id: 'coral', name: 'Đỏ San Hô (Coral)', hex: '#F43F5E', secondary: '#FB7185' },
-  { id: 'orange', name: 'Cam Tươi (Orange)', hex: '#EA580C', secondary: '#F97316' },
-  { id: 'pink', name: 'Hồng Phấn (Pink)', hex: '#EC4899', secondary: '#F472B6' },
-  { id: 'slate', name: 'Xám Đen (Slate Dark)', hex: '#334155', secondary: '#475569' },
-];
-
 export type BackgroundMode = 'auto' | 'fixed';
 export type TimeOfDayPeriod = 'morning' | 'afternoon' | 'night';
 
