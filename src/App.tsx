@@ -3,10 +3,6 @@ import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 
-// Feature Modals
-import { ReaderModal } from '@/features/reader/components/reader-modal';
-import { FlashcardModal } from '@/features/flashcards/components/flashcard-modal';
-import { ReflectionsModal } from '@/features/community/components/reflections-modal';
 import { SettingsModal } from './components/SettingsModal';
 
 // Feature Pages
@@ -40,11 +36,6 @@ export const App: React.FC = () => {
     setIsLoggedIn(false);
     navigate('/');
   };
-
-  const [activeReaderLesson, setActiveReaderLesson] = useState<Lesson | null>(null);
-  const [activeFlashcardLesson, setActiveFlashcardLesson] = useState<Lesson | null>(null);
-  const [activeReflectionsLesson, setActiveReflectionsLesson] = useState<Lesson | null>(null);
-  const [isReflectionsOpen, setIsReflectionsOpen] = useState<boolean>(false);
 
   // Map path to active view name for Navbar and component compatibility
   const getActiveView = (pathname: string): string => {
@@ -244,47 +235,6 @@ export const App: React.FC = () => {
 
       {/* GLOBAL SETTINGS MODAL */}
       <SettingsModal />
-
-      {/* MODAL 1: Paragraph Pairing Bilingual Reader */}
-      {activeReaderLesson && (
-        <ReaderModal
-          lesson={activeReaderLesson}
-          onClose={() => setActiveReaderLesson(null)}
-          onOpenFlashcards={(l: Lesson) => {
-            setActiveReaderLesson(null);
-            setActiveFlashcardLesson(l);
-          }}
-          onOpenReflections={(l: Lesson) => {
-            setActiveReaderLesson(null);
-            setActiveReflectionsLesson(l);
-            setIsReflectionsOpen(true);
-          }}
-        />
-      )}
-
-      {/* MODAL 2: 3D Flashcards with Spaced Repetition */}
-      {activeFlashcardLesson && (
-        <FlashcardModal
-          lesson={activeFlashcardLesson}
-          onClose={() => setActiveFlashcardLesson(null)}
-          onOpenReflections={(l: Lesson) => {
-            setActiveFlashcardLesson(null);
-            setActiveReflectionsLesson(l);
-            setIsReflectionsOpen(true);
-          }}
-        />
-      )}
-
-      {/* MODAL 3: Reflections UGC Community */}
-      {isReflectionsOpen && (
-        <ReflectionsModal
-          lesson={activeReflectionsLesson || undefined}
-          onClose={() => {
-            setIsReflectionsOpen(false);
-            setActiveReflectionsLesson(null);
-          }}
-        />
-      )}
     </div>
   );
 };
