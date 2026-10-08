@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Play, Pause, Volume2, VolumeX, Mic, Repeat, Gauge, RotateCcw, Sparkles } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Mic, Repeat, Gauge, RotateCcw, Sparkles, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AudioShadowingBarProps {
@@ -12,6 +12,19 @@ interface AudioShadowingBarProps {
   currentSentenceEn?: string;
   themeMode?: "paper" | "dark";
   onClose?: () => void;
+  // Audio state props
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (newTime: number) => void;
+  onRestart?: () => void;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
+  // Voice selection props
+  selectedVoiceName?: string;
+  selectedVoiceFlag?: string;
+  selectedVoiceGender?: string;
+  audioScope?: "full" | "sentence";
+  onOpenVoiceCustomizer?: () => void;
 }
 
 export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
@@ -22,12 +35,20 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
   isRepeatLoop,
   onToggleRepeatLoop,
   themeMode = "paper",
+  currentTime = 0,
+  duration = 0,
+  onSeek,
+  onRestart,
+  isMuted = false,
+  onToggleMute,
+  selectedVoiceName = "Puck",
+  selectedVoiceFlag = "🇺🇸",
+  audioScope = "full",
+  onOpenVoiceCustomizer,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [progress, setProgress] = useState(0); // Starts cleanly at 0
   const [scrollY, setScrollY] = useState(0);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const speeds = [0.75, 1.0, 1.25, 1.5];
 
   const isDark = themeMode === "dark";
@@ -48,10 +69,8 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
       setScrollY(currentScrollY);
 
       if (currentScrollY > lastScrollY && currentScrollY > 80) {
-        // Scrolling DOWN -> Hide floating bar
         setIsScrollingDown(true);
       } else if (currentScrollY < lastScrollY) {
-        // Scrolling UP -> Show floating bar
         setIsScrollingDown(false);
       }
       lastScrollY = currentScrollY;
@@ -61,29 +80,21 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Simulate audio playback / recording progress movement
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null;
-    if (isPlaying || isRecording) {
-      interval = setInterval(() => {
-        setProgress((prev) => (prev >= 100 ? 0 : prev + 2));
-      }, 300 / playbackSpeed);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isPlaying, isRecording, playbackSpeed]);
-
-  const formatTime = (percent: number) => {
-    const totalSeconds = 15;
-    const current = Math.floor((percent / 100) * totalSeconds);
-    const m = Math.floor(current / 60);
-    const s = current % 60;
+  const formatSecs = (seconds: number) => {
+    if (!seconds || isNaN(seconds) || seconds <= 0) return "0:00";
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  const handleRestart = () => {
-    setProgress(0);
+  const progressPercent = duration > 0 ? Math.min(100, Math.max(0, (currentTime / duration) * 100)) : 0;
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    if (onSeek && duration > 0) {
+      const targetTime = (val / 100) * duration;
+      onSeek(targetTime);
+    }
   };
 
   const isAtTop = scrollY < 80;
@@ -107,8 +118,8 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
       {/* ── Single Compact 1-Line Row Layout ──────────────────────────────────── */}
       <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-3 sm:gap-4">
         
-        {/* 1. Left: Track / Audio Info */}
-        <div className="flex items-center gap-2.5 shrink-0 min-w-0">
+        {/* 1. Left: Track / Audio Info + Voice Indicator Button */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
           <div
             className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 border ${
               isDark
@@ -121,18 +132,41 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             ) : isPlaying ? (
               <Sparkles className="w-4 h-4 text-[#D9B76A] animate-spin" style={{ animationDuration: '3s' }} />
             ) : (
-              <Volume2 className="w-4 h-4" />
+              <Volume2 className="w-4 h-4 text-[#D9B76A]" />
             )}
           </div>
+          
           <div className="min-w-0">
-            <h4 className={`text-xs font-bold truncate leading-tight ${
-              isDark ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-            }`}>
-              Tết Heritage Essay
-            </h4>
-            <p className={`text-[10px] truncate ${isDark ? "text-[#BFE3EA]" : "text-[#1E4B43]/70"}`}>
-              {isRecording ? "🔴 AI Shadowing" : "AI Audio Engine"}
-            </p>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h4 className={`text-xs font-bold truncate leading-tight ${
+                isDark ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+              }`}>
+                Tết: Renewal
+              </h4>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded font-semibold ${
+                audioScope === "full"
+                  ? "bg-[#2563EB]/15 text-[#2563EB] dark:text-[#93C5FD]"
+                  : "bg-[#D9B76A]/20 text-[#D9B76A]"
+              }`}>
+                {audioScope === "full" ? "Toàn bài" : "Shadowing"}
+              </span>
+            </div>
+
+            {/* Voice Switcher trigger button */}
+            {onOpenVoiceCustomizer && (
+              <button
+                type="button"
+                onClick={onOpenVoiceCustomizer}
+                className={`text-[10px] font-bold flex items-center gap-1 group transition-colors cursor-pointer hover:underline ${
+                  isDark ? "text-[#D9B76A]" : "text-[#1E4B43]"
+                }`}
+                title="Bấm để chọn giọng đọc Google Gemini"
+              >
+                <span>{selectedVoiceFlag}</span>
+                <span>Giọng: {selectedVoiceName}</span>
+                <SlidersHorizontal className="w-2.5 h-2.5 opacity-70 group-hover:opacity-100" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -143,7 +177,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             {/* Replay */}
             <button
-              onClick={handleRestart}
+              onClick={onRestart}
               title="Nghe lại từ đầu"
               className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer shrink-0 ${
                 isDark
@@ -177,7 +211,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             </button>
           </div>
 
-          {/* Play/Pause Button (adjacent to audio track) */}
+          {/* Play/Pause Button */}
           <Button
             variant="gold"
             size="icon"
@@ -187,7 +221,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 ? "bg-[#D9B76A] hover:bg-[#c9a657] text-[#1E4B43]"
                 : "bg-[#1E4B43] hover:bg-[#163D37] text-[#FBF7EE]"
             }`}
-            title={isPlaying ? "Tạm dừng" : "Phát audio"}
+            title={isPlaying ? "Tạm dừng" : "Phát audio Google Gemini"}
             aria-label={isPlaying ? "Tạm dừng" : "Phát audio"}
           >
             {isPlaying ? (
@@ -208,7 +242,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 isDark ? "text-[#BFE3EA]" : "text-[#1E4B43]/80"
               }`}
             >
-              {formatTime(progress)}
+              {formatSecs(currentTime)}
             </span>
 
             <div className="relative w-full h-4 flex items-center min-w-0">
@@ -216,12 +250,13 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 type="range"
                 min="0"
                 max="100"
-                value={progress}
-                onChange={(e) => setProgress(Number(e.target.value))}
+                step="0.1"
+                value={progressPercent}
+                onChange={handleSliderChange}
                 style={{
                   background: isDark
-                    ? `linear-gradient(to right, #D9B76A 0%, #D9B76A ${progress}%, rgba(255, 255, 255, 0.2) ${progress}%, rgba(255, 255, 255, 0.2) 100%)`
-                    : `linear-gradient(to right, #1E4B43 0%, #1E4B43 ${progress}%, rgba(30, 75, 67, 0.15) ${progress}%, rgba(30, 75, 67, 0.15) 100%)`,
+                    ? `linear-gradient(to right, #D9B76A 0%, #D9B76A ${progressPercent}%, rgba(255, 255, 255, 0.2) ${progressPercent}%, rgba(255, 255, 255, 0.2) 100%)`
+                    : `linear-gradient(to right, #1E4B43 0%, #1E4B43 ${progressPercent}%, rgba(30, 75, 67, 0.15) ${progressPercent}%, rgba(30, 75, 67, 0.15) 100%)`,
                 }}
                 className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none m-0 ${
                   isDark
@@ -241,7 +276,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 isDark ? "text-[#BFE3EA]" : "text-[#1E4B43]/80"
               }`}
             >
-              0:15
+              {formatSecs(duration)}
             </span>
           </div>
 
@@ -281,10 +316,25 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
 
         </div>
 
-        {/* 3. Right: Secondary Tools & Badge */}
-        <div className="hidden lg:flex items-center justify-end gap-2 shrink-0 min-w-0">
+        {/* 3. Right: Voice Customizer Action Button & Mute */}
+        <div className="flex items-center justify-end gap-2 shrink-0 min-w-0">
+          {onOpenVoiceCustomizer && (
+            <button
+              onClick={onOpenVoiceCustomizer}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-[11px] font-bold transition-all cursor-pointer shadow-xs ${
+                isDark
+                  ? "bg-[#D9B76A]/20 border-[#D9B76A]/60 text-[#D9B76A] hover:bg-[#D9B76A]/30"
+                  : "bg-[#1E4B43]/10 border-[#1E4B43]/30 text-[#1E4B43] hover:bg-[#1E4B43]/15"
+              }`}
+              title="Mở giao diện tùy chỉnh giọng đọc Google Gemini"
+            >
+              <SlidersHorizontal className="w-3 h-3" />
+              <span className="hidden sm:inline">Chỉnh giọng đọc</span>
+            </button>
+          )}
+
           <button
-            onClick={() => setIsMuted(!isMuted)}
+            onClick={onToggleMute}
             title={isMuted ? "Bật âm thanh" : "Tắt âm thanh"}
             className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
               isMuted
@@ -297,13 +347,6 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
           >
             {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border shrink-0 ${
-            isDark
-              ? "border-[#D9B76A]/40 bg-[#D9B76A]/15 text-[#D9B76A]"
-              : "border-[#1E4B43]/30 bg-[#1E4B43]/10 text-[#1E4B43]"
-          }`}>
-            Level 2–3
-          </span>
         </div>
 
       </div>

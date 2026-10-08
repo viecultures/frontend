@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   AudioShadowingBar,
@@ -7,6 +7,7 @@ import {
   ReaderToolbar,
   ReaderVocabDrawer,
   ReaderRecommendedSection,
+  VoiceCustomizerModal,
 } from "../components";
 import { Footer } from "@/components/Footer";
 import {
@@ -14,6 +15,7 @@ import {
   RECOMMENDED_ARTICLES,
   type VocabItem,
 } from "@/data/readerData";
+import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
 
 export default function ReaderPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -66,37 +68,134 @@ export default function ReaderPage() {
   const [q2Answer, setQ2Answer] = useState<string>("");
   const [quizSubmitted, setQuizSubmitted] = useState<boolean>(false);
 
-  // Audio Shadowing Bar states
+  // ── Google Gemini Real Audio Engine (Bỏ hoàn toàn giọng robotic cũ) ──
+  const [selectedVoiceId, setSelectedVoiceId] = useState<
+    "puck" | "charon" | "kore" | "aoede" | "fenrir"
+  >("puck");
+  const [audioScope, setAudioScope] = useState<"full" | "sentence">("full");
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState<boolean>(false);
+
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const [isRepeatLoop, setIsRepeatLoop] = useState<boolean>(false);
-  const [currentSentenceEn] = useState<string>(
-    "Tết Nguyên Đán, often called simply Tết, is described as the most important and sacred holiday in Vietnamese culture."
-  );
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
 
-  const handleTogglePlay = () => {
-    if (isPlaying) {
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
-      setIsPlaying(false);
-    } else {
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(currentSentenceEn);
-        utterance.rate = playbackSpeed;
-        utterance.lang = "en-US";
-        utterance.onend = () => {
-          if (isRepeatLoop) {
-            window.speechSynthesis.speak(utterance);
-          } else {
-            setIsPlaying(false);
-          }
-        };
-        setIsPlaying(true);
-        window.speechSynthesis.speak(utterance);
-      }
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const currentSentenceEn =
+    "Tết Nguyên Đán, often called simply Tết, is described as the most important and sacred holiday in Vietnamese culture.";
+
+  const currentVoice: GeminiVoice =
+    GEMINI_VOICES.find((v) => v.id === selectedVoiceId) || GEMINI_VOICES[0];
+  const currentAudioUrl =
+    audioScope === "full"
+      ? currentVoice.fullAudioUrl
+      : currentVoice.sentenceAudioUrl;
+
+  // Initialize and update Audio element when voice or scope changes
+  useEffect(() => {
+    const wasPlaying = isPlaying;
+
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
     }
+
+    const audio = audioRef.current;
+    audio.src = currentAudioUrl;
+    audio.playbackRate = playbackSpeed;
+    audio.muted = isMuted;
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration || 0);
+    };
+
+    const handleEnded = () => {
+      if (isRepeatLoop) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      } else {
+        setIsPlaying(false);
+        setCurrentTime(0);
+      }
+    };
+
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+
+    if (wasPlaying) {
+      audio.play().catch(() => {});
+    }
+
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+    };
+  }, [currentAudioUrl]);
+
+  // Sync playback speed
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackSpeed;
+    }
+  }, [playbackSpeed]);
+
+  // Sync mute state
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  // Handle Play/Pause
+  const handleTogglePlay = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch((err) => {
+        console.warn("Audio play prevented:", err);
+      });
+    }
+  };
+
+  // Handle Seek / Scrubber drag
+  const handleSeek = (newTime: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  // Handle Restart audio
+  const handleRestart = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      setCurrentTime(0);
+      audioRef.current.play().catch(() => {});
+    }
+  };
+
+  // Handle Voice Selection
+  const handleSelectVoice = (
+    voiceId: "puck" | "charon" | "kore" | "aoede" | "fenrir"
+  ) => {
+    setSelectedVoiceId(voiceId);
   };
 
   // Toggle Vocabulary Drawer
@@ -158,6 +257,9 @@ export default function ReaderPage() {
         vocabCount={Object.keys(VOCAB_DATABASE).length}
         themeMode={themeMode}
         onChangeThemeMode={setThemeMode}
+        onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
+        selectedVoiceName={currentVoice.name}
+        selectedVoiceFlag={currentVoice.flag}
       />
 
       {/* Main Canvas Container */}
@@ -165,7 +267,7 @@ export default function ReaderPage() {
         className={`py-8 px-4 sm:px-8 transition-colors duration-300 ${canvasBgClass}`}
       >
         <div className="max-w-7xl mx-auto space-y-8">
-          {/* Audio Shadowing Engine Section */}
+          {/* Audio Shadowing Engine Section with Real Google Gemini Audio */}
           <AudioShadowingBar
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
@@ -175,6 +277,17 @@ export default function ReaderPage() {
             onToggleRepeatLoop={() => setIsRepeatLoop(!isRepeatLoop)}
             currentSentenceEn={currentSentenceEn}
             themeMode={themeMode}
+            currentTime={currentTime}
+            duration={duration}
+            onSeek={handleSeek}
+            onRestart={handleRestart}
+            isMuted={isMuted}
+            onToggleMute={() => setIsMuted(!isMuted)}
+            selectedVoiceName={currentVoice.name}
+            selectedVoiceFlag={currentVoice.flag}
+            selectedVoiceGender={currentVoice.gender}
+            audioScope={audioScope}
+            onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
           />
 
           {/* Main Reading Views: Bilingual View vs Extensive Reading View */}
@@ -230,6 +343,17 @@ export default function ReaderPage() {
         vocabList={Object.values(VOCAB_DATABASE)}
         bookmarkedWords={bookmarkedWords}
         onToggleBookmarkWord={toggleBookmarkWord}
+      />
+
+      {/* Voice Customizer Modal (Tùy chỉnh giọng đọc Google Gemini) */}
+      <VoiceCustomizerModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        selectedVoiceId={selectedVoiceId}
+        onSelectVoice={handleSelectVoice}
+        audioScope={audioScope}
+        onChangeAudioScope={setAudioScope}
+        themeMode={themeMode}
       />
     </main>
   );

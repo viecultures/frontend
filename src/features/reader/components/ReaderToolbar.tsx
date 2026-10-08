@@ -10,6 +10,9 @@ interface ReaderToolbarProps {
   vocabCount: number;
   themeMode: "paper" | "dark";
   onChangeThemeMode: (theme: "paper" | "dark") => void;
+  onOpenVoiceCustomizer?: () => void;
+  selectedVoiceName?: string;
+  selectedVoiceFlag?: string;
 }
 
 export function ReaderToolbar({
@@ -21,6 +24,9 @@ export function ReaderToolbar({
   vocabCount,
   themeMode,
   onChangeThemeMode,
+  onOpenVoiceCustomizer,
+  selectedVoiceName,
+  selectedVoiceFlag = "🇺🇸",
 }: ReaderToolbarProps) {
   return (
     <section className="bg-[#1E4B43] text-[#FBF7EE] border-b border-[#D9B76A]/30 py-3 px-6 sm:px-8 sticky top-0 z-30 shadow-md">
@@ -96,6 +102,18 @@ export function ReaderToolbar({
             <BookOpen className="w-3.5 h-3.5" />
             <span>{vocabCount} từ vựng</span>
           </button>
+
+          {/* Giọng đọc Gemini Button */}
+          {onOpenVoiceCustomizer && (
+            <button
+              onClick={onOpenVoiceCustomizer}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#163D37] border border-[#D9B76A]/50 text-[#FBF7EE] hover:bg-[#1E4B43] font-bold transition-all cursor-pointer shadow-sm"
+              title="Tùy chỉnh giọng đọc Google Gemini"
+            >
+              <span>{selectedVoiceFlag}</span>
+              <span className="hidden sm:inline">Giọng: {selectedVoiceName || "Puck"}</span>
+            </button>
+          )}
 
           {/* Theme Toggle */}
           <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40">
