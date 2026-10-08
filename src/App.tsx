@@ -15,6 +15,7 @@ import DictionaryPage from '@/features/flashcards/pages/dictionary';
 import FlashcardStudyPage from '@/features/flashcards/pages/flashcard-study';
 import CommunityPage from '@/features/community/pages/community';
 import CommunityContestPage from '@/features/community/pages/community-contest';
+import PlaygroundPage from '@/features/playground/pages/playground';
 
 import type { Lesson } from '@/types';
 
@@ -64,6 +65,8 @@ export const App: React.FC = () => {
       case '/community-2':
       case '/community-contest':
         return 'community-contest';
+      case '/playground':
+        return 'playground';
       default:
         return 'landing';
     }
@@ -107,6 +110,9 @@ export const App: React.FC = () => {
       case 'community-contest':
         navigate('/community-2');
         break;
+      case 'playground':
+        navigate('/playground');
+        break;
       default:
         if (view.startsWith('/')) {
           navigate(view);
@@ -133,8 +139,8 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
-      {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, and flashcard layout) */}
-      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'dictionary' && activeView !== 'flashcard-study' && (
+      {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, flashcard layout, and standalone playground) */}
+      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'dictionary' && activeView !== 'flashcard-study' && activeView !== 'playground' && (
         <Navbar
           activeView={activeView}
           isLoggedIn={isLoggedIn}
@@ -224,14 +230,18 @@ export const App: React.FC = () => {
             element={<Navigate to="/community-2" replace />}
           />
           <Route
+            path="/playground"
+            element={<PlaygroundPage />}
+          />
+          <Route
             path="*"
             element={<Navigate to="/" replace />}
           />
         </Routes>
       </main>
 
-      {/* Footer (hidden on login, home dashboard, and reader page) */}
-      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && <Footer />}
+      {/* Footer (hidden on login, home dashboard, reader page, and playground) */}
+      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'playground' && <Footer />}
 
       {/* GLOBAL SETTINGS MODAL */}
       <SettingsModal />
