@@ -16,6 +16,8 @@ import {
   type VocabItem,
 } from "@/data/readerData";
 import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
+import { readerApiService } from "../services/readerApiService";
+import type { ReaderArticleData } from "../services/readerApiService";
 
 export default function ReaderPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,6 +40,44 @@ export default function ReaderPage() {
   const [selectedLevel, setSelectedLevel] = useState<"Level 1" | "Level 2" | "Level 3">(
     initialLevel
   );
+
+  // Dynamic Post Data from Backend API (null = fallback to Tết default)
+  const [articleData, setArticleData] = useState<ReaderArticleData | null>(null);
+
+  // Fetch article data whenever postId, story, or id URL parameter changes
+  useEffect(() => {
+    const postId = searchParams.get("postId") || searchParams.get("id");
+    const storyId = searchParams.get("story");
+    const targetId = postId || storyId;
+
+    if (!targetId || targetId === "tet-holiday") {
+      setArticleData(null);
+      return;
+    }
+
+    let isMounted = true;
+    readerApiService
+      .getPostById(targetId)
+      .then((post) => {
+        if (!isMounted) return;
+        if (post) {
+          const mapped = readerApiService.mapPostToReaderData(post);
+          setArticleData(mapped);
+          if (mapped.level && (mapped.level === "Level 1" || mapped.level === "Level 2" || mapped.level === "Level 3")) {
+            setSelectedLevel(mapped.level);
+          }
+        } else {
+          setArticleData(null);
+        }
+      })
+      .catch(() => {
+        if (isMounted) setArticleData(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [searchParams.get("postId"), searchParams.get("story"), searchParams.get("id")]);
 
   // Sync state if URL searchParams change externally
   useEffect(() => {
@@ -73,7 +113,7 @@ export default function ReaderPage() {
     );
   };
 
-  const handleLevelChange = (newLevel: "Level 1" | "Level 2" | "Level 3") => {
+  const handleLevelChange = async (newLevel: "Level 1" | "Level 2" | "Level 3") => {
     setSelectedLevel(newLevel);
     setSearchParams(
       (prev) => {
@@ -83,6 +123,32 @@ export default function ReaderPage() {
       },
       { replace: true }
     );
+
+    // If currently viewing a post with topicGroup, attempt to switch to the corresponding CEFR post
+    if (articleData?.topicGroup) {
+      const levelMap: Record<string, string[]> = {
+        "Level 1": ["A1", "A2", "Level 1"],
+        "Level 2": ["B1", "B2", "Level 2"],
+        "Level 3": ["C1", "C2", "Level 3"],
+      };
+      const candidateLevels = levelMap[newLevel] || [newLevel];
+      for (const lvl of candidateLevels) {
+        const matchingPost = await readerApiService.getPostByTopicGroupAndLevel(articleData.topicGroup, lvl);
+        if (matchingPost) {
+          setArticleData(readerApiService.mapPostToReaderData(matchingPost));
+          setSearchParams(
+            (prev) => {
+              const next = new URLSearchParams(prev);
+              next.set("postId", matchingPost.id);
+              next.set("level", newLevel);
+              return next;
+            },
+            { replace: true }
+          );
+          break;
+        }
+      }
+    }
   };
 
   const [isVocabDrawerOpen, setIsVocabDrawerOpen] = useState<boolean>(false);
@@ -113,14 +179,17 @@ export default function ReaderPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const currentSentenceEn =
-    "Tết Nguyên Đán, often called simply Tết, is described as the most important and sacred holiday in Vietnamese culture.";
+    articleData && articleData.paragraphs.length > 0 && articleData.paragraphs[0].enText
+      ? articleData.paragraphs[0].enText.split(". ")[0] + "."
+      : "Tết Nguyên Đán, often called simply Tết, is described as the most important and sacred holiday in Vietnamese culture.";
 
   const currentVoice: GeminiVoice =
     GEMINI_VOICES.find((v) => v.id === selectedVoiceId) || GEMINI_VOICES[0];
   const currentAudioUrl =
-    audioScope === "full"
+    articleData?.shadowingAudioUrl ||
+    (audioScope === "full"
       ? currentVoice.fullAudioUrl
-      : currentVoice.sentenceAudioUrl;
+      : currentVoice.sentenceAudioUrl);
 
   // Initialize and update Audio element when voice or scope changes
   useEffect(() => {
@@ -228,8 +297,10 @@ export default function ReaderPage() {
 
   // Toggle Vocabulary Drawer
   const openVocab = (key: string) => {
-    if (VOCAB_DATABASE[key]) {
-      setSelectedVocab(VOCAB_DATABASE[key]);
+    const lowerKey = key.trim().toLowerCase();
+    const vocab = articleData?.vocabMap?.[lowerKey] || articleData?.vocabMap?.[key] || VOCAB_DATABASE[key];
+    if (vocab) {
+      setSelectedVocab(vocab);
       setIsVocabDrawerOpen(true);
     }
   };
@@ -281,10 +352,13 @@ export default function ReaderPage() {
         selectedLevel={selectedLevel}
         onChangeLevel={handleLevelChange}
         onOpenVocabList={() => {
-          setSelectedVocab(VOCAB_DATABASE["sacred"]);
+          const firstVocab = articleData && articleData.vocabularies.length > 0
+            ? articleData.vocabularies[0]
+            : VOCAB_DATABASE["sacred"];
+          setSelectedVocab(firstVocab);
           setIsVocabDrawerOpen(true);
         }}
-        vocabCount={Object.keys(VOCAB_DATABASE).length}
+        vocabCount={articleData ? articleData.vocabularies.length : Object.keys(VOCAB_DATABASE).length}
         themeMode={themeMode}
         onChangeThemeMode={setThemeMode}
         onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
@@ -341,6 +415,7 @@ export default function ReaderPage() {
               setQuizSubmitted={setQuizSubmitted}
               selectedLevel={selectedLevel}
               onChangeLevel={handleLevelChange}
+              articleData={articleData}
             />
           ) : (
             <ExtensiveReaderView
@@ -355,6 +430,7 @@ export default function ReaderPage() {
               openVocab={openVocab}
               selectedLevel={selectedLevel}
               onChangeLevel={handleLevelChange}
+              articleData={articleData}
             />
           )}
 
@@ -375,7 +451,7 @@ export default function ReaderPage() {
         onClose={() => setIsVocabDrawerOpen(false)}
         selectedVocab={selectedVocab}
         onSelectVocab={setSelectedVocab}
-        vocabList={Object.values(VOCAB_DATABASE)}
+        vocabList={articleData && articleData.vocabularies.length > 0 ? articleData.vocabularies : Object.values(VOCAB_DATABASE)}
         bookmarkedWords={bookmarkedWords}
         onToggleBookmarkWord={toggleBookmarkWord}
       />

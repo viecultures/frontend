@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { LESSONS_DATA, getLessonStatsForLevel } from '@/data/discoveryData';
+import { LESSONS_DATA, getLessonStatsForLevel, type Lesson, type LevelType } from '@/data/discoveryData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
+import { readerApiService } from '@/features/reader/services/readerApiService';
 
 // Modular Discovery Sub-components
 import { DiscoverySpotlight } from '../components/DiscoverySpotlight';
@@ -35,6 +36,72 @@ export default function DiscoveryPage() {
   });
   const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [backendLessons, setBackendLessons] = useState<Lesson[]>([]);
+
+  // Fetch backend posts and merge into catalog seamlessly
+  useEffect(() => {
+    let isMounted = true;
+    readerApiService
+      .getAllPosts()
+      .then((posts) => {
+        if (!isMounted || !posts || posts.length === 0) return;
+        const mapped: Lesson[] = posts.map((post) => {
+          const levelMapped: LevelType =
+            post.level === 'A1' || post.level === 'A2'
+              ? 'Level 1'
+              : post.level === 'C1' || post.level === 'C2'
+              ? 'Level 3'
+              : 'Level 2';
+
+          const readTimeStr =
+            post.readTime || `${Math.max(2, Math.ceil((post.wordCount || 250) / 100))} min read`;
+          const vocabCount = post.vocabularies?.length || 8;
+
+          return {
+            id: post.id,
+            title: post.titleEn,
+            vietnameseTitle: post.titleVi,
+            category: (['Heritage', 'Cuisine', 'Crafts', 'Nature', 'Folklore'].includes(post.topic)
+              ? post.topic
+              : 'Heritage') as any,
+            categoryVi: post.topic || 'Văn hóa & Phong tục',
+            cefrLevel: levelMapped,
+            availableLevels: ['Level 1', 'Level 2', 'Level 3'],
+            levelDetails: {
+              'Level 1': { readTime: '3 min read', vocabCount: 6, summary: post.summary },
+              'Level 2': { readTime: readTimeStr, vocabCount, summary: post.summary },
+              'Level 3': { readTime: '6 min read', vocabCount: 12, summary: post.summary },
+            },
+            readTime: readTimeStr,
+            vocabCount,
+            summary: post.summary || '',
+            gradient: 'from-amber-600/40 via-emerald-800/60 to-heritage-green/90',
+            iconSymbol: '🏛️',
+            imageUrl:
+              post.imageUrl ||
+              'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80',
+            featured: false,
+            dateAdded: post.createdAt || new Date().toISOString(),
+          };
+        });
+        setBackendLessons(mapped);
+      })
+      .catch((err) => {
+        console.warn('[Discovery] Không thể tải bài từ API backend:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Merge backend posts ahead of static catalog (avoiding duplicate IDs)
+  const catalogLessons = useMemo(() => {
+    if (backendLessons.length === 0) return LESSONS_DATA;
+    const backendIds = new Set(backendLessons.map((l) => l.id));
+    const dedupedLessons = LESSONS_DATA.filter((l) => !backendIds.has(l.id));
+    return [...backendLessons, ...dedupedLessons];
+  }, [backendLessons]);
 
   // Smooth brief transition skeleton when changing major filters
   useEffect(() => {
@@ -70,16 +137,16 @@ export default function DiscoveryPage() {
 
   // Count per Topic
   const topicCounts = useMemo(() => {
-    const counts: Record<string, number> = { All: LESSONS_DATA.length };
-    LESSONS_DATA.forEach((lesson) => {
+    const counts: Record<string, number> = { All: catalogLessons.length };
+    catalogLessons.forEach((lesson) => {
       counts[lesson.category] = (counts[lesson.category] || 0) + 1;
     });
     return counts;
-  }, []);
+  }, [catalogLessons]);
 
   // Smart Filter & Sort Logic
   const filteredLessons = useMemo(() => {
-    return LESSONS_DATA.filter((lesson) => {
+    return catalogLessons.filter((lesson) => {
       // If filtering only bookmarked stories
       if (onlyBookmarked && !bookmarks[lesson.id]) return false;
 

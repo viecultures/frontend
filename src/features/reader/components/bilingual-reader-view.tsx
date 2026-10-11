@@ -3,6 +3,7 @@ import Link from "@/components/Link";
 import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight, RefreshCw, Sparkles } from "lucide-react";
 import { READER_QUIZ_QUESTIONS, VOCAB_DATABASE, lookupWord, extractSentenceContext, type VocabItem } from "@/data/readerData";
 import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
+import type { ReaderArticleData } from "../services/readerApiService";
 
 interface BilingualReaderViewProps {
   themeMode: "paper" | "dark";
@@ -22,6 +23,7 @@ interface BilingualReaderViewProps {
   setQuizSubmitted: (val: boolean) => void;
   selectedLevel?: "Level 1" | "Level 2" | "Level 3";
   onChangeLevel?: (lvl: "Level 1" | "Level 2" | "Level 3") => void;
+  articleData?: ReaderArticleData | null;
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
@@ -41,6 +43,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   setQuizSubmitted,
   selectedLevel = "Level 2",
   onChangeLevel,
+  articleData,
 }) => {
   // ── Proportional Scroll Sync Refs & State ─────────────────────────────────
   const leftSheetRef = useRef<HTMLDivElement>(null);
@@ -102,7 +105,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
     // Find enclosing paragraph text to get the full accurate sentence
     const blockEl = el.closest('p');
     const fullParagraph = blockEl ? (blockEl.innerText || blockEl.textContent || "") : "";
-    const vocabData = VOCAB_DATABASE[key] || lookupWord(key);
+    const vocabData = articleData?.vocabMap?.[key.toLowerCase()] || VOCAB_DATABASE[key] || lookupWord(key);
     const fullSentence = fullParagraph ? extractSentenceContext(fullParagraph, vocabData.word) : vocabData.contextSentence;
 
     setPopupState({
@@ -115,6 +118,44 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
         x: rect.left + rect.width / 2,
         y: rect.bottom,
       },
+    });
+  };
+
+  // Helper to dynamically highlight words from articleData.vocabularies
+  const renderParagraphContent = (text: string) => {
+    if (!articleData?.vocabularies || articleData.vocabularies.length === 0) {
+      return text;
+    }
+
+    const sortedVocabs = [...articleData.vocabularies].sort(
+      (a, b) => b.word.length - a.word.length
+    );
+    const escapedWords = sortedVocabs
+      .map((v) => v.word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .filter(Boolean);
+
+    if (escapedWords.length === 0) return text;
+
+    const regex = new RegExp(`\\b(${escapedWords.join("|")})\\b`, "gi");
+    const parts = text.split(regex);
+
+    return parts.map((part, index) => {
+      const matched = sortedVocabs.find(
+        (v) => v.word.toLowerCase() === part.toLowerCase()
+      );
+      if (matched) {
+        return (
+          <button
+            key={index}
+            onClick={(e) => handleVocabClick(matched.word, e)}
+            className={vocabBtnClass}
+            title={`Nhấp để tra từ '${matched.word}' tại chỗ`}
+          >
+            {part}
+          </button>
+        );
+      }
+      return part;
     });
   };
 
@@ -232,15 +273,15 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] ${paperSheetBgClass}`}
         >
           <div>
-            {/* Header Tag */}
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
-              <span className={`text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-md border ${isDark
-                ? "text-[#D9B76A] bg-[#D9B76A]/15 border-[#D9B76A]/30"
-                : "text-heritage-green bg-heritage-green/10 border-heritage-green/15"
-                }`}>
-                ENGLISH ORIGINAL
+              <span className={`text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-md border ${
+                isDark
+                  ? "text-[#D9B76A] bg-[#D9B76A]/10 border-[#D9B76A]/30"
+                  : "text-[#1E4B43] bg-[#1E4B43]/10 border-[#1E4B43]/20"
+              }`}>
+                ENGLISH ORIGINAL (BILINGUAL PARALLEL)
               </span>
-              <span className="text-xs font-bold bg-heritage-green text-warm-ivory px-2.5 py-0.5 rounded">
+              <span className="text-xs font-bold bg-[#1E4B43] text-[#FBF7EE] px-2.5 py-0.5 rounded">
                 EN
               </span>
             </div>
@@ -249,17 +290,17 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
             <h1
               className={`font-sans text-2xl sm:text-3xl font-bold ${paperTitleColor} leading-snug mb-3`}
             >
-              Tết: Renewal, Remembrance and Regional Flavours
+              {articleData?.titleEn || "Tết: Renewal, Remembrance and Regional Flavours"}
             </h1>
             <p className={`font-sans italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
-              A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions
+              {articleData?.summary || "A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions"}
             </p>
 
             {/* Traditional Vietnamese Tết Artwork Banner */}
             <div className="relative h-60 sm:h-72 w-full rounded-2xl overflow-hidden mb-8 shadow-md border border-[#D9B76A]/40 group">
               <img
-                src="https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80"
-                alt="Tết Nguyên Đán Traditional Holiday"
+                src={articleData?.imageUrl || "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80"}
+                alt={articleData?.titleEn || "Tết Nguyên Đán Traditional Holiday"}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                 loading="lazy"
               />
@@ -268,25 +309,25 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
               <div className="absolute top-4 left-4 right-4 flex items-center justify-between text-xs font-bold text-[#D9B76A] uppercase tracking-wider">
                 <span className="bg-[#1E4B43]/80 backdrop-blur-xs px-2.5 py-1 rounded-md border border-[#D9B76A]/40 text-[#FBF7EE]">
-                  Cultural Essay
+                  {articleData?.topic || "Cultural Essay"}
                 </span>
                 <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A] flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${selectedLevel === 'Level 1' ? 'bg-emerald-400' : selectedLevel === 'Level 2' ? 'bg-cyan-400' : 'bg-rose-400'}`} />
-                  <span>{selectedLevel} ({selectedLevel === 'Level 1' ? '~220' : selectedLevel === 'Level 2' ? '~370' : '~520'} words)</span>
+                  <span>{selectedLevel} ({articleData?.wordCount ? `~${articleData.wordCount}` : selectedLevel === 'Level 1' ? '~220' : selectedLevel === 'Level 2' ? '~370' : '~520'} words)</span>
                 </span>
               </div>
 
               <div className="absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-white">
                 <div>
                   <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
-                    Vietnamese Lunar New Year
+                    {articleData?.topicGroup || "Vietnamese Lunar New Year"}
                   </span>
                   <h3 className="font-sans text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
-                    Tết Nguyên Đán Heritage
+                    {articleData?.titleEn || "Tết Nguyên Đán Heritage"}
                   </h3>
                 </div>
                 <div className="text-[11px] text-[#BFE3EA] font-sans opacity-90 text-left sm:text-right">
-                  Truyền Thống & Phong Vị Ba Miền
+                  {articleData?.region ? `${articleData.region} • Di sản văn hóa` : "Truyền Thống & Phong Vị Ba Miền"}
                 </div>
               </div>
             </div>
@@ -296,153 +337,163 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               className={`space-y-5 leading-relaxed ${paperBodyTextColor} font-sans`}
               style={{ fontSize: `${fontSize}px` }}
             >
-              <p>
-                Tết Nguyên Đán, often called simply Tết, is described as the most important and{" "}
-                <button
-                  onClick={(e) => handleVocabClick("sacred", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'sacred' tại chỗ"
-                >
-                  sacred
-                </button>{" "}
-                holiday in Vietnamese culture. It marks the{" "}
-                <button
-                  onClick={(e) => handleVocabClick("passage", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'passage from one year to the next' tại chỗ"
-                >
-                  passage from the old year to the new one
-                </button>
-                , but its meaning goes further. According to the article, Tết stands for{" "}
-                <button
-                  onClick={(e) => handleVocabClick("family-reunion", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'family reunion' tại chỗ"
-                >
-                  family reunion
-                </button>
-                , respect for ancestors, and hope for a better future.
-              </p>
+              {articleData?.paragraphs && articleData.paragraphs.length > 0 ? (
+                articleData.paragraphs.map((p, idx) => (
+                  <p key={p.id || idx}>
+                    {renderParagraphContent(p.enText)}
+                  </p>
+                ))
+              ) : (
+                <>
+                  <p>
+                    Tết Nguyên Đán, often called simply Tết, is described as the most important and{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("sacred", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'sacred' tại chỗ"
+                    >
+                      sacred
+                    </button>{" "}
+                    holiday in Vietnamese culture. It marks the{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("passage", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'passage from one year to the next' tại chỗ"
+                    >
+                      passage from the old year to the new one
+                    </button>
+                    , but its meaning goes further. According to the article, Tết stands for{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("family-reunion", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'family reunion' tại chỗ"
+                    >
+                      family reunion
+                    </button>
+                    , respect for ancestors, and hope for a better future.
+                  </p>
 
-              <p>
-                The article traces Tết back to the ancient{" "}
-                <button
-                  onClick={(e) => handleVocabClick("agricultural-civilization", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'agricultural civilization' tại chỗ"
-                >
-                  agricultural civilization
-                </button>{" "}
-                of East Asia, where the cycle of the seasons played a central role in daily life. Tết takes place when winter{" "}
-                <button
-                  onClick={(e) => handleVocabClick("give-way-to", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'give way to' tại chỗ"
-                >
-                  gives way to
-                </button>{" "}
-                spring and plants begin to grow again, which{" "}
-                <button
-                  onClick={(e) => handleVocabClick("symbolize", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'symbolize' tại chỗ"
-                >
-                  symbolizes
-                </button>{" "}
-                a new beginning. A{" "}
-                <button
-                  onClick={(e) => handleVocabClick("folk-legend", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'folk legend' tại chỗ"
-                >
-                  folk legend
-                </button>{" "}
-                also says that the festival is a time for descendants to remember their ancestors and pray for a good harvest. Over time, Tết{" "}
-                <button
-                  onClick={(e) => handleVocabClick("absorb-influences", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'absorb influences' tại chỗ"
-                >
-                  absorbed influences
-                </button>{" "}
-                from Chinese culture during the period of Chinese rule, yet it kept its own identity.
-              </p>
+                  <p>
+                    The article traces Tết back to the ancient{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("agricultural-civilization", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'agricultural civilization' tại chỗ"
+                    >
+                      agricultural civilization
+                    </button>{" "}
+                    of East Asia, where the cycle of the seasons played a central role in daily life. Tết takes place when winter{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("give-way-to", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'give way to' tại chỗ"
+                    >
+                      gives way to
+                    </button>{" "}
+                    spring and plants begin to grow again, which{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("symbolize", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'symbolize' tại chỗ"
+                    >
+                      symbolizes
+                    </button>{" "}
+                    a new beginning. A{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("folk-legend", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'folk legend' tại chỗ"
+                    >
+                      folk legend
+                    </button>{" "}
+                    also says that the festival is a time for descendants to remember their ancestors and pray for a good harvest. Over time, Tết{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("absorb-influences", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'absorb influences' tại chỗ"
+                    >
+                      absorbed influences
+                    </button>{" "}
+                    from Chinese culture during the period of Chinese rule, yet it kept its own identity.
+                  </p>
 
-              <p>
-                Traditional customs follow three stages. Before Tết, people clean their houses, prepare a{" "}
-                <button
-                  onClick={(e) => handleVocabClick("five-fruit-tray", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'five-fruit tray' tại chỗ"
-                >
-                  five-fruit tray
-                </button>
-                , and wrap bánh chưng or bánh tét together. During the holiday, families hold{" "}
-                <button
-                  onClick={(e) => handleVocabClick("ancestor-worship", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'ancestor worship' tại chỗ"
-                >
-                  ancestor worship
-                </button>{" "}
-                ceremonies, exchange New Year wishes, give{" "}
-                <button
-                  onClick={(e) => handleVocabClick("li-xi", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'lì xì' tại chỗ"
-                >
-                  lì xì
-                </button>{" "}
-                to children, and visit pagodas. Afterwards, people take part in spring festivals to wish for good luck. Although the way Vietnamese people celebrate has changed, the article argues that the{" "}
-                <button
-                  onClick={(e) => handleVocabClick("core-values", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'core values' tại chỗ"
-                >
-                  core values
-                </button>{" "}
-                of togetherness, gratitude, and hope remain the soul of the holiday.
-              </p>
+                  <p>
+                    Traditional customs follow three stages. Before Tết, people clean their houses, prepare a{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("five-fruit-tray", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'five-fruit tray' tại chỗ"
+                    >
+                      five-fruit tray
+                    </button>
+                    , and wrap bánh chưng or bánh tét together. During the holiday, families hold{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("ancestor-worship", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'ancestor worship' tại chỗ"
+                    >
+                      ancestor worship
+                    </button>{" "}
+                    ceremonies, exchange New Year wishes, give{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("li-xi", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'lì xì' tại chỗ"
+                    >
+                      lì xì
+                    </button>{" "}
+                    to children, and visit pagodas. Afterwards, people take part in spring festivals to wish for good luck. Although the way Vietnamese people celebrate has changed, the article argues that the{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("core-values", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'core values' tại chỗ"
+                    >
+                      core values
+                    </button>{" "}
+                    of togetherness, gratitude, and hope remain the soul of the holiday.
+                  </p>
 
-              <p>
-                Food carries cultural and spiritual meaning as well. Bánh chưng and bánh tét, which the article calls symbols of earth and sky, express gratitude to ancestors. Bánh chưng is usually made in the North, whereas bánh tét is more common in the Centre and the South.{" "}
-                <button
-                  onClick={(e) => handleVocabClick("dua-hanh", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'dưa hành' tại chỗ"
-                >
-                  Dưa hành
-                </button>{" "}
-                balances rich, protein-heavy dishes, and thịt kho tàu with duck eggs represents fullness and{" "}
-                <button
-                  onClick={(e) => handleVocabClick("prosperity", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'prosperity' tại chỗ"
-                >
-                  prosperity
-                </button>
-                . Mứt Tết, made from coconut, ginger, or kumquat, stands for sweetness and a good start.
-              </p>
+                  <p>
+                    Food carries cultural and spiritual meaning as well. Bánh chưng and bánh tét, which the article calls symbols of earth and sky, express gratitude to ancestors. Bánh chưng is usually made in the North, whereas bánh tét is more common in the Centre and the South.{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("dua-hanh", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'dưa hành' tại chỗ"
+                    >
+                      Dưa hành
+                    </button>{" "}
+                    balances rich, protein-heavy dishes, and thịt kho tàu with duck eggs represents fullness and{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("prosperity", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'prosperity' tại chỗ"
+                    >
+                      prosperity
+                    </button>
+                    . Mứt Tết, made from coconut, ginger, or kumquat, stands for sweetness and a good start.
+                  </p>
 
-              <p>
-                Finally, the{" "}
-                <button
-                  onClick={(e) => handleVocabClick("atmosphere", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'atmosphere' tại chỗ"
-                >
-                  atmosphere
-                </button>{" "}
-                of Tết{" "}
-                <button
-                  onClick={(e) => handleVocabClick("differ-from-region-to-region", e)}
-                  className={vocabBtnClass}
-                  title="Nhấp để tra từ 'differ from region to region' tại chỗ"
-                >
-                  differs from region to region
-                </button>
-                . In the North, it is linked to peach blossoms, bánh chưng, and solemn customs, with a busy Tết market and a nostalgic mood. The Central region celebrates in a simpler but equally warm way, with yellow mai flowers, red couplets, and dishes such as nem chua and tré. In the South, Tết feels lively and open, with mai flowers, red watermelons, flower markets, and folk games.
-              </p>
+                  <p>
+                    Finally, the{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("atmosphere", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'atmosphere' tại chỗ"
+                    >
+                      atmosphere
+                    </button>{" "}
+                    of Tết{" "}
+                    <button
+                      onClick={(e) => handleVocabClick("differ-from-region-to-region", e)}
+                      className={vocabBtnClass}
+                      title="Nhấp để tra từ 'differ from region to region' tại chỗ"
+                    >
+                      differs from region to region
+                    </button>
+                    . In the North, it is linked to peach blossoms, bánh chưng, and solemn customs, with a busy Tết market and a nostalgic mood. The Central region celebrates in a simpler but equally warm way, with yellow mai flowers, red couplets, and dishes such as nem chua và tré. In the South, Tết feels lively and open, with mai flowers, red watermelons, flower markets, and folk games.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -471,17 +522,17 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
             <h1
               className={`font-sans text-2xl sm:text-3xl font-bold ${paperTitleColor} italic leading-snug mb-3`}
             >
-              Tết: Sự đổi mới, lòng tưởng nhớ và hương vị các vùng miền
+              {articleData?.titleVi || "Tết: Sự đổi mới, lòng tưởng nhớ và hương vị các vùng miền"}
             </h1>
             <p className={`font-sans italic text-sm sm:text-base ${paperSubtitleColor} mb-6`}>
-              Khám phá văn hóa về sự đổi mới, lòng tri ân tổ tiên và phong vị ẩm thực ba miền
+              {articleData?.summary || "Khám phá văn hóa về sự đổi mới, lòng tri ân tổ tiên và phong vị ẩm thực ba miền"}
             </p>
 
             {/* Vietnamese Side Banner */}
             <div className="relative h-60 sm:h-72 w-full rounded-2xl overflow-hidden mb-8 shadow-md border border-[#D9B76A]/40 group">
               <img
-                src="https://images.unsplash.com/photo-1582233479366-6d38bc390a08?auto=format&fit=crop&w=1200&q=80"
-                alt="Phong Vị Tết Cổ Truyền Việt Nam"
+                src={articleData?.imageUrl || "https://images.unsplash.com/photo-1582233479366-6d38bc390a08?auto=format&fit=crop&w=1200&q=80"}
+                alt={articleData?.titleVi || "Phong Vị Tết Cổ Truyền Việt Nam"}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                 loading="lazy"
               />
@@ -490,24 +541,24 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
               <div className="absolute top-4 left-4 right-4 flex items-center justify-between text-xs font-bold text-[#D9B76A] uppercase tracking-wider">
                 <span className="bg-[#059669]/80 backdrop-blur-xs px-2.5 py-1 rounded-md border border-[#D9B76A]/40 text-[#FBF7EE]">
-                  Tản Văn Văn Hóa
+                  {articleData?.topic || "Tản Văn Văn Hóa"}
                 </span>
                 <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A]">
-                  Trình Độ: Level 2–3
+                  Trình Độ: {articleData?.cefrLevel ? articleData.cefrLevel : selectedLevel}
                 </span>
               </div>
 
               <div className="absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-white">
                 <div>
                   <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
-                    Phong Tục & Ẩm Thực
+                    {articleData?.topicGroup || "Phong Tục & Ẩm Thực"}
                   </span>
                   <h3 className="font-sans text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
-                    Phong Vị Tết Cổ Truyền
+                    {articleData?.titleVi || "Phong Vị Tết Cổ Truyền"}
                   </h3>
                 </div>
                 <div className="text-[11px] text-[#BFE3EA] font-sans opacity-90 text-left sm:text-right">
-                  Bản Dịch Tiếng Việt Chuẩn Ngữ Cảnh
+                  {articleData?.region ? `${articleData.region} • Bản Dịch Tiếng Việt` : "Bản Dịch Tiếng Việt Chuẩn Ngữ Cảnh"}
                 </div>
               </div>
             </div>
@@ -517,25 +568,35 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               className={`space-y-5 leading-relaxed ${paperBodyTextColor} font-sans`}
               style={{ fontSize: `${fontSize}px` }}
             >
-              <p>
-                Tết Nguyên Đán, thường được gọi đơn giản là Tết, được mô tả là ngày lễ quan trọng và thiêng liêng nhất trong văn hóa Việt Nam. Tết đánh dấu sự chuyển giao từ năm cũ sang năm mới, nhưng ý nghĩa của nó còn sâu xa hơn thế. Theo bài viết, Tết tượng trưng cho sự đoàn viên gia đình, lòng kính trọng tổ tiên và hy vọng về một tương lai tốt đẹp hơn.
-              </p>
+              {articleData && articleData.paragraphs.length > 0 ? (
+                articleData.paragraphs.map((p, idx) => (
+                  <p key={idx} className="leading-relaxed">
+                    {p.viText}
+                  </p>
+                ))
+              ) : (
+                <>
+                  <p>
+                    Tết Nguyên Đán, thường được gọi đơn giản là Tết, được mô tả là ngày lễ quan trọng và thiêng liêng nhất trong văn hóa Việt Nam. Tết đánh dấu sự chuyển giao từ năm cũ sang năm mới, nhưng ý nghĩa của nó còn sâu xa hơn thế. Theo bài viết, Tết tượng trưng cho sự đoàn viên gia đình, lòng kính trọng tổ tiên và hy vọng về một tương lai tốt đẹp hơn.
+                  </p>
 
-              <p>
-                Bài viết truy nguồn gốc của Tết về nền văn minh nông nghiệp lâu đời của người Á Đông, nơi vòng quay của các mùa đóng vai trò trung tâm trong đời sống hằng ngày. Tết diễn ra khi mùa đông nhường chỗ cho mùa xuân và cây cối bắt đầu sinh trưởng trở lại, điều này tượng trưng cho một khởi đầu mới. Một truyền thuyết dân gian cũng kể rằng Tết là dịp để con cháu tưởng nhớ tổ tiên và cầu mong mùa màng bội thu. Theo thời gian, Tết tiếp nhận những ảnh hưởng từ văn hóa Trung Hoa trong thời kỳ Bắc thuộc, nhưng vẫn giữ được bản sắc riêng.
-              </p>
+                  <p>
+                    Bài viết truy nguồn gốc của Tết về nền văn minh nông nghiệp lâu đời của người Á Đông, nơi vòng quay của các mùa đóng vai trò trung tâm trong đời sống hằng ngày. Tết diễn ra khi mùa đông nhường chỗ cho mùa xuân và cây cối bắt đầu sinh trưởng trở lại, điều này tượng trưng cho một khởi đầu mới. Một truyền thuyết dân gian cũng kể rằng Tết là dịp để con cháu tưởng nhớ tổ tiên và cầu mong mùa màng bội thu. Theo thời gian, Tết tiếp nhận những ảnh hưởng từ văn hóa Trung Hoa trong thời kỳ Bắc thuộc, nhưng vẫn giữ được bản sắc riêng.
+                  </p>
 
-              <p>
-                Các phong tục truyền thống diễn ra theo ba giai đoạn. Trước Tết, mọi người dọn dẹp nhà cửa, bày mâm ngũ quả và cùng nhau gói bánh chưng hoặc bánh tét. Trong Tết, các gia đình cúng gia tiên, chúc Tết, lì xì cho trẻ em và đi chùa. Sau Tết, mọi người tham gia các lễ hội xuân để cầu may mắn. Dù cách người Việt đón Tết đã thay đổi, bài viết cho rằng những giá trị cốt lõi như sự sum họp, lòng biết ơn và hy vọng vẫn là linh hồn của ngày lễ.
-              </p>
+                  <p>
+                    Các phong tục truyền thống diễn ra theo ba giai đoạn. Trước Tết, mọi người dọn dẹp nhà cửa, bày mâm ngũ quả và cùng nhau gói bánh chưng hoặc bánh tét. Trong Tết, các gia đình cúng gia tiên, chúc Tết, lì xì cho trẻ em và đi chùa. Sau Tết, mọi người tham gia các lễ hội xuân để cầu may mắn. Dù cách người Việt đón Tết đã thay đổi, bài viết cho rằng những giá trị cốt lõi như sự sum họp, lòng biết ơn và hy vọng vẫn là linh hồn của ngày lễ.
+                  </p>
 
-              <p>
-                Ẩm thực cũng mang ý nghĩa văn hóa và tâm linh. Bánh chưng và bánh tét, mà bài viết gọi là biểu tượng của đất và trời, thể hiện lòng biết ơn tổ tiên. Bánh chưng thường được làm ở miền Bắc, trong khi bánh tét phổ biến hơn ở miền Trung và miền Nam. Dưa hành giúp cân bằng các món nhiều đạm, còn thịt kho tàu với trứng vịt thể hiện sự tròn đầy và sung túc. Mứt Tết, làm từ dừa, gừng hoặc quất, biểu trưng cho sự ngọt ngào và một khởi đầu tốt đẹp.
-              </p>
+                  <p>
+                    Ẩm thực cũng mang ý nghĩa văn hóa và tâm linh. Bánh chưng và bánh tét, mà bài viết gọi là biểu tượng của đất và trời, thể hiện lòng biết ơn tổ tiên. Bánh chưng thường được làm ở miền Bắc, trong khi bánh tét phổ biến hơn ở miền Trung và miền Nam. Dưa hành giúp cân bằng các món nhiều đạm, còn thịt kho tàu với trứng vịt thể hiện sự tròn đầy và sung túc. Mứt Tết, làm từ dừa, gừng hoặc quất, biểu trưng cho sự ngọt ngào và một khởi đầu tốt đẹp.
+                  </p>
 
-              <p>
-                Cuối cùng, không khí Tết khác nhau giữa các vùng miền. Ở miền Bắc, Tết gắn với hoa đào, bánh chưng và những phong tục trang trọng, với phiên chợ Tết nhộn nhịp và không khí hoài niệm. Miền Trung đón Tết giản dị hơn nhưng không kém phần ấm cúng, với hoa mai vàng, câu đối đỏ và các món như nem chua, tré. Ở miền Nam, Tết sôi động và phóng khoáng, với hoa mai, dưa hấu đỏ, chợ hoa và các trò chơi dân gian.
-              </p>
+                  <p>
+                    Cuối cùng, không khí Tết khác nhau giữa các vùng miền. Ở miền Bắc, Tết gắn với hoa đào, bánh chưng và những phong tục trang trọng, với phiên chợ Tết nhộn nhịp và không khí hoài niệm. Miền Trung đón Tết giản dị hơn nhưng không kém phần ấm cúng, với hoa mai vàng, câu đối đỏ và các món như nem chua, tré. Ở miền Nam, Tết sôi động và phóng khoáng, với hoa mai, dưa hấu đỏ, chợ hoa và các trò chơi dân gian.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
