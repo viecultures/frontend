@@ -26,6 +26,7 @@ export interface Lesson {
   iconSymbol: string;
   imageUrl?: string;
   featured?: boolean;
+  isFromDatabase?: boolean;
   dateAdded: string;
 }
 

@@ -1,7 +1,47 @@
 import type { ReadingPostItem } from '@/features/admin/types/adminTypes';
 import { VOCAB_DATABASE, type VocabItem } from '@/data/readerData';
+import type { Lesson, LevelDetail } from '@/data/discoveryData';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
+export interface CatalogLevelDetail {
+  postId: string;
+  cefrLevel?: string;
+  readTime: string;
+  vocabCount: number;
+  wordCount?: number;
+  summary?: string;
+}
+
+export interface CatalogLesson {
+  id: string;
+  topicGroup?: string;
+  titleEn: string;
+  titleVi: string;
+  category: "Heritage" | "Cuisine" | "Crafts" | "Nature" | "Folklore";
+  categoryVi: string;
+  region: string;
+  imageUrl: string;
+  summary: string;
+  featured: boolean;
+  totalReads: number;
+  likesCount: number;
+  primaryLevel: "Level 1" | "Level 2" | "Level 3";
+  readTime: string;
+  vocabCount: number;
+  availableLevels: Array<"Level 1" | "Level 2" | "Level 3">;
+  levelDetails: Record<string, CatalogLevelDetail>;
+  createdAt?: string;
+}
+
+export interface CatalogResponseData {
+  items: CatalogLesson[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  topicCounts: Record<string, number>;
+}
 
 export interface ReaderArticleData {
   id: string;
@@ -122,6 +162,119 @@ export const readerApiService = {
           ],
       vocabularies: mappedVocabs,
       vocabMap,
+    };
+  },
+
+  // ─── 5. Fetch Grouped Catalog Lessons for Discovery Page ────────────────
+  async getCatalog(params?: {
+    topic?: string;
+    level?: string;
+    query?: string;
+    region?: string;
+    sortBy?: string;
+    page?: number;
+    size?: number;
+  }): Promise<CatalogResponseData | null> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.topic && params.topic !== 'All') sp.set('topic', params.topic);
+      if (params?.level && params.level !== 'All') sp.set('level', params.level);
+      if (params?.query) sp.set('query', params.query);
+      if (params?.region) sp.set('region', params.region);
+      if (params?.sortBy) sp.set('sortBy', params.sortBy);
+      if (params?.page !== undefined) sp.set('page', String(params.page));
+      if (params?.size !== undefined) sp.set('size', String(params.size));
+
+      const res = await fetch(`${API_BASE_URL}/api/posts/catalog?${sp.toString()}`);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (err) {
+      console.warn('[Reader API] Lỗi khi tải danh mục catalog:', err);
+      return null;
+    }
+  },
+
+  // ─── 6. Map Backend CatalogLesson to UI Lesson Model ─────────────────────
+  mapCatalogLessonToDiscoveryLesson(item: CatalogLesson): Lesson {
+    const safeSummary = item.summary || 'Khám phá bài học văn hóa Việt Nam độc đáo cùng VieCultures.';
+    const safeReadTime = item.readTime || '3 phút đọc';
+    const safeVocabCount = typeof item.vocabCount === 'number' ? item.vocabCount : 0;
+
+    const defaultLevelDetail = (summaryText: string) => ({
+      readTime: safeReadTime,
+      vocabCount: safeVocabCount,
+      summary: summaryText,
+    });
+
+    const levelDetails: Record<'Level 1' | 'Level 2' | 'Level 3', LevelDetail> = {
+      'Level 1': item.levelDetails && item.levelDetails['Level 1']
+        ? {
+            readTime: item.levelDetails['Level 1'].readTime || '3 phút đọc',
+            vocabCount: item.levelDetails['Level 1'].vocabCount ?? safeVocabCount,
+            wordCount: item.levelDetails['Level 1'].wordCount,
+            summary: item.levelDetails['Level 1'].summary || safeSummary,
+          }
+        : defaultLevelDetail(safeSummary),
+      'Level 2': item.levelDetails && item.levelDetails['Level 2']
+        ? {
+            readTime: item.levelDetails['Level 2'].readTime || safeReadTime,
+            vocabCount: item.levelDetails['Level 2'].vocabCount ?? safeVocabCount,
+            wordCount: item.levelDetails['Level 2'].wordCount,
+            summary: item.levelDetails['Level 2'].summary || safeSummary,
+          }
+        : {
+            readTime: safeReadTime,
+            vocabCount: safeVocabCount,
+            summary: safeSummary,
+          },
+      'Level 3': item.levelDetails && item.levelDetails['Level 3']
+        ? {
+            readTime: item.levelDetails['Level 3'].readTime || '6 phút đọc',
+            vocabCount: item.levelDetails['Level 3'].vocabCount ?? 12,
+            wordCount: item.levelDetails['Level 3'].wordCount,
+            summary: item.levelDetails['Level 3'].summary || safeSummary,
+          }
+        : {
+            readTime: '6 phút đọc',
+            vocabCount: 12,
+            summary: safeSummary,
+          },
+    };
+
+    const availableLevels =
+      item.availableLevels && item.availableLevels.length > 0
+        ? item.availableLevels
+        : (['Level 1', 'Level 2', 'Level 3'] as any);
+
+    const iconMap: Record<string, string> = {
+      Heritage: '🏛️',
+      Cuisine: '🍜',
+      Crafts: '🎨',
+      Nature: '🏔️',
+      Folklore: '🏮',
+    };
+
+    const categorySafe = item.category || 'Heritage';
+    const categoryViSafe = item.categoryVi || 'Di sản văn hóa';
+
+    return {
+      id: item.id,
+      title: item.titleEn || item.titleVi || 'Bài học văn hóa',
+      vietnameseTitle: item.titleVi || item.titleEn || 'Bài học văn hóa',
+      category: categorySafe,
+      categoryVi: categoryViSafe,
+      cefrLevel: item.primaryLevel || 'Level 2',
+      availableLevels: ['Level 1', 'Level 2', 'Level 3'], // Luôn hỗ trợ cả 3 level để không bị mất bài khi user đổi tab level
+      levelDetails,
+      readTime: safeReadTime,
+      vocabCount: safeVocabCount,
+      summary: safeSummary,
+      gradient: 'from-amber-600/40 via-emerald-800/60 to-heritage-green/90',
+      iconSymbol: iconMap[categorySafe] || '🏛️',
+      imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80',
+      featured: item.featured ?? false,
+      isFromDatabase: true,
+      dateAdded: item.createdAt || new Date().toISOString(),
     };
   },
 };

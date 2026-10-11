@@ -35,59 +35,24 @@ export default function DiscoveryPage() {
     'imperial-hue': true,
   });
   const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
+  const [filterSource, setFilterSource] = useState<'all' | 'db'>('all');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [backendLessons, setBackendLessons] = useState<Lesson[]>([]);
 
-  // Fetch backend posts and merge into catalog seamlessly
+  // Fetch backend grouped catalog and merge into catalog seamlessly
   useEffect(() => {
     let isMounted = true;
     readerApiService
-      .getAllPosts()
-      .then((posts) => {
-        if (!isMounted || !posts || posts.length === 0) return;
-        const mapped: Lesson[] = posts.map((post) => {
-          const levelMapped: LevelType =
-            post.level === 'A1' || post.level === 'A2'
-              ? 'Level 1'
-              : post.level === 'C1' || post.level === 'C2'
-              ? 'Level 3'
-              : 'Level 2';
-
-          const readTimeStr =
-            post.readTime || `${Math.max(2, Math.ceil((post.wordCount || 250) / 100))} min read`;
-          const vocabCount = post.vocabularies?.length || 8;
-
-          return {
-            id: post.id,
-            title: post.titleEn,
-            vietnameseTitle: post.titleVi,
-            category: (['Heritage', 'Cuisine', 'Crafts', 'Nature', 'Folklore'].includes(post.topic)
-              ? post.topic
-              : 'Heritage') as any,
-            categoryVi: post.topic || 'Văn hóa & Phong tục',
-            cefrLevel: levelMapped,
-            availableLevels: ['Level 1', 'Level 2', 'Level 3'],
-            levelDetails: {
-              'Level 1': { readTime: '3 min read', vocabCount: 6, summary: post.summary },
-              'Level 2': { readTime: readTimeStr, vocabCount, summary: post.summary },
-              'Level 3': { readTime: '6 min read', vocabCount: 12, summary: post.summary },
-            },
-            readTime: readTimeStr,
-            vocabCount,
-            summary: post.summary || '',
-            gradient: 'from-amber-600/40 via-emerald-800/60 to-heritage-green/90',
-            iconSymbol: '🏛️',
-            imageUrl:
-              post.imageUrl ||
-              'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80',
-            featured: false,
-            dateAdded: post.createdAt || new Date().toISOString(),
-          };
-        });
+      .getCatalog()
+      .then((catalog) => {
+        if (!isMounted || !catalog || !catalog.items || catalog.items.length === 0) return;
+        const mapped: Lesson[] = catalog.items.map((item) =>
+          readerApiService.mapCatalogLessonToDiscoveryLesson(item)
+        );
         setBackendLessons(mapped);
       })
       .catch((err) => {
-        console.warn('[Discovery] Không thể tải bài từ API backend:', err);
+        console.warn('[Discovery] Không thể tải danh mục bài từ API backend:', err);
       });
 
     return () => {
@@ -95,12 +60,12 @@ export default function DiscoveryPage() {
     };
   }, []);
 
-  // Merge backend posts ahead of static catalog (avoiding duplicate IDs)
+  // Giữ lại mockdata hiện tại (LESSONS_DATA) sau đó thêm các data thật từ DB phía sau
   const catalogLessons = useMemo(() => {
     if (backendLessons.length === 0) return LESSONS_DATA;
-    const backendIds = new Set(backendLessons.map((l) => l.id));
-    const dedupedLessons = LESSONS_DATA.filter((l) => !backendIds.has(l.id));
-    return [...backendLessons, ...dedupedLessons];
+    const mockIds = new Set(LESSONS_DATA.map((l) => l.id));
+    const dedupedBackend = backendLessons.filter((l) => !mockIds.has(l.id));
+    return [...LESSONS_DATA, ...dedupedBackend];
   }, [backendLessons]);
 
   // Smooth brief transition skeleton when changing major filters
@@ -108,7 +73,7 @@ export default function DiscoveryPage() {
     setIsLoading(true);
     const timer = setTimeout(() => setIsLoading(false), 220);
     return () => clearTimeout(timer);
-  }, [selectedTopic, selectedCefr, selectedReadTime, sortBy]);
+  }, [selectedTopic, selectedCefr, selectedReadTime, sortBy, filterSource]);
 
   // Interactive Map Spotlight State
   const [activePinIndex, setActivePinIndex] = useState<number>(2);
@@ -128,7 +93,7 @@ export default function DiscoveryPage() {
   // Reset pagination when filters or view mode change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedTopic, selectedCefr, selectedReadTime, searchQuery, sortBy, onlyBookmarked, viewMode]);
+  }, [selectedTopic, selectedCefr, selectedReadTime, searchQuery, sortBy, onlyBookmarked, viewMode, filterSource]);
 
   // Toggle Favorite Bookmark
   const toggleBookmark = (id: string) => {
@@ -147,6 +112,9 @@ export default function DiscoveryPage() {
   // Smart Filter & Sort Logic
   const filteredLessons = useMemo(() => {
     return catalogLessons.filter((lesson) => {
+      // Lọc theo nguồn: chỉ xem bài thật từ Database nếu được chọn
+      if (filterSource === 'db' && !lesson.isFromDatabase) return false;
+
       // If filtering only bookmarked stories
       if (onlyBookmarked && !bookmarks[lesson.id]) return false;
 
@@ -162,7 +130,7 @@ export default function DiscoveryPage() {
 
       // Level-specific stats for duration filtering
       const levelStats = getLessonStatsForLevel(lesson, selectedCefr);
-      const readMinutes = parseInt(levelStats.readTime);
+      const readMinutes = parseInt(levelStats?.readTime || '3') || 3;
 
       const matchTime =
         selectedReadTime === 'All' ||
@@ -170,20 +138,25 @@ export default function DiscoveryPage() {
         (selectedReadTime === 'medium' && readMinutes >= 6 && readMinutes <= 8) ||
         (selectedReadTime === 'long' && readMinutes > 8);
 
-      // Smart Accent-Insensitive Search Query Matching
+      // Smart Accent-Insensitive Search Query Matching (Null-safe)
       const q = searchQuery.toLowerCase().trim();
       const normalizedQ = removeAccents(q);
 
+      const title = lesson.title || '';
+      const viTitle = lesson.vietnameseTitle || '';
+      const summary = lesson.summary || '';
+      const catVi = lesson.categoryVi || '';
+
       const matchSearch =
         !q ||
-        lesson.title.toLowerCase().includes(q) ||
-        removeAccents(lesson.title.toLowerCase()).includes(normalizedQ) ||
-        lesson.vietnameseTitle.toLowerCase().includes(q) ||
-        removeAccents(lesson.vietnameseTitle.toLowerCase()).includes(normalizedQ) ||
-        lesson.summary.toLowerCase().includes(q) ||
-        removeAccents(lesson.summary.toLowerCase()).includes(normalizedQ) ||
-        lesson.categoryVi.toLowerCase().includes(q) ||
-        removeAccents(lesson.categoryVi.toLowerCase()).includes(normalizedQ);
+        title.toLowerCase().includes(q) ||
+        removeAccents(title.toLowerCase()).includes(normalizedQ) ||
+        viTitle.toLowerCase().includes(q) ||
+        removeAccents(viTitle.toLowerCase()).includes(normalizedQ) ||
+        summary.toLowerCase().includes(q) ||
+        removeAccents(summary.toLowerCase()).includes(normalizedQ) ||
+        catVi.toLowerCase().includes(q) ||
+        removeAccents(catVi.toLowerCase()).includes(normalizedQ);
 
       return matchTopic && matchCefr && matchTime && matchSearch;
     }).sort((a, b) => {
@@ -191,20 +164,22 @@ export default function DiscoveryPage() {
       const statsB = getLessonStatsForLevel(b, selectedCefr);
 
       if (sortBy === 'recent') {
-        return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
+        const dateA = a.dateAdded ? new Date(a.dateAdded).getTime() : 0;
+        const dateB = b.dateAdded ? new Date(b.dateAdded).getTime() : 0;
+        return dateB - dateA;
       }
       if (sortBy === 'vocab') {
-        return statsB.vocabCount - statsA.vocabCount;
+        return (statsB?.vocabCount || 0) - (statsA?.vocabCount || 0);
       }
       if (sortBy === 'time_asc') {
-        return parseInt(statsA.readTime) - parseInt(statsB.readTime);
+        return (parseInt(statsA?.readTime || '3') || 3) - (parseInt(statsB?.readTime || '3') || 3);
       }
       if (sortBy === 'time_desc') {
-        return parseInt(statsB.readTime) - parseInt(statsA.readTime);
+        return (parseInt(statsB?.readTime || '3') || 3) - (parseInt(statsA?.readTime || '3') || 3);
       }
       return 0;
     });
-  }, [selectedTopic, selectedCefr, selectedReadTime, searchQuery, sortBy, onlyBookmarked, bookmarks]);
+  }, [selectedTopic, selectedCefr, selectedReadTime, searchQuery, sortBy, onlyBookmarked, bookmarks, filterSource, catalogLessons]);
 
   // Pagination Calculation
   const totalPages = Math.max(1, Math.ceil(filteredLessons.length / itemsPerPage));
@@ -219,6 +194,7 @@ export default function DiscoveryPage() {
     setSelectedReadTime('All');
     setSearchQuery('');
     setOnlyBookmarked(false);
+    setFilterSource('all');
     setCurrentPage(1);
   };
 
@@ -275,6 +251,42 @@ export default function DiscoveryPage() {
             onResetAllFilters={resetAllFilters}
           />
         </div>
+
+        {/* 4.5. Nguồn dữ liệu & Nút chuyển nhanh xem bài thật từ Database */}
+        {backendLessons.length > 0 && (
+          <div className="-mt-4 mb-6 flex flex-wrap items-center justify-between gap-3 bg-emerald-950/5 border border-emerald-600/20 rounded-2xl p-3 px-4 shadow-2xs">
+            <div className="flex items-center gap-2 text-xs text-heritage-green">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span>
+                Cơ sở dữ liệu: <strong className="font-bold text-emerald-800">{backendLessons.length} bài viết từ DB</strong> đang được xếp sau {LESSONS_DATA.length} bài mẫu (ở trang sau hoặc bấm xem riêng bài DB).
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setFilterSource('all')}
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  filterSource === 'all'
+                    ? 'bg-heritage-green text-warm-ivory shadow-xs'
+                    : 'bg-warm-ivory text-text-secondary hover:text-heritage-green border border-heritage-green/15'
+                }`}
+              >
+                Tất cả bài ({catalogLessons.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterSource('db')}
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  filterSource === 'db'
+                    ? 'bg-emerald-700 text-warm-ivory shadow-xs ring-2 ring-emerald-500/50'
+                    : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-600/25'
+                }`}
+              >
+                <span>✨ Chỉ xem bài từ DB ({backendLessons.length})</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* 5. Article Catalog Display (Grid / List) */}
         <section className="mb-12 relative z-10">

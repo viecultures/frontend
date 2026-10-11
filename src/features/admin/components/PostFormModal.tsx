@@ -83,6 +83,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   const [imageUrl, setImageUrl] = useState('');
   const [shadowingAudioUrl, setShadowingAudioUrl] = useState('');
   const [summary, setSummary] = useState('');
+  const [featured, setFeatured] = useState<boolean>(false);
   const [contentEn, setContentEn] = useState('');
   const [contentVi, setContentVi] = useState('');
 
@@ -116,6 +117,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
       setImageUrl(initialData.imageUrl || '');
       setShadowingAudioUrl(initialData.shadowingAudioUrl || '');
       setSummary(initialData.summary || '');
+      setFeatured(Boolean(initialData.featured));
       setContentEn(initialData.contentEn || '');
       setContentVi(initialData.contentVi || '');
       setParagraphs(initialData.paragraphs || []);
@@ -139,6 +141,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
     setImageUrl('');
     setShadowingAudioUrl('');
     setSummary('');
+    setFeatured(false);
     setContentEn('');
     setContentVi('');
     setParagraphs([]);
@@ -283,6 +286,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
         imageUrl: imageUrl.trim() || undefined,
         shadowingAudioUrl: shadowingAudioUrl.trim() || undefined,
         summary: summary.trim() || undefined,
+        featured,
         contentEn: contentEn.trim() || undefined,
         contentVi: contentVi.trim() || undefined,
         paragraphs: paragraphs.length > 0 ? paragraphs : undefined,
@@ -580,6 +584,20 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                     className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                   />
                 </div>
+              </div>
+
+              {/* Featured Checkbox Toggle */}
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-warm-ivory/80 dark:bg-heritage-dark/50 border border-antique-gold/30">
+                <input
+                  type="checkbox"
+                  id="featured-checkbox"
+                  checked={featured}
+                  onChange={(e) => setFeatured(e.target.checked)}
+                  className="w-4 h-4 rounded text-heritage-green accent-heritage-green cursor-pointer"
+                />
+                <label htmlFor="featured-checkbox" className="text-xs font-bold text-text-body dark:text-warm-ivory cursor-pointer select-none">
+                  ⭐ Đánh dấu bài viết nổi bật (Featured) – Hiển thị huy hiệu Tiêu Điểm trên trang Khám phá
+                </label>
               </div>
 
               {/* Summary */}

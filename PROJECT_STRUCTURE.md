@@ -79,8 +79,8 @@ Khi nhận yêu cầu từ người dùng, Agent hãy tra cứu ngay bảng này
 | **Sửa API gọi Backend cho Admin** | `src/features/admin/services/postAdminService.ts` |
 | **Đổi kiểu dữ liệu bài đăng / cặp đoạn / từ vựng** | `src/features/admin/types/adminTypes.ts` và `src/types/index.ts` |
 | **Sửa màn hình Đọc bài song ngữ & Shadowing** | `src/features/reader/pages/reader.tsx`<br>`src/features/reader/components/` |
+| **Sửa trang Khám phá & Bản đồ di sản** | `src/features/discovery/pages/discovery.tsx`<br>`src/features/reader/services/readerApiService.ts` (API `GET /api/posts/catalog`) |
 | **Sửa phòng luyện nghe chép (Dictation / AI Map)** | `src/features/playground/pages/playground.tsx`<br>`src/features/playground/services/dictationService.ts` |
-| **Sửa trang Khám phá & Bản đồ di sản** | `src/features/discovery/pages/discovery.tsx` |
 | **Sửa trang Phòng học cá nhân / Gamification** | `src/features/home/pages/home.tsx` |
 | **Sửa Kho từ vựng & Flashcards** | `src/features/flashcards/pages/dictionary.tsx`<br>`src/features/flashcards/pages/flashcard-study.tsx` |
 | **Sửa Header, Navbar hoặc Profile menu** | `src/components/Navbar.tsx`<br>`src/components/ProfileDropdown.tsx` |

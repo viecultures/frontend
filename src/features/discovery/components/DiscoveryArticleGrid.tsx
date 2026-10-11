@@ -108,9 +108,17 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
 
                 {/* Top Overlay: Category badge & Bookmark */}
                 <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-heritage-green/90 text-warm-ivory border border-white/20 backdrop-blur-md shadow-xs">
-                    {lesson.categoryVi}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-heritage-green/90 text-warm-ivory border border-white/20 backdrop-blur-md shadow-xs">
+                      {lesson.categoryVi}
+                    </span>
+                    {lesson.isFromDatabase && (
+                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-emerald-600/90 text-warm-ivory border border-white/25 backdrop-blur-md shadow-xs flex items-center gap-1">
+                        <Sparkles className="w-2.5 h-2.5 text-antique-gold" />
+                        <span>Database</span>
+                      </span>
+                    )}
+                  </div>
                   <button
                     type="button"
                     onClick={() => onToggleBookmark(lesson.id)}
@@ -258,6 +266,12 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   <span className="text-[11px] font-bold text-heritage-green bg-heritage-green/10 px-2 py-0.5 rounded border border-heritage-green/15">
                     {lesson.categoryVi}
                   </span>
+                  {lesson.isFromDatabase && (
+                    <span className="text-[10px] font-bold text-warm-ivory bg-emerald-600 px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
+                      <Sparkles className="w-2.5 h-2.5 text-antique-gold" />
+                      <span>Database</span>
+                    </span>
+                  )}
                 </div>
                 <Link
                   href={`/reader?story=${lesson.id}&level=${encodeURIComponent(activeLevel)}`}

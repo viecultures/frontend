@@ -36,6 +36,7 @@ export interface ReadingPostPayload {
   shadowingAudioUrl?: string;
   level: CefrLevel;
   readTime?: string;
+  featured?: boolean;
   paragraphs?: ParagraphPairDto[];
   vocabularies?: VocabItemDto[];
 }
