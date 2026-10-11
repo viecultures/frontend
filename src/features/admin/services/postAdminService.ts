@@ -269,4 +269,103 @@ export const postAdminService = {
       vocabularies,
     };
   },
+
+  // ─── 5. Quản lý Voice Models & Sinh Voice Track Bài Viết ──────────────────
+
+  async getVoiceModels() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/voice/models`);
+      if (!res.ok) throw new Error('Không thể tải danh sách model giọng đọc');
+      return await res.json();
+    } catch (err) {
+      console.warn('[postAdminService] Lỗi tải voice models từ server, kích hoạt danh sách chuẩn:', err);
+      return [
+        {
+          id: 'en-US-AmandaMultilingualNeural',
+          name: 'Amanda (Nữ - Đa ngôn ngữ)',
+          gender: 'Female',
+          locale: 'en-US',
+          description: 'Giọng Nữ chuẩn quốc tế, phát âm đa ngôn ngữ tự nhiên, truyền cảm và rõ ràng',
+          isMultilingual: true,
+          isPrimary: true,
+        },
+        {
+          id: 'en-US-DustinMultilingualNeural',
+          name: 'Dustin (Nam - Đa ngôn ngữ)',
+          gender: 'Male',
+          locale: 'en-US',
+          description: 'Giọng Nam trầm ấm, phong thái điềm đạm, hỗ trợ đa ngôn ngữ chuẩn xác',
+          isMultilingual: true,
+          isPrimary: true,
+        },
+        {
+          id: 'en-US-JennyNeural',
+          name: 'Jenny (Nữ - Mỹ)',
+          gender: 'Female',
+          locale: 'en-US',
+          description: 'Giọng Nữ bản ngữ Mỹ biểu cảm, ngữ điệu thân thiện, lý tưởng cho bài đọc học thuật',
+          isMultilingual: false,
+          isPrimary: true,
+        },
+        {
+          id: 'en-US-GuyNeural',
+          name: 'Guy (Nam - Mỹ)',
+          gender: 'Male',
+          locale: 'en-US',
+          description: 'Giọng Nam Mỹ trầm bổng, phong cách kể chuyện truyền cảm hứng và cuốn hút',
+          isMultilingual: false,
+          isPrimary: true,
+        },
+        {
+          id: 'en-US-AriaNeural',
+          name: 'Aria (Nữ - Mỹ)',
+          gender: 'Female',
+          locale: 'en-US',
+          description: 'Giọng Nữ năng động, sắc thái chuyên nghiệp, thích hợp phóng sự văn hóa',
+          isMultilingual: false,
+          isPrimary: false,
+        },
+        {
+          id: 'en-US-DavisNeural',
+          name: 'Davis (Nam - Mỹ)',
+          gender: 'Male',
+          locale: 'en-US',
+          description: 'Giọng Nam đĩnh đạc, phát âm chậm rãi, chuẩn mực từng âm tiết',
+          isMultilingual: false,
+          isPrimary: false,
+        },
+      ];
+    }
+  },
+
+  async generateVoiceTrack(payload: {
+    text: string;
+    voiceId: string;
+    voiceName?: string;
+    titleSlug?: string;
+  }): Promise<{
+    success: boolean;
+    voiceId: string;
+    voiceName: string;
+    normalUrl?: string;
+    slowUrl: string;
+    fastUrl?: string;
+    message?: string;
+  }> {
+    const res = await fetch(`${API_BASE_URL}/api/voice/generate-track`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Lỗi khi tạo giọng đọc AI (HTTP ${res.status})`);
+    }
+
+    return res.json();
+  },
 };
+

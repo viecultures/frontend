@@ -15,12 +15,20 @@ import {
   HelpCircle,
   Wand2,
   ListPlus,
+  Volume2,
+  Headphones,
+  Radio,
+  Star,
+  ExternalLink,
+  Loader2,
 } from 'lucide-react';
 import type {
   ReadingPostPayload,
   ParagraphPairDto,
   VocabItemDto,
   CefrLevel,
+  AudioTrackDto,
+  VoiceModelItem,
 } from '../types/adminTypes';
 import { postAdminService } from '../services/postAdminService';
 
@@ -69,7 +77,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   onSuccess,
   initialData,
 }) => {
-  const [activeTab, setActiveTab] = useState<'info' | 'bilingual' | 'vocab' | 'tsv'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'bilingual' | 'vocab' | 'voices' | 'tsv'>('info');
 
   // Form states
   const [topicGroup, setTopicGroup] = useState('');
@@ -93,6 +101,12 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   // Vocabularies
   const [vocabularies, setVocabularies] = useState<VocabItemDto[]>([]);
 
+  // Voice Tracks & Models
+  const [voiceTracks, setVoiceTracks] = useState<AudioTrackDto[]>([]);
+  const [voiceModels, setVoiceModels] = useState<VoiceModelItem[]>([]);
+  const [generatingVoiceId, setGeneratingVoiceId] = useState<string | null>(null);
+  const [isLoadingModels, setIsLoadingModels] = useState<boolean>(false);
+
   // Fast tool helpers
   const [fastVocabInput, setFastVocabInput] = useState('');
   const [tsvRawRow, setTsvRawRow] = useState('');
@@ -105,6 +119,15 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
 
   // Initialize or reset form data
   useEffect(() => {
+    if (isOpen) {
+      setIsLoadingModels(true);
+      postAdminService
+        .getVoiceModels()
+        .then((models) => setVoiceModels(models))
+        .catch((err) => console.error('Error fetching voice models:', err))
+        .finally(() => setIsLoadingModels(false));
+    }
+
     if (initialData) {
       setTopicGroup(initialData.topicGroup || '');
       setTitleEn(initialData.titleEn || '');
@@ -122,6 +145,24 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
       setContentVi(initialData.contentVi || '');
       setParagraphs(initialData.paragraphs || []);
       setVocabularies(initialData.vocabularies || []);
+
+      if (initialData.audioTracks) {
+        try {
+          const parsed =
+            typeof initialData.audioTracks === 'string'
+              ? JSON.parse(initialData.audioTracks)
+              : initialData.audioTracks;
+          if (Array.isArray(parsed)) {
+            setVoiceTracks(parsed);
+          } else {
+            setVoiceTracks([]);
+          }
+        } catch {
+          setVoiceTracks([]);
+        }
+      } else {
+        setVoiceTracks([]);
+      }
     } else {
       resetForm();
     }
@@ -146,6 +187,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
     setContentVi('');
     setParagraphs([]);
     setVocabularies([]);
+    setVoiceTracks([]);
     setFastVocabInput('');
     setTsvRawRow('');
     setActiveTab('info');
@@ -255,6 +297,79 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
     setVocabularies((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  // Handle Voice generation
+  const handleGenerateVoice = async (model: VoiceModelItem) => {
+    const readingText =
+      contentEn.trim() ||
+      paragraphs
+        .map((p) => p.enText.trim())
+        .filter(Boolean)
+        .join('\n\n');
+
+    if (!readingText) {
+      setErrorMsg('Vui lòng nhập nội dung bài đọc tiếng Anh (Toàn văn ở Tab 1 hoặc Cặp đoạn ở Tab 2) trước khi tạo giọng đọc.');
+      return;
+    }
+
+    setGeneratingVoiceId(model.id);
+    setErrorMsg(null);
+
+    try {
+      const res = await postAdminService.generateVoiceTrack({
+        text: readingText,
+        voiceId: model.id,
+        voiceName: model.name,
+        titleSlug: topicGroup || titleEn || 'reading-post',
+      });
+
+      const newTrack: AudioTrackDto = {
+        voiceId: res.voiceId,
+        voiceName: res.voiceName,
+        normalUrl: res.normalUrl || res.fastUrl,
+        slowUrl: res.slowUrl,
+        fastUrl: res.normalUrl || res.fastUrl,
+        createdAt: new Date().toISOString(),
+      };
+
+      setVoiceTracks((prev) => {
+        const existingIdx = prev.findIndex((t) => t.voiceId === model.id);
+        if (existingIdx >= 0) {
+          const updated = [...prev];
+          updated[existingIdx] = newTrack;
+          return updated;
+        }
+        return [...prev, newTrack];
+      });
+
+      // Gán audio shadowing mặc định là bản NGUYÊN BẢN (Normal/Original)
+      const defaultAudioUrl = newTrack.normalUrl || newTrack.slowUrl;
+      if (!shadowingAudioUrl && defaultAudioUrl) {
+        setShadowingAudioUrl(defaultAudioUrl);
+      }
+
+      setSuccessToast(`Đã tạo thành công giọng đọc AI "${model.name}" với 2 phiên bản (Nguyên bản mặc định & Chậm)!`);
+      setTimeout(() => setSuccessToast(null), 4000);
+    } catch (err: any) {
+      setErrorMsg(err.message || `Lỗi khi tạo giọng đọc với ${model.name}`);
+    } finally {
+      setGeneratingVoiceId(null);
+    }
+  };
+
+  // Remove voice track
+  const handleRemoveVoiceTrack = (voiceId: string) => {
+    setVoiceTracks((prev) => prev.filter((t) => t.voiceId !== voiceId));
+    setSuccessToast('Đã xóa bản ghi âm khỏi bài đọc.');
+    setTimeout(() => setSuccessToast(null), 3000);
+  };
+
+  // Set as primary shadowing audio
+  const handleSetPrimaryAudio = (url: string, name: string, speedLabel: string) => {
+    setShadowingAudioUrl(url);
+    setSuccessToast(`Đã chọn bản "${name} (${speedLabel})" làm Audio Shadowing mặc định!`);
+    setTimeout(() => setSuccessToast(null), 3000);
+  };
+
   // Submit Handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,7 +399,8 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
         wordCount: wordCount > 0 ? wordCount : undefined,
         readTime: readTime.trim() || undefined,
         imageUrl: imageUrl.trim() || undefined,
-        shadowingAudioUrl: shadowingAudioUrl.trim() || undefined,
+        shadowingAudioUrl: shadowingAudioUrl.trim() || (voiceTracks.length > 0 ? (voiceTracks[0].normalUrl || voiceTracks[0].slowUrl) : undefined),
+        audioTracks: voiceTracks.length > 0 ? JSON.stringify(voiceTracks) : undefined,
         summary: summary.trim() || undefined,
         featured,
         contentEn: contentEn.trim() || undefined,
@@ -380,6 +496,18 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
           >
             <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
             <span>3. Từ vựng trọng tâm ({vocabularies.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('voices')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              activeTab === 'voices'
+                ? 'bg-heritage-green text-warm-ivory shadow-xs'
+                : 'text-text-body dark:text-warm-ivory/70 hover:bg-white/40 dark:hover:bg-white/5'
+            }`}
+          >
+            <Radio className="w-3.5 h-3.5 text-antique-gold" />
+            <span>4. Giọng đọc AI ({voiceTracks.length})</span>
           </button>
           <button
             type="button"
@@ -573,16 +701,29 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
 
                 {/* Audio URL */}
                 <div>
-                  <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                    Link Audio Shadowing (.mp3)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                      Link Audio Shadowing (.mp3)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('voices')}
+                      className="text-[11px] text-antique-gold hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <Radio className="w-3 h-3" />
+                      <span>Tạo Voice AI ({voiceTracks.length}) ➔</span>
+                    </button>
+                  </div>
                   <input
                     type="url"
                     value={shadowingAudioUrl}
                     onChange={(e) => setShadowingAudioUrl(e.target.value)}
-                    placeholder="https://example.com/audio.mp3"
+                    placeholder="https://example.com/audio.mp3 hoặc tạo từ Tab Giọng đọc AI"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                   />
+                  <p className="text-[10px] text-text-muted mt-1">
+                    Audio chính cho học viên luyện nói Shadowing. Bạn có thể tự động tạo âm thanh ở tab 4 "Giọng đọc AI".
+                  </p>
                 </div>
               </div>
 
@@ -990,7 +1131,292 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
             </div>
           )}
 
-          {/* ════ TAB 4: TRÌNH NHẬP NHANH TSV (FAST LOADER) ════ */}
+          {/* ════ TAB 4: GIỌNG ĐỌC AI & ĐA TỐC ĐỘ ════ */}
+          {activeTab === 'voices' && (
+            <div className="space-y-6">
+              {/* Introduction Card */}
+              <div className="p-4 rounded-2xl bg-warm-ivory/80 dark:bg-heritage-dark/60 border border-antique-gold/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Radio className="w-5 h-5 text-antique-gold" />
+                    <h3 className="text-sm font-bold text-heritage-green dark:text-antique-bright">
+                      Bộ Sinh Giọng Đọc AI Đa Tốc Độ (Azure Speech Neural)
+                    </h3>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-antique-gold/20 text-heritage-dark dark:text-antique-bright text-[11px] font-bold">
+                    {voiceTracks.length} giọng đã tạo
+                  </span>
+                </div>
+                <p className="text-xs text-text-body dark:text-warm-ivory/80 leading-relaxed">
+                  Khi bạn chọn 1 model giọng đọc và nhấn <strong>Tạo Giọng Đọc</strong>, hệ thống sẽ tự động tổng hợp toàn bộ bài đọc tiếng Anh thành <strong>2 phiên bản tốc độ</strong>:
+                  <span className="inline-block mx-1 font-semibold text-emerald-700 dark:text-emerald-300">⭐ Nguyên bản (Chuẩn 100% - Mặc định bài học)</span> và
+                  <span className="inline-block mx-1 font-semibold text-blue-700 dark:text-blue-300">🐢 Chậm (-15% cho người mới học / Shadowing)</span>.
+                </p>
+
+                {/* Context Status */}
+                {!contentEn.trim() && paragraphs.length === 0 ? (
+                  <div className="mt-2 p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+                    <span>
+                      Chưa có nội dung tiếng Anh. Vui lòng nhập ở <strong>Tab 1 (Toàn văn)</strong> hoặc <strong>Tab 2 (Cặp đoạn)</strong> trước khi tạo giọng đọc.
+                    </span>
+                  </div>
+                ) : (
+                  <div className="mt-2 flex items-center gap-2 text-[11px] text-text-muted">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>
+                      Đã sẵn sàng tạo âm thanh cho nội dung ({contentEn.trim() ? `${contentEn.trim().split(/\s+/).filter(Boolean).length} từ toàn văn` : `${paragraphs.length} đoạn văn`}).
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Section 1: Tracks already generated for this post */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-text-body dark:text-warm-ivory uppercase tracking-wider flex items-center gap-2">
+                    <Headphones className="w-4 h-4 text-antique-gold" />
+                    <span>Giọng Đọc Đã Tạo Cho Bài Viết ({voiceTracks.length})</span>
+                  </h4>
+                  {voiceTracks.length > 0 && (
+                    <span className="text-[11px] text-text-muted">
+                      Bản Nguyên bản được ưu tiên làm audio mặc định cho bài đọc
+                    </span>
+                  )}
+                </div>
+
+                {voiceTracks.length === 0 ? (
+                  <div className="text-center py-8 border-2 border-dashed border-antique-gold/30 rounded-2xl p-4">
+                    <Headphones className="w-8 h-8 text-antique-gold/40 mx-auto mb-2" />
+                    <p className="text-xs font-medium text-text-body dark:text-warm-ivory">
+                      Chưa có giọng đọc AI nào được tạo cho bài viết này.
+                    </p>
+                    <p className="text-[11px] text-text-muted mt-1">
+                      Hãy chọn một model bên dưới (khuyên dùng <strong>Amanda</strong> hoặc <strong>Dustin</strong>) rồi bấm "Tạo Giọng Đọc".
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {voiceTracks.map((track) => {
+                      const normalAudioUrl = track.normalUrl || track.fastUrl || '';
+                      const isNormalPrimary = shadowingAudioUrl === normalAudioUrl;
+                      const isSlowPrimary = shadowingAudioUrl === track.slowUrl;
+
+                      return (
+                        <div
+                          key={track.voiceId}
+                          className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/60 border border-antique-gold/40 shadow-xs space-y-3 transition-all hover:border-antique-gold"
+                        >
+                          {/* Track Header */}
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/10 flex items-center justify-center text-heritage-green dark:text-antique-bright font-bold">
+                                <Volume2 className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-bold text-heritage-dark dark:text-warm-ivory">
+                                    {track.voiceName || track.voiceId}
+                                  </span>
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-black/5 dark:bg-white/10 text-text-muted">
+                                    {track.voiceId}
+                                  </span>
+                                </div>
+                                <span className="text-[10px] text-text-muted">
+                                  Đã tạo lúc {track.createdAt ? new Date(track.createdAt).toLocaleTimeString('vi-VN') : 'vừa xong'}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveVoiceTrack(track.voiceId)}
+                                className="p-1.5 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer text-xs flex items-center gap-1"
+                                title="Xóa giọng này khỏi bài viết"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Xóa</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* 2 Speed Players: Normal (Default) and Slow */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                            {/* Normal Track (Default) */}
+                            <div
+                              className={`p-3 rounded-xl border transition-all ${
+                                isNormalPrimary
+                                  ? 'bg-antique-gold/15 border-antique-gold dark:bg-antique-gold/10'
+                                  : 'bg-white/60 dark:bg-heritage-dark/80 border-antique-gold/20'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold flex items-center gap-1">
+                                  ⭐ Tốc độ Nguyên bản (Chuẩn 100% - Mặc định)
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetPrimaryAudio(normalAudioUrl, track.voiceName, 'Nguyên bản')}
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
+                                    isNormalPrimary
+                                      ? 'bg-antique-gold text-heritage-dark font-extrabold'
+                                      : 'text-text-muted hover:text-antique-gold hover:bg-antique-gold/10'
+                                  }`}
+                                >
+                                  {isNormalPrimary ? '★ Audio mặc định chính' : 'Đặt làm Audio chính'}
+                                </button>
+                              </div>
+                              <audio
+                                src={normalAudioUrl}
+                                controls
+                                preload="none"
+                                className="w-full h-8 rounded"
+                              />
+                            </div>
+
+                            {/* Slow Track */}
+                            <div
+                              className={`p-3 rounded-xl border transition-all ${
+                                isSlowPrimary
+                                  ? 'bg-antique-gold/15 border-antique-gold dark:bg-antique-gold/10'
+                                  : 'bg-white/60 dark:bg-heritage-dark/80 border-antique-gold/20'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 text-[10px] font-bold">
+                                  🐢 Tốc độ Chậm (-15%)
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetPrimaryAudio(track.slowUrl, track.voiceName, 'Chậm')}
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
+                                    isSlowPrimary
+                                      ? 'bg-antique-gold text-heritage-dark font-extrabold'
+                                      : 'text-text-muted hover:text-antique-gold hover:bg-antique-gold/10'
+                                  }`}
+                                >
+                                  {isSlowPrimary ? '★ Audio mặc định chính' : 'Đặt làm Audio chính'}
+                                </button>
+                              </div>
+                              <audio
+                                src={track.slowUrl}
+                                controls
+                                preload="none"
+                                className="w-full h-8 rounded"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Section 2: Model Pickers */}
+              <div className="space-y-3 pt-2 border-t border-antique-gold/20">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-text-body dark:text-warm-ivory uppercase tracking-wider flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-antique-gold" />
+                    <span>Chọn Model Để Tạo Voice (Dev Predefined)</span>
+                  </h4>
+                  {isLoadingModels && (
+                    <span className="text-[11px] text-text-muted flex items-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin text-antique-gold" />
+                      Đang tải danh sách model...
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {voiceModels.map((model) => {
+                    const isExisting = voiceTracks.some((t) => t.voiceId === model.id);
+                    const isGenerating = generatingVoiceId === model.id;
+                    const canGenerate = (contentEn.trim().length > 0 || paragraphs.length > 0) && !generatingVoiceId;
+
+                    return (
+                      <div
+                        key={model.id}
+                        className={`p-4 rounded-2xl border transition-all flex flex-col justify-between ${
+                          isExisting
+                            ? 'bg-warm-ivory dark:bg-heritage-dark/70 border-emerald-500/50 shadow-xs'
+                            : 'bg-warm-ivory/60 dark:bg-heritage-dark/50 border-antique-gold/30 hover:border-antique-gold/60'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-start justify-between gap-2 mb-1.5">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs font-bold text-heritage-dark dark:text-warm-ivory">
+                                {model.name}
+                              </span>
+                              {model.isPrimary && (
+                                <span className="px-2 py-0.5 rounded-full bg-antique-gold/20 text-heritage-dark dark:text-antique-bright text-[10px] font-extrabold flex items-center gap-0.5">
+                                  <Star className="w-2.5 h-2.5 fill-current" />
+                                  <span>Khuyên dùng</span>
+                                </span>
+                              )}
+                              {model.isMultilingual && (
+                                <span className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-medium">
+                                  Đa ngôn ngữ
+                                </span>
+                              )}
+                            </div>
+
+                            <span className="text-[10px] text-text-muted font-mono">
+                              {model.gender === 'Female' ? 'Nữ' : 'Nam'}
+                            </span>
+                          </div>
+
+                          <p className="text-[11px] text-text-muted leading-relaxed mb-3">
+                            {model.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-antique-gold/15">
+                          <span className="text-[10px] text-text-muted font-mono">
+                            {model.id}
+                          </span>
+
+                          <button
+                            type="button"
+                            disabled={!canGenerate && !isGenerating}
+                            onClick={() => handleGenerateVoice(model)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                              isGenerating
+                                ? 'bg-antique-gold text-heritage-dark animate-pulse'
+                                : isExisting
+                                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200'
+                                : 'bg-heritage-green text-warm-ivory hover:bg-heritage-dark'
+                            }`}
+                          >
+                            {isGenerating ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                <span>Đang tổng hợp...</span>
+                              </>
+                            ) : isExisting ? (
+                              <>
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                <span>Tạo lại giọng này</span>
+                              </>
+                            ) : (
+                              <>
+                                <Wand2 className="w-3.5 h-3.5 text-antique-gold" />
+                                <span>Tạo Giọng Đọc</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ════ TAB 5: TRÌNH NHẬP NHANH TSV (FAST LOADER) ════ */}
           {activeTab === 'tsv' && (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-antique-gold/15 border border-antique-gold/40 space-y-3">

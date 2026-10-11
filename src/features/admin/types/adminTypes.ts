@@ -21,6 +21,25 @@ export interface VocabItemDto {
   usageNote?: string;
 }
 
+export interface AudioTrackDto {
+  voiceId: string;
+  voiceName: string;
+  normalUrl?: string; // Phiên bản nguyên bản (chuẩn 100% - mặc định)
+  slowUrl: string;    // Phiên bản chậm (-15%)
+  fastUrl?: string;   // alias fallback
+  createdAt?: string;
+}
+
+export interface VoiceModelItem {
+  id: string;
+  name: string;
+  gender: string;
+  locale: string;
+  description: string;
+  isMultilingual?: boolean;
+  isPrimary?: boolean;
+}
+
 export interface ReadingPostPayload {
   id?: string;
   topicGroup?: string;
@@ -34,6 +53,7 @@ export interface ReadingPostPayload {
   contentEn?: string;
   contentVi?: string;
   shadowingAudioUrl?: string;
+  audioTracks?: string; // JSON encoded list of AudioTrackDto
   level: CefrLevel;
   readTime?: string;
   featured?: boolean;
