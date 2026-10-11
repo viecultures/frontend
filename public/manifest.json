@@ -1,0 +1,61 @@
+{
+  "name": "VieCultures - Văn Hóa & Song Ngữ",
+  "short_name": "VieCultures",
+  "description": "Nền tảng đọc hiểu văn hóa Việt Nam song ngữ, audio luyện phát âm & flashcards",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FBF7EE",
+  "theme_color": "#163D37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": [
+    "education",
+    "culture",
+    "books"
+  ],
+  "shortcuts": [
+    {
+      "name": "Khám phá bài đọc",
+      "short_name": "Khám phá",
+      "description": "Khám phá các bài đọc văn hóa đặc sắc",
+      "url": "/discovery",
+      "icons": [
+        {
+          "src": "/favicon/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Học Flashcards",
+      "short_name": "Flashcards",
+      "description": "Ôn tập từ vựng văn hóa với flashcards",
+      "url": "/dictionary",
+      "icons": [
+        {
+          "src": "/favicon/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

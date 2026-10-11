@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 
 import { SettingsModal } from './components/SettingsModal';
+import { PwaInstallBanner } from './components/pwa';
 
 // Feature Pages
 import LandingPage from '@/features/landing/pages/landing';
@@ -245,6 +246,9 @@ export const App: React.FC = () => {
 
       {/* GLOBAL SETTINGS MODAL */}
       <SettingsModal />
+
+      {/* PWA MOBILE INSTALL BANNER */}
+      <PwaInstallBanner />
     </div>
   );
 };
