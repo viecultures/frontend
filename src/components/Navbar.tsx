@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Settings } from 'lucide-react';
+import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Crown } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
-import { useSettings } from '@/context/SettingsContext';
 
 interface NavbarProps {
   activeView?: string;
@@ -19,10 +18,9 @@ const NAV_LINK_BASE =
   'transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer focus-ring-dark';
 
 const navLinkClass = (isActive: boolean) =>
-  `${NAV_LINK_BASE} ${
-    isActive
-      ? 'bg-heritage-green text-warm-ivory border border-antique-gold/50 shadow-sm font-bold'
-      : 'text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50'
+  `${NAV_LINK_BASE} ${isActive
+    ? 'bg-heritage-green text-warm-ivory border border-antique-gold/50 shadow-sm font-bold'
+    : 'text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50'
   }`;
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -32,9 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   user,
   onNavigateToSection,
   onLogout,
-  onOpenProfile,
 }) => {
-  const { openSettings } = useSettings();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const hoverScale = shouldReduceMotion ? 1 : 1.03;
@@ -54,7 +50,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleProfileClick = () => {
     setIsProfileOpen(!isProfileOpen);
-    if (onOpenProfile) onOpenProfile();
   };
 
   return (
@@ -198,16 +193,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* ── Right Actions ────────────────────────────────────────────── */}
           <div className="flex items-center gap-2.5">
-            <motion.button
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.94 }}
-              onClick={openSettings}
-              className="w-10 h-10 rounded-xl bg-heritage-green/60 hover:bg-heritage-green border border-antique-gold/40 flex items-center justify-center text-warm-ivory/80 hover:text-antique-gold transition-all cursor-pointer focus-ring-dark"
-              title="Cài đặt Trang chủ (Màu sắc & Hình nền)"
-              aria-label="Cài đặt Trang chủ"
-            >
-              <Settings className="w-4 h-4" />
-            </motion.button>
 
             {isLoggedIn ? (
               <div className="relative">
@@ -215,13 +200,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                   whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.94 }}
                   onClick={handleProfileClick}
-                  className="relative flex items-center justify-center w-10 h-10 rounded-full bg-heritage-green border border-antique-gold/60 shadow-lg cursor-pointer group focus-ring-dark"
+                  className="relative flex items-center justify-center w-10 h-10 rounded-full bg-heritage-green border border-antique-gold/60 shadow-lg cursor-pointer group focus-ring-dark overflow-hidden p-0.5"
                   title="Mở Profile Menu"
                   aria-label="Mở menu hồ sơ cá nhân"
                   aria-expanded={isProfileOpen}
                 >
-                  <span className="text-lg">{user?.avatar || '🐢'}</span>
-                  <span className="absolute -top-1 -right-1 text-xs select-none" aria-hidden="true">👑</span>
+                  {user?.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? (
+                    <img src={user.avatar} alt={user?.name || 'User'} className="w-full h-full object-cover rounded-full" />
+                  ) : (
+                    <span className="text-xs font-bold text-antique-gold">
+                      {user?.avatar || 'NL'}
+                    </span>
+                  )}
+                  <span className="absolute -top-0.5 -right-0.5 p-0.5 rounded-full bg-antique-gold text-heritage-dark shadow-xs" aria-hidden="true">
+                    <Crown className="w-2.5 h-2.5 fill-current" />
+                  </span>
                 </motion.button>
 
                 <ProfileDropdown
@@ -237,11 +230,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 whileHover={{ scale: hoverScale }}
                 whileTap={{ scale: tapScale }}
                 onClick={() => onNavigateToSection('login')}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer focus-ring-dark ${
-                  activeView === 'login'
-                    ? 'bg-antique-gold text-heritage-dark ring-2 ring-antique-gold'
-                    : 'bg-heritage-green text-warm-ivory hover:bg-heritage-dark border border-antique-gold/40'
-                }`}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer focus-ring-dark ${activeView === 'login'
+                  ? 'bg-antique-gold text-heritage-dark ring-2 ring-antique-gold'
+                  : 'bg-heritage-green text-warm-ivory hover:bg-heritage-dark border border-antique-gold/40'
+                  }`}
                 aria-label="Đăng nhập vào VieCultures"
               >
                 <User className="w-4 h-4 text-antique-gold" />

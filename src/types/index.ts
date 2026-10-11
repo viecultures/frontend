@@ -59,3 +59,87 @@ export interface UserReflection {
   likes: number;
   userLiked?: boolean;
 }
+
+// ─── Gamification & Rewards Types ───────────────────────────────────────────
+export type RewardActionType =
+  | 'READER_ARTICLE_COMPLETED'
+  | 'READER_QUIZ_COMPLETED'
+  | 'FLASHCARD_DECK_COMPLETED'
+  | 'FLASHCARD_WORD_MASTERED'
+  | 'SHADOWING_PRACTICE'
+  | 'COMMUNITY_POST_SUBMITTED'
+  | 'COMMUNITY_VOTE'
+  | 'DAILY_TASK_COMPLETED'
+  | 'DAILY_CHECKIN';
+
+export interface BonusContext {
+  isPerfect?: boolean;
+  cardCount?: number;
+  customCoins?: number;
+  customXP?: number;
+  title?: string;
+  description?: string;
+}
+
+export interface GamificationStats {
+  coins: number;
+  xp: number;
+  level: Level;
+  streakDays: number;
+  lastActiveDate: string;
+  streakProtected: boolean;
+  streakFreezeCount: number;
+  unlockedBadges: string[];
+  equippedTitle: string;
+  inventory: string[];
+  completedMissions: Record<string, boolean>;
+}
+
+export interface Mission {
+  id: string;
+  title: string;
+  description: string;
+  type?: 'daily' | 'weekly' | string;
+  target: number;
+  current: number;
+  rewardCoins: number;
+  rewardXP: number;
+  completed: boolean;
+  claimed: boolean;
+  iconName: string;
+}
+
+export interface HeritageBadge {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  category: 'reading' | 'mastery' | 'vocab' | 'streak' | 'community';
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  iconName: string;
+}
+
+export interface HeritageShopItem {
+  id: string;
+  name: string;
+  desc: string;
+  cost: number;
+  tag: string;
+  category: 'audio' | 'theme' | 'title' | 'powerup';
+  iconName: string;
+  isPurchased?: boolean;
+  isEquipped?: boolean;
+}
+
+export interface RewardCelebrationPayload {
+  title: string;
+  subtitle: string;
+  coinsEarned: number;
+  xpEarned: number;
+  bonusMultiplier?: number;
+  bonusReason?: string;
+  isLevelUp?: boolean;
+  newLevel?: Level;
+  unlockedBadge?: HeritageBadge;
+}
+

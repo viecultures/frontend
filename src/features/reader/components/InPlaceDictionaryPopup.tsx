@@ -167,7 +167,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
         {/* English Definition */}
         {vocab.enDefinition && (
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#2563EB] dark:text-[#93C5FD] block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-heritage-green dark:text-[#D9B76A] block">
               English Definition:
             </span>
             <p className="opacity-90 italic mt-0.5 leading-relaxed">

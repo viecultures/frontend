@@ -118,10 +118,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
           <div className="relative">
             <button
               type="button"
-              onClick={() => {
-                setIsProfileOpen(!isProfileOpen);
-                if (onOpenProfile) onOpenProfile();
-              }}
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="relative flex items-center justify-center w-8 h-8 rounded-full bg-heritage-green border border-antique-gold/60 shadow-lg hover:scale-105 active:scale-95 transition-all group overflow-hidden cursor-pointer focus-ring"
               title="Mở Profile Menu"
               aria-label="Menu cá nhân"

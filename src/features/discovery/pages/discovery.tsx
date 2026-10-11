@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { LESSONS_DATA } from '@/data/discoveryData';
+import { LESSONS_DATA, getLessonStatsForLevel } from '@/data/discoveryData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 
 // Modular Discovery Sub-components
@@ -87,12 +87,16 @@ export default function DiscoveryPage() {
       const matchTopic =
         selectedTopic === 'All' || lesson.category === selectedTopic;
 
-      // Filter by CEFR Level
+      // Filter by Level (Every lesson supports Level 1, Level 2, Level 3)
       const matchCefr =
-        selectedCefr === 'All' || lesson.cefrLevel === selectedCefr;
+        selectedCefr === 'All' ||
+        lesson.availableLevels?.includes(selectedCefr as any) ||
+        lesson.cefrLevel === selectedCefr;
 
-      // Filter by Reading Time Duration
-      const readMinutes = parseInt(lesson.readTime);
+      // Level-specific stats for duration filtering
+      const levelStats = getLessonStatsForLevel(lesson, selectedCefr);
+      const readMinutes = parseInt(levelStats.readTime);
+
       const matchTime =
         selectedReadTime === 'All' ||
         (selectedReadTime === 'short' && readMinutes < 6) ||
@@ -116,17 +120,20 @@ export default function DiscoveryPage() {
 
       return matchTopic && matchCefr && matchTime && matchSearch;
     }).sort((a, b) => {
+      const statsA = getLessonStatsForLevel(a, selectedCefr);
+      const statsB = getLessonStatsForLevel(b, selectedCefr);
+
       if (sortBy === 'recent') {
         return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
       }
       if (sortBy === 'vocab') {
-        return b.vocabCount - a.vocabCount;
+        return statsB.vocabCount - statsA.vocabCount;
       }
       if (sortBy === 'time_asc') {
-        return parseInt(a.readTime) - parseInt(b.readTime);
+        return parseInt(statsA.readTime) - parseInt(statsB.readTime);
       }
       if (sortBy === 'time_desc') {
-        return parseInt(b.readTime) - parseInt(a.readTime);
+        return parseInt(statsB.readTime) - parseInt(statsA.readTime);
       }
       return 0;
     });
@@ -212,6 +219,7 @@ export default function DiscoveryPage() {
             onToggleBookmark={toggleBookmark}
             onlyBookmarked={onlyBookmarked}
             onResetAllFilters={resetAllFilters}
+            selectedCefr={selectedCefr}
           />
 
           {/* 6. Pagination Bar */}

@@ -11,6 +11,7 @@ interface AudioShadowingBarProps {
   onToggleRepeatLoop: () => void;
   currentSentenceEn?: string;
   themeMode?: "paper" | "dark";
+  selectedLevel?: "Level 1" | "Level 2" | "Level 3";
   onClose?: () => void;
   // Audio state props
   currentTime?: number;
@@ -35,6 +36,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
   isRepeatLoop,
   onToggleRepeatLoop,
   themeMode = "paper",
+  selectedLevel = "Level 2",
   currentTime = 0,
   duration = 0,
   onSeek,
@@ -347,6 +349,13 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
           >
             {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border shrink-0 ${
+            isDark
+              ? "border-[#D9B76A]/40 bg-[#D9B76A]/15 text-[#D9B76A]"
+              : "border-[#1E4B43]/30 bg-[#1E4B43]/10 text-[#1E4B43]"
+          }`}>
+            {selectedLevel}
+          </span>
         </div>
 
       </div>

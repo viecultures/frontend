@@ -20,6 +20,8 @@ interface BilingualReaderViewProps {
   setQ2Answer: (val: string) => void;
   quizSubmitted: boolean;
   setQuizSubmitted: (val: boolean) => void;
+  selectedLevel?: "Level 1" | "Level 2" | "Level 3";
+  onChangeLevel?: (lvl: "Level 1" | "Level 2" | "Level 3") => void;
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
@@ -37,13 +39,15 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   setQ2Answer,
   quizSubmitted,
   setQuizSubmitted,
+  selectedLevel = "Level 2",
+  onChangeLevel,
 }) => {
   // ── Proportional Scroll Sync Refs & State ─────────────────────────────────
   const leftSheetRef = useRef<HTMLDivElement>(null);
   const rightSheetRef = useRef<HTMLDivElement>(null);
-  const isSyncingRef = useRef<boolean>(false);
+  const activeScrollerRef = useRef<"left" | "right" | null>(null);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState<boolean>(true);
-
   // ── In-Place Dictionary Popup State ───────────────────────────────────────
   const [popupState, setPopupState] = useState<{
     isOpen: boolean;
@@ -57,7 +61,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
   // Handle Proportional Scroll Sync
   const handleScroll = useCallback((source: "left" | "right") => {
-    if (!isScrollSyncEnabled || isSyncingRef.current) return;
+    if (!isScrollSyncEnabled) return;
+
+    // If another pane is actively driving the scroll, ignore echo scroll events
+    if (activeScrollerRef.current && activeScrollerRef.current !== source) {
+      return;
+    }
 
     const sourceEl = source === "left" ? leftSheetRef.current : rightSheetRef.current;
     const targetEl = source === "left" ? rightSheetRef.current : leftSheetRef.current;
@@ -69,14 +78,19 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
     if (sourceMaxScroll <= 0 || targetMaxScroll <= 0) return;
 
-    const scrollRatio = sourceEl.scrollTop / sourceMaxScroll;
+    // Lock the active source driver
+    activeScrollerRef.current = source;
 
-    isSyncingRef.current = true;
+    const scrollRatio = sourceEl.scrollTop / sourceMaxScroll;
     targetEl.scrollTop = scrollRatio * targetMaxScroll;
 
-    requestAnimationFrame(() => {
-      isSyncingRef.current = false;
-    });
+    // Reset lock once scrolling settles
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    scrollTimeoutRef.current = setTimeout(() => {
+      activeScrollerRef.current = null;
+    }, 120);
   }, [isScrollSyncEnabled]);
 
   // Handle click on predetermined vocab word
@@ -84,7 +98,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
     e.stopPropagation();
     const el = e.currentTarget as HTMLElement;
     const rect = el.getBoundingClientRect();
-    
+
     // Find enclosing paragraph text to get the full accurate sentence
     const blockEl = el.closest('p');
     const fullParagraph = blockEl ? (blockEl.innerText || blockEl.textContent || "") : "";
@@ -156,6 +170,15 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
     }
   };
 
+  // Cleanup sync timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Recalculate sync when font size reflows
   useEffect(() => {
     if (leftSheetRef.current && rightSheetRef.current && isScrollSyncEnabled) {
@@ -167,21 +190,20 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
-      
+
       {/* ── Scroll Sync Toolbar Indicator ─────────────────────────────────── */}
       <div className="flex items-center justify-between px-2 text-xs font-semibold">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsScrollSyncEnabled(!isScrollSyncEnabled)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${
-              isScrollSyncEnabled
-                ? isDark
-                  ? "bg-[#D9B76A]/20 border-[#D9B76A] text-[#D9B76A] font-bold shadow-xs"
-                  : "bg-[#1E4B43]/10 border-[#1E4B43]/30 text-[#1E4B43] font-bold shadow-xs"
-                : isDark
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${isScrollSyncEnabled
+              ? isDark
+                ? "bg-[#D9B76A]/20 border-[#D9B76A] text-[#D9B76A] font-bold shadow-xs"
+                : "bg-[#1E4B43]/10 border-[#1E4B43]/30 text-[#1E4B43] font-bold shadow-xs"
+              : isDark
                 ? "bg-white/5 border-transparent text-[#BFE3EA]/60 hover:text-[#FBF7EE]"
                 : "bg-black/5 border-transparent text-[#1E4B43]/60 hover:text-[#1E4B43]"
-            }`}
+              }`}
             title="Bật/Tắt tính năng đồng bộ cuộn theo tỉ lệ giữa văn bản gốc và bản dịch"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isScrollSyncEnabled ? "text-[#D9B76A]" : ""}`} />
@@ -189,9 +211,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           </button>
         </div>
 
-        <span className={`text-[11px] font-medium hidden sm:flex items-center gap-1.5 ${
-          isDark ? "text-[#BFE3EA]" : "text-[#1E4B43]/80"
-        }`}>
+        <span className={`text-[11px] font-medium hidden sm:flex items-center gap-1.5 ${isDark ? "text-[#BFE3EA]" : "text-[#1E4B43]/80"
+          }`}>
           <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />
           <span>Click hoặc bôi đen cụm từ bất kỳ để tra từ & lưu ngữ cảnh tại chỗ</span>
         </span>
@@ -199,21 +220,27 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
       {/* ── BILINGUAL MODE: Dual Paper Sheets (Side-by-Side Instant Comparison) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
+
         {/* ── LEFT PAPER SHEET (ENGLISH ORIGINAL) ─────────────────────────── */}
         <div
           ref={leftSheetRef}
+          onMouseEnter={() => { activeScrollerRef.current = "left"; }}
+          onTouchStart={() => { activeScrollerRef.current = "left"; }}
+          onWheel={() => { activeScrollerRef.current = "left"; }}
           onScroll={() => handleScroll("left")}
           onMouseUp={handleTextSelection}
-          className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] scroll-smooth ${paperSheetBgClass}`}
+          className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] ${paperSheetBgClass}`}
         >
           <div>
             {/* Header Tag */}
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-[#2563EB] bg-[#EFF6FF] dark:bg-[#2563EB]/20 dark:text-[#93C5FD] px-3 py-1 rounded-md">
+              <span className={`text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-md border ${isDark
+                ? "text-[#D9B76A] bg-[#D9B76A]/15 border-[#D9B76A]/30"
+                : "text-heritage-green bg-heritage-green/10 border-heritage-green/15"
+                }`}>
                 ENGLISH ORIGINAL
               </span>
-              <span className="text-xs font-bold bg-[#2563EB] text-white px-2.5 py-0.5 rounded">
+              <span className="text-xs font-bold bg-heritage-green text-warm-ivory px-2.5 py-0.5 rounded">
                 EN
               </span>
             </div>
@@ -243,8 +270,9 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 <span className="bg-[#1E4B43]/80 backdrop-blur-xs px-2.5 py-1 rounded-md border border-[#D9B76A]/40 text-[#FBF7EE]">
                   Cultural Essay
                 </span>
-                <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A]">
-                  Level 2–3 (~370 words)
+                <span className="bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[#D9B76A] flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${selectedLevel === 'Level 1' ? 'bg-emerald-400' : selectedLevel === 'Level 2' ? 'bg-cyan-400' : 'bg-rose-400'}`} />
+                  <span>{selectedLevel} ({selectedLevel === 'Level 1' ? '~220' : selectedLevel === 'Level 2' ? '~370' : '~520'} words)</span>
                 </span>
               </div>
 
@@ -422,8 +450,11 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
         {/* ── RIGHT PAPER SHEET (TIẾNG VIỆT TRANSLATION) ────────────────────── */}
         <div
           ref={rightSheetRef}
+          onMouseEnter={() => { activeScrollerRef.current = "right"; }}
+          onTouchStart={() => { activeScrollerRef.current = "right"; }}
+          onWheel={() => { activeScrollerRef.current = "right"; }}
           onScroll={() => handleScroll("right")}
-          className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] scroll-smooth ${paperSheetBgClass}`}
+          className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] ${paperSheetBgClass}`}
         >
           <div>
             {/* Header Tag */}
@@ -522,9 +553,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               Reading Check & Comprehension
             </span>
             <h2
-              className={`font-serif text-2xl font-bold mt-1 ${
-                themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-              }`}
+              className={`font-serif text-2xl font-bold mt-1 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                }`}
             >
               Câu Hỏi Kiểm Tra Thấu Hiểu Bài Đọc
             </h2>
@@ -533,9 +563,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           {/* Quiz Q1 */}
           <div className="mb-8">
             <h3
-              className={`text-sm sm:text-base font-bold mb-3 ${
-                themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-              }`}
+              className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                }`}
             >
               {READER_QUIZ_QUESTIONS[0]?.question}
             </h3>
@@ -544,13 +573,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               {READER_QUIZ_QUESTIONS[0]?.options.map((opt) => (
                 <label
                   key={opt.value}
-                  className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                    q1Answer === opt.value
-                      ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                      : themeMode === "dark"
+                  className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === opt.value
+                    ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
+                    : themeMode === "dark"
                       ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
                       : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"
@@ -569,9 +597,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           {/* Quiz Q2 */}
           <div className="mb-8">
             <h3
-              className={`text-sm sm:text-base font-bold mb-3 ${
-                themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-              }`}
+              className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                }`}
             >
               {READER_QUIZ_QUESTIONS[1]?.question}
             </h3>
@@ -580,13 +607,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               {READER_QUIZ_QUESTIONS[1]?.options.map((opt) => (
                 <label
                   key={opt.value}
-                  className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                    q2Answer === opt.value
-                      ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                      : themeMode === "dark"
+                  className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q2Answer === opt.value
+                    ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
+                    : themeMode === "dark"
                       ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
                       : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"
@@ -615,7 +641,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 <CheckCircle2 className="w-4 h-4" />
                 <span>
                   {q1Answer === READER_QUIZ_QUESTIONS[0]?.correctValue &&
-                  q2Answer === READER_QUIZ_QUESTIONS[1]?.correctValue
+                    q2Answer === READER_QUIZ_QUESTIONS[1]?.correctValue
                     ? "Chính xác! Bạn đạt 2/2 câu hỏi thấu hiểu."
                     : "Bạn đã hoàn thành bài kiểm tra thấu hiểu."}
                 </span>
@@ -632,9 +658,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 Next Learning Steps
               </span>
               <h3
-                className={`font-serif text-xl font-bold mt-1 ${
-                  themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-                }`}
+                className={`font-serif text-xl font-bold mt-1 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                  }`}
               >
                 Chế Độ Ôn Luyện
               </h3>
@@ -661,11 +686,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                     "Tính năng Dictation (Luyện chép chính tả) đang được phát triển, sẽ sớm ra mắt!"
                   )
                 }
-                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer ${
-                  themeMode === "dark"
-                    ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
-                    : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
-                }`}
+                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer ${themeMode === "dark"
+                  ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
+                  : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                  }`}
               >
                 <span className="flex items-center gap-2">
                   <Headphones className="w-4 h-4 text-[#D9B76A]" />
@@ -676,11 +700,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
               <Link
                 href="/community"
-                className={`flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all group ${
-                  themeMode === "dark"
-                    ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
-                    : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
-                }`}
+                className={`flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all group ${themeMode === "dark"
+                  ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
+                  : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                  }`}
               >
                 <span className="flex items-center gap-2">
                   <PenTool className="w-4 h-4 text-[#D9B76A]" />

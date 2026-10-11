@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { User, Settings, LogOut, ChevronRight, ExternalLink } from 'lucide-react';
-import { useSettings } from '@/context/SettingsContext';
+import { User, LogOut, ChevronRight, ExternalLink, Crown } from 'lucide-react';
 
 interface ProfileDropdownProps {
   isOpen: boolean;
@@ -18,7 +17,6 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
   onLogout,
   onNavigate,
 }) => {
-  const { openSettings } = useSettings();
   const handleItemClick = (action?: () => void, view?: string) => {
     onClose();
     if (action) {
@@ -48,38 +46,37 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               <div className="flex items-center gap-2.5">
                 <div className="w-10 h-10 rounded-full bg-heritage-green border border-antique-gold flex items-center justify-center shadow-sm shrink-0 overflow-hidden p-1">
                   {user?.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? (
-                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover rounded-full" />
+                    <img src={user.avatar} alt={user?.name || 'User'} className="w-full h-full object-cover rounded-full" />
                   ) : (
-                    <img
-                      src="/favicon/android-chrome-192x192.png"
-                      alt="VieCulture Turtle Mascot Avatar"
-                      className="w-full h-full object-contain"
-                    />
+                    <span className="text-xs font-bold text-antique-gold">
+                      {user?.avatar || 'NL'}
+                    </span>
                   )}
                 </div>
 
                 <div className="overflow-hidden">
                   <h3 className="font-heading font-bold text-sm text-heritage-dark dark:text-warm-ivory tracking-tight truncate">
-                    {user?.name || 'luanninh2005'}
+                    {user?.name || 'Ninh Thiên Luân'}
                   </h3>
                   <p className="text-[11px] text-text-secondary dark:text-[#9FCED8] font-medium truncate">
-                    {user?.email || 'student@viecultures.com'}
+                    {user?.email || 'luanninh@viecultures.com'}
                   </p>
                 </div>
               </div>
 
-              {/* Badges adhering to Master Color System */}
+              {/* Badges adhering to Master Color System & 0 emoji rule */}
               <div className="flex items-center gap-2 pt-0.5">
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-mist text-heritage-dark border border-[#9FCED8]">
                   Starter
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-antique-bright text-heritage-dark border border-antique-gold">
-                  👑 2 ngày Premium
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-antique-bright text-heritage-dark border border-antique-gold">
+                  <Crown className="w-3 h-3 text-heritage-dark fill-current" />
+                  <span>2 ngày Premium</span>
                 </span>
               </div>
             </div>
 
-            {/* 3 Main Menu Items */}
+            {/* Menu Items */}
             <div className="space-y-2">
               {/* 1. Hồ sơ cá nhân */}
               <motion.button
@@ -94,23 +91,9 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                 </div>
                 <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
               </motion.button>
-
-              {/* 2. Cài đặt Trang chủ */}
-              <motion.button
-                whileHover={{ x: 2, scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleItemClick(openSettings)}
-                className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-green/70 hover:bg-mist-cloud dark:hover:bg-heritage-green border border-heritage-green/15 dark:border-white/10 hover:border-antique-gold text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
-              >
-                <div className="flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-antique-gold" />
-                  <span>Cài đặt Trang chủ</span>
-                </div>
-                <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
-              </motion.button>
             </div>
 
-            {/* 3. Đăng xuất */}
+            {/* 2. Đăng xuất */}
             <div className="pt-1.5 border-t border-heritage-green/15 dark:border-white/10">
               <motion.button
                 whileHover={{ x: 2, scale: 1.01 }}

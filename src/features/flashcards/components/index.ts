@@ -1,7 +1,4 @@
 export { default as FlashcardSidebarLayout } from "./flashcard-sidebar-layout";
-export { FlashcardModal } from "./flashcard-modal";
-export { FlashcardsView } from "./flashcards-view";
-export { SRSCard } from "./srs-card";
 export { FlashcardStudyHeader } from "./FlashcardStudyHeader";
 export { FlashcardProgressBar } from "./FlashcardProgressBar";
 export { FlashcardModeTabs, type PlayerMode } from "./FlashcardModeTabs";

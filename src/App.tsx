@@ -2,12 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import { ProfileDrawer } from './components/ProfileDrawer';
 
-// Feature Modals
-import { ReaderModal } from '@/features/reader/components/reader-modal';
-import { FlashcardModal } from '@/features/flashcards/components/flashcard-modal';
-import { ReflectionsModal } from '@/features/community/components/reflections-modal';
 import { SettingsModal } from './components/SettingsModal';
 
 // Feature Pages
@@ -20,6 +15,7 @@ import DictionaryPage from '@/features/flashcards/pages/dictionary';
 import FlashcardStudyPage from '@/features/flashcards/pages/flashcard-study';
 import CommunityPage from '@/features/community/pages/community';
 import CommunityContestPage from '@/features/community/pages/community-contest';
+import PlaygroundPage from '@/features/playground/pages/playground';
 
 import type { Lesson } from '@/types';
 
@@ -30,7 +26,6 @@ export const App: React.FC = () => {
   const defaultUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
   const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(defaultUser);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
-  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -42,11 +37,6 @@ export const App: React.FC = () => {
     setIsLoggedIn(false);
     navigate('/');
   };
-
-  const [activeReaderLesson, setActiveReaderLesson] = useState<Lesson | null>(null);
-  const [activeFlashcardLesson, setActiveFlashcardLesson] = useState<Lesson | null>(null);
-  const [activeReflectionsLesson, setActiveReflectionsLesson] = useState<Lesson | null>(null);
-  const [isReflectionsOpen, setIsReflectionsOpen] = useState<boolean>(false);
 
   // Map path to active view name for Navbar and component compatibility
   const getActiveView = (pathname: string): string => {
@@ -75,6 +65,8 @@ export const App: React.FC = () => {
       case '/community-2':
       case '/community-contest':
         return 'community-contest';
+      case '/playground':
+        return 'playground';
       default:
         return 'landing';
     }
@@ -118,6 +110,9 @@ export const App: React.FC = () => {
       case 'community-contest':
         navigate('/community-2');
         break;
+      case 'playground':
+        navigate('/playground');
+        break;
       default:
         if (view.startsWith('/')) {
           navigate(view);
@@ -144,15 +139,14 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
-      {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, and flashcard layout) */}
-      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'dictionary' && activeView !== 'flashcard-study' && (
+      {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, flashcard layout, and standalone playground) */}
+      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'dictionary' && activeView !== 'flashcard-study' && activeView !== 'playground' && (
         <Navbar
           activeView={activeView}
           isLoggedIn={isLoggedIn}
           user={user}
           onNavigateToSection={handleNavigate}
           onLogout={handleLogout}
-          onOpenProfile={() => setIsProfileDrawerOpen(true)}
         />
       )}
 
@@ -188,7 +182,6 @@ export const App: React.FC = () => {
                 isLoggedIn={isLoggedIn}
                 user={user}
                 onLogout={handleLogout}
-                onOpenProfile={() => setIsProfileDrawerOpen(true)}
               />
             }
           />
@@ -237,67 +230,21 @@ export const App: React.FC = () => {
             element={<Navigate to="/community-2" replace />}
           />
           <Route
+            path="/playground"
+            element={<PlaygroundPage />}
+          />
+          <Route
             path="*"
             element={<Navigate to="/" replace />}
           />
         </Routes>
       </main>
 
-      {/* Footer (hidden on login, home dashboard, and reader page) */}
-      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && <Footer />}
-
-      {/* PROFILE DRAWER MODAL (EngDaily Style) */}
-      <ProfileDrawer
-        isOpen={isProfileDrawerOpen}
-        onClose={() => setIsProfileDrawerOpen(false)}
-        user={user}
-        onLogout={handleLogout}
-        onNavigate={handleNavigate}
-      />
+      {/* Footer (hidden on login, home dashboard, reader page, and playground) */}
+      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'playground' && <Footer />}
 
       {/* GLOBAL SETTINGS MODAL */}
       <SettingsModal />
-
-      {/* MODAL 1: Paragraph Pairing Bilingual Reader */}
-      {activeReaderLesson && (
-        <ReaderModal
-          lesson={activeReaderLesson}
-          onClose={() => setActiveReaderLesson(null)}
-          onOpenFlashcards={(l: Lesson) => {
-            setActiveReaderLesson(null);
-            setActiveFlashcardLesson(l);
-          }}
-          onOpenReflections={(l: Lesson) => {
-            setActiveReaderLesson(null);
-            setActiveReflectionsLesson(l);
-            setIsReflectionsOpen(true);
-          }}
-        />
-      )}
-
-      {/* MODAL 2: 3D Flashcards with Spaced Repetition */}
-      {activeFlashcardLesson && (
-        <FlashcardModal
-          lesson={activeFlashcardLesson}
-          onClose={() => setActiveFlashcardLesson(null)}
-          onOpenReflections={(l: Lesson) => {
-            setActiveFlashcardLesson(null);
-            setActiveReflectionsLesson(l);
-            setIsReflectionsOpen(true);
-          }}
-        />
-      )}
-
-      {/* MODAL 3: Reflections UGC Community */}
-      {isReflectionsOpen && (
-        <ReflectionsModal
-          lesson={activeReflectionsLesson || undefined}
-          onClose={() => {
-            setIsReflectionsOpen(false);
-            setActiveReflectionsLesson(null);
-          }}
-        />
-      )}
     </div>
   );
 };

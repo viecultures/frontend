@@ -1,5 +1,5 @@
 import Link from "@/components/Link";
-import { ArrowLeft, Columns, BookOpen, Moon, Sun } from "lucide-react";
+import { ArrowLeft, Columns, BookOpen, Moon, Sun, Layers } from "lucide-react";
 
 interface ReaderToolbarProps {
   fontSize: number;
@@ -10,6 +10,8 @@ interface ReaderToolbarProps {
   vocabCount: number;
   themeMode: "paper" | "dark";
   onChangeThemeMode: (theme: "paper" | "dark") => void;
+  selectedLevel?: "Level 1" | "Level 2" | "Level 3";
+  onChangeLevel?: (lvl: "Level 1" | "Level 2" | "Level 3") => void;
   onOpenVoiceCustomizer?: () => void;
   selectedVoiceName?: string;
   selectedVoiceFlag?: string;
@@ -24,6 +26,8 @@ export function ReaderToolbar({
   vocabCount,
   themeMode,
   onChangeThemeMode,
+  selectedLevel = "Level 2",
+  onChangeLevel,
   onOpenVoiceCustomizer,
   selectedVoiceName,
   selectedVoiceFlag = "🇺🇸",
@@ -44,6 +48,27 @@ export function ReaderToolbar({
 
         {/* Right Controls: Reading Mode Toggle, Font Size, Vocab Drawer, Theme Toggle */}
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-semibold">
+
+          {/* Level Selector: Level 1 • Level 2 • Level 3 */}
+          {onChangeLevel && (
+            <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40 text-xs font-bold">
+              {(['Level 1', 'Level 2', 'Level 3'] as const).map((lvl) => (
+                <button
+                  key={lvl}
+                  type="button"
+                  onClick={() => onChangeLevel(lvl)}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                    selectedLevel === lvl
+                      ? 'bg-emerald-600 text-white shadow-xs font-bold ring-1 ring-antique-gold/60'
+                      : 'text-[#BFE3EA] hover:text-[#FBF7EE]'
+                  }`}
+                  title={`Chuyển sang ${lvl}`}
+                >
+                  {lvl}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Cỡ chữ (Icon A⁻ / A⁺) */}
           <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40">
