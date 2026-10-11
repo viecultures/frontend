@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Crown } from 'lucide-react';
+import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Crown, ShieldCheck } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
 
@@ -142,6 +142,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <Users className="w-4 h-4 text-antique-gold" />
                   <span>Cộng Đồng</span>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
+                  onClick={() => onNavigateToSection('admin')}
+                  className={navLinkClass(activeView === 'admin')}
+                  aria-current={activeView === 'admin' ? 'page' : undefined}
+                >
+                  <ShieldCheck className="w-4 h-4 text-antique-gold" />
+                  <span>Admin CMS</span>
                 </motion.button>
               </>
             ) : (

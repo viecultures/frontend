@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { User, LogOut, ChevronRight, ExternalLink, Crown } from 'lucide-react';
+import { User, LogOut, ChevronRight, ExternalLink, Crown, ShieldCheck } from 'lucide-react';
 
 interface ProfileDropdownProps {
   isOpen: boolean;
@@ -90,6 +90,20 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                   <span>Hồ sơ cá nhân</span>
                 </div>
                 <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
+              </motion.button>
+
+              {/* 2. Quản trị CMS Bài Viết */}
+              <motion.button
+                whileHover={{ x: 2, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleItemClick(undefined, 'admin')}
+                className="w-full px-3 py-2.5 rounded-xl bg-antique-gold/15 hover:bg-antique-gold/25 border border-antique-gold/40 text-xs font-bold text-heritage-dark dark:text-antique-bright flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
+              >
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-heritage-green dark:text-antique-gold" />
+                  <span>Quản trị CMS Bài Viết</span>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-heritage-green/60 dark:text-antique-gold group-hover:translate-x-0.5 transition-all" />
               </motion.button>
             </div>
 

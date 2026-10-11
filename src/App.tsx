@@ -17,6 +17,7 @@ import FlashcardStudyPage from '@/features/flashcards/pages/flashcard-study';
 import CommunityPage from '@/features/community/pages/community';
 import CommunityContestPage from '@/features/community/pages/community-contest';
 import PlaygroundPage from '@/features/playground/pages/playground';
+import AdminPage from '@/features/admin/pages/AdminPage';
 
 import type { Lesson } from '@/types';
 
@@ -68,6 +69,9 @@ export const App: React.FC = () => {
         return 'community-contest';
       case '/playground':
         return 'playground';
+      case '/admin':
+      case '/admin/posts':
+        return 'admin';
       default:
         return 'landing';
     }
@@ -113,6 +117,9 @@ export const App: React.FC = () => {
         break;
       case 'playground':
         navigate('/playground');
+        break;
+      case 'admin':
+        navigate('/admin');
         break;
       default:
         if (view.startsWith('/')) {
@@ -233,6 +240,14 @@ export const App: React.FC = () => {
           <Route
             path="/playground"
             element={<PlaygroundPage />}
+          />
+          <Route
+            path="/admin"
+            element={<AdminPage />}
+          />
+          <Route
+            path="/admin/posts"
+            element={<Navigate to="/admin" replace />}
           />
           <Route
             path="*"
