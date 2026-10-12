@@ -1,5 +1,14 @@
 import React from 'react';
 import type { MapPoiLayerProps } from './types';
+import { geoToSvg } from '@/utils/vietnamMapUtils';
+
+const CATEGORY_COLORS: Record<string, { stroke: string; dot: string; ping: string }> = {
+  Heritage: { stroke: '#D9B76A', dot: '#F5D280', ping: '#F5D280' },
+  Nature: { stroke: '#10B981', dot: '#34D399', ping: '#34D399' },
+  Cuisine: { stroke: '#F59E0B', dot: '#FBBF24', ping: '#FBBF24' },
+  Crafts: { stroke: '#8B5CF6', dot: '#A78BFA', ping: '#A78BFA' },
+  Folklore: { stroke: '#EC4899', dot: '#F472B6', ping: '#F472B6' },
+};
 
 export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
   landmarks,
@@ -34,14 +43,23 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
         const siblingIndex = siblings.findIndex((s) => s.id === lm.id);
         const totalSiblings = siblings.length;
 
-        // Calculate exact X and Y coordinates
+        // Calculate exact X and Y coordinates (GPS calibrated projection takes precedence)
         let x = p.cx;
         let y = p.cy;
+
+        if (lm.coordinates) {
+          const projected = geoToSvg(lm.coordinates.lat, lm.coordinates.lng);
+          x = projected.x;
+          y = projected.y;
+        } else if (lm.pinCoordinates) {
+          x = lm.pinCoordinates.x;
+          y = lm.pinCoordinates.y;
+        }
 
         if (lm.offset) {
           x += lm.offset.dx;
           y += lm.offset.dy;
-        } else if (totalSiblings > 1) {
+        } else if (totalSiblings > 1 && !lm.coordinates) {
           // Automatic radial fan-out distribution with compact radius
           const radius = 8;
           const angle = (2 * Math.PI * siblingIndex) / totalSiblings - Math.PI / 2;
@@ -54,12 +72,13 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
         const isPoiHovered = hoveredPoiId === lm.id;
         const hasFocus = selectedProvinceId !== null;
 
-        // Region check: In regional view, hide POIs from other regions
-        if (activeRegion !== 'all' && p.region !== activeRegion) {
+        // Region check: In regional view, hide POIs from other regions or national items
+        if (activeRegion !== 'all' && (lm.isNational || p.region !== activeRegion)) {
           return null;
         }
 
         const isDimmedOther = hasFocus && !isProvinceSelected;
+        const catColor = CATEGORY_COLORS[lm.category] || CATEGORY_COLORS.Heritage;
 
         // Reveal badge if this specific POI is hovered, or if province is selected
         const isVisible = isPoiHovered || (isProvinceSelected && (totalSiblings === 1 || isPoiHovered));
@@ -97,7 +116,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
                 cx="0"
                 cy="0"
                 r={7.5}
-                fill="#F5D280"
+                fill={catColor.ping}
                 opacity={0.55}
                 className="animate-ping pointer-events-none"
               />
@@ -108,7 +127,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
               cx="0"
               cy="0"
               r={isHighlighted ? 4.0 : isPoiHovered ? 3.4 : 2.5}
-              fill={isHighlighted ? '#F5D280' : isPoiHovered ? '#FCE5B5' : '#D9B76A'}
+              fill={isHighlighted || isPoiHovered ? catColor.dot : catColor.stroke}
               stroke="#122A22"
               strokeWidth={isHighlighted || isPoiHovered ? '1.0' : '0.8'}
               className="drop-shadow-sm pointer-events-none"
@@ -135,8 +154,8 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
                   width={badgeWidth}
                   height="13"
                   rx="6.5"
-                  fill={isPoiHovered ? '#F5D280' : '#122A22'}
-                  stroke={isPoiHovered ? '#FFFFFF' : '#D9B76A'}
+                  fill={isPoiHovered ? catColor.stroke : '#122A22'}
+                  stroke={isPoiHovered ? '#FFFFFF' : catColor.stroke}
                   strokeWidth={isPoiHovered ? '1.0' : '0.8'}
                   opacity="0.95"
                   className="drop-shadow-md"
@@ -145,7 +164,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
                 <path
                   d="M3.2 1.2C2.1 1.2 1.2 2.1 1.2 3.2c0 1.5 2 3.6 2 3.6s2-2.1 2-3.6c0-1.1-.9-2-2-2zm0 2.6c-.35 0-.64-.29-.64-.64s.29-.64.64-.64.64.29.64.64-.29.64-.64.64z"
                   transform={`translate(${-halfWidth + 4}, -4.2)`}
-                  fill={isPoiHovered ? '#122A22' : '#D9B76A'}
+                  fill={isPoiHovered ? '#122A22' : catColor.dot}
                 />
                 <text
                   x={4}

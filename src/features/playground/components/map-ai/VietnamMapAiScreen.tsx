@@ -27,7 +27,7 @@ function MapAiContent() {
   const { isSidebarOpen } = useUI();
   const [showPopUp, setShowPopUp] = useState(false);
   const { connected, connect, client } = useLiveAPIContext();
-  const { isDrawerOpen, dockPosition } = useMapAiDebugStore();
+  const { isDrawerOpen } = useMapAiDebugStore();
 
   const cameraTarget = useMapStore(s => s.cameraTarget);
   const highlightedPlaceId = useMapStore(s => s.highlightedPlaceId);
@@ -112,50 +112,40 @@ function MapAiContent() {
       <div
         className={`streaming-console ${
           isSidebarOpen ? 'sidebar-open' : ''
-        } flex flex-col h-full w-full overflow-hidden`}
+        } flex flex-row h-full w-full overflow-hidden`}
       >
-        {/* UPPER ROW: In-flow Left Debug Panel (if docked left) + Chat Panel + Map Panel */}
-        <div className="flex-1 min-h-0 flex flex-row w-full overflow-hidden">
-          {/* FAR-LEFT IN-FLOW COLUMN (Never covers map or chat) */}
-          {isDrawerOpen && dockPosition === 'left' && (
-            <MapAiDebugDrawer mode="panel" />
-          )}
+        {/* FAR-LEFT IN-FLOW DEBUG HUB */}
+        {isDrawerOpen && <MapAiDebugDrawer mode="panel" />}
 
-          <div className="console-panel">
-            <StreamingConsole />
-            <ControlTray />
-          </div>
-
-          <div className="map-panel flex flex-col items-center justify-center p-2 relative overflow-hidden bg-[#090e1a]">
-            {selectedProvinceDetail && (
-              <ProvinceHoverCard
-                provinceDetail={selectedProvinceDetail}
-                onClose={() => handleSelectProvince(null)}
-                onSpeak={handleSpeakText}
-                onAskAi={handleAskAiAboutProvince}
-              />
-            )}
-            <VietnamMap
-              selectedProvinceId={selectedProvinceId}
-              onSelectProvince={handleSelectProvince}
-              activeRegion={cameraTarget?.region || 'all'}
-              onSelectRegion={handleSelectRegion}
-              onSelectLandmark={handleSelectLandmark}
-              showControls={true}
-              showRegionTabs={true}
-              showPoiPins={true}
-              showSeaLayer={true}
-              showLabels={true}
-              showTooltip={true}
-              className="w-full h-full"
-            />
-          </div>
+        <div className="console-panel">
+          <StreamingConsole />
+          <ControlTray />
         </div>
 
-        {/* BOTTOM IN-FLOW ROW (Pushes chat & map up, never overlaps either) */}
-        {isDrawerOpen && dockPosition === 'bottom' && (
-          <MapAiDebugDrawer mode="panel" />
-        )}
+        <div className="map-panel flex flex-col items-center justify-center p-2 relative overflow-hidden bg-[#090e1a]">
+          {selectedProvinceDetail && (
+            <ProvinceHoverCard
+              provinceDetail={selectedProvinceDetail}
+              onClose={() => handleSelectProvince(null)}
+              onSpeak={handleSpeakText}
+              onAskAi={handleAskAiAboutProvince}
+            />
+          )}
+          <VietnamMap
+            selectedProvinceId={selectedProvinceId}
+            onSelectProvince={handleSelectProvince}
+            activeRegion={cameraTarget?.region || 'all'}
+            onSelectRegion={handleSelectRegion}
+            onSelectLandmark={handleSelectLandmark}
+            showControls={true}
+            showRegionTabs={true}
+            showPoiPins={true}
+            showSeaLayer={true}
+            showLabels={true}
+            showTooltip={true}
+            className="w-full h-full"
+          />
+        </div>
       </div>
     </>
   );

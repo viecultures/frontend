@@ -27,6 +27,8 @@ export interface Lesson {
   imageUrl?: string;
   featured?: boolean;
   dateAdded: string;
+  provinceId?: string;
+  isNational?: boolean;
 }
 
 export const DEFAULT_AVAILABLE_LEVELS: LevelType[] = ['Level 1', 'Level 2', 'Level 3'];
@@ -83,6 +85,8 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "UtensilsCrossed",
     imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-28",
+    provinceId: "ha-noi",
+    isNational: true,
   },
   {
     id: "gong-culture-tay-nguyen",
@@ -105,6 +109,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Landmark",
     imageUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-27",
+    provinceId: "dak-lak",
   },
   {
     id: "non-la-culture",
@@ -127,6 +132,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Palette",
     imageUrl: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-26",
+    provinceId: "hue",
   },
   {
     id: "quan-ho-singing",
@@ -149,6 +155,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Sparkles",
     imageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-25",
+    provinceId: "bac-ninh",
   },
   {
     id: "floating-markets-mekong",
@@ -171,6 +178,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Mountain",
     imageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-24",
+    provinceId: "can-tho",
   },
   {
     id: "my-son-sanctuary",
@@ -193,6 +201,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Landmark",
     imageUrl: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-23",
+    provinceId: "da-nang",
   },
   {
     id: "pho-hanoi-history",
@@ -215,6 +224,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "UtensilsCrossed",
     imageUrl: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-22",
+    provinceId: "ha-noi",
   },
   {
     id: "ha-long-bay",
@@ -237,6 +247,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Mountain",
     imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-21",
+    provinceId: "quang-ninh",
   },
   {
     id: "dong-ho-paintings",
@@ -259,6 +270,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Palette",
     imageUrl: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-20",
+    provinceId: "bac-ninh",
   },
   {
     id: "tet-festivities",
@@ -281,6 +293,8 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Sparkles",
     imageUrl: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-19",
+    provinceId: "ha-noi",
+    isNational: true,
   },
   {
     id: "son-doong-expedition",
@@ -303,6 +317,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Mountain",
     imageUrl: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-18",
+    provinceId: "quang-tri",
   },
   {
     id: "vietnamese-tea-culture",
@@ -325,6 +340,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "UtensilsCrossed",
     imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-17",
+    provinceId: "ha-noi",
   },
   {
     id: "trang-an-caves",
@@ -347,6 +363,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Mountain",
     imageUrl: "https://images.unsplash.com/photo-1540611025311-01df3cef54b5?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-16",
+    provinceId: "ninh-binh",
   },
   {
     id: "imperial-hue",
@@ -370,6 +387,7 @@ export const LESSONS_DATA: Lesson[] = [
     imageUrl: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80",
     featured: true,
     dateAdded: "2026-03-15",
+    provinceId: "hue",
   },
   {
     id: "egg-coffee",
@@ -392,6 +410,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "UtensilsCrossed",
     imageUrl: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-14",
+    provinceId: "ha-noi",
   },
   {
     id: "hoi-an-lanterns",
@@ -414,6 +433,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Flame",
     imageUrl: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-12",
+    provinceId: "da-nang",
   },
   {
     id: "saigon-banh-mi",
@@ -436,6 +456,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "UtensilsCrossed",
     imageUrl: "https://images.unsplash.com/photo-1626804475297-41608e074eb1?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-10",
+    provinceId: "ho-chi-minh",
   },
   {
     id: "bat-trang-pottery",
@@ -458,6 +479,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Palette",
     imageUrl: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-08",
+    provinceId: "ha-noi",
   },
   {
     id: "mu-cang-chai",
@@ -480,6 +502,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Mountain",
     imageUrl: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-05",
+    provinceId: "lao-cai",
   },
   {
     id: "ao-dai-weaving",
@@ -502,6 +525,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Palette",
     imageUrl: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-03",
+    provinceId: "ha-noi",
   },
   {
     id: "water-puppetry",
@@ -524,6 +548,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Sparkles",
     imageUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-01",
+    provinceId: "ha-noi",
   },
   {
     id: "sword-lake-legend",
@@ -546,6 +571,7 @@ export const LESSONS_DATA: Lesson[] = [
     iconSymbol: "Sparkles",
     imageUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-02-28",
+    provinceId: "ha-noi",
   },
 ];
 
