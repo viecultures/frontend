@@ -23,7 +23,8 @@ import { MAP_TOOL_NAMES } from '../../lib/tools/tool-registry';
 import { PROFICIENCY_LEVELS, type ProficiencyLevel } from '../../lib/prompt-scaffolder';
 import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
 import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
-import { lookupWord, type VocabItem } from '@/data/readerData';
+import { extractSentenceContext, type VocabItem } from '@/data/readerData';
+import { lookupWordInstant, sanitizeChatWord } from '../../lib/dictionary-service';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -93,6 +94,8 @@ export default function StreamingConsole() {
   const lastInterruptionTime = useRef(0);
   const [selectedWord, setSelectedWord] = useState<VocabItem | null>(null);
   const [wordPosition, setWordPosition] = useState<{ x: number; y: number } | null>(null);
+  const lookupRequestIdRef = useRef<number>(0);
+  const lastLookupRef = useRef<{ text: string; time: number }>({ text: '', time: 0 });
 
   const activeLesson: LessonAgentMetadata =
     findLessonById(activeLessonId) || LESSON_AGENT_CATALOG[0];
@@ -259,34 +262,86 @@ export default function StreamingConsole() {
     }
   };
 
-  const handleWordClick = (event: React.MouseEvent<HTMLSpanElement>, rawWord: string) => {
-    const word = rawWord.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').trim();
-    if (!word || word.length < 2) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    setSelectedWord(lookupWord(word));
-    setWordPosition({ x: rect.left + rect.width / 2, y: rect.bottom });
-  };
+  // Handle text selection (bôi đen) or double-click anywhere in conversation timeline
+  const handleTextSelection = async (e: React.MouseEvent) => {
+    // Ignore clicks/selection originating inside the popup itself
+    if ((e.target as HTMLElement)?.closest('.in-place-dictionary-popup')) {
+      return;
+    }
 
-  const renderClickableText = (value: string) => value.split(/(\s+)/).map((part, index) =>
-    /^\s+$/.test(part) ? part : (
-      <span
-        key={`${part}-${index}`}
-        role="button"
-        tabIndex={0}
-        className="chat-word"
-        onClick={event => handleWordClick(event, part)}
-        onKeyDown={event => {
-          if (event.key === 'Enter' || event.key === ' ') handleWordClick(event as unknown as React.MouseEvent<HTMLSpanElement>, part);
-        }}
-      >{part}</span>
-    ),
-  );
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed) return;
 
-  const markdownComponents = {
-    text: ({ children }: { children?: React.ReactNode }) => {
-      const value = String(children ?? '');
-      return <>{renderClickableText(value)}</>;
-    },
+    const rawSelected = selection.toString();
+    const cleanText = sanitizeChatWord(rawSelected);
+    if (!cleanText || cleanText.length < 2 || cleanText.split(/\s+/).length > 8) {
+      return;
+    }
+
+    // Debounce rapid duplicate invocations within 350ms for the same word
+    const now = Date.now();
+    const lower = cleanText.toLowerCase();
+    if (lastLookupRef.current.text === lower && now - lastLookupRef.current.time < 350) {
+      return;
+    }
+    lastLookupRef.current = { text: lower, time: now };
+    const reqId = ++lookupRequestIdRef.current;
+
+    try {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+
+      // Extract enclosing turn or paragraph text to provide full context sentence
+      let blockEl: HTMLElement | null = null;
+      let node: Node | null = range.startContainer;
+      while (node && node !== document.body) {
+        if (
+          node instanceof HTMLElement &&
+          (node.tagName === 'P' || node.tagName === 'DIV' || node.classList.contains('prose'))
+        ) {
+          blockEl = node;
+          break;
+        }
+        node = node.parentNode;
+      }
+
+      const fullParagraph = blockEl
+        ? blockEl.innerText || blockEl.textContent || ''
+        : range.commonAncestorContainer.textContent || '';
+      const contextSentence = extractSentenceContext(fullParagraph, cleanText);
+
+      const position =
+        rect.width > 0 || rect.height > 0
+          ? {
+              x: rect.left + rect.width / 2,
+              y: rect.bottom,
+            }
+          : {
+              x: e.clientX,
+              y: e.clientY + 12,
+            };
+
+      setWordPosition(position);
+
+      // Hiển thị ngay trạng thái tra cứu tức thì (Optimistic instant response)
+      setSelectedWord({
+        id: cleanText.toLowerCase(),
+        word: cleanText,
+        pos: cleanText.includes(' ') ? 'Cụm từ / Phrase' : 'Đang tra cứu...',
+        ipa: '/.../',
+        viMeaning: 'Đang tải nghĩa & phiên âm IPA...',
+        enDefinition: 'Fetching dictionary definition...',
+        contextSentence: contextSentence || `Context: "${cleanText}" in English conversation.`,
+      });
+
+      const resolved = await lookupWordInstant(cleanText, contextSentence);
+      // Discard response if a newer lookup request was initiated
+      if (reqId === lookupRequestIdRef.current) {
+        setSelectedWord(resolved);
+      }
+    } catch (err) {
+      debugLog.error('DictionarySelectionLookup', err);
+    }
   };
 
   return (
@@ -367,7 +422,12 @@ export default function StreamingConsole() {
       </div>
 
       {/* Message Timeline */}
-      <div className="transcription-view flex-1 overflow-y-auto p-4 space-y-3.5" ref={scrollRef}>
+      <div
+        className="transcription-view flex-1 overflow-y-auto p-4 space-y-3.5 select-text"
+        ref={scrollRef}
+        onMouseUp={handleTextSelection}
+        onDoubleClick={handleTextSelection}
+      >
         {displayedTurns.length === 0 && !isAwaitingFunctionResponse ? (
           <div className="empty-state text-center py-10 space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-[#1E4B43]/60 text-[#D4AF37] flex items-center justify-center mx-auto shadow-lg border border-[#D4AF37]/30">
@@ -414,8 +474,8 @@ export default function StreamingConsole() {
                       </span>
                       <span>{formatTimestamp(t.timestamp)}</span>
                     </div>
-                    <div className="prose prose-invert prose-xs leading-relaxed max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{t.text}</ReactMarkdown>
+                    <div className="prose prose-invert prose-xs leading-relaxed max-w-none select-text cursor-text">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{t.text}</ReactMarkdown>
                     </div>
                   </div>
                 );
@@ -444,8 +504,8 @@ export default function StreamingConsole() {
                         : 'bg-[#232729] text-[#f1f3f4] border border-white/10 rounded-tl-sm shadow-md'
                     }`}
                   >
-                    <div className="prose prose-invert prose-xs max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{t.text}</ReactMarkdown>
+                    <div className="prose prose-invert prose-xs max-w-none select-text cursor-text">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{t.text}</ReactMarkdown>
                     </div>
                   </div>
                 </div>

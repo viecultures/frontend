@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Volume2, Bookmark, Check, X, Sparkles, BookOpen } from "lucide-react";
 import type { VocabItem } from "@/data/readerData";
 
@@ -51,6 +52,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
   }, [isOpen, onClose]);
 
   if (!isOpen || !vocab || !position) return null;
+  if (typeof document === "undefined") return null;
 
   const handlePlayAudio = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -102,11 +104,11 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
 
   const isPhrase = vocab.word.trim().split(/\s+/).length > 1;
 
-  return (
+  return createPortal(
     <div
       ref={popupRef}
       style={{ top: `${top}px`, left: `${left}px`, width: `${popupWidth}px` }}
-      className={`fixed z-50 p-4 rounded-2xl shadow-2xl border backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200 ${
+      className={`in-place-dictionary-popup fixed z-[9999] p-4 rounded-2xl shadow-2xl border backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200 ${
         isLight
           ? "bg-[#FBF7EE]/98 text-[#1E4B43] border-[#D9B76A]/60 shadow-[0_16px_45px_rgba(30,75,67,0.2)]"
           : "bg-[#141C1A]/98 text-[#FBF7EE] border-[#D9B76A]/80 shadow-[0_16px_50px_rgba(0,0,0,0.8)]"
@@ -215,7 +217,8 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
           )}
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
