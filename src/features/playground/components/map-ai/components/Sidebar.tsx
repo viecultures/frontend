@@ -36,7 +36,6 @@ import {
   type LessonAgentMetadata,
   type ProficiencyLevel,
 } from '@/data/lessonAgentCatalog';
-import { scaffoldSystemPrompt } from '../lib/prompt-scaffolder';
 
 const AVAILABLE_MODELS = ['gemini-3.1-flash-live-preview', 'gemini-2.0-flash-realtime-exp'];
 
@@ -83,7 +82,7 @@ export default function Sidebar() {
     }
   }, [availableVoices, voice, setVoice]);
 
-  // When lesson changes, auto-scaffold dynamic prompt
+  // When lesson changes
   const handleLessonChange = (newLessonId: string) => {
     setActiveLessonId(newLessonId);
     const targetLesson = findLessonById(newLessonId);
@@ -95,20 +94,17 @@ export default function Sidebar() {
         });
         useMapStore.getState().setHighlightedPlaceId(targetLesson.provinceId);
       }
-      setSystemPrompt(scaffoldSystemPrompt(newLessonId, conversationMode, proficiencyLevel));
     }
   };
 
-  // When proficiency level changes, auto-scaffold dynamic prompt
+  // When proficiency level changes
   const handleLevelChange = (newLevel: ProficiencyLevel) => {
     setProficiencyLevel(newLevel);
-    setSystemPrompt(scaffoldSystemPrompt(activeLessonId, conversationMode, newLevel));
   };
 
-  // When conversation mode changes, auto-scaffold dynamic prompt
+  // When conversation mode changes
   const handleModeChange = (newMode: ConversationMode) => {
     setConversationMode(newMode);
-    setSystemPrompt(scaffoldSystemPrompt(activeLessonId, newMode, proficiencyLevel));
   };
 
   const handleExportLogs = () => {

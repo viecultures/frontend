@@ -11,7 +11,6 @@ import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 import {
   CONVERSATION_MODES,
   PROFICIENCY_LEVELS,
-  scaffoldSystemPrompt,
   type ProficiencyLevel,
 } from '../lib/prompt-scaffolder';
 
@@ -26,10 +25,8 @@ export const QuickModeSwitcher: React.FC = () => {
   const {
     conversationMode,
     proficiencyLevel,
-    activeLessonId,
     setConversationMode,
     setProficiencyLevel,
-    setSystemPrompt,
   } = useSettings();
   const { connected, client } = useLiveAPIContext();
 
@@ -37,7 +34,6 @@ export const QuickModeSwitcher: React.FC = () => {
     if (targetLevel === proficiencyLevel) return;
 
     setProficiencyLevel(targetLevel);
-    setSystemPrompt(scaffoldSystemPrompt(activeLessonId, conversationMode, targetLevel));
 
     const levelMeta = PROFICIENCY_LEVELS[targetLevel];
 
@@ -62,7 +58,6 @@ export const QuickModeSwitcher: React.FC = () => {
     if (targetMode === conversationMode) return;
 
     setConversationMode(targetMode);
-    setSystemPrompt(scaffoldSystemPrompt(activeLessonId, targetMode, proficiencyLevel));
 
     const modeMeta = CONVERSATION_MODES[targetMode];
 
