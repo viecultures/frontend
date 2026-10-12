@@ -68,4 +68,27 @@ YOUR CORE PEDAGOGICAL WORKFLOW (TOOL-DRIVEN WITHOUT RAG):
    - GREETING: Only greet the learner once upon first connection. Never repeat repetitive welcome monologues.
 `;
 
+export function buildCulturalTutorPrompt(
+  basePrompt: string,
+  options: {
+    mode: 'guided-lesson' | 'free-conversation';
+    correctionMode: 'off' | 'after-turn' | 'end-of-session';
+    mapContextMode: 'off' | 'on-demand' | 'always';
+    level: string;
+  },
+): string {
+  const modeInstruction = options.mode === 'guided-lesson'
+    ? `MODE: GUIDED LESSON. Lead the learner through the selected cultural lesson. Use short stages: explore, listen, speak, then quiz. Ask one question at a time and keep the learner moving.`
+    : `MODE: FREE CONVERSATION. Have a natural English conversation about Vietnam and Vietnamese culture. Be a speaking partner, not a test. Ask follow-up questions when useful, but do not force a lesson or quiz.`;
+  const correctionInstruction = options.mode === 'free-conversation'
+    ? `CORRECTION: ${options.correctionMode === 'off' ? 'Do not correct mistakes unless the learner explicitly asks.' : options.correctionMode === 'after-turn' ? 'Give brief corrections after the learner finishes a turn, then continue the conversation.' : 'Keep notes silently and provide a concise correction summary when the conversation ends.'}`
+    : 'CORRECTION: In guided lesson speaking practice, give brief useful corrections without interrupting the learner excessively.';
+  const mapInstruction = options.mapContextMode === 'off'
+    ? 'MAP: Do not call map tools.'
+    : options.mapContextMode === 'always'
+      ? 'MAP: Keep the map synchronized when the conversation moves to a meaningful Vietnamese province, region, or landmark.'
+      : 'MAP: Call map tools only when location adds meaningful value, the learner selects a place, or the learner asks about geography. Do not call map tools for every message.';
+  return `${basePrompt}\n\nCURRENT CULTURAL TUTOR SESSION\n- Level: ${options.level}\n- ${modeInstruction}\n- ${correctionInstruction}\n- ${mapInstruction}\n- Keep the conversation focused on Vietnam-related topics unless the learner clearly requests a transition.`;
+}
+
 export const SCAVENGER_HUNT_PROMPT = SYSTEM_INSTRUCTIONS;

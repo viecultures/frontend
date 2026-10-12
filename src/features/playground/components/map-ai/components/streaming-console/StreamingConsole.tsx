@@ -19,6 +19,7 @@ import { User, Sparkles, RefreshCw, BookOpen, MessageSquareText, Compass, MapPin
 import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '@/data/lessonAgentCatalog';
 import QuickModeSwitcher from '../QuickModeSwitcher';
 import { debugLog } from '../../lib/debug-logger';
+import { buildCulturalTutorPrompt } from '../../lib/constants';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -76,7 +77,7 @@ export default function StreamingConsole() {
     setConfig,
   } = useLiveAPIContext();
 
-  const { systemPrompt, voice, model, activeLessonId, proficiencyLevel } = useSettings();
+  const { systemPrompt, voice, model, activeLessonId, proficiencyLevel, tutorMode, correctionMode, mapContextMode } = useSettings();
   const { tools } = useTools();
   const turns = useLogStore(state => state.turns);
   const { showSystemMessages } = useUI();
@@ -86,6 +87,8 @@ export default function StreamingConsole() {
 
   const activeLesson: LessonAgentMetadata =
     findLessonById(activeLessonId) || LESSON_AGENT_CATALOG[0];
+
+  const effectiveSystemPrompt = buildCulturalTutorPrompt(systemPrompt, { mode: tutorMode, correctionMode, mapContextMode, level: proficiencyLevel });
 
   const displayedTurns = showSystemMessages
     ? turns
@@ -115,15 +118,15 @@ export default function StreamingConsole() {
       },
       inputAudioTranscription: {},
       outputAudioTranscription: {},
-      systemInstruction: systemPrompt,
+      systemInstruction: effectiveSystemPrompt,
       tools: enabledTools,
     };
 
     const { initSession } = useLogStore.getState();
-    initSession({ systemPrompt, model });
+    initSession({ systemPrompt: effectiveSystemPrompt, model });
 
     setConfig(config);
-  }, [setConfig, systemPrompt, tools, voice, model]);
+  }, [setConfig, effectiveSystemPrompt, tools, voice, model]);
 
   useEffect(() => {
     const handleInputTranscription = (text: string, isFinal: boolean) => {

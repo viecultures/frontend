@@ -25,6 +25,9 @@ export interface SVGCameraTarget {
 }
 
 export type ConversationMode = 'discussion' | 'comprehension' | 'shadowing' | 'interview';
+export type CulturalTutorMode = 'guided-lesson' | 'free-conversation';
+export type CorrectionMode = 'off' | 'after-turn' | 'end-of-session';
+export type MapContextMode = 'off' | 'on-demand' | 'always';
 
 /**
  * Settings Store
@@ -36,6 +39,9 @@ export const useSettings = create<{
   activeLessonId: string;
   proficiencyLevel: ProficiencyLevel;
   conversationMode: ConversationMode;
+  tutorMode: CulturalTutorMode;
+  correctionMode: CorrectionMode;
+  mapContextMode: MapContextMode;
   customGeminiApiKey: string;
   theme: 'dark' | 'light';
   setSystemPrompt: (prompt: string) => void;
@@ -44,6 +50,9 @@ export const useSettings = create<{
   setActiveLessonId: (lessonId: string) => void;
   setProficiencyLevel: (level: ProficiencyLevel) => void;
   setConversationMode: (mode: ConversationMode) => void;
+  setTutorMode: (mode: CulturalTutorMode) => void;
+  setCorrectionMode: (mode: CorrectionMode) => void;
+  setMapContextMode: (mode: MapContextMode) => void;
   setCustomGeminiApiKey: (key: string) => void;
   setTheme: (theme: 'dark' | 'light') => void;
 }>(set => ({
@@ -53,6 +62,9 @@ export const useSettings = create<{
   activeLessonId: 'pho-hanoi-history',
   proficiencyLevel: 'Level 2',
   conversationMode: 'discussion',
+  tutorMode: 'guided-lesson',
+  correctionMode: 'after-turn',
+  mapContextMode: 'on-demand',
   customGeminiApiKey:
     typeof window !== 'undefined'
       ? localStorage.getItem('custom_gemini_api_key') || ''
@@ -67,6 +79,9 @@ export const useSettings = create<{
   setActiveLessonId: activeLessonId => set({ activeLessonId }),
   setProficiencyLevel: proficiencyLevel => set({ proficiencyLevel }),
   setConversationMode: conversationMode => set({ conversationMode }),
+  setTutorMode: tutorMode => set({ tutorMode }),
+  setCorrectionMode: correctionMode => set({ correctionMode }),
+  setMapContextMode: mapContextMode => set({ mapContextMode }),
   setCustomGeminiApiKey: customGeminiApiKey => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('custom_gemini_api_key', customGeminiApiKey);

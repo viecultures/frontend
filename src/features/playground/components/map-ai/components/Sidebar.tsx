@@ -9,6 +9,9 @@ import {
   useLogStore,
   useTools,
   useMapStore,
+  type CulturalTutorMode,
+  type CorrectionMode,
+  type MapContextMode,
   type ConversationMode,
 } from '../lib/state';
 import c from 'classnames';
@@ -52,6 +55,9 @@ export default function Sidebar() {
     voice,
     activeLessonId,
     conversationMode,
+    tutorMode,
+    correctionMode,
+    mapContextMode,
     proficiencyLevel,
     customGeminiApiKey,
     theme,
@@ -59,6 +65,9 @@ export default function Sidebar() {
     setActiveLessonId,
     setProficiencyLevel,
     setConversationMode,
+    setTutorMode,
+    setCorrectionMode,
+    setMapContextMode,
     setCustomGeminiApiKey,
     setTheme,
   } = useSettings();
@@ -220,24 +229,28 @@ export default function Sidebar() {
             </p>
           </div>
 
-          {/* Conversation Mode */}
+          {/* Cultural Tutor Mode */}
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
               <Mic className="w-3.5 h-3.5" />
-              <span>Chế Độ Luyện Tập</span>
+              <span>Cách Học Với Cultural Tutor</span>
             </label>
             <select
-              value={conversationMode}
+              value={tutorMode}
               disabled={connected}
-              onChange={e => handleModeChange(e.target.value as ConversationMode)}
+              onChange={e => setTutorMode(e.target.value as CulturalTutorMode)}
               className="w-full text-xs"
             >
-              <option value="discussion">Đàm Thoại &amp; Thảo Luận Văn Hóa</option>
-              <option value="comprehension">Hỏi Đáp Đọc Hiểu &amp; Phản Xạ</option>
-              <option value="shadowing">Luyện Phát Âm &amp; Shadowing</option>
-              <option value="interview">Thử Thách Phỏng Vấn Sứ Giả</option>
+              <option value="guided-lesson">Học theo lesson có hướng dẫn</option>
+              <option value="free-conversation">Trò chuyện tự do về Việt Nam</option>
             </select>
+            <p className="text-[11px] text-gray-400">{tutorMode === 'guided-lesson' ? 'Agent dẫn dắt Explore, Listen, Speak và Quiz.' : 'Agent trò chuyện tự nhiên về Việt Nam, không tự động sửa lỗi.'}</p>
           </div>
+
+          {tutorMode === 'free-conversation' && <>
+            <div className="space-y-1.5 mb-4"><label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Sửa lỗi trong hội thoại</label><select value={correctionMode} disabled={connected} onChange={e => setCorrectionMode(e.target.value as CorrectionMode)} className="w-full text-xs"><option value="off">Tắt sửa lỗi</option><option value="after-turn">Sửa sau mỗi lượt nói</option><option value="end-of-session">Tổng hợp cuối buổi</option></select></div>
+            <div className="space-y-1.5 mb-4"><label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Context bản đồ</label><select value={mapContextMode} disabled={connected} onChange={e => setMapContextMode(e.target.value as MapContextMode)} className="w-full text-xs"><option value="off">Không dùng bản đồ</option><option value="on-demand">Chỉ hiển thị khi cần</option><option value="always">Luôn đồng bộ với hội thoại</option></select></div>
+          </>}
 
           {/* Voice Selection */}
           <div className="space-y-1.5 mb-4">
