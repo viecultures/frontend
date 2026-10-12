@@ -20,6 +20,7 @@ import ProvinceHoverCard from './components/ProvinceHoverCard';
 import { getProvinceCultureData } from './data/vietnamProvincesDetail';
 import MapAiDebugDrawer from './components/MapAiDebugDrawer';
 import { debugLog, useMapAiDebugStore } from './lib/debug-logger';
+import AiMapLessonPanel from './components/AiMapLessonPanel';
 
 const GEMINI_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : '') || '';
 
@@ -118,6 +119,7 @@ function MapAiContent() {
         {isDrawerOpen && <MapAiDebugDrawer mode="panel" />}
 
         <div className="console-panel">
+          <AiMapLessonPanel onSpeakText={handleSpeakText} />
           <StreamingConsole />
           <ControlTray />
         </div>

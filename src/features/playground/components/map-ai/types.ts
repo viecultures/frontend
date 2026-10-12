@@ -53,3 +53,58 @@ export interface MapAiSettingsState {
   selectedPersona: string;
   autoSyncMap: boolean;
 }
+
+import type { LessonAgentVocab, ProficiencyLevel } from '@/data/lessonAgentCatalog';
+
+export type AiMapLessonStep = 'explore' | 'listen' | 'speak' | 'quiz' | 'complete';
+
+export interface AiMapQuizQuestion {
+  id: string;
+  prompt: string;
+  options: { id: string; label: string }[];
+  correctOptionId: string;
+  explanation: string;
+}
+
+export interface AiMapQuizResult {
+  totalQuestions: number;
+  correctAnswers: number;
+  score: number;
+  passed: boolean;
+}
+
+export interface AiMapArticleRecommendation {
+  id: string;
+  title: string;
+  url: string;
+}
+
+export interface AiMapLessonPayload {
+  lessonId: string;
+  title: string;
+  vietnameseTitle: string;
+  provinceId: string;
+  provinceName: string;
+  level: ProficiencyLevel;
+  durationMinutes: number;
+  summaryEn: string;
+  summaryVi: string;
+  vocabulary: LessonAgentVocab[];
+  listeningPrompts: string[];
+  speakingPrompts: string[];
+  comprehensionQuestions: AiMapQuizQuestion[];
+  relatedArticleIds: string[];
+}
+
+export interface AiMapLessonState {
+  lessonId: string;
+  provinceId: string;
+  level: ProficiencyLevel;
+  currentStep: AiMapLessonStep;
+  completedSteps: AiMapLessonStep[];
+  startedAt: string;
+  completedAt?: string;
+  quizScore?: AiMapQuizResult;
+  encounteredVocabulary: string[];
+  rewardGranted: boolean;
+}
