@@ -41,7 +41,9 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
     hoveredProvince,
     setHoveredId,
     selectProvince,
+    focusProvince,
     resetToAll,
+    handleBackdropClick,
     zoomScale,
     zoomIn,
     zoomOut,
@@ -67,7 +69,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
     <div
       ref={containerRef}
       {...containerProps}
-      onClick={() => resetToAll()}
+      onClick={() => handleBackdropClick()}
       className={`relative flex flex-col items-center justify-between overflow-hidden select-none w-full h-full touch-none ${
         zoomScale > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''
       } ${className}`}
@@ -120,7 +122,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
             fill="transparent"
             onClick={(e) => {
               e.stopPropagation();
-              resetToAll();
+              handleBackdropClick();
             }}
           />
 
@@ -137,13 +139,14 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
           {/* Layer 2: Maritime Sovereignty (Hoàng Sa & Trường Sa, Biển Đông) */}
           {showSeaLayer && <MapSeaLayer islands={VIETNAM_ISLANDS} />}
 
-          {/* Layer 3: Province Name Text Labels */}
+          {/* Layer 3: Province Name Text Labels with LOD */}
           {showLabels && (
             <MapLabelsLayer
               provinces={VIETNAM_34_PROVINCES}
               selectedProvinceId={effectiveSelectedId}
               hoveredProvinceId={hoveredProvince?.id || null}
               activeRegion={activeRegion}
+              zoomScale={zoomScale}
             />
           )}
 
@@ -155,7 +158,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
               selectedProvinceId={effectiveSelectedId}
               hoveredProvinceId={hoveredProvince?.id || null}
               activeRegion={activeRegion}
-              onSelectLandmarkProvince={selectProvince}
+              onSelectLandmarkProvince={focusProvince}
               onHoverLandmarkProvince={setHoveredId}
               onSelectLandmark={onSelectLandmark}
             />

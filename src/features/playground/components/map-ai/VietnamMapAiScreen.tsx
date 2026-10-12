@@ -18,6 +18,8 @@ import type { ProvinceMapItem } from '@/data/vietnamMapData';
 import { useUI, useSettings, useMapStore, useLogStore } from './lib/state';
 import ProvinceHoverCard from './components/ProvinceHoverCard';
 import { getProvinceCultureData } from './data/vietnamProvincesDetail';
+import MapAiDebugDrawer from './components/MapAiDebugDrawer';
+import { debugLog } from './lib/debug-logger';
 
 const GEMINI_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : '') || '';
 
@@ -44,12 +46,32 @@ function MapAiContent() {
 
   const handleSelectProvince = (province: ProvinceMapItem | null) => {
     if (province) {
+      debugLog.map(`Người dùng chọn tỉnh: ${province.name} (${province.id})`, {
+        region: province.region,
+      });
       setHighlightedPlaceId(province.id);
       setCameraTarget({ provinceId: province.id, region: province.region });
     } else {
+      debugLog.map('Người dùng bỏ chọn tỉnh (Clear selection)');
       setHighlightedPlaceId(null);
       setCameraTarget(null);
     }
+  };
+
+  const handleSelectRegion = (region: 'north' | 'central' | 'south' | 'all') => {
+    debugLog.map(`Người dùng bấm chuyển tab vùng: ${region}`);
+    setCameraTarget({
+      provinceId: undefined,
+      region,
+    });
+  };
+
+  const handleSelectLandmark = (landmark: any, province: ProvinceMapItem) => {
+    debugLog.map(`Người dùng bấm di tích: ${landmark.name} (${province.name})`, {
+      landmarkId: landmark.id,
+      provinceId: province.id,
+    });
+    handleSelectProvince(province);
   };
 
   const { proficiencyLevel } = useSettings();
@@ -81,6 +103,7 @@ function MapAiContent() {
     <>
       <ErrorScreen />
       <Sidebar />
+      <MapAiDebugDrawer />
       {showPopUp && <PopUp onClose={handleClosePopUp} />}
       <div className={`streaming-console ${isSidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="console-panel">
@@ -99,6 +122,9 @@ function MapAiContent() {
           <VietnamMap
             selectedProvinceId={selectedProvinceId}
             onSelectProvince={handleSelectProvince}
+            activeRegion={cameraTarget?.region || 'all'}
+            onSelectRegion={handleSelectRegion}
+            onSelectLandmark={handleSelectLandmark}
             showControls={true}
             showRegionTabs={true}
             showPoiPins={true}

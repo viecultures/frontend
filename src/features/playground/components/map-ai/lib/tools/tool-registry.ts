@@ -5,6 +5,7 @@
 
 import { type MapMarker, useMapStore, useLogStore, useSettings } from '../state';
 import { findProvinceById, findProvinceByName, svgCoordsToLatLng } from '../svg-map-controller';
+import { debugLog } from '../debug-logger';
 import {
   findLessonById,
   filterLessons,
@@ -24,7 +25,7 @@ export interface ToolContext {
 
 export type ToolImplementation = (
   params: any,
-  context: ToolContext,
+  context?: ToolContext,
 ) => Promise<string | object>;
 
 /**
@@ -186,7 +187,10 @@ async function executeHighlightMapProvince(params: {
   culturalTopic?: string;
 }): Promise<string> {
   const { provinceName, culturalTopic } = params;
-  if (!provinceName) return 'No province specified.';
+  if (!provinceName) {
+    debugLog.tool('highlightMapProvince', 'error', params, 'Missing provinceName');
+    return 'No province specified.';
+  }
 
   const province = findProvinceByName(provinceName);
   if (province) {
@@ -207,9 +211,26 @@ async function executeHighlightMapProvince(params: {
     };
     useMapStore.getState().setMarkers([newMarker]);
 
+    debugLog.tool('highlightMapProvince', 'success', params, {
+      matchedId: province.id,
+      matchedName: province.name,
+      region: province.region,
+      coords: geo,
+    });
+    debugLog.map(`Highlight province [${province.name}] (ID: ${province.id})`, {
+      region: province.region,
+      marker: newMarker,
+    });
+
     return `Successfully highlighted ${province.name} on the Vietnam map (${culturalTopic || 'Cultural Context'}).`;
   }
 
+  debugLog.tool(
+    'highlightMapProvince',
+    'error',
+    params,
+    `Tên tỉnh '${provinceName}' không khớp bất kỳ tỉnh nào trong 34 tỉnh SVG vector.`
+  );
   return `Province '${provinceName}' noted.`;
 }
 
@@ -228,6 +249,9 @@ async function executeFocusMapRegion(params: {
     south: 'Miền Nam (Southern Vietnam)',
     all: 'Toàn quốc Việt Nam (Full Map)',
   };
+
+  debugLog.tool('focusMapRegion', 'success', params, `Đã chuyển vùng bản đồ: ${labels[region] || region}`);
+  debugLog.map(`Focus region [${region}]`, { regionLabel: labels[region] });
   return `Focused map on ${labels[region] || region}.`;
 }
 

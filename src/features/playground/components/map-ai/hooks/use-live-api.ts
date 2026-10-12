@@ -11,6 +11,7 @@ import { audioContext } from '../lib/utils';
 import VolMeterWorklet from '../lib/worklets/vol-meter';
 import { useLogStore, useSettings } from '../lib/state';
 import { type ToolContext, toolRegistry } from '../lib/tools/tool-registry';
+import { debugLog } from '../lib/debug-logger';
 
 export type UseLiveApiResults = {
   client: GenAILiveClient;
@@ -60,15 +61,33 @@ export function useLiveApi({
   useEffect(() => {
     const onOpen = () => {
       setConnected(true);
+      debugLog.ws('WebSocket kết nối thành công', { model: client.model }, 'success');
     };
 
     const onSetupComplete = () => {
+      debugLog.ws('Setup hoàn tất - Gửi tín hiệu chào ban đầu');
       client.sendRealtimeText('hello');
+    };
+
+    const onError = (error: ErrorEvent) => {
+      debugLog.error('WebSocket LiveClient', {
+        message: error?.message || 'WebSocket Error',
+        type: error?.type,
+      });
     };
 
     const onClose = (event: CloseEvent) => {
       setConnected(false);
       stopAudioStreamer();
+      debugLog.ws(
+        'WebSocket đóng kết nối',
+        {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean,
+        },
+        event.wasClean ? 'info' : 'error'
+      );
       const reason = "Session ended. Press 'Play' to start a new speaking practice session. " + event.reason;
       useLogStore.getState().addTurn({
         role: 'agent',
@@ -85,6 +104,7 @@ export function useLiveApi({
 
     const onInterrupted = () => {
       stopAudioStreamer();
+      debugLog.audio('Server audio bị ngắt quãng (Interrupted)');
       const { updateLastTurn, turns } = useLogStore.getState();
       const lastTurn = turns[turns.length - 1];
       if (lastTurn && !lastTurn.isFinal) {
@@ -102,6 +122,12 @@ export function useLiveApi({
       const { setIsAwaitingFunctionResponse } = useLogStore.getState();
       setIsAwaitingFunctionResponse(true, 'batch');
 
+      const toolNames = toolCall.functionCalls?.map(fc => fc.name) || [];
+      debugLog.ws('Nhận yêu cầu gọi tool từ Agent', {
+        count: toolNames.length,
+        tools: toolNames,
+      });
+
       try {
         const functionResponses: any[] = [];
         const toolContext: ToolContext = {};
@@ -109,6 +135,8 @@ export function useLiveApi({
         for (const fc of toolCall.functionCalls || []) {
           const fcName = fc.name || 'unknown';
           setIsAwaitingFunctionResponse(true, fcName);
+          debugLog.tool(fcName, 'calling', fc.args);
+
           useLogStore.getState().mergeIntoLastAgentTurn({
             actualToolCalls: [{ name: fcName, args: fc.args }],
           });
@@ -118,8 +146,10 @@ export function useLiveApi({
             const toolImplementation = fc.name ? toolRegistry[fc.name] : undefined;
             if (toolImplementation) {
               toolResponse = await toolImplementation(fc.args, toolContext);
+              debugLog.tool(fcName, 'success', fc.args, toolResponse);
             } else {
               toolResponse = `Unknown tool called: ${fcName}.`;
+              debugLog.tool(fcName, 'error', fc.args, toolResponse);
               console.warn(toolResponse);
             }
 
@@ -130,6 +160,7 @@ export function useLiveApi({
             });
           } catch (err: any) {
             console.error(`Error executing tool ${fcName}:`, err);
+            debugLog.tool(fcName, 'error', fc.args, err?.message || String(err));
             functionResponses.push({
               id: fc.id,
               name: fcName,
@@ -140,9 +171,13 @@ export function useLiveApi({
 
         if (functionResponses.length > 0) {
           client.sendToolResponse({ functionResponses });
+          debugLog.ws('Đã gửi phản hồi tool về Gemini', {
+            responsesCount: functionResponses.length,
+          });
         }
       } catch (err) {
         console.error('Error handling toolCall event:', err);
+        debugLog.error('onToolCall batch handler', err);
       } finally {
         setIsAwaitingFunctionResponse(false);
       }
@@ -150,6 +185,7 @@ export function useLiveApi({
 
     client.on('open', onOpen);
     client.on('setupcomplete', onSetupComplete);
+    client.on('error', onError);
     client.on('close', onClose);
     client.on('interrupted', onInterrupted);
     client.on('audio', onAudio);
@@ -158,10 +194,12 @@ export function useLiveApi({
     return () => {
       client.off('open', onOpen);
       client.off('setupcomplete', onSetupComplete);
+      client.off('error', onError);
       client.off('close', onClose);
       client.off('interrupted', onInterrupted);
       client.off('audio', onAudio);
       client.off('toolcall', onToolCall);
+
     };
   }, [client]);
 

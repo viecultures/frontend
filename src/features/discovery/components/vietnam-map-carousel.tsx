@@ -20,16 +20,19 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
   const safeIndex = Math.max(0, Math.min(activeIndex, VIETNAM_LANDMARKS.length - 1));
   const currentLandmark = VIETNAM_LANDMARKS[safeIndex] || VIETNAM_LANDMARKS[0];
 
-  const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(
-    currentLandmark.provinceId
-  );
+  // Start at national overview (null) to allow 2-stage user interaction
+  const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(null);
 
-  // Sync province selection when activeIndex changes from parent or auto-tour
+  // Sync province selection only when activeIndex is changed explicitly from outside
+  const prevIndexRef = React.useRef(activeIndex);
   useEffect(() => {
-    if (currentLandmark?.provinceId) {
-      setSelectedProvinceId(currentLandmark.provinceId);
+    if (prevIndexRef.current !== activeIndex) {
+      prevIndexRef.current = activeIndex;
+      if (currentLandmark?.provinceId) {
+        setSelectedProvinceId(currentLandmark.provinceId);
+      }
     }
-  }, [currentLandmark?.provinceId]);
+  }, [activeIndex, currentLandmark?.provinceId]);
 
   const handleSelectProvince = (prov: ProvinceMapItem | null) => {
     if (!prov) {
@@ -37,7 +40,7 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
       return;
     }
 
-    // Always update the selected province on the map so it highlights and moves to ANY province clicked
+    // Set focused province
     setSelectedProvinceId(prov.id);
 
     if (onSelectLandmark) {
@@ -50,6 +53,7 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
           lm.name.toLowerCase().includes(prov.name.toLowerCase())
       );
       if (foundIdx !== -1) {
+        prevIndexRef.current = foundIdx;
         onSelectLandmark(foundIdx);
       }
     }
@@ -58,6 +62,7 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
   const handleSelectLandmarkPoi = (lm: { id: string }) => {
     const foundIdx = VIETNAM_LANDMARKS.findIndex((l) => l.id === lm.id);
     if (foundIdx !== -1) {
+      prevIndexRef.current = foundIdx;
       onSelectLandmark?.(foundIdx);
       const target = VIETNAM_LANDMARKS[foundIdx];
       setSelectedProvinceId(target.provinceId);

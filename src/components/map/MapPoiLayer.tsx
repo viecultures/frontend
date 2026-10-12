@@ -52,10 +52,17 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
         const isProvinceSelected = selectedProvinceId === p.id;
         const isProvinceHovered = hoveredProvinceId === p.id;
         const isPoiHovered = hoveredPoiId === lm.id;
-        const isDimmed = activeRegion !== 'all' && p.region !== activeRegion;
+        const hasFocus = selectedProvinceId !== null;
 
-        // Reveal badge if this specific POI is hovered, or if province is selected/hovered
-        const isVisible = isPoiHovered || (isProvinceSelected && totalSiblings === 1);
+        // Region check: In regional view, hide POIs from other regions
+        if (activeRegion !== 'all' && p.region !== activeRegion) {
+          return null;
+        }
+
+        const isDimmedOther = hasFocus && !isProvinceSelected;
+
+        // Reveal badge if this specific POI is hovered, or if province is selected
+        const isVisible = isPoiHovered || (isProvinceSelected && (totalSiblings === 1 || isPoiHovered));
         const isHighlighted = isPoiHovered || isProvinceSelected;
 
         // Dynamic badge width calculation based on landmark name length (compact & elegant)
@@ -73,48 +80,55 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
             }}
             onMouseEnter={() => {
               setHoveredPoiId(lm.id);
-              onHoverLandmarkProvince?.(p.id);
             }}
             onMouseLeave={() => {
               setHoveredPoiId(null);
-              onHoverLandmarkProvince?.(null);
             }}
-            className={`cursor-pointer transition-opacity duration-300 ${
-              isDimmed ? 'opacity-25 grayscale-[70%]' : 'opacity-100'
+            className={`cursor-pointer transition-opacity duration-200 ${
+              isDimmedOther ? 'opacity-65 hover:opacity-100' : 'opacity-100'
             }`}
           >
-            {/* Animated Radar Pulsing Aura Ring */}
-            <circle
-              cx="0"
-              cy="0"
-              r={isHighlighted ? 7.5 : isProvinceHovered ? 6 : 4.2}
-              fill={isHighlighted ? '#F5D280' : '#D9B76A'}
-              opacity={isHighlighted ? 0.55 : isProvinceHovered ? 0.45 : 0.3}
-              className="animate-ping"
-            />
+            {/* Stable Invisible Hitbox to guarantee 100% jitter-free hover */}
+            <circle cx="0" cy="0" r="12" fill="transparent" />
+
+            {/* Animated Radar Pulsing Aura Ring - strictly on highlighted/active POI, pointer-events-none */}
+            {isHighlighted && (
+              <circle
+                cx="0"
+                cy="0"
+                r={7.5}
+                fill="#F5D280"
+                opacity={0.55}
+                className="animate-ping pointer-events-none"
+              />
+            )}
 
             {/* Outer Solid Glowing Circle */}
             <circle
               cx="0"
               cy="0"
-              r={isHighlighted ? 3.8 : isProvinceHovered ? 3.2 : 2.4}
-              fill={isHighlighted ? '#F5D280' : isProvinceHovered ? '#FCE5B5' : '#D9B76A'}
+              r={isHighlighted ? 4.0 : isPoiHovered ? 3.4 : 2.5}
+              fill={isHighlighted ? '#F5D280' : isPoiHovered ? '#FCE5B5' : '#D9B76A'}
               stroke="#122A22"
-              strokeWidth={isHighlighted || isProvinceHovered ? '1.0' : '0.8'}
-              className="drop-shadow-sm"
+              strokeWidth={isHighlighted || isPoiHovered ? '1.0' : '0.8'}
+              className="drop-shadow-sm pointer-events-none"
             />
 
             {/* Inner Core Accent Circle */}
             <circle
               cx="0"
               cy="0"
-              r={isHighlighted ? 1.6 : isProvinceHovered ? 1.3 : 1.0}
+              r={isHighlighted ? 1.6 : 1.1}
               fill="#122A22"
+              className="pointer-events-none"
             />
 
-            {/* Floating POI Tag Badge - Only displayed when hovered */}
+            {/* Floating POI Tag Badge - strictly pointer-events-none */}
             {isVisible && (
-              <g transform="translate(0, -12)" className="animate-in fade-in zoom-in duration-150">
+              <g
+                transform="translate(0, -12)"
+                className="pointer-events-none animate-in fade-in zoom-in duration-150"
+              >
                 <rect
                   x={-halfWidth}
                   y="-6.5"

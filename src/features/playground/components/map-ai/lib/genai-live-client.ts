@@ -19,6 +19,7 @@ import EventEmitter from 'eventemitter3';
 import { DEFAULT_LIVE_API_MODEL } from './constants';
 import { difference } from 'lodash';
 import { base64ToArrayBuffer } from './utils';
+import { debugLog } from './debug-logger';
 
 /**
  * Represents a single log entry in the system.
@@ -225,28 +226,30 @@ export class GenAILiveClient {
 
       if (serverContent.inputTranscription) {
         const text = serverContent.inputTranscription.text || '';
-        this.emitter.emit(
-          'inputTranscription',
-          text,
-          (serverContent.inputTranscription as any).isFinal ?? false,
-        );
-        this.log(
-          'server.inputTranscription',
-          text,
-        );
+        const isFinal =
+          serverContent.inputTranscription.finished ??
+          (serverContent.inputTranscription as any).isFinal ??
+          false;
+        this.emitter.emit('inputTranscription', text, isFinal);
+        this.log('server.inputTranscription', text);
+        debugLog.asr('user', text, {
+          rawTranscription: serverContent.inputTranscription,
+          isFinal,
+        });
       }
 
       if (serverContent.outputTranscription) {
         const text = serverContent.outputTranscription.text || '';
-        this.emitter.emit(
-          'outputTranscription',
-          text,
-          (serverContent.outputTranscription as any).isFinal ?? false,
-        );
-        this.log(
-          'server.outputTranscription',
-          text,
-        );
+        const isFinal =
+          serverContent.outputTranscription.finished ??
+          (serverContent.outputTranscription as any).isFinal ??
+          false;
+        this.emitter.emit('outputTranscription', text, isFinal);
+        this.log('server.outputTranscription', text);
+        debugLog.asr('agent', text, {
+          rawTranscription: serverContent.outputTranscription,
+          isFinal,
+        });
       }
 
       if (serverContent.modelTurn) {

@@ -24,6 +24,7 @@ import VolMeterWorket from './worklets/vol-meter';
 
 import { createWorketFromSrc } from './audioworklet-registry';
 import EventEmitter from 'eventemitter3';
+import { debugLog } from './debug-logger';
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   var binary = '';
@@ -132,9 +133,14 @@ export class AudioRecorder {
 
         this.source.connect(this.vuWorklet);
         this.recording = true;
+        debugLog.audio('Khởi tạo Micro & AudioWorklet thành công', {
+          hardwareSampleRate: this.audioContext.sampleRate,
+          targetSampleRate: this.sampleRate,
+        });
         resolve();
       } catch (error) {
         this.recording = false;
+        debugLog.error('AudioRecorder.start', error);
         this.emitter.emit('error', error);
         reject(error);
       } finally {
@@ -147,6 +153,7 @@ export class AudioRecorder {
 
   stop() {
     this.recording = false;
+    debugLog.audio('Dừng ghi âm Micro');
     const handleStop = () => {
       try {
         this.source?.disconnect();

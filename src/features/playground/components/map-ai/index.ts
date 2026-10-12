@@ -5,5 +5,7 @@ export { MapAiSettingsDrawer } from './components/MapAiSettingsDrawer';
 export { ProvinceHoverCard } from './components/ProvinceHoverCard';
 export { sendMapAiPrompt, detectProvinceFromText } from './services/geminiMapAiService';
 export { getProvinceCultureData, PROVINCES_CULTURE_DETAILS } from './data/vietnamProvincesDetail';
+export { MapAiDebugDrawer } from './components/MapAiDebugDrawer';
+export { debugLog, useMapAiDebugStore, isMapAiDebugEnabled } from './lib/debug-logger';
 export * from './types';
 export * from './constants';

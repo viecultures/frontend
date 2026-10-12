@@ -18,6 +18,7 @@ import {
 import { User, Sparkles, RefreshCw, BookOpen, MessageSquareText, Compass, MapPin } from 'lucide-react';
 import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '@/data/lessonAgentCatalog';
 import QuickModeSwitcher from '../QuickModeSwitcher';
+import { debugLog } from '../../lib/debug-logger';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -134,18 +135,28 @@ export default function StreamingConsole() {
       if (text.trim() && !trimmedText) return;
 
       if (last && last.role === 'user' && !last.isFinal) {
+        const needsSpace = last.text && text && !last.text.endsWith(' ') && !text.startsWith(' ');
+        const nextText = last.text + (needsSpace ? ' ' : '') + text;
         updateLastTurn({
-          text: last.text + text,
+          text: nextText,
           isFinal,
         });
+        debugLog.info(`UI User Turn cập nhật: "${nextText}"`, { delta: text, isFinal });
       } else {
         addTurn({ role: 'user', text, isFinal });
+        debugLog.info(`UI User Turn tạo mới: "${text}"`, { isFinal });
       }
     };
 
     const handleOutputTranscription = (text: string, isFinal: boolean) => {
-      const { turns, mergeIntoLastAgentTurn } = useLogStore.getState();
+      const { turns, updateLastTurn, mergeIntoLastAgentTurn } = useLogStore.getState();
       const last = turns[turns.length - 1];
+
+      // Finalize pending user turn when agent starts generating response
+      if (last?.role === 'user' && !last.isFinal) {
+        updateLastTurn({ isFinal: true });
+        debugLog.info(`Chốt lượt nói của người dùng (Finalized User Turn): "${last.text}"`);
+      }
 
       const trimmedText = text.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
       if (['googleawesome', 'tomute'].includes(trimmedText)) return;
@@ -170,9 +181,15 @@ export default function StreamingConsole() {
     };
 
     const handleTurnComplete = () => {
-      const { mergeIntoLastAgentTurn } = useLogStore.getState();
+      const { mergeIntoLastAgentTurn, updateLastTurn, turns } = useLogStore.getState();
       mergeIntoLastAgentTurn({ text: '', isFinal: true });
+      const last = turns[turns.length - 1];
+      if (last && !last.isFinal) {
+        updateLastTurn({ isFinal: true });
+      }
+      debugLog.ws('Agent hoàn tất lượt sinh nội dung (turnComplete)');
     };
+
 
     const handleInterrupted = () => {
       const { turns, updateLastTurn, setIsAwaitingFunctionResponse } = useLogStore.getState();

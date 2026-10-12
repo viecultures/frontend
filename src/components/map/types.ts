@@ -86,6 +86,7 @@ export interface MapLabelsLayerProps {
   selectedProvinceId: string | null;
   hoveredProvinceId: string | null;
   activeRegion: RegionKey;
+  zoomScale?: number;
 }
 
 export interface MapPoiLayerProps {

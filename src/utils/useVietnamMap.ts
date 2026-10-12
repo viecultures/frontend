@@ -140,11 +140,13 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
   const setActiveRegion = useCallback(
     (region: RegionKey) => {
       setActiveRegionState(region);
+      setSelectedProvinceId(null);
       setZoomScale(1);
       setPanPosition({ x: 0, y: 0 });
+      onSelectProvince?.(null);
       onSelectRegion?.(region);
     },
-    [onSelectRegion]
+    [onSelectProvince, onSelectRegion]
   );
 
   const resetToAll = useCallback(
@@ -184,11 +186,11 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
         return;
       }
 
-      // Update selected province
+      // 1-Click Select & Zoom:
+      // Instantly select & highlight province, and zoom into its region seamlessly
       setSelectedProvinceId(provId);
       onSelectProvince?.(provItem);
 
-      // Only switch region if the selected province is in a different region
       if (provItem.region && provItem.region !== activeRegion) {
         setActiveRegionState(provItem.region);
         setZoomScale(1);
@@ -197,6 +199,25 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
       }
     },
     [activeRegion, onSelectProvince, onSelectRegion]
+  );
+
+  const focusProvince = selectProvince;
+
+  // Single-click backdrop escape: resets map cleanly to national overview ('all')
+  const handleBackdropClick = useCallback(
+    (force = false) => {
+      if (!force && hasDraggedRef.current) return;
+
+      if (selectedProvinceId !== null || activeRegion !== 'all' || zoomScale > 1) {
+        setActiveRegionState('all');
+        setSelectedProvinceId(null);
+        setZoomScale(1);
+        setPanPosition({ x: 0, y: 0 });
+        onSelectProvince?.(null);
+        onSelectRegion?.('all');
+      }
+    },
+    [selectedProvinceId, activeRegion, zoomScale, onSelectProvince, onSelectRegion]
   );
 
   const zoomIn = useCallback(() => {
@@ -380,7 +401,9 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
     hoveredProvince,
     setHoveredId,
     selectProvince,
+    focusProvince,
     resetToAll,
+    handleBackdropClick,
     zoomScale,
     panPosition,
     isDragging,
