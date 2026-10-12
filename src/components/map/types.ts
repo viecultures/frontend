@@ -20,6 +20,12 @@ export interface VietnamMapProps {
   selectedProvinceId?: string | null;
   /** Callback triggered when a province is clicked / selected */
   onSelectProvince?: (province: ProvinceMapItem | null) => void;
+  /** Controlled active region ('all' | 'north' | 'central' | 'south') */
+  activeRegion?: RegionKey;
+  /** Callback triggered when active region changes */
+  onSelectRegion?: (region: RegionKey) => void;
+  /** Callback triggered when a specific Landmark POI is clicked */
+  onSelectLandmark?: (landmark: LandmarkPoiItem, province: ProvinceMapItem) => void;
   /** Custom wrapper CSS class */
   className?: string;
   /** Show floating Zoom In / Zoom Out / Reset controls */
@@ -90,4 +96,5 @@ export interface MapPoiLayerProps {
   activeRegion: RegionKey;
   onSelectLandmarkProvince: (province: ProvinceMapItem) => void;
   onHoverLandmarkProvince?: (provinceId: string | null) => void;
+  onSelectLandmark?: (landmark: LandmarkPoiItem, province: ProvinceMapItem) => void;
 }

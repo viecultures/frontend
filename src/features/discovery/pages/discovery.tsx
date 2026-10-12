@@ -161,7 +161,10 @@ export default function DiscoveryPage() {
         {/* 1. Interactive Vietnam Map Spotlight Section */}
         <DiscoverySpotlight
           activePinIndex={activePinIndex}
-          onSelectPinIndex={setActivePinIndex}
+          onSelectPinIndex={(idx) => {
+            setIsAutoTour(false);
+            setActivePinIndex(idx);
+          }}
           onMouseEnter={() => setIsAutoTour(false)}
           onMouseLeave={() => setIsAutoTour(true)}
         />

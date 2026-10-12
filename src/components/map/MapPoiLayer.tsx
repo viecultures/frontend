@@ -9,6 +9,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
   activeRegion,
   onSelectLandmarkProvince,
   onHoverLandmarkProvince,
+  onSelectLandmark,
 }) => {
   const [hoveredPoiId, setHoveredPoiId] = React.useState<string | null>(null);
 
@@ -67,6 +68,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
             transform={`translate(${x}, ${y})`}
             onClick={(e) => {
               e.stopPropagation();
+              onSelectLandmark?.(lm, p);
               onSelectLandmarkProvince(p);
             }}
             onMouseEnter={() => {

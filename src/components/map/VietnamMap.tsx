@@ -20,6 +20,9 @@ import { MapPoiLayer } from './MapPoiLayer';
 export const VietnamMap: React.FC<VietnamMapProps> = ({
   selectedProvinceId,
   onSelectProvince,
+  activeRegion: controlledRegion,
+  onSelectRegion,
+  onSelectLandmark,
   className = '',
   showControls = true,
   showRegionTabs = true,
@@ -48,7 +51,9 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
     containerProps,
   } = useVietnamMap({
     defaultSelectedId: selectedProvinceId,
+    activeRegion: controlledRegion,
     onSelectProvince,
+    onSelectRegion,
   });
 
   const effectiveSelectedId =
@@ -63,7 +68,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
       ref={containerRef}
       {...containerProps}
       onClick={() => resetToAll()}
-      className={`relative flex flex-col items-center justify-between overflow-hidden select-none w-full h-full ${
+      className={`relative flex flex-col items-center justify-between overflow-hidden select-none w-full h-full touch-none ${
         zoomScale > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''
       } ${className}`}
     >
@@ -152,6 +157,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
               activeRegion={activeRegion}
               onSelectLandmarkProvince={selectProvince}
               onHoverLandmarkProvince={setHoveredId}
+              onSelectLandmark={onSelectLandmark}
             />
           )}
         </svg>

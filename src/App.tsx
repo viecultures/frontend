@@ -139,8 +139,8 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
-      {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, flashcard layout, and standalone playground) */}
-      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'dictionary' && activeView !== 'flashcard-study' && activeView !== 'playground' && (
+      {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, and standalone playground) */}
+      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'playground' && (
         <Navbar
           activeView={activeView}
           isLoggedIn={isLoggedIn}

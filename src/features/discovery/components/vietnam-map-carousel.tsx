@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
 import { VietnamMap } from '@/components/VietnamMap';
 import { type ProvinceMapItem } from '@/data/vietnamMapData';
@@ -20,16 +20,47 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
   const safeIndex = Math.max(0, Math.min(activeIndex, VIETNAM_LANDMARKS.length - 1));
   const currentLandmark = VIETNAM_LANDMARKS[safeIndex] || VIETNAM_LANDMARKS[0];
 
+  const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(
+    currentLandmark.provinceId
+  );
+
+  // Sync province selection when activeIndex changes from parent or auto-tour
+  useEffect(() => {
+    if (currentLandmark?.provinceId) {
+      setSelectedProvinceId(currentLandmark.provinceId);
+    }
+  }, [currentLandmark?.provinceId]);
+
   const handleSelectProvince = (prov: ProvinceMapItem | null) => {
-    if (!prov || !onSelectLandmark) return;
-    const foundIdx = VIETNAM_LANDMARKS.findIndex(
-      (lm) =>
-        lm.provinceId === prov.id ||
-        prov.name.toLowerCase().includes(lm.name.toLowerCase()) ||
-        lm.name.toLowerCase().includes(prov.name.toLowerCase())
-    );
+    if (!prov) {
+      setSelectedProvinceId(null);
+      return;
+    }
+
+    // Always update the selected province on the map so it highlights and moves to ANY province clicked
+    setSelectedProvinceId(prov.id);
+
+    if (onSelectLandmark) {
+      const foundIdx = VIETNAM_LANDMARKS.findIndex(
+        (lm) =>
+          lm.provinceId === prov.id ||
+          prov.id.includes(lm.provinceId) ||
+          lm.provinceId.includes(prov.id) ||
+          prov.name.toLowerCase().includes(lm.name.toLowerCase()) ||
+          lm.name.toLowerCase().includes(prov.name.toLowerCase())
+      );
+      if (foundIdx !== -1) {
+        onSelectLandmark(foundIdx);
+      }
+    }
+  };
+
+  const handleSelectLandmarkPoi = (lm: { id: string }) => {
+    const foundIdx = VIETNAM_LANDMARKS.findIndex((l) => l.id === lm.id);
     if (foundIdx !== -1) {
-      onSelectLandmark(foundIdx);
+      onSelectLandmark?.(foundIdx);
+      const target = VIETNAM_LANDMARKS[foundIdx];
+      setSelectedProvinceId(target.provinceId);
     }
   };
 
@@ -37,9 +68,11 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
     <div className="relative w-full h-full flex flex-col items-center justify-center min-h-0 select-none overflow-hidden">
       {/* 34-Province SVG Vector Vietnam Map */}
       <VietnamMap
-        selectedProvinceId={currentLandmark.provinceId}
+        selectedProvinceId={selectedProvinceId}
         onSelectProvince={handleSelectProvince}
+        onSelectLandmark={handleSelectLandmarkPoi}
         showRegionTabs={showRegionTabs}
+        showTooltip={true}
         className="w-full h-full flex-1 min-h-0"
       />
 
