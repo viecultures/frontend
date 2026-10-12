@@ -187,7 +187,7 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Bài Đọc Văn Hóa Mục Tiêu</span>
+              <span>{tutorMode === 'free-conversation' ? 'Chủ Đề Văn Hóa Việt Nam' : 'Bài Đọc Văn Hóa Mục Tiêu'}</span>
             </label>
             <select
               value={activeLessonId}
@@ -202,7 +202,7 @@ export default function Sidebar() {
               ))}
             </select>
             <p className="text-[11px] text-gray-400">
-              Gia sư AI sẽ tự động đồng bộ bản đồ, từ vựng và câu hỏi theo bài học này.
+              {tutorMode === 'free-conversation' ? 'Chọn một chủ đề để bắt đầu trò chuyện tiếng Anh tự nhiên về Việt Nam.' : 'Gia sư AI sẽ tự động đồng bộ bản đồ, từ vựng và câu hỏi theo bài học này.'}
             </p>
           </div>
 

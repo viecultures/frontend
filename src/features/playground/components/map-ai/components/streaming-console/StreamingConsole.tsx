@@ -227,12 +227,19 @@ export default function StreamingConsole() {
     }
   }, [displayedTurns]);
 
-  const quickActions =
+  const guidedActions =
     LESSON_QUICK_ACTIONS[activeLesson.id] || [
       { text: `Tell me about the history and importance of ${activeLesson.vietnameseTitle}.`, label: `Tìm hiểu về ${activeLesson.vietnameseTitle}` },
       { text: `What key English vocabulary should I know about this cultural topic?`, label: `Học từ vựng chủ đề` },
       { text: `Let's practice discussing ${activeLesson.vietnameseTitle} together.`, label: `Bắt đầu đàm thoại` },
     ];
+  const conversationActions = [
+    { text: 'Let’s have a natural conversation about Vietnamese food and regional flavors.', label: 'Ẩm thực Việt Nam' },
+    { text: 'Let’s talk about a Vietnamese festival and what it means to local people.', label: 'Lễ hội Việt Nam' },
+    { text: 'Let’s discuss Vietnamese family traditions in everyday life.', label: 'Đời sống & gia đình' },
+    { text: 'Let’s compare cultural life in Northern, Central, and Southern Vietnam.', label: 'So sánh ba miền' },
+  ];
+  const quickActions = tutorMode === 'free-conversation' ? conversationActions : guidedActions;
 
   const handleSendPrompt = async (text: string) => {
     if (!connected) await connect();
@@ -287,7 +294,7 @@ export default function StreamingConsole() {
                 Sứ Giả Văn Hóa AI — Luyện Nói &amp; Luyện Nghe
               </h3>
               <p className="text-xs text-gray-400 max-w-sm mx-auto leading-relaxed">
-                Đàm thoại tiếng Anh thời gian thực cùng trợ lý AI về chủ đề <strong>{activeLesson.vietnameseTitle}</strong>. Bấm nút <strong>Play</strong> bên dưới hoặc chọn gợi ý để bắt đầu.
+                Đàm thoại tiếng Anh thời gian thực cùng trợ lý AI về chủ đề <strong>{tutorMode === 'free-conversation' ? 'văn hóa Việt Nam' : activeLesson.vietnameseTitle}</strong>. Bấm nút <strong>Play</strong> bên dưới hoặc chọn gợi ý để bắt đầu.
               </p>
             </div>
 
