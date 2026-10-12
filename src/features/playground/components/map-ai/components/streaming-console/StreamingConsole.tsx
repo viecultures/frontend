@@ -20,6 +20,7 @@ import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '
 import { debugLog } from '../../lib/debug-logger';
 import { buildCulturalTutorPrompt } from '../../lib/constants';
 import { MAP_TOOL_NAMES } from '../../lib/tools/tool-registry';
+import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -245,6 +246,7 @@ export default function StreamingConsole() {
 
   return (
     <div className="transcription-container flex flex-col h-full bg-[#121619] text-[#f1f3f4]">
+      <AiMapLessonProgressBar />
       {/* Target Lesson Header Banner */}
       <div className="flex-shrink-0 p-3 bg-[#181d20] border-b border-white/10 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 overflow-hidden">
