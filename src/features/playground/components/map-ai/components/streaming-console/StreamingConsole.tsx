@@ -17,9 +17,9 @@ import {
 } from '../../lib/state';
 import { User, Sparkles, RefreshCw, BookOpen, MessageSquareText, Compass, MapPin } from 'lucide-react';
 import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '@/data/lessonAgentCatalog';
-import QuickModeSwitcher from '../QuickModeSwitcher';
 import { debugLog } from '../../lib/debug-logger';
 import { buildCulturalTutorPrompt } from '../../lib/constants';
+import { MAP_TOOL_NAMES } from '../../lib/tools/tool-registry';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -98,7 +98,7 @@ export default function StreamingConsole() {
     const enabledTools = [
       {
         functionDeclarations: tools
-          .filter(tool => tool.isEnabled)
+          .filter(tool => tool.isEnabled && (mapContextMode !== 'off' || !MAP_TOOL_NAMES.has(tool.name)))
           .map(tool => ({
             name: tool.name,
             description: tool.description,
@@ -272,9 +272,6 @@ export default function StreamingConsole() {
           </div>
         </div>
       </div>
-
-      {/* Quick Mode Switcher */}
-      <QuickModeSwitcher />
 
       {/* Message Timeline */}
       <div className="transcription-view flex-1 overflow-y-auto p-4 space-y-3.5" ref={scrollRef}>

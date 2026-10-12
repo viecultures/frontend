@@ -21,6 +21,7 @@ import {
 export interface ToolContext {
   setHeldGroundedResponse?: (response: any) => void;
   setHeldGroundingChunks?: (chunks: any) => void;
+  allowMapTools?: boolean;
 }
 
 export type ToolImplementation = (
@@ -70,6 +71,8 @@ export const toolRegistry: Record<string, ToolImplementation> = {
     return await executeEvaluateSpeechOrGrammar(params);
   },
 };
+
+export const MAP_TOOL_NAMES = new Set(['highlightMapProvince', 'focusMapRegion']);
 
 /**
  * Discovers and lists cultural lessons.

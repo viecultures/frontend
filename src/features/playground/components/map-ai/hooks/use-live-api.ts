@@ -10,7 +10,7 @@ import { AudioStreamer } from '../lib/audio-streamer';
 import { audioContext } from '../lib/utils';
 import VolMeterWorklet from '../lib/worklets/vol-meter';
 import { useLogStore, useSettings } from '../lib/state';
-import { type ToolContext, toolRegistry } from '../lib/tools/tool-registry';
+import { MAP_TOOL_NAMES, type ToolContext, toolRegistry } from '../lib/tools/tool-registry';
 import { debugLog } from '../lib/debug-logger';
 
 export type UseLiveApiResults = {
@@ -130,7 +130,9 @@ export function useLiveApi({
 
       try {
         const functionResponses: any[] = [];
-        const toolContext: ToolContext = {};
+        const toolContext: ToolContext = {
+          allowMapTools: useSettings.getState().mapContextMode !== 'off',
+        };
 
         for (const fc of toolCall.functionCalls || []) {
           const fcName = fc.name || 'unknown';
@@ -143,6 +145,12 @@ export function useLiveApi({
 
           let toolResponse: string | object = 'ok';
           try {
+            if (MAP_TOOL_NAMES.has(fcName) && !toolContext.allowMapTools) {
+              toolResponse = 'Map context is disabled for this conversation. Continue without changing the map.';
+              functionResponses.push({ id: fc.id, name: fcName, response: { result: toolResponse } });
+              debugLog.tool(fcName, 'success', fc.args, toolResponse);
+              continue;
+            }
             const toolImplementation = fc.name ? toolRegistry[fc.name] : undefined;
             if (toolImplementation) {
               toolResponse = await toolImplementation(fc.args, toolContext);
