@@ -1,15 +1,13 @@
 /**
  * MapAiDebugDrawer
  *
- * Developer Diagnostic Terminal & Simulator for Vietnam Map AI Tutor.
- * Docked at the BOTTOM (IDE Terminal style) or FAR-LEFT so it NEVER covers the Vietnam map.
- * Condition: Only rendered when VITE_MAP_AI_DEBUG=true or import.meta.env.DEV is true.
+ * Left-Sidebar Diagnostic & Simulation Hub for Vietnam Map AI Tutor.
+ * In-flow layout on the far left, guaranteeing ZERO overlap on Chat or Vietnam Map.
  * Strictly adheres to Lucide React SVG iconography (0 emojis).
  */
 
 import React, { useState, useMemo } from 'react';
 import {
-  Terminal,
   Activity,
   Wrench,
   X,
@@ -30,10 +28,7 @@ import {
   Compass,
   BookOpen,
   Sparkles,
-  PanelBottom,
-  PanelLeft,
-  Maximize2,
-  Minimize2,
+  Terminal,
 } from 'lucide-react';
 import {
   useMapAiDebugStore,
@@ -67,8 +62,6 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
     selectedCategory,
     searchQuery,
     errorCount,
-    dockPosition,
-    setDockPosition,
     toggleDrawer,
     setDrawerOpen,
     setActiveTab,
@@ -81,7 +74,6 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
   const { cameraTarget, highlightedPlaceId, markers } = useMapStore();
   const { model, activeLessonId, proficiencyLevel } = useSettings();
 
-  const [isMaximized, setIsMaximized] = useState(false);
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
   const [simRunning, setSimRunning] = useState<string | null>(null);
@@ -215,18 +207,21 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
     );
   };
 
+  const showButton = (mode === 'button' || mode === 'all') && !isDrawerOpen;
+  const showPanel = (mode === 'panel' || mode === 'all') && isDrawerOpen;
+
   return (
     <>
-      {/* FLOATING TRIGGER BADGE (Docked bottom-left, never blocks the map) */}
-      {!isDrawerOpen && (
+      {/* FLOATING TRIGGER BUTTON (Docked bottom-left when closed) */}
+      {showButton && (
         <button
           onClick={toggleDrawer}
-          className="fixed bottom-3 left-3 z-40 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0c1422] text-slate-300 border border-[#223854] shadow-xl hover:border-amber-400/80 hover:text-white transition-all cursor-pointer backdrop-blur-md font-mono text-xs"
-          title="Mở Debug Console / Terminal (Dev Mode)"
-          aria-label="Mở Bảng Chẩn Đoán & Giả Lập Map AI"
+          className="fixed bottom-4 left-4 z-40 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0c1422] text-slate-300 border border-[#223854] shadow-xl hover:border-amber-400/80 hover:text-white transition-all cursor-pointer backdrop-blur-md font-mono text-xs"
+          title="Mở Bảng Điều Khiển &amp; Debug Hub (Dev Mode)"
+          aria-label="Mở Bảng Điều Khiển &amp; Debug Hub"
         >
-          <Terminal className="w-3.5 h-3.5 text-amber-400" />
-          <span className="font-bold tracking-wider">TERMINAL</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span className="font-bold tracking-wider">AI MAP HUB</span>
 
           {/* Connection Dot */}
           <span
@@ -244,78 +239,29 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
         </button>
       )}
 
-      {/* DOCKED CONSOLE PANEL (BOTTOM TERMINAL OR FAR-LEFT SIDEBAR) */}
-      {isDrawerOpen && (
-        <div
-          className={`fixed z-50 bg-[#080d16] text-slate-200 shadow-2xl flex flex-col font-sans select-text border-[#1b2b40] transition-all duration-200 ${
-            dockPosition === 'bottom'
-              ? `inset-x-0 bottom-0 border-t ${
-                  isMaximized ? 'h-[75vh]' : 'h-80 sm:h-96'
-                }`
-              : `inset-y-0 left-0 border-r w-full sm:w-[520px] ${
-                  isMaximized ? 'sm:w-[760px]' : ''
-                }`
-          }`}
-        >
-          {/* TERMINAL TOP TOOLBAR (VS Code Style) */}
-          <div className="h-10 px-3 border-b border-[#1b2b40] bg-[#0c1320] flex items-center justify-between shrink-0">
-            {/* Left: Tab selectors */}
-            <div className="flex items-center gap-1">
-              <div className="flex items-center gap-1.5 mr-3 pr-3 border-r border-[#1b2b40] text-amber-400 font-mono text-xs font-bold">
-                <Terminal className="w-3.5 h-3.5" />
-                <span>TERMINAL</span>
-                <span className="px-1 py-0.2 rounded text-[9px] bg-amber-500/15 text-amber-300 border border-amber-500/30">
+      {/* DOCKED LEFT HUB PANEL (In-flow column on the far left) */}
+      {showPanel && (
+        <aside className="w-80 sm:w-96 shrink-0 h-full border-r border-[#1b2b40] bg-[#080d16] text-slate-200 shadow-xl flex flex-col font-sans select-text z-20 overflow-hidden">
+          {/* HEADER ROW 1: Brand Title, WS Badge & Close Button */}
+          <div className="h-12 px-3.5 border-b border-[#1b2b40] bg-[#0c1320] flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <Sparkles className="w-3.5 h-3.5" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold text-white tracking-wide">
+                  AI MAP HUB
+                </span>
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold">
                   DEV
                 </span>
               </div>
-
-              <button
-                onClick={() => setActiveTab('logs')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
-                  activeTab === 'logs'
-                    ? 'bg-[#162338] text-amber-300 border border-amber-500/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#0e1726]'
-                }`}
-              >
-                <Terminal className="w-3 h-3" />
-                <span>Nhật Ký Trace ({logs.length})</span>
-                {errorCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[9px] font-bold">
-                    {errorCount}
-                  </span>
-                )}
-              </button>
-
-              <button
-                onClick={() => setActiveTab('health')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
-                  activeTab === 'health'
-                    ? 'bg-[#162338] text-amber-300 border border-amber-500/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#0e1726]'
-                }`}
-              >
-                <Activity className="w-3 h-3" />
-                <span>Hệ Thống</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('simulator')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
-                  activeTab === 'simulator'
-                    ? 'bg-[#162338] text-amber-300 border border-amber-500/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#0e1726]'
-                }`}
-              >
-                <Wrench className="w-3 h-3" />
-                <span>Giả Lập (Simulator)</span>
-              </button>
             </div>
 
-            {/* Right: Quick system info + dock switcher & close */}
             <div className="flex items-center gap-2">
-              {/* WS Live status dot */}
+              {/* Live WS Status Badge */}
               <div
-                className={`hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono border ${
+                className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-medium border ${
                   connected
                     ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800'
                     : 'bg-rose-950/60 text-rose-300 border-rose-800'
@@ -329,322 +275,80 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
                 <span>{connected ? 'WS LIVE' : 'WS OFF'}</span>
               </div>
 
-              {/* Dock position toggle button */}
-              <button
-                onClick={() =>
-                  setDockPosition(p => (p === 'bottom' ? 'left' : 'bottom'))
-                }
-                className="p-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                title={
-                  dockPosition === 'bottom'
-                    ? 'Chuyển sang thanh bên trái ngoài cùng (Far-Left)'
-                    : 'Chuyển sang thanh Terminal dưới đáy (Bottom)'
-                }
-              >
-                {dockPosition === 'bottom' ? (
-                  <PanelLeft className="w-3.5 h-3.5" />
-                ) : (
-                  <PanelBottom className="w-3.5 h-3.5" />
-                )}
-              </button>
-
-              {/* Maximize / Restore height button */}
-              <button
-                onClick={() => setIsMaximized(m => !m)}
-                className="p-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                title={isMaximized ? 'Thu nhỏ cửa sổ' : 'Phóng to cửa sổ'}
-              >
-                {isMaximized ? (
-                  <Minimize2 className="w-3.5 h-3.5" />
-                ) : (
-                  <Maximize2 className="w-3.5 h-3.5" />
-                )}
-              </button>
-
-              {/* Close button */}
+              {/* Close Button */}
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="p-1.5 rounded text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors cursor-pointer"
-                title="Đóng Terminal"
-                aria-label="Đóng Terminal"
+                className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                title="Đóng Hub Điều Khiển"
+                aria-label="Đóng Hub Điều Khiển"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* TERMINAL BODY */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-3">
-            {/* 1. TRACE LOGS TAB */}
-            {activeTab === 'logs' && (
-              <div className="space-y-2.5">
-                {/* Search & Actions Bar */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="relative flex-1 min-w-[200px]">
-                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={e => setSearchQuery(e.target.value)}
-                      placeholder="Tìm kiếm log, transcript, tên tool, lỗi..."
-                      className="w-full bg-[#0e1625] border border-[#1b2b40] rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
+          {/* HEADER ROW 2: Segmented Tabs Navigation Bar (Full Width, Equal Columns) */}
+          <div className="px-3 py-2 border-b border-[#1b2b40] bg-[#090f1a] shrink-0">
+            <div className="grid grid-cols-3 gap-1 bg-[#060a12] p-1 rounded-lg border border-[#162335]">
+              {/* Tab 1: Simulator */}
+              <button
+                onClick={() => setActiveTab('simulator')}
+                className={`flex items-center justify-center gap-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                  activeTab === 'simulator'
+                    ? 'bg-amber-500 text-black font-bold shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#0e1726]'
+                }`}
+              >
+                <Wrench className="w-3.5 h-3.5 shrink-0" />
+                <span>Giả Lập</span>
+              </button>
 
-                  {/* Category Pills */}
-                  <div className="flex items-center gap-1 text-[11px] font-mono">
-                    {(
-                      [
-                        'all',
-                        'asr',
-                        'tool',
-                        'ws',
-                        'audio',
-                        'map',
-                        'system',
-                      ] as const
-                    ).map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`px-2 py-1 rounded cursor-pointer uppercase transition-colors ${
-                          selectedCategory === cat
-                            ? 'bg-amber-500 text-black font-bold'
-                            : 'bg-[#0e1625] text-slate-400 border border-[#1b2b40] hover:text-slate-200'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-1.5 ml-auto">
-                    <button
-                      onClick={handleCopyLogs}
-                      className="px-2.5 py-1.5 rounded-lg bg-[#0e1625] border border-[#1b2b40] text-slate-300 hover:text-white hover:bg-slate-800 text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                      title="Sao chép toàn bộ logs"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{copySuccess ? 'Đã chép' : 'Chép'}</span>
-                    </button>
-
-                    <button
-                      onClick={handleDownloadLogs}
-                      className="px-2.5 py-1.5 rounded-lg bg-[#0e1625] border border-[#1b2b40] text-slate-300 hover:text-white hover:bg-slate-800 text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                      title="Tải logs JSON"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Tải</span>
-                    </button>
-
-                    <button
-                      onClick={clearLogs}
-                      className="p-1.5 rounded-lg bg-[#0e1625] border border-[#1b2b40] text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 text-xs transition-colors cursor-pointer"
-                      title="Xóa logs"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Log Event Stream */}
-                {filteredLogs.length === 0 ? (
-                  <div className="p-8 text-center text-slate-500 text-xs font-mono">
-                    Chưa có nhật ký nào phù hợp bộ lọc.
-                  </div>
-                ) : (
-                  <div className="space-y-1 font-mono text-[11px]">
-                    {filteredLogs.map(log => {
-                      const isExpanded = expandedLogId === log.id;
-                      const hasData =
-                        log.data !== undefined && log.data !== null;
-
-                      return (
-                        <div
-                          key={log.id}
-                          className={`p-2 rounded-md border transition-all ${
-                            log.level === 'error'
-                              ? 'bg-rose-950/20 border-rose-800/60'
-                              : log.level === 'warn'
-                              ? 'bg-amber-950/20 border-amber-800/60'
-                              : log.level === 'success'
-                              ? 'bg-emerald-950/15 border-emerald-800/40'
-                              : log.category === 'asr'
-                              ? 'bg-pink-950/15 border-pink-800/40'
-                              : 'bg-[#0d1422] border-[#182638]'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-slate-500 text-[10px]">
-                                {new Date(log.timestamp).toLocaleTimeString()}
-                              </span>
-                              {getLevelBadge(log.level)}
-                              {getCategoryBadge(log.category)}
-                              <span className="text-slate-200 break-words font-medium">
-                                {log.message}
-                              </span>
-                            </div>
-
-                            {hasData && (
-                              <button
-                                onClick={() =>
-                                  setExpandedLogId(isExpanded ? null : log.id)
-                                }
-                                className="text-slate-400 hover:text-white p-0.5 cursor-pointer shrink-0"
-                                title="Xem payload chi tiết"
-                              >
-                                {isExpanded ? (
-                                  <ChevronDown className="w-3.5 h-3.5" />
-                                ) : (
-                                  <ChevronRight className="w-3.5 h-3.5" />
-                                )}
-                              </button>
-                            )}
-                          </div>
-
-                          {/* Expanded JSON Payload */}
-                          {isExpanded && hasData && (
-                            <div className="mt-2 p-2 rounded bg-[#060a12] border border-[#172435] overflow-x-auto text-[10px] text-amber-200">
-                              <pre>{JSON.stringify(log.data, null, 2)}</pre>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+              {/* Tab 2: Trace Logs */}
+              <button
+                onClick={() => setActiveTab('logs')}
+                className={`flex items-center justify-center gap-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                  activeTab === 'logs'
+                    ? 'bg-amber-500 text-black font-bold shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#0e1726]'
+                }`}
+              >
+                <Terminal className="w-3.5 h-3.5 shrink-0" />
+                <span>Nhật Ký</span>
+                {logs.length > 0 && (
+                  <span
+                    className={`px-1 py-0.2 rounded text-[10px] font-mono ${
+                      activeTab === 'logs'
+                        ? 'bg-black/20 text-black'
+                        : 'bg-slate-800 text-slate-300'
+                    }`}
+                  >
+                    {logs.length}
+                  </span>
                 )}
-              </div>
-            )}
+              </button>
 
-            {/* 2. SYSTEM HEALTH TAB */}
-            {activeTab === 'health' && (
-              <div
-                className={`grid gap-3 ${
-                  dockPosition === 'bottom'
-                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
-                    : 'grid-cols-1'
+              {/* Tab 3: Health */}
+              <button
+                onClick={() => setActiveTab('health')}
+                className={`flex items-center justify-center gap-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                  activeTab === 'health'
+                    ? 'bg-amber-500 text-black font-bold shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#0e1726]'
                 }`}
               >
-                {/* WebSocket Card */}
-                <div className="p-3.5 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                      <Radio className="w-3.5 h-3.5 text-purple-400" />
-                      Gemini Live WebSocket
-                    </span>
-                    <span
-                      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
-                        connected
-                          ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                          : 'bg-rose-950 text-rose-300 border border-rose-800'
-                      }`}
-                    >
-                      {connected ? 'CONNECTED' : 'OFF'}
-                    </span>
-                  </div>
-                  <div className="text-[11px] font-mono space-y-1 bg-[#090e17] p-2 rounded border border-[#1b2b40]">
-                    <div>
-                      <span className="text-slate-500">Model: </span>
-                      <span className="text-slate-200 font-bold truncate">
-                        {model}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">Status: </span>
-                      <span className="text-slate-200 font-bold">
-                        {client.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                <Activity className="w-3.5 h-3.5 shrink-0" />
+                <span>Hệ Thống</span>
+              </button>
+            </div>
+          </div>
 
-                {/* Audio Resampling Card */}
-                <div className="p-3.5 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                      <Volume2 className="w-3.5 h-3.5 text-sky-400" />
-                      Audio Resampler Worklet
-                    </span>
-                    <span className="text-[10px] font-mono text-sky-400">
-                      16kHz PCM16
-                    </span>
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
-                      <span>Live Volume:</span>
-                      <span>{Math.round(volume * 100)}%</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-sky-500 via-emerald-400 to-amber-400 transition-all duration-75"
-                        style={{
-                          width: `${Math.min(
-                            100,
-                            Math.max(0, volume * 200)
-                          )}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Vector Map State Card */}
-                <div className="p-3.5 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                      <Compass className="w-3.5 h-3.5 text-emerald-400" />
-                      Vector Map State
-                    </span>
-                    <span className="text-[10px] font-mono text-emerald-400 uppercase">
-                      {cameraTarget?.region || 'all'}
-                    </span>
-                  </div>
-                  <div className="text-[11px] font-mono space-y-1 bg-[#090e17] p-2 rounded border border-[#1b2b40]">
-                    <div>
-                      <span className="text-slate-500">Tỉnh chọn: </span>
-                      <span className="text-amber-300 font-bold truncate">
-                        {highlightedPlaceId || 'None'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">Markers: </span>
-                      <span className="text-slate-200 font-bold">
-                        {markers.length}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Lesson & Level Card */}
-                <div className="p-3.5 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                      <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-                      Bài Học &amp; Trình Độ
-                    </span>
-                    <span className="text-[10px] font-mono text-amber-400">
-                      {proficiencyLevel}
-                    </span>
-                  </div>
-                  <div className="text-[11px] font-mono bg-[#090e17] p-2 rounded border border-[#1b2b40] text-slate-300 truncate">
-                    Lesson: <span className="text-white font-bold">{activeLessonId}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 3. SIMULATOR TAB */}
+          {/* HUB BODY (Scrollable content) */}
+          <div className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-3.5">
+            {/* 1. SIMULATOR TAB */}
             {activeTab === 'simulator' && (
-              <div
-                className={`grid gap-3 ${
-                  dockPosition === 'bottom'
-                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
-                    : 'grid-cols-1'
-                }`}
-              >
+              <div className="space-y-3.5">
                 {/* Section 1: Map Tools Simulator */}
-                <div className="p-3.5 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
+                <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
                   <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5" />
                     <span>Highlight Province</span>
@@ -713,7 +417,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
                 </div>
 
                 {/* Section 2: Region Focus Simulator */}
-                <div className="p-3.5 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
+                <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
                   <h4 className="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
                     <Compass className="w-3.5 h-3.5" />
                     <span>Focus Map Region</span>
@@ -770,7 +474,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
                 </div>
 
                 {/* Section 3: Pedagogical Lesson Tools */}
-                <div className="p-3.5 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
+                <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
                   <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>Lesson Plans &amp; Vocab</span>
@@ -786,7 +490,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
                           });
                         })
                       }
-                      className="w-full px-2 py-1.5 rounded bg-amber-950/50 border border-amber-800 text-amber-300 hover:bg-amber-900 text-xs font-medium text-left cursor-pointer transition-colors flex items-center justify-between"
+                      className="w-full px-2.5 py-1.5 rounded bg-amber-950/50 border border-amber-800 text-amber-300 hover:bg-amber-900 text-xs font-medium text-left cursor-pointer transition-colors flex items-center justify-between"
                     >
                       <span>Plan: Phở Hà Nội</span>
                       <Play className="w-3 h-3" />
@@ -805,7 +509,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
                           });
                         })
                       }
-                      className="w-full px-2 py-1.5 rounded bg-cyan-950/50 border border-cyan-800 text-cyan-300 hover:bg-cyan-900 text-xs font-medium text-left cursor-pointer transition-colors flex items-center justify-between"
+                      className="w-full px-2.5 py-1.5 rounded bg-cyan-950/50 border border-cyan-800 text-cyan-300 hover:bg-cyan-900 text-xs font-medium text-left cursor-pointer transition-colors flex items-center justify-between"
                     >
                       <span>Thẻ từ vựng Quan họ</span>
                       <Play className="w-3 h-3" />
@@ -814,7 +518,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
                 </div>
 
                 {/* Section 4: Speech Assessment Simulator */}
-                <div className="p-3.5 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
+                <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
                   <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Speech Evaluation</span>
@@ -834,7 +538,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
                         });
                       })
                     }
-                    className="w-full px-2 py-1.5 rounded bg-rose-950/40 border border-rose-800 text-rose-300 hover:bg-rose-900 text-xs font-medium text-left cursor-pointer transition-colors flex items-center justify-between"
+                    className="w-full px-2.5 py-1.5 rounded bg-rose-950/40 border border-rose-800 text-rose-300 hover:bg-rose-900 text-xs font-medium text-left cursor-pointer transition-colors flex items-center justify-between"
                   >
                     <span>Mô Phỏng Sửa Lỗi Nói</span>
                     <Play className="w-3 h-3" />
@@ -842,8 +546,263 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
                 </div>
               </div>
             )}
+
+            {/* 2. TRACE LOGS TAB */}
+            {activeTab === 'logs' && (
+              <div className="space-y-2.5">
+                {/* Search & Actions Bar */}
+                <div className="space-y-2">
+                  <div className="relative w-full">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      placeholder="Tìm log, transcript, tool..."
+                      className="w-full bg-[#0e1625] border border-[#1b2b40] rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  {/* Category Pills */}
+                  <div className="flex items-center gap-1 overflow-x-auto pb-0.5 text-[10px] font-mono">
+                    {(
+                      [
+                        'all',
+                        'asr',
+                        'tool',
+                        'ws',
+                        'audio',
+                        'map',
+                        'system',
+                      ] as const
+                    ).map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`px-2 py-0.5 rounded cursor-pointer uppercase transition-colors shrink-0 ${
+                          selectedCategory === cat
+                            ? 'bg-amber-500 text-black font-bold'
+                            : 'bg-[#0e1625] text-slate-400 border border-[#1b2b40] hover:text-slate-200'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-1.5 pt-1">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={handleCopyLogs}
+                        className="px-2 py-1 rounded bg-[#0e1625] border border-[#1b2b40] text-slate-300 hover:text-white hover:bg-slate-800 text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                        title="Sao chép logs"
+                      >
+                        <Copy className="w-3 h-3" />
+                        <span>{copySuccess ? 'Đã chép' : 'Chép'}</span>
+                      </button>
+
+                      <button
+                        onClick={handleDownloadLogs}
+                        className="px-2 py-1 rounded bg-[#0e1625] border border-[#1b2b40] text-slate-300 hover:text-white hover:bg-slate-800 text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                        title="Tải JSON"
+                      >
+                        <Download className="w-3 h-3" />
+                        <span>Tải</span>
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={clearLogs}
+                      className="p-1 rounded bg-[#0e1625] border border-[#1b2b40] text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 text-[11px] transition-colors cursor-pointer"
+                      title="Xóa logs"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Log Event Stream */}
+                {filteredLogs.length === 0 ? (
+                  <div className="p-8 text-center text-slate-500 text-xs font-mono">
+                    Chưa có nhật ký nào phù hợp.
+                  </div>
+                ) : (
+                  <div className="space-y-1 font-mono text-[11px]">
+                    {filteredLogs.map(log => {
+                      const isExpanded = expandedLogId === log.id;
+                      const hasData =
+                        log.data !== undefined && log.data !== null;
+
+                      return (
+                        <div
+                          key={log.id}
+                          className={`p-2 rounded-md border transition-all ${
+                            log.level === 'error'
+                              ? 'bg-rose-950/20 border-rose-800/60'
+                              : log.level === 'warn'
+                              ? 'bg-amber-950/20 border-amber-800/60'
+                              : log.level === 'success'
+                              ? 'bg-emerald-950/15 border-emerald-800/40'
+                              : log.category === 'asr'
+                              ? 'bg-pink-950/15 border-pink-800/40'
+                              : 'bg-[#0d1422] border-[#182638]'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-1.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-slate-500 text-[10px]">
+                                {new Date(log.timestamp).toLocaleTimeString()}
+                              </span>
+                              {getLevelBadge(log.level)}
+                              {getCategoryBadge(log.category)}
+                              <span className="text-slate-200 break-words font-medium">
+                                {log.message}
+                              </span>
+                            </div>
+
+                            {hasData && (
+                              <button
+                                onClick={() =>
+                                  setExpandedLogId(isExpanded ? null : log.id)
+                                }
+                                className="text-slate-400 hover:text-white p-0.5 cursor-pointer shrink-0"
+                                title="Xem payload"
+                              >
+                                {isExpanded ? (
+                                  <ChevronDown className="w-3.5 h-3.5" />
+                                ) : (
+                                  <ChevronRight className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Expanded JSON Payload */}
+                          {isExpanded && hasData && (
+                            <div className="mt-2 p-2 rounded bg-[#060a12] border border-[#172435] overflow-x-auto text-[10px] text-amber-200">
+                              <pre>{JSON.stringify(log.data, null, 2)}</pre>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 3. SYSTEM HEALTH TAB */}
+            {activeTab === 'health' && (
+              <div className="space-y-3">
+                {/* WebSocket Card */}
+                <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                      <Radio className="w-3.5 h-3.5 text-purple-400" />
+                      Gemini Live WebSocket
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
+                        connected
+                          ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                          : 'bg-rose-950 text-rose-300 border border-rose-800'
+                      }`}
+                    >
+                      {connected ? 'CONNECTED' : 'OFF'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] font-mono space-y-1 bg-[#090e17] p-2 rounded border border-[#1b2b40]">
+                    <div>
+                      <span className="text-slate-500">Model: </span>
+                      <span className="text-slate-200 font-bold truncate">
+                        {model}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">Status: </span>
+                      <span className="text-slate-200 font-bold">
+                        {client.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Audio Resampling Card */}
+                <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                      <Volume2 className="w-3.5 h-3.5 text-sky-400" />
+                      Audio Resampler Worklet
+                    </span>
+                    <span className="text-[10px] font-mono text-sky-400">
+                      16kHz PCM16
+                    </span>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
+                      <span>Live Volume:</span>
+                      <span>{Math.round(volume * 100)}%</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-sky-500 via-emerald-400 to-amber-400 transition-all duration-75"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            Math.max(0, volume * 200)
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vector Map State Card */}
+                <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                      <Compass className="w-3.5 h-3.5 text-emerald-400" />
+                      Vector Map State
+                    </span>
+                    <span className="text-[10px] font-mono text-emerald-400 uppercase">
+                      {cameraTarget?.region || 'all'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] font-mono space-y-1 bg-[#090e17] p-2 rounded border border-[#1b2b40]">
+                    <div>
+                      <span className="text-slate-500">Tỉnh chọn: </span>
+                      <span className="text-amber-300 font-bold truncate">
+                        {highlightedPlaceId || 'None'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">Markers: </span>
+                      <span className="text-slate-200 font-bold">
+                        {markers.length}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lesson & Level Card */}
+                <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+                      Bài Học &amp; Trình Độ
+                    </span>
+                    <span className="text-[10px] font-mono text-amber-400">
+                      {proficiencyLevel}
+                    </span>
+                  </div>
+                  <div className="text-[11px] font-mono bg-[#090e17] p-2 rounded border border-[#1b2b40] text-slate-300 truncate">
+                    Lesson: <span className="text-white font-bold">{activeLessonId}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        </aside>
       )}
     </>
   );

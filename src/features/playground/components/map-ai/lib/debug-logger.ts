@@ -35,6 +35,8 @@ export const isMapAiDebugEnabled = (): boolean => {
 interface MapAiDebugState {
   logs: DebugLogEntry[];
   maxLogs: number;
+  isDrawerOpen: boolean;
+  activeTab: 'health' | 'logs' | 'simulator';
   selectedCategory: 'all' | LogCategory;
   searchQuery: string;
   errorCount: number;
