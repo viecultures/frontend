@@ -151,4 +151,17 @@ export const culturalSpeakingTools: FunctionCall[] = [
     },
     isEnabled: true,
   },
+  {
+    name: 'recordLessonQuizResult',
+    description: 'Records the final score after the learner completes the guided lesson quiz. Use only after all quiz answers are collected.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        totalQuestions: { type: 'INTEGER', description: 'Total quiz questions.' },
+        correctAnswers: { type: 'INTEGER', description: 'Number of correct answers.' },
+      },
+      required: ['totalQuestions', 'correctAnswers'],
+    },
+    isEnabled: true,
+  },
 ];

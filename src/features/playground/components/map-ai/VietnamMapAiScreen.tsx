@@ -52,6 +52,10 @@ function MapAiContent() {
       });
       setHighlightedPlaceId(province.id);
       setCameraTarget({ provinceId: province.id, region: province.region });
+      if (connected && tutorMode === 'free-conversation' && mapContextMode !== 'off') {
+        client.sendRealtimeText(`The learner selected ${province.name} on the Vietnam map. Continue our conversation about Vietnam by asking one natural question connected to this place.`);
+        useLogStore.getState().addTurn({ role: 'user', text: `I selected ${province.name} on the map.`, isFinal: true });
+      }
     } else {
       debugLog.map('Người dùng bỏ chọn tỉnh (Clear selection)');
       setHighlightedPlaceId(null);
@@ -75,7 +79,7 @@ function MapAiContent() {
     handleSelectProvince(province);
   };
 
-  const { proficiencyLevel } = useSettings();
+  const { proficiencyLevel, tutorMode, mapContextMode } = useSettings();
 
   const handleAskAiAboutProvince = async (provinceName: string) => {
     if (!connected) {

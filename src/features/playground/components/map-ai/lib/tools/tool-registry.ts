@@ -8,6 +8,7 @@ import { findProvinceById, findProvinceByName, svgCoordsToLatLng } from '../svg-
 import { debugLog } from '../debug-logger';
 import { buildAiMapLessonPayload } from '../lesson-payload';
 import { useAiMapLessonStore } from '../lesson-state';
+import type { AiMapQuizResult } from '../../types';
 import {
   findLessonById,
   filterLessons,
@@ -72,6 +73,8 @@ export const toolRegistry: Record<string, ToolImplementation> = {
   }) => {
     return await executeEvaluateSpeechOrGrammar(params);
   },
+
+  recordLessonQuizResult: async (params: { totalQuestions: number; correctAnswers: number }) => executeRecordLessonQuizResult(params),
 };
 
 export const MAP_TOOL_NAMES = new Set(['highlightMapProvince', 'focusMapRegion']);
@@ -303,4 +306,12 @@ async function executeEvaluateSpeechOrGrammar(params: {
   });
 
   return `Speech feedback recorded.`;
+}
+
+async function executeRecordLessonQuizResult(params: { totalQuestions: number; correctAnswers: number }): Promise<AiMapQuizResult> {
+  const totalQuestions = Math.max(1, Math.floor(params.totalQuestions));
+  const correctAnswers = Math.min(totalQuestions, Math.max(0, Math.floor(params.correctAnswers)));
+  const result: AiMapQuizResult = { totalQuestions, correctAnswers, score: Math.round((correctAnswers / totalQuestions) * 100), passed: correctAnswers / totalQuestions >= 0.6 };
+  useAiMapLessonStore.getState().setQuizScore(result);
+  return result;
 }
