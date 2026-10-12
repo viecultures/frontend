@@ -15,6 +15,7 @@ import {
   MicOff,
   Keyboard,
   Send,
+  Sparkles,
 } from 'lucide-react';
 import { AudioRecorder } from '../lib/audio-recorder';
 import { useLogStore, useUI, useSettings } from '../lib/state';
@@ -184,7 +185,12 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             ref={connectButtonRef}
             className={cn('action-button connect-toggle', { connected })}
             onClick={() => {
-              if (connected) disconnect(); else connect();
+              if (connected) {
+                disconnect();
+              } else {
+                setMuted(false);
+                connect();
+              }
             }}
             title={connectButtonTitle}
             style={{ width: '100%', height: '100%' }}
@@ -193,7 +199,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           </button>
           {!connected && turns.length === 0 && (
             <div
-              className="start-here-bubble animate-bounce"
+              className="start-here-bubble animate-bounce flex items-center gap-1.5"
               style={{
                 position: 'absolute',
                 bottom: '100%',
@@ -212,7 +218,8 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
                 zIndex: 1000,
               }}
             >
-              Bắt đầu luyện nói tại đây 👆
+              <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+              <span>Bắt đầu luyện nói tại đây</span>
             </div>
           )}
         </div>

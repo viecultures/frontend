@@ -34,9 +34,11 @@ import {
   LESSON_AGENT_CATALOG,
   findLessonById,
   type LessonAgentMetadata,
+  type ProficiencyLevel,
 } from '@/data/lessonAgentCatalog';
+import { scaffoldSystemPrompt } from '../lib/prompt-scaffolder';
 
-const AVAILABLE_MODELS = ['gemini-3.1-flash-live-preview'];
+const AVAILABLE_MODELS = ['gemini-3.1-flash-live-preview', 'gemini-2.0-flash-realtime-exp'];
 
 export default function Sidebar() {
   const {
@@ -52,11 +54,13 @@ export default function Sidebar() {
     voice,
     activeLessonId,
     conversationMode,
+    proficiencyLevel,
     customGeminiApiKey,
     theme,
     setSystemPrompt,
     setVoice,
     setActiveLessonId,
+    setProficiencyLevel,
     setConversationMode,
     setCustomGeminiApiKey,
     setTheme,
@@ -79,57 +83,6 @@ export default function Sidebar() {
     }
   }, [availableVoices, voice, setVoice]);
 
-  const getModeInstruction = (mode: ConversationMode): string => {
-    switch (mode) {
-      case 'discussion':
-        return `
-MODE: ĐÀM THOẠI & THẢO LUẬN VĂN HÓA (Casual Cultural Conversation)
-- Act as a warm, inspiring cultural guide.
-- Focus on open-ended discussions about cultural traditions, personal feelings, and regional heritage.
-- Encourage the learner to express their thoughts freely in English.`;
-      case 'comprehension':
-        return `
-MODE: HỎI ĐÁP ĐỌC HIỂU & PHẢN XẠ (Reading Comprehension & Quick Reflex Q&A)
-- Act as an interactive quiz master and listening tutor.
-- Ask target comprehension questions based on the lesson details (facts, history, cultural significance).
-- Test key vocabulary definitions and reward accurate answers.`;
-      case 'shadowing':
-        return `
-MODE: LUYỆN PHÁT ÂM & SHADOWING (Pronunciation & Shadowing Coach)
-- Act as a supportive pronunciation coach.
-- Read 1 clear, well-articulated cultural sentence at a time, then ask the learner to repeat (shadow) it after you.
-- Introduce key vocabulary with IPA breakdown via displayCulturalVocab and offer pronunciation tips via evaluateSpeechOrGrammar.`;
-      case 'interview':
-        return `
-MODE: THỬ THÁCH PHỎNG VẤN SỨ GIẢ VĂN HÓA (Cultural Ambassador Interview Simulation)
-- Act as a Senior Cultural Journalist / Panel Judge conducting a formal interview for the "VieCultures Ambassador" title.
-- Ask structured, thought-provoking interview questions about heritage preservation, regional identity, and international promotion.
-- Evaluate the clarity, depth, and confidence of the candidate's answers.`;
-      default:
-        return '';
-    }
-  };
-
-  const scaffoldSystemPrompt = (lessonId: string, mode: ConversationMode): string => {
-    const targetLesson = findLessonById(lessonId) || LESSON_AGENT_CATALOG[0];
-    const modeInstruction = getModeInstruction(mode);
-
-    return `
-You are "Sứ Giả Văn Hóa AI" (VieCultures Cultural AI Companion & English Speaking/Listening Tutor).
-Currently practicing English Speaking & Listening on topic: "${targetLesson.title}" (${targetLesson.vietnameseTitle}).
-Province: ${targetLesson.provinceName}. Category: ${targetLesson.category}. Level: ${targetLesson.cefrLevel}.
-Summary: "${targetLesson.summaryEn}".
-
-${modeInstruction}
-
-CORE PEDAGOGICAL WORKFLOW:
-- Help the user talk about ${targetLesson.vietnameseTitle} in English according to the active MODE above.
-- Call highlightMapProvince({ provinceName: "${targetLesson.provinceName}" }) when focusing on this location.
-- Call displayCulturalVocab({ word, ipa, vietnameseMeaning, exampleSentence }) when introducing key cultural words.
-- Encourage active English speaking, keeping voice turns concise (1-3 sentences) and ending with an engaging question.
-`.trim();
-  };
-
   // When lesson changes, auto-scaffold dynamic prompt
   const handleLessonChange = (newLessonId: string) => {
     setActiveLessonId(newLessonId);
@@ -142,14 +95,20 @@ CORE PEDAGOGICAL WORKFLOW:
         });
         useMapStore.getState().setHighlightedPlaceId(targetLesson.provinceId);
       }
-      setSystemPrompt(scaffoldSystemPrompt(newLessonId, conversationMode));
+      setSystemPrompt(scaffoldSystemPrompt(newLessonId, conversationMode, proficiencyLevel));
     }
+  };
+
+  // When proficiency level changes, auto-scaffold dynamic prompt
+  const handleLevelChange = (newLevel: ProficiencyLevel) => {
+    setProficiencyLevel(newLevel);
+    setSystemPrompt(scaffoldSystemPrompt(activeLessonId, conversationMode, newLevel));
   };
 
   // When conversation mode changes, auto-scaffold dynamic prompt
   const handleModeChange = (newMode: ConversationMode) => {
     setConversationMode(newMode);
-    setSystemPrompt(scaffoldSystemPrompt(activeLessonId, newMode));
+    setSystemPrompt(scaffoldSystemPrompt(activeLessonId, newMode, proficiencyLevel));
   };
 
   const handleExportLogs = () => {
@@ -162,6 +121,7 @@ CORE PEDAGOGICAL WORKFLOW:
       configuration: {
         model: config.model,
         activeLessonId: config.activeLessonId,
+        proficiencyLevel: config.proficiencyLevel,
         conversationMode: config.conversationMode,
         systemPrompt: config.systemPrompt,
       },
@@ -240,6 +200,29 @@ CORE PEDAGOGICAL WORKFLOW:
             </select>
             <p className="text-[11px] text-gray-400">
               Gia sư AI sẽ tự động đồng bộ bản đồ, từ vựng và câu hỏi theo bài học này.
+            </p>
+          </div>
+
+          {/* Proficiency Level Selector (Level 1, Level 2, Level 3) */}
+          <div className="space-y-1.5 mb-4">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Trình Độ Luyện Nói &amp; Nội Dung</span>
+            </label>
+            <select
+              value={proficiencyLevel}
+              disabled={connected}
+              onChange={e => handleLevelChange(e.target.value as ProficiencyLevel)}
+              className="w-full text-xs font-semibold"
+            >
+              <option value="Level 1">Level 1 (A1–A2) — Sơ cấp · Câu ngắn &amp; Gợi ý mẫu câu</option>
+              <option value="Level 2">Level 2 (B1–B2) — Trung cấp · Đàm thoại tự nhiên &amp; So sánh</option>
+              <option value="Level 3">Level 3 (B2–C1) — Cao cấp · Di sản chuyên sâu &amp; Phản biện</option>
+            </select>
+            <p className="text-[11px] text-gray-400">
+              {proficiencyLevel === 'Level 1' && 'Level 1: Từ vựng đơn giản, câu 5-10 từ, kèm mẫu câu gợi ý (Sentence Starters).'}
+              {proficiencyLevel === 'Level 2' && 'Level 2: Đàm thoại tự nhiên, câu ghép nối ý, từ vựng văn hóa tiêu chuẩn.'}
+              {proficiencyLevel === 'Level 3' && 'Level 3: Thuật ngữ học thuật, tư duy phản biện, đối thoại vai trò Sứ giả Văn hóa.'}
             </p>
           </div>
 

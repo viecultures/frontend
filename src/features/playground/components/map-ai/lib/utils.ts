@@ -24,47 +24,30 @@ type GetAudioContextOptions = AudioContextOptions & {
 
 const map: Map<string, AudioContext> = new Map();
 
-export const audioContext: (
+export const audioContext = async (
   options?: GetAudioContextOptions
-) => Promise<AudioContext> = (() => {
-  const didInteract = new Promise(res => {
-    window.addEventListener('pointerdown', res, { once: true });
-    window.addEventListener('keydown', res, { once: true });
-  });
-
-  return async (options?: GetAudioContextOptions) => {
-    try {
-      const a = new Audio();
-      a.src =
-        'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-      await a.play();
-      if (options?.id && map.has(options.id)) {
-        const ctx = map.get(options.id);
-        if (ctx) {
-          return ctx;
-        }
+): Promise<AudioContext> => {
+  if (options?.id && map.has(options.id)) {
+    const existing = map.get(options.id);
+    if (existing && existing.state !== 'closed') {
+      if (existing.state === 'suspended') {
+        await existing.resume().catch(() => {});
       }
-      const ctx = new AudioContext(options);
-      if (options?.id) {
-        map.set(options.id, ctx);
-      }
-      return ctx;
-    } catch (e) {
-      await didInteract;
-      if (options?.id && map.has(options.id)) {
-        const ctx = map.get(options.id);
-        if (ctx) {
-          return ctx;
-        }
-      }
-      const ctx = new AudioContext(options);
-      if (options?.id) {
-        map.set(options.id, ctx);
-      }
-      return ctx;
+      return existing;
     }
-  };
-})();
+  }
+
+  const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+  const ctx = new AudioCtx(options);
+  if (ctx.state === 'suspended') {
+    await ctx.resume().catch(() => {});
+  }
+
+  if (options?.id) {
+    map.set(options.id, ctx);
+  }
+  return ctx;
+};
 
 export function base64ToArrayBuffer(base64: string) {
   var binaryString = atob(base64);

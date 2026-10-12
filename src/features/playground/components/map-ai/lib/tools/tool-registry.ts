@@ -9,7 +9,9 @@ import {
   findLessonById,
   filterLessons,
   searchLessonsByKeyword,
+  getLessonForLevel,
   LESSON_AGENT_CATALOG,
+  type ProficiencyLevel,
 } from '@/data/lessonAgentCatalog';
 
 /**
@@ -32,13 +34,13 @@ export const toolRegistry: Record<string, ToolImplementation> = {
   listCulturalLessons: async (params: {
     category?: 'Cuisine' | 'Heritage' | 'Crafts' | 'Nature' | 'Folklore';
     region?: 'north' | 'central' | 'south' | 'all';
-    cefrLevel?: 'A2' | 'B1' | 'B2';
+    cefrLevel?: string;
     searchKeyword?: string;
   }) => {
     return await executeListCulturalLessons(params);
   },
 
-  loadLessonDiscussionPlan: async (params: { lessonId: string }) => {
+  loadLessonDiscussionPlan: async (params: { lessonId: string; level?: ProficiencyLevel }) => {
     return await executeLoadLessonDiscussionPlan(params);
   },
 
@@ -74,7 +76,7 @@ export const toolRegistry: Record<string, ToolImplementation> = {
 async function executeListCulturalLessons(params: {
   category?: 'Cuisine' | 'Heritage' | 'Crafts' | 'Nature' | 'Folklore';
   region?: 'north' | 'central' | 'south' | 'all';
-  cefrLevel?: 'A2' | 'B1' | 'B2';
+  cefrLevel?: string;
   searchKeyword?: string;
 }): Promise<object> {
   const { category, region, cefrLevel, searchKeyword } = params;
@@ -86,24 +88,30 @@ async function executeListCulturalLessons(params: {
     results = filterLessons({ category, region, cefrLevel });
   }
 
-  const previews = results.slice(0, 4).map(l => ({
-    lessonId: l.id,
-    title: l.title,
-    vietnameseTitle: l.vietnameseTitle,
-    province: l.provinceName,
-    level: l.cefrLevel,
-    category: l.category,
-    summary: l.summaryVi,
-  }));
+  const activeLevel = useSettings.getState().proficiencyLevel;
+
+  const previews = results.slice(0, 4).map(l => {
+    const levelInfo = l.levelContent?.[activeLevel] || l.levelContent?.['Level 2'];
+    return {
+      lessonId: l.id,
+      title: l.title,
+      vietnameseTitle: l.vietnameseTitle,
+      province: l.provinceName,
+      level: l.cefrLevel,
+      category: l.category,
+      summary: levelInfo?.summaryVi || l.summaryVi,
+    };
+  });
 
   useLogStore.getState().addTurn({
     role: 'system',
-    text: `**Danh sách chủ đề gợi ý:**\n${previews.map(p => `* **${p.vietnameseTitle}** (${p.level}) - ${p.province} [\`${p.lessonId}\`]`).join('\n')}`,
+    text: `**Danh sách bài học gợi ý (${activeLevel}):**\n${previews.map(p => `* **${p.vietnameseTitle}** - ${p.province} [\`${p.lessonId}\`]`).join('\n')}`,
     isFinal: true,
   });
 
   return {
     count: previews.length,
+    activeLevel,
     lessons: previews,
   };
 }
@@ -111,9 +119,16 @@ async function executeListCulturalLessons(params: {
 /**
  * Loads a full lesson discussion plan and syncs map/settings.
  */
-async function executeLoadLessonDiscussionPlan(params: { lessonId: string }): Promise<object> {
-  const { lessonId } = params;
-  const lesson = findLessonById(lessonId) || LESSON_AGENT_CATALOG[0];
+async function executeLoadLessonDiscussionPlan(params: {
+  lessonId: string;
+  level?: ProficiencyLevel;
+}): Promise<object> {
+  const { lessonId, level } = params;
+  const targetLevel = level || useSettings.getState().proficiencyLevel || 'Level 2';
+
+  const result = getLessonForLevel(lessonId, targetLevel);
+  const lesson = result ? result.lesson : LESSON_AGENT_CATALOG[0];
+  const levelContent = result ? result.content : lesson.levelContent[targetLevel] || lesson.levelContent['Level 2'];
 
   useSettings.getState().setActiveLessonId(lesson.id);
 
@@ -140,9 +155,13 @@ async function executeLoadLessonDiscussionPlan(params: { lessonId: string }): Pr
     }
   }
 
+  const startersText = levelContent.discussionPrompts.sentenceStarters?.length
+    ? `\n- *Mẫu câu gợi ý (Starters):* ${levelContent.discussionPrompts.sentenceStarters.map(s => `"${s}"`).join(', ')}`
+    : '';
+
   useLogStore.getState().addTurn({
     role: 'system',
-    text: `**Đã chọn bài luyện tập:** **${lesson.vietnameseTitle}**\n- *Tiêu đề tiếng Anh:* ${lesson.title}\n- *Trình độ:* ${lesson.cefrLevel} · ${lesson.durationMinutes} phút\n- *Tóm tắt:* ${lesson.summaryVi}`,
+    text: `**Đã chọn bài luyện tập [${targetLevel}]:** **${lesson.vietnameseTitle}**\n- *Tiêu đề:* ${lesson.title}\n- *Tóm tắt luyện nghe:* ${levelContent.summaryEn}\n- *Nội dung:* ${levelContent.summaryVi}${startersText}`,
     isFinal: true,
   });
 
@@ -151,10 +170,11 @@ async function executeLoadLessonDiscussionPlan(params: { lessonId: string }): Pr
     title: lesson.title,
     vietnameseTitle: lesson.vietnameseTitle,
     province: lesson.provinceName,
-    cefrLevel: lesson.cefrLevel,
-    summaryForListening: lesson.summaryEn,
-    keyVocabularies: lesson.keyVocabularies,
-    speakingPrompts: lesson.discussionPrompts,
+    activeLevel: targetLevel,
+    summaryForListening: levelContent.summaryEn,
+    summaryVi: levelContent.summaryVi,
+    keyVocabularies: levelContent.keyVocabularies,
+    speakingPrompts: levelContent.discussionPrompts,
   };
 }
 
@@ -224,7 +244,7 @@ async function executeDisplayCulturalVocab(params: {
 
   useLogStore.getState().addTurn({
     role: 'system',
-    text: `📚 **Từ Vựng Văn Hóa:** **${word}** ${ipa ? `\`${ipa}\`` : ''}\n- **Ý nghĩa:** ${vietnameseMeaning}\n${exampleSentence ? `- *Ví dụ:* "${exampleSentence}"` : ''}`,
+    text: `**Từ Vựng Văn Hóa:** **${word}** ${ipa ? `\`${ipa}\`` : ''}\n- **Ý nghĩa:** ${vietnameseMeaning}\n${exampleSentence ? `- *Ví dụ:* "${exampleSentence}"` : ''}`,
     isFinal: true,
   });
 
@@ -243,7 +263,7 @@ async function executeEvaluateSpeechOrGrammar(params: {
 
   useLogStore.getState().addTurn({
     role: 'system',
-    text: `✨ **Góp Ý Luyện Nói:**\n- **Câu luyện tập:** "${targetPhrase}"\n- **Gợi ý cải thiện:** ${feedback}\n${encouragement ? `- 💡 *Động viên:* ${encouragement}` : ''}`,
+    text: `**Góp Ý Luyện Nói:**\n- **Câu luyện tập:** "${targetPhrase}"\n- **Gợi ý cải thiện:** ${feedback}\n${encouragement ? `- *Động viên:* ${encouragement}` : ''}`,
     isFinal: true,
   });
 

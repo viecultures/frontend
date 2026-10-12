@@ -17,6 +17,7 @@ import {
 } from '../../lib/state';
 import { User, Sparkles, RefreshCw, BookOpen, MessageSquareText, Compass, MapPin } from 'lucide-react';
 import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '@/data/lessonAgentCatalog';
+import QuickModeSwitcher from '../QuickModeSwitcher';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -74,7 +75,7 @@ export default function StreamingConsole() {
     setConfig,
   } = useLiveAPIContext();
 
-  const { systemPrompt, voice, model, activeLessonId } = useSettings();
+  const { systemPrompt, voice, model, activeLessonId, proficiencyLevel } = useSettings();
   const { tools } = useTools();
   const turns = useLogStore(state => state.turns);
   const { showSystemMessages } = useUI();
@@ -235,8 +236,8 @@ export default function StreamingConsole() {
               <span className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase tracking-wider bg-[#D4AF37]/20 text-[#FCE5B5] font-semibold border border-[#D4AF37]/30">
                 {activeLesson.category}
               </span>
-              <span className="text-[10px] font-mono text-[#6E9FA1] font-semibold">
-                {activeLesson.cefrLevel}
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase font-bold bg-[#1E4B43] text-[#D4AF37] border border-[#D4AF37]/40">
+                {proficiencyLevel}
               </span>
               {activeLesson.provinceName && (
                 <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
@@ -251,6 +252,9 @@ export default function StreamingConsole() {
           </div>
         </div>
       </div>
+
+      {/* Quick Mode Switcher */}
+      <QuickModeSwitcher />
 
       {/* Message Timeline */}
       <div className="transcription-view flex-1 overflow-y-auto p-4 space-y-3.5" ref={scrollRef}>

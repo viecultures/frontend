@@ -15,6 +15,8 @@ import type {
   LiveServerToolCall,
 } from '@google/genai';
 
+import type { ProficiencyLevel } from '@/data/lessonAgentCatalog';
+
 export interface SVGCameraTarget {
   provinceId?: string;
   region?: 'north' | 'central' | 'south' | 'all';
@@ -32,6 +34,7 @@ export const useSettings = create<{
   model: string;
   voice: string;
   activeLessonId: string;
+  proficiencyLevel: ProficiencyLevel;
   conversationMode: ConversationMode;
   customGeminiApiKey: string;
   theme: 'dark' | 'light';
@@ -39,6 +42,7 @@ export const useSettings = create<{
   setModel: (model: string) => void;
   setVoice: (voice: string) => void;
   setActiveLessonId: (lessonId: string) => void;
+  setProficiencyLevel: (level: ProficiencyLevel) => void;
   setConversationMode: (mode: ConversationMode) => void;
   setCustomGeminiApiKey: (key: string) => void;
   setTheme: (theme: 'dark' | 'light') => void;
@@ -47,6 +51,7 @@ export const useSettings = create<{
   model: DEFAULT_LIVE_API_MODEL,
   voice: DEFAULT_VOICE,
   activeLessonId: 'pho-hanoi-history',
+  proficiencyLevel: 'Level 2',
   conversationMode: 'discussion',
   customGeminiApiKey:
     typeof window !== 'undefined'
@@ -60,6 +65,7 @@ export const useSettings = create<{
   setModel: model => set({ model }),
   setVoice: voice => set({ voice }),
   setActiveLessonId: activeLessonId => set({ activeLessonId }),
+  setProficiencyLevel: proficiencyLevel => set({ proficiencyLevel }),
   setConversationMode: conversationMode => set({ conversationMode }),
   setCustomGeminiApiKey: customGeminiApiKey => {
     if (typeof window !== 'undefined') {
@@ -93,7 +99,7 @@ export const useUI = create<{
   showSystemMessages: true,
   toggleShowSystemMessages: () =>
     set(state => ({ showSystemMessages: !state.showSystemMessages })),
-  muted: true,
+  muted: false,
   setMuted: muted => set({ muted }),
   speakerMuted: false,
   setSpeakerMuted: speakerMuted => set({ speakerMuted }),

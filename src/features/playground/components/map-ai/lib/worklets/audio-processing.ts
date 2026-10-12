@@ -38,14 +38,17 @@ class AudioProcessingWorklet extends AudioWorkletProcessor {
    * @param outputs Float32Array[][]
    */
   process(inputs) {
-    if (inputs[0].length) {
+    if (inputs && inputs[0] && inputs[0].length > 0) {
       const channel0 = inputs[0][0];
-      this.processChunk(channel0);
+      if (channel0 && channel0.length > 0) {
+        this.processChunk(channel0);
+      }
     }
     return true;
   }
 
   sendAndClearBuffer(){
+    if (this.bufferWriteIndex === 0) return;
     this.port.postMessage({
       event: "chunk",
       data: {
@@ -59,16 +62,12 @@ class AudioProcessingWorklet extends AudioWorkletProcessor {
     const l = float32Array.length;
     
     for (let i = 0; i < l; i++) {
-      // convert float32 -1 to 1 to int16 -32768 to 32767
-      const int16Value = float32Array[i] * 32768;
+      const s = Math.max(-1, Math.min(1, float32Array[i]));
+      const int16Value = s < 0 ? Math.floor(s * 0x8000) : Math.min(0x7fff, Math.floor(s * 0x7fff));
       this.buffer[this.bufferWriteIndex++] = int16Value;
       if(this.bufferWriteIndex >= this.buffer.length) {
         this.sendAndClearBuffer();
       }
-    }
-
-    if(this.bufferWriteIndex >= this.buffer.length) {
-      this.sendAndClearBuffer();
     }
   }
 }

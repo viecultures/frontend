@@ -11,7 +11,7 @@ export const culturalSpeakingTools: FunctionCall[] = [
   {
     name: 'listCulturalLessons',
     description:
-      'Discovers and returns a curated list of Vietnamese cultural reading/speaking lessons based on region, topic category, CEFR level, or search keyword.',
+      'Discovers and returns a curated list of Vietnamese cultural reading/speaking lessons based on region, topic category, proficiency level (Level 1, Level 2, Level 3), or search keyword.',
     parameters: {
       type: 'OBJECT',
       properties: {
@@ -27,8 +27,8 @@ export const culturalSpeakingTools: FunctionCall[] = [
         },
         cefrLevel: {
           type: 'STRING',
-          description: 'Target English proficiency level.',
-          enum: ['A2', 'B1', 'B2'],
+          description: 'Target English proficiency level (Level 1 [A1-A2], Level 2 [B1-B2], or Level 3 [B2-C1]).',
+          enum: ['Level 1', 'Level 2', 'Level 3', 'A2', 'B1', 'B2'],
         },
         searchKeyword: {
           type: 'STRING',
@@ -41,13 +41,18 @@ export const culturalSpeakingTools: FunctionCall[] = [
   {
     name: 'loadLessonDiscussionPlan',
     description:
-      'Loads the comprehensive pedagogical discussion plan for a specific lesson: brief English & Vietnamese summary for listening, key vocabulary with IPA, and speaking discussion prompts.',
+      'Loads the comprehensive pedagogical discussion plan for a specific lesson: English & Vietnamese summary tailored to the learner\'s level, key vocabulary with IPA, and speaking discussion prompts with sentence starters.',
     parameters: {
       type: 'OBJECT',
       properties: {
         lessonId: {
           type: 'STRING',
           description: 'The unique lesson identifier (e.g. "pho-hanoi-history", "ha-long-bay", "gong-culture-tay-nguyen", "non-la-culture", "my-son-sanctuary", "floating-markets-mekong", "nem-ran-spring-rolls", "dong-ho-paintings").',
+        },
+        level: {
+          type: 'STRING',
+          description: 'Target proficiency level (Level 1 [A1-A2], Level 2 [B1-B2], or Level 3 [B2-C1]). If omitted, the currently active session level is used.',
+          enum: ['Level 1', 'Level 2', 'Level 3'],
         },
       },
       required: ['lessonId'],
