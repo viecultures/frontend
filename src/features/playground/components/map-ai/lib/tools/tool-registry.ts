@@ -6,6 +6,8 @@
 import { type MapMarker, useMapStore, useLogStore, useSettings } from '../state';
 import { findProvinceById, findProvinceByName, svgCoordsToLatLng } from '../svg-map-controller';
 import { debugLog } from '../debug-logger';
+import { buildAiMapLessonPayload } from '../lesson-payload';
+import { useAiMapLessonStore } from '../lesson-state';
 import {
   findLessonById,
   filterLessons,
@@ -135,6 +137,8 @@ async function executeLoadLessonDiscussionPlan(params: {
   const levelContent = result ? result.content : lesson.levelContent[targetLevel] || lesson.levelContent['Level 2'];
 
   useSettings.getState().setActiveLessonId(lesson.id);
+  const lessonPayload = buildAiMapLessonPayload(lesson.id, targetLevel);
+  if (lessonPayload) useAiMapLessonStore.getState().startLesson(lessonPayload);
 
   // Auto-focus map if lesson has a specific province
   if (lesson.provinceId) {
@@ -269,6 +273,8 @@ async function executeDisplayCulturalVocab(params: {
 }): Promise<string> {
   const { word, ipa, vietnameseMeaning, exampleSentence } = params;
 
+  useAiMapLessonStore.getState().markVocabulary([word]);
+
   useLogStore.getState().addTurn({
     role: 'system',
     text: `**Từ Vựng Văn Hóa:** **${word}** ${ipa ? `\`${ipa}\`` : ''}\n- **Ý nghĩa:** ${vietnameseMeaning}\n${exampleSentence ? `- *Ví dụ:* "${exampleSentence}"` : ''}`,
@@ -287,6 +293,8 @@ async function executeEvaluateSpeechOrGrammar(params: {
   encouragement?: string;
 }): Promise<string> {
   const { targetPhrase, feedback, encouragement } = params;
+
+  useAiMapLessonStore.getState().completeStep('speak');
 
   useLogStore.getState().addTurn({
     role: 'system',

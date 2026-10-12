@@ -16,7 +16,7 @@ const steps: { id: AiMapLessonStep; label: string }[] = [
 export default function AiMapLessonProgressBar() {
   const { tutorMode, activeLessonId, proficiencyLevel } = useSettings();
   const { client, connected, connect } = useLiveAPIContext();
-  const { session, payload, startLesson } = useAiMapLessonStore();
+  const { session, payload, startLesson, completeStep } = useAiMapLessonStore();
 
   useEffect(() => {
     if (tutorMode !== 'guided-lesson') return;
@@ -40,7 +40,9 @@ export default function AiMapLessonProgressBar() {
       quiz: `Continue the guided lesson with a short quiz about ${payload.title}. Ask one question at a time and wait for my answer.`,
       complete: 'Summarize my guided lesson progress and congratulate me.',
     };
-    client.sendRealtimeText(prompts[session.currentStep]);
+    const requestedStep = session.currentStep;
+    client.sendRealtimeText(prompts[requestedStep]);
+    if (requestedStep !== 'complete' && requestedStep !== 'quiz') completeStep(requestedStep);
   };
 
   const completedCount = session.completedSteps.filter(step => step !== 'complete').length;
