@@ -48,7 +48,6 @@ export default function Sidebar() {
   } = useUI();
 
   const {
-    systemPrompt,
     model,
     voice,
     activeLessonId,
@@ -56,7 +55,6 @@ export default function Sidebar() {
     proficiencyLevel,
     customGeminiApiKey,
     theme,
-    setSystemPrompt,
     setVoice,
     setActiveLessonId,
     setProficiencyLevel,
@@ -274,21 +272,6 @@ export default function Sidebar() {
               onChange={e => setCustomGeminiApiKey(e.target.value)}
               placeholder="Nhập API Key để ghi đè .env (nếu có)..."
               className="w-full text-xs font-mono"
-            />
-          </div>
-
-          {/* System Prompt */}
-          <div className="space-y-1.5 mb-4">
-            <label className="text-xs font-bold text-gray-300">
-              Chỉ Dẫn Hệ Thống (System Prompt)
-            </label>
-            <textarea
-              value={systemPrompt}
-              disabled={connected}
-              onChange={e => setSystemPrompt(e.target.value)}
-              rows={8}
-              placeholder="Mô tả vai trò và phong cách hướng dẫn của Gia sư AI..."
-              className="w-full text-xs leading-relaxed font-mono"
             />
           </div>
 
