@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LESSONS_DATA, getLessonStatsForLevel } from '@/data/discoveryData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
+import type { ProvinceMapItem } from '@/data/vietnamMapData';
 
 // Modular Discovery Sub-components
 import { DiscoverySpotlight } from '../components/DiscoverySpotlight';
@@ -46,6 +47,8 @@ export default function DiscoveryPage() {
   // Interactive Map Spotlight State
   const [activePinIndex, setActivePinIndex] = useState<number>(2);
   const [isAutoTour, setIsAutoTour] = useState<boolean>(true);
+  const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(null);
+  const [selectedProvinceName, setSelectedProvinceName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAutoTour) return;
@@ -80,6 +83,7 @@ export default function DiscoveryPage() {
   // Smart Filter & Sort Logic
   const filteredLessons = useMemo(() => {
     return LESSONS_DATA.filter((lesson) => {
+      if (selectedProvinceId && lesson.provinceId !== selectedProvinceId && !lesson.isNational) return false;
       // If filtering only bookmarked stories
       if (onlyBookmarked && !bookmarks[lesson.id]) return false;
 
@@ -137,7 +141,7 @@ export default function DiscoveryPage() {
       }
       return 0;
     });
-  }, [selectedTopic, selectedCefr, selectedReadTime, searchQuery, sortBy, onlyBookmarked, bookmarks]);
+  }, [selectedTopic, selectedCefr, selectedReadTime, searchQuery, sortBy, onlyBookmarked, bookmarks, selectedProvinceId]);
 
   // Pagination Calculation
   const totalPages = Math.max(1, Math.ceil(filteredLessons.length / itemsPerPage));
@@ -152,6 +156,8 @@ export default function DiscoveryPage() {
     setSelectedReadTime('All');
     setSearchQuery('');
     setOnlyBookmarked(false);
+    setSelectedProvinceId(null);
+    setSelectedProvinceName(null);
     setCurrentPage(1);
   };
 
@@ -165,6 +171,11 @@ export default function DiscoveryPage() {
             setIsAutoTour(false);
             setActivePinIndex(idx);
           }}
+          onSelectProvince={(province: ProvinceMapItem | null) => {
+            setIsAutoTour(false);
+            setSelectedProvinceId(province?.id ?? null);
+            setSelectedProvinceName(province?.name ?? null);
+          }}
           onMouseEnter={() => setIsAutoTour(false)}
           onMouseLeave={() => setIsAutoTour(true)}
         />
@@ -175,6 +186,21 @@ export default function DiscoveryPage() {
           onSelectTopic={setSelectedTopic}
           topicCounts={topicCounts}
         />
+
+        {selectedProvinceId && (
+          <div className="mb-5 flex items-center gap-2 text-xs font-semibold text-heritage-green">
+            <span className="rounded-full bg-heritage-green/10 px-3 py-1.5 border border-heritage-green/15">
+              Đang xem bài học tại {selectedProvinceName}
+            </span>
+            <button
+              type="button"
+              onClick={() => { setSelectedProvinceId(null); setSelectedProvinceName(null); }}
+              className="rounded-full px-2.5 py-1.5 text-text-secondary hover:bg-mist-cloud transition-colors"
+            >
+              Xóa lọc
+            </button>
+          </div>
+        )}
 
         {/* 3. Filter, Search, Sort & View Mode Toolbar */}
         <DiscoveryFilterToolbar

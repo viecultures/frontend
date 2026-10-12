@@ -2,7 +2,7 @@
  * StreamingConsole for Cultural Speaking & Listening AI Tutor
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Modality } from '@google/genai';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -20,7 +20,10 @@ import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '
 import { debugLog } from '../../lib/debug-logger';
 import { buildCulturalTutorPrompt } from '../../lib/constants';
 import { MAP_TOOL_NAMES } from '../../lib/tools/tool-registry';
+import { PROFICIENCY_LEVELS, type ProficiencyLevel } from '../../lib/prompt-scaffolder';
 import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
+import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
+import { lookupWord, type VocabItem } from '@/data/readerData';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -76,6 +79,9 @@ export default function StreamingConsole() {
     connected,
     connect,
     setConfig,
+    sendPrompt,
+    connecting,
+    ending,
   } = useLiveAPIContext();
 
   const { systemPrompt, voice, model, activeLessonId, proficiencyLevel, tutorMode, correctionMode, mapContextMode } = useSettings();
@@ -85,6 +91,8 @@ export default function StreamingConsole() {
   const { isAwaitingFunctionResponse } = useLogStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastInterruptionTime = useRef(0);
+  const [selectedWord, setSelectedWord] = useState<VocabItem | null>(null);
+  const [wordPosition, setWordPosition] = useState<{ x: number; y: number } | null>(null);
 
   const activeLesson: LessonAgentMetadata =
     findLessonById(activeLessonId) || LESSON_AGENT_CATALOG[0];
@@ -99,7 +107,7 @@ export default function StreamingConsole() {
     const enabledTools = [
       {
         functionDeclarations: tools
-          .filter(tool => tool.isEnabled && (mapContextMode !== 'off' || !MAP_TOOL_NAMES.has(tool.name)))
+          .filter(tool => tool.isEnabled && (mapContextMode !== 'off' || !MAP_TOOL_NAMES.has(tool.name)) && (tutorMode !== 'free-conversation' || !['listCulturalLessons', 'loadLessonDiscussionPlan', 'recordLessonQuizResult'].includes(tool.name)))
           .map(tool => ({
             name: tool.name,
             description: tool.description,
@@ -208,14 +216,12 @@ export default function StreamingConsole() {
     client.on('inputTranscription', handleInputTranscription);
     client.on('outputTranscription', handleOutputTranscription);
     client.on('turncomplete', handleTurnComplete);
-    client.on('generationcomplete', handleTurnComplete);
     client.on('interrupted', handleInterrupted);
 
     return () => {
       client.off('inputTranscription', handleInputTranscription);
       client.off('outputTranscription', handleOutputTranscription);
       client.off('turncomplete', handleTurnComplete);
-      client.off('generationcomplete', handleTurnComplete);
       client.off('interrupted', handleInterrupted);
     };
   }, [client]);
@@ -242,13 +248,45 @@ export default function StreamingConsole() {
   const quickActions = tutorMode === 'free-conversation' ? conversationActions : guidedActions;
 
   const handleSendPrompt = async (text: string) => {
-    if (!connected) await connect();
-    client.sendRealtimeText(text);
-    useLogStore.getState().addTurn({
-      role: 'user',
-      text: text,
-      isFinal: true,
-    });
+    await sendPrompt(text);
+  };
+
+  const handleLevelSwitch = async (level: ProficiencyLevel) => {
+    if (proficiencyLevel === level) return;
+    useSettings.getState().setProficiencyLevel(level);
+    if (connected) {
+      await sendPrompt(PROFICIENCY_LEVELS[level].switchPrompt);
+    }
+  };
+
+  const handleWordClick = (event: React.MouseEvent<HTMLSpanElement>, rawWord: string) => {
+    const word = rawWord.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').trim();
+    if (!word || word.length < 2) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    setSelectedWord(lookupWord(word));
+    setWordPosition({ x: rect.left + rect.width / 2, y: rect.bottom });
+  };
+
+  const renderClickableText = (value: string) => value.split(/(\s+)/).map((part, index) =>
+    /^\s+$/.test(part) ? part : (
+      <span
+        key={`${part}-${index}`}
+        role="button"
+        tabIndex={0}
+        className="chat-word"
+        onClick={event => handleWordClick(event, part)}
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') handleWordClick(event as unknown as React.MouseEvent<HTMLSpanElement>, part);
+        }}
+      >{part}</span>
+    ),
+  );
+
+  const markdownComponents = {
+    text: ({ children }: { children?: React.ReactNode }) => {
+      const value = String(children ?? '');
+      return <>{renderClickableText(value)}</>;
+    },
   };
 
   return (
@@ -263,21 +301,67 @@ export default function StreamingConsole() {
           <div className="overflow-hidden">
             <div className="flex items-center gap-1.5">
               <span className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase tracking-wider bg-[#D4AF37]/20 text-[#FCE5B5] font-semibold border border-[#D4AF37]/30">
-                {activeLesson.category}
+                {tutorMode === 'free-conversation' ? 'Đàm Thoại Tự Do' : `Bài Đọc · ${activeLesson.category}`}
               </span>
               <span className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase font-bold bg-[#1E4B43] text-[#D4AF37] border border-[#D4AF37]/40">
                 {proficiencyLevel}
               </span>
-              {activeLesson.provinceName && (
+              {tutorMode !== 'free-conversation' && activeLesson.provinceName && (
                 <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
                   <MapPin className="w-3 h-3 text-[#D4AF37]" />
                   {activeLesson.provinceName}
                 </span>
               )}
             </div>
-            <h2 className="text-xs font-serif font-bold text-white truncate max-w-[340px]">
-              {activeLesson.vietnameseTitle}
+            <h2 className="text-xs font-serif font-bold text-white truncate max-w-[260px] sm:max-w-[320px]">
+              {tutorMode === 'free-conversation' ? 'Trò chuyện về Việt Nam · Khám phá map tự do' : activeLesson.vietnameseTitle}
             </h2>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+            {/* 2-Mode Quick Switcher */}
+            <div className="flex items-center bg-black/40 p-0.5 rounded-lg border border-white/10 text-[10px]">
+              <button
+                type="button"
+                disabled={connected || connecting || ending}
+                aria-pressed={tutorMode === 'free-conversation'}
+                onClick={() => useSettings.getState().setTutorMode('free-conversation')}
+                className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
+                  tutorMode === 'free-conversation'
+                    ? 'bg-[#1E4B43] text-[#D4AF37] font-bold shadow-sm'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                title="Đàm thoại tự do về văn hóa Việt Nam"
+              >
+                Đàm thoại
+              </button>
+              <button
+                type="button"
+                disabled={connected || connecting || ending}
+                aria-pressed={tutorMode === 'guided-lesson'}
+                onClick={() => useSettings.getState().setTutorMode('guided-lesson')}
+                className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
+                  tutorMode === 'guided-lesson'
+                    ? 'bg-[#1E4B43] text-[#D4AF37] font-bold shadow-sm'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                title="Luyện tập bài đọc & bài học di sản"
+              >
+                Bài đọc
+              </button>
+            </div>
+
+            <div className="level-quick-switch" aria-label="Quick level switch">
+              {(['Level 1', 'Level 2', 'Level 3'] as const).map(level => (
+                <button
+                  key={level}
+                  type="button"
+                  disabled={connecting || ending}
+                  aria-pressed={proficiencyLevel === level}
+                  onClick={() => void handleLevelSwitch(level)}
+                  title={`Chuyển sang ${level}: ${PROFICIENCY_LEVELS[level].description}`}
+                >{level.replace('Level ', 'L')}</button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -303,6 +387,7 @@ export default function StreamingConsole() {
               {quickActions.map((action, idx) => (
                 <button
                   key={idx}
+                  disabled={connecting || ending}
                   onClick={() => handleSendPrompt(action.text)}
                   className="px-3 py-1.5 rounded-full bg-[#1E4B43]/30 hover:bg-[#1E4B43] border border-[#D4AF37]/30 text-[#FCE5B5] text-xs transition-all shadow-sm flex items-center gap-1.5 cursor-pointer text-left"
                 >
@@ -330,7 +415,7 @@ export default function StreamingConsole() {
                       <span>{formatTimestamp(t.timestamp)}</span>
                     </div>
                     <div className="prose prose-invert prose-xs leading-relaxed max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{t.text}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{t.text}</ReactMarkdown>
                     </div>
                   </div>
                 );
@@ -360,7 +445,7 @@ export default function StreamingConsole() {
                     }`}
                   >
                     <div className="prose prose-invert prose-xs max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{t.text}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>{t.text}</ReactMarkdown>
                     </div>
                   </div>
                 </div>
@@ -390,6 +475,13 @@ export default function StreamingConsole() {
           </>
         )}
       </div>
+      <InPlaceDictionaryPopup
+        isOpen={Boolean(selectedWord && wordPosition)}
+        vocab={selectedWord}
+        position={wordPosition}
+        onClose={() => { setSelectedWord(null); setWordPosition(null); }}
+        themeMode="dark"
+      />
     </div>
   );
 }

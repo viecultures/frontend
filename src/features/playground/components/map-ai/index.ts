@@ -1,5 +1,6 @@
 export { VietnamMapAiScreen } from './VietnamMapAiScreen';
-export { StreamingConsole } from './components/StreamingConsole';
+export { VietnamMapImmersiveScreen } from './VietnamMapImmersiveScreen';
+export { default as StreamingConsole } from './components/streaming-console/StreamingConsole';
 export { ControlTray } from './components/ControlTray';
 export { MapAiSettingsDrawer } from './components/MapAiSettingsDrawer';
 export { ProvinceHoverCard } from './components/ProvinceHoverCard';

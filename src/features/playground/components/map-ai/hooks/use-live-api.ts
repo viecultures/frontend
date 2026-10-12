@@ -7,9 +7,10 @@ import { type MutableRefObject, useEffect, useMemo, useRef, useState } from 'rea
 import { GenAILiveClient } from '../lib/genai-live-client';
 import type { LiveConnectConfig, LiveServerToolCall } from '@google/genai';
 import { AudioStreamer } from '../lib/audio-streamer';
-import { audioContext } from '../lib/utils';
+import { createAudioContext, resumeAudioOutput } from '../lib/utils';
 import VolMeterWorklet from '../lib/worklets/vol-meter';
-import { useLogStore, useSettings } from '../lib/state';
+import { useLogStore, useSettings, useUI } from '../lib/state';
+import { buildCulturalTutorPrompt } from '../lib/constants';
 import { MAP_TOOL_NAMES, type ToolContext, toolRegistry } from '../lib/tools/tool-registry';
 import { debugLog } from '../lib/debug-logger';
 
@@ -18,7 +19,13 @@ export type UseLiveApiResults = {
   setConfig: (config: LiveConnectConfig) => void;
   config: LiveConnectConfig;
   audioStreamer: MutableRefObject<AudioStreamer | null>;
-  connect: () => Promise<void>;
+  connect: (openingText?: string) => Promise<void>;
+  sendPrompt: (text: string) => Promise<boolean>;
+  pendingPrompt: string;
+  connecting: boolean;
+  connectionError: string | null;
+  ending: boolean;
+  endSession: () => Promise<void>;
   disconnect: () => void;
   connected: boolean;
   volume: number;
@@ -33,43 +40,63 @@ export function useLiveApi({
   const client = useMemo(() => new GenAILiveClient(apiKey, model), [apiKey, model]);
 
   const audioStreamerRef = useRef<AudioStreamer | null>(null);
-  const pendingInputQueue = useRef<string[]>([]);
+  const connectionAttempt = useRef<Promise<void> | null>(null);
+  const lifecycle = useRef(0);
+  const [connecting, setConnecting] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [pendingPrompt, setPendingPrompt] = useState('');
+  const sending = useRef(false);
+  const [ending, setEnding] = useState(false);
+  const endingRef = useRef(false);
+  const summaryComplete = useRef(false);
 
   const [volume, setVolume] = useState(0);
   const [connected, setConnected] = useState(false);
   const [, setStreamerReady] = useState(false);
   const [config, setConfig] = useState<LiveConnectConfig>({});
 
-  // register audio for streaming server -> speakers
+  // No output AudioContext is created at mount. Play/text/map actions unlock it.
   useEffect(() => {
-    if (!audioStreamerRef.current) {
-      audioContext({ id: 'audio-out' }).then((audioCtx: AudioContext) => {
-        audioStreamerRef.current = new AudioStreamer(audioCtx);
-        setStreamerReady(true);
-        audioStreamerRef.current
-          .addWorklet<any>('vumeter-out', VolMeterWorklet, (ev: any) => {
-            setVolume(ev.data.volume);
-          })
-          .catch(err => {
-            console.error('Error adding worklet:', err);
-          });
-      });
-    }
+    return () => {
+      lifecycle.current += 1;
+      const streamer = audioStreamerRef.current;
+      audioStreamerRef.current = null;
+      streamer?.stop();
+      void streamer?.context.close().catch(() => {});
+    };
   }, []);
+
+  const prepareAudioOutput = () => {
+    let streamer = audioStreamerRef.current;
+    if (!streamer || streamer.context.state === 'closed') {
+      streamer = new AudioStreamer(createAudioContext());
+      audioStreamerRef.current = streamer;
+      streamer.setGain(useUI.getState().speakerMuted ? 0 : 1);
+      setStreamerReady(true);
+      // Metering is optional; failure must not block conversation playback.
+      void streamer.addWorklet('vumeter-out', VolMeterWorklet, (event: { data: { volume: number } }) => {
+        setVolume(event.data.volume);
+      }).catch(err => debugLog.error('Audio output meter', err));
+    }
+    // Called before any network await, while the initiating gesture is active.
+    return resumeAudioOutput(streamer.context);
+  };
 
   // Main Event Handlers
   useEffect(() => {
     const onOpen = () => {
-      setConnected(true);
       debugLog.ws('WebSocket kết nối thành công', { model: client.model }, 'success');
     };
 
     const onSetupComplete = () => {
-      debugLog.ws('Setup hoàn tất - Gửi tín hiệu chào ban đầu');
-      client.sendRealtimeText('hello');
+      debugLog.ws('Setup hoàn tất');
     };
 
     const onError = (error: ErrorEvent) => {
+      setConnectionError(error.message || 'Không thể kết nối. Hãy thử lại.');
+      setConnected(false);
+      useUI.getState().setMuted(true);
+      audioStreamerRef.current?.stop();
       debugLog.error('WebSocket LiveClient', {
         message: error?.message || 'WebSocket Error',
         type: error?.type,
@@ -78,6 +105,9 @@ export function useLiveApi({
 
     const onClose = (event: CloseEvent) => {
       setConnected(false);
+      useUI.getState().setMuted(true);
+      setEnding(false);
+      endingRef.current = false;
       stopAudioStreamer();
       debugLog.ws(
         'WebSocket đóng kết nối',
@@ -88,12 +118,7 @@ export function useLiveApi({
         },
         event.wasClean ? 'info' : 'error'
       );
-      const reason = "Session ended. Press 'Play' to start a new speaking practice session. " + event.reason;
-      useLogStore.getState().addTurn({
-        role: 'agent',
-        text: reason,
-        isFinal: true,
-      });
+      if (!event.wasClean) setConnectionError('Kết nối bị gián đoạn. Thử lại hoặc tiếp tục từ lịch sử.');
     };
 
     const stopAudioStreamer = () => {
@@ -152,6 +177,10 @@ export function useLiveApi({
               continue;
             }
             const toolImplementation = fc.name ? toolRegistry[fc.name] : undefined;
+            if (useSettings.getState().tutorMode === 'free-conversation' && ['listCulturalLessons', 'loadLessonDiscussionPlan', 'recordLessonQuizResult'].includes(fcName)) {
+              functionResponses.push({ id: fc.id, name: fcName, response: { result: 'This tool is unavailable in free conversation.' } });
+              continue;
+            }
             if (toolImplementation) {
               toolResponse = await toolImplementation(fc.args, toolContext);
               debugLog.tool(fcName, 'success', fc.args, toolResponse);
@@ -198,6 +227,8 @@ export function useLiveApi({
     client.on('interrupted', onInterrupted);
     client.on('audio', onAudio);
     client.on('toolcall', onToolCall);
+    const onTurnComplete = () => { if (endingRef.current) summaryComplete.current = true; };
+    client.on('turncomplete', onTurnComplete);
 
     return () => {
       client.off('open', onOpen);
@@ -207,14 +238,24 @@ export function useLiveApi({
       client.off('interrupted', onInterrupted);
       client.off('audio', onAudio);
       client.off('toolcall', onToolCall);
+      client.off('turncomplete', onTurnComplete);
+      client.disconnect();
+      stopAudioStreamer();
 
     };
   }, [client]);
 
-  const connect = async () => {
-    if (connected) return;
-    try {
-      const { systemPrompt } = useSettings.getState();
+  const connect = async (openingText = 'Start a friendly conversation about Vietnam. Ask me what I would like to talk about.') => {
+    if (connectionAttempt.current) return connectionAttempt.current;
+    const generation = lifecycle.current;
+    setConnecting(true);
+    setConnectionError(null);
+    const attempt = (async () => {
+      await prepareAudioOutput();
+      if (generation !== lifecycle.current) throw new Error('Phiên đã được hủy.');
+      if (client.status === 'connected') return;
+      const settings = useSettings.getState();
+      const systemPrompt = buildCulturalTutorPrompt(settings.systemPrompt, { mode: settings.tutorMode, correctionMode: settings.correctionMode, mapContextMode: settings.mapContextMode, level: settings.proficiencyLevel });
       const currentConfig = {
         ...config,
         systemInstruction: {
@@ -222,25 +263,64 @@ export function useLiveApi({
         },
       };
 
-      await client.connect(currentConfig);
+      const ready = await client.connect(currentConfig);
+      if (generation !== lifecycle.current) { client.disconnect(); throw new Error('Phiên đã được hủy.'); }
+      if (!ready) throw new Error('Kết nối chưa sẵn sàng. Hãy thử lại.');
+      setConnected(true);
+      useLogStore.setState({ sessionMetadata: { sessionId: crypto.randomUUID(), startedAt: new Date(), systemPrompt, model } });
+      if (openingText) client.send({ text: openingText });
+    })();
+    connectionAttempt.current = attempt;
+    try { await attempt; }
+    catch (err) { setConnectionError(err instanceof Error ? err.message : 'Kết nối thất bại'); throw err; }
+    finally { connectionAttempt.current = null; setConnecting(false); }
+  };
 
-      if (pendingInputQueue.current.length > 0) {
-        for (const input of pendingInputQueue.current) {
-          client.sendRealtimeText(input);
-        }
-        pendingInputQueue.current = [];
-      }
-    } catch (err) {
-      console.error('Failed to connect to Live API:', err);
-      throw err;
-    }
+  const sendPrompt = async (text: string) => {
+    if (!text.trim() || sending.current || endingRef.current) return false;
+    sending.current = true;
+    setPendingPrompt(text);
+    try {
+      await connect('');
+      client.interrupt();
+      client.send({ text });
+      useLogStore.getState().addTurn({ role: 'user', text, isFinal: true });
+      setPendingPrompt('');
+      return true;
+    } catch { return false; }
+    finally { sending.current = false; }
   };
 
   const disconnect = () => {
+    lifecycle.current += 1;
+    setConnected(false);
+    endingRef.current = false;
+    setEnding(false);
+    useUI.getState().setMuted(true);
+    audioStreamerRef.current?.stop();
     if (client) {
       client.disconnect();
     }
   };
+
+  const endSession = async () => {
+    if (!connected || endingRef.current) return;
+    useUI.getState().setMuted(true);
+    client.interrupt();
+    summaryComplete.current = false;
+    endingRef.current = true;
+    setEnding(true);
+    client.send({ text: 'End our conversation now. Briefly summarize the topics and useful vocabulary. Include corrections only if our correction setting is end-of-session. Do not ask another question.' });
+  };
+
+  useEffect(() => {
+    if (!ending) return;
+    const startedAt = Date.now();
+    const timer = setInterval(() => {
+      if ((summaryComplete.current && !audioStreamerRef.current?.playing) || Date.now() - startedAt > 60000) disconnect();
+    }, 250);
+    return () => clearInterval(timer);
+  }, [ending]);
 
   return {
     client,
@@ -248,6 +328,12 @@ export function useLiveApi({
     setConfig,
     connected,
     connect,
+    sendPrompt,
+    pendingPrompt,
+    connecting,
+    connectionError,
+    ending,
+    endSession,
     disconnect,
     volume,
     audioStreamer: audioStreamerRef,

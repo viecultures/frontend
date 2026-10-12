@@ -17,6 +17,15 @@ import type {
 
 import type { ProficiencyLevel } from '@/data/lessonAgentCatalog';
 
+function readPreference<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
+  try { const value = localStorage.getItem(`map_ai_${key}`); return allowed.includes(value as T) ? value as T : fallback; }
+  catch { return fallback; }
+}
+
+function savePreference(key: string, value: string) {
+  try { localStorage.setItem(`map_ai_${key}`, value); } catch { /* Preferences remain usable in memory. */ }
+}
+
 export interface SVGCameraTarget {
   provinceId?: string;
   region?: 'north' | 'central' | 'south' | 'all';
@@ -58,12 +67,12 @@ export const useSettings = create<{
 }>(set => ({
   systemPrompt: SYSTEM_INSTRUCTIONS,
   model: DEFAULT_LIVE_API_MODEL,
-  voice: DEFAULT_VOICE,
+  voice: readPreference('voice', ['Aoede', 'Charon', 'Fenrir', 'Kore', 'Puck', 'Zephyr', 'Leda', 'Orus'], DEFAULT_VOICE),
   activeLessonId: 'pho-hanoi-history',
-  proficiencyLevel: 'Level 2',
+  proficiencyLevel: readPreference('level', ['Level 1', 'Level 2', 'Level 3'] as const, 'Level 2'),
   conversationMode: 'discussion',
-  tutorMode: 'guided-lesson',
-  correctionMode: 'after-turn',
+  tutorMode: 'free-conversation',
+  correctionMode: readPreference('correction', ['off', 'after-turn', 'end-of-session'] as const, 'off'),
   mapContextMode: 'on-demand',
   customGeminiApiKey:
     typeof window !== 'undefined'
@@ -75,12 +84,12 @@ export const useSettings = create<{
       : 'dark',
   setSystemPrompt: prompt => set({ systemPrompt: prompt }),
   setModel: model => set({ model }),
-  setVoice: voice => set({ voice }),
+  setVoice: voice => { savePreference('voice', voice); set({ voice }); },
   setActiveLessonId: activeLessonId => set({ activeLessonId }),
-  setProficiencyLevel: proficiencyLevel => set({ proficiencyLevel }),
+  setProficiencyLevel: proficiencyLevel => { savePreference('level', proficiencyLevel); set({ proficiencyLevel }); },
   setConversationMode: conversationMode => set({ conversationMode }),
   setTutorMode: tutorMode => set({ tutorMode }),
-  setCorrectionMode: correctionMode => set({ correctionMode }),
+  setCorrectionMode: correctionMode => { savePreference('correction', correctionMode); set({ correctionMode }); },
   setMapContextMode: mapContextMode => set({ mapContextMode }),
   setCustomGeminiApiKey: customGeminiApiKey => {
     if (typeof window !== 'undefined') {
@@ -114,7 +123,7 @@ export const useUI = create<{
   showSystemMessages: true,
   toggleShowSystemMessages: () =>
     set(state => ({ showSystemMessages: !state.showSystemMessages })),
-  muted: false,
+  muted: true,
   setMuted: muted => set({ muted }),
   speakerMuted: false,
   setSpeakerMuted: speakerMuted => set({ speakerMuted }),
@@ -216,7 +225,7 @@ export const useLogStore = create<{
       const turns = state.turns;
       const lastAgentTurnIndex = turns.map(t => t.role).lastIndexOf('agent');
 
-      if (lastAgentTurnIndex === -1 || turns[lastAgentTurnIndex].isFinal) {
+      if (lastAgentTurnIndex === -1 || lastAgentTurnIndex !== turns.length - 1 || turns[lastAgentTurnIndex].isFinal) {
         const hasData = !!(update.text || update.toolResponse || update.actualToolCalls?.length);
         if (!hasData) return state;
 

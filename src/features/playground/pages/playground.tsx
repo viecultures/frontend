@@ -6,6 +6,7 @@ import { Feather, Radio, Zap, Sparkles } from 'lucide-react';
 // Experimental Screen Components
 import { VideoDictationShadowingScreen } from '../components/screens/VideoDictationShadowingScreen';
 import { VietnamMapAiScreen } from '../components/screens/VietnamMapAiScreen';
+import { VietnamMapImmersiveScreen } from '../components/screens/VietnamMapImmersiveScreen';
 
 export const PlaygroundPage: React.FC = () => {
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
@@ -106,26 +107,13 @@ export const PlaygroundPage: React.FC = () => {
           <VietnamMapAiScreen />
         </section>
 
-        {/* Screen 3: AI Heritage Scribe & Essay Reviewer */}
+        {/* Screen 3: Vietnam Map AI Immersive (Ambient Center) */}
         <section
           ref={el => { screenRefs.current[2] = el; }}
-          id="screen-ai-scribe"
-          className="w-full h-screen snap-start flex flex-col items-center justify-center border-b border-[#1E4B43]/10 p-6 bg-[#FBF7EE] dark:bg-[#0b1a17]"
+          id="screen-vietnam-map-immersive"
+          className="w-full h-screen snap-start flex flex-col justify-center border-b border-[#1E4B43]/10 overflow-hidden"
         >
-          <div className="max-w-xl text-center p-8 rounded-3xl bg-white/80 dark:bg-[#12231F]/80 backdrop-blur-md border border-[#1E4B43]/15 shadow-xl space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#1E4B43] text-[#D4AF37] flex items-center justify-center shadow-lg">
-              <Feather className="w-7 h-7" />
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[#D4AF37]/20 text-[#B8860B] dark:text-[#FCE5B5]">
-              <Sparkles className="w-3.5 h-3.5" /> Màn hình #03 · Đang phát triển (Beta)
-            </div>
-            <h2 className="text-2xl font-serif font-bold text-[#1E4B43] dark:text-[#FBF7EE]">
-              AI Heritage Scribe &amp; Essay Reviewer
-            </h2>
-            <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">
-              Trợ lý AI thẩm định và trau chuốt văn phong di sản học thuật, chấm điểm độ thuần văn hóa và gợi ý từ vựng chuyên sâu tự động.
-            </p>
-          </div>
+          <VietnamMapImmersiveScreen />
         </section>
 
         {/* Screen 4: 3-Region Dialect & Tone Explorer */}

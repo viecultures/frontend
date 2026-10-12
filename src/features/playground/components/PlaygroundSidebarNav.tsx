@@ -7,7 +7,8 @@ import {
   Compass,
   Feather,
   Radio,
-  Zap
+  Zap,
+  Map,
 } from 'lucide-react';
 import { PLAYGROUND_SCREENS } from '../types';
 
@@ -30,6 +31,7 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
       case 'Feather': return <Feather {...props} />;
       case 'Radio': return <Radio {...props} />;
       case 'Zap': return <Zap {...props} />;
+      case 'Map': return <Map {...props} />;
       default: return null;
     }
   };

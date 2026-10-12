@@ -3,10 +3,12 @@ import Link from '@/components/Link';
 import { MapPin, BookOpen, Sparkles, Clock } from 'lucide-react';
 import VietnamMapCarousel from '@/features/discovery/components/vietnam-map-carousel';
 import { VIETNAM_LANDMARKS, type LandmarkArticle } from '@/data/landmarksData';
+import type { ProvinceMapItem } from '@/data/vietnamMapData';
 
 interface DiscoverySpotlightProps {
   activePinIndex: number;
   onSelectPinIndex: (index: number) => void;
+  onSelectProvince?: (province: ProvinceMapItem | null) => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }
@@ -14,6 +16,7 @@ interface DiscoverySpotlightProps {
 export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
   activePinIndex,
   onSelectPinIndex,
+  onSelectProvince,
   onMouseEnter,
   onMouseLeave,
 }) => {
@@ -44,6 +47,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
           <VietnamMapCarousel
             activeIndex={activePinIndex}
             onSelectLandmark={onSelectPinIndex}
+            onSelectProvince={onSelectProvince}
             showRegionTabs={false}
             showPoiInfoBox={false}
           />

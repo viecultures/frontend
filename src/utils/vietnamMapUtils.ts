@@ -234,14 +234,7 @@ export function clampZoom(scale: number, min = 1.0, max = 2.5): number {
  * Convert real-world GPS coordinates (lat, lng) to Vietnam SVG Map canvas coordinates (x, y)
  * Calibrated against the official 520 x 1100 Vietnam 34-provinces vector map dataset.
  */
-export function geoToSvg(lat: number, lng: number): { x: number; y: number } {
-  const x = 55.5242 * lng - 0.3554 * lat - 5609.5346;
-  const y = 4.3056 * lng - 61.6367 * lat + 1040.9510;
-  return {
-    x: Math.round(x * 10) / 10,
-    y: Math.round(y * 10) / 10,
-  };
-}
+export { geoToSvg, svgToGeo } from './vietnamMapProjection';
 
 export { VIETNAM_34_PROVINCES, VIETNAM_ISLANDS, VIETNAM_MAP_DIMENSIONS, VIETNAM_REGION_VIEWBOXES, type ProvinceMapItem };
 

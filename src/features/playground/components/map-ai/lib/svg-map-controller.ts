@@ -8,53 +8,74 @@
 
 import { type MapMarker, type SVGCameraTarget, useMapStore } from './state';
 import { VIETNAM_34_PROVINCES, type ProvinceMapItem } from '@/data/vietnamMapData';
+import { geoToSvg, svgToGeo } from '@/utils/vietnamMapUtils';
 
 // ─────────────────────────────────────────────
 // Centroid lookup
 // ─────────────────────────────────────────────
-const SVG_VIEWBOX = { minX: 240, minY: 50, maxX: 730, maxY: 1150 };
-const GEO_BOUNDS = { minLat: 8.3, maxLat: 23.4, minLng: 102.1, maxLng: 109.5 };
-
 export function latLngToSvgCoords(lat: number, lng: number): { x: number; y: number } {
-  const x =
-    SVG_VIEWBOX.minX +
-    ((lng - GEO_BOUNDS.minLng) / (GEO_BOUNDS.maxLng - GEO_BOUNDS.minLng)) *
-      (SVG_VIEWBOX.maxX - SVG_VIEWBOX.minX);
-  const y =
-    SVG_VIEWBOX.minY +
-    ((GEO_BOUNDS.maxLat - lat) / (GEO_BOUNDS.maxLat - GEO_BOUNDS.minLat)) *
-      (SVG_VIEWBOX.maxY - SVG_VIEWBOX.minY);
-  return { x, y };
+  return geoToSvg(lat, lng);
 }
 
 export function svgCoordsToLatLng(x: number, y: number): { lat: number; lng: number } {
-  const lng =
-    GEO_BOUNDS.minLng +
-    ((x - SVG_VIEWBOX.minX) / (SVG_VIEWBOX.maxX - SVG_VIEWBOX.minX)) *
-      (GEO_BOUNDS.maxLng - GEO_BOUNDS.minLng);
-  const lat =
-    GEO_BOUNDS.maxLat -
-    ((y - SVG_VIEWBOX.minY) / (SVG_VIEWBOX.maxY - SVG_VIEWBOX.minY)) *
-      (GEO_BOUNDS.maxLat - GEO_BOUNDS.minLat);
-  return { lat, lng };
+  return svgToGeo(x, y);
 }
 
 export function findProvinceById(id: string): ProvinceMapItem | undefined {
   return VIETNAM_34_PROVINCES.find(p => p.id === id);
 }
 
+const PROVINCE_ALIASES: Record<string, string> = {
+  'saigon': 'ho-chi-minh',
+  'sai gon': 'ho-chi-minh',
+  'tphcm': 'ho-chi-minh',
+  'tp hcm': 'ho-chi-minh',
+  'tp.hcm': 'ho-chi-minh',
+  'hcmc': 'ho-chi-minh',
+  'hcm': 'ho-chi-minh',
+  'sai-gon': 'ho-chi-minh',
+  'ho chi minh city': 'ho-chi-minh',
+  'thanh pho ho chi minh': 'ho-chi-minh',
+  'ha noi': 'ha-noi',
+  'hanoi': 'ha-noi',
+  'thu do ha noi': 'ha-noi',
+  'da nang': 'da-nang',
+  'danang': 'da-nang',
+  'hue': 'thua-thien-hue',
+  'thua thien hue': 'thua-thien-hue',
+  'can tho': 'can-tho',
+  'cantho': 'can-tho',
+  'hai phong': 'hai-phong',
+  'haiphong': 'hai-phong',
+  'vinh ha long': 'quang-ninh',
+  'ha long': 'quang-ninh',
+  'quan ho': 'bac-ninh',
+  'bac ninh': 'bac-ninh',
+  'nha trang': 'khanh-hoa',
+  'da lat': 'lam-dong',
+  'dalat': 'lam-dong',
+};
+
 export function findProvinceByName(name: string): ProvinceMapItem | undefined {
   const norm = name
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
     .trim();
+
+  const aliasId = PROVINCE_ALIASES[norm];
+  if (aliasId) {
+    const province = findProvinceById(aliasId);
+    if (province) return province;
+  }
 
   return VIETNAM_34_PROVINCES.find(p => {
     const pNorm = p.name
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
       .trim();
     return pNorm === norm || pNorm.includes(norm) || norm.includes(pNorm);
   });

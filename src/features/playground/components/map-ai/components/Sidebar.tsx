@@ -12,7 +12,6 @@ import {
   type CulturalTutorMode,
   type CorrectionMode,
   type MapContextMode,
-  type ConversationMode,
 } from '../lib/state';
 import c from 'classnames';
 import {
@@ -39,6 +38,7 @@ import {
   type LessonAgentMetadata,
   type ProficiencyLevel,
 } from '@/data/lessonAgentCatalog';
+import { PROFICIENCY_LEVELS } from '../lib/prompt-scaffolder';
 
 const AVAILABLE_MODELS = ['gemini-3.1-flash-live-preview', 'gemini-2.0-flash-realtime-exp'];
 
@@ -54,7 +54,6 @@ export default function Sidebar() {
     model,
     voice,
     activeLessonId,
-    conversationMode,
     tutorMode,
     correctionMode,
     mapContextMode,
@@ -64,7 +63,6 @@ export default function Sidebar() {
     setVoice,
     setActiveLessonId,
     setProficiencyLevel,
-    setConversationMode,
     setTutorMode,
     setCorrectionMode,
     setMapContextMode,
@@ -72,7 +70,8 @@ export default function Sidebar() {
     setTheme,
   } = useSettings();
 
-  const { connected, connect, disconnect } = useLiveAPIContext();
+  const { connected: sessionConnected, connecting, disconnect, sendPrompt } = useLiveAPIContext();
+  const connected = sessionConnected || connecting;
 
   const availableVoices = useMemo(() => {
     const isLimited =
@@ -105,13 +104,11 @@ export default function Sidebar() {
   };
 
   // When proficiency level changes
-  const handleLevelChange = (newLevel: ProficiencyLevel) => {
+  const handleLevelChange = async (newLevel: ProficiencyLevel) => {
     setProficiencyLevel(newLevel);
-  };
-
-  // When conversation mode changes
-  const handleModeChange = (newMode: ConversationMode) => {
-    setConversationMode(newMode);
+    if (sessionConnected) {
+      await sendPrompt(PROFICIENCY_LEVELS[newLevel].switchPrompt);
+    }
   };
 
   const handleExportLogs = () => {
@@ -126,7 +123,10 @@ export default function Sidebar() {
         activeLessonId: config.activeLessonId,
         proficiencyLevel: config.proficiencyLevel,
         conversationMode: config.conversationMode,
-        systemPrompt: config.systemPrompt,
+        tutorMode: config.tutorMode,
+        correctionMode: config.correctionMode,
+        mapContextMode: config.mapContextMode,
+        systemPrompt: sessionMetadata?.systemPrompt,
       },
       tools,
       conversation: turns.map(turn => ({
@@ -184,10 +184,10 @@ export default function Sidebar() {
 
         <div className="sidebar-section">
           {/* Target Reading Lesson Selector */}
-          <div className="space-y-1.5 mb-4">
+          {tutorMode !== 'free-conversation' && <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
               <BookOpen className="w-3.5 h-3.5" />
-              <span>{tutorMode === 'free-conversation' ? 'Chủ Đề Văn Hóa Việt Nam' : 'Bài Đọc Văn Hóa Mục Tiêu'}</span>
+              <span>Bài Đọc Văn Hóa Mục Tiêu</span>
             </label>
             <select
               value={activeLessonId}
@@ -202,9 +202,9 @@ export default function Sidebar() {
               ))}
             </select>
             <p className="text-[11px] text-gray-400">
-              {tutorMode === 'free-conversation' ? 'Chọn một chủ đề để bắt đầu trò chuyện tiếng Anh tự nhiên về Việt Nam.' : 'Gia sư AI sẽ tự động đồng bộ bản đồ, từ vựng và câu hỏi theo bài học này.'}
+              Gia sư AI sẽ đồng bộ bản đồ, từ vựng và câu hỏi theo bài học này.
             </p>
-          </div>
+          </div>}
 
           {/* Proficiency Level Selector (Level 1, Level 2, Level 3) */}
           <div className="space-y-1.5 mb-4">
@@ -214,18 +214,18 @@ export default function Sidebar() {
             </label>
             <select
               value={proficiencyLevel}
-              disabled={connected}
-              onChange={e => handleLevelChange(e.target.value as ProficiencyLevel)}
+              disabled={connecting}
+              onChange={e => void handleLevelChange(e.target.value as ProficiencyLevel)}
               className="w-full text-xs font-semibold"
             >
-              <option value="Level 1">Level 1 (A1–A2) — Sơ cấp · Câu ngắn &amp; Gợi ý mẫu câu</option>
-              <option value="Level 2">Level 2 (B1–B2) — Trung cấp · Đàm thoại tự nhiên &amp; So sánh</option>
+              <option value="Level 1">Level 1 (A1) — Nói CHẬM · Câu 5-10 từ · Ngữ pháp A1 &amp; Starters/Movers</option>
+              <option value="Level 2">Level 2 (B1–B2) — Trung cấp · Đàm thoại tự nhiên &amp; So sánh vùng miền</option>
               <option value="Level 3">Level 3 (B2–C1) — Cao cấp · Di sản chuyên sâu &amp; Phản biện</option>
             </select>
             <p className="text-[11px] text-gray-400">
-              {proficiencyLevel === 'Level 1' && 'Level 1: Từ vựng đơn giản, câu 5-10 từ, kèm mẫu câu gợi ý (Sentence Starters).'}
-              {proficiencyLevel === 'Level 2' && 'Level 2: Đàm thoại tự nhiên, câu ghép nối ý, từ vựng văn hóa tiêu chuẩn.'}
-              {proficiencyLevel === 'Level 3' && 'Level 3: Thuật ngữ học thuật, tư duy phản biện, đối thoại vai trò Sứ giả Văn hóa.'}
+              {proficiencyLevel === 'Level 1' && 'Level 1: AI nói chậm, chia 2-3 đoạn ngắn, mỗi câu 1 ý chính (5-10 từ), ngữ pháp A1 (There is, People make), kèm mẫu câu gợi ý.'}
+              {proficiencyLevel === 'Level 2' && 'Level 2: Tốc độ tự nhiên, câu ghép 10-18 từ, từ vựng văn hóa tiêu chuẩn, câu hỏi so sánh vùng miền.'}
+              {proficiencyLevel === 'Level 3' && 'Level 3: Tốc độ lưu loát bản ngữ, câu phức học thuật, thuật ngữ di sản chuyên sâu, tư duy phản biện & bảo tồn.'}
             </p>
           </div>
 
@@ -233,24 +233,61 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
               <Mic className="w-3.5 h-3.5" />
-              <span>Cách Học Với Cultural Tutor</span>
+              <span>Chế Độ Học &amp; Đàm Thoại</span>
             </label>
-            <select
-              value={tutorMode}
-              disabled={connected}
-              onChange={e => setTutorMode(e.target.value as CulturalTutorMode)}
-              className="w-full text-xs"
-            >
-              <option value="guided-lesson">Học theo lesson có hướng dẫn</option>
-              <option value="free-conversation">Trò chuyện tự do về Việt Nam</option>
-            </select>
-            <p className="text-[11px] text-gray-400">{tutorMode === 'guided-lesson' ? 'Agent dẫn dắt Explore, Listen, Speak và Quiz.' : 'Agent trò chuyện tự nhiên về Việt Nam, không tự động sửa lỗi.'}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                disabled={connected}
+                onClick={() => setTutorMode('free-conversation')}
+                className={`py-2 px-2 rounded-lg text-xs font-semibold text-center border transition-all ${
+                  tutorMode === 'free-conversation'
+                    ? 'bg-[#1E4B43] text-[#D4AF37] border-[#D4AF37]/60 shadow-md font-bold'
+                    : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
+                }`}
+              >
+                Đàm thoại tự do
+              </button>
+              <button
+                type="button"
+                disabled={connected}
+                onClick={() => setTutorMode('guided-lesson')}
+                className={`py-2 px-2 rounded-lg text-xs font-semibold text-center border transition-all ${
+                  tutorMode === 'guided-lesson'
+                    ? 'bg-[#1E4B43] text-[#D4AF37] border-[#D4AF37]/60 shadow-md font-bold'
+                    : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
+                }`}
+              >
+                Luyện tập bài đọc
+              </button>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-1">
+              {tutorMode === 'guided-lesson'
+                ? 'Luyện theo bài học di sản: AI dẫn dắt Nghe, Nói, Từ vựng và Đọc hiểu.'
+                : 'Trò chuyện tự do: Đàm thoại tiếng Anh tự nhiên về văn hóa, địa danh Việt Nam.'}
+            </p>
           </div>
 
-          {tutorMode === 'free-conversation' && <>
-            <div className="space-y-1.5 mb-4"><label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Sửa lỗi trong hội thoại</label><select value={correctionMode} disabled={connected} onChange={e => setCorrectionMode(e.target.value as CorrectionMode)} className="w-full text-xs"><option value="off">Tắt sửa lỗi</option><option value="after-turn">Sửa sau mỗi lượt nói</option><option value="end-of-session">Tổng hợp cuối buổi</option></select></div>
-            <div className="space-y-1.5 mb-4"><label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Context bản đồ</label><select value={mapContextMode} disabled={connected} onChange={e => setMapContextMode(e.target.value as MapContextMode)} className="w-full text-xs"><option value="off">Không dùng bản đồ</option><option value="on-demand">Chỉ hiển thị khi cần</option><option value="always">Luôn đồng bộ với hội thoại</option></select></div>
-          </>}
+          {tutorMode === 'free-conversation' && (
+            <>
+              <div className="space-y-1.5 mb-4">
+                <label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Sửa lỗi trong hội thoại</label>
+                <select value={correctionMode} disabled={connected} onChange={e => setCorrectionMode(e.target.value as CorrectionMode)} className="w-full text-xs">
+                  <option value="off">Tắt sửa lỗi</option>
+                  <option value="after-turn">Sửa sau mỗi lượt nói</option>
+                  <option value="end-of-session">Tổng hợp cuối buổi</option>
+                </select>
+              </div>
+              <div className="space-y-1.5 mb-4">
+                <label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">AI điều khiển bản đồ</label>
+                <select value={mapContextMode} disabled={connected} onChange={e => setMapContextMode(e.target.value as MapContextMode)} className="w-full text-xs">
+                  <option value="off">Tắt điều khiển bằng AI</option>
+                  <option value="on-demand">Khi tôi yêu cầu chỉ địa điểm</option>
+                </select>
+                <p className="text-[11px] text-gray-400">Bạn luôn có thể khám phá map độc lập. Bấm Hỏi AI để đưa địa điểm vào cuộc trò chuyện.</p>
+              </div>
+            </>
+          )}
 
           {/* Voice Selection */}
           <div className="space-y-1.5 mb-4">
@@ -332,20 +369,13 @@ export default function Sidebar() {
           </button>
           <button
             onClick={() => {
+              disconnect();
               useLogStore.getState().clearTurns();
-              const mapStore = useMapStore.getState();
-              mapStore.clearMarkers();
-              mapStore.setCameraTarget(null);
-
-              if (connected) {
-                disconnect();
-                setTimeout(connect, 500);
-              }
             }}
             title="Làm mới phiên luyện tập"
           >
             <RefreshCw className="w-4 h-4 mr-1.5" />
-            Làm Mới Phiên
+            Cuộc trò chuyện mới
           </button>
         </div>
       </div>

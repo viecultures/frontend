@@ -108,6 +108,12 @@ export class AudioRecorder {
           workletName
         );
 
+        this.recordingWorklet.port.postMessage({
+          type: 'config',
+          sampleRate: this.audioContext.sampleRate,
+          targetSampleRate: this.sampleRate,
+        });
+
         this.recordingWorklet.port.onmessage = async (ev: MessageEvent) => {
           const arrayBuffer = ev.data?.data?.int16arrayBuffer;
           if (arrayBuffer) {
@@ -133,9 +139,11 @@ export class AudioRecorder {
 
         this.source.connect(this.vuWorklet);
         this.recording = true;
+        const resampleRatio = (this.audioContext.sampleRate / this.sampleRate).toFixed(2);
         debugLog.audio('Khởi tạo Micro & AudioWorklet thành công', {
           hardwareSampleRate: this.audioContext.sampleRate,
           targetSampleRate: this.sampleRate,
+          resampleRatio: `${resampleRatio}x`,
         });
         resolve();
       } catch (error) {
@@ -172,10 +180,13 @@ export class AudioRecorder {
       this.source = undefined;
       this.recordingWorklet = undefined;
       this.vuWorklet = undefined;
+      this.recording = false;
+      void this.audioContext?.close().catch(() => {});
+      this.audioContext = undefined;
     };
 
     if (this.starting) {
-      this.starting.then(handleStop).catch(() => {});
+      this.starting.then(handleStop, handleStop);
       return;
     }
     handleStop();

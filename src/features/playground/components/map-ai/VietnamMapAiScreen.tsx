@@ -8,14 +8,14 @@
 import React, { useState, useMemo } from 'react';
 import './map-ai.css';
 import ControlTray from './components/ControlTray';
-import ErrorScreen from './components/ErrorScreen';
 import StreamingConsole from './components/streaming-console/StreamingConsole';
 import PopUp from './components/popup/PopUp';
 import Sidebar from './components/Sidebar';
 import { LiveAPIProvider, useLiveAPIContext } from './contexts/LiveAPIContext';
 import VietnamMap from '@/components/map/VietnamMap';
 import type { ProvinceMapItem } from '@/data/vietnamMapData';
-import { useUI, useSettings, useMapStore, useLogStore } from './lib/state';
+import type { LandmarkArticle } from '@/data/landmarksData';
+import { useUI, useSettings, useMapStore } from './lib/state';
 import ProvinceHoverCard from './components/ProvinceHoverCard';
 import { getProvinceCultureData } from './data/vietnamProvincesDetail';
 import MapAiDebugDrawer from './components/MapAiDebugDrawer';
@@ -26,7 +26,8 @@ const GEMINI_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof 
 function MapAiContent() {
   const { isSidebarOpen } = useUI();
   const [showPopUp, setShowPopUp] = useState(false);
-  const { connected, connect, client } = useLiveAPIContext();
+  const { sendPrompt, connecting, ending } = useLiveAPIContext();
+  const [selectedLandmark, setSelectedLandmark] = useState<LandmarkArticle | null>(null);
   const { isDrawerOpen } = useMapAiDebugStore();
 
   const cameraTarget = useMapStore(s => s.cameraTarget);
@@ -46,16 +47,13 @@ function MapAiContent() {
   };
 
   const handleSelectProvince = (province: ProvinceMapItem | null) => {
+    setSelectedLandmark(null);
     if (province) {
       debugLog.map(`Người dùng chọn tỉnh: ${province.name} (${province.id})`, {
         region: province.region,
       });
       setHighlightedPlaceId(province.id);
       setCameraTarget({ provinceId: province.id, region: province.region });
-      if (connected && tutorMode === 'free-conversation' && mapContextMode !== 'off') {
-        client.sendRealtimeText(`The learner selected ${province.name} on the Vietnam map. Continue our conversation about Vietnam by asking one natural question connected to this place.`);
-        useLogStore.getState().addTurn({ role: 'user', text: `I selected ${province.name} on the map.`, isFinal: true });
-      }
     } else {
       debugLog.map('Người dùng bỏ chọn tỉnh (Clear selection)');
       setHighlightedPlaceId(null);
@@ -64,6 +62,8 @@ function MapAiContent() {
   };
 
   const handleSelectRegion = (region: 'north' | 'central' | 'south' | 'all') => {
+    setSelectedLandmark(null);
+    setHighlightedPlaceId(null);
     debugLog.map(`Người dùng bấm chuyển tab vùng: ${region}`);
     setCameraTarget({
       provinceId: undefined,
@@ -71,27 +71,20 @@ function MapAiContent() {
     });
   };
 
-  const handleSelectLandmark = (landmark: any, province: ProvinceMapItem) => {
+  const handleSelectLandmark = (landmark: LandmarkArticle, province: ProvinceMapItem) => {
     debugLog.map(`Người dùng bấm di tích: ${landmark.name} (${province.name})`, {
       landmarkId: landmark.id,
       provinceId: province.id,
     });
     handleSelectProvince(province);
+    setSelectedLandmark(landmark);
   };
 
-  const { proficiencyLevel, tutorMode, mapContextMode } = useSettings();
+  const { proficiencyLevel } = useSettings();
 
   const handleAskAiAboutProvince = async (provinceName: string) => {
-    if (!connected) {
-      await connect();
-    }
     const query = `Tell me about the cultural heritage, famous landmarks, and speaking practice points for ${provinceName} in English suited for ${proficiencyLevel}.`;
-    client.sendRealtimeText(query);
-    useLogStore.getState().addTurn({
-      role: 'user',
-      text: `Tell me about ${provinceName} cultural heritage and local specialties (${proficiencyLevel}).`,
-      isFinal: true,
-    });
+    await sendPrompt(query);
   };
 
   const handleSpeakText = (text: string) => {
@@ -106,7 +99,6 @@ function MapAiContent() {
 
   return (
     <>
-      <ErrorScreen />
       <Sidebar />
       {showPopUp && <PopUp onClose={handleClosePopUp} />}
 
@@ -127,6 +119,11 @@ function MapAiContent() {
         </div>
 
         <div className="map-panel flex flex-col items-center justify-center p-2 relative overflow-hidden bg-[#090e1a]">
+          {selectedLandmark && selectedLandmark.provinceId === selectedProvinceId && (
+            <button type="button" disabled={connecting || ending} className="absolute bottom-4 left-4 z-30 rounded-xl bg-heritage-green px-4 py-2 text-xs text-white" onClick={() => void sendPrompt(`Tell me about ${selectedLandmark.name} in ${selectedProvinceDetail?.name || selectedLandmark.locationNameVi}. Use English suited for ${proficiencyLevel}.`)}>
+              Hỏi AI về {selectedLandmark.name}
+            </button>
+          )}
           {selectedProvinceDetail && (
             <ProvinceHoverCard
               provinceDetail={selectedProvinceDetail}

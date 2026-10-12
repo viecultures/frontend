@@ -1,7 +1,7 @@
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
-*/
+ */
 /**
  * Copyright 2024 Google LLC
  *
@@ -22,21 +22,29 @@ const AudioRecordingWorklet = `
 class AudioProcessingWorklet extends AudioWorkletProcessor {
 
   // send and clear buffer every 2048 samples, 
-  // which at 16khz is about 8 times a second
+  // which at 16khz is about 8 times a second (128ms)
   buffer = new Int16Array(2048);
-
-  // current write index
   bufferWriteIndex = 0;
+  targetSampleRate = 16000;
+  ratio = 1;
+  fractionalOffset = 0;
 
   constructor() {
     super();
-    this.hasAudio = false;
+    // sampleRate is globally available in AudioWorkletGlobalScope representing AudioContext sample rate
+    const currentRate = typeof sampleRate !== 'undefined' && sampleRate > 0 ? sampleRate : 16000;
+    this.ratio = currentRate / this.targetSampleRate;
+
+    this.port.onmessage = (event) => {
+      if (event.data?.type === 'config') {
+        const rate = event.data.sampleRate || currentRate;
+        const target = event.data.targetSampleRate || 16000;
+        this.targetSampleRate = target;
+        this.ratio = rate / target;
+      }
+    };
   }
 
-  /**
-   * @param inputs Float32Array[][] [input#][channel#][sample#] so to access first inputs 1st channel inputs[0][0]
-   * @param outputs Float32Array[][]
-   */
   process(inputs) {
     if (inputs && inputs[0] && inputs[0].length > 0) {
       const channel0 = inputs[0][0];
@@ -47,7 +55,7 @@ class AudioProcessingWorklet extends AudioWorkletProcessor {
     return true;
   }
 
-  sendAndClearBuffer(){
+  sendAndClearBuffer() {
     if (this.bufferWriteIndex === 0) return;
     this.port.postMessage({
       event: "chunk",
@@ -59,16 +67,42 @@ class AudioProcessingWorklet extends AudioWorkletProcessor {
   }
 
   processChunk(float32Array) {
-    const l = float32Array.length;
-    
-    for (let i = 0; i < l; i++) {
-      const s = Math.max(-1, Math.min(1, float32Array[i]));
-      const int16Value = s < 0 ? Math.floor(s * 0x8000) : Math.min(0x7fff, Math.floor(s * 0x7fff));
+    const inputLen = float32Array.length;
+    if (inputLen === 0) return;
+
+    // Fast path: if input rate matches 16kHz
+    if (Math.abs(this.ratio - 1.0) < 0.01) {
+      for (let i = 0; i < inputLen; i++) {
+        const s = Math.max(-1, Math.min(1, float32Array[i]));
+        const int16Value = s < 0 ? Math.floor(s * 0x8000) : Math.min(0x7fff, Math.floor(s * 0x7fff));
+        this.buffer[this.bufferWriteIndex++] = int16Value;
+        if (this.bufferWriteIndex >= this.buffer.length) {
+          this.sendAndClearBuffer();
+        }
+      }
+      return;
+    }
+
+    // High quality linear interpolation resampling (e.g. 48kHz -> 16kHz, 44.1kHz -> 16kHz)
+    let offset = this.fractionalOffset;
+    while (offset < inputLen) {
+      const idx = Math.floor(offset);
+      const frac = offset - idx;
+      const s0 = float32Array[idx];
+      const s1 = idx + 1 < inputLen ? float32Array[idx + 1] : s0;
+      const s = s0 + frac * (s1 - s0);
+
+      const clamped = Math.max(-1, Math.min(1, s));
+      const int16Value = clamped < 0 ? Math.floor(clamped * 0x8000) : Math.min(0x7fff, Math.floor(clamped * 0x7fff));
+
       this.buffer[this.bufferWriteIndex++] = int16Value;
-      if(this.bufferWriteIndex >= this.buffer.length) {
+      if (this.bufferWriteIndex >= this.buffer.length) {
         this.sendAndClearBuffer();
       }
+
+      offset += this.ratio;
     }
+    this.fractionalOffset = offset - inputLen;
   }
 }
 `;

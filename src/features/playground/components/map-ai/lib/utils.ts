@@ -24,6 +24,29 @@ type GetAudioContextOptions = AudioContextOptions & {
 
 const map: Map<string, AudioContext> = new Map();
 
+/** Create synchronously so output can be unlocked in the initiating user gesture. */
+export function createAudioContext(options?: AudioContextOptions): AudioContext {
+  const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+  return new AudioCtx(options);
+}
+
+/** Do not silently swallow autoplay failures or wait indefinitely for permission. */
+export async function resumeAudioOutput(context: AudioContext, timeoutMs = 5000): Promise<void> {
+  if (context.state === 'closed') throw new Error('Audio output đã đóng. Hãy thử kết nối lại.');
+  if (context.state === 'running') return;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      context.resume(),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('Không thể mở âm thanh. Bấm Thử lại để cho phép phát âm thanh.')), timeoutMs);
+      }),
+    ]);
+    // resume() changes state asynchronously; re-read instead of relying on narrowing.
+    if ((context.state as AudioContextState) !== 'running') throw new Error('Âm thanh chưa sẵn sàng. Hãy thử lại.');
+  } finally { clearTimeout(timer); }
+}
+
 export const audioContext = async (
   options?: GetAudioContextOptions
 ): Promise<AudioContext> => {

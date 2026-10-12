@@ -226,6 +226,52 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.map-ai-app .chat-word {
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.map-ai-app .chat-word:hover,
+.map-ai-app .chat-word:focus-visible {
+  background: rgba(217, 183, 106, 0.22);
+  color: #fce5b5;
+  outline: none;
+}
+
+.map-ai-app .level-quick-switch {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid rgba(217, 183, 106, 0.28);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.18);
+  flex-shrink: 0;
+}
+
+.map-ai-app .level-quick-switch button {
+  min-width: 32px;
+  min-height: 30px;
+  padding: 0 7px;
+  border-radius: 7px;
+  color: #b9c1c3;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.map-ai-app .level-quick-switch button:hover:not(:disabled),
+.map-ai-app .level-quick-switch button[aria-pressed="true"] {
+  background: #1e4b43;
+  color: #fce5b5;
+}
+
+.map-ai-app .level-quick-switch button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .map-ai-app .transcription-entry.user .message-bubble {
   background: #2563EB;
   color: #ffffff;

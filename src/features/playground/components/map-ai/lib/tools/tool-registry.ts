@@ -241,7 +241,7 @@ async function executeHighlightMapProvince(params: {
     params,
     `Tên tỉnh '${provinceName}' không khớp bất kỳ tỉnh nào trong 34 tỉnh SVG vector.`
   );
-  return `Province '${provinceName}' noted.`;
+  return `Could not locate '${provinceName}' on the map. The map was not changed. Ask the learner to clarify the province name.`;
 }
 
 /**

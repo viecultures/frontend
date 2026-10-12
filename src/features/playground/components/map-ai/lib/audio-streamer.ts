@@ -233,12 +233,11 @@ export class AudioStreamer {
       this.context.currentTime + 0.1
     );
 
-    setTimeout(() => {
-      this.gainNode.disconnect();
-      this.gainNode = this.context.createGain();
-      this.gainNode.gain.setValueAtTime(this.currentGain, this.context.currentTime);
-      this.gainNode.connect(this.context.destination);
-    }, 200);
+    const oldGain = this.gainNode;
+    this.gainNode = this.context.createGain();
+    this.gainNode.gain.setValueAtTime(this.currentGain, this.context.currentTime);
+    this.gainNode.connect(this.context.destination);
+    setTimeout(() => oldGain.disconnect(), 200);
   }
 
   async resume() {
@@ -261,6 +260,8 @@ export class AudioStreamer {
     this.isStreamComplete = true;
     this.onComplete();
   }
+
+  get playing() { return this.audioQueue.length > 0 || this.scheduledTime > this.context.currentTime; }
 }
 
 // // Usage example:

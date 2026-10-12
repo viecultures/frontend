@@ -17,7 +17,6 @@ import type {
 } from '@google/genai';
 import EventEmitter from 'eventemitter3';
 import { DEFAULT_LIVE_API_MODEL } from './constants';
-import { difference } from 'lodash';
 import { base64ToArrayBuffer } from './utils';
 import { debugLog } from './debug-logger';
 
@@ -65,6 +64,7 @@ export class GenAILiveClient {
 
   protected readonly client: GoogleGenAI;
   protected session?: Session;
+  private cancelSetup?: () => void;
 
   private _status: 'connected' | 'disconnected' | 'connecting' = 'disconnected';
   public get status() {
@@ -85,6 +85,15 @@ export class GenAILiveClient {
     }
 
     this._status = 'connecting';
+    let setupTimer: ReturnType<typeof setTimeout>;
+    const setupReady = new Promise<void>((resolve, reject) => {
+      const ready = () => { clearTimeout(setupTimer); this.off('setupcomplete', ready); this.cancelSetup = undefined; resolve(); };
+      this.on('setupcomplete', ready);
+      this.cancelSetup = () => { clearTimeout(setupTimer); this.off('setupcomplete', ready); reject(new Error('Không thể khởi tạo phiên. Hãy thử lại.')); };
+      setupTimer = setTimeout(() => this.cancelSetup?.(), 15000);
+    });
+    // Attach immediately so an early close cannot create an unhandled rejection.
+    void setupReady.catch(() => {});
     const callbacks: LiveCallbacks = {
       onopen: this.onOpen.bind(this),
       onmessage: this.onMessage.bind(this),
@@ -100,7 +109,11 @@ export class GenAILiveClient {
         },
         callbacks,
       });
+      await setupReady;
     } catch (e: any) {
+      this.cancelSetup?.();
+      this.cancelSetup = undefined;
+      this.session?.close();
       console.error('Error connecting to GenAI Live:', e);
       this._status = 'disconnected';
       this.session = undefined;
@@ -117,6 +130,8 @@ export class GenAILiveClient {
   }
 
   public disconnect() {
+    this.cancelSetup?.();
+    this.cancelSetup = undefined;
     this.session?.close();
     this.session = undefined;
     this._status = 'disconnected';
@@ -127,14 +142,12 @@ export class GenAILiveClient {
 
   public interrupt() {
     this.emitter.emit('interrupted');
-    (this.session as any)?.sendRealtimeInput({ control: { interrupt: true } });
     this.log('client.interrupt', 'Client-side interruption');
   }
 
   public send(parts: Part | Part[], turnComplete: boolean = true) {
     if (this._status !== 'connected' || !this.session) {
-      this.emitter.emit('error', new ErrorEvent('Client is not connected'));
-      return;
+      throw new Error('Phiên chưa sẵn sàng. Câu hỏi chưa được gửi.');
     }
     const partsArray = Array.isArray(parts) ? parts : [parts];
     this.session.sendClientContent({
@@ -259,7 +272,7 @@ export class GenAILiveClient {
           p.inlineData?.mimeType?.startsWith('audio/pcm'),
         );
         const base64s = audioParts.map(p => p.inlineData?.data);
-        const otherParts = difference(parts, audioParts);
+        const otherParts = parts.filter(part => !audioParts.includes(part));
 
         base64s.forEach(b64 => {
           if (b64) {
@@ -298,11 +311,11 @@ export class GenAILiveClient {
   }
 
   protected onOpen() {
-    this._status = 'connected';
     this.emitter.emit('open');
   }
 
   protected onClose(e: CloseEvent) {
+    this.cancelSetup?.();
     this._status = 'disconnected';
     let reason = e.reason || '';
     if (reason.toLowerCase().includes('error')) {

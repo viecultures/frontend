@@ -7,6 +7,7 @@ import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 interface VietnamMapCarouselProps {
   activeIndex?: number;
   onSelectLandmark?: (index: number) => void;
+  onSelectProvince?: (province: ProvinceMapItem | null) => void;
   showRegionTabs?: boolean;
   showPoiInfoBox?: boolean;
 }
@@ -14,6 +15,7 @@ interface VietnamMapCarouselProps {
 export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
   activeIndex = 0,
   onSelectLandmark,
+  onSelectProvince,
   showRegionTabs = false,
   showPoiInfoBox = false,
 }) => {
@@ -35,6 +37,7 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
   }, [activeIndex, currentLandmark?.provinceId]);
 
   const handleSelectProvince = (prov: ProvinceMapItem | null) => {
+    onSelectProvince?.(prov);
     if (!prov) {
       setSelectedProvinceId(null);
       return;

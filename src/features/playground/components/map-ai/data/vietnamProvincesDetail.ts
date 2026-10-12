@@ -1,4 +1,5 @@
 import type { ProvinceCultureData } from '../types';
+import { VIETNAM_34_PROVINCES } from '../../../../../data/vietnamMapData';
 
 export const PROVINCES_CULTURE_DETAILS: Record<string, ProvinceCultureData> = {
   'ha-noi': {
@@ -358,5 +359,16 @@ export function getProvinceCultureData(provinceId: string, provinceName?: string
   if (PROVINCES_CULTURE_DETAILS[provinceId]) {
     return PROVINCES_CULTURE_DETAILS[provinceId];
   }
-  return DEFAULT_PROVINCE_DETAIL(provinceId, provinceName || provinceId);
+  const province = VIETNAM_34_PROVINCES.find(item => item.id === provinceId);
+  const detail = DEFAULT_PROVINCE_DETAIL(provinceId, provinceName || province?.name || provinceId);
+  return {
+    ...detail,
+    region: province?.region || detail.region,
+    regionName: province?.regionName || 'Đang cập nhật',
+    capital: 'Đang cập nhật',
+    landmarks: [],
+    specialties: [],
+    itinerary: [],
+    summary: `Thông tin văn hóa chi tiết về ${detail.name} đang được cập nhật.`,
+  };
 }
