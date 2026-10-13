@@ -15,7 +15,10 @@ export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
       {provinces.map((p) => {
         const isSelected = selectedProvinceId === p.id;
         const isHovered = hoveredProvinceId === p.id;
-        const isDimmed = activeRegion !== 'all' && p.region !== activeRegion;
+        const hasFocus = selectedProvinceId !== null;
+
+        const isOtherRegion = activeRegion !== 'all' && p.region !== activeRegion;
+        const isOtherInFocus = hasFocus && !isSelected;
 
         const regionKey = (p.region || 'default') as keyof typeof REGION_PALETTES;
         const palette = REGION_PALETTES[regionKey] || REGION_PALETTES.default;
@@ -37,6 +40,15 @@ export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
           dropShadow = 'drop-shadow(0 0 12px rgba(217,183,106,0.85))';
         }
 
+        let opacityClass = 'opacity-95 hover:opacity-100';
+        if (isOtherRegion) {
+          opacityClass = 'opacity-15 grayscale-[90%]';
+        } else if (isOtherInFocus) {
+          opacityClass = 'opacity-65 hover:opacity-100';
+        } else if (isSelected) {
+          opacityClass = 'opacity-100';
+        }
+
         return (
           <path
             key={p.id}
@@ -52,9 +64,7 @@ export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
             }}
             onMouseEnter={() => onHoverProvince(p.id)}
             onMouseLeave={() => onHoverProvince(null)}
-            className={`cursor-pointer transition-all duration-200 ${
-              isDimmed ? 'opacity-20 grayscale-[80%]' : 'opacity-95 hover:opacity-100'
-            }`}
+            className={`cursor-pointer transition-all duration-300 ${opacityClass}`}
             style={{
               vectorEffect: 'non-scaling-stroke',
               filter: dropShadow,

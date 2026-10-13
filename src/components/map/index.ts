@@ -6,6 +6,7 @@ export { MapProvincesLayer } from './MapProvincesLayer';
 export { MapSeaLayer } from './MapSeaLayer';
 export { MapLabelsLayer } from './MapLabelsLayer';
 export { MapPoiLayer } from './MapPoiLayer';
+export { MapAiMarkersLayer } from './MapAiMarkersLayer';
 
 export * from './types';
 export * from './constants';

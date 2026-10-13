@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import Link from "@/components/Link";
-import { Info, Layers, Headphones, PenTool, ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronRight, Headphones, Layers, PenTool } from "lucide-react";
 import { EXTENSIVE_QUESTIONS } from "@/data/readerData";
 import type { ReaderArticleData } from "../services/readerApiService";
+import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
+import { useReaderDictionary } from "../hooks/useReaderDictionary";
 
 interface ExtensiveReaderViewProps {
   themeMode: "paper" | "dark";
@@ -39,13 +41,18 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
   const [focusedQuestionId, setFocusedQuestionId] = useState<string | null>(null);
 
   const isDark = themeMode === "dark";
+  const { popupState, closeDictionary, handleTextSelection, handleVocabClick } = useReaderDictionary(articleData?.vocabMap);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Extensive Reading Grid: Passage (7 cols / 70%) + Side-by-Side Questions (3 cols / 30%) */}
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start">
         {/* Left 7 Cols (70% Area): Extended Article Reading Passage */}
-        <div className={`lg:col-span-7 p-8 sm:p-10 rounded-3xl transition-colors duration-300 ${paperSheetBgClass}`}>
+        <div
+          onMouseUp={handleTextSelection}
+          onDoubleClick={handleTextSelection}
+          className={`lg:col-span-7 p-8 sm:p-10 rounded-3xl transition-colors duration-300 ${paperSheetBgClass}`}
+        >
           <div>
             {/* Header Tag */}
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
@@ -122,7 +129,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                   <p>
                     Tết Nguyên Đán, often called simply Tết, is described as the most important and{" "}
                     <button
-                      onClick={() => openVocab("sacred")}
+                      onClick={(e) => handleVocabClick("sacred", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -130,7 +137,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>{" "}
                     holiday in Vietnamese culture. It marks the{" "}
                     <button
-                      onClick={() => openVocab("passage")}
+                      onClick={(e) => handleVocabClick("passage", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -138,7 +145,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>
                     , but its meaning goes further. According to the article, Tết stands for{" "}
                     <button
-                      onClick={() => openVocab("family-reunion")}
+                      onClick={(e) => handleVocabClick("family-reunion", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -150,7 +157,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                   <p>
                     The article traces Tết back to the ancient{" "}
                     <button
-                      onClick={() => openVocab("agricultural-civilization")}
+                      onClick={(e) => handleVocabClick("agricultural-civilization", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -158,7 +165,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>{" "}
                     of East Asia, where the cycle of the seasons played a central role in daily life. Tết takes place when winter{" "}
                     <button
-                      onClick={() => openVocab("give-way-to")}
+                      onClick={(e) => handleVocabClick("give-way-to", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -166,7 +173,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>{" "}
                     spring and plants begin to grow again, which{" "}
                     <button
-                      onClick={() => openVocab("symbolize")}
+                      onClick={(e) => handleVocabClick("symbolize", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -174,7 +181,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>{" "}
                     a new beginning. A{" "}
                     <button
-                      onClick={() => openVocab("folk-legend")}
+                      onClick={(e) => handleVocabClick("folk-legend", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -182,7 +189,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>{" "}
                     also says that the festival is a time for descendants to remember their ancestors and pray for a good harvest. Over time, Tết{" "}
                     <button
-                      onClick={() => openVocab("absorb-influences")}
+                      onClick={(e) => handleVocabClick("absorb-influences", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -194,7 +201,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                   <p>
                     Traditional customs follow three stages. Before Tết, people clean their houses, prepare a{" "}
                     <button
-                      onClick={() => openVocab("five-fruit-tray")}
+                      onClick={(e) => handleVocabClick("five-fruit-tray", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -202,7 +209,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>
                     , and wrap bánh chưng or bánh tét together. During the holiday, families hold{" "}
                     <button
-                      onClick={() => openVocab("ancestor-worship")}
+                      onClick={(e) => handleVocabClick("ancestor-worship", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -210,7 +217,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>{" "}
                     ceremonies, exchange New Year wishes, give{" "}
                     <button
-                      onClick={() => openVocab("li-xi")}
+                      onClick={(e) => handleVocabClick("li-xi", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -218,7 +225,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>{" "}
                     to children, and visit pagodas. Afterwards, people take part in spring festivals to wish for good luck. Although the way Vietnamese people celebrate has changed, the article argues that the{" "}
                     <button
-                      onClick={() => openVocab("core-values")}
+                      onClick={(e) => handleVocabClick("core-values", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -230,7 +237,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                   <p>
                     Food carries cultural and spiritual meaning as well. Bánh chưng and bánh tét, which the article calls symbols of earth and sky, express gratitude to ancestors. Bánh chưng is usually made in the North, whereas bánh tét is more common in the Centre and the South.{" "}
                     <button
-                      onClick={() => openVocab("dua-hanh")}
+                      onClick={(e) => handleVocabClick("dua-hanh", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -238,7 +245,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>{" "}
                     balances rich, protein-heavy dishes, and thịt kho tàu with duck eggs represents fullness and{" "}
                     <button
-                      onClick={() => openVocab("prosperity")}
+                      onClick={(e) => handleVocabClick("prosperity", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -250,7 +257,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                   <p>
                     Finally, the{" "}
                     <button
-                      onClick={() => openVocab("atmosphere")}
+                      onClick={(e) => handleVocabClick("atmosphere", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -258,7 +265,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
                     </button>{" "}
                     of Tết{" "}
                     <button
-                      onClick={() => openVocab("differ-from-region-to-region")}
+                      onClick={(e) => handleVocabClick("differ-from-region-to-region", e)}
                       className={isHighlightEnabled ? vocabBtnClass : ""}
                       title="Nhấp để xem từ vựng"
                     >
@@ -409,6 +416,15 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
           </Link>
         </div>
       </div>
+
+      {/* ── In-Place Dictionary Popup ──────────────────────────────────────── */}
+      <InPlaceDictionaryPopup
+        isOpen={popupState.isOpen}
+        vocab={popupState.vocab}
+        position={popupState.position}
+        onClose={closeDictionary}
+        themeMode={themeMode}
+      />
     </div>
   );
 };

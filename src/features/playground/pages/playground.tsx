@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PLAYGROUND_SCREENS } from '../types';
+import { PlaygroundSidebarNav } from '../components/PlaygroundSidebarNav';
+import { Feather, Radio, Zap, Sparkles } from 'lucide-react';
 
 // Experimental Screen Components
 import { VideoDictationShadowingScreen } from '../components/screens/VideoDictationShadowingScreen';
 import { VietnamMapAiScreen } from '../components/screens/VietnamMapAiScreen';
-
+import { VietnamMapImmersiveScreen } from '../components/screens/VietnamMapImmersiveScreen';
+import { LiveAPIProvider } from '../components/map-ai/contexts/LiveAPIContext';
 
 export const PlaygroundPage: React.FC = () => {
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
@@ -75,7 +78,14 @@ export const PlaygroundPage: React.FC = () => {
   }, [currentScreenIndex]);
 
   return (
+    <LiveAPIProvider activeView={currentScreenIndex === 1 ? 'chat' : currentScreenIndex === 2 ? 'immersive' : null}>
     <div className="relative w-full h-screen overflow-hidden bg-[#FBF7EE] dark:bg-[#0b1a17]">
+      {/* Floating Sidebar Navigation */}
+      <PlaygroundSidebarNav
+        currentScreenIndex={currentScreenIndex}
+        onSelectScreen={scrollToScreen}
+      />
+
       {/* Main Snap Scrollable Multi-Screen Desktop Container */}
       <div
         ref={containerRef}
@@ -85,7 +95,7 @@ export const PlaygroundPage: React.FC = () => {
         <section
           ref={el => { screenRefs.current[0] = el; }}
           id="screen-dictation-shadowing"
-          className="w-full min-h-screen lg:h-screen lg:snap-start flex flex-col justify-center border-b border-[#1E4B43]/10"
+          className="w-full h-screen snap-start flex flex-col justify-center border-b border-[#1E4B43]/10 overflow-hidden"
         >
           <VideoDictationShadowingScreen />
         </section>
@@ -94,12 +104,66 @@ export const PlaygroundPage: React.FC = () => {
         <section
           ref={el => { screenRefs.current[1] = el; }}
           id="screen-vietnam-map-ai"
-          className="w-full min-h-screen lg:h-screen lg:snap-start flex flex-col justify-center border-b border-[#1E4B43]/10"
+          className="w-full h-screen snap-start flex flex-col justify-center border-b border-[#1E4B43]/10 overflow-hidden"
         >
           <VietnamMapAiScreen />
         </section>
+
+        {/* Screen 3: Vietnam Map AI Immersive (Ambient Center) */}
+        <section
+          ref={el => { screenRefs.current[2] = el; }}
+          id="screen-vietnam-map-immersive"
+          className="w-full h-screen snap-start flex flex-col justify-center border-b border-[#1E4B43]/10 overflow-hidden"
+        >
+          <VietnamMapImmersiveScreen />
+        </section>
+
+        {/* Screen 4: 3-Region Dialect & Tone Explorer */}
+        <section
+          ref={el => { screenRefs.current[3] = el; }}
+          id="screen-regional-dialects"
+          className="w-full h-screen snap-start flex flex-col items-center justify-center border-b border-[#1E4B43]/10 p-6 bg-[#FBF7EE] dark:bg-[#0b1a17]"
+        >
+          <div className="max-w-xl text-center p-8 rounded-3xl bg-white/80 dark:bg-[#12231F]/80 backdrop-blur-md border border-[#1E4B43]/15 shadow-xl space-y-4">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#1E4B43] text-[#D4AF37] flex items-center justify-center shadow-lg">
+              <Radio className="w-7 h-7" />
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[#D4AF37]/20 text-[#B8860B] dark:text-[#FCE5B5]">
+              <Sparkles className="w-3.5 h-3.5" /> Màn hình #04 · Đang phát triển (Alpha)
+            </div>
+            <h2 className="text-2xl font-serif font-bold text-[#1E4B43] dark:text-[#FBF7EE]">
+              3-Region Dialect &amp; Tone Explorer
+            </h2>
+            <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">
+              Khám phá sóng âm và ma trận phương ngữ Bắc - Trung - Nam, so sánh đường biểu diễn thanh điệu và biến thể từ vựng văn hóa dân gian.
+            </p>
+          </div>
+        </section>
+
+        {/* Screen 5: Heritage Speed-Run Duel Arena */}
+        <section
+          ref={el => { screenRefs.current[4] = el; }}
+          id="screen-heritage-speed-duel"
+          className="w-full h-screen snap-start flex flex-col items-center justify-center border-b border-[#1E4B43]/10 p-6 bg-[#FBF7EE] dark:bg-[#0b1a17]"
+        >
+          <div className="max-w-xl text-center p-8 rounded-3xl bg-white/80 dark:bg-[#12231F]/80 backdrop-blur-md border border-[#1E4B43]/15 shadow-xl space-y-4">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#1E4B43] text-[#D4AF37] flex items-center justify-center shadow-lg">
+              <Zap className="w-7 h-7" />
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[#D4AF37]/20 text-[#B8860B] dark:text-[#FCE5B5]">
+              <Sparkles className="w-3.5 h-3.5" /> Màn hình #05 · Lab Concept
+            </div>
+            <h2 className="text-2xl font-serif font-bold text-[#1E4B43] dark:text-[#FBF7EE]">
+              Heritage Speed-Run Duel Arena
+            </h2>
+            <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">
+              Đấu trường di sản thử thách phản xạ và từ vựng tốc độ 60 giây dồn dập, tích lũy điểm combo và huy hiệu Sứ Giả Văn Hóa.
+            </p>
+          </div>
+        </section>
       </div>
     </div>
+    </LiveAPIProvider>
   );
 };
 

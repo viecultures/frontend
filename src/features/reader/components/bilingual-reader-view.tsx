@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Link from "@/components/Link";
 import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight, RefreshCw, Sparkles } from "lucide-react";
-import { READER_QUIZ_QUESTIONS, VOCAB_DATABASE, lookupWord, extractSentenceContext, type VocabItem } from "@/data/readerData";
+import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
 import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
 import type { ReaderArticleData } from "../services/readerApiService";
+import { useReaderDictionary } from "../hooks/useReaderDictionary";
 
 interface BilingualReaderViewProps {
   themeMode: "paper" | "dark";
@@ -51,16 +52,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   const activeScrollerRef = useRef<"left" | "right" | null>(null);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState<boolean>(true);
-  // ── In-Place Dictionary Popup State ───────────────────────────────────────
-  const [popupState, setPopupState] = useState<{
-    isOpen: boolean;
-    vocab: VocabItem | null;
-    position: { x: number; y: number } | null;
-  }>({
-    isOpen: false,
-    vocab: null,
-    position: null,
-  });
+  // ── Shared In-Place Realtime Dictionary Hook ───────────────────────────────
+  const { popupState, closeDictionary, handleTextSelection, handleVocabClick } = useReaderDictionary(articleData?.vocabMap);
 
   // Handle Proportional Scroll Sync
   const handleScroll = useCallback((source: "left" | "right") => {
@@ -95,31 +88,6 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
       activeScrollerRef.current = null;
     }, 120);
   }, [isScrollSyncEnabled]);
-
-  // Handle click on predetermined vocab word
-  const handleVocabClick = (key: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const el = e.currentTarget as HTMLElement;
-    const rect = el.getBoundingClientRect();
-
-    // Find enclosing paragraph text to get the full accurate sentence
-    const blockEl = el.closest('p');
-    const fullParagraph = blockEl ? (blockEl.innerText || blockEl.textContent || "") : "";
-    const vocabData = articleData?.vocabMap?.[key.toLowerCase()] || VOCAB_DATABASE[key] || lookupWord(key);
-    const fullSentence = fullParagraph ? extractSentenceContext(fullParagraph, vocabData.word) : vocabData.contextSentence;
-
-    setPopupState({
-      isOpen: true,
-      vocab: {
-        ...vocabData,
-        contextSentence: fullSentence || vocabData.contextSentence,
-      },
-      position: {
-        x: rect.left + rect.width / 2,
-        y: rect.bottom,
-      },
-    });
-  };
 
   // Helper to dynamically highlight words from articleData.vocabularies
   const renderParagraphContent = (text: string) => {
@@ -157,58 +125,6 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
       }
       return part;
     });
-  };
-
-  // Handle selection / highlighting of any word or phrase (Tra từ tại chỗ)
-  const handleTextSelection = (e: React.MouseEvent) => {
-    const selection = window.getSelection();
-    if (!selection || selection.isCollapsed) return;
-
-    const selectedText = selection.toString().trim();
-    if (!selectedText || selectedText.length < 2) return;
-
-    try {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-
-      // Find enclosing paragraph (<p>) element to extract full paragraph text
-      let blockEl: HTMLElement | null = null;
-      let node: Node | null = range.startContainer;
-      while (node && node !== document.body) {
-        if (node instanceof HTMLElement && (node.tagName === 'P' || node.tagName === 'DIV')) {
-          blockEl = node;
-          break;
-        }
-        node = node.parentNode;
-      }
-
-      const fullParagraph = blockEl ? (blockEl.innerText || blockEl.textContent || "") : (range.commonAncestorContainer.textContent || "");
-      const fullSentence = extractSentenceContext(fullParagraph, selectedText);
-      const vocab = lookupWord(selectedText, fullSentence);
-
-      setPopupState({
-        isOpen: true,
-        vocab: {
-          ...vocab,
-          contextSentence: fullSentence,
-        },
-        position: {
-          x: rect.left + rect.width / 2,
-          y: rect.bottom,
-        },
-      });
-    } catch (err) {
-      // Fallback positioning with mouse coordinates
-      const vocab = lookupWord(selectedText);
-      setPopupState({
-        isOpen: true,
-        vocab,
-        position: {
-          x: e.clientX,
-          y: e.clientY + 10,
-        },
-      });
-    }
   };
 
   // Cleanup sync timeout on unmount
@@ -270,6 +186,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           onWheel={() => { activeScrollerRef.current = "left"; }}
           onScroll={() => handleScroll("left")}
           onMouseUp={handleTextSelection}
+          onDoubleClick={handleTextSelection}
           className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] ${paperSheetBgClass}`}
         >
           <div>
@@ -505,6 +422,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           onTouchStart={() => { activeScrollerRef.current = "right"; }}
           onWheel={() => { activeScrollerRef.current = "right"; }}
           onScroll={() => handleScroll("right")}
+          onMouseUp={handleTextSelection}
+          onDoubleClick={handleTextSelection}
           className={`p-6 sm:p-10 rounded-3xl flex flex-col justify-between transition-colors duration-300 overflow-y-auto max-h-[750px] ${paperSheetBgClass}`}
         >
           <div>
@@ -782,7 +701,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
         isOpen={popupState.isOpen}
         vocab={popupState.vocab}
         position={popupState.position}
-        onClose={() => setPopupState((prev) => ({ ...prev, isOpen: false }))}
+        onClose={closeDictionary}
         themeMode={themeMode}
       />
 

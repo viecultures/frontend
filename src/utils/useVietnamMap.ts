@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import type { LandmarkArticle } from '@/data/landmarksData';
 import {
   getProvinceById,
   clampZoom,
@@ -9,20 +10,31 @@ import {
 export type RegionKey = 'all' | 'north' | 'central' | 'south';
 
 export interface UseVietnamMapOptions {
+  /** undefined uses local state; null explicitly clears controlled selection. */
+  selectedProvinceId?: string | null;
+  selectedLandmarkId?: string | null;
   defaultSelectedId?: string | null;
+  defaultSelectedLandmarkId?: string | null;
   defaultRegion?: RegionKey;
+  activeRegion?: RegionKey;
   onSelectProvince?: (province: ProvinceMapItem | null) => void;
   onSelectRegion?: (region: RegionKey) => void;
+  onSelectLandmark?: (landmark: LandmarkArticle, province: ProvinceMapItem) => void;
   minScale?: number;
   maxScale?: number;
 }
 
 export function useVietnamMap(options: UseVietnamMapOptions = {}) {
   const {
+    selectedProvinceId: controlledProvinceId,
+    selectedLandmarkId: controlledLandmarkId,
     defaultSelectedId = null,
+    defaultSelectedLandmarkId = null,
     defaultRegion = 'all',
+    activeRegion: controlledRegion,
     onSelectProvince,
     onSelectRegion,
+    onSelectLandmark,
     minScale = 1.0,
     maxScale = 2.5,
   } = options;
@@ -31,8 +43,34 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
   const mouseDownPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const hasDraggedRef = useRef<boolean>(false);
 
-  const [activeRegion, setActiveRegionState] = useState<RegionKey>(defaultRegion);
-  const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(defaultSelectedId);
+  const [regionState, setRegionState] = useState(() => ({
+    region: controlledRegion === undefined
+      ? getProvinceById(controlledProvinceId)?.region ?? defaultRegion
+      : defaultRegion,
+    provinceId: controlledProvinceId,
+  }));
+  let localRegion = regionState.region;
+  if (regionState.provinceId !== controlledProvinceId) {
+    // External selections (e.g. carousel changes) silently focus the region.
+    // Track the prop change so unchanged selections cannot undo a tab/reset.
+    // Adjust before commit to keep the province and viewBox in the same frame.
+    if (controlledRegion === undefined) {
+      localRegion = getProvinceById(controlledProvinceId)?.region ?? localRegion;
+    }
+    setRegionState({ region: localRegion, provinceId: controlledProvinceId });
+  }
+  const [localProvinceId, setLocalProvinceId] = useState<string | null>(defaultSelectedId);
+  const [localLandmarkId, setLocalLandmarkId] = useState<string | null>(defaultSelectedLandmarkId);
+  const activeRegion = controlledRegion === undefined ? localRegion : controlledRegion;
+  const selectedProvinceId = controlledProvinceId === undefined ? localProvinceId : controlledProvinceId;
+  const selectedLandmarkId = controlledLandmarkId === undefined ? localLandmarkId : controlledLandmarkId;
+  const setActiveRegionState = useCallback((region: RegionKey) => {
+    if (controlledRegion === undefined) setRegionState(previous => ({ ...previous, region }));
+  }, [controlledRegion]);
+  const setSelectedProvinceId = useCallback((id: string | null) => {
+    if (controlledProvinceId === undefined) setLocalProvinceId(id);
+    if (controlledLandmarkId === undefined) setLocalLandmarkId(null);
+  }, [controlledProvinceId, controlledLandmarkId]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Zoom & Pan State
@@ -41,42 +79,112 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  // Sync internal state when defaultSelectedId prop changes
-  useEffect(() => {
-    if (defaultSelectedId !== undefined) {
-      setSelectedProvinceId(defaultSelectedId);
-      if (defaultSelectedId) {
-        const prov = getProvinceById(defaultSelectedId);
-        if (prov?.region) {
-          setActiveRegionState(prov.region);
-          setZoomScale(1);
-          setPanPosition({ x: 0, y: 0 });
-        }
-      }
-    }
-  }, [defaultSelectedId]);
-
-  const selectedProvince = getProvinceById(selectedProvinceId);
-  const hoveredProvince = getProvinceById(hoveredId);
+  // Touch tracking refs
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const touchDistStartRef = useRef<number | null>(null);
+  const touchScaleStartRef = useRef<number>(1);
 
   const currentViewBox =
     (VIETNAM_REGION_VIEWBOXES as Record<string, { viewBox: string }>)[activeRegion]?.viewBox ||
     '0 0 520 1100';
 
+  // Calculate strict pan bounds based on actual rendered SVG dimensions inside container
+  const calculatePanBounds = useCallback((scale: number) => {
+    const container = containerRef.current;
+    if (!container || scale <= 1) {
+      return { minX: 0, maxX: 0, minY: 0, maxY: 0 };
+    }
+    const width = container.clientWidth || 500;
+    const height = container.clientHeight || 700;
+
+    // Parse viewBox to determine actual rendered SVG aspect ratio
+    const vbParts = currentViewBox.split(' ').map(Number);
+    const vbWidth = vbParts[2] || 520;
+    const vbHeight = vbParts[3] || 1100;
+    const vbAspect = vbWidth / vbHeight;
+    const containerAspect = width / height;
+
+    // Calculate actual unscaled dimensions of the SVG (preserveAspectRatio xMidYMid meet)
+    let renderedSvgW = width;
+    let renderedSvgH = height;
+
+    if (containerAspect > vbAspect) {
+      // Container is wider than SVG: height fills container, width is letterboxed
+      renderedSvgW = height * vbAspect;
+    } else {
+      // Container is taller than SVG: width fills container, height is letterboxed
+      renderedSvgH = width / vbAspect;
+    }
+
+    const scaledW = renderedSvgW * scale;
+    const scaledH = renderedSvgH * scale;
+
+    // Strict boundary: Only allow panning if scaled dimension exceeds container viewport
+    // Content edges will align with container edges at limits, completely preventing empty voids
+    const maxDeltaX = Math.max(0, (scaledW - width) / 2);
+    const maxDeltaY = Math.max(0, (scaledH - height) / 2);
+
+    return {
+      minX: -maxDeltaX,
+      maxX: maxDeltaX,
+      minY: -maxDeltaY,
+      maxY: maxDeltaY,
+    };
+  }, [currentViewBox]);
+
+  const clampPanPosition = useCallback(
+    (x: number, y: number, scale: number) => {
+      if (scale <= 1) return { x: 0, y: 0 };
+      const bounds = calculatePanBounds(scale);
+      return {
+        x: Math.min(Math.max(x, bounds.minX), bounds.maxX),
+        y: Math.min(Math.max(y, bounds.minY), bounds.maxY),
+      };
+    },
+    [calculatePanBounds]
+  );
+
+  // Defaults initialize local state only. Controlled props are read directly,
+  // so a parent can clear selection or change regions without an effect race.
+  useEffect(() => {
+    setZoomScale(1);
+    setPanPosition({ x: 0, y: 0 });
+  }, [activeRegion]);
+
+  const selectedProvince = getProvinceById(selectedProvinceId);
+  const hoveredProvince = getProvinceById(hoveredId);
+
   const setActiveRegion = useCallback(
     (region: RegionKey) => {
       setActiveRegionState(region);
+      setSelectedProvinceId(null);
       setZoomScale(1);
       setPanPosition({ x: 0, y: 0 });
       onSelectRegion?.(region);
+      onSelectProvince?.(null);
     },
-    [onSelectRegion]
+    [onSelectProvince, onSelectRegion, setActiveRegionState, setSelectedProvinceId]
   );
 
-  const selectProvince = useCallback(
-    (province: ProvinceMapItem | string | null, force = false) => {
+  const resetToAll = useCallback(
+    (force = false) => {
       // Ignore click if the user was dragging/panning the map
       if (!force && hasDraggedRef.current) return;
+
+      setActiveRegionState('all');
+      setSelectedProvinceId(null);
+      setZoomScale(1);
+      setPanPosition({ x: 0, y: 0 });
+      onSelectRegion?.('all');
+      onSelectProvince?.(null);
+    },
+    [onSelectProvince, onSelectRegion, setActiveRegionState, setSelectedProvinceId]
+  );
+
+  const focusProvince = useCallback(
+    (province: ProvinceMapItem | string | null, force = false, notify = true) => {
+      // Ignore click if the user was dragging/panning the map
+      if (!force && hasDraggedRef.current) return false;
 
       let provItem: ProvinceMapItem | undefined;
       let provId: string | null = null;
@@ -91,56 +199,81 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
 
       if (!provId || !provItem) {
         setSelectedProvinceId(null);
-        onSelectProvince?.(null);
-        return;
+        if (notify) onSelectProvince?.(null);
+        return true;
       }
 
-      // 🗺️ Auto region switch & zoom when clicking any province
+      // 1-Click Select & Zoom:
+      // Instantly select & highlight province, and zoom into its region seamlessly
       setSelectedProvinceId(provId);
-      onSelectProvince?.(provItem);
 
-      if (provItem.region) {
+      if (provItem.region && provItem.region !== activeRegion) {
         setActiveRegionState(provItem.region);
         setZoomScale(1);
         setPanPosition({ x: 0, y: 0 });
-        onSelectRegion?.(provItem.region);
       }
+      // Automatic region focus is part of selection, not a user tab event.
+      if (notify) onSelectProvince?.(provItem);
+      return true;
     },
-    [onSelectProvince, onSelectRegion]
+    [activeRegion, onSelectProvince, setActiveRegionState, setSelectedProvinceId]
   );
 
-  const resetToAll = useCallback(
+  const selectProvince = useCallback(
+    (province: ProvinceMapItem | string | null, force = false) => focusProvince(province, force),
+    [focusProvince],
+  );
+
+  // Publish one complete transaction. Older province-only consumers still
+  // receive their province callback when a landmark is clicked.
+  const selectLandmark = useCallback((landmark: LandmarkArticle, province: ProvinceMapItem) => {
+    if (!focusProvince(province, false, !onSelectLandmark)) return;
+    if (controlledLandmarkId === undefined) setLocalLandmarkId(landmark.id);
+    onSelectLandmark?.(landmark, province);
+  }, [controlledLandmarkId, focusProvince, onSelectLandmark]);
+
+  // Single-click backdrop escape: resets map cleanly to national overview ('all')
+  const handleBackdropClick = useCallback(
     (force = false) => {
-      // Ignore click if the user was dragging/panning the map
       if (!force && hasDraggedRef.current) return;
 
-      setActiveRegionState('all');
-      setSelectedProvinceId(null);
-      setZoomScale(1);
-      setPanPosition({ x: 0, y: 0 });
-      onSelectProvince?.(null);
-      onSelectRegion?.('all');
+      if (selectedProvinceId !== null || activeRegion !== 'all' || zoomScale > 1) {
+        setActiveRegionState('all');
+        setSelectedProvinceId(null);
+        setZoomScale(1);
+        setPanPosition({ x: 0, y: 0 });
+        onSelectRegion?.('all');
+        onSelectProvince?.(null);
+      }
     },
-    [onSelectProvince, onSelectRegion]
+    [selectedProvinceId, activeRegion, zoomScale, onSelectProvince, onSelectRegion, setActiveRegionState, setSelectedProvinceId]
   );
 
   const zoomIn = useCallback(() => {
-    setZoomScale((prev) => clampZoom(prev * 1.25, minScale, maxScale));
-  }, [minScale, maxScale]);
+    setZoomScale((prev) => {
+      const next = clampZoom(prev * 1.25, minScale, maxScale);
+      setPanPosition((cur) => clampPanPosition(cur.x, cur.y, next));
+      return next;
+    });
+  }, [minScale, maxScale, clampPanPosition]);
 
   const zoomOut = useCallback(() => {
     setZoomScale((prev) => {
       const next = clampZoom(prev / 1.25, minScale, maxScale);
-      if (next === 1) setPanPosition({ x: 0, y: 0 });
+      if (next <= 1) {
+        setPanPosition({ x: 0, y: 0 });
+        return 1;
+      }
+      setPanPosition((cur) => clampPanPosition(cur.x, cur.y, next));
       return next;
     });
-  }, [minScale, maxScale]);
+  }, [minScale, maxScale, clampPanPosition]);
 
   const resetZoom = useCallback(() => {
     resetToAll(true);
   }, [resetToAll]);
 
-  // Intercept scroll wheel with non-passive listener to prevent outer page scroll
+  // Intercept scroll wheel with Zoom-to-cursor math and pan clamping
   useEffect(() => {
     const elem = containerRef.current;
     if (!elem) return;
@@ -149,23 +282,43 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
       e.preventDefault();
       e.stopPropagation();
 
-      if (e.deltaY < 0) {
-        setZoomScale((prev) => clampZoom(prev * 1.1, minScale, maxScale));
-      } else {
-        setZoomScale((prev) => {
-          const next = clampZoom(prev / 1.1, minScale, maxScale);
-          if (next === 1) setPanPosition({ x: 0, y: 0 });
-          return next;
+      const container = containerRef.current;
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      const mouseX = e.clientX - (rect.left + rect.width / 2);
+      const mouseY = e.clientY - (rect.top + rect.height / 2);
+
+      setZoomScale((prevScale) => {
+        const zoomFactor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+        const nextScale = clampZoom(prevScale * zoomFactor, minScale, maxScale);
+
+        if (nextScale === prevScale) return prevScale;
+
+        if (nextScale <= 1) {
+          setPanPosition({ x: 0, y: 0 });
+          return 1;
+        }
+
+        // Calculate smooth zoom towards mouse cursor position
+        setPanPosition((prevPan) => {
+          const ratio = nextScale / prevScale;
+          const targetX = prevPan.x * ratio + mouseX * (1 - ratio);
+          const targetY = prevPan.y * ratio + mouseY * (1 - ratio);
+          return clampPanPosition(targetX, targetY, nextScale);
         });
-      }
+
+        return nextScale;
+      });
     };
 
     elem.addEventListener('wheel', handleWheel, { passive: false });
     return () => {
       elem.removeEventListener('wheel', handleWheel);
     };
-  }, [minScale, maxScale]);
+  }, [minScale, maxScale, clampPanPosition]);
 
+  // Mouse pan handlers with clamping
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
@@ -186,17 +339,78 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
         hasDraggedRef.current = true;
       }
       if (isDragging && zoomScale > 1) {
-        setPanPosition({
-          x: e.clientX - dragStart.x,
-          y: e.clientY - dragStart.y,
-        });
+        const rawX = e.clientX - dragStart.x;
+        const rawY = e.clientY - dragStart.y;
+        setPanPosition(clampPanPosition(rawX, rawY, zoomScale));
       }
     },
-    [isDragging, zoomScale, dragStart]
+    [isDragging, zoomScale, dragStart, clampPanPosition]
   );
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
+  }, []);
+
+  // Touch pan & pinch-to-zoom handlers for mobile/tablet
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      hasDraggedRef.current = false;
+      if (e.touches.length === 1) {
+        const t = e.touches[0];
+        touchStartRef.current = { x: t.clientX, y: t.clientY };
+        mouseDownPosRef.current = { x: t.clientX, y: t.clientY };
+        if (zoomScale > 1) {
+          setIsDragging(true);
+          setDragStart({ x: t.clientX - panPosition.x, y: t.clientY - panPosition.y });
+        }
+      } else if (e.touches.length === 2) {
+        setIsDragging(false);
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        touchDistStartRef.current = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        touchScaleStartRef.current = zoomScale;
+      }
+    },
+    [zoomScale, panPosition]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (e.touches.length === 1) {
+        const t = e.touches[0];
+        const dx = t.clientX - (touchStartRef.current?.x || t.clientX);
+        const dy = t.clientY - (touchStartRef.current?.y || t.clientY);
+        if (Math.hypot(dx, dy) > 5) {
+          hasDraggedRef.current = true;
+        }
+        if (zoomScale > 1) {
+          const rawX = t.clientX - dragStart.x;
+          const rawY = t.clientY - dragStart.y;
+          setPanPosition(clampPanPosition(rawX, rawY, zoomScale));
+        }
+      } else if (e.touches.length === 2 && touchDistStartRef.current) {
+        hasDraggedRef.current = true;
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const newDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const factor = newDist / touchDistStartRef.current;
+        const newScale = clampZoom(touchScaleStartRef.current * factor, minScale, maxScale);
+
+        setZoomScale(newScale);
+        if (newScale <= 1) {
+          setPanPosition({ x: 0, y: 0 });
+        } else {
+          setPanPosition((prev) => clampPanPosition(prev.x, prev.y, newScale));
+        }
+      }
+    },
+    [zoomScale, dragStart, clampPanPosition, minScale, maxScale]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+    touchStartRef.current = null;
+    touchDistStartRef.current = null;
   }, []);
 
   const transformStyle: React.CSSProperties = {
@@ -211,12 +425,16 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
     setActiveRegion,
     currentViewBox,
     selectedProvinceId,
+    selectedLandmarkId,
+    selectLandmark,
     selectedProvince,
     hoveredId,
     hoveredProvince,
     setHoveredId,
     selectProvince,
+    focusProvince,
     resetToAll,
+    handleBackdropClick,
     zoomScale,
     panPosition,
     isDragging,
@@ -229,6 +447,10 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
       onMouseMove: handleMouseMove,
       onMouseUp: handleMouseUp,
       onMouseLeave: handleMouseUp,
+      onTouchStart: handleTouchStart,
+      onTouchMove: handleTouchMove,
+      onTouchEnd: handleTouchEnd,
+      onTouchCancel: handleTouchEnd,
     },
   };
 }

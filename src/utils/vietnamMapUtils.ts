@@ -230,5 +230,11 @@ export function clampZoom(scale: number, min = 1.0, max = 2.5): number {
   return Math.min(max, Math.max(min, scale));
 }
 
+/**
+ * Convert real-world GPS coordinates (lat, lng) to Vietnam SVG Map canvas coordinates (x, y)
+ * Calibrated against the official 520 x 1100 Vietnam 34-provinces vector map dataset.
+ */
+export { geoToSvg, svgToGeo } from './vietnamMapProjection';
+
 export { VIETNAM_34_PROVINCES, VIETNAM_ISLANDS, VIETNAM_MAP_DIMENSIONS, VIETNAM_REGION_VIEWBOXES, type ProvinceMapItem };
 

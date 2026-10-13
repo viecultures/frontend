@@ -1,14 +1,25 @@
 import React from 'react';
 import type { MapPoiLayerProps } from './types';
+import { geoToSvg } from '@/utils/vietnamMapUtils';
+
+const CATEGORY_COLORS: Record<string, { stroke: string; dot: string; ping: string }> = {
+  Heritage: { stroke: '#D9B76A', dot: '#F5D280', ping: '#F5D280' },
+  Nature: { stroke: '#10B981', dot: '#34D399', ping: '#34D399' },
+  Cuisine: { stroke: '#F59E0B', dot: '#FBBF24', ping: '#FBBF24' },
+  Crafts: { stroke: '#8B5CF6', dot: '#A78BFA', ping: '#A78BFA' },
+  Folklore: { stroke: '#EC4899', dot: '#F472B6', ping: '#F472B6' },
+};
 
 export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
   landmarks,
   provinces,
   selectedProvinceId,
+  selectedLandmarkId,
   hoveredProvinceId,
   activeRegion,
   onSelectLandmarkProvince,
   onHoverLandmarkProvince,
+  onSelectLandmark,
 }) => {
   const [hoveredPoiId, setHoveredPoiId] = React.useState<string | null>(null);
 
@@ -33,14 +44,23 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
         const siblingIndex = siblings.findIndex((s) => s.id === lm.id);
         const totalSiblings = siblings.length;
 
-        // Calculate exact X and Y coordinates
+        // Calculate exact X and Y coordinates (GPS calibrated projection takes precedence)
         let x = p.cx;
         let y = p.cy;
+
+        if (lm.coordinates) {
+          const projected = geoToSvg(lm.coordinates.lat, lm.coordinates.lng);
+          x = projected.x;
+          y = projected.y;
+        } else if (lm.pinCoordinates) {
+          x = lm.pinCoordinates.x;
+          y = lm.pinCoordinates.y;
+        }
 
         if (lm.offset) {
           x += lm.offset.dx;
           y += lm.offset.dy;
-        } else if (totalSiblings > 1) {
+        } else if (totalSiblings > 1 && !lm.coordinates) {
           // Automatic radial fan-out distribution with compact radius
           const radius = 8;
           const angle = (2 * Math.PI * siblingIndex) / totalSiblings - Math.PI / 2;
@@ -51,11 +71,20 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
         const isProvinceSelected = selectedProvinceId === p.id;
         const isProvinceHovered = hoveredProvinceId === p.id;
         const isPoiHovered = hoveredPoiId === lm.id;
-        const isDimmed = activeRegion !== 'all' && p.region !== activeRegion;
+        const isPoiSelected = selectedLandmarkId === lm.id;
+        const hasFocus = selectedProvinceId !== null;
 
-        // Reveal badge if this specific POI is hovered, or if province is selected/hovered
-        const isVisible = isPoiHovered || (isProvinceSelected && totalSiblings === 1);
-        const isHighlighted = isPoiHovered || isProvinceSelected;
+        // Region check: In regional view, hide POIs from other regions or national items
+        if (activeRegion !== 'all' && (lm.isNational || p.region !== activeRegion)) {
+          return null;
+        }
+
+        const isDimmedOther = hasFocus && !isProvinceSelected;
+        const catColor = CATEGORY_COLORS[lm.category] || CATEGORY_COLORS.Heritage;
+
+        // Reveal badge if this specific POI is hovered, or if province is selected
+        const isVisible = isPoiSelected || isPoiHovered || (isProvinceSelected && totalSiblings === 1);
+        const isHighlighted = isPoiSelected || isPoiHovered || isProvinceSelected;
 
         // Dynamic badge width calculation based on landmark name length (compact & elegant)
         const badgeWidth = Math.max(68, lm.name.length * 5.2 + 18);
@@ -67,60 +96,68 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
             transform={`translate(${x}, ${y})`}
             onClick={(e) => {
               e.stopPropagation();
-              onSelectLandmarkProvince(p);
+              if (onSelectLandmark) onSelectLandmark(lm, p);
+              else onSelectLandmarkProvince(p);
             }}
             onMouseEnter={() => {
               setHoveredPoiId(lm.id);
-              onHoverLandmarkProvince?.(p.id);
             }}
             onMouseLeave={() => {
               setHoveredPoiId(null);
-              onHoverLandmarkProvince?.(null);
             }}
-            className={`cursor-pointer transition-opacity duration-300 ${
-              isDimmed ? 'opacity-25 grayscale-[70%]' : 'opacity-100'
+            className={`cursor-pointer transition-opacity duration-200 ${
+              isDimmedOther ? 'opacity-65 hover:opacity-100' : 'opacity-100'
             }`}
           >
-            {/* Animated Radar Pulsing Aura Ring */}
-            <circle
-              cx="0"
-              cy="0"
-              r={isHighlighted ? 7.5 : isProvinceHovered ? 6 : 4.2}
-              fill={isHighlighted ? '#F5D280' : '#D9B76A'}
-              opacity={isHighlighted ? 0.55 : isProvinceHovered ? 0.45 : 0.3}
-              className="animate-ping"
-            />
+            {/* Stable Invisible Hitbox to guarantee 100% jitter-free hover */}
+            <circle cx="0" cy="0" r="12" fill="transparent" />
+
+            {/* Animated Radar Pulsing Aura Ring - strictly on highlighted/active POI, pointer-events-none */}
+            {isHighlighted && (
+              <circle
+                cx="0"
+                cy="0"
+                r={7.5}
+                fill={catColor.ping}
+                opacity={0.55}
+                className="animate-ping pointer-events-none"
+              />
+            )}
 
             {/* Outer Solid Glowing Circle */}
             <circle
               cx="0"
               cy="0"
-              r={isHighlighted ? 3.8 : isProvinceHovered ? 3.2 : 2.4}
-              fill={isHighlighted ? '#F5D280' : isProvinceHovered ? '#FCE5B5' : '#D9B76A'}
+              r={isHighlighted ? 4.0 : isPoiHovered ? 3.4 : 2.5}
+              fill={isHighlighted || isPoiHovered ? catColor.dot : catColor.stroke}
               stroke="#122A22"
-              strokeWidth={isHighlighted || isProvinceHovered ? '1.0' : '0.8'}
-              className="drop-shadow-sm"
+              strokeWidth={isHighlighted || isPoiHovered ? '1.0' : '0.8'}
+              className="drop-shadow-sm pointer-events-none"
             />
 
             {/* Inner Core Accent Circle */}
             <circle
               cx="0"
               cy="0"
-              r={isHighlighted ? 1.6 : isProvinceHovered ? 1.3 : 1.0}
+              r={isHighlighted ? 1.6 : 1.1}
               fill="#122A22"
+              className="pointer-events-none"
             />
 
-            {/* Floating POI Tag Badge - Only displayed when hovered */}
+            {/* Floating POI Tag Badge - strictly pointer-events-none */}
             {isVisible && (
-              <g transform="translate(0, -12)" className="animate-in fade-in zoom-in duration-150">
+              <g
+                transform="translate(0, -12)"
+                className="pointer-events-none animate-in fade-in zoom-in duration-150"
+              >
                 <rect
                   x={-halfWidth}
                   y="-6.5"
                   width={badgeWidth}
                   height="13"
                   rx="6.5"
-                  fill={isPoiHovered ? '#F5D280' : '#122A22'}
-                  stroke={isPoiHovered ? '#FFFFFF' : '#D9B76A'}
+                  fill={isPoiHovered ? catColor.stroke : '#122A22'}
+                  stroke={isPoiHovered ? '#FFFFFF' : catColor.stroke}
                   strokeWidth={isPoiHovered ? '1.0' : '0.8'}
                   opacity="0.95"
                   className="drop-shadow-md"
@@ -129,7 +166,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
                 <path
                   d="M3.2 1.2C2.1 1.2 1.2 2.1 1.2 3.2c0 1.5 2 3.6 2 3.6s2-2.1 2-3.6c0-1.1-.9-2-2-2zm0 2.6c-.35 0-.64-.29-.64-.64s.29-.64.64-.64.64.29.64.64-.29.64-.64.64z"
                   transform={`translate(${-halfWidth + 4}, -4.2)`}
-                  fill={isPoiHovered ? '#122A22' : '#D9B76A'}
+                  fill={isPoiHovered ? '#122A22' : catColor.dot}
                 />
                 <text
                   x={4}

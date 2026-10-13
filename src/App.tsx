@@ -6,18 +6,20 @@ import { Footer } from './components/Footer';
 import { SettingsModal } from './components/SettingsModal';
 import { PwaInstallBanner } from './components/pwa';
 
-// Feature Pages
+// Primary Entry Pages
 import LandingPage from '@/features/landing/pages/landing';
 import LoginPage from '@/features/auth/pages/login';
-import HomePage from '@/features/home/pages/home';
-import DiscoveryPage from '@/features/discovery/pages/discovery';
-import ReaderPage from '@/features/reader/pages/reader';
-import DictionaryPage from '@/features/flashcards/pages/dictionary';
-import FlashcardStudyPage from '@/features/flashcards/pages/flashcard-study';
-import CommunityPage from '@/features/community/pages/community';
-import CommunityContestPage from '@/features/community/pages/community-contest';
-import PlaygroundPage from '@/features/playground/pages/playground';
-import AdminPage from '@/features/admin/pages/AdminPage';
+
+
+// Lazy-loaded Feature Pages (Bundle Optimization)
+const HomePage = React.lazy(() => import('@/features/home/pages/home'));
+const DiscoveryPage = React.lazy(() => import('@/features/discovery/pages/discovery'));
+const ReaderPage = React.lazy(() => import('@/features/reader/pages/reader'));
+const DictionaryPage = React.lazy(() => import('@/features/flashcards/pages/dictionary'));
+const FlashcardStudyPage = React.lazy(() => import('@/features/flashcards/pages/flashcard-study'));
+const CommunityPage = React.lazy(() => import('@/features/community/pages/community'));
+const CommunityContestPage = React.lazy(() => import('@/features/community/pages/community-contest'));
+const PlaygroundPage = React.lazy(() => import('@/features/playground/pages/playground'));
 
 import type { Lesson } from '@/types';
 
@@ -147,8 +149,8 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
-      {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, flashcard layout, and standalone playground) */}
-      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'dictionary' && activeView !== 'flashcard-study' && activeView !== 'playground' && (
+      {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, and standalone playground) */}
+      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'playground' && (
         <Navbar
           activeView={activeView}
           isLoggedIn={isLoggedIn}
@@ -160,101 +162,102 @@ export const App: React.FC = () => {
 
       {/* Main Content Area / React Router Routes */}
       <main className="flex-1 w-full">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <LandingPage
-                onNavigate={handleNavigate}
-              />
-            }
-          />
-          <Route
-            path="/landing"
-            element={<Navigate to="/" replace />}
-          />
-          <Route
-            path="/login"
-            element={
-              <LoginPage
-                onLoginSuccess={handleLoginSuccess}
-                onNavigate={handleNavigate}
-              />
-            }
-          />
-          <Route
-            path="/home"
-            element={
-              <HomePage
-                onNavigate={handleNavigate}
-                isLoggedIn={isLoggedIn}
-                user={user}
-                onLogout={handleLogout}
-              />
-            }
-          />
-          <Route
-            path="/discovery"
-            element={<DiscoveryPage />}
-          />
-          <Route
-            path="/reader"
-            element={<ReaderPage />}
-          />
-          <Route
-            path="/bilingual-reader"
-            element={<ReaderPage />}
-          />
-          <Route
-            path="/extensive-reader"
-            element={<Navigate to="/bilingual-reader?mode=extensive" replace />}
-          />
-          <Route
-            path="/dictionary"
-            element={<DictionaryPage />}
-          />
-          <Route
-            path="/flashcard-library"
-            element={<Navigate to="/dictionary" replace />}
-          />
-          <Route
-            path="/flashcard-study"
-            element={<FlashcardStudyPage />}
-          />
-          <Route
-            path="/community"
-            element={<CommunityPage />}
-          />
-          <Route
-            path="/community-1"
-            element={<Navigate to="/community" replace />}
-          />
-          <Route
-            path="/community-2"
-            element={<CommunityContestPage />}
-          />
-          <Route
-            path="/community-contest"
-            element={<Navigate to="/community-2" replace />}
-          />
-          <Route
-            path="/playground"
-            element={<PlaygroundPage />}
-          />
-          <Route
-            path="/admin"
-            element={<AdminPage />}
-          />
-          <Route
-            path="/admin/posts"
-            element={<Navigate to="/admin" replace />}
-          />
-          <Route
-            path="*"
-            element={<Navigate to="/" replace />}
-          />
-        </Routes>
-      </main>
+
+        <React.Suspense
+          fallback={
+            <div className="min-h-[60vh] flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-[#1E4B43]/20 border-t-[#1E4B43] rounded-full animate-spin" />
+            </div>
+          }
+        >
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <LandingPage
+                  onNavigate={handleNavigate}
+                />
+              }
+            />
+            <Route
+              path="/landing"
+              element={<Navigate to="/" replace />}
+            />
+            <Route
+              path="/login"
+              element={
+                <LoginPage
+                  onLoginSuccess={handleLoginSuccess}
+                  onNavigate={handleNavigate}
+                />
+              }
+            />
+            <Route
+              path="/home"
+              element={
+                <HomePage
+                  onNavigate={handleNavigate}
+                  isLoggedIn={isLoggedIn}
+                  user={user}
+                  onLogout={handleLogout}
+                />
+              }
+            />
+            <Route
+              path="/discovery"
+              element={<DiscoveryPage />}
+            />
+            <Route
+              path="/reader"
+              element={<ReaderPage />}
+            />
+            <Route
+              path="/bilingual-reader"
+              element={<ReaderPage />}
+            />
+            <Route
+              path="/extensive-reader"
+              element={<Navigate to="/bilingual-reader?mode=extensive" replace />}
+            />
+            <Route
+              path="/dictionary"
+              element={<DictionaryPage />}
+            />
+            <Route
+              path="/flashcard-library"
+              element={<Navigate to="/dictionary" replace />}
+            />
+            <Route
+              path="/flashcard-study"
+              element={<FlashcardStudyPage />}
+            />
+            <Route
+              path="/community"
+              element={<CommunityPage />}
+            />
+            <Route
+              path="/community-1"
+              element={<Navigate to="/community" replace />}
+            />
+            <Route
+              path="/community-2"
+              element={<CommunityContestPage />}
+            />
+            <Route
+              path="/community-contest"
+              element={<Navigate to="/community-2" replace />}
+            />
+            <Route
+              path="/playground"
+              element={<PlaygroundPage />}
+            />
+            <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+            />
+          </Routes>
+        </React.Suspense>
+      </main >
 
       {/* Footer (hidden on login, home dashboard, reader page, and playground) */}
       {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'playground' && <Footer />}
@@ -264,7 +267,7 @@ export const App: React.FC = () => {
 
       {/* PWA MOBILE INSTALL BANNER */}
       <PwaInstallBanner />
-    </div>
+    </div >
   );
 };
 

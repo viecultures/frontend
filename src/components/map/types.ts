@@ -16,10 +16,20 @@ export interface RegionTabItem {
 }
 
 export interface VietnamMapProps {
-  /** Currently selected province ID (e.g. 'ha-noi', 'hue', 'ho-chi-minh') */
+  /** undefined is uncontrolled; null or a string is controlled. */
   selectedProvinceId?: string | null;
+  defaultSelectedProvinceId?: string | null;
+  selectedLandmarkId?: string | null;
+  defaultSelectedLandmarkId?: string | null;
+  defaultRegion?: RegionKey;
   /** Callback triggered when a province is clicked / selected */
   onSelectProvince?: (province: ProvinceMapItem | null) => void;
+  /** Controlled active region ('all' | 'north' | 'central' | 'south') */
+  activeRegion?: RegionKey;
+  /** Explicit region-tab/reset event; automatic selection focus does not emit it. */
+  onSelectRegion?: (region: RegionKey) => void;
+  /** Complete landmark selection; replaces onSelectProvince for that click. */
+  onSelectLandmark?: (landmark: LandmarkPoiItem, province: ProvinceMapItem) => void;
   /** Custom wrapper CSS class */
   className?: string;
   /** Show floating Zoom In / Zoom Out / Reset controls */
@@ -34,8 +44,23 @@ export interface VietnamMapProps {
   showLabels?: boolean;
   /** Show floating cultural tooltip on hover (defaults to false) */
   showTooltip?: boolean;
+  /** Optional projected AI markers. No runtime store is required. */
+  markers?: readonly VietnamMapMarker[];
+  onSelectMarker?: (marker: VietnamMapMarker) => void;
   /** Optional custom children to overlay on the map */
   children?: React.ReactNode;
+}
+
+export interface VietnamMapMarker {
+  position: { lat: number; lng: number; altitude?: number };
+  label: string;
+  showLabel: boolean;
+  placeId?: string;
+}
+
+export interface MapAiMarkersLayerProps {
+  markers: readonly VietnamMapMarker[];
+  onSelectMarker?: (marker: VietnamMapMarker) => void;
 }
 
 export interface MapRegionTabsProps {
@@ -80,14 +105,17 @@ export interface MapLabelsLayerProps {
   selectedProvinceId: string | null;
   hoveredProvinceId: string | null;
   activeRegion: RegionKey;
+  zoomScale?: number;
 }
 
 export interface MapPoiLayerProps {
   landmarks: LandmarkPoiItem[];
   provinces: ProvinceMapItem[];
   selectedProvinceId: string | null;
+  selectedLandmarkId?: string | null;
   hoveredProvinceId?: string | null;
   activeRegion: RegionKey;
-  onSelectLandmarkProvince: (province: ProvinceMapItem) => void;
+  onSelectLandmarkProvince: (province: ProvinceMapItem) => void | boolean;
   onHoverLandmarkProvince?: (provinceId: string | null) => void;
+  onSelectLandmark?: (landmark: LandmarkPoiItem, province: ProvinceMapItem) => void;
 }

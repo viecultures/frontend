@@ -1,6 +1,8 @@
 import React from 'react';
 import type { MapTooltipProps } from './types';
 
+import { MapPin } from 'lucide-react';
+
 export const MapTooltip: React.FC<MapTooltipProps> = ({
   province,
   specialty,
@@ -24,7 +26,7 @@ export const MapTooltip: React.FC<MapTooltipProps> = ({
             } animate-pulse`}
           />
           <span className="text-sm font-bold flex items-center gap-1">
-            <span>{specialty?.icon || '📍'}</span>
+            <MapPin className="w-3.5 h-3.5 text-antique-bright shrink-0" />
             <span>{province.name}</span>
           </span>
           <span className="text-[10px] text-antique-rich font-medium">

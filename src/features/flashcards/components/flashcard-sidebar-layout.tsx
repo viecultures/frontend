@@ -10,7 +10,6 @@ import {
   BookOpen,
   ArrowRight,
 } from "lucide-react";
-import { BrandLogo } from "@/components/BrandLogo";
 
 interface FlashcardSidebarLayoutProps {
   children: React.ReactNode;
@@ -56,43 +55,41 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-warm-ivory text-text-body flex flex-col lg:flex-row font-sans selection:bg-sky-mist selection:text-heritage-green">
-      {/* Mobile Top Header */}
-      <header className="lg:hidden sticky top-0 z-40 bg-heritage-dark text-warm-ivory px-4 py-3 flex items-center justify-between border-b border-antique-gold/30 shadow-sm">
-        <BrandLogo size="sm" theme="dark" suffix="Vocab" />
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-xl bg-heritage-green text-warm-ivory border border-antique-gold/40 cursor-pointer focus-ring"
-          aria-label={isMobileMenuOpen ? "Đóng menu" : "Mở menu"}
-        >
-          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </header>
+      {/* Mobile Floating Drawer Trigger */}
+      <button
+        onClick={() => setIsMobileMenuOpen(true)}
+        className="lg:hidden fixed bottom-6 left-5 z-40 px-3.5 py-2.5 rounded-full bg-heritage-green text-warm-ivory border border-antique-gold/50 shadow-lg flex items-center gap-2 text-xs font-bold cursor-pointer focus-ring"
+        aria-label="Mở menu từ vựng"
+      >
+        <Menu className="w-4 h-4 text-antique-gold" />
+        <span>Menu</span>
+      </button>
 
       {/* Mobile Drawer Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-30 bg-black/50 backdrop-blur-xs"
+          className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-xs"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* LEFT NAVIGATION SIDEBAR */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-40 h-screen w-64 shrink-0 bg-surface border-r border-line p-5 flex flex-col justify-between transition-transform duration-300 ${
+        className={`fixed lg:sticky top-0 lg:top-20 left-0 z-40 h-screen lg:h-[calc(100vh-5rem)] w-64 shrink-0 bg-surface border-r border-line p-5 flex flex-col justify-between transition-transform duration-300 overflow-y-auto ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         <div className="space-y-6">
-          {/* Top Brand Identity */}
-          <div className="pb-4 border-b border-line">
-            <BrandLogo
-              size="md"
-              theme="light"
-              onClick={() => handleNav("/home")}
-            />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-antique-gold block mt-1 pl-13">
-              Kho Từ Vựng &amp; SRS
-            </span>
+          {/* Mobile drawer close button */}
+          <div className="lg:hidden flex items-center justify-between pb-3 border-b border-line">
+            <span className="text-xs font-bold text-heritage-green">Menu tùy chọn</span>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-1.5 rounded-lg text-text-secondary hover:text-heritage-green hover:bg-rice-paper cursor-pointer"
+              aria-label="Đóng menu"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Sidebar Menu Items */}

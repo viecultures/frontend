@@ -31,14 +31,14 @@ export const PLAYGROUND_SCREENS: PlaygroundScreenConfig[] = [
     description: 'Đàm thoại giọng nói & văn bản thời gian thực cùng Sứ Giả AI, tự động đồng bộ vị trí, lộ trình và tra cứu hồ sơ di sản 34 tỉnh thành.'
   },
   {
-    id: 'ai-scribe-editor',
+    id: 'vietnam-map-immersive',
     number: '03',
-    title: 'AI Heritage Scribe & Essay Reviewer',
-    subtitle: 'Trợ Lý AI Thẩm Định & Trau Chuốt Văn Phong Di Sản',
-    category: 'AI Editorial & NLP',
-    status: 'Beta',
-    iconName: 'Feather',
-    description: 'Chấm điểm độ thuần văn hóa, gợi ý từ vựng di sản học thuật và kiểm tra sắc thái biểu đạt tự động.'
+    title: 'Vietnam Map AI Immersive (Ambient Center)',
+    subtitle: 'Bản Đồ Di Sản Trung Tâm · Trợ Lý Giọng Nói AI (Ẩn Chat · Glow Focus)',
+    category: 'Multimodal AI & Immersive GIS',
+    status: 'Interactive Prototype',
+    iconName: 'Map',
+    description: 'Bản đồ đặt ở trung tâm không gian, tự động chìm xuống khi không tương tác và bừng sáng khi có focus; ẩn hộp chat để tối ưu trải nghiệm đàm thoại giọng nói.'
   },
   {
     id: 'regional-dialects',

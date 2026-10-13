@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { LESSONS_DATA, getLessonStatsForLevel, type Lesson, type LevelType } from '@/data/discoveryData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { readerApiService } from '@/features/reader/services/readerApiService';
+import type { ProvinceMapItem } from '@/data/vietnamMapData';
 
 // Modular Discovery Sub-components
 import { DiscoverySpotlight } from '../components/DiscoverySpotlight';
@@ -78,6 +79,8 @@ export default function DiscoveryPage() {
   // Interactive Map Spotlight State
   const [activePinIndex, setActivePinIndex] = useState<number>(2);
   const [isAutoTour, setIsAutoTour] = useState<boolean>(true);
+  const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(null);
+  const [selectedProvinceName, setSelectedProvinceName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAutoTour) return;
@@ -114,6 +117,8 @@ export default function DiscoveryPage() {
     return catalogLessons.filter((lesson) => {
       // Lọc theo nguồn: chỉ xem bài thật từ Database nếu được chọn
       if (filterSource === 'db' && !lesson.isFromDatabase) return false;
+
+      if (selectedProvinceId && lesson.provinceId !== selectedProvinceId && !lesson.isNational) return false;
 
       // If filtering only bookmarked stories
       if (onlyBookmarked && !bookmarks[lesson.id]) return false;
@@ -194,7 +199,10 @@ export default function DiscoveryPage() {
     setSelectedReadTime('All');
     setSearchQuery('');
     setOnlyBookmarked(false);
+
     setFilterSource('all');
+    setSelectedProvinceId(null);
+    setSelectedProvinceName(null);
     setCurrentPage(1);
   };
 
@@ -204,7 +212,15 @@ export default function DiscoveryPage() {
         {/* 1. Interactive Vietnam Map Spotlight Section */}
         <DiscoverySpotlight
           activePinIndex={activePinIndex}
-          onSelectPinIndex={setActivePinIndex}
+          onSelectPinIndex={(idx) => {
+            setIsAutoTour(false);
+            setActivePinIndex(idx);
+          }}
+          onSelectProvince={(province: ProvinceMapItem | null) => {
+            setIsAutoTour(false);
+            setSelectedProvinceId(province?.id ?? null);
+            setSelectedProvinceName(province?.name ?? null);
+          }}
           onMouseEnter={() => setIsAutoTour(false)}
           onMouseLeave={() => setIsAutoTour(true)}
         />
@@ -215,6 +231,21 @@ export default function DiscoveryPage() {
           onSelectTopic={setSelectedTopic}
           topicCounts={topicCounts}
         />
+
+        {selectedProvinceId && (
+          <div className="mb-5 flex items-center gap-2 text-xs font-semibold text-heritage-green">
+            <span className="rounded-full bg-heritage-green/10 px-3 py-1.5 border border-heritage-green/15">
+              Đang xem bài học tại {selectedProvinceName}
+            </span>
+            <button
+              type="button"
+              onClick={() => { setSelectedProvinceId(null); setSelectedProvinceName(null); }}
+              className="rounded-full px-2.5 py-1.5 text-text-secondary hover:bg-mist-cloud transition-colors"
+            >
+              Xóa lọc
+            </button>
+          </div>
+        )}
 
         {/* 3. Filter, Search, Sort & View Mode Toolbar */}
         <DiscoveryFilterToolbar
@@ -265,22 +296,20 @@ export default function DiscoveryPage() {
               <button
                 type="button"
                 onClick={() => setFilterSource('all')}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  filterSource === 'all'
-                    ? 'bg-heritage-green text-warm-ivory shadow-xs'
-                    : 'bg-warm-ivory text-text-secondary hover:text-heritage-green border border-heritage-green/15'
-                }`}
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${filterSource === 'all'
+                  ? 'bg-heritage-green text-warm-ivory shadow-xs'
+                  : 'bg-warm-ivory text-text-secondary hover:text-heritage-green border border-heritage-green/15'
+                  }`}
               >
                 Tất cả bài ({catalogLessons.length})
               </button>
               <button
                 type="button"
                 onClick={() => setFilterSource('db')}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  filterSource === 'db'
-                    ? 'bg-emerald-700 text-warm-ivory shadow-xs ring-2 ring-emerald-500/50'
-                    : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-600/25'
-                }`}
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${filterSource === 'db'
+                  ? 'bg-emerald-700 text-warm-ivory shadow-xs ring-2 ring-emerald-500/50'
+                  : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-600/25'
+                  }`}
               >
                 <span>✨ Chỉ xem bài từ DB ({backendLessons.length})</span>
               </button>

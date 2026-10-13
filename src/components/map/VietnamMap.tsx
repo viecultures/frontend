@@ -2,7 +2,6 @@ import React from 'react';
 import {
   VIETNAM_ISLANDS,
   VIETNAM_34_PROVINCES,
-  type ProvinceMapItem,
 } from '@/data/vietnamMapData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { useVietnamMap } from '@/utils/useVietnamMap';
@@ -16,10 +15,18 @@ import { MapProvincesLayer } from './MapProvincesLayer';
 import { MapSeaLayer } from './MapSeaLayer';
 import { MapLabelsLayer } from './MapLabelsLayer';
 import { MapPoiLayer } from './MapPoiLayer';
+import { MapAiMarkersLayer } from './MapAiMarkersLayer';
 
 export const VietnamMap: React.FC<VietnamMapProps> = ({
   selectedProvinceId,
+  defaultSelectedProvinceId,
+  selectedLandmarkId,
+  defaultSelectedLandmarkId,
+  defaultRegion,
   onSelectProvince,
+  activeRegion: controlledRegion,
+  onSelectRegion,
+  onSelectLandmark,
   className = '',
   showControls = true,
   showRegionTabs = true,
@@ -27,6 +34,8 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
   showSeaLayer = true,
   showLabels = true,
   showTooltip = false,
+  markers = [],
+  onSelectMarker,
   children,
 }) => {
   const {
@@ -35,10 +44,13 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
     setActiveRegion,
     currentViewBox,
     selectedProvinceId: activeId,
+    selectedLandmarkId: activeLandmarkId,
+    selectLandmark,
     hoveredProvince,
     setHoveredId,
     selectProvince,
-    resetToAll,
+    focusProvince,
+    handleBackdropClick,
     zoomScale,
     zoomIn,
     zoomOut,
@@ -47,12 +59,18 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
     transformStyle,
     containerProps,
   } = useVietnamMap({
-    defaultSelectedId: selectedProvinceId,
+    selectedProvinceId,
+    selectedLandmarkId,
+    defaultSelectedId: defaultSelectedProvinceId,
+    defaultSelectedLandmarkId,
+    defaultRegion,
+    activeRegion: controlledRegion,
     onSelectProvince,
+    onSelectRegion,
+    onSelectLandmark,
   });
 
-  const effectiveSelectedId =
-    selectedProvinceId !== undefined ? selectedProvinceId : activeId;
+  const effectiveSelectedId = activeId;
 
   const hoveredSpecialty = hoveredProvince
     ? getProvinceSpecialty(hoveredProvince.id)
@@ -62,8 +80,8 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
     <div
       ref={containerRef}
       {...containerProps}
-      onClick={() => resetToAll()}
-      className={`relative flex flex-col items-center justify-between overflow-hidden select-none w-full h-full ${
+      onClick={() => handleBackdropClick()}
+      className={`relative flex flex-col items-center justify-between overflow-hidden select-none w-full h-full touch-none ${
         zoomScale > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''
       } ${className}`}
     >
@@ -115,7 +133,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
             fill="transparent"
             onClick={(e) => {
               e.stopPropagation();
-              resetToAll();
+              handleBackdropClick();
             }}
           />
 
@@ -132,13 +150,14 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
           {/* Layer 2: Maritime Sovereignty (Hoàng Sa & Trường Sa, Biển Đông) */}
           {showSeaLayer && <MapSeaLayer islands={VIETNAM_ISLANDS} />}
 
-          {/* Layer 3: Province Name Text Labels */}
+          {/* Layer 3: Province Name Text Labels with LOD */}
           {showLabels && (
             <MapLabelsLayer
               provinces={VIETNAM_34_PROVINCES}
               selectedProvinceId={effectiveSelectedId}
               hoveredProvinceId={hoveredProvince?.id || null}
               activeRegion={activeRegion}
+              zoomScale={zoomScale}
             />
           )}
 
@@ -148,12 +167,15 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
               landmarks={VIETNAM_LANDMARKS}
               provinces={VIETNAM_34_PROVINCES}
               selectedProvinceId={effectiveSelectedId}
+              selectedLandmarkId={activeLandmarkId}
               hoveredProvinceId={hoveredProvince?.id || null}
               activeRegion={activeRegion}
-              onSelectLandmarkProvince={selectProvince}
+              onSelectLandmarkProvince={focusProvince}
               onHoverLandmarkProvince={setHoveredId}
+              onSelectLandmark={selectLandmark}
             />
           )}
+          <MapAiMarkersLayer markers={markers} onSelectMarker={onSelectMarker} />
         </svg>
       </div>
 
