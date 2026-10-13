@@ -7,6 +7,7 @@ export interface VocabItem {
   viMeaning: string;
   enDefinition?: string;
   contextSentence: string;
+  isProfane?: boolean;
 }
 
 export const VOCAB_DATABASE: Record<string, VocabItem> = {

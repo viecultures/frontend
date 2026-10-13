@@ -1,6 +1,7 @@
 import React from 'react';
-import { Landmark, Volume2, X, Sparkles, MapPin, Utensils, Bot, ChevronRight } from 'lucide-react';
+import { Landmark, Volume2, X, Sparkles, MapPin, Utensils, Bot, ChevronRight, BookOpen, ExternalLink } from 'lucide-react';
 import type { ProvinceCultureData } from '../types';
+import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 
 interface ProvinceHoverCardProps {
   provinceDetail: ProvinceCultureData;
@@ -17,6 +18,9 @@ export const ProvinceHoverCard: React.FC<ProvinceHoverCardProps> = ({
   onSpeak,
   onAskAi,
 }) => {
+  const matchingLandmarks = React.useMemo(() => {
+    return VIETNAM_LANDMARKS.filter(item => item.provinceId === provinceDetail.id);
+  }, [provinceDetail.id]);
   return (
     <div className="absolute top-4 right-4 z-30 w-72 sm:w-80 bg-white/95 dark:bg-[#162420]/95 backdrop-blur-xl border border-[#1E4B43]/20 dark:border-[#D4AF37]/30 rounded-2xl shadow-2xl p-3.5 animate-in fade-in zoom-in-95 duration-200 select-text">
       {/* Header */}
@@ -88,6 +92,40 @@ export const ProvinceHoverCard: React.FC<ProvinceHoverCardProps> = ({
           </span>
         </div>
       </div>
+
+      {/* Matching VieCultures Reading Articles */}
+      {matchingLandmarks.length > 0 && (
+        <div className="pt-2 border-t border-black/5 dark:border-white/10 space-y-1.5">
+          <div className="flex items-center justify-between text-[10px] text-[#5D706A] dark:text-[#8E9F99]">
+            <span className="font-semibold flex items-center gap-1 text-[#D4AF37]">
+              <BookOpen className="w-3 h-3 text-[#D4AF37]" /> Bài đọc VieCultures
+            </span>
+            <span className="text-[9.5px] font-mono">{matchingLandmarks.length} bài</span>
+          </div>
+          <div className="space-y-1">
+            {matchingLandmarks.slice(0, 2).map((art) => (
+              <a
+                key={art.id}
+                href={`/bilingual-reader?article=${encodeURIComponent(art.id)}&level=${encodeURIComponent(art.level || 'Level 2')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-1.5 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-[#D4AF37]/10 dark:hover:bg-[#D4AF37]/15 border border-black/5 dark:border-white/10 hover:border-[#D4AF37]/30 transition-all group text-left cursor-pointer"
+                title={`Mở bài đọc: ${art.titleVi}`}
+              >
+                <div className="min-w-0 pr-1.5">
+                  <p className="text-[11px] font-medium text-gray-800 dark:text-gray-200 group-hover:text-[#D4AF37] truncate">
+                    {art.titleVi}
+                  </p>
+                  <p className="text-[9.5px] text-gray-500 dark:text-gray-400 truncate">
+                    {art.level} • {art.readTime}
+                  </p>
+                </div>
+                <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-[#D4AF37] shrink-0" />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Ask AI Mini Button */}
       <button

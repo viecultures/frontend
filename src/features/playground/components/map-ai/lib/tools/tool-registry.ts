@@ -19,6 +19,92 @@ import {
   LESSON_AGENT_CATALOG,
   type ProficiencyLevel,
 } from '@/data/lessonAgentCatalog';
+import { VIETNAM_LANDMARKS, type LandmarkArticle } from '@/data/landmarksData';
+
+export function normalizeRawText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function normalizeSearchText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'd')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Matches a cultural topic or query against VIETNAM_LANDMARKS.
+ * Prioritizes landmarks in the specified province when available.
+ */
+export function findLandmarkByTopicOrName(topic: string, provinceId?: string): LandmarkArticle | undefined {
+  if (!topic) return undefined;
+  const raw = normalizeRawText(topic);
+  const norm = normalizeSearchText(topic);
+  if (norm.length < 2) return undefined;
+
+  const candidates = provinceId
+    ? [...VIETNAM_LANDMARKS.filter(l => l.provinceId === provinceId), ...VIETNAM_LANDMARKS.filter(l => l.provinceId !== provinceId)]
+    : VIETNAM_LANDMARKS;
+
+  // 1. Direct ID match
+  const byId = candidates.find(l => norm === normalizeSearchText(l.id) || norm.includes(normalizeSearchText(l.id)));
+  if (byId) return byId;
+
+  // 2. Accent-aware exact or word match
+  const rawExact = candidates.find(l => raw === normalizeRawText(l.name) || raw === normalizeRawText(l.titleVi) || raw === normalizeRawText(l.title));
+  if (rawExact) return rawExact;
+
+  const rawWordMatch = candidates.find(l => {
+    const words = normalizeRawText(l.name).split(' ');
+    const rawTokens = raw.split(' ');
+    return rawTokens.every(t => words.includes(t)) || normalizeRawText(l.name).includes(raw);
+  });
+  if (rawWordMatch) return rawWordMatch;
+
+  // 3. Unaccented exact or phrase match
+  const normExact = candidates.find(l => norm === normalizeSearchText(l.name) || norm === normalizeSearchText(l.titleVi) || norm === normalizeSearchText(l.title));
+  if (normExact) return normExact;
+
+  for (const l of candidates) {
+    const normName = normalizeSearchText(l.name);
+    const normTitleVi = normalizeSearchText(l.titleVi);
+    const normTitle = normalizeSearchText(l.title);
+    if (
+      norm.includes(normName) ||
+      (norm.length >= 4 && normName.includes(norm)) ||
+      norm.includes(normTitleVi) ||
+      (norm.length >= 6 && normTitleVi.includes(norm)) ||
+      norm.includes(normTitle) ||
+      (norm.length >= 6 && normTitle.includes(norm))
+    ) {
+      return l;
+    }
+  }
+
+  // 4. Significant word token match
+  const stopWords = new Set(['cho', 'va', 'o', 'tai', 'mot', 'trong', 'nhung', 'cac', 'la', 'cua', 'the', 'in', 'and', 'of', 'a', 'an', 'den', 'du', 'khach', 'noi', 'tieng']);
+  const tokens = norm.split(' ').filter(w => w.length >= 3 && !stopWords.has(w));
+  if (tokens.length > 0) {
+    for (const l of candidates) {
+      const landmarkText = normalizeSearchText(`${l.name} ${l.title} ${l.titleVi} ${l.vocabHighlights.join(' ')}`);
+      const matchedTokens = tokens.filter(t => landmarkText.includes(t));
+      if (matchedTokens.length >= 2 || (matchedTokens.length === 1 && matchedTokens[0].length >= 5)) {
+        return l;
+      }
+    }
+  }
+
+  return undefined;
+}
 
 /**
  * Context object passed to tool implementations.
@@ -93,6 +179,14 @@ export const toolImplementations: Record<string, ToolImplementation> = {
   },
 
   recordLessonQuizResult: async (params: { totalQuestions: number; correctAnswers: number }, context) => executeRecordLessonQuizResult(params, context),
+
+  getVieCultureArticles: async (params: {
+    provinceName?: string;
+    topic?: string;
+    category?: 'Cuisine' | 'Heritage' | 'Crafts' | 'Nature' | 'Folklore';
+  }, context) => {
+    return await executeGetVieCultureArticles(params, context);
+  },
 };
 
 /** Legacy callers get the same validation and guards as the Live dispatcher. */
@@ -173,14 +267,13 @@ async function executeLoadLessonDiscussionPlan(params: {
   if (mapToolsAllowed(context) && lesson.provinceId) {
     const province = findProvinceById(lesson.provinceId) || findProvinceByName(lesson.provinceName);
     if (province) {
-      const geo = svgCoordsToLatLng(province.cx, province.cy);
-      const marker: MapMarker = {
-        position: { lat: geo.lat, lng: geo.lng, altitude: 0 },
-        label: `${province.name} · ${lesson.vietnameseTitle}`,
-        showLabel: true,
-        placeId: province.id,
-      };
-      mutate(context, () => useMapStore.getState().selectProvince(province.id, { source: 'lesson', markers: [marker] }));
+      const matchedLandmark = findLandmarkByTopicOrName(lesson.vietnameseTitle, province.id) ||
+        VIETNAM_LANDMARKS.find(l => l.id === lesson.id);
+      if (matchedLandmark) {
+        mutate(context, () => useMapStore.getState().selectLandmark(matchedLandmark.id, { source: 'lesson' }));
+      } else {
+        mutate(context, () => useMapStore.getState().selectProvince(province.id, { source: 'lesson', markers: [] }));
+      }
     }
   }
 
@@ -209,6 +302,7 @@ async function executeLoadLessonDiscussionPlan(params: {
 
 /**
  * Geocodes location name to Vietnam SVG map province and sets camera focus.
+ * If culturalTopic matches a specific cultural landmark, auto-focuses the POI pin (Option 3).
  */
 async function executeHighlightMapProvince(params: {
   provinceName: string;
@@ -221,38 +315,142 @@ async function executeHighlightMapProvince(params: {
   }
 
   const province = findProvinceByName(provinceName);
-  if (province) {
-    const geo = svgCoordsToLatLng(province.cx, province.cy);
-    const newMarker: MapMarker = {
-      position: { lat: geo.lat, lng: geo.lng, altitude: 0 },
-      label: `${province.name}${culturalTopic ? ` · ${culturalTopic}` : ''}`,
-      showLabel: true,
-      placeId: province.id,
-    };
-    if (!mapToolsAllowed(context)) return 'Map tools are disabled.';
-    mutate(context, () => useMapStore.getState().selectProvince(province.id, { source: 'ai', markers: [newMarker] }));
-
-    debugLog.tool('highlightMapProvince', 'success', params, {
-      matchedId: province.id,
-      matchedName: province.name,
-      region: province.region,
-      coords: geo,
-    });
-    debugLog.map(`Highlight province [${province.name}] (ID: ${province.id})`, {
-      region: province.region,
-      marker: newMarker,
-    });
-
-    return `Successfully highlighted ${province.name} on the Vietnam map (${culturalTopic || 'Cultural Context'}).`;
+  if (!province) {
+    debugLog.tool(
+      'highlightMapProvince',
+      'error',
+      params,
+      `Tên tỉnh '${provinceName}' không khớp bất kỳ tỉnh nào trong 34 tỉnh SVG vector.`
+    );
+    return `Could not locate '${provinceName}' on the map. The map was not changed. Ask the learner to clarify the province name.`;
   }
 
-  debugLog.tool(
-    'highlightMapProvince',
-    'error',
-    params,
-    `Tên tỉnh '${provinceName}' không khớp bất kỳ tỉnh nào trong 34 tỉnh SVG vector.`
-  );
-  return `Could not locate '${provinceName}' on the map. The map was not changed. Ask the learner to clarify the province name.`;
+  if (!mapToolsAllowed(context)) return 'Map tools are disabled.';
+
+  // Check if culturalTopic mentions a specific landmark in VIETNAM_LANDMARKS (Option 3 POI auto-selection)
+  const isGenericProvinceTopic = !culturalTopic ||
+    culturalTopic.trim().toLowerCase() === province.name.toLowerCase() ||
+    normalizeSearchText(culturalTopic) === normalizeSearchText(province.name);
+
+  const matchedLandmark = !isGenericProvinceTopic
+    ? findLandmarkByTopicOrName(culturalTopic!, province.id)
+    : undefined;
+
+  if (matchedLandmark) {
+    mutate(context, () => useMapStore.getState().selectLandmark(matchedLandmark.id, { source: 'ai' }));
+    debugLog.tool('highlightMapProvince', 'success', params, {
+      matchedProvinceId: province.id,
+      matchedLandmarkId: matchedLandmark.id,
+      landmarkName: matchedLandmark.name,
+    });
+    debugLog.map(`Focus landmark POI [${matchedLandmark.name}] in [${province.name}] (ID: ${matchedLandmark.id})`);
+    return `Successfully focused landmark '${matchedLandmark.name}' (${matchedLandmark.title}) in ${province.name} on the map.`;
+  }
+
+  // If no landmark is matched, select the province with no synthetic text markers to avoid overlapping map labels
+  mutate(context, () => useMapStore.getState().selectProvince(province.id, { source: 'ai', markers: [] }));
+
+  debugLog.tool('highlightMapProvince', 'success', params, {
+    matchedId: province.id,
+    matchedName: province.name,
+    region: province.region,
+  });
+  debugLog.map(`Highlight province [${province.name}] (ID: ${province.id})`, {
+    region: province.region,
+  });
+
+  return `Successfully highlighted ${province.name} on the Vietnam map (${culturalTopic || 'Cultural Context'}).`;
+}
+
+/**
+ * Searches and retrieves curated bilingual cultural reading articles from VieCultures library.
+ */
+async function executeGetVieCultureArticles(params: {
+  provinceName?: string;
+  topic?: string;
+  category?: 'Cuisine' | 'Heritage' | 'Crafts' | 'Nature' | 'Folklore';
+}, context?: ToolContext): Promise<object> {
+  const { provinceName, topic, category } = params;
+
+  let matchedProvince: ReturnType<typeof findProvinceByName> | undefined;
+  if (provinceName) {
+    matchedProvince = findProvinceByName(provinceName);
+  }
+
+  let results = VIETNAM_LANDMARKS;
+
+  if (matchedProvince) {
+    const byProv = results.filter(l => l.provinceId === matchedProvince!.id);
+    if (byProv.length > 0) results = byProv;
+  }
+
+  if (category) {
+    const byCat = results.filter(l => l.category.toLowerCase() === category.toLowerCase());
+    if (byCat.length > 0) results = byCat;
+  }
+
+  if (topic) {
+    const norm = normalizeSearchText(topic);
+    const byTopic = results.filter(l => {
+      const landmarkText = normalizeSearchText(`${l.name} ${l.title} ${l.titleVi} ${l.excerptEn} ${l.excerptVi} ${l.vocabHighlights.join(' ')}`);
+      return landmarkText.includes(norm) || norm.split(' ').some(w => w.length >= 3 && landmarkText.includes(w));
+    });
+    if (byTopic.length > 0) results = byTopic;
+  }
+
+  const topArticles = results.slice(0, 3);
+
+  // Auto-focus first landmark on the map if map tools are allowed (Option 3 sync)
+  if (topArticles.length > 0 && mapToolsAllowed(context)) {
+    const first = topArticles[0];
+    mutate(context, () => useMapStore.getState().selectLandmark(first.id, { source: 'ai' }));
+  }
+
+  if (topArticles.length > 0) {
+    const cardContent = topArticles.map((a, i) =>
+      `### ${i + 1}. ${a.titleVi}\n*${a.title}*\n- **Địa danh / Tỉnh:** ${a.locationNameVi}\n- **Cấp độ:** \`${a.level}\` • **Thời gian đọc:** ${a.readTime}\n- **Từ vựng nổi bật:** ${a.vocabHighlights.join(', ')}\n- **Trích dẫn:** "${a.excerptEn.slice(0, 140)}..."`
+    ).join('\n\n---\n\n');
+
+    mutate(context, () => useLogStore.getState().addTurn({
+      role: 'system',
+      text: `**Thư viện bài đọc VieCultures (${topArticles.length} bài phù hợp):**\n\n${cardContent}`,
+      toolResponse: {
+        type: 'vieculture_articles',
+        articles: topArticles.map(a => ({
+          id: a.id,
+          title: a.title,
+          titleVi: a.titleVi,
+          location: a.locationNameVi,
+          category: a.category,
+          level: a.level,
+          readTime: a.readTime,
+          excerptEn: a.excerptEn,
+          excerptVi: a.excerptVi,
+          vocabHighlights: a.vocabHighlights,
+          speakingSentenceEn: a.speakingSentenceEn,
+        })),
+      },
+      isFinal: true,
+    }));
+  }
+
+  return {
+    platform: 'VieCultures Cultural Reading Library',
+    count: topArticles.length,
+    articles: topArticles.map(a => ({
+      id: a.id,
+      title: a.title,
+      titleVi: a.titleVi,
+      location: a.locationNameVi,
+      category: a.category,
+      level: a.level,
+      readTime: a.readTime,
+      excerptEn: a.excerptEn,
+      excerptVi: a.excerptVi,
+      vocabHighlights: a.vocabHighlights,
+      speakingSentenceEn: a.speakingSentenceEn,
+    })),
+  };
 }
 
 /**

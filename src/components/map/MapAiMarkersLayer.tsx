@@ -10,6 +10,10 @@ export function MapAiMarkersLayer({ markers, onSelectMarker }: MapAiMarkersLayer
         if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
         const { x, y } = geoToSvg(lat, lng);
         const select = () => onSelectMarker?.(marker);
+        const maxLabelLength = 24;
+        const displayLabel = marker.label && marker.label.length > maxLabelLength
+          ? marker.label.slice(0, maxLabelLength).trim() + '…'
+          : (marker.label || '');
         return (
           <g
             key={`${marker.placeId ?? 'marker'}-${index}`}
@@ -29,10 +33,10 @@ export function MapAiMarkersLayer({ markers, onSelectMarker }: MapAiMarkersLayer
           >
             <title>{marker.label}</title>
             <circle r="12" fill="transparent" />
-            <circle r="6" fill="#F5D280" stroke="#122A22" strokeWidth="2" />
-            {marker.showLabel && (
-              <text y="-12" textAnchor="middle" fontSize="9" fontWeight="700" fill="#F5D280" stroke="#122A22" strokeWidth="3" paintOrder="stroke" pointerEvents="none">
-                {marker.label}
+            <circle r="5" fill="#F5D280" stroke="#122A22" strokeWidth="2" />
+            {marker.showLabel && Boolean(displayLabel) && (
+              <text y="-11" textAnchor="middle" fontSize="8" fontWeight="700" fill="#F5D280" stroke="#122A22" strokeWidth="2.5" paintOrder="stroke" pointerEvents="none">
+                {displayLabel}
               </text>
             )}
           </g>

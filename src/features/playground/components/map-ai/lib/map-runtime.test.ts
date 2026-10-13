@@ -15,7 +15,7 @@ import { useLogStore, useSettings } from './state';
 import { useAiMapLessonStore } from './lesson-state';
 import { findProvinceByName } from './svg-map-controller';
 import { dispatchTool, type ToolContext } from './tools/tool-dispatcher';
-import { toolRegistry } from './tools/tool-registry';
+import { toolRegistry, findLandmarkByTopicOrName } from './tools/tool-registry';
 
 const guided: ToolContext = { tutorMode: 'guided-lesson', allowMapTools: true };
 const marker: MapMarker = { position: { lat: 21, lng: 105, altitude: 0 }, label: 'AI place', showLabel: true, placeId: 'ha-noi' };
@@ -340,8 +340,10 @@ test('successful AI selection is atomic and legacy registry also enforces valida
     const result = await dispatchTool('highlightMapProvince', { provinceName: ' Hà Nội ', culturalTopic: 'Phở' }, guided);
     assert.equal(typeof result, 'string');
     assert.equal(snapshots.length, 1);
-    assert.equal(snapshots[0].markers[0].placeId, 'ha-noi');
     assert.equal(snapshots[0].highlightedPlaceId, 'ha-noi');
+    assert.equal(snapshots[0].selectedProvinceId, 'ha-noi');
+    assert.equal(snapshots[0].selectedLandmarkId, 'pho-hanoi-history');
+    assert.deepEqual(snapshots[0].markers, []);
     await toolRegistry.focusMapRegion({ region: 'invalid' }, guided);
     assert.equal(snapshots.length, 1);
     await toolRegistry.focusMapRegion({ region: 'south' }, guided);
@@ -371,3 +373,47 @@ test('optional marker layer projects coordinates, escapes labels, and skips inva
   const withMarker = renderToStaticMarkup(createElement(VietnamMap, { markers: [marker] }));
   assert.ok(withMarker.includes('AI place'));
 });
+
+test('findLandmarkByTopicOrName matches Vietnamese and English landmark names, accents, and province context', () => {
+  assert.equal(findLandmarkByTopicOrName('Chợ nổi Cái Răng', 'can-tho')?.id, 'cai-rang-floating-market');
+  assert.equal(findLandmarkByTopicOrName('cho noi cai rang')?.id, 'cai-rang-floating-market');
+  assert.equal(findLandmarkByTopicOrName('Cái Răng', 'can-tho')?.id, 'cai-rang-floating-market');
+  assert.equal(findLandmarkByTopicOrName('Phở', 'ha-noi')?.id, 'pho-hanoi-history');
+  assert.equal(findLandmarkByTopicOrName('Vịnh Hạ Long', 'quang-ninh')?.id, 'ha-long-bay');
+  assert.equal(findLandmarkByTopicOrName('Ha Long Bay')?.id, 'ha-long-bay');
+  assert.equal(findLandmarkByTopicOrName('Nonexistent topic 12345', 'ha-noi'), undefined);
+  assert.equal(findLandmarkByTopicOrName(''), undefined);
+});
+
+test('highlightMapProvince selects province cleanly without markers when no landmark is matched', async () => {
+  useMapStore.setState(useMapStore.getInitialState(), true);
+  await dispatchTool('highlightMapProvince', { provinceName: 'Cần Thơ' }, guided);
+  const state = useMapStore.getState();
+  assert.equal(state.selectedProvinceId, 'can-tho');
+  assert.equal(state.selectedLandmarkId, null);
+  assert.deepEqual(state.markers, []);
+});
+
+test('getVieCultureArticles retrieves curated articles from landmarks data and syncs map', async () => {
+  useMapStore.setState(useMapStore.getInitialState(), true);
+  useLogStore.getState().clearTurns();
+
+  const result = await dispatchTool('getVieCultureArticles', { provinceName: 'Cần Thơ', topic: 'Cái Răng' }, guided) as any;
+  assert.equal(result.platform, 'VieCultures Cultural Reading Library');
+  assert.ok(result.count > 0);
+  assert.equal(result.articles[0].id, 'cai-rang-floating-market');
+
+  // Verify map synchronized to the landmark
+  assert.equal(useMapStore.getState().selectedLandmarkId, 'cai-rang-floating-market');
+  assert.equal(useMapStore.getState().selectedProvinceId, 'can-tho');
+
+  // Verify system turn added to log
+  const turns = useLogStore.getState().turns;
+  assert.equal(turns.length, 1);
+  assert.equal(turns[0].role, 'system');
+  assert.ok(turns[0].text.includes('Thư viện bài đọc VieCultures'));
+  assert.equal((turns[0].toolResponse as any)?.type, 'vieculture_articles');
+  assert.ok(Array.isArray((turns[0].toolResponse as any)?.articles));
+  assert.equal((turns[0].toolResponse as any)?.articles[0].id, 'cai-rang-floating-market');
+});
+

@@ -58,3 +58,51 @@ test('setup cancellation returns failure and closes the pending session', async 
   assert.equal(client.status, 'disconnected');
   assert.equal(closed, true);
 });
+
+test('Sesame flow and pedagogical profanity boundary are present in free conversation', () => {
+  const prompt = buildCulturalTutorPrompt(SYSTEM_INSTRUCTIONS, {
+    mode: 'free-conversation',
+    correctionMode: 'off',
+    mapContextMode: 'on-demand',
+    level: 'Level 3',
+  });
+  assert.ok(prompt.includes('Sesame Flow'));
+  assert.ok(prompt.includes('NEVER interrogate the learner or mechanically end turns with formulaic questions'));
+  assert.ok(prompt.includes('PEDAGOGICAL & LANGUAGE BOUNDARY'));
+  assert.ok(prompt.includes('LEVEL 3 (B2–C1 - ADVANCED & CULTURAL AMBASSADOR)'));
+  assert.ok(prompt.includes('IN-DEPTH STORYTELLING'));
+});
+
+test('profanity filtering blocks vulgar words and prevents raw translations', async () => {
+  const { isProfaneWord, lookupWordInstant } = await import('./dictionary-service');
+  assert.equal(isProfaneWord('fuck'), true);
+  assert.equal(isProfaneWord('What the fuck?'), true);
+  assert.equal(isProfaneWord('shit'), true);
+  assert.equal(isProfaneWord('bustling'), false);
+  assert.equal(isProfaneWord('heritage'), false);
+
+  const profaneResult = await lookupWordInstant('fuck', 'What the fuck?');
+  assert.equal(profaneResult.isProfane, true);
+  assert.ok(profaneResult.viMeaning.includes('ngôn từ nhạy cảm'));
+  assert.ok(profaneResult.enDefinition?.includes('blocked'));
+
+  const normalResult = await lookupWordInstant('bustling');
+  assert.equal(normalResult.isProfane, undefined);
+  assert.ok(normalResult.viMeaning.includes('Nhộn nhịp'));
+});
+
+test('VieCultures brand acoustic mapping and article library guidance are present in prompt', () => {
+  const prompt = buildCulturalTutorPrompt(SYSTEM_INSTRUCTIONS, {
+    mode: 'free-conversation',
+    correctionMode: 'off',
+    mapContextMode: 'on-demand',
+    level: 'Level 2',
+  });
+  assert.ok(prompt.includes('via cultures'));
+  assert.ok(prompt.includes('vee cultures'));
+  assert.ok(prompt.includes('getVieCultureArticles'));
+  assert.ok(prompt.includes('VieCultures'));
+  assert.ok(prompt.includes('BRAND IDENTITY & VIECULTURES LIBRARY'));
+  assert.ok(SYSTEM_INSTRUCTIONS.includes('BRAND IDENTITY & VIECULTURES ARTICLE LIBRARY'));
+});
+

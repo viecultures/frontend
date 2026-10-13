@@ -377,6 +377,36 @@ function getWordVariations(word: string): string[] {
   return variations;
 }
 
+export const PROFANITY_BLACKLIST = new Set([
+  'fuck', 'fucking', 'fucked', 'fucker', 'fuckers', 'fucks', 'motherfucker', 'motherfucking',
+  'shit', 'shits', 'shitty', 'bullshit', 'horseshit',
+  'bitch', 'bitches', 'bitching',
+  'cunt', 'cunts',
+  'dick', 'dicks',
+  'cock', 'cocks', 'cocksucker',
+  'pussy', 'pussies',
+  'asshole', 'assholes', 'dumbass', 'jackass',
+  'bastard', 'bastards',
+  'slut', 'sluts', 'whore', 'whores',
+  'wanker', 'wankers',
+  'damn', 'damnit', 'dammit',
+]);
+
+export function isProfaneWord(text: string): boolean {
+  if (!text) return false;
+  const tokens = text.toLowerCase().split(/\s+/).map(t => t.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''));
+  for (const token of tokens) {
+    if (!token) continue;
+    if (PROFANITY_BLACKLIST.has(token)) return true;
+    for (const root of ['fuck', 'shit', 'bitch', 'cunt', 'asshole']) {
+      if (token.startsWith(root) && token.length <= root.length + 4) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /**
  * Instant Dictionary Lookup Service
  * Multi-tier: Memory Cache -> Local DB -> Datamuse/Wiktionary + MyMemory -> Graceful fallback
@@ -397,6 +427,22 @@ export async function lookupWordInstant(
       viMeaning: 'Không có dữ liệu từ vựng.',
       contextSentence: contextSentence || '',
     };
+  }
+
+  // Intercept profanity / vulgar language immediately
+  if (isProfaneWord(cleanWord)) {
+    const profaneResult: VocabItem = {
+      id: lowerWord,
+      word: cleanWord,
+      pos: 'từ nhạy cảm',
+      ipa: '/-/',
+      viMeaning: 'Từ này thuộc nhóm ngôn từ nhạy cảm / không phù hợp.',
+      enDefinition: 'This word contains profanity or vulgar language and is blocked in the VieCultures educational environment.',
+      contextSentence: contextSentence || `"${cleanWord}"`,
+      isProfane: true,
+    };
+    VOCAB_MEMORY_CACHE.set(lowerWord, profaneResult);
+    return profaneResult;
   }
 
   // 1. Check in-memory cache (only return if it has a valid translation)

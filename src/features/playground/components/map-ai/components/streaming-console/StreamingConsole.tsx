@@ -12,12 +12,56 @@ import {
   useLogStore,
   useUI,
 } from '../../lib/state';
-import { User, Sparkles, RefreshCw, BookOpen, MessageSquareText, Compass, MapPin } from 'lucide-react';
+import { useMapStore } from '../../lib/map-state';
+import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
+import { User, Sparkles, RefreshCw, BookOpen, MessageSquareText, Compass, MapPin, Clock, ExternalLink } from 'lucide-react';
 import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '@/data/lessonAgentCatalog';
 import { PROFICIENCY_LEVELS, type ProficiencyLevel } from '../../lib/prompt-scaffolder';
 import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
 import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
 import { useTimelineSelection } from './useTimelineSelection';
+
+export interface VieCultureArticleItem {
+  id: string;
+  title: string;
+  titleVi: string;
+  location?: string;
+  category?: string;
+  level?: string;
+  readTime?: string;
+  excerptEn?: string;
+  excerptVi?: string;
+  vocabHighlights?: string[];
+  speakingSentenceEn?: string;
+}
+
+function extractArticlesFromText(text: string): VieCultureArticleItem[] {
+  const matches: { index: number; article: VieCultureArticleItem }[] = [];
+  for (const landmark of VIETNAM_LANDMARKS) {
+    let idx = text.indexOf(landmark.titleVi);
+    if (idx === -1) idx = text.indexOf(landmark.title);
+    if (idx !== -1) {
+      matches.push({
+        index: idx,
+        article: {
+          id: landmark.id,
+          title: landmark.title,
+          titleVi: landmark.titleVi,
+          location: landmark.locationNameVi,
+          category: landmark.category,
+          level: landmark.level,
+          readTime: landmark.readTime,
+          excerptEn: landmark.excerptEn,
+          excerptVi: landmark.excerptVi,
+          vocabHighlights: landmark.vocabHighlights,
+          speakingSentenceEn: landmark.speakingSentenceEn,
+        },
+      });
+    }
+  }
+  matches.sort((a, b) => a.index - b.index);
+  return matches.map(m => m.article);
+}
 
 const MessageMarkdown = memo(function MessageMarkdown({ text }: { text: string }) {
   return <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>;
@@ -111,6 +155,17 @@ export default function StreamingConsole() {
   const handleLevelSwitch = async (level: ProficiencyLevel) => {
     if (busy || proficiencyLevel === level) return;
     await changeLevel(level);
+  };
+  const handleFocusLandmarkOnMap = (landmarkId: string) => {
+    useMapStore.getState().selectLandmark(landmarkId, { source: 'user' });
+  };
+  const handleDiscussArticle = async (article: VieCultureArticleItem) => {
+    if (busy) return;
+    useMapStore.getState().selectLandmark(article.id, { source: 'user' });
+    await sendMessage({
+      text: `Tell me more about the cultural reading "${article.title}" in ${article.location || 'Vietnam'}. What are its historical highlights and key vocabulary?`,
+      source: 'suggestion',
+    });
   };
 
   return (
@@ -236,6 +291,126 @@ export default function StreamingConsole() {
               const isSystem = t.role === 'system';
 
               if (isSystem) {
+                const articlePayload: VieCultureArticleItem[] | null =
+                  t.toolResponse && (t.toolResponse as any).type === 'vieculture_articles'
+                    ? (t.toolResponse as any).articles
+                    : t.text.includes('Thư viện bài đọc VieCultures')
+                      ? extractArticlesFromText(t.text)
+                      : null;
+
+                if (articlePayload && articlePayload.length > 0) {
+                  return (
+                    <div
+                      key={t.id}
+                      data-turn-id={t.id}
+                      className="p-3.5 rounded-xl bg-[#1E4B43]/20 border border-[#D4AF37]/30 text-xs text-[#E8ECE9] shadow-sm space-y-3 animate-fadeIn"
+                    >
+                      <div className="flex items-center justify-between text-[11px] font-mono text-[#D4AF37] border-b border-[#D4AF37]/20 pb-2">
+                        <span className="font-bold flex items-center gap-1.5">
+                          <BookOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          Thư Viện Bài Đọc VieCultures ({articlePayload.length} bài đề cử)
+                        </span>
+                        <span className="text-gray-400 text-[10px]">{formatTimestamp(t.timestamp)}</span>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {articlePayload.map((art, idx) => (
+                          <div
+                            key={`${art.id}-${idx}`}
+                            className="rounded-xl bg-[#14181a] border border-[#D4AF37]/25 hover:border-[#D4AF37]/60 p-3 space-y-2 transition-all shadow-sm group"
+                          >
+                            <div className="flex items-center justify-between gap-2 flex-wrap">
+                              <div className="flex items-center gap-1.5 text-[10.5px] text-gray-300">
+                                <MapPin className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                                <span className="font-medium text-gray-200">{art.location || art.titleVi}</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold bg-[#1E4B43] text-[#D4AF37] border border-[#D4AF37]/30">
+                                  {art.level}
+                                </span>
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono text-gray-400 bg-white/5 border border-white/10 flex items-center gap-1">
+                                  <Clock className="w-2.5 h-2.5 text-[#D4AF37]" />
+                                  {art.readTime}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div>
+                              <a
+                                href={`/bilingual-reader?article=${encodeURIComponent(art.id)}&level=${encodeURIComponent(art.level || 'Level 2')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group/title inline-block"
+                                title="Mở bài đọc song ngữ trên VieCultures trong tab mới"
+                              >
+                                <h4 className="text-xs font-serif font-bold text-white group-hover/title:text-[#FCE5B5] group-hover/title:underline transition-colors leading-snug">
+                                  {art.titleVi}
+                                </h4>
+                              </a>
+                              <p className="text-[11px] text-gray-400 italic">
+                                {art.title}
+                              </p>
+                            </div>
+
+                            {art.vocabHighlights && art.vocabHighlights.length > 0 && (
+                              <div className="flex items-center gap-1 flex-wrap pt-0.5">
+                                <span className="text-[10px] text-[#D4AF37] font-medium mr-0.5">Từ vựng:</span>
+                                {art.vocabHighlights.map((vocab, vIdx) => (
+                                  <span
+                                    key={vIdx}
+                                    className="px-1.5 py-0.5 rounded text-[9.5px] bg-[#1E4B43]/50 text-[#E8ECE9] border border-[#D4AF37]/20 font-mono"
+                                  >
+                                    {vocab}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            {art.excerptEn && (
+                              <p className="text-[10.5px] text-gray-300/90 leading-relaxed bg-black/30 p-2 rounded-lg border-l-2 border-[#D4AF37]/60 italic">
+                                "{art.excerptEn.length > 150 ? art.excerptEn.slice(0, 150) + '…' : art.excerptEn}"
+                              </p>
+                            )}
+
+                            <div className="flex items-center justify-end gap-1.5 pt-1 border-t border-white/5 flex-wrap">
+                              <button
+                                type="button"
+                                onClick={() => handleFocusLandmarkOnMap(art.id)}
+                                className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-[#1E4B43]/40 hover:bg-[#1E4B43] text-[#FCE5B5] border border-[#D4AF37]/30 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
+                                title="Định vị và làm nổi bật địa danh này trên bản đồ"
+                              >
+                                <Compass className="w-3 h-3 text-[#D4AF37]" />
+                                <span>Xem trên bản đồ</span>
+                              </button>
+                              <button
+                                type="button"
+                                disabled={busy}
+                                onClick={() => handleDiscussArticle(art)}
+                                className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 hover:border-white/20 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
+                                title="Gửi yêu cầu đàm thoại về bài đọc này tới AI"
+                              >
+                                <MessageSquareText className="w-3 h-3 text-[#D4AF37]" />
+                                <span>Đàm thoại bài này</span>
+                              </button>
+                              <a
+                                href={`/bilingual-reader?article=${encodeURIComponent(art.id)}&level=${encodeURIComponent(art.level || 'Level 2')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-[#D4AF37]/15 hover:bg-[#D4AF37]/25 text-[#FCE5B5] border border-[#D4AF37]/35 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
+                                title="Mở bài đọc song ngữ trên VieCultures trong tab mới"
+                              >
+                                <BookOpen className="w-3 h-3 text-[#D4AF37]" />
+                                <span>Đọc bài viết</span>
+                                <ExternalLink className="w-2.5 h-2.5 text-[#D4AF37]/70" />
+                              </a>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
                   <div
                     key={t.id}

@@ -74,7 +74,7 @@ export const culturalSpeakingTools: FunctionCall[] = [
         culturalTopic: {
           type: 'STRING',
           description:
-            'A brief note on why this location is relevant to the conversation or reading lesson (e.g., "Phở Hà Nội", "Vịnh Hạ Long", "Cố đô Huế", "Chợ nổi Cái Răng").',
+            'A very short 2-3 word topic name (max 20 characters) for the map pin (e.g., "Chợ nổi Cái Răng", "Phở Hà Nội", "Cố đô Huế"). Never provide long sentences, descriptions, or lists.',
         },
       },
       required: ['provinceName'],
@@ -164,4 +164,29 @@ export const culturalSpeakingTools: FunctionCall[] = [
     },
     isEnabled: true,
   },
+  {
+    name: 'getVieCultureArticles',
+    description:
+      'Searches and retrieves curated bilingual Vietnamese cultural reading articles from the VieCultures platform library by province, landmark topic, category (Heritage, Cuisine, Crafts, Nature, Folklore), or keyword. Use this whenever the learner asks about reading articles, cultural stories, or what VieCultures has to offer.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        provinceName: {
+          type: 'STRING',
+          description: 'Name of the province or city (e.g. "Cần Thơ", "Hà Nội", "Huế", "Quảng Nam", "Lâm Đồng").',
+        },
+        topic: {
+          type: 'STRING',
+          description: 'Search topic or landmark name (e.g. "Chợ nổi Cái Răng", "Phở", "Vịnh Hạ Long", "áo dài", "bánh mì").',
+        },
+        category: {
+          type: 'STRING',
+          description: 'Cultural topic category.',
+          enum: ['Cuisine', 'Heritage', 'Crafts', 'Nature', 'Folklore'],
+        },
+      },
+    },
+    isEnabled: true,
+  },
 ];
+

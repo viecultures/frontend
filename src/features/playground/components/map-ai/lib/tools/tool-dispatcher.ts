@@ -36,6 +36,11 @@ export const toolSchemas = {
   }).refine(value => value.correctAnswers <= value.totalQuestions, {
     message: 'correctAnswers cannot exceed totalQuestions', path: ['correctAnswers'],
   }),
+  getVieCultureArticles: z.strictObject({
+    provinceName: text.optional(),
+    topic: text.optional(),
+    category: z.enum(['Cuisine', 'Heritage', 'Crafts', 'Nature', 'Folklore']).optional(),
+  }),
 } satisfies Record<string, z.ZodType>;
 
 const GUIDED_TOOL_NAMES = new Set(['listCulturalLessons', 'loadLessonDiscussionPlan', 'recordLessonQuizResult']);
