@@ -20,19 +20,23 @@
 
 import React, { createContext, type FC, type ReactNode, useContext } from 'react';
 import { useLiveApi, type UseLiveApiResults } from '../hooks/use-live-api';
+import { useSettings } from '../lib/state';
+import type { ActiveView } from '../lib/session-controller';
 
 const LiveAPIContext = createContext<UseLiveApiResults | undefined>(undefined);
 
 export type LiveAPIProviderProps = {
   children: ReactNode;
-  apiKey: string;
+  activeView: ActiveView;
 };
 
 export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
-  apiKey,
+  activeView,
   children,
 }) => {
-  const liveAPI = useLiveApi({ apiKey });
+  const customGeminiApiKey = useSettings(state => state.customGeminiApiKey);
+  const apiKey = customGeminiApiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
+  const liveAPI = useLiveApi({ apiKey, activeView });
 
   return (
     <LiveAPIContext.Provider value={liveAPI}>

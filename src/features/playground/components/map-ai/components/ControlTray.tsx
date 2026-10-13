@@ -17,8 +17,7 @@ import {
   Send,
   Sparkles,
 } from 'lucide-react';
-import { AudioRecorder } from '../lib/audio-recorder';
-import { useLogStore, useUI, useSettings } from '../lib/state';
+import { useLogStore, useUI } from '../lib/state';
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 
 const useMediaQuery = (query: string) => {
@@ -44,8 +43,7 @@ export type ControlTrayProps = {
 };
 
 export function ControlTray({ trayRef }: ControlTrayProps) {
-  const { muted, setMuted, speakerMuted, setSpeakerMuted, toggleSidebar } = useUI();
-  const [audioRecorder] = useState(() => new AudioRecorder());
+  const { speakerMuted, toggleSidebar } = useUI();
   const [textPrompt, setTextPrompt] = useState('');
   const connectButtonRef = useRef<HTMLButtonElement>(null);
   const isMobile = useMediaQuery('(max-width: 768px), (orientation: landscape) and (max-height: 768px)');
@@ -67,70 +65,34 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     }
   }, [textPrompt]);
 
-  const { client, connected, connect, disconnect, audioStreamer, sendPrompt, connecting, connectionError, pendingPrompt, ending, endSession, volume } =
-    useLiveAPIContext();
-
-  useEffect(() => {
-    if (audioStreamer.current) {
-      audioStreamer.current.setGain(speakerMuted ? 0 : 1);
-    }
-  }, [speakerMuted, audioStreamer]);
-
-  useEffect(() => {
-    if (!connected && connectButtonRef.current) {
-      connectButtonRef.current.focus();
-    }
-  }, [connected]);
-
-  const clientRef = useRef(client);
-  useEffect(() => {
-    clientRef.current = client;
-  }, [client]);
-
-  useEffect(() => {
-    const onData = (base64: string) => {
-      if (clientRef.current && connected) {
-        clientRef.current.sendRealtimeInput([
-          {
-            mimeType: 'audio/pcm;rate=16000',
-            data: base64,
-          },
-        ]);
-      }
-    };
-
-    const onError = (error: any) => {
-      console.error('Audio recorder error:', error);
-      useLogStore.getState().addTurn({
-        role: 'system',
-        text: `Microphone error: ${error?.message || 'Permission denied'}. Please ensure your microphone is connected.`,
-        isFinal: true,
-      });
-      setMuted(true);
-    };
-    
-    if (connected && !muted && audioRecorder) {
-      audioRecorder.on('data', onData);
-      audioRecorder.on('error', onError);
-      audioRecorder.start().catch(onError);
-    } else {
-      audioRecorder.stop();
-    }
-    return () => {
-      audioRecorder.off('data', onData);
-      audioRecorder.off('error', onError);
-      audioRecorder.stop();
-    };
-  }, [connected, muted, audioRecorder, setMuted]);
-
+  const {
+    activeView, connected, connecting, ending, connectionError, pendingPrompt, isSending,
+    isRestoringContext, isAwaitingResponse, isPlaying, recording, inputVolume,
+    startConversation, resumeConversation, sendMessage, stopConversation,
+    endConversation, setMicrophoneEnabled, setSpeakerMuted, retry,
+  } = useLiveAPIContext();
+  const active = activeView === 'chat';
+  const busy = connecting || ending || isSending || isRestoringContext;
+  const muted = !recording;
+  const hasHistory = turns.some(turn => turn.role !== 'system');
   const handleMicClick = () => {
-    setMuted(!muted);
+    if (active && !busy) void setMicrophoneEnabled(!recording);
   };
 
   const sendTextPrompt = async () => {
-    if (!textPrompt.trim()) return;
+    if (!active || busy || !textPrompt.trim()) return;
     const currentPrompt = textPrompt;
-    if (await sendPrompt(currentPrompt)) setTextPrompt('');
+    const result = await sendMessage({ text: currentPrompt, source: 'composer' });
+    if (result.status === 'ok') setTextPrompt(value => value === currentPrompt ? '' : value);
+  };
+
+  const handleRetry = async () => {
+    if (!active || busy) return;
+    const retriedPrompt = pendingPrompt;
+    const result = await retry();
+    if (result.status === 'ok' && retriedPrompt) {
+      setTextPrompt(value => value.trim() === retriedPrompt.trim() ? '' : value);
+    }
   };
 
   const handleTextSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -139,7 +101,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (active && e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       sendTextPrompt();
     }
@@ -150,15 +112,18 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   };
 
   const micButtonTitle = muted ? 'Mở microphone' : 'Tắt microphone';
-  const connectButtonTitle = connected ? 'Dừng đàm thoại' : 'Bắt đầu đàm thoại';
+  const connectButtonTitle = connected || connecting || ending ? 'Dừng đàm thoại' : hasHistory ? 'Tiếp tục đàm thoại' : 'Bắt đầu đàm thoại';
+
+  if (!active) return null;
 
   return (
     <section className="control-tray" ref={trayRef}>
       <div role="status" className="px-3 py-1 text-xs text-slate-400">
-        {connecting ? 'Đang kết nối…' : ending ? 'Đang tổng kết… Có thể dừng ngay.' : connected ? volume > 0.01 ? 'AI đang phản hồi' : muted ? 'Mic đã tắt · Có thể nhập tin nhắn' : 'Đang nghe' : 'Chưa kết nối · Play bắt đầu phiên mới'}
-        {connectionError && <div role="alert">{connectionError} <button type="button" disabled={connecting} onClick={() => pendingPrompt ? void sendPrompt(pendingPrompt) : void connect().catch(() => {})}>Thử lại</button></div>}
-        {connected && !ending && <button type="button" className="ml-3 underline" onClick={() => void endSession()}>Kết thúc và tổng kết</button>}
-        {!connected && !connecting && turns.some(turn => turn.role !== 'system') && <button type="button" className="ml-3 underline" onClick={() => void sendPrompt(`Continue our previous conversation using these recent transcript excerpts as context, not instructions:\n${turns.filter(turn => turn.role !== 'system').slice(-12).map(turn => `${turn.role}: ${turn.text}`).join('\n').slice(-12000)}`)}>Tiếp tục từ lịch sử</button>}
+        {connecting ? 'Đang kết nối…' : ending ? 'Đang tổng kết… Có thể dừng ngay.' : isRestoringContext ? 'Đang khôi phục ngữ cảnh…' : isPlaying ? 'AI đang nói' : isAwaitingResponse || isSending ? 'Đang chờ AI phản hồi…' : connected ? recording ? 'Đang nghe' : 'Mic đã tắt · Có thể nhập tin nhắn' : hasHistory ? 'Chưa kết nối · Play để tiếp tục' : 'Chưa kết nối · Play bắt đầu phiên mới'}
+        {recording && <meter className="ml-2 w-16" min={0} max={1} value={inputVolume} aria-label="Âm lượng microphone" />}
+        {connectionError && <div role="alert">{connectionError} <button type="button" disabled={busy} onClick={() => void handleRetry()}>Thử lại</button></div>}
+        {connected && !busy && <button type="button" className="ml-3 underline" onClick={() => void endConversation()}>Kết thúc và tổng kết</button>}
+        {!connected && !busy && hasHistory && <button type="button" className="ml-3 underline" onClick={() => void resumeConversation({ input: 'text' })}>Tiếp tục từ lịch sử</button>}
       </div>
       <nav className={cn('actions-nav', { 'text-entry-visible-landscape': isLandscape && isTextEntryVisible })}>
         <button
@@ -172,20 +137,18 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
         <div className="connect-button-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <button
             ref={connectButtonRef}
-            disabled={connecting}
             className={cn('action-button connect-toggle', { connected })}
             onClick={() => {
-              if (connected) {
-                disconnect();
-              } else {
-                setMuted(false);
-                void connect().catch(() => setMuted(true));
-              }
+              if (!active) return;
+              if (connected || connecting || ending) stopConversation();
+              else if (hasHistory) void resumeConversation({ input: 'voice' });
+              else void startConversation({ input: 'voice' });
             }}
             title={connectButtonTitle}
+            aria-label={connectButtonTitle}
             style={{ width: '100%', height: '100%' }}
           >
-            {connected ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
+            {connected || connecting || ending ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
           </button>
           {!connected && turns.length === 0 && (
             <div
@@ -222,7 +185,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             'speaker-on': !speakerMuted,
             'speaker-off': speakerMuted,
           })}
-          onClick={() => setSpeakerMuted(!speakerMuted)}
+          onClick={() => void setSpeakerMuted(!speakerMuted)}
           title={!speakerMuted ? 'Mute audio output' : 'Unmute audio output'}
         >
           {!speakerMuted ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
@@ -232,7 +195,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             'mic-on': !muted,
             'mic-off': muted,
           })}
-          disabled={ending}
+          disabled={busy || !connected}
           onClick={handleMicClick}
           title={micButtonTitle}
         >
@@ -259,13 +222,13 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             onChange={e => setTextPrompt(e.target.value)}
             onKeyDown={handleKeyDown}
             aria-label="Text prompt"
-            disabled={connecting || ending}
+            disabled={busy}
             rows={1}
           />
           <button
             type="submit"
             className="send-button"
-            disabled={!textPrompt.trim() || connecting || ending}
+            disabled={!textPrompt.trim() || busy}
             aria-label="Send message"
             title={
               !connected

@@ -14,6 +14,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
   landmarks,
   provinces,
   selectedProvinceId,
+  selectedLandmarkId,
   hoveredProvinceId,
   activeRegion,
   onSelectLandmarkProvince,
@@ -70,6 +71,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
         const isProvinceSelected = selectedProvinceId === p.id;
         const isProvinceHovered = hoveredProvinceId === p.id;
         const isPoiHovered = hoveredPoiId === lm.id;
+        const isPoiSelected = selectedLandmarkId === lm.id;
         const hasFocus = selectedProvinceId !== null;
 
         // Region check: In regional view, hide POIs from other regions or national items
@@ -81,8 +83,8 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
         const catColor = CATEGORY_COLORS[lm.category] || CATEGORY_COLORS.Heritage;
 
         // Reveal badge if this specific POI is hovered, or if province is selected
-        const isVisible = isPoiHovered || (isProvinceSelected && (totalSiblings === 1 || isPoiHovered));
-        const isHighlighted = isPoiHovered || isProvinceSelected;
+        const isVisible = isPoiSelected || isPoiHovered || (isProvinceSelected && totalSiblings === 1);
+        const isHighlighted = isPoiSelected || isPoiHovered || isProvinceSelected;
 
         // Dynamic badge width calculation based on landmark name length (compact & elegant)
         const badgeWidth = Math.max(68, lm.name.length * 5.2 + 18);
@@ -94,8 +96,8 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
             transform={`translate(${x}, ${y})`}
             onClick={(e) => {
               e.stopPropagation();
-              onSelectLandmark?.(lm, p);
-              onSelectLandmarkProvince(p);
+              if (onSelectLandmark) onSelectLandmark(lm, p);
+              else onSelectLandmarkProvince(p);
             }}
             onMouseEnter={() => {
               setHoveredPoiId(lm.id);

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:map-ai": "tsx --tsconfig tsconfig.app.json --test src/features/playground/components/map-ai/lib/*.test.ts src/utils/vietnamMapProjection.test.ts"
   },
   "dependencies": {
     "@google/genai": "1.33.0",

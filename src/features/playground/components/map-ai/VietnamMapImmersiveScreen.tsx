@@ -9,19 +9,19 @@
  * - Chat box is hidden; uses floating audio HUD and live spoken subtitles.
  */
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './map-ai.css';
 import Sidebar from './components/Sidebar';
-import { LiveAPIProvider, useLiveAPIContext } from './contexts/LiveAPIContext';
+import { useLiveAPIContext } from './contexts/LiveAPIContext';
 import VietnamMap from '@/components/map/VietnamMap';
+import type { VietnamMapMarker } from '@/components/map/types';
 import type { ProvinceMapItem } from '@/data/vietnamMapData';
-import type { LandmarkArticle } from '@/data/landmarksData';
+import { VIETNAM_LANDMARKS, type LandmarkArticle } from '@/data/landmarksData';
 import { useUI, useSettings, useMapStore, useLogStore } from './lib/state';
 import ProvinceHoverCard from './components/ProvinceHoverCard';
 import { getProvinceCultureData } from './data/vietnamProvincesDetail';
 import MapAiDebugDrawer from './components/MapAiDebugDrawer';
-import { debugLog, useMapAiDebugStore } from './lib/debug-logger';
-import { AudioRecorder } from './lib/audio-recorder';
+import { useMapAiDebugStore } from './lib/debug-logger';
 import {
   Play,
   Pause,
@@ -38,28 +38,32 @@ import {
   Radio,
 } from 'lucide-react';
 
-const GEMINI_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : '') || '';
 
 function VietnamMapImmersiveContent() {
-  const { toggleSidebar, muted, setMuted, speakerMuted, setSpeakerMuted } = useUI();
-  const { connected, connect, disconnect, client, sendPrompt, connecting, ending, volume, audioStreamer } = useLiveAPIContext();
+  const { toggleSidebar, speakerMuted } = useUI();
+  const {
+    activeView, connected, connecting, ending, isSending, isRestoringContext,
+    isAwaitingResponse, isPlaying, recording, inputVolume, connectionError,
+    startConversation, resumeConversation, stopConversation, endConversation,
+    sendMessage, setMicrophoneEnabled, setSpeakerMuted, retry,
+  } = useLiveAPIContext();
+  const active = activeView === 'immersive';
+  const busy = !active || connecting || ending || isSending || isRestoringContext;
+  const muted = !recording;
   const { isDrawerOpen } = useMapAiDebugStore();
   const { proficiencyLevel } = useSettings();
 
   const cameraTarget = useMapStore(s => s.cameraTarget);
-  const highlightedPlaceId = useMapStore(s => s.highlightedPlaceId);
-  const setCameraTarget = useMapStore(s => s.setCameraTarget);
-  const setHighlightedPlaceId = useMapStore(s => s.setHighlightedPlaceId);
+  const { selectProvince, selectLandmark, selectRegion, clearSelection, selectedLandmarkId, selectedProvinceId, markers } = useMapStore();
+  const selectedLandmark = VIETNAM_LANDMARKS.find(item => item.id === selectedLandmarkId) ?? null;
 
   const turns = useLogStore(s => s.turns);
+  const hasHistory = turns.some(turn => turn.role !== 'system');
   const isAwaitingFunctionResponse = useLogStore(s => s.isAwaitingFunctionResponse);
 
-  const [selectedLandmark, setSelectedLandmark] = useState<LandmarkArticle | null>(null);
   const [manualFocus, setManualFocus] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
-  const [audioRecorder] = useState(() => new AudioRecorder());
 
-  const selectedProvinceId = highlightedPlaceId || cameraTarget?.provinceId || undefined;
 
   const selectedProvinceDetail = useMemo(() => {
     if (!selectedProvinceId) return null;
@@ -70,101 +74,42 @@ function VietnamMapImmersiveContent() {
   const isFocused = Boolean(
     selectedProvinceId ||
     selectedLandmark ||
-    connected ||
+    (active && connected) ||
     isInteracting ||
     manualFocus
   );
 
-  // Sync audio gain with mute state
-  useEffect(() => {
-    if (audioStreamer.current) {
-      audioStreamer.current.setGain(speakerMuted ? 0 : 1);
-    }
-  }, [speakerMuted, audioStreamer]);
-
-  // Client ref for mic listener
-  const clientRef = useRef(client);
-  useEffect(() => {
-    clientRef.current = client;
-  }, [client]);
-
-  // Audio Recorder integration for microphone streaming
-  useEffect(() => {
-    const onData = (base64: string) => {
-      if (clientRef.current && connected) {
-        clientRef.current.sendRealtimeInput([
-          {
-            mimeType: 'audio/pcm;rate=16000',
-            data: base64,
-          },
-        ]);
-      }
-    };
-
-    const onError = (error: any) => {
-      console.error('Audio recorder error:', error);
-      debugLog.error('AudioRecorder Immersive', error);
-      setMuted(true);
-    };
-
-    if (connected && !muted && audioRecorder) {
-      audioRecorder.on('data', onData);
-      audioRecorder.on('error', onError);
-      audioRecorder.start().catch(onError);
-    } else {
-      audioRecorder.stop();
-    }
-
-    return () => {
-      audioRecorder.off('data', onData);
-      audioRecorder.off('error', onError);
-    };
-  }, [connected, muted, audioRecorder, setMuted]);
-
-  // Province selection handler
   const handleSelectProvince = (province: ProvinceMapItem | null) => {
-    setSelectedLandmark(null);
-    if (province) {
-      debugLog.map(`[Immersive] Chọn tỉnh: ${province.name} (${province.id})`, {
-        region: province.region,
-      });
-      setHighlightedPlaceId(province.id);
-      setCameraTarget({ provinceId: province.id, region: province.region });
-      setManualFocus(true);
-    } else {
-      debugLog.map('[Immersive] Bỏ chọn tỉnh');
-      setHighlightedPlaceId(null);
-      setCameraTarget(null);
-      setManualFocus(false);
-    }
+    if (!active) return;
+    if (province) selectProvince(province.id, 'user');
+    else clearSelection();
+    setManualFocus(Boolean(province));
   };
-
   const handleSelectRegion = (region: 'north' | 'central' | 'south' | 'all') => {
-    setSelectedLandmark(null);
-    setHighlightedPlaceId(null);
-    debugLog.map(`[Immersive] Chọn vùng: ${region}`);
-    setCameraTarget({
-      provinceId: undefined,
-      region,
-    });
+    if (!active) return;
+    selectRegion(region, 'user');
     setManualFocus(region !== 'all');
   };
+  const handleSelectLandmark = (landmark: LandmarkArticle) => {
+    if (!active) return;
+    selectLandmark(landmark.id, 'user');
+    setManualFocus(true);
+  };
 
-  const handleSelectLandmark = (landmark: LandmarkArticle, province: ProvinceMapItem) => {
-    debugLog.map(`[Immersive] Chọn di tích: ${landmark.name} (${province.name})`, {
-      landmarkId: landmark.id,
-      provinceId: province.id,
-    });
-    handleSelectProvince(province);
-    setSelectedLandmark(landmark);
+  const handleSelectMarker = (marker: VietnamMapMarker) => {
+    if (!active || !marker.placeId) return;
+    if (VIETNAM_LANDMARKS.some(item => item.id === marker.placeId)) selectLandmark(marker.placeId, 'user');
+    else selectProvince(marker.placeId, 'user');
   };
 
   const handleAskAiAboutProvince = async (provinceName: string) => {
+    if (busy) return;
     const query = `Tell me about the cultural heritage, famous landmarks, and speaking practice points for ${provinceName} in English suited for ${proficiencyLevel}.`;
-    await sendPrompt(query);
+    await sendMessage({ text: query, source: 'map' });
   };
 
   const handleSpeakText = (text: string) => {
+    if (!active) return;
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
@@ -176,15 +121,17 @@ function VietnamMapImmersiveContent() {
 
   // Keyboard shortcut for resetting focus (ESC)
   useEffect(() => {
+    if (!active) return;
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
       if (e.key === 'Escape') {
-        handleSelectProvince(null);
+        clearSelection();
         setManualFocus(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [active, clearSelection]);
 
   // Latest conversation turn for live subtitle display
   const latestSpokenTurn = useMemo(() => {
@@ -199,11 +146,11 @@ function VietnamMapImmersiveContent() {
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-gradient-to-b from-[#030706] via-[#071310] to-[#020504] select-none text-[#FBF7EE]">
-      <Sidebar />
+      {active && <Sidebar />}
 
       {/* Far-Left Diagnostic Drawer Trigger */}
-      {!isDrawerOpen && <MapAiDebugDrawer mode="button" />}
-      {isDrawerOpen && (
+      {active && !isDrawerOpen && <MapAiDebugDrawer mode="button" />}
+      {active && isDrawerOpen && (
         <div className="absolute left-0 top-0 bottom-0 z-40 h-full">
           <MapAiDebugDrawer mode="panel" />
         </div>
@@ -224,7 +171,7 @@ function VietnamMapImmersiveContent() {
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.65)_100%)] z-10" />
 
       {/* Top Floating Focus Status Bar */}
-      <header className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
+      {active && <header className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
         {selectedProvinceDetail ? (
           <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#12231F]/90 backdrop-blur-md border border-[#D4AF37]/40 shadow-2xl text-xs animate-in fade-in zoom-in-95 duration-200">
             <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-ping" />
@@ -251,16 +198,17 @@ function VietnamMapImmersiveContent() {
             <span>Bản đồ ở chế độ tĩnh · Chạm vào tỉnh thành hoặc bật mic để kích hoạt tiêu điểm</span>
           </div>
         )}
-      </header>
+      </header>}
 
       {/* Floating Province Culture Card (Top Right) */}
-      {selectedProvinceDetail && (
+      {active && selectedProvinceDetail && (
         <div className="absolute top-4 right-4 z-30 animate-in fade-in slide-in-from-right-4 duration-300">
           <ProvinceHoverCard
             provinceDetail={selectedProvinceDetail}
             onClose={() => handleSelectProvince(null)}
             onSpeak={handleSpeakText}
             onAskAi={handleAskAiAboutProvince}
+            disabled={busy}
           />
         </div>
       )}
@@ -268,10 +216,10 @@ function VietnamMapImmersiveContent() {
       {/* CENTER HERO: Vietnam Map Container (Sinks when idle, Elevates & Glows when focused) */}
       <main
         className="w-full h-full flex items-center justify-center relative z-20"
-        onMouseEnter={() => setIsInteracting(true)}
+        onMouseEnter={() => active && setIsInteracting(true)}
         onMouseLeave={() => setIsInteracting(false)}
         onClick={() => {
-          if (!isFocused) setManualFocus(true);
+          if (active && !isFocused) setManualFocus(true);
         }}
       >
         <div
@@ -283,6 +231,9 @@ function VietnamMapImmersiveContent() {
         >
           <VietnamMap
             selectedProvinceId={selectedProvinceId}
+            selectedLandmarkId={selectedLandmarkId}
+            markers={markers}
+            onSelectMarker={handleSelectMarker}
             onSelectProvince={handleSelectProvince}
             activeRegion={cameraTarget?.region || 'all'}
             onSelectRegion={handleSelectRegion}
@@ -299,7 +250,7 @@ function VietnamMapImmersiveContent() {
       </main>
 
       {/* LIVE SPOKEN SUBTITLES (Floating above the bottom controls) */}
-      {(latestSpokenTurn || isAwaitingFunctionResponse) && (
+      {active && (latestSpokenTurn || isAwaitingFunctionResponse) && (
         <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-30 w-full max-w-2xl px-4 pointer-events-none animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="p-3.5 rounded-2xl bg-[#0c1915]/90 backdrop-blur-xl border border-[#D4AF37]/35 shadow-2xl text-xs text-[#E8ECE9] pointer-events-auto">
             <div className="flex items-center justify-between text-[10px] font-mono mb-1 text-[#D4AF37]">
@@ -328,7 +279,13 @@ function VietnamMapImmersiveContent() {
       )}
 
       {/* FLOATING AUDIO & NAVIGATION HUD (Bottom Center) */}
-      <footer className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30">
+      {active && <footer className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30">
+        <div role="status" className="mb-2 rounded-xl bg-[#10201B]/95 px-3 py-2 text-center text-xs">
+          {connecting ? 'Đang kết nối…' : ending ? 'Đang tổng kết…' : isRestoringContext ? 'Đang khôi phục ngữ cảnh…' : isPlaying ? 'AI đang nói' : isSending || isAwaitingResponse ? 'Đang chờ AI phản hồi…' : recording ? 'Đang nghe' : connected ? 'Mic đã tắt' : hasHistory ? 'Play để tiếp tục đàm thoại' : 'Sẵn sàng trò chuyện'}
+          {connectionError && <div role="alert">{connectionError} <button disabled={busy} onClick={() => void retry()} className="underline">Thử lại</button></div>}
+          {connected && !busy && <button onClick={() => void endConversation()} className="ml-2 underline">Kết thúc và tổng kết</button>}
+          {!connected && !busy && hasHistory && <button onClick={() => void resumeConversation({ input: 'voice' })} className="ml-2 underline">Tiếp tục từ lịch sử</button>}
+        </div>
         <nav
           className="flex items-center gap-2 p-2 px-3.5 rounded-full bg-[#10201B]/90 backdrop-blur-xl border border-[#D4AF37]/40 shadow-[0_12px_45px_rgba(0,0,0,0.7)]"
           aria-label="Floating Cultural AI Audio Controls"
@@ -346,21 +303,18 @@ function VietnamMapImmersiveContent() {
           {/* Connect / Disconnect Toggle Button */}
           <button
             onClick={() => {
-              if (connected) {
-                disconnect();
-              } else {
-                setMuted(false);
-                connect();
-              }
+              if (!active) return;
+              if (connected || connecting || ending) stopConversation();
+              else if (hasHistory) void resumeConversation({ input: 'voice' });
+              else void startConversation({ input: 'voice' });
             }}
-            disabled={connecting || ending}
             className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-lg border ${
               connected
                 ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-400/50 animate-pulse'
                 : 'bg-[#1E4B43] hover:bg-[#153a33] text-[#D4AF37] border-[#D4AF37]/60'
             }`}
-            title={connected ? 'Dừng đàm thoại' : 'Bắt đầu đàm thoại cùng Sứ Giả AI'}
-            aria-label={connected ? 'Dừng đàm thoại' : 'Bắt đầu đàm thoại'}
+            title={connected || connecting || ending ? 'Dừng đàm thoại' : hasHistory ? 'Tiếp tục đàm thoại cùng Sứ Giả AI' : 'Bắt đầu đàm thoại cùng Sứ Giả AI'}
+            aria-label={connected || connecting || ending ? 'Dừng đàm thoại' : hasHistory ? 'Tiếp tục đàm thoại' : 'Bắt đầu đàm thoại'}
           >
             {connecting ? (
               <RefreshCw className="w-5 h-5 animate-spin" />
@@ -374,7 +328,8 @@ function VietnamMapImmersiveContent() {
           {/* Microphone Mute / Unmute Button */}
           <div className="relative">
             <button
-              onClick={() => setMuted(!muted)}
+              disabled={busy || !connected}
+              onClick={() => void setMicrophoneEnabled(!recording)}
               className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer border ${
                 !muted
                   ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30'
@@ -386,14 +341,14 @@ function VietnamMapImmersiveContent() {
               {!muted ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
             </button>
             {/* Animated Audio Volume Pulse Ring */}
-            {connected && !muted && volume > 0.05 && (
+            {connected && !muted && inputVolume > 0.05 && (
               <span className="absolute -inset-1 rounded-full border border-emerald-400/60 animate-ping pointer-events-none" />
             )}
           </div>
 
           {/* Speaker Mute / Unmute Button */}
           <button
-            onClick={() => setSpeakerMuted(!speakerMuted)}
+            onClick={() => void setSpeakerMuted(!speakerMuted)}
             className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer border ${
               !speakerMuted
                 ? 'bg-white/5 text-gray-200 border-white/10 hover:bg-white/10'
@@ -426,20 +381,17 @@ function VietnamMapImmersiveContent() {
             <Compass className="w-4 h-4" />
           </button>
         </nav>
-      </footer>
+      </footer>}
     </div>
   );
 }
 
 export const VietnamMapImmersiveScreen: React.FC = () => {
-  const { theme, customGeminiApiKey } = useSettings();
-  const activeGeminiApiKey = customGeminiApiKey || GEMINI_API_KEY;
+  const { theme } = useSettings();
 
   return (
     <div className={`map-ai-app ${theme === 'light' ? 'light-theme' : ''} w-full h-full relative overflow-hidden`}>
-      <LiveAPIProvider apiKey={activeGeminiApiKey}>
-        <VietnamMapImmersiveContent />
-      </LiveAPIProvider>
+      <VietnamMapImmersiveContent />
     </div>
   );
 };

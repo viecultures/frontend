@@ -4,6 +4,7 @@ import type { ProvinceCultureData } from '../types';
 
 interface ProvinceHoverCardProps {
   provinceDetail: ProvinceCultureData;
+  disabled?: boolean;
   onClose: () => void;
   onSpeak: (text: string) => void;
   onAskAi: (provinceName: string) => void;
@@ -11,6 +12,7 @@ interface ProvinceHoverCardProps {
 
 export const ProvinceHoverCard: React.FC<ProvinceHoverCardProps> = ({
   provinceDetail,
+  disabled = false,
   onClose,
   onSpeak,
   onAskAi,
@@ -89,6 +91,7 @@ export const ProvinceHoverCard: React.FC<ProvinceHoverCardProps> = ({
 
       {/* Ask AI Mini Button */}
       <button
+        disabled={disabled}
         onClick={() => onAskAi(provinceDetail.name)}
         className="w-full mt-2.5 py-1.5 px-3 rounded-lg bg-[#1E4B43] hover:bg-[#15342F] text-[#D4AF37] font-medium text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
       >

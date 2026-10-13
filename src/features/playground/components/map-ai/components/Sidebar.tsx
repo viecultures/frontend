@@ -62,7 +62,6 @@ export default function Sidebar() {
     theme,
     setVoice,
     setActiveLessonId,
-    setProficiencyLevel,
     setTutorMode,
     setCorrectionMode,
     setMapContextMode,
@@ -70,8 +69,9 @@ export default function Sidebar() {
     setTheme,
   } = useSettings();
 
-  const { connected: sessionConnected, connecting, disconnect, sendPrompt } = useLiveAPIContext();
-  const connected = sessionConnected || connecting;
+  const { activeView, connected: sessionConnected, connecting, ending, isSending, isRestoringContext, resetConversation, changeLevel } = useLiveAPIContext();
+  const connected = sessionConnected || connecting || ending;
+  const busy = connecting || ending || isSending || isRestoringContext;
 
   const availableVoices = useMemo(() => {
     const isLimited =
@@ -83,32 +83,27 @@ export default function Sidebar() {
   }, [model]);
 
   useEffect(() => {
-    if (!availableVoices.some(v => v.name === voice)) {
+    if (activeView && !availableVoices.some(v => v.name === voice)) {
       setVoice(DEFAULT_VOICE);
     }
-  }, [availableVoices, voice, setVoice]);
+  }, [activeView, availableVoices, voice, setVoice]);
 
   // When lesson changes
   const handleLessonChange = (newLessonId: string) => {
+    if (!activeView || connected) return;
     setActiveLessonId(newLessonId);
     const targetLesson = findLessonById(newLessonId);
     if (targetLesson) {
-      if (targetLesson.provinceId) {
-        useMapStore.getState().setCameraTarget({
-          provinceId: targetLesson.provinceId,
-          region: targetLesson.region,
-        });
-        useMapStore.getState().setHighlightedPlaceId(targetLesson.provinceId);
+      if (targetLesson.provinceId && mapContextMode !== 'off') {
+        useMapStore.getState().selectProvince(targetLesson.provinceId, 'user');
       }
     }
   };
 
   // When proficiency level changes
   const handleLevelChange = async (newLevel: ProficiencyLevel) => {
-    setProficiencyLevel(newLevel);
-    if (sessionConnected) {
-      await sendPrompt(PROFICIENCY_LEVELS[newLevel].switchPrompt);
-    }
+    if (!activeView || busy) return;
+    await changeLevel(newLevel);
   };
 
   const handleExportLogs = () => {
@@ -147,6 +142,8 @@ export default function Sidebar() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+
+  if (!activeView) return null;
 
   return (
     <aside className={c('sidebar', { open: isSidebarOpen })}>
@@ -214,7 +211,7 @@ export default function Sidebar() {
             </label>
             <select
               value={proficiencyLevel}
-              disabled={connecting}
+              disabled={busy}
               onChange={e => void handleLevelChange(e.target.value as ProficiencyLevel)}
               className="w-full text-xs font-semibold"
             >
@@ -369,8 +366,7 @@ export default function Sidebar() {
           </button>
           <button
             onClick={() => {
-              disconnect();
-              useLogStore.getState().clearTurns();
+              if (activeView) resetConversation();
             }}
             title="Làm mới phiên luyện tập"
           >

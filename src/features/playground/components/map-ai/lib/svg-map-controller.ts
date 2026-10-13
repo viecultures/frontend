@@ -6,7 +6,7 @@
  * then reactively reflects those changes on the SVG.
  */
 
-import { type MapMarker, type SVGCameraTarget, useMapStore } from './state';
+import { type MapMarker, type SVGCameraTarget, useMapStore } from './map-state';
 import { VIETNAM_34_PROVINCES, type ProvinceMapItem } from '@/data/vietnamMapData';
 import { geoToSvg, svgToGeo } from '@/utils/vietnamMapUtils';
 
@@ -64,13 +64,17 @@ export function findProvinceByName(name: string): ProvinceMapItem | undefined {
     .replace(/đ/g, 'd')
     .trim();
 
+  if (!norm) return undefined;
+  const byId = findProvinceById(norm);
+  if (byId) return byId;
+
   const aliasId = PROVINCE_ALIASES[norm];
   if (aliasId) {
     const province = findProvinceById(aliasId);
     if (province) return province;
   }
 
-  return VIETNAM_34_PROVINCES.find(p => {
+  const matches = VIETNAM_34_PROVINCES.filter(p => {
     const pNorm = p.name
       .toLowerCase()
       .normalize('NFD')
@@ -79,6 +83,8 @@ export function findProvinceByName(name: string): ProvinceMapItem | undefined {
       .trim();
     return pNorm === norm || pNorm.includes(norm) || norm.includes(pNorm);
   });
+  // Ambiguous partial names must not silently select the first province.
+  return matches.length === 1 ? matches[0] : undefined;
 }
 
 // ─────────────────────────────────────────────
@@ -156,7 +162,10 @@ export class SVGMapController {
    * Focus / fly to a target (province, region, or lat/lng).
    */
   public flyTo(target: SVGCameraTarget) {
-    useMapStore.getState().setCameraTarget(target);
+    const store = useMapStore.getState();
+    if (target.provinceId) store.selectProvince(target.provinceId, { source: 'ai' });
+    else if (target.region) store.focusRegion(target.region, 'ai');
+    else store.setCameraTarget(target);
   }
 
   /**

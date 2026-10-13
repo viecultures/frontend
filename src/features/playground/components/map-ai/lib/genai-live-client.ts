@@ -14,6 +14,7 @@ import type {
   Part,
   Session,
   Blob,
+  Content,
 } from '@google/genai';
 import EventEmitter from 'eventemitter3';
 import { DEFAULT_LIVE_API_MODEL } from './constants';
@@ -65,6 +66,7 @@ export class GenAILiveClient {
   protected readonly client: GoogleGenAI;
   protected session?: Session;
   private cancelSetup?: () => void;
+  private generation = 0;
 
   private _status: 'connected' | 'disconnected' | 'connecting' = 'disconnected';
   public get status() {
@@ -85,6 +87,8 @@ export class GenAILiveClient {
     }
 
     this._status = 'connecting';
+    const generation = ++this.generation;
+    const current = () => generation === this.generation;
     let setupTimer: ReturnType<typeof setTimeout>;
     const setupReady = new Promise<void>((resolve, reject) => {
       const ready = () => { clearTimeout(setupTimer); this.off('setupcomplete', ready); this.cancelSetup = undefined; resolve(); };
@@ -95,22 +99,35 @@ export class GenAILiveClient {
     // Attach immediately so an early close cannot create an unhandled rejection.
     void setupReady.catch(() => {});
     const callbacks: LiveCallbacks = {
-      onopen: this.onOpen.bind(this),
-      onmessage: this.onMessage.bind(this),
-      onerror: this.onError.bind(this),
-      onclose: this.onClose.bind(this),
+      onopen: () => { if (current()) this.onOpen(); },
+      onmessage: message => { if (current()) this.onMessage(message); },
+      onerror: event => { if (current()) { this.cancelSetup?.(); this.onError(event); } },
+      onclose: event => { if (current()) this.onClose(event); },
     };
 
     try {
-      this.session = await this.client.live.connect({
+      const pendingSession = this.client.live.connect({
         model: this.model,
         config: {
           ...config,
         },
         callbacks,
+      }).then(session => {
+        if (!current()) { session.close(); throw new Error('Phiên đã được hủy.'); }
+        return session;
       });
+      // A setup timeout/cancellation must also release callers while the SDK's
+      // connection promise is still pending. A late session closes itself above.
+      const session = await Promise.race([
+        pendingSession,
+        setupReady.then(() => new Promise<never>(() => {})),
+      ]);
+      if (!current()) { session.close(); return false; }
+      this.session = session;
       await setupReady;
     } catch (e: any) {
+      if (!current()) return false;
+      this.generation += 1;
       this.cancelSetup?.();
       this.cancelSetup = undefined;
       this.session?.close();
@@ -125,11 +142,13 @@ export class GenAILiveClient {
       return false;
     }
 
+    if (!current()) return false;
     this._status = 'connected';
     return true;
   }
 
   public disconnect() {
+    this.generation += 1;
     this.cancelSetup?.();
     this.cancelSetup = undefined;
     this.session?.close();
@@ -143,6 +162,16 @@ export class GenAILiveClient {
   public interrupt() {
     this.emitter.emit('interrupted');
     this.log('client.interrupt', 'Client-side interruption');
+  }
+
+  /** Restore role-preserving context without requesting a response. */
+  public prefill(turns: Content[]) {
+    if (this._status !== 'connected' || !this.session) throw new Error('Phiên chưa sẵn sàng.');
+    if (turns.length) this.session.sendClientContent({ turns, turnComplete: false });
+  }
+
+  public endAudioInput() {
+    if (this._status === 'connected' && this.session) this.session.sendRealtimeInput({ audioStreamEnd: true });
   }
 
   public send(parts: Part | Part[], turnComplete: boolean = true) {

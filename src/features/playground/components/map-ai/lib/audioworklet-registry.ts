@@ -27,10 +27,10 @@ export type WorkletGraph = {
   handlers: Array<(this: MessagePort, ev: MessageEvent) => any>;
 };
 
-export const registeredWorklets: Map<
+export const registeredWorklets: WeakMap<
   AudioContext,
   Record<string, WorkletGraph>
-> = new Map();
+> = new WeakMap();
 
 export const createWorketFromSrc = (
   workletName: string,

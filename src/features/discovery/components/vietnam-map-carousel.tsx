@@ -62,13 +62,14 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
     }
   };
 
-  const handleSelectLandmarkPoi = (lm: { id: string }) => {
+  const handleSelectLandmarkPoi = (lm: { id: string }, province: ProvinceMapItem) => {
     const foundIdx = VIETNAM_LANDMARKS.findIndex((l) => l.id === lm.id);
     if (foundIdx !== -1) {
       prevIndexRef.current = foundIdx;
       onSelectLandmark?.(foundIdx);
       const target = VIETNAM_LANDMARKS[foundIdx];
       setSelectedProvinceId(target.provinceId);
+      onSelectProvince?.(province);
     }
   };
 

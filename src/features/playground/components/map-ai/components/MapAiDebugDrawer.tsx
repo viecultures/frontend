@@ -70,7 +70,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
     clearLogs,
   } = useMapAiDebugStore();
 
-  const { connected, client, volume } = useLiveAPIContext();
+  const { activeView, connected, client, volume } = useLiveAPIContext();
   const { cameraTarget, highlightedPlaceId, markers } = useMapStore();
   const { model, activeLessonId, proficiencyLevel } = useSettings();
 
@@ -140,8 +140,9 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
   // Simulator runner
   const runSimulation = async (
     name: string,
-    action: () => Promise<any> | void
+    action: () => Promise<unknown> | void
   ) => {
+    if (!activeView) return;
     setSimRunning(name);
     debugLog.info(`Bắt đầu chạy giả lập: [${name}]`);
     try {
@@ -206,6 +207,8 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
       </span>
     );
   };
+
+  if (!activeView) return null;
 
   const showButton = (mode === 'button' || mode === 'all') && !isDrawerOpen;
   const showPanel = (mode === 'panel' || mode === 'all') && isDrawerOpen;

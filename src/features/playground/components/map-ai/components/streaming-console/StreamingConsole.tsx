@@ -2,8 +2,7 @@
  * StreamingConsole for Cultural Speaking & Listening AI Tutor
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Modality } from '@google/genai';
+import React, { memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -11,20 +10,18 @@ import { useLiveAPIContext } from '../../contexts/LiveAPIContext';
 import {
   useSettings,
   useLogStore,
-  useTools,
-  type ConversationTurn,
   useUI,
 } from '../../lib/state';
 import { User, Sparkles, RefreshCw, BookOpen, MessageSquareText, Compass, MapPin } from 'lucide-react';
 import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '@/data/lessonAgentCatalog';
-import { debugLog } from '../../lib/debug-logger';
-import { buildCulturalTutorPrompt } from '../../lib/constants';
-import { MAP_TOOL_NAMES } from '../../lib/tools/tool-registry';
 import { PROFICIENCY_LEVELS, type ProficiencyLevel } from '../../lib/prompt-scaffolder';
 import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
 import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
-import { extractSentenceContext, type VocabItem } from '@/data/readerData';
-import { lookupWordInstant, sanitizeChatWord } from '../../lib/dictionary-service';
+import { useTimelineSelection } from './useTimelineSelection';
+
+const MessageMarkdown = memo(function MessageMarkdown({ text }: { text: string }) {
+  return <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>;
+});
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -76,165 +73,23 @@ const LESSON_QUICK_ACTIONS: Record<string, Array<{ text: string; label: string }
 
 export default function StreamingConsole() {
   const {
-    client,
-    connected,
-    connect,
-    setConfig,
-    sendPrompt,
-    connecting,
-    ending,
+    activeView, connected, sendMessage, changeLevel, connecting, ending,
+    isSending, isRestoringContext, isAwaitingResponse,
   } = useLiveAPIContext();
-
-  const { systemPrompt, voice, model, activeLessonId, proficiencyLevel, tutorMode, correctionMode, mapContextMode } = useSettings();
-  const { tools } = useTools();
+  const active = activeView === 'chat';
+  const busy = !active || connecting || ending || isSending || isRestoringContext;
+  const { activeLessonId, proficiencyLevel, tutorMode } = useSettings();
   const turns = useLogStore(state => state.turns);
+  const sessionId = useLogStore(state => state.sessionMetadata?.sessionId);
   const { showSystemMessages } = useUI();
-  const { isAwaitingFunctionResponse } = useLogStore();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const lastInterruptionTime = useRef(0);
-  const [selectedWord, setSelectedWord] = useState<VocabItem | null>(null);
-  const [wordPosition, setWordPosition] = useState<{ x: number; y: number } | null>(null);
-  const lookupRequestIdRef = useRef<number>(0);
-  const lastLookupRef = useRef<{ text: string; time: number }>({ text: '', time: 0 });
-
+  const isAwaitingFunctionResponse = useLogStore(state => state.isAwaitingFunctionResponse);
+  const {
+    scrollRef, selectedWord, wordPosition, closeSelection, handlePointerDown,
+    handleTextSelection, handleScroll, hasNewMessages, scrollToLatest, renderedTurn,
+  } = useTimelineSelection(turns, active, sessionId);
   const activeLesson: LessonAgentMetadata =
     findLessonById(activeLessonId) || LESSON_AGENT_CATALOG[0];
-
-  const effectiveSystemPrompt = buildCulturalTutorPrompt(systemPrompt, { mode: tutorMode, correctionMode, mapContextMode, level: proficiencyLevel });
-
-  const displayedTurns = showSystemMessages
-    ? turns
-    : turns.filter(turn => turn.role !== 'system');
-
-  useEffect(() => {
-    const enabledTools = [
-      {
-        functionDeclarations: tools
-          .filter(tool => tool.isEnabled && (mapContextMode !== 'off' || !MAP_TOOL_NAMES.has(tool.name)) && (tutorMode !== 'free-conversation' || !['listCulturalLessons', 'loadLessonDiscussionPlan', 'recordLessonQuizResult'].includes(tool.name)))
-          .map(tool => ({
-            name: tool.name,
-            description: tool.description,
-            parameters: tool.parameters,
-          })),
-      },
-    ];
-
-    const config: any = {
-      responseModalities: [Modality.AUDIO],
-      speechConfig: {
-        voiceConfig: {
-          prebuiltVoiceConfig: {
-            voiceName: voice,
-          },
-        },
-      },
-      inputAudioTranscription: {},
-      outputAudioTranscription: {},
-      systemInstruction: effectiveSystemPrompt,
-      tools: enabledTools,
-    };
-
-    const { initSession } = useLogStore.getState();
-    initSession({ systemPrompt: effectiveSystemPrompt, model });
-
-    setConfig(config);
-  }, [setConfig, effectiveSystemPrompt, tools, voice, model]);
-
-  useEffect(() => {
-    const handleInputTranscription = (text: string, isFinal: boolean) => {
-      const { turns, updateLastTurn, addTurn } = useLogStore.getState();
-      const last = turns[turns.length - 1];
-
-      const trimmedText = text.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (['googleawesome', 'tomute'].includes(trimmedText)) return;
-      if (text.trim() && !trimmedText) return;
-
-      if (last && last.role === 'user' && !last.isFinal) {
-        const needsSpace = last.text && text && !last.text.endsWith(' ') && !text.startsWith(' ');
-        const nextText = last.text + (needsSpace ? ' ' : '') + text;
-        updateLastTurn({
-          text: nextText,
-          isFinal,
-        });
-        debugLog.info(`UI User Turn cập nhật: "${nextText}"`, { delta: text, isFinal });
-      } else {
-        addTurn({ role: 'user', text, isFinal });
-        debugLog.info(`UI User Turn tạo mới: "${text}"`, { isFinal });
-      }
-    };
-
-    const handleOutputTranscription = (text: string, isFinal: boolean) => {
-      const { turns, updateLastTurn, mergeIntoLastAgentTurn } = useLogStore.getState();
-      const last = turns[turns.length - 1];
-
-      // Finalize pending user turn when agent starts generating response
-      if (last?.role === 'user' && !last.isFinal) {
-        updateLastTurn({ isFinal: true });
-        debugLog.info(`Chốt lượt nói của người dùng (Finalized User Turn): "${last.text}"`);
-      }
-
-      const trimmedText = text.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (['googleawesome', 'tomute'].includes(trimmedText)) return;
-      if (text.trim() && !trimmedText) return;
-
-      const timeSinceInterruption = Date.now() - lastInterruptionTime.current;
-      if (timeSinceInterruption < 1500) {
-        if (last?.role === 'user') {
-          const match = text.match(/^([a-z\s]{1,10})([A-Z].*)/);
-          if (match) {
-            text = match[2];
-          }
-        }
-      }
-
-      const turnData: Omit<ConversationTurn, 'timestamp' | 'role'> = {
-        text,
-        isFinal,
-      };
-
-      mergeIntoLastAgentTurn(turnData);
-    };
-
-    const handleTurnComplete = () => {
-      const { mergeIntoLastAgentTurn, updateLastTurn, turns } = useLogStore.getState();
-      mergeIntoLastAgentTurn({ text: '', isFinal: true });
-      const last = turns[turns.length - 1];
-      if (last && !last.isFinal) {
-        updateLastTurn({ isFinal: true });
-      }
-      debugLog.ws('Agent hoàn tất lượt sinh nội dung (turnComplete)');
-    };
-
-
-    const handleInterrupted = () => {
-      const { turns, updateLastTurn, setIsAwaitingFunctionResponse } = useLogStore.getState();
-      const last = turns[turns.length - 1];
-      if (last && last.role === 'agent' && !last.isFinal) {
-        updateLastTurn({ isFinal: true });
-      }
-      lastInterruptionTime.current = Date.now();
-      setIsAwaitingFunctionResponse(false);
-    };
-
-    client.on('inputTranscription', handleInputTranscription);
-    client.on('outputTranscription', handleOutputTranscription);
-    client.on('turncomplete', handleTurnComplete);
-    client.on('interrupted', handleInterrupted);
-
-    return () => {
-      client.off('inputTranscription', handleInputTranscription);
-      client.off('outputTranscription', handleOutputTranscription);
-      client.off('turncomplete', handleTurnComplete);
-      client.off('interrupted', handleInterrupted);
-    };
-  }, [client]);
-
-  // Auto scroll to bottom
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [displayedTurns]);
+  const displayedTurns = showSystemMessages ? turns : turns.filter(turn => turn.role !== 'system');
 
   const guidedActions =
     LESSON_QUICK_ACTIONS[activeLesson.id] || [
@@ -251,97 +106,11 @@ export default function StreamingConsole() {
   const quickActions = tutorMode === 'free-conversation' ? conversationActions : guidedActions;
 
   const handleSendPrompt = async (text: string) => {
-    await sendPrompt(text);
+    if (!busy) await sendMessage({ text, source: 'suggestion' });
   };
-
   const handleLevelSwitch = async (level: ProficiencyLevel) => {
-    if (proficiencyLevel === level) return;
-    useSettings.getState().setProficiencyLevel(level);
-    if (connected) {
-      await sendPrompt(PROFICIENCY_LEVELS[level].switchPrompt);
-    }
-  };
-
-  // Handle text selection (bôi đen) or double-click anywhere in conversation timeline
-  const handleTextSelection = async (e: React.MouseEvent) => {
-    // Ignore clicks/selection originating inside the popup itself
-    if ((e.target as HTMLElement)?.closest('.in-place-dictionary-popup')) {
-      return;
-    }
-
-    const selection = window.getSelection();
-    if (!selection || selection.isCollapsed) return;
-
-    const rawSelected = selection.toString();
-    const cleanText = sanitizeChatWord(rawSelected);
-    if (!cleanText || cleanText.length < 2 || cleanText.split(/\s+/).length > 8) {
-      return;
-    }
-
-    // Debounce rapid duplicate invocations within 350ms for the same word
-    const now = Date.now();
-    const lower = cleanText.toLowerCase();
-    if (lastLookupRef.current.text === lower && now - lastLookupRef.current.time < 350) {
-      return;
-    }
-    lastLookupRef.current = { text: lower, time: now };
-    const reqId = ++lookupRequestIdRef.current;
-
-    try {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-
-      // Extract enclosing turn or paragraph text to provide full context sentence
-      let blockEl: HTMLElement | null = null;
-      let node: Node | null = range.startContainer;
-      while (node && node !== document.body) {
-        if (
-          node instanceof HTMLElement &&
-          (node.tagName === 'P' || node.tagName === 'DIV' || node.classList.contains('prose'))
-        ) {
-          blockEl = node;
-          break;
-        }
-        node = node.parentNode;
-      }
-
-      const fullParagraph = blockEl
-        ? blockEl.innerText || blockEl.textContent || ''
-        : range.commonAncestorContainer.textContent || '';
-      const contextSentence = extractSentenceContext(fullParagraph, cleanText);
-
-      const position =
-        rect.width > 0 || rect.height > 0
-          ? {
-              x: rect.left + rect.width / 2,
-              y: rect.bottom,
-            }
-          : {
-              x: e.clientX,
-              y: e.clientY + 12,
-            };
-
-      setWordPosition(position);
-
-      // Hiển thị ngay trạng thái tra cứu tức thì (Optimistic instant response)
-      setSelectedWord({
-        id: cleanText.toLowerCase(),
-        word: cleanText,
-        pos: cleanText.includes(' ') ? 'Cụm từ / Phrase' : 'Đang tra cứu...',
-        ipa: '/.../',
-        viMeaning: 'Đang tải nghĩa & phiên âm IPA...',
-        enDefinition: 'Fetching dictionary definition...',
-        contextSentence: contextSentence || `Context: "${cleanText}" in English conversation.`,
-      });
-
-      const resolved = await lookupWordInstant(cleanText, contextSentence);
-      // Discard response if a newer lookup request was initiated
-      if (reqId === lookupRequestIdRef.current) {
-        setSelectedWord(resolved);
-      }
-    } catch (err) {
-      debugLog.error('DictionarySelectionLookup', err);
-    }
+    if (busy || proficiencyLevel === level) return;
+    await changeLevel(level);
   };
 
   return (
@@ -377,7 +146,7 @@ export default function StreamingConsole() {
             <div className="flex items-center bg-black/40 p-0.5 rounded-lg border border-white/10 text-[10px]">
               <button
                 type="button"
-                disabled={connected || connecting || ending}
+                disabled={connected || busy}
                 aria-pressed={tutorMode === 'free-conversation'}
                 onClick={() => useSettings.getState().setTutorMode('free-conversation')}
                 className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
@@ -391,7 +160,7 @@ export default function StreamingConsole() {
               </button>
               <button
                 type="button"
-                disabled={connected || connecting || ending}
+                disabled={connected || busy}
                 aria-pressed={tutorMode === 'guided-lesson'}
                 onClick={() => useSettings.getState().setTutorMode('guided-lesson')}
                 className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
@@ -410,7 +179,7 @@ export default function StreamingConsole() {
                 <button
                   key={level}
                   type="button"
-                  disabled={connecting || ending}
+                  disabled={busy}
                   aria-pressed={proficiencyLevel === level}
                   onClick={() => void handleLevelSwitch(level)}
                   title={`Chuyển sang ${level}: ${PROFICIENCY_LEVELS[level].description}`}
@@ -425,6 +194,9 @@ export default function StreamingConsole() {
       <div
         className="transcription-view flex-1 overflow-y-auto p-4 space-y-3.5 select-text"
         ref={scrollRef}
+        onPointerDownCapture={handlePointerDown}
+        onScroll={handleScroll}
+        style={{ overflowAnchor: 'none' }}
         onMouseUp={handleTextSelection}
         onDoubleClick={handleTextSelection}
       >
@@ -447,7 +219,7 @@ export default function StreamingConsole() {
               {quickActions.map((action, idx) => (
                 <button
                   key={idx}
-                  disabled={connecting || ending}
+                  disabled={busy}
                   onClick={() => handleSendPrompt(action.text)}
                   className="px-3 py-1.5 rounded-full bg-[#1E4B43]/30 hover:bg-[#1E4B43] border border-[#D4AF37]/30 text-[#FCE5B5] text-xs transition-all shadow-sm flex items-center gap-1.5 cursor-pointer text-left"
                 >
@@ -459,13 +231,15 @@ export default function StreamingConsole() {
           </div>
         ) : (
           <>
-            {displayedTurns.map((t, index) => {
+            {displayedTurns.map(turn => {
+              const t = renderedTurn(turn);
               const isSystem = t.role === 'system';
 
               if (isSystem) {
                 return (
                   <div
-                    key={index}
+                    key={t.id}
+                  data-turn-id={t.id}
                     className="p-3 rounded-xl bg-[#1E4B43]/20 border border-[#D4AF37]/30 text-xs text-[#E8ECE9] shadow-sm space-y-1 animate-fadeIn"
                   >
                     <div className="flex items-center justify-between text-[10px] font-mono text-[#D4AF37]">
@@ -475,7 +249,7 @@ export default function StreamingConsole() {
                       <span>{formatTimestamp(t.timestamp)}</span>
                     </div>
                     <div className="prose prose-invert prose-xs leading-relaxed max-w-none select-text cursor-text">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{t.text}</ReactMarkdown>
+                      <MessageMarkdown text={t.text} />
                     </div>
                   </div>
                 );
@@ -484,7 +258,8 @@ export default function StreamingConsole() {
               const isUser = t.role === 'user';
               return (
                 <div
-                  key={index}
+                  key={t.id}
+                    data-turn-id={t.id}
                   className={`flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-fadeIn`}
                 >
                   <div
@@ -505,14 +280,14 @@ export default function StreamingConsole() {
                     }`}
                   >
                     <div className="prose prose-invert prose-xs max-w-none select-text cursor-text">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{t.text}</ReactMarkdown>
+                      <MessageMarkdown text={t.text} />
                     </div>
                   </div>
                 </div>
               );
             })}
 
-            {isAwaitingFunctionResponse && (
+            {active && (isAwaitingFunctionResponse || isAwaitingResponse) && (
               <div className="flex items-center gap-2 text-xs text-[#D4AF37] p-2 bg-[#1E4B43]/20 rounded-lg border border-[#D4AF37]/20">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                 <span>Gia sư AI đang đồng bộ bản đồ &amp; chuẩn bị bài luyện tập...</span>
@@ -524,6 +299,7 @@ export default function StreamingConsole() {
               {quickActions.slice(0, 3).map((action, idx) => (
                 <button
                   key={idx}
+                  disabled={busy}
                   onClick={() => handleSendPrompt(action.text)}
                   className="px-2.5 py-1 rounded-full bg-[#232729] hover:bg-[#1E4B43] border border-white/10 text-xs text-[#D4AF37] transition-all flex items-center gap-1 cursor-pointer"
                 >
@@ -535,11 +311,12 @@ export default function StreamingConsole() {
           </>
         )}
       </div>
+      {active && hasNewMessages && <button type="button" onClick={scrollToLatest} className="mx-auto my-2 rounded-full bg-[#1E4B43] px-4 py-2 text-xs text-[#D4AF37]">Tin nhắn mới ↓</button>}
       <InPlaceDictionaryPopup
-        isOpen={Boolean(selectedWord && wordPosition)}
+        isOpen={active && Boolean(selectedWord && wordPosition)}
         vocab={selectedWord}
         position={wordPosition}
-        onClose={() => { setSelectedWord(null); setWordPosition(null); }}
+        onClose={closeSelection}
         themeMode="dark"
       />
     </div>

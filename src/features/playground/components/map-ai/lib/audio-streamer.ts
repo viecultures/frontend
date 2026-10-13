@@ -39,6 +39,8 @@ export class AudioStreamer {
   public gainNode: GainNode;
   public source: AudioBufferSourceNode;
   private endOfQueueAudioSource: AudioBufferSourceNode | null = null;
+  private scheduleTimer: ReturnType<typeof setTimeout> | null = null;
+  private sources = new Set<AudioBufferSourceNode>();
 
   public onComplete = () => {};
 
@@ -72,7 +74,9 @@ export class AudioStreamer {
     workletsRecord[workletName] = { handlers: [handler] };
 
     const src = createWorketFromSrc(workletName, workletSrc);
-    await this.context.audioWorklet.addModule(src);
+    try { await this.context.audioWorklet.addModule(src); }
+    finally { URL.revokeObjectURL(src); }
+    if (this.context.state === 'closed') return this;
     const worklet = new AudioWorkletNode(this.context, workletName);
 
     //add the node into the map
@@ -140,6 +144,7 @@ export class AudioStreamer {
   }
 
   private scheduleNextBuffer() {
+    if (!this.isPlaying || this.context.state === 'closed') return;
     const SCHEDULE_AHEAD_TIME = 0.2;
 
     while (
@@ -149,6 +154,8 @@ export class AudioStreamer {
       const audioData = this.audioQueue.shift()!;
       const audioBuffer = this.createAudioBuffer(audioData);
       const source = this.context.createBufferSource();
+      this.sources.add(source);
+      source.addEventListener('ended', () => this.sources.delete(source), { once: true });
 
       if (this.audioQueue.length === 0) {
         if (this.endOfQueueAudioSource) {
@@ -210,7 +217,7 @@ export class AudioStreamer {
     } else {
       const nextCheckTime =
         (this.scheduledTime - this.context.currentTime) * 1000;
-      setTimeout(
+      this.scheduleTimer = setTimeout(
         () => this.scheduleNextBuffer(),
         Math.max(0, nextCheckTime - 50)
       );
@@ -218,6 +225,14 @@ export class AudioStreamer {
   }
 
   stop() {
+    if (this.scheduleTimer) clearTimeout(this.scheduleTimer);
+    this.scheduleTimer = null;
+    this.endOfQueueAudioSource = null;
+    for (const source of this.sources) {
+      source.onended = null;
+      try { source.stop(); source.disconnect(); } catch { /* Already ended. */ }
+    }
+    this.sources.clear();
     this.isPlaying = false;
     this.isStreamComplete = true;
     this.audioQueue = [];
@@ -258,7 +273,7 @@ export class AudioStreamer {
 
   complete() {
     this.isStreamComplete = true;
-    this.onComplete();
+    if (!this.playing) this.onComplete();
   }
 
   get playing() { return this.audioQueue.length > 0 || this.scheduledTime > this.context.currentTime; }

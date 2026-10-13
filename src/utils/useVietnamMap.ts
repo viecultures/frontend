@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import type { LandmarkArticle } from '@/data/landmarksData';
 import {
   getProvinceById,
   clampZoom,
@@ -9,22 +10,31 @@ import {
 export type RegionKey = 'all' | 'north' | 'central' | 'south';
 
 export interface UseVietnamMapOptions {
+  /** undefined uses local state; null explicitly clears controlled selection. */
+  selectedProvinceId?: string | null;
+  selectedLandmarkId?: string | null;
   defaultSelectedId?: string | null;
+  defaultSelectedLandmarkId?: string | null;
   defaultRegion?: RegionKey;
   activeRegion?: RegionKey;
   onSelectProvince?: (province: ProvinceMapItem | null) => void;
   onSelectRegion?: (region: RegionKey) => void;
+  onSelectLandmark?: (landmark: LandmarkArticle, province: ProvinceMapItem) => void;
   minScale?: number;
   maxScale?: number;
 }
 
 export function useVietnamMap(options: UseVietnamMapOptions = {}) {
   const {
+    selectedProvinceId: controlledProvinceId,
+    selectedLandmarkId: controlledLandmarkId,
     defaultSelectedId = null,
+    defaultSelectedLandmarkId = null,
     defaultRegion = 'all',
     activeRegion: controlledRegion,
     onSelectProvince,
     onSelectRegion,
+    onSelectLandmark,
     minScale = 1.0,
     maxScale = 2.5,
   } = options;
@@ -33,10 +43,34 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
   const mouseDownPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const hasDraggedRef = useRef<boolean>(false);
 
-  const [activeRegion, setActiveRegionState] = useState<RegionKey>(
-    controlledRegion || defaultRegion
-  );
-  const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(defaultSelectedId);
+  const [regionState, setRegionState] = useState(() => ({
+    region: controlledRegion === undefined
+      ? getProvinceById(controlledProvinceId)?.region ?? defaultRegion
+      : defaultRegion,
+    provinceId: controlledProvinceId,
+  }));
+  let localRegion = regionState.region;
+  if (regionState.provinceId !== controlledProvinceId) {
+    // External selections (e.g. carousel changes) silently focus the region.
+    // Track the prop change so unchanged selections cannot undo a tab/reset.
+    // Adjust before commit to keep the province and viewBox in the same frame.
+    if (controlledRegion === undefined) {
+      localRegion = getProvinceById(controlledProvinceId)?.region ?? localRegion;
+    }
+    setRegionState({ region: localRegion, provinceId: controlledProvinceId });
+  }
+  const [localProvinceId, setLocalProvinceId] = useState<string | null>(defaultSelectedId);
+  const [localLandmarkId, setLocalLandmarkId] = useState<string | null>(defaultSelectedLandmarkId);
+  const activeRegion = controlledRegion === undefined ? localRegion : controlledRegion;
+  const selectedProvinceId = controlledProvinceId === undefined ? localProvinceId : controlledProvinceId;
+  const selectedLandmarkId = controlledLandmarkId === undefined ? localLandmarkId : controlledLandmarkId;
+  const setActiveRegionState = useCallback((region: RegionKey) => {
+    if (controlledRegion === undefined) setRegionState(previous => ({ ...previous, region }));
+  }, [controlledRegion]);
+  const setSelectedProvinceId = useCallback((id: string | null) => {
+    if (controlledProvinceId === undefined) setLocalProvinceId(id);
+    if (controlledLandmarkId === undefined) setLocalLandmarkId(null);
+  }, [controlledProvinceId, controlledLandmarkId]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Zoom & Pan State
@@ -110,29 +144,12 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
     [calculatePanBounds]
   );
 
-  // Sync internal state when defaultSelectedId prop changes
+  // Defaults initialize local state only. Controlled props are read directly,
+  // so a parent can clear selection or change regions without an effect race.
   useEffect(() => {
-    if (defaultSelectedId !== undefined) {
-      setSelectedProvinceId(defaultSelectedId);
-      if (defaultSelectedId) {
-        const prov = getProvinceById(defaultSelectedId);
-        if (prov?.region && prov.region !== activeRegion) {
-          setActiveRegionState(prov.region);
-          setZoomScale(1);
-          setPanPosition({ x: 0, y: 0 });
-        }
-      }
-    }
-  }, [defaultSelectedId, activeRegion]);
-
-  // Sync internal state when controlled activeRegion changes
-  useEffect(() => {
-    if (controlledRegion !== undefined && controlledRegion !== activeRegion) {
-      setActiveRegionState(controlledRegion);
-      setZoomScale(1);
-      setPanPosition({ x: 0, y: 0 });
-    }
-  }, [controlledRegion, activeRegion]);
+    setZoomScale(1);
+    setPanPosition({ x: 0, y: 0 });
+  }, [activeRegion]);
 
   const selectedProvince = getProvinceById(selectedProvinceId);
   const hoveredProvince = getProvinceById(hoveredId);
@@ -143,10 +160,10 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
       setSelectedProvinceId(null);
       setZoomScale(1);
       setPanPosition({ x: 0, y: 0 });
-      onSelectProvince?.(null);
       onSelectRegion?.(region);
+      onSelectProvince?.(null);
     },
-    [onSelectProvince, onSelectRegion]
+    [onSelectProvince, onSelectRegion, setActiveRegionState, setSelectedProvinceId]
   );
 
   const resetToAll = useCallback(
@@ -158,16 +175,16 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
       setSelectedProvinceId(null);
       setZoomScale(1);
       setPanPosition({ x: 0, y: 0 });
-      onSelectProvince?.(null);
       onSelectRegion?.('all');
+      onSelectProvince?.(null);
     },
-    [onSelectProvince, onSelectRegion]
+    [onSelectProvince, onSelectRegion, setActiveRegionState, setSelectedProvinceId]
   );
 
-  const selectProvince = useCallback(
-    (province: ProvinceMapItem | string | null, force = false) => {
+  const focusProvince = useCallback(
+    (province: ProvinceMapItem | string | null, force = false, notify = true) => {
       // Ignore click if the user was dragging/panning the map
-      if (!force && hasDraggedRef.current) return;
+      if (!force && hasDraggedRef.current) return false;
 
       let provItem: ProvinceMapItem | undefined;
       let provId: string | null = null;
@@ -182,26 +199,38 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
 
       if (!provId || !provItem) {
         setSelectedProvinceId(null);
-        onSelectProvince?.(null);
-        return;
+        if (notify) onSelectProvince?.(null);
+        return true;
       }
 
       // 1-Click Select & Zoom:
       // Instantly select & highlight province, and zoom into its region seamlessly
       setSelectedProvinceId(provId);
-      onSelectProvince?.(provItem);
 
       if (provItem.region && provItem.region !== activeRegion) {
         setActiveRegionState(provItem.region);
         setZoomScale(1);
         setPanPosition({ x: 0, y: 0 });
-        onSelectRegion?.(provItem.region);
       }
+      // Automatic region focus is part of selection, not a user tab event.
+      if (notify) onSelectProvince?.(provItem);
+      return true;
     },
-    [activeRegion, onSelectProvince, onSelectRegion]
+    [activeRegion, onSelectProvince, setActiveRegionState, setSelectedProvinceId]
   );
 
-  const focusProvince = selectProvince;
+  const selectProvince = useCallback(
+    (province: ProvinceMapItem | string | null, force = false) => focusProvince(province, force),
+    [focusProvince],
+  );
+
+  // Publish one complete transaction. Older province-only consumers still
+  // receive their province callback when a landmark is clicked.
+  const selectLandmark = useCallback((landmark: LandmarkArticle, province: ProvinceMapItem) => {
+    if (!focusProvince(province, false, !onSelectLandmark)) return;
+    if (controlledLandmarkId === undefined) setLocalLandmarkId(landmark.id);
+    onSelectLandmark?.(landmark, province);
+  }, [controlledLandmarkId, focusProvince, onSelectLandmark]);
 
   // Single-click backdrop escape: resets map cleanly to national overview ('all')
   const handleBackdropClick = useCallback(
@@ -213,11 +242,11 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
         setSelectedProvinceId(null);
         setZoomScale(1);
         setPanPosition({ x: 0, y: 0 });
-        onSelectProvince?.(null);
         onSelectRegion?.('all');
+        onSelectProvince?.(null);
       }
     },
-    [selectedProvinceId, activeRegion, zoomScale, onSelectProvince, onSelectRegion]
+    [selectedProvinceId, activeRegion, zoomScale, onSelectProvince, onSelectRegion, setActiveRegionState, setSelectedProvinceId]
   );
 
   const zoomIn = useCallback(() => {
@@ -396,6 +425,8 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
     setActiveRegion,
     currentViewBox,
     selectedProvinceId,
+    selectedLandmarkId,
+    selectLandmark,
     selectedProvince,
     hoveredId,
     hoveredProvince,

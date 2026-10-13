@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-import { audioContext } from './utils';
+import { createAudioContext, resumeAudioOutput } from './utils';
 import AudioRecordingWorklet from './worklets/audio-processing';
 import VolMeterWorket from './worklets/vol-meter';
 
@@ -50,6 +50,7 @@ export class AudioRecorder {
   vuWorklet: AudioWorkletNode | undefined;
 
   private starting: Promise<void> | null = null;
+  private generation = 0;
 
   constructor(public sampleRate = 16000) {}
 
@@ -71,6 +72,8 @@ export class AudioRecorder {
       throw new Error('Could not request user media');
     }
 
+    const generation = this.generation;
+    const current = () => generation === this.generation;
     this.starting = new Promise(async (resolve, reject) => {
       try {
         if (this.stream) {
@@ -78,7 +81,7 @@ export class AudioRecorder {
           this.stream = undefined;
         }
 
-        this.stream = await navigator.mediaDevices.getUserMedia({
+        const stream = await navigator.mediaDevices.getUserMedia({
           audio: {
             channelCount: 1,
             echoCancellation: true,
@@ -86,11 +89,11 @@ export class AudioRecorder {
             autoGainControl: true,
           },
         });
-
-        this.audioContext = await audioContext({ sampleRate: this.sampleRate });
-        if (this.audioContext.state === 'suspended') {
-          await this.audioContext.resume();
-        }
+        if (!current()) { stream.getTracks().forEach(track => track.stop()); resolve(); return; }
+        this.stream = stream;
+        this.audioContext = createAudioContext({ sampleRate: this.sampleRate });
+        await resumeAudioOutput(this.audioContext);
+        if (!current()) { resolve(); return; }
 
         this.source = this.audioContext.createMediaStreamSource(this.stream);
 
@@ -101,7 +104,10 @@ export class AudioRecorder {
           await this.audioContext.audioWorklet.addModule(src);
         } catch (e) {
           // Module already added on this AudioContext instance, ignore
+        } finally {
+          URL.revokeObjectURL(src);
         }
+        if (!current()) { resolve(); return; }
 
         this.recordingWorklet = new AudioWorkletNode(
           this.audioContext,
@@ -130,7 +136,10 @@ export class AudioRecorder {
           await this.audioContext.audioWorklet.addModule(vuSrc);
         } catch (e) {
           // Module already added, ignore
+        } finally {
+          URL.revokeObjectURL(vuSrc);
         }
+        if (!current()) { resolve(); return; }
 
         this.vuWorklet = new AudioWorkletNode(this.audioContext, vuWorkletName);
         this.vuWorklet.port.onmessage = (ev: MessageEvent) => {
@@ -147,6 +156,8 @@ export class AudioRecorder {
         });
         resolve();
       } catch (error) {
+        if (!current()) { resolve(); return; }
+        this.stop();
         this.recording = false;
         debugLog.error('AudioRecorder.start', error);
         this.emitter.emit('error', error);
@@ -160,6 +171,7 @@ export class AudioRecorder {
   }
 
   stop() {
+    this.generation++;
     this.recording = false;
     debugLog.audio('Dừng ghi âm Micro');
     const handleStop = () => {
@@ -185,10 +197,6 @@ export class AudioRecorder {
       this.audioContext = undefined;
     };
 
-    if (this.starting) {
-      this.starting.then(handleStop, handleStop);
-      return;
-    }
     handleStop();
   }
 }

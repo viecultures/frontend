@@ -7,6 +7,7 @@ import { Feather, Radio, Zap, Sparkles } from 'lucide-react';
 import { VideoDictationShadowingScreen } from '../components/screens/VideoDictationShadowingScreen';
 import { VietnamMapAiScreen } from '../components/screens/VietnamMapAiScreen';
 import { VietnamMapImmersiveScreen } from '../components/screens/VietnamMapImmersiveScreen';
+import { LiveAPIProvider } from '../components/map-ai/contexts/LiveAPIContext';
 
 export const PlaygroundPage: React.FC = () => {
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
@@ -77,6 +78,7 @@ export const PlaygroundPage: React.FC = () => {
   }, [currentScreenIndex]);
 
   return (
+    <LiveAPIProvider activeView={currentScreenIndex === 1 ? 'chat' : currentScreenIndex === 2 ? 'immersive' : null}>
     <div className="relative w-full h-screen overflow-hidden bg-[#FBF7EE] dark:bg-[#0b1a17]">
       {/* Floating Sidebar Navigation */}
       <PlaygroundSidebarNav
@@ -161,6 +163,7 @@ export const PlaygroundPage: React.FC = () => {
         </section>
       </div>
     </div>
+    </LiveAPIProvider>
   );
 };
 

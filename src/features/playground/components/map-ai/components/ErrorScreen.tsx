@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 
 export interface ExtendedErrorType {
@@ -13,25 +13,9 @@ export interface ExtendedErrorType {
 }
 
 export default function ErrorScreen() {
-  const { client, connected } = useLiveAPIContext();
-  const [error, setError] = useState<{ message?: string } | null>(null);
-
-  useEffect(() => {
-    function onError(error: ErrorEvent) {
-      if (connected) {
-        console.warn('Ignoring WebSocket error overlay since the session was already connected:', error);
-        return;
-      }
-      console.error(error);
-      setError(error);
-    }
-
-    client.on('error', onError);
-
-    return () => {
-      client.off('error', onError);
-    };
-  }, [client, connected]);
+  const { activeView, connectionError, connecting, retry } = useLiveAPIContext();
+  const [dismissedError, setDismissedError] = useState<string | null>(null);
+  const error = connectionError ? { message: connectionError } : null;
 
   const quotaErrorMessage =
     'You have hit the limited free quota for today. Please come back tomorrow to continue.';
@@ -45,7 +29,7 @@ export default function ErrorScreen() {
     tryAgainOption = false;
   }
 
-  if (!error) {
+  if (!activeView || !error || dismissedError === connectionError) {
     return <div style={{ display: 'none' }} />;
   }
 
@@ -76,12 +60,13 @@ export default function ErrorScreen() {
         <button
           className="close-button"
           onClick={() => {
-            setError(null);
+            setDismissedError(connectionError);
           }}
         >
           Close
         </button>
       ) : null}
+      {tryAgainOption && <button disabled={connecting} onClick={() => void retry()}>Thử lại</button>}
       {rawMessage ? (
         <div
           className="error-raw-message-container"

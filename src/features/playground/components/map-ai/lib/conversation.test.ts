@@ -11,12 +11,13 @@ test('uncurated province fallback uses map name and region without invented land
   assert.deepEqual(detail.landmarks, []);
 });
 
-test('conversation excludes guided instructions and keeps explicit map requests', () => {
+test('conversation excludes guided instructions and retains current on-demand landmark flow', () => {
   const prompt = buildCulturalTutorPrompt(SYSTEM_INSTRUCTIONS, { mode: 'free-conversation', correctionMode: 'off', mapContextMode: 'on-demand', level: 'Level 1' });
   assert.ok(!prompt.includes('MUST CALL loadLessonDiscussionPlan'));
-  assert.ok(prompt.includes('Only call map tools when explicitly asked'));
+  assert.ok(prompt.includes('asks to locate, explore or show a place'));
+  assert.ok(prompt.includes('when focusing on a specific landmark'));
   assert.ok(prompt.includes('Do not correct mistakes unless'));
-  assert.ok(prompt.includes('Level: Level 1'));
+  assert.ok(prompt.includes('ACTIVE LEVEL: Level 1'));
 });
 
 test('guided mode retains its lesson workflow', () => {
