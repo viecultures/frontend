@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PLAYGROUND_SCREENS } from '../types';
 import { PlaygroundSidebarNav } from '../components/PlaygroundSidebarNav';
-import { Feather, Radio, Zap, Sparkles } from 'lucide-react';
+import { Feather, Radio, Zap, Sparkles, Home } from 'lucide-react';
 
 // Experimental Screen Components
 import { VideoDictationShadowingScreen } from '../components/screens/VideoDictationShadowingScreen';
@@ -10,6 +11,7 @@ import { VietnamMapImmersiveScreen } from '../components/screens/VietnamMapImmer
 import { LiveAPIProvider } from '../components/map-ai/contexts/LiveAPIContext';
 
 export const PlaygroundPage: React.FC = () => {
+  const navigate = useNavigate();
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const screenRefs = useRef<(HTMLElement | null)[]>([]);
@@ -80,6 +82,19 @@ export const PlaygroundPage: React.FC = () => {
   return (
     <LiveAPIProvider activeView={currentScreenIndex === 1 ? 'chat' : currentScreenIndex === 2 ? 'immersive' : null}>
     <div className="relative w-full h-screen overflow-hidden bg-[#FBF7EE] dark:bg-[#0b1a17]">
+      {/* Mobile / Tablet Quick Exit to Home */}
+      <div className="xl:hidden fixed top-3 right-3 z-50">
+        <button
+          onClick={() => navigate('/home')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E2925]/90 backdrop-blur-md border border-[#D4AF37]/40 text-[#D4AF37] hover:text-white text-xs font-semibold shadow-lg cursor-pointer"
+          title="Về Phòng Học"
+          aria-label="Về Phòng Học"
+        >
+          <Home className="w-3.5 h-3.5" />
+          <span>Về Phòng Học</span>
+        </button>
+      </div>
+
       {/* Floating Sidebar Navigation */}
       <PlaygroundSidebarNav
         currentScreenIndex={currentScreenIndex}

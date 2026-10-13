@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bot, MessageSquare, Settings } from 'lucide-react';
+import { Search, Bot, MessageSquare, Settings, Sparkles } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
 
 interface HomeFloatingSidebarProps {
@@ -26,6 +26,19 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
         <Search className="w-5 h-5" />
         <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
           Tìm kiếm bài đọc
+        </span>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => onNavigate('playground')}
+        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        title="AI Playground"
+        aria-label="AI Playground"
+      >
+        <Sparkles className="w-5 h-5 text-antique-gold group-hover:text-heritage-dark transition-colors" />
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
+          AI Playground
         </span>
       </button>
 

@@ -142,8 +142,10 @@ export const App: React.FC = () => {
     };
 
     window.addEventListener('app-navigate', handleAppNavigate);
+    window.addEventListener('app:navigate', handleAppNavigate);
     return () => {
       window.removeEventListener('app-navigate', handleAppNavigate);
+      window.removeEventListener('app:navigate', handleAppNavigate);
     };
   }, []);
 

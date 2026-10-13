@@ -76,6 +76,15 @@ export const Footer: React.FC = () => {
                   Community
                 </button>
               </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleNav('playground')}
+                  className="hover:text-antique-bright transition-colors cursor-pointer"
+                >
+                  AI Playground
+                </button>
+              </li>
             </ul>
           </div>
 

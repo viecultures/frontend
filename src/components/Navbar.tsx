@@ -147,6 +147,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
+                  onClick={() => onNavigateToSection('playground')}
+                  className={navLinkClass(activeView === 'playground')}
+                  aria-current={activeView === 'playground' ? 'page' : undefined}
+                >
+                  <Sparkles className="w-4 h-4 text-antique-gold" />
+                  <span>AI Playground</span>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={() => onNavigateToSection('admin')}
                   className={navLinkClass(activeView === 'admin')}
                   aria-current={activeView === 'admin' ? 'page' : undefined}
@@ -197,6 +208,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <Compass className="w-4 h-4 text-antique-gold" />
                   <span>Kho Bài Đọc</span>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
+                  onClick={() => onNavigateToSection('playground')}
+                  className={navLinkClass(activeView === 'playground')}
+                  aria-current={activeView === 'playground' ? 'page' : undefined}
+                >
+                  <Sparkles className="w-4 h-4 text-antique-gold" />
+                  <span>AI Playground</span>
                 </motion.button>
               </>
             )}

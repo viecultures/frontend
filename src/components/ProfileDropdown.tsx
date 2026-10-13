@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { User, LogOut, ChevronRight, ExternalLink, Crown, ShieldCheck } from 'lucide-react';
+import { User, LogOut, ChevronRight, ExternalLink, Crown, ShieldCheck, Sparkles } from 'lucide-react';
 
 interface ProfileDropdownProps {
   isOpen: boolean;
@@ -92,7 +92,21 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                 <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
               </motion.button>
 
-              {/* 2. Quản trị CMS Bài Viết */}
+              {/* 2. AI Playground */}
+              <motion.button
+                whileHover={{ x: 2, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleItemClick(undefined, 'playground')}
+                className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-green/70 hover:bg-mist-cloud dark:hover:bg-heritage-green border border-heritage-green/15 dark:border-white/10 hover:border-antique-gold text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-antique-gold" />
+                  <span>AI Playground</span>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
+              </motion.button>
+
+              {/* 3. Quản trị CMS Bài Viết */}
               <motion.button
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}

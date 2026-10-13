@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Menu, X, ArrowRight } from 'lucide-react';
+import { Search, Menu, X, ArrowRight, Sparkles } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
 
 interface LandingHeaderProps {
@@ -98,6 +98,15 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
 
           <button
             type="button"
+            onClick={() => handleNavClick('playground')}
+            className="px-3.5 py-2 rounded-xl border border-antique-gold/60 hover:bg-antique-gold/15 text-heritage-dark font-bold text-xs uppercase tracking-wider transition-all shadow-xs flex items-center gap-1.5 cursor-pointer focus-ring shrink-0"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
+            <span>AI Playground</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => handleNavClick('login')}
             className="text-xs font-bold uppercase tracking-wider text-text-main hover:text-mountain-teal transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg focus-ring"
           >
@@ -159,6 +168,14 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
           </div>
 
           <div className="pt-4 border-t border-line flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => handleNavClick('playground')}
+              className="w-full py-2.5 rounded-xl border border-antique-gold/60 bg-antique-gold/10 hover:bg-antique-gold/20 text-heritage-dark text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-antique-gold" />
+              <span>AI Playground</span>
+            </button>
             <button
               type="button"
               onClick={() => handleNavClick('login')}

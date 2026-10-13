@@ -1,3 +1,5 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ChevronUp,
   ChevronDown,
@@ -9,6 +11,7 @@ import {
   Radio,
   Zap,
   Map,
+  Home,
 } from 'lucide-react';
 import { PLAYGROUND_SCREENS } from '../types';
 
@@ -21,6 +24,8 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
   currentScreenIndex,
   onSelectScreen
 }) => {
+  const navigate = useNavigate();
+
   const getIcon = (iconName: string, active: boolean) => {
     const props = { className: `w-4 h-4 ${active ? 'text-[#D4AF37]' : 'text-[#5D706A] group-hover:text-white'}` };
     switch (iconName) {
@@ -50,6 +55,16 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
 
   return (
     <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col items-center gap-3">
+      {/* Home / Exit Button */}
+      <button
+        onClick={() => navigate('/home')}
+        className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-[#D4AF37]/30 text-[#D4AF37] hover:text-white hover:bg-[#1E4B43] flex items-center justify-center transition-all cursor-pointer shadow-lg mb-1"
+        title="Về Phòng Học"
+        aria-label="Về Phòng Học"
+      >
+        <Home className="w-4 h-4" />
+      </button>
+
       {/* Up Button */}
       <button
         onClick={handlePrev}
