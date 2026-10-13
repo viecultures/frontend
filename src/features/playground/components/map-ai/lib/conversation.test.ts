@@ -74,15 +74,27 @@ test('Sesame flow and pedagogical profanity boundary are present in free convers
 });
 
 test('profanity filtering blocks vulgar words and prevents raw translations', async () => {
-  const { isProfaneWord, lookupWordInstant } = await import('./dictionary-service');
+  const { isProfaneWord, lookupWordInstant, maskProfanity } = await import('./dictionary-service');
   assert.equal(isProfaneWord('fuck'), true);
   assert.equal(isProfaneWord('What the fuck?'), true);
   assert.equal(isProfaneWord('shit'), true);
+  assert.equal(isProfaneWord('bitch'), true);
+  assert.equal(isProfaneWord('đụ má'), true);
+  assert.equal(isProfaneWord('vcl'), true);
   assert.equal(isProfaneWord('bustling'), false);
   assert.equal(isProfaneWord('heritage'), false);
+  assert.equal(isProfaneWord('Đèo Hải Vân'), false);
+  assert.equal(isProfaneWord('Buổi sáng'), false);
+
+  assert.equal(maskProfanity('fuck'), '*****');
+  assert.equal(maskProfanity('What the fuck is this bitch?'), 'What the ***** is this *****?');
+  assert.equal(maskProfanity('đụ má mày vcl'), '***** *****');
+  assert.equal(maskProfanity('Chào buổi sáng tại Đèo Hải Vân'), 'Chào buổi sáng tại Đèo Hải Vân');
 
   const profaneResult = await lookupWordInstant('fuck', 'What the fuck?');
   assert.equal(profaneResult.isProfane, true);
+  assert.equal(profaneResult.word, '*****');
+  assert.equal(profaneResult.contextSentence, 'What the *****?');
   assert.ok(profaneResult.viMeaning.includes('ngôn từ nhạy cảm'));
   assert.ok(profaneResult.enDefinition?.includes('blocked'));
 

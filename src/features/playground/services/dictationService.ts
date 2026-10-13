@@ -47,27 +47,84 @@ export const DEFAULT_BACKEND_URL = 'http://localhost:8080';
 
 // Calculate local diff algorithm when checking text
 export function computeLocalDictationDiff(userText: string, targetText: string): DictationCheckResult {
-  const cleanUserWords = userText.trim().replace(/[.,!?;:"]/g, '').split(/\s+/).filter(Boolean);
-  const cleanTargetWords = targetText.trim().replace(/[.,!?;:"]/g, '').split(/\s+/).filter(Boolean);
+  const cleanToken = (token: string) =>
+    token
+      .trim()
+      .replace(/^[^\w']+|[^\w']+$/g, '')
+      .replace(/’/g, "'");
 
+  const cleanUserWords = userText
+    .trim()
+    .split(/\s+/)
+    .map(cleanToken)
+    .filter(Boolean);
+
+  const cleanTargetWords = targetText
+    .trim()
+    .split(/\s+/)
+    .map(cleanToken)
+    .filter(Boolean);
+
+  const m = cleanUserWords.length;
+  const n = cleanTargetWords.length;
+  const SUB_COST = 1.2;
+  const INS_COST = 1.0;
+  const DEL_COST = 1.0;
+
+  const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  const op: string[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(''));
+
+  for (let i = 1; i <= m; i++) {
+    dp[i][0] = i * INS_COST;
+    op[i][0] = 'extra';
+  }
+  for (let j = 1; j <= n; j++) {
+    dp[0][j] = j * DEL_COST;
+    op[0][j] = 'missing';
+  }
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const u = cleanUserWords[i - 1].toLowerCase().replace(/['’]/g, '');
+      const t = cleanTargetWords[j - 1].toLowerCase().replace(/['’]/g, '');
+      if (u === t) {
+        dp[i][j] = dp[i - 1][j - 1];
+        op[i][j] = 'match';
+      } else {
+        const sub = dp[i - 1][j - 1] + SUB_COST;
+        const ins = dp[i - 1][j] + INS_COST;
+        const del = dp[i][j - 1] + DEL_COST;
+        const minVal = Math.min(sub, ins, del);
+        dp[i][j] = minVal;
+        if (minVal === sub) op[i][j] = 'sub';
+        else if (minVal === del) op[i][j] = 'missing';
+        else op[i][j] = 'extra';
+      }
+    }
+  }
+
+  let i = m;
+  let j = n;
   let matches = 0;
   const diff: DictationCheckResult['diff'] = [];
 
-  const maxLen = Math.max(cleanUserWords.length, cleanTargetWords.length);
-
-  for (let i = 0; i < maxLen; i++) {
-    const userW = cleanUserWords[i];
-    const targetW = cleanTargetWords[i];
-
-    if (!userW && targetW) {
-      diff.push({ word: targetW, status: 'missing', expected: targetW });
-    } else if (userW && !targetW) {
-      diff.push({ word: userW, status: 'extra' });
-    } else if (userW.toLowerCase() === targetW.toLowerCase()) {
-      diff.push({ word: userW, status: 'correct', expected: targetW });
+  while (i > 0 || j > 0) {
+    const action = op[i][j];
+    if (action === 'match') {
       matches++;
+      diff.unshift({ word: cleanUserWords[i - 1], status: 'correct', expected: cleanTargetWords[j - 1] });
+      i--;
+      j--;
+    } else if (action === 'sub') {
+      diff.unshift({ word: cleanUserWords[i - 1], status: 'incorrect', expected: cleanTargetWords[j - 1] });
+      i--;
+      j--;
+    } else if (action === 'missing') {
+      diff.unshift({ word: `[thiếu: ${cleanTargetWords[j - 1]}]`, status: 'missing', expected: cleanTargetWords[j - 1] });
+      j--;
     } else {
-      diff.push({ word: userW, status: 'incorrect', expected: targetW });
+      diff.unshift({ word: cleanUserWords[i - 1], status: 'extra' });
+      i--;
     }
   }
 
@@ -76,10 +133,12 @@ export function computeLocalDictationDiff(userText: string, targetText: string):
     : 0;
 
   let feedback = 'Hãy lắng nghe kỹ lại đoạn video và chú ý các âm nối, mạo từ và đuôi từ vựng.';
-  if (accuracy >= 95) {
+  if (accuracy >= 98) {
     feedback = 'Xuất sắc! Bạn đã nghe và chép chính xác 100% ngữ cảnh của đoạn video.';
-  } else if (accuracy >= 75) {
+  } else if (accuracy >= 80) {
     feedback = 'Rất tốt! Bạn đã nắm bắt hầu hết các từ khóa chính.';
+  } else if (accuracy >= 50) {
+    feedback = 'Khá tốt! Bạn có thể bật tính năng Gợi ý hoặc giảm tốc độ xuống 0.75x để nghe rõ hơn.';
   }
 
   return {
@@ -91,13 +150,21 @@ export function computeLocalDictationDiff(userText: string, targetText: string):
   };
 }
 
-// Generate hint scaffold from text
+// Generate hint scaffold from text (e.g. H____ w____)
 export function generateHintScaffold(text: string): string {
   return text
     .split(' ')
     .map(word => {
-      if (word.length <= 2) return word;
-      return word[0] + '_'.repeat(word.length - 1);
+      // Extract prefix punctuation, first alphanumeric character, middle, and suffix punctuation
+      const match = word.match(/^([^\w]*)([\w])([\w']*)([^\w]*)$/);
+      if (!match) return word;
+      const prefix = match[1] || '';
+      const firstChar = match[2];
+      const middle = match[3] || '';
+      const suffix = match[4] || '';
+      if (!middle) return word;
+      const maskedMiddle = middle.replace(/[\w]/g, '_');
+      return prefix + firstChar + maskedMiddle + suffix;
     })
     .join(' ');
 }

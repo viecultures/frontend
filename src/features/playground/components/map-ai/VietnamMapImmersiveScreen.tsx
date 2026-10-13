@@ -2,11 +2,16 @@
  * VietnamMapImmersiveScreen
  *
  * Screen #03 in Playground:
- * An ambient, voice-first cultural immersion experience.
- * - Map is centered in the viewport.
- * - Recesses/dims ("chìm xuống dưới") when idle without focus.
- * - Elevates and glows ("sáng lên") when a province/landmark is focused or during conversation.
- * - Chat box is hidden; uses floating audio HUD and live spoken subtitles.
+ * An ambient, voice-first cultural immersion experience with comic-style mascot interaction.
+ *
+ * Features:
+ * - Unified dark map background (#030706) without splitting into 2 separate panels or borders.
+ * - Mascot character anchored at the bottom-left, standing still on the dark ground.
+ * - Comic speech bubble floats directly above the mascot and automatically updates in real-time with AI speech/chat.
+ * - Interactive retrieved article cards: when AI calls `getVieCultureArticles`, matching reading articles are presented cleanly with 1-click links to Bilingual Reader.
+ * - Quick toolbar button "Bài đọc văn hóa" to trigger article retrieval on demand.
+ * - Full-screen Vietnam Map canvas with region tabs and top-right ProvinceHoverCard.
+ * - 100% Lucide React SVG icons (RULE[user_global]: Zero raw emojis).
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -22,6 +27,9 @@ import ProvinceHoverCard from './components/ProvinceHoverCard';
 import { getProvinceCultureData } from './data/vietnamProvincesDetail';
 import MapAiDebugDrawer from './components/MapAiDebugDrawer';
 import { useMapAiDebugStore } from './lib/debug-logger';
+import MascotCharacter from './components/MascotCharacter';
+import MascotChatBubble from './components/MascotChatBubble';
+import ImmersiveTopicTray, { type CulturalTopicItem } from './components/ImmersiveTopicTray';
 import {
   Play,
   Pause,
@@ -31,21 +39,32 @@ import {
   VolumeX,
   SlidersHorizontal,
   Compass,
-  Sparkles,
   MapPin,
   RefreshCw,
   X,
-  Radio,
+  BookOpen,
+  ExternalLink,
 } from 'lucide-react';
-
 
 function VietnamMapImmersiveContent() {
   const { toggleSidebar, speakerMuted } = useUI();
   const {
-    activeView, connected, connecting, ending, isSending, isRestoringContext,
-    isAwaitingResponse, isPlaying, recording, inputVolume, connectionError,
-    startConversation, resumeConversation, stopConversation, endConversation,
-    sendMessage, setMicrophoneEnabled, setSpeakerMuted, retry,
+    activeView,
+    connected,
+    connecting,
+    ending,
+    isSending,
+    isRestoringContext,
+    isAwaitingResponse,
+    isPlaying,
+    recording,
+    inputVolume,
+    startConversation,
+    resumeConversation,
+    stopConversation,
+    sendMessage,
+    setMicrophoneEnabled,
+    setSpeakerMuted,
   } = useLiveAPIContext();
   const active = activeView === 'immersive';
   const busy = !active || connecting || ending || isSending || isRestoringContext;
@@ -53,17 +72,25 @@ function VietnamMapImmersiveContent() {
   const { isDrawerOpen } = useMapAiDebugStore();
   const { proficiencyLevel } = useSettings();
 
-  const cameraTarget = useMapStore(s => s.cameraTarget);
-  const { selectProvince, selectLandmark, selectRegion, clearSelection, selectedLandmarkId, selectedProvinceId, markers } = useMapStore();
-  const selectedLandmark = VIETNAM_LANDMARKS.find(item => item.id === selectedLandmarkId) ?? null;
+  const cameraTarget = useMapStore((s) => s.cameraTarget);
+  const {
+    selectProvince,
+    selectLandmark,
+    selectRegion,
+    clearSelection,
+    selectedLandmarkId,
+    selectedProvinceId,
+    markers,
+  } = useMapStore();
+  const selectedLandmark = VIETNAM_LANDMARKS.find((item) => item.id === selectedLandmarkId) ?? null;
 
-  const turns = useLogStore(s => s.turns);
-  const hasHistory = turns.some(turn => turn.role !== 'system');
-  const isAwaitingFunctionResponse = useLogStore(s => s.isAwaitingFunctionResponse);
+  const turns = useLogStore((s) => s.turns);
+  const hasHistory = turns.some((turn) => turn.role !== 'system');
+  const isAwaitingFunctionResponse = useLogStore((s) => s.isAwaitingFunctionResponse);
 
   const [manualFocus, setManualFocus] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
-
+  const [showArticlesCard, setShowArticlesCard] = useState(true);
 
   const selectedProvinceDetail = useMemo(() => {
     if (!selectedProvinceId) return null;
@@ -73,10 +100,10 @@ function VietnamMapImmersiveContent() {
   // Focus condition: province selected, landmark selected, connected, interacting, or manual focus
   const isFocused = Boolean(
     selectedProvinceId ||
-    selectedLandmark ||
-    (active && connected) ||
-    isInteracting ||
-    manualFocus
+      selectedLandmark ||
+      (active && connected) ||
+      isInteracting ||
+      manualFocus
   );
 
   const handleSelectProvince = (province: ProvinceMapItem | null) => {
@@ -85,11 +112,13 @@ function VietnamMapImmersiveContent() {
     else clearSelection();
     setManualFocus(Boolean(province));
   };
+
   const handleSelectRegion = (region: 'north' | 'central' | 'south' | 'all') => {
     if (!active) return;
     selectRegion(region, 'user');
     setManualFocus(region !== 'all');
   };
+
   const handleSelectLandmark = (landmark: LandmarkArticle) => {
     if (!active) return;
     selectLandmark(landmark.id, 'user');
@@ -98,14 +127,58 @@ function VietnamMapImmersiveContent() {
 
   const handleSelectMarker = (marker: VietnamMapMarker) => {
     if (!active || !marker.placeId) return;
-    if (VIETNAM_LANDMARKS.some(item => item.id === marker.placeId)) selectLandmark(marker.placeId, 'user');
+    if (VIETNAM_LANDMARKS.some((item) => item.id === marker.placeId))
+      selectLandmark(marker.placeId, 'user');
     else selectProvince(marker.placeId, 'user');
   };
 
   const handleAskAiAboutProvince = async (provinceName: string) => {
     if (busy) return;
-    const query = `Tell me about the cultural heritage, famous landmarks, and speaking practice points for ${provinceName} in English suited for ${proficiencyLevel}.`;
+    const query = `Tell me about the cultural heritage, famous landmarks, and speaking practice points for ${provinceName} in English suited for ${proficiencyLevel}. Please also use getVieCultureArticles to introduce authentic reading articles.`;
     await sendMessage({ text: query, source: 'map' });
+  };
+
+  const handleSelectTopic = async (topic: CulturalTopicItem) => {
+    if (busy) return;
+    if (topic.landmarkId) {
+      selectLandmark(topic.landmarkId, 'user');
+    } else if (topic.provinceId) {
+      selectProvince(topic.provinceId, 'user');
+    }
+    setManualFocus(true);
+
+    const query = topic.prompt;
+    if (connected) {
+      await sendMessage({ text: query, source: 'suggestion' });
+    } else {
+      if (hasHistory) {
+        await resumeConversation({ input: 'voice' });
+      } else {
+        await startConversation({ input: 'voice' });
+      }
+      setTimeout(() => {
+        void sendMessage({ text: query, source: 'suggestion' });
+      }, 700);
+    }
+  };
+
+  const handleRequestArticles = async () => {
+    if (busy) return;
+    const targetProvince = selectedProvinceDetail?.name || 'Hà Nội';
+    const query = `Please call getVieCultureArticles to search and recommend curated bilingual reading articles for ${targetProvince} from the VieCultures platform library.`;
+    setShowArticlesCard(true);
+    if (connected) {
+      await sendMessage({ text: query, source: 'suggestion' });
+    } else {
+      if (hasHistory) {
+        await resumeConversation({ input: 'voice' });
+      } else {
+        await startConversation({ input: 'voice' });
+      }
+      setTimeout(() => {
+        void sendMessage({ text: query, source: 'suggestion' });
+      }, 700);
+    }
   };
 
   const handleSpeakText = (text: string) => {
@@ -119,11 +192,22 @@ function VietnamMapImmersiveContent() {
     }
   };
 
+  const handleToggleConversation = () => {
+    if (!active) return;
+    if (connected || connecting || ending) stopConversation();
+    else if (hasHistory) void resumeConversation({ input: 'voice' });
+    else void startConversation({ input: 'voice' });
+  };
+
   // Keyboard shortcut for resetting focus (ESC)
   useEffect(() => {
     if (!active) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (
+        e.target instanceof HTMLElement &&
+        e.target.closest('input, textarea, select, [contenteditable="true"]')
+      )
+        return;
       if (e.key === 'Escape') {
         clearSelection();
         setManualFocus(false);
@@ -133,19 +217,52 @@ function VietnamMapImmersiveContent() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [active, clearSelection]);
 
-  // Latest conversation turn for live subtitle display
-  const latestSpokenTurn = useMemo(() => {
+  // Extract the latest AI dialogue turn in real-time
+  const latestAgentText = useMemo(() => {
     for (let i = turns.length - 1; i >= 0; i--) {
       const turn = turns[i];
-      if (turn.role === 'agent' || turn.role === 'user') {
-        return turn;
+      if (turn.role === 'agent' && turn.text?.trim()) {
+        return turn.text.trim();
+      }
+    }
+    return '';
+  }, [turns]);
+
+  // Extract reading articles retrieved by AI via getVieCultureArticles tool
+  const retrievedArticles = useMemo(() => {
+    for (let i = turns.length - 1; i >= 0; i--) {
+      const turn = turns[i];
+      if (
+        turn.role === 'system' &&
+        (turn.toolResponse as any)?.type === 'vieculture_articles' &&
+        Array.isArray((turn.toolResponse as any)?.articles) &&
+        (turn.toolResponse as any).articles.length > 0
+      ) {
+        return (turn.toolResponse as any).articles as Array<{
+          id: string;
+          title: string;
+          titleVi: string;
+          location?: string;
+          category: string;
+          level: string;
+          readTime: string;
+          excerptEn?: string;
+          vocabHighlights?: string[];
+        }>;
       }
     }
     return null;
   }, [turns]);
 
+  // Auto-show articles card when new articles arrive from the tool
+  useEffect(() => {
+    if (retrievedArticles && retrievedArticles.length > 0) {
+      setShowArticlesCard(true);
+    }
+  }, [retrievedArticles]);
+
   return (
-    <div className="relative w-full h-full overflow-hidden bg-gradient-to-b from-[#030706] via-[#071310] to-[#020504] select-none text-[#FBF7EE]">
+    <div className="relative w-full h-full overflow-hidden bg-[#030706] select-none text-[#FBF7EE]">
       {active && <Sidebar />}
 
       {/* Far-Left Diagnostic Drawer Trigger */}
@@ -156,51 +273,260 @@ function VietnamMapImmersiveContent() {
         </div>
       )}
 
-      {/* Ambient Radial Spotlight (Backdrop Light) */}
+      {/* Ambient Radial Spotlight behind Map */}
       <div
-        className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 ease-out ${
-          isFocused ? 'opacity-100' : 'opacity-20'
+        className={`absolute inset-0 pointer-events-none transition-all duration-1000 ease-out ${
+          isFocused ? 'opacity-100' : 'opacity-30'
         }`}
         style={{
-          background:
-            'radial-gradient(ellipse 65% 55% at 50% 48%, rgba(30, 75, 67, 0.45) 0%, rgba(212, 175, 55, 0.16) 38%, transparent 72%)',
+          background: isPlaying
+            ? 'radial-gradient(ellipse 75% 65% at 55% 50%, rgba(212, 175, 55, 0.35) 0%, rgba(30, 75, 67, 0.45) 36%, transparent 75%)'
+            : recording && inputVolume > 0.05
+              ? 'radial-gradient(ellipse 70% 60% at 55% 50%, rgba(16, 185, 129, 0.28) 0%, rgba(30, 75, 67, 0.4) 36%, transparent 72%)'
+              : 'radial-gradient(ellipse 65% 55% at 55% 50%, rgba(30, 75, 67, 0.4) 0%, rgba(212, 175, 55, 0.15) 38%, transparent 72%)',
         }}
       />
 
-      {/* Ambient Vignette & Grain */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.65)_100%)] z-10" />
+      {/* Ambient Vignette */}
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_45%,rgba(0,0,0,0.65)_100%)] z-10" />
 
-      {/* Top Floating Focus Status Bar */}
-      {active && <header className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
-        {selectedProvinceDetail ? (
-          <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#12231F]/90 backdrop-blur-md border border-[#D4AF37]/40 shadow-2xl text-xs animate-in fade-in zoom-in-95 duration-200">
-            <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-ping" />
-            <span className="font-serif font-bold text-white flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" />
-              {selectedProvinceDetail.name}
-            </span>
-            <span className="text-[10px] text-[#A2B5AD] font-medium">({selectedProvinceDetail.regionName})</span>
-            <button
-              onClick={() => handleSelectProvince(null)}
-              className="ml-1 p-1 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-all cursor-pointer"
-              title="Khôi phục toàn cảnh (ESC)"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ) : (
-          <div
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[11px] text-gray-400 transition-opacity duration-500 ${
-              isFocused ? 'opacity-0 pointer-events-none' : 'opacity-90'
-            }`}
-          >
-            <Sparkles className="w-3 h-3 text-[#D4AF37]" />
-            <span>Bản đồ ở chế độ tĩnh · Chạm vào tỉnh thành hoặc bật mic để kích hoạt tiêu điểm</span>
+      {/* ============================================================ */}
+      {/* 1. TOP-LEFT FLOATING CONTROLS (Clean, no subtitle banner) */}
+      {/* ============================================================ */}
+      <div className="absolute top-4 left-6 z-30 flex items-center gap-2">
+        <ImmersiveTopicTray
+          onSelectTopic={handleSelectTopic}
+          disabled={busy}
+          selectedProvinceName={selectedProvinceDetail?.name}
+        />
+
+        {/* 1-Click Button: Call Tool to get Reading Articles */}
+        <button
+          type="button"
+          disabled={busy}
+          onClick={handleRequestArticles}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-[#1E4B43] text-gray-200 hover:text-[#D4AF37] border border-white/10 text-xs font-medium transition-all cursor-pointer shadow-sm disabled:opacity-50"
+          title="Yêu cầu Sứ Giả AI tìm bài đọc văn hóa cho địa danh hiện tại"
+        >
+          <BookOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
+          <span>Bài đọc văn hóa</span>
+        </button>
+
+        {/* Play / Pause Toggle Button */}
+        <button
+          type="button"
+          onClick={handleToggleConversation}
+          className={`p-2 rounded-xl transition-all cursor-pointer shadow-md border ${
+            connected
+              ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-400/50'
+              : 'bg-[#1E4B43] hover:bg-[#153a33] text-[#D4AF37] border-[#D4AF37]/50'
+          }`}
+          title={
+            connected || connecting || ending
+              ? 'Dừng đàm thoại'
+              : hasHistory
+                ? 'Tiếp tục đàm thoại'
+                : 'Bắt đầu đàm thoại'
+          }
+          aria-label="Đàm thoại"
+        >
+          {connecting ? (
+            <RefreshCw className="w-4 h-4 animate-spin" />
+          ) : connected ? (
+            <Pause className="w-4 h-4" />
+          ) : (
+            <Play className="w-4 h-4 ml-0.5" />
+          )}
+        </button>
+
+        {/* Microphone Toggle Button */}
+        <button
+          type="button"
+          disabled={busy || !connected}
+          onClick={() => void setMicrophoneEnabled(!recording)}
+          className={`p-2 rounded-xl transition-all cursor-pointer border ${
+            !muted
+              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30'
+              : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10'
+          }`}
+          title={muted ? 'Bật microphone' : 'Tắt microphone'}
+          aria-label="Microphone"
+        >
+          {!muted ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
+        </button>
+
+        {/* Speaker Toggle Button */}
+        <button
+          type="button"
+          onClick={() => void setSpeakerMuted(!speakerMuted)}
+          className={`p-2 rounded-xl transition-all cursor-pointer border ${
+            !speakerMuted
+              ? 'bg-white/5 text-gray-200 border-white/10 hover:bg-white/10'
+              : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+          }`}
+          title={speakerMuted ? 'Bật âm thanh loa' : 'Tắt âm thanh loa'}
+          aria-label="Loa"
+        >
+          {!speakerMuted ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+        </button>
+
+        {/* Ambient / Focus Reset Button */}
+        <button
+          type="button"
+          onClick={() => {
+            if (manualFocus || selectedProvinceId) {
+              handleSelectProvince(null);
+              setManualFocus(false);
+            } else {
+              setManualFocus(true);
+            }
+          }}
+          className={`p-2 rounded-xl transition-all cursor-pointer border ${
+            isFocused
+              ? 'bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/50'
+              : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10'
+          }`}
+          title="Khôi phục toàn cảnh (ESC)"
+          aria-label="Tiêu điểm"
+        >
+          <Compass className="w-4 h-4" />
+        </button>
+
+        {/* Voice Settings Drawer Toggle */}
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className="p-2 rounded-xl bg-white/5 hover:bg-[#1E4B43] text-gray-300 hover:text-[#D4AF37] border border-white/10 transition-colors cursor-pointer"
+          title="Cài đặt giọng nói &amp; chủ đề"
+          aria-label="Cài đặt"
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* ============================================================ */}
+      {/* 2. FLOATING COMIC CHAT BUBBLES & RETRIEVED ARTICLES */}
+      {/* ============================================================ */}
+      <div className="absolute bottom-[300px] sm:bottom-[320px] left-6 sm:left-10 z-20 w-fit max-w-[calc(92vw-40px)] lg:max-w-[42vw] xl:max-w-[600px] pointer-events-auto flex flex-col items-start gap-3">
+        {/* Main Comic Dialogue Bubble */}
+        <MascotChatBubble
+          latestText={latestAgentText}
+          role="agent"
+          isAwaitingResponse={isAwaitingFunctionResponse}
+          isThinking={isSending || isAwaitingResponse}
+          onSpeak={handleSpeakText}
+        />
+
+        {/* Interactive Articles Card Retrieved via AI getVieCultureArticles Tool */}
+        {showArticlesCard && retrievedArticles && retrievedArticles.length > 0 && (
+          <div className="w-[calc(100vw-48px)] sm:w-[480px] lg:w-[540px] xl:w-[580px] max-w-[calc(92vw-40px)] lg:max-w-[42vw] p-3.5 rounded-2xl bg-[#0d1d19]/95 border border-[#D4AF37]/40 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-xs">
+              <span className="font-serif font-bold text-[#FCE5B5] flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
+                Bài Đọc Được AI Đề Cử ({retrievedArticles.length} bài)
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowArticlesCard(false)}
+                className="text-gray-400 hover:text-white p-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
+                title="Ẩn danh sách bài đọc"
+                aria-label="Đóng"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+              {retrievedArticles.map((art) => (
+                <div
+                  key={art.id}
+                  className="p-2.5 rounded-xl bg-black/40 border border-white/10 hover:border-[#D4AF37]/50 transition-all flex flex-col gap-1.5 group"
+                >
+                  <div className="flex items-center justify-between gap-1 text-[11px]">
+                    <span className="font-semibold text-white group-hover:text-[#FCE5B5] transition-colors line-clamp-1">
+                      {art.titleVi}
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-[#1E4B43] text-[#D4AF37] border border-[#D4AF37]/30 shrink-0">
+                      {art.level} · {art.readTime}
+                    </span>
+                  </div>
+
+                  <p className="text-[10px] text-gray-400 italic line-clamp-1">
+                    {art.title}
+                  </p>
+
+                  <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/5">
+                    {art.vocabHighlights && (
+                      <div className="flex items-center gap-1 overflow-hidden text-[9px] text-[#D4AF37]">
+                        <span className="truncate">{art.vocabHighlights.slice(0, 2).join(', ')}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1.5 ml-auto shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => selectLandmark(art.id, 'user')}
+                        className="px-2 py-0.5 rounded text-[10px] bg-white/5 hover:bg-[#1E4B43] text-[#FCE5B5] border border-white/10 flex items-center gap-1 cursor-pointer transition-colors"
+                        title="Xem trên bản đồ"
+                      >
+                        <Compass className="w-2.5 h-2.5" />
+                        <span>Xem</span>
+                      </button>
+                      <a
+                        href={`/bilingual-reader?article=${encodeURIComponent(art.id)}&level=${encodeURIComponent(art.level)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2 py-0.5 rounded text-[10px] bg-[#D4AF37]/20 hover:bg-[#D4AF37]/35 text-[#FCE5B5] border border-[#D4AF37]/40 flex items-center gap-1 cursor-pointer transition-colors"
+                        title="Mở bài đọc song ngữ trên tab mới"
+                      >
+                        <ExternalLink className="w-2.5 h-2.5" />
+                        <span>Đọc bài</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
-      </header>}
+      </div>
 
-      {/* Floating Province Culture Card (Top Right) */}
+      {/* ============================================================ */}
+      {/* 3. MASCOT CHARACTER (Anchored at bottom-left, standing still) */}
+      {/* ============================================================ */}
+      <div className="absolute bottom-2 left-6 sm:left-10 z-20 pointer-events-none">
+        <MascotCharacter
+          isPlaying={isPlaying}
+          className="flex items-end justify-start"
+        />
+      </div>
+
+      {/* ============================================================ */}
+      {/* 4. ACTIVE PROVINCE TAG (Top Center) */}
+      {/* ============================================================ */}
+      {active && selectedProvinceDetail && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#12231F]/90 backdrop-blur-md border border-[#D4AF37]/50 shadow-2xl text-xs animate-in fade-in zoom-in-95 duration-200">
+          <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-ping" />
+          <span className="font-serif font-bold text-white flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" />
+            {selectedProvinceDetail.name}
+          </span>
+          <span className="text-[10px] text-[#A2B5AD] font-medium">
+            ({selectedProvinceDetail.regionName})
+          </span>
+          <button
+            type="button"
+            onClick={() => handleSelectProvince(null)}
+            className="ml-1 p-0.5 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
+            title="Khôi phục toàn cảnh (ESC)"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 5. FLOATING PROVINCE CULTURE CARD (Top Right) */}
+      {/* ============================================================ */}
       {active && selectedProvinceDetail && (
         <div className="absolute top-4 right-4 z-30 animate-in fade-in slide-in-from-right-4 duration-300">
           <ProvinceHoverCard
@@ -213,9 +539,11 @@ function VietnamMapImmersiveContent() {
         </div>
       )}
 
-      {/* CENTER HERO: Vietnam Map Container (Sinks when idle, Elevates & Glows when focused) */}
+      {/* ============================================================ */}
+      {/* 6. FULL-SCREEN VIETNAM MAP CANVAS (Unified Background) */}
+      {/* ============================================================ */}
       <main
-        className="w-full h-full flex items-center justify-center relative z-20"
+        className="w-full h-full relative z-10 flex items-center justify-center select-none"
         onMouseEnter={() => active && setIsInteracting(true)}
         onMouseLeave={() => setIsInteracting(false)}
         onClick={() => {
@@ -223,10 +551,14 @@ function VietnamMapImmersiveContent() {
         }}
       >
         <div
-          className={`w-full h-full max-w-5xl flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`w-full h-full flex items-center justify-center pl-0 lg:pl-36 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
             isFocused
-              ? 'scale-100 translate-y-0 opacity-100 brightness-100 contrast-100 drop-shadow-[0_0_50px_rgba(212,175,55,0.22)]'
-              : 'scale-[0.88] translate-y-9 opacity-40 brightness-75 contrast-90 filter blur-[0.3px] hover:opacity-75 hover:scale-[0.93] hover:translate-y-4 hover:blur-0 cursor-pointer'
+              ? isPlaying
+                ? 'scale-[1.01] opacity-100 brightness-110 contrast-105 drop-shadow-[0_0_80px_rgba(212,175,55,0.45)]'
+                : recording && inputVolume > 0.05
+                  ? 'scale-[1.005] opacity-100 brightness-105 contrast-100 drop-shadow-[0_0_65px_rgba(16,185,129,0.38)]'
+                  : 'scale-100 opacity-100 brightness-100 contrast-100 drop-shadow-[0_0_50px_rgba(212,175,55,0.22)]'
+              : 'scale-[0.94] opacity-70 brightness-90 contrast-95 filter blur-[0.2px] hover:opacity-90 hover:scale-[0.97] hover:blur-0 cursor-pointer'
           }`}
         >
           <VietnamMap
@@ -248,140 +580,6 @@ function VietnamMapImmersiveContent() {
           />
         </div>
       </main>
-
-      {/* LIVE SPOKEN SUBTITLES (Floating above the bottom controls) */}
-      {active && (latestSpokenTurn || isAwaitingFunctionResponse) && (
-        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-30 w-full max-w-2xl px-4 pointer-events-none animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="p-3.5 rounded-2xl bg-[#0c1915]/90 backdrop-blur-xl border border-[#D4AF37]/35 shadow-2xl text-xs text-[#E8ECE9] pointer-events-auto">
-            <div className="flex items-center justify-between text-[10px] font-mono mb-1 text-[#D4AF37]">
-              <span className="font-bold flex items-center gap-1.5">
-                {latestSpokenTurn?.role === 'user' ? (
-                  <>
-                    <Radio className="w-3 h-3 text-blue-400" /> Bạn
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-3 h-3 text-[#D4AF37]" /> Sứ Giả Văn Hóa AI
-                  </>
-                )}
-              </span>
-              {isAwaitingFunctionResponse && (
-                <span className="inline-flex items-center gap-1 text-[#D4AF37]">
-                  <RefreshCw className="w-3 h-3 animate-spin" /> Đang định vị bản đồ...
-                </span>
-              )}
-            </div>
-            <p className="line-clamp-3 leading-relaxed text-slate-200">
-              {latestSpokenTurn?.text || 'Đang chuẩn bị nội dung...'}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* FLOATING AUDIO & NAVIGATION HUD (Bottom Center) */}
-      {active && <footer className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30">
-        <div role="status" className="mb-2 rounded-xl bg-[#10201B]/95 px-3 py-2 text-center text-xs">
-          {connecting ? 'Đang kết nối…' : ending ? 'Đang tổng kết…' : isRestoringContext ? 'Đang khôi phục ngữ cảnh…' : isPlaying ? 'AI đang nói' : isSending || isAwaitingResponse ? 'Đang chờ AI phản hồi…' : recording ? 'Đang nghe' : connected ? 'Mic đã tắt' : hasHistory ? 'Play để tiếp tục đàm thoại' : 'Sẵn sàng trò chuyện'}
-          {connectionError && <div role="alert">{connectionError} <button disabled={busy} onClick={() => void retry()} className="underline">Thử lại</button></div>}
-          {connected && !busy && <button onClick={() => void endConversation()} className="ml-2 underline">Kết thúc và tổng kết</button>}
-          {!connected && !busy && hasHistory && <button onClick={() => void resumeConversation({ input: 'voice' })} className="ml-2 underline">Tiếp tục từ lịch sử</button>}
-        </div>
-        <nav
-          className="flex items-center gap-2 p-2 px-3.5 rounded-full bg-[#10201B]/90 backdrop-blur-xl border border-[#D4AF37]/40 shadow-[0_12px_45px_rgba(0,0,0,0.7)]"
-          aria-label="Floating Cultural AI Audio Controls"
-        >
-          {/* Settings Drawer Button */}
-          <button
-            onClick={toggleSidebar}
-            className="w-9 h-9 rounded-full bg-white/5 hover:bg-[#1E4B43] text-gray-300 hover:text-[#D4AF37] border border-white/10 flex items-center justify-center transition-all cursor-pointer"
-            title="Cài đặt chủ đề &amp; giọng nói"
-            aria-label="Cài đặt"
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-          </button>
-
-          {/* Connect / Disconnect Toggle Button */}
-          <button
-            onClick={() => {
-              if (!active) return;
-              if (connected || connecting || ending) stopConversation();
-              else if (hasHistory) void resumeConversation({ input: 'voice' });
-              else void startConversation({ input: 'voice' });
-            }}
-            className={`w-11 h-11 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-lg border ${
-              connected
-                ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-400/50 animate-pulse'
-                : 'bg-[#1E4B43] hover:bg-[#153a33] text-[#D4AF37] border-[#D4AF37]/60'
-            }`}
-            title={connected || connecting || ending ? 'Dừng đàm thoại' : hasHistory ? 'Tiếp tục đàm thoại cùng Sứ Giả AI' : 'Bắt đầu đàm thoại cùng Sứ Giả AI'}
-            aria-label={connected || connecting || ending ? 'Dừng đàm thoại' : hasHistory ? 'Tiếp tục đàm thoại' : 'Bắt đầu đàm thoại'}
-          >
-            {connecting ? (
-              <RefreshCw className="w-5 h-5 animate-spin" />
-            ) : connected ? (
-              <Pause className="w-5 h-5" />
-            ) : (
-              <Play className="w-5 h-5 ml-0.5" />
-            )}
-          </button>
-
-          {/* Microphone Mute / Unmute Button */}
-          <div className="relative">
-            <button
-              disabled={busy || !connected}
-              onClick={() => void setMicrophoneEnabled(!recording)}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer border ${
-                !muted
-                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30'
-                  : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10'
-              }`}
-              title={muted ? 'Bật microphone' : 'Tắt microphone'}
-              aria-label={muted ? 'Bật microphone' : 'Tắt microphone'}
-            >
-              {!muted ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-            </button>
-            {/* Animated Audio Volume Pulse Ring */}
-            {connected && !muted && inputVolume > 0.05 && (
-              <span className="absolute -inset-1 rounded-full border border-emerald-400/60 animate-ping pointer-events-none" />
-            )}
-          </div>
-
-          {/* Speaker Mute / Unmute Button */}
-          <button
-            onClick={() => void setSpeakerMuted(!speakerMuted)}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer border ${
-              !speakerMuted
-                ? 'bg-white/5 text-gray-200 border-white/10 hover:bg-white/10'
-                : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
-            }`}
-            title={speakerMuted ? 'Bật âm thanh loa' : 'Tắt âm thanh loa'}
-            aria-label={speakerMuted ? 'Bật loa' : 'Tắt loa'}
-          >
-            {!speakerMuted ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-          </button>
-
-          {/* Ambient / Focus Toggle */}
-          <button
-            onClick={() => {
-              if (manualFocus || selectedProvinceId) {
-                handleSelectProvince(null);
-                setManualFocus(false);
-              } else {
-                setManualFocus(true);
-              }
-            }}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer border ${
-              isFocused
-                ? 'bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/50'
-                : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10'
-            }`}
-            title={isFocused ? 'Chuyển về chế độ tĩnh (Ambient)' : 'Kích hoạt tiêu điểm bản đồ (Focus)'}
-            aria-label="Chuyển chế độ tiêu điểm"
-          >
-            <Compass className="w-4 h-4" />
-          </button>
-        </nav>
-      </footer>}
     </div>
   );
 }
@@ -390,7 +588,11 @@ export const VietnamMapImmersiveScreen: React.FC = () => {
   const { theme } = useSettings();
 
   return (
-    <div className={`map-ai-app ${theme === 'light' ? 'light-theme' : ''} w-full h-full relative overflow-hidden`}>
+    <div
+      className={`map-ai-app ${
+        theme === 'light' ? 'light-theme' : ''
+      } w-full h-full relative overflow-hidden`}
+    >
       <VietnamMapImmersiveContent />
     </div>
   );

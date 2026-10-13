@@ -20,6 +20,7 @@ import { PROFICIENCY_LEVELS, type ProficiencyLevel } from '../../lib/prompt-scaf
 import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
 import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
 import { useTimelineSelection } from './useTimelineSelection';
+import { maskProfanity } from '@/utils/dictionary-service';
 
 export interface VieCultureArticleItem {
   id: string;
@@ -64,7 +65,7 @@ function extractArticlesFromText(text: string): VieCultureArticleItem[] {
 }
 
 const MessageMarkdown = memo(function MessageMarkdown({ text }: { text: string }) {
-  return <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>;
+  return <ReactMarkdown remarkPlugins={[remarkGfm]}>{maskProfanity(text)}</ReactMarkdown>;
 });
 
 const formatTimestamp = (date: Date) => {

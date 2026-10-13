@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Volume2, Bookmark, Check, X, Sparkles, BookOpen, ShieldAlert } from "lucide-react";
 import type { VocabItem } from "@/data/readerData";
+import { maskProfanity } from "@/utils/dictionary-service";
 
 interface InPlaceDictionaryPopupProps {
   isOpen: boolean;
@@ -122,7 +123,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h3 className="font-serif font-bold text-base sm:text-lg leading-tight truncate text-current">
-                {vocab.word}
+                {vocab.isProfane ? '*****' : vocab.word}
               </h3>
               {!vocab.isProfane && (
                 <button
@@ -211,7 +212,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
                   Ngữ cảnh bài học:
                 </span>
                 <p className="text-[11px] opacity-80 mt-1 line-clamp-2 leading-normal">
-                  "{vocab.contextSentence}"
+                  "{maskProfanity(vocab.contextSentence)}"
                 </p>
               </div>
             )}
