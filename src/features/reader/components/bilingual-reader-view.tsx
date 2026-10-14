@@ -650,12 +650,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
             <div className="space-y-3 mt-6">
               <Link
-                href="/flashcard-study"
+                href={`/flashcard-study?deck=${encodeURIComponent(articleData?.id || 'tet-holiday')}&level=${encodeURIComponent(selectedLevel)}`}
                 className="flex items-center justify-between px-5 py-3.5 rounded-2xl bg-[#1E4B43] text-[#FBF7EE] text-xs font-bold shadow-sm hover:bg-[#163D37] border border-[#D9B76A]/50 transition-all group"
               >
                 <span className="flex items-center gap-2">
                   <Layers className="w-4 h-4 text-[#D9B76A]" />
-                  Ôn Tập Flashcards (16 từ bài đọc)
+                  Ôn Tập Flashcards ({articleData?.vocabularies?.length || 8} từ bài đọc)
                 </span>
                 <ArrowRight className="w-4 h-4 text-[#D9B76A] group-hover:translate-x-1 transition-transform" />
               </Link>

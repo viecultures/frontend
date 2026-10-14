@@ -44,10 +44,10 @@ export default function ReaderPage() {
   // Dynamic Post Data from Backend API (null = fallback to Tết default)
   const [articleData, setArticleData] = useState<ReaderArticleData | null>(null);
 
-  // Fetch article data whenever postId, story, or id URL parameter changes
+  // Fetch article data whenever postId, story, article, or id URL parameter changes
   useEffect(() => {
     const postId = searchParams.get("postId") || searchParams.get("id");
-    const storyId = searchParams.get("story");
+    const storyId = searchParams.get("story") || searchParams.get("article");
     const targetId = postId || storyId;
 
     if (!targetId || targetId === "tet-holiday") {
@@ -67,17 +67,29 @@ export default function ReaderPage() {
             setSelectedLevel(mapped.level);
           }
         } else {
-          setArticleData(null);
+          // Fallback to local curated article (landmarks or discovery lessons)
+          const localArticle = readerApiService.getLocalArticle(targetId, selectedLevel);
+          if (localArticle) {
+            setArticleData(localArticle);
+            if (localArticle.level && (localArticle.level === "Level 1" || localArticle.level === "Level 2" || localArticle.level === "Level 3")) {
+              setSelectedLevel(localArticle.level as any);
+            }
+          } else {
+            setArticleData(null);
+          }
         }
       })
       .catch(() => {
-        if (isMounted) setArticleData(null);
+        if (isMounted) {
+          const localArticle = readerApiService.getLocalArticle(targetId, selectedLevel);
+          setArticleData(localArticle);
+        }
       });
 
     return () => {
       isMounted = false;
     };
-  }, [searchParams.get("postId"), searchParams.get("story"), searchParams.get("id")]);
+  }, [searchParams.get("postId"), searchParams.get("story"), searchParams.get("article"), searchParams.get("id")]);
 
   // Sync state if URL searchParams change externally
   useEffect(() => {
@@ -454,6 +466,8 @@ export default function ReaderPage() {
         vocabList={articleData && articleData.vocabularies.length > 0 ? articleData.vocabularies : Object.values(VOCAB_DATABASE)}
         bookmarkedWords={bookmarkedWords}
         onToggleBookmarkWord={toggleBookmarkWord}
+        deckId={articleData?.id || searchParams.get("story") || searchParams.get("article") || 'tet-holiday'}
+        selectedLevel={selectedLevel}
       />
 
       {/* Voice Customizer Modal (Tùy chỉnh giọng đọc Google Gemini) */}

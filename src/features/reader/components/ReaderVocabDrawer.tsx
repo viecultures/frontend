@@ -10,6 +10,8 @@ interface ReaderVocabDrawerProps {
   vocabList: VocabItem[];
   bookmarkedWords: Record<string, boolean>;
   onToggleBookmarkWord: (wordId: string) => void;
+  deckId?: string;
+  selectedLevel?: string;
 }
 
 export function ReaderVocabDrawer({
@@ -20,6 +22,8 @@ export function ReaderVocabDrawer({
   vocabList,
   bookmarkedWords,
   onToggleBookmarkWord,
+  deckId,
+  selectedLevel = 'Level 2',
 }: ReaderVocabDrawerProps) {
   if (!isOpen) return null;
 
@@ -125,7 +129,7 @@ export function ReaderVocabDrawer({
         {/* Drawer Footer Actions */}
         <div className="pt-4 border-t border-[rgba(30,75,67,0.12)] space-y-2 mt-6">
           <Link
-            href="/discovery#flashcards"
+            href={`/flashcard-study?deck=${encodeURIComponent(deckId || 'tet-holiday')}&level=${encodeURIComponent(selectedLevel)}`}
             className="w-full py-3 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] flex items-center justify-center gap-2 shadow-sm border border-[#D9B76A]/50 transition-all"
           >
             <span>Ôn Tập Flashcards từ vựng</span>
