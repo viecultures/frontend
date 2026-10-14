@@ -16,7 +16,7 @@ export function FlashcardSpellingView({
   onCheckSpelling,
 }: FlashcardSpellingViewProps) {
   return (
-    <div className="w-full min-h-[380px] p-8 sm:p-10 rounded-3xl bg-white border border-[rgba(30,75,67,0.15)] shadow-sm flex flex-col justify-between text-center space-y-6 animate-in fade-in duration-200">
+    <div className="vocab-spelling-view w-full max-w-2xl mx-auto p-5 sm:p-6 rounded-3xl bg-surface border border-line flex flex-col justify-between text-center gap-5 animate-in fade-in duration-200">
       <div className="my-auto space-y-2">
         <span className="text-xs font-bold text-[#6E7E79]">
           Gõ từ tiếng Anh tương ứng:
@@ -30,6 +30,7 @@ export function FlashcardSpellingView({
         <div className="flex gap-3">
           <input
             type="text"
+            aria-label="Nhập từ tiếng Anh"
             value={spellingInput}
             onChange={(e) => onChangeInput(e.target.value)}
             onKeyDown={(e) => {

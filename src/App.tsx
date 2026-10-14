@@ -270,8 +270,8 @@ export const App: React.FC = () => {
         </React.Suspense>
       </main >
 
-      {/* Footer (hidden on login, home dashboard, reader page, and playground) */}
-      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'playground' && <Footer />}
+      {/* Focused learning workspaces use the viewport without the site footer. */}
+      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'playground' && activeView !== 'flashcard-study' && <Footer />}
 
       {/* GLOBAL SETTINGS MODAL */}
       <SettingsModal />

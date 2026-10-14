@@ -17,7 +17,7 @@ export function FlashcardMultipleChoiceView({
   onNextQuestion,
 }: FlashcardMultipleChoiceViewProps) {
   return (
-    <div className="w-full max-w-2xl mx-auto min-h-[420px] p-8 sm:p-10 rounded-3xl bg-surface border-2 border-line shadow-lg flex flex-col justify-between space-y-6 animate-in fade-in duration-300">
+    <div className="vocab-quiz-view w-full max-w-2xl mx-auto p-5 sm:p-6 rounded-3xl bg-surface border border-line flex flex-col justify-between gap-4 animate-in fade-in duration-300">
       <div className="text-center space-y-2.5 my-auto">
         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rice-paper text-heritage-green font-bold text-xs border border-antique-gold/40">
           Trắc Nghiệm Nhanh

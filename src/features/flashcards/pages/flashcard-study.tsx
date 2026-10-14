@@ -19,7 +19,6 @@ import {
   FlashcardFlipView,
   FlashcardMultipleChoiceView,
   FlashcardSpellingView,
-  FlashcardPracticeModesGrid,
 } from "../components";
 
 export default function FlashcardStudyPage() {
@@ -134,8 +133,8 @@ export default function FlashcardStudyPage() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
-        document.activeElement?.tagName === "INPUT" ||
-        document.activeElement?.tagName === "TEXTAREA" ||
+        (e.target instanceof HTMLElement && (e.target.closest("input, textarea, select, button, [role='button'], [contenteditable='true']"))) ||
+        playerMode !== "flip" ||
         isSessionComplete
       ) {
         return;
@@ -165,7 +164,7 @@ export default function FlashcardStudyPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeCards.length, currentIndex, currentCard, isSessionComplete]);
+  }, [activeCards.length, currentIndex, currentCard, isSessionComplete, playerMode]);
 
   const playAudio = (wordText?: string) => {
     const word = wordText || currentCard?.word;
@@ -199,7 +198,7 @@ export default function FlashcardStudyPage() {
 
   return (
     <FlashcardSidebarLayout>
-      <div className="w-full space-y-5">
+      <div className="vocab-study-page w-full">
         {/* Active Deck Header Banner */}
         <FlashcardStudyHeader
           activeLesson={activeLesson}
@@ -215,6 +214,7 @@ export default function FlashcardStudyPage() {
         <FlashcardProgressBar
           currentIndex={isSessionComplete ? activeCards.length : currentIndex}
           totalCards={activeCards.length}
+          isComplete={isSessionComplete}
         />
 
         {/* Player Mode Navigation Bar */}
@@ -223,9 +223,14 @@ export default function FlashcardStudyPage() {
           onChangeMode={(mode) => {
             setPlayerMode(mode);
             setIsSessionComplete(false);
+            setIsFlipped(false);
+            setMcSelected(null);
+            setSpellingInput("");
+            setSpellingFeedback(null);
           }}
         />
 
+        <div className="vocab-study-player">
         {/* SESSION COMPLETION SUMMARY VIEW */}
         {isSessionComplete ? (
           <div className="w-full max-w-2xl mx-auto rounded-3xl bg-surface border-2 border-line p-8 sm:p-10 shadow-xl space-y-6 text-center animate-in fade-in zoom-in-95 duration-300">
@@ -360,22 +365,9 @@ export default function FlashcardStudyPage() {
             )}
           </>
         )}
+        </div>
 
-        {/* BOTTOM SECTION: Practice Modes Grid */}
-        <FlashcardPracticeModesGrid
-          playerMode={playerMode}
-          onSelectQuiz={() => {
-            setPlayerMode("mc");
-            setIsSessionComplete(false);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-          onSelectListening={() => {
-            setPlayerMode("spelling");
-            setIsSessionComplete(false);
-            playAudio();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-        />
+        {!isSessionComplete && <p className="vocab-study-tip">Một ít mỗi ngày, nhớ lâu hơn. Hãy đọc to từ vựng trước khi xem đáp án.</p>}
       </div>
     </FlashcardSidebarLayout>
   );

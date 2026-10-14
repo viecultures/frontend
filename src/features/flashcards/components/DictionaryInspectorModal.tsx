@@ -1,4 +1,5 @@
 import { X, Volume2, ArrowRight } from "lucide-react";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import type { Lesson } from "@/data/discoveryData";
 import { getDeckData } from "@/data/flashcardsData";
 
@@ -20,20 +21,21 @@ export function DictionaryInspectorModal({
   const deckData = getDeckData(lesson);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-white rounded-3xl p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+    <Dialog open={!!lesson} onClose={onClose} className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+      <DialogPanel className="w-full max-w-2xl bg-surface rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[85dvh] overflow-y-auto">
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div>
             <span className="text-[10px] font-bold uppercase bg-[#ECFDF5] text-[#059669] px-2.5 py-0.5 rounded-full">
               {lesson.categoryVi}
             </span>
-            <h3 className="font-serif text-xl font-bold text-[#1E4B43] mt-1">
+            <DialogTitle className="font-serif text-xl font-bold text-ink mt-1">
               Từ điển bộ từ: {lesson.title}
-            </h3>
+            </DialogTitle>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500 cursor-pointer"
+            aria-label="Đóng từ điển bộ từ"
+            className="p-2.5 rounded-full hover:bg-surface-muted text-ink-soft cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -43,27 +45,27 @@ export function DictionaryInspectorModal({
           {deckData.cards.map((card, idx) => (
             <div
               key={card.id}
-              className="p-4 rounded-2xl bg-[#F6EEDC]/50 border border-[rgba(30,75,67,0.1)] flex items-start justify-between gap-4"
+              className="p-4 rounded-2xl bg-surface-muted border border-line flex items-start justify-between gap-4"
             >
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm text-[#1E4B43]">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-bold text-sm text-ink">
                     {idx + 1}. {card.word}
                   </span>
-                  <span className="text-xs font-mono text-gray-500">
+                  <span className="text-xs font-mono text-ink-faint">
                     {card.ipa}
                   </span>
-                  <span className="text-[10px] font-bold bg-[#1E4B43]/10 text-[#1E4B43] px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold bg-surface-sunken text-ink px-2 py-0.5 rounded">
                     {card.pos}
                   </span>
                 </div>
-                <div className="text-xs font-bold text-[#059669]">
+                <div className="text-xs font-bold text-ink">
                   Nghĩa: {card.viMeaning}
                 </div>
-                <div className="text-xs text-[#3F5550]">
+                <div className="text-xs text-ink-soft">
                   Định nghĩa: {card.viDefinition}
                 </div>
-                <div className="text-xs italic text-[#6E7E79]">
+                <div className="text-xs italic text-ink-faint">
                   "{card.contextEn}"
                 </div>
               </div>
@@ -72,6 +74,7 @@ export function DictionaryInspectorModal({
                 onClick={() => onPlayAudio(card.word)}
                 className="p-2.5 rounded-full bg-[#1E4B43] text-white hover:bg-[#163D37] cursor-pointer shrink-0 shadow-xs"
                 title="Phát âm"
+                aria-label={`Phát âm ${card.word}`}
               >
                 <Volume2 className="w-4 h-4 text-[#D9B76A]" />
               </button>
@@ -92,7 +95,7 @@ export function DictionaryInspectorModal({
             <ArrowRight className="w-4 h-4 text-[#D9B76A]" />
           </button>
         </div>
-      </div>
-    </div>
+      </DialogPanel>
+    </Dialog>
   );
 }

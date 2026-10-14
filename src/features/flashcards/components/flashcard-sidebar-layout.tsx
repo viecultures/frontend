@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import "../vocabulary.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   BookMarked,
   PlusCircle,
   Sparkles,
-  Menu,
   X,
   Plus,
   BookOpen,
@@ -21,8 +21,6 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
-
   // Quick Add Word Modal State
   const [isAddWordModalOpen, setIsAddWordModalOpen] = useState<boolean>(false);
   const [newWord, setNewWord] = useState<string>("");
@@ -32,12 +30,10 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
   const currentPath = location.pathname;
 
   const handleNav = (path: string) => {
-    setIsMobileMenuOpen(false);
     navigate(path);
   };
 
   const handleOpenAddWord = () => {
-    setIsMobileMenuOpen(false);
     setIsAddWordModalOpen(true);
   };
 
@@ -54,49 +50,25 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-warm-ivory text-text-body flex flex-col lg:flex-row font-sans selection:bg-sky-mist selection:text-heritage-green">
-      {/* Mobile Floating Drawer Trigger */}
-      <button
-        onClick={() => setIsMobileMenuOpen(true)}
-        className="lg:hidden fixed bottom-6 left-5 z-40 px-3.5 py-2.5 rounded-full bg-heritage-green text-warm-ivory border border-antique-gold/50 shadow-lg flex items-center gap-2 text-xs font-bold cursor-pointer focus-ring"
-        aria-label="Mở menu từ vựng"
-      >
-        <Menu className="w-4 h-4 text-antique-gold" />
-        <span>Menu</span>
-      </button>
-
-      {/* Mobile Drawer Overlay */}
-      {isMobileMenuOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-xs"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
+    <div className={`vocab-shell ${currentPath === "/flashcard-study" ? "vocab-study-shell" : ""} text-text-body flex flex-col lg:flex-row font-sans selection:bg-sky-mist selection:text-heritage-green`}>
+      <nav className="vocab-mobile-nav lg:hidden" aria-label="Điều hướng từ vựng trên điện thoại">
+        <button onClick={() => handleNav("/dictionary")} aria-current={currentPath === "/dictionary" ? "page" : undefined}><BookMarked size={16} />Thư viện</button>
+        <button onClick={handleOpenAddWord}><PlusCircle size={16} />Thêm từ</button>
+        <button onClick={() => handleNav("/flashcard-study")} aria-current={currentPath === "/flashcard-study" ? "page" : undefined}><Sparkles size={16} />Ôn tập</button>
+      </nav>
 
       {/* LEFT NAVIGATION SIDEBAR */}
       <aside
-        className={`fixed lg:sticky top-0 lg:top-20 left-0 z-40 h-screen lg:h-[calc(100vh-5rem)] w-64 shrink-0 bg-surface border-r border-line p-5 flex flex-col justify-between transition-transform duration-300 overflow-y-auto ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className="vocab-sidebar hidden lg:flex sticky top-20 left-0 z-40 h-[calc(100vh-5rem)] w-56 shrink-0 bg-surface border-r border-line p-4 flex-col justify-between overflow-y-auto"
       >
         <div className="space-y-6">
-          {/* Mobile drawer close button */}
-          <div className="lg:hidden flex items-center justify-between pb-3 border-b border-line">
-            <span className="text-xs font-bold text-heritage-green">Menu tùy chọn</span>
-            <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="p-1.5 rounded-lg text-text-secondary hover:text-heritage-green hover:bg-rice-paper cursor-pointer"
-              aria-label="Đóng menu"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
           {/* Sidebar Menu Items */}
+          <div className="vocab-sidebar-heading"><BookMarked size={18} /><span>GÓC HỌC TẬP</span></div>
           <nav className="space-y-1.5" aria-label="Điều hướng Flashcards">
             {/* TAB 1: THƯ VIỆN */}
             <button
               onClick={() => handleNav("/dictionary")}
+              aria-current={currentPath === "/dictionary" ? "page" : undefined}
               className={`w-full px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer focus-ring ${
                 currentPath === "/dictionary" || currentPath === "/flashcard-library"
                   ? "bg-rice-paper text-heritage-green border border-antique-gold/50 shadow-xs"
@@ -119,6 +91,7 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
             {/* TAB 3: ÔN TẬP SRS */}
             <button
               onClick={() => handleNav("/flashcard-study")}
+              aria-current={currentPath === "/flashcard-study" ? "page" : undefined}
               className={`w-full px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer focus-ring ${
                 currentPath === "/flashcard-study" && !location.search.includes("mode=match")
                   ? "bg-rice-paper text-heritage-green border border-antique-gold/50 shadow-xs"
@@ -138,7 +111,7 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
             <span>Cộng đồng Học tập</span>
           </div>
           <p className="text-[11px] text-sky-mist leading-relaxed">
-            Hơn 200+ bộ thẻ di sản được đóng góp bởi các Đại Sứ Văn Hóa.
+            Cùng chia sẻ từ mới và khám phá văn hóa Việt qua mỗi câu chuyện.
           </p>
           <button
             onClick={() => handleNav("/community")}
@@ -151,7 +124,7 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
       </aside>
 
       {/* RIGHT MAIN CONTENT AREA */}
-      <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 w-full">
+      <main className="vocab-main flex-1 min-w-0 w-full">
         {children}
       </main>
 

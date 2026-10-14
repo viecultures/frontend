@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
 import FlashcardSidebarLayout from "../components/flashcard-sidebar-layout";
@@ -22,6 +22,8 @@ const CATEGORY_OPTIONS = [
 
 export default function DictionaryPage() {
   const navigate = useNavigate();
+  const libraryRef = useRef<HTMLElement>(null);
+  const [sortOrder, setSortOrder] = useState("default");
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -34,7 +36,7 @@ export default function DictionaryPage() {
 
   // Filtered Lessons
   const filteredLessons = useMemo(() => {
-    return LESSONS_DATA.filter((lesson) => {
+    const lessons = LESSONS_DATA.filter((lesson) => {
       const matchCat =
         selectedCategory === "All" || lesson.category === selectedCategory;
       const q = searchQuery.toLowerCase().trim();
@@ -45,7 +47,10 @@ export default function DictionaryPage() {
         lesson.summary.toLowerCase().includes(q);
       return matchCat && matchSearch;
     });
-  }, [selectedCategory, searchQuery]);
+    if (sortOrder === "name") lessons.sort((a, b) => a.vietnameseTitle.localeCompare(b.vietnameseTitle, "vi"));
+    if (sortOrder === "newest") lessons.sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
+    return lessons;
+  }, [selectedCategory, searchQuery, sortOrder]);
 
   // Audio Pronunciation
   const playAudio = (word: string) => {
@@ -72,34 +77,29 @@ export default function DictionaryPage() {
 
   return (
     <FlashcardSidebarLayout>
-      <div className="w-full space-y-8">
-        {/* SECTION 1: HỌC TẬP MỖI NGÀY — Hôm nay học gì? Header & Inline Search Bar */}
+      <div className="vocab-library-page">
+        {/* Daily recommendation and quick actions */}
         <div className="space-y-4">
           <DictionaryDailyHero
             searchQuery={searchQuery}
             onChangeSearch={setSearchQuery}
           />
 
-          {/* 3 Top Action Cards */}
           <DictionaryQuickActionCards
             onGoToRecent={() => handleGoToStudy("imperial-hue")}
             onExploreMore={() => {
               setSelectedCategory("All");
-              window.scrollTo({ top: 400, behavior: "smooth" });
+              libraryRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
             }}
             onOpenCreateDeck={() => setIsCreateDeckOpen(true)}
           />
         </div>
 
-        {/* SECTION 2: TỦ SÁCH CÁ NHÂN — Thư viện của bạn */}
-        <div className="space-y-4 pt-4 border-t border-[rgba(30,75,67,0.12)]">
-          <div className="space-y-0.5">
-            <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#059669]">
-              — TỦ SÁCH CÁ NHÂN
-            </span>
-            <h2 className="font-serif text-2xl sm:text-3xl font-black text-[#1E4B43]">
-              Thư viện của bạn
-            </h2>
+        {/* Cultural vocabulary catalog */}
+        <section ref={libraryRef} className="vocab-library-section" aria-labelledby="vocab-library-title">
+          <div className="vocab-library-heading">
+            <div><p className="vocab-eyebrow">HỌC NGÔN NGỮ QUA DI SẢN</p><h2 id="vocab-library-title">Thư viện bộ từ <span>{LESSONS_DATA.length}</span></h2></div>
+            <label className="vocab-sort"><span>Sắp xếp:</span><select aria-label="Sắp xếp bộ từ" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}><option value="default">Đề xuất</option><option value="newest">Mới nhất</option><option value="name">Tên A – Z</option></select></label>
           </div>
 
           {/* Category Filter Pills */}
@@ -109,13 +109,15 @@ export default function DictionaryPage() {
             onSelectCategory={setSelectedCategory}
           />
 
+          <p className="vocab-results" role="status">{searchQuery ? `Tìm thấy ${filteredLessons.length} bộ từ cho “${searchQuery}”` : `${filteredLessons.length} bộ từ để bạn khám phá`}</p>
+
           {/* Library Cards Grid */}
           <DictionaryLibraryGrid
             lessons={filteredLessons}
             onGoToStudy={handleGoToStudy}
             onInspectLesson={setInspectLesson}
           />
-        </div>
+        </section>
       </div>
 
       {/* DICTIONARY INSPECTOR MODAL */}
