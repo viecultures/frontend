@@ -20,6 +20,7 @@ const FlashcardStudyPage = React.lazy(() => import('@/features/flashcards/pages/
 const CommunityPage = React.lazy(() => import('@/features/community/pages/community'));
 const CommunityContestPage = React.lazy(() => import('@/features/community/pages/community-contest'));
 const PlaygroundPage = React.lazy(() => import('@/features/playground/pages/playground'));
+const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
 
 import type { Lesson } from '@/types';
 
@@ -252,6 +253,14 @@ export const App: React.FC = () => {
             <Route
               path="/playground"
               element={<PlaygroundPage />}
+            />
+            <Route
+              path="/admin"
+              element={<AdminPage />}
+            />
+            <Route
+              path="/admin/posts"
+              element={<Navigate to="/admin" replace />}
             />
             <Route
               path="*"

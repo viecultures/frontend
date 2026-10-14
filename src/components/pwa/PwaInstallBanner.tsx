@@ -10,7 +10,8 @@ import {
   CheckCircle2, 
   Zap, 
   BookOpen, 
-  ExternalLink 
+  ExternalLink,
+  Star
 } from 'lucide-react';
 import { usePWAInstall } from './usePWAInstall';
 
@@ -96,8 +97,8 @@ export const PwaInstallBanner: React.FC = () => {
                   (e.currentTarget as HTMLImageElement).src = '/favicon/favicon-32x32.png';
                 }}
               />
-              <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#DCA842] text-[10px] text-[#163D37] font-bold shadow-xs">
-                ★
+              <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#DCA842] shadow-xs">
+                <Star size={10} className="fill-[#163D37] text-[#163D37]" />
               </span>
             </div>
 

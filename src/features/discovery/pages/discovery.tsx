@@ -3,6 +3,7 @@ import { LESSONS_DATA, getLessonStatsForLevel, type Lesson, type LevelType } fro
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { readerApiService } from '@/features/reader/services/readerApiService';
 import type { ProvinceMapItem } from '@/data/vietnamMapData';
+import { Sparkles } from 'lucide-react';
 
 // Modular Discovery Sub-components
 import { DiscoverySpotlight } from '../components/DiscoverySpotlight';
@@ -311,7 +312,8 @@ export default function DiscoveryPage() {
                   : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-600/25'
                   }`}
               >
-                <span>✨ Chỉ xem bài từ DB ({backendLessons.length})</span>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Chỉ xem bài từ DB ({backendLessons.length})</span>
               </button>
             </div>
           </div>
