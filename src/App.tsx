@@ -21,7 +21,9 @@ const CommunityPage = React.lazy(() => import('@/features/community/pages/commun
 const CommunityContestPage = React.lazy(() => import('@/features/community/pages/community-contest'));
 const PlaygroundPage = React.lazy(() => import('@/features/playground/pages/playground'));
 const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
+const PricingPage = React.lazy(() => import('@/features/subscription/pages/PricingPage'));
 
+import { getStoredUser, setStoredUser } from '@/utils/auth-storage';
 import type { Lesson } from '@/types';
 
 export const App: React.FC = () => {
@@ -29,17 +31,27 @@ export const App: React.FC = () => {
   const location = useLocation();
 
   const defaultUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
-  const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(defaultUser);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
+  const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(() => getStoredUser() || defaultUser);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser());
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (customUserData?: { email?: string; name?: string }) => {
+    const activeUser = customUserData
+      ? {
+          name: customUserData.name || customUserData.email?.split('@')[0] || defaultUser.name,
+          email: customUserData.email || defaultUser.email,
+          avatar: (customUserData.name || customUserData.email || 'U').substring(0, 2).toUpperCase(),
+        }
+      : defaultUser;
     setIsLoggedIn(true);
-    setUser(defaultUser);
+    setUser(activeUser);
+    setStoredUser(activeUser);
     navigate('/home');
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setUser(null);
+    setStoredUser(null);
     navigate('/');
   };
 
@@ -75,6 +87,10 @@ export const App: React.FC = () => {
       case '/admin':
       case '/admin/posts':
         return 'admin';
+      case '/pricing':
+      case '/subscription':
+      case '/upgrade':
+        return 'pricing';
       default:
         return 'landing';
     }
@@ -123,6 +139,11 @@ export const App: React.FC = () => {
         break;
       case 'admin':
         navigate('/admin');
+        break;
+      case 'pricing':
+      case 'subscription':
+      case 'upgrade':
+        navigate('/pricing');
         break;
       default:
         if (view.startsWith('/')) {
@@ -223,6 +244,14 @@ export const App: React.FC = () => {
               element={<Navigate to="/bilingual-reader?mode=extensive" replace />}
             />
             <Route
+              path="/learning-loop"
+              element={<Navigate to="/bilingual-reader" replace />}
+            />
+            <Route
+              path="/loop"
+              element={<Navigate to="/bilingual-reader" replace />}
+            />
+            <Route
               path="/dictionary"
               element={<DictionaryPage />}
             />
@@ -261,6 +290,18 @@ export const App: React.FC = () => {
             <Route
               path="/admin/posts"
               element={<Navigate to="/admin" replace />}
+            />
+            <Route
+              path="/pricing"
+              element={<PricingPage />}
+            />
+            <Route
+              path="/subscription"
+              element={<Navigate to="/pricing" replace />}
+            />
+            <Route
+              path="/upgrade"
+              element={<Navigate to="/pricing" replace />}
             />
             <Route
               path="*"

@@ -8,6 +8,7 @@ import {
   ReaderVocabDrawer,
   ReaderRecommendedSection,
   VoiceCustomizerModal,
+  FloatingAiCompanionWidget,
 } from "../components";
 import { Footer } from "@/components/Footer";
 import {
@@ -18,9 +19,31 @@ import {
 import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
 import { readerApiService } from "../services/readerApiService";
 import type { ReaderArticleData } from "../services/readerApiService";
+import { getStoredUser, setStoredUser, getIsProUser, type AppUser } from "@/utils/auth-storage";
 
 export default function ReaderPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // User & Pro status
+  const defaultDemoUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
+  const [user, setUser] = useState<AppUser | null>(getStoredUser() || defaultDemoUser);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
+  const [isPro, setIsPro] = useState<boolean>(getIsProUser());
+
+  useEffect(() => {
+    const handleAuth = () => {
+      const u = getStoredUser();
+      setUser(u);
+      setIsLoggedIn(!!u);
+    };
+    const handleSub = () => setIsPro(getIsProUser());
+    window.addEventListener('auth:change', handleAuth);
+    window.addEventListener('subscription:change', handleSub);
+    return () => {
+      window.removeEventListener('auth:change', handleAuth);
+      window.removeEventListener('subscription:change', handleSub);
+    };
+  }, []);
 
   // Reader Control States
   const [fontSize, setFontSize] = useState<number>(17);
@@ -376,6 +399,14 @@ export default function ReaderPage() {
         onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
         selectedVoiceName={currentVoice.name}
         selectedVoiceFlag={currentVoice.flag}
+        isLoggedIn={isLoggedIn}
+        user={user}
+        onLogout={() => {
+          setStoredUser(null);
+          setIsLoggedIn(false);
+          setUser(null);
+        }}
+        isPro={isPro}
       />
 
       {/* Main Canvas Container */}
@@ -479,6 +510,11 @@ export default function ReaderPage() {
         audioScope={audioScope}
         onChangeAudioScope={setAudioScope}
         themeMode={themeMode}
+      />
+
+      {/* Floating AI Companion Chatbot at bottom-right corner */}
+      <FloatingAiCompanionWidget
+        articleTitle={articleData?.titleVi || "Tết Cổ Truyền: Đổi Mới, Nhớ Về Cội Nguồn & Phong Vị Ba Miền"}
       />
     </main>
   );

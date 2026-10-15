@@ -1,5 +1,8 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Link from "@/components/Link";
-import { ArrowLeft, Columns, BookOpen, Moon, Sun, Layers } from "lucide-react";
+import { ArrowLeft, Columns, BookOpen, Moon, Sun, Layers, LogIn, Crown, User } from "lucide-react";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 
 interface ReaderToolbarProps {
   fontSize: number;
@@ -15,6 +18,10 @@ interface ReaderToolbarProps {
   onOpenVoiceCustomizer?: () => void;
   selectedVoiceName?: string;
   selectedVoiceFlag?: string;
+  isLoggedIn?: boolean;
+  user?: { name: string; email: string; avatar: string } | null;
+  onLogout?: () => void;
+  isPro?: boolean;
 }
 
 export function ReaderToolbar({
@@ -31,7 +38,13 @@ export function ReaderToolbar({
   onOpenVoiceCustomizer,
   selectedVoiceName,
   selectedVoiceFlag = "🇺🇸",
+  isLoggedIn = false,
+  user = null,
+  onLogout,
+  isPro = false,
 }: ReaderToolbarProps) {
+  const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   return (
     <section className="bg-[#1E4B43] text-[#FBF7EE] border-b border-[#D9B76A]/30 py-3 px-6 sm:px-8 sticky top-0 z-30 shadow-md">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -167,6 +180,64 @@ export function ReaderToolbar({
               Sáng
             </button>
           </div>
+
+          {/* User Account / Login Button */}
+          {isLoggedIn ? (
+            <div className="relative flex items-center gap-2 pl-1 border-l border-[#D9B76A]/40">
+              <Link
+                href="/pricing"
+                className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all ${
+                  isPro
+                    ? "bg-[#D9B76A] text-[#122A22] border-[#D9B76A]"
+                    : "bg-[#163D37] text-[#D9B76A] border-[#D9B76A]/40 hover:bg-[#1E4B43]"
+                }`}
+                title="Gói hội viên"
+              >
+                <Crown className="w-3 h-3 fill-current" />
+                <span>{isPro ? "Hội Viên Pro" : "Nâng Cấp Pro"}</span>
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#163D37] border border-[#D9B76A] shadow-sm cursor-pointer group overflow-hidden"
+                title="Mở hồ sơ cá nhân"
+              >
+                {user?.avatar && (user.avatar.startsWith("http") || user.avatar.startsWith("/")) ? (
+                  <img src={user.avatar} alt={user?.name || "User"} className="w-full h-full object-cover rounded-full" />
+                ) : (
+                  <span className="text-[11px] font-bold text-[#D9B76A]">
+                    {user?.avatar || (user?.name ? user.name.slice(0, 2).toUpperCase() : "NL")}
+                  </span>
+                )}
+                {isPro && (
+                  <span className="absolute -top-0.5 -right-0.5 p-0.5 rounded-full bg-[#D9B76A] text-[#122A22]" aria-hidden="true">
+                    <Crown className="w-2 h-2 fill-current" />
+                  </span>
+                )}
+              </button>
+
+              <ProfileDropdown
+                isOpen={isProfileOpen}
+                onClose={() => setIsProfileOpen(false)}
+                user={user}
+                onLogout={onLogout}
+                onNavigate={(view) => {
+                  if (view.startsWith("/")) navigate(view);
+                  else navigate(`/${view}`);
+                }}
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#9E2A2B] hover:bg-[#852223] text-white font-bold text-xs shadow-sm border border-[#D9B76A]/60 transition-all cursor-pointer"
+            >
+              <LogIn className="w-3.5 h-3.5 text-[#D9B76A]" />
+              <span>Đăng Nhập</span>
+            </button>
+          )}
         </div>
       </div>
     </section>

@@ -1,8 +1,11 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Link from "@/components/Link";
-import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight, RefreshCw, Sparkles } from "lucide-react";
+import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight, RefreshCw, Sparkles, Award } from "lucide-react";
 import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
 import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
+import { ReaderDictationSection } from "./ReaderDictationSection";
+import { ReaderQuickFlashcards } from "./ReaderQuickFlashcards";
+import { LessonCompletionFlowModal } from "./LessonCompletionFlowModal";
 import type { ReaderArticleData } from "../services/readerApiService";
 import { useReaderDictionary } from "../hooks/useReaderDictionary";
 
@@ -52,6 +55,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   const activeScrollerRef = useRef<"left" | "right" | null>(null);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState<boolean>(true);
+  const [isMocSonModalOpen, setIsMocSonModalOpen] = useState<boolean>(false);
   // ── Shared In-Place Realtime Dictionary Hook ───────────────────────────────
   const { popupState, closeDictionary, handleTextSelection, handleVocabClick } = useReaderDictionary(articleData?.vocabMap);
 
@@ -649,41 +653,65 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
             </div>
 
             <div className="space-y-3 mt-6">
+
+              {/* Scroll to Stacked Dictation */}
+              <button
+                type="button"
+                onClick={() => {
+                  document.getElementById("reader-dictation")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer group ${
+                  themeMode === "dark"
+                    ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
+                    : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Headphones className="w-4 h-4 text-[#D9B76A]" />
+                  <span>Nghe Chép Chính Tả (Dictation)</span>
+                </span>
+                <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              {/* Scroll to Stacked Flashcards */}
+              <button
+                type="button"
+                onClick={() => {
+                  document.getElementById("reader-flashcards")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer group ${
+                  themeMode === "dark"
+                    ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
+                    : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-[#D9B76A]" />
+                  <span>Ôn Thẻ Nhớ Nhanh (Active Recall)</span>
+                </span>
+                <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              {/* Full Flashcard Study Room Link */}
               <Link
                 href={`/flashcard-study?deck=${encodeURIComponent(articleData?.id || 'tet-holiday')}&level=${encodeURIComponent(selectedLevel)}`}
                 className="flex items-center justify-between px-5 py-3.5 rounded-2xl bg-[#1E4B43] text-[#FBF7EE] text-xs font-bold shadow-sm hover:bg-[#163D37] border border-[#D9B76A]/50 transition-all group"
               >
                 <span className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-[#D9B76A]" />
-                  Ôn Tập Flashcards ({articleData?.vocabularies?.length || 8} từ bài đọc)
+                  <Sparkles className="w-4 h-4 text-[#D9B76A]" />
+                  Phòng Học Thẻ Toàn Diện ({articleData?.vocabularies?.length || 8} từ bài đọc)
                 </span>
                 <ArrowRight className="w-4 h-4 text-[#D9B76A] group-hover:translate-x-1 transition-transform" />
               </Link>
 
-              <button
-                onClick={() =>
-                  alert(
-                    "Tính năng Dictation (Luyện chép chính tả) đang được phát triển, sẽ sớm ra mắt!"
-                  )
-                }
-                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer ${themeMode === "dark"
-                  ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
-                  : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
-                  }`}
-              >
-                <span className="flex items-center gap-2">
-                  <Headphones className="w-4 h-4 text-[#D9B76A]" />
-                  Luyện Chép Chính Tả (Dictation)
-                </span>
-                <ChevronRight className="w-4 h-4 opacity-60" />
-              </button>
-
+              {/* Community Reflection Link */}
               <Link
                 href="/community"
-                className={`flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all group ${themeMode === "dark"
-                  ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
-                  : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
-                  }`}
+                className={`flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all group ${
+                  themeMode === "dark"
+                    ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
+                    : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                }`}
               >
                 <span className="flex items-center gap-2">
                   <PenTool className="w-4 h-4 text-[#D9B76A]" />
@@ -695,6 +723,28 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* ── STACKED SECTION 1: NGHE CHÉP CHÍNH TẢ (DICTATION) ──────── */}
+      <div id="reader-dictation" className="scroll-mt-20">
+        <ReaderDictationSection themeMode={themeMode} />
+      </div>
+
+      {/* ── STACKED SECTION 2: ÔN THẺ NHỚ NHANH (ACTIVE RECALL) ─────── */}
+      <div id="reader-flashcards" className="scroll-mt-20">
+        <ReaderQuickFlashcards
+          themeMode={themeMode}
+          onOpenMocSonModal={() => setIsMocSonModalOpen(true)}
+          deckId={articleData?.id || 'tet-holiday'}
+          selectedLevel={selectedLevel}
+        />
+      </div>
+
+      {/* ── MODAL CHUỖI THÀNH TỰU & TRẢI NGHIỆM PRO ─────────────────────────── */}
+      <LessonCompletionFlowModal
+        isOpen={isMocSonModalOpen}
+        onClose={() => setIsMocSonModalOpen(false)}
+        articleTitle={articleData?.titleVi || "Tết Cổ Truyền: Đổi Mới, Nhớ Về Cội Nguồn & Phong Vị Ba Miền"}
+      />
 
       {/* ── In-Place Dictionary Popup ──────────────────────────────────────── */}
       <InPlaceDictionaryPopup
@@ -710,3 +760,4 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 };
 
 export default BilingualReaderView;
+

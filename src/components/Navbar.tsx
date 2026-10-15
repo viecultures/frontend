@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Crown, ShieldCheck } from 'lucide-react';
+import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Crown, ShieldCheck, Award } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
 

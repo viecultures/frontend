@@ -42,7 +42,7 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({ onNavigate
             <span className="landing-eyebrow"><span className="landing-eyebrow-line" /> TIẾNG ANH QUA VĂN HÓA VIỆT</span>
             <h1 id="landing-title">Một ngôn ngữ mới.<br />Một Việt Nam<br /><em>gần gũi hơn.</em></h1>
             <p>Khám phá văn hóa Việt qua bài đọc song ngữ. Đọc để hiểu, nghe để cảm, ôn để nhớ.</p>
-            <div className="landing-hero-actions">
+            <div className="landing-hero-actions flex flex-wrap items-center gap-3">
               <button type="button" className="landing-button landing-button-primary" onClick={startLearning}>Khám phá bài đọc <ArrowUpRight size={18} aria-hidden="true" /></button>
               <button type="button" className="landing-text-link" onClick={previewFlashcard}>Thử flashcard <ArrowRight size={17} aria-hidden="true" /></button>
             </div>
