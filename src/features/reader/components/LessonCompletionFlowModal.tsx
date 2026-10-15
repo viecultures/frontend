@@ -206,7 +206,8 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
                 type="button"
                 onClick={() => {
                   onClose();
-                  navigate('/login');
+                  const currentPath = window.location.pathname + window.location.search;
+                  navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
                 }}
                 className="w-full py-3.5 px-6 rounded-full bg-[#1E4B43] hover:bg-[#163D37] text-white font-serif font-bold text-sm shadow-xl border border-[#D9B76A] transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-[1.02]"
               >
@@ -371,7 +372,7 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
                 type="button"
                 onClick={() => {
                   onClose();
-                  navigate('/bilingual-reader?postId=imperial-hue&story=imperial-hue');
+                  navigate('/reader?postId=imperial-hue&story=imperial-hue');
                 }}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#1E4B43] hover:bg-[#163D37] text-white font-serif font-bold text-xs sm:text-sm shadow-xl border border-[#D9B76A] transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
               >

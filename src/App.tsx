@@ -22,30 +22,58 @@ const CommunityContestPage = React.lazy(() => import('@/features/community/pages
 const PlaygroundPage = React.lazy(() => import('@/features/playground/pages/playground'));
 const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
 const PricingPage = React.lazy(() => import('@/features/subscription/pages/PricingPage'));
+const CheckoutPage = React.lazy(() => import('@/features/subscription/pages/CheckoutPage'));
 
 import { getStoredUser, setStoredUser } from '@/utils/auth-storage';
 import type { Lesson } from '@/types';
+
+// Redirect legacy /bilingual-reader or /loop routes to canonical /reader while preserving search query
+const RedirectToReader: React.FC<{ defaultParams?: string }> = ({ defaultParams = '' }) => {
+  const location = useLocation();
+  const search = location.search || defaultParams;
+  return <Navigate to={`/reader${search}`} replace />;
+};
 
 export const App: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const defaultUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
-  const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(() => getStoredUser() || defaultUser);
+  const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(() => getStoredUser());
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser());
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const stored = getStoredUser();
+      setUser(stored);
+      setIsLoggedIn(!!stored);
+    };
+    window.addEventListener('auth:change', handleAuthChange);
+    return () => window.removeEventListener('auth:change', handleAuthChange);
+  }, []);
 
   const handleLoginSuccess = (customUserData?: { email?: string; name?: string }) => {
     const activeUser = customUserData
       ? {
           name: customUserData.name || customUserData.email?.split('@')[0] || defaultUser.name,
           email: customUserData.email || defaultUser.email,
-          avatar: (customUserData.name || customUserData.email || 'U').substring(0, 2).toUpperCase(),
+          avatar: (customUserData.name || customUserData.email || 'NL').substring(0, 2).toUpperCase(),
         }
       : defaultUser;
     setIsLoggedIn(true);
     setUser(activeUser);
     setStoredUser(activeUser);
-    navigate('/home');
+
+    // Quay về trang trước đó sau khi đăng nhập
+    const params = new URLSearchParams(window.location.search);
+    const redirectUrl = params.get('redirect');
+    if (redirectUrl) {
+      navigate(redirectUrl);
+    } else if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/home');
+    }
   };
 
   const handleLogout = () => {
@@ -70,7 +98,7 @@ export const App: React.FC = () => {
       case '/bilingual-reader':
       case '/extensive-reader':
       case '/reader':
-        return 'bilingual-reader';
+        return 'reader';
       case '/dictionary':
       case '/flashcard-library':
         return 'dictionary';
@@ -90,6 +118,8 @@ export const App: React.FC = () => {
       case '/pricing':
       case '/subscription':
       case '/upgrade':
+      case '/checkout':
+      case '/pricing/checkout':
         return 'pricing';
       default:
         return 'landing';
@@ -116,8 +146,9 @@ export const App: React.FC = () => {
       case 'discovery':
         navigate('/discovery');
         break;
+      case 'reader':
       case 'bilingual-reader':
-        navigate('/bilingual-reader');
+        navigate('/reader');
         break;
       case 'dictionary':
       case 'flashcard-library':
@@ -144,6 +175,9 @@ export const App: React.FC = () => {
       case 'subscription':
       case 'upgrade':
         navigate('/pricing');
+        break;
+      case 'checkout':
+        navigate('/checkout');
         break;
       default:
         if (view.startsWith('/')) {
@@ -174,7 +208,7 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
       {/* Navbar shown across application views (hidden on landing page, login, home dashboard, reader page, and standalone playground) */}
-      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'playground' && (
+      {activeView !== 'landing' && activeView !== 'login' && activeView !== 'home' && activeView !== 'reader' && activeView !== 'bilingual-reader' && activeView !== 'playground' && (
         <Navbar
           activeView={activeView}
           isLoggedIn={isLoggedIn}
@@ -237,19 +271,19 @@ export const App: React.FC = () => {
             />
             <Route
               path="/bilingual-reader"
-              element={<ReaderPage />}
+              element={<RedirectToReader />}
             />
             <Route
               path="/extensive-reader"
-              element={<Navigate to="/bilingual-reader?mode=extensive" replace />}
+              element={<RedirectToReader defaultParams="?mode=extensive" />}
             />
             <Route
               path="/learning-loop"
-              element={<Navigate to="/bilingual-reader" replace />}
+              element={<RedirectToReader />}
             />
             <Route
               path="/loop"
-              element={<Navigate to="/bilingual-reader" replace />}
+              element={<RedirectToReader />}
             />
             <Route
               path="/dictionary"
@@ -304,6 +338,14 @@ export const App: React.FC = () => {
               element={<Navigate to="/pricing" replace />}
             />
             <Route
+              path="/checkout"
+              element={<CheckoutPage />}
+            />
+            <Route
+              path="/pricing/checkout"
+              element={<Navigate to="/checkout" replace />}
+            />
+            <Route
               path="*"
               element={<Navigate to="/" replace />}
             />
@@ -312,7 +354,7 @@ export const App: React.FC = () => {
       </main >
 
       {/* Focused learning workspaces use the viewport without the site footer. */}
-      {activeView !== 'login' && activeView !== 'home' && activeView !== 'bilingual-reader' && activeView !== 'playground' && activeView !== 'flashcard-study' && <Footer />}
+      {activeView !== 'login' && activeView !== 'home' && activeView !== 'reader' && activeView !== 'bilingual-reader' && activeView !== 'playground' && activeView !== 'flashcard-study' && <Footer />}
 
       {/* GLOBAL SETTINGS MODAL */}
       <SettingsModal />

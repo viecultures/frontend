@@ -24,7 +24,7 @@ export const DiscoveryHeroQuoteBanner: React.FC = () => {
 
         <div className="mt-6 flex items-center justify-center gap-3 flex-wrap pt-2">
           <Link
-            href="/bilingual-reader"
+            href="/reader"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm transition-all focus-ring hover:scale-102"
           >
             <BookOpen className="w-3.5 h-3.5 text-antique-gold" />

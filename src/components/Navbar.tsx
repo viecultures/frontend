@@ -102,9 +102,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('bilingual-reader')}
-                  className={navLinkClass(activeView === 'bilingual-reader')}
-                  aria-current={activeView === 'bilingual-reader' ? 'page' : undefined}
+                  onClick={() => onNavigateToSection('reader')}
+                  className={navLinkClass(activeView === 'reader' || activeView === 'bilingual-reader')}
+                  aria-current={activeView === 'reader' || activeView === 'bilingual-reader' ? 'page' : undefined}
                 >
                   <BookOpen className="w-4 h-4 text-antique-gold" />
                   <span>Đọc Song Ngữ</span>

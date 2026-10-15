@@ -25,10 +25,9 @@ export default function ReaderPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // User & Pro status
-  const defaultDemoUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
-  const [user, setUser] = useState<AppUser | null>(getStoredUser() || defaultDemoUser);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
-  const [isPro, setIsPro] = useState<boolean>(getIsProUser());
+  const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser());
+  const [isPro, setIsPro] = useState<boolean>(() => getIsProUser());
 
   useEffect(() => {
     const handleAuth = () => {

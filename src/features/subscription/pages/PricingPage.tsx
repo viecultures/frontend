@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Check,
   X,
@@ -7,7 +7,6 @@ import {
   Sparkles,
   ArrowRight,
   ShieldCheck,
-  QrCode,
   Zap,
   CheckCircle2,
   BookOpen,
@@ -16,19 +15,13 @@ import {
   Layers,
   ArrowLeft,
 } from 'lucide-react';
-import { getIsProUser, setIsProUser, getStoredUser } from '@/utils/auth-storage';
+import { getIsProUser } from '@/utils/auth-storage';
 
 export const PricingPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [isPro, setLocalIsPro] = useState<boolean>(getIsProUser());
-  const [showQrCheckout, setShowQrCheckout] = useState<boolean>(false);
-  const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
-  const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-
-  const currentUser = getStoredUser();
 
   useEffect(() => {
     setLocalIsPro(getIsProUser());
@@ -36,20 +29,7 @@ export const PricingPage: React.FC = () => {
   }, []);
 
   const handleSelectPro = () => {
-    setShowQrCheckout(true);
-    setTimeout(() => {
-      document.getElementById('qr-payment-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 150);
-  };
-
-  const handleConfirmPayment = () => {
-    setIsProcessingPayment(true);
-    setTimeout(() => {
-      setIsProUser(true);
-      setLocalIsPro(true);
-      setIsProcessingPayment(false);
-      setPaymentSuccess(true);
-    }, 800);
+    navigate('/checkout');
   };
 
   return (
@@ -248,99 +228,6 @@ export const PricingPage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* ── QR PAYMENT SECTION (Nhấn thêm cái nữa mới QR) ──────────────────── */}
-        {showQrCheckout && !isPro && (
-          <section id="qr-payment-section" className="scroll-mt-24 max-w-2xl mx-auto pt-6 animate-in fade-in duration-300">
-            <div className="bg-white dark:bg-[#141C1A] border-4 border-[#D9B76A] rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6 text-center">
-              <div className="space-y-1">
-                <span className="text-[11px] font-bold uppercase tracking-widest text-[#D9B76A]">
-                  CỔNG THANH TOÁN MÔ PHỎNG EDTECH
-                </span>
-                <h3 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#1E4B43] dark:text-white">
-                  Quét Mã VietQR / MoMo Kích Hoạt Gói Pro
-                </h3>
-                <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300">
-                  Hệ thống tự động kích hoạt tài khoản ngay khi nhận được xác nhận chuyển khoản.
-                </p>
-              </div>
-
-              {/* QR Code Container */}
-              <div className="max-w-xs mx-auto bg-stone-50 dark:bg-stone-900 border-2 border-stone-800 p-4 rounded-2xl shadow-inner space-y-3">
-                <div className="w-40 h-40 mx-auto bg-white p-2 rounded-xl border flex items-center justify-center shadow-xs">
-                  <QrCode className="w-32 h-32 text-[#1E4B43]" />
-                </div>
-                <div className="space-y-1 text-xs">
-                  <div className="font-serif text-lg font-bold text-[#9E2A2B]">
-                    {billingCycle === 'monthly' ? '39.000 VNĐ' : '375.000 VNĐ'}
-                  </div>
-                  <div className="font-mono text-stone-700 dark:text-stone-300 font-bold">
-                    Nội dung: PRO VIE_{currentUser?.name ? currentUser.name.slice(0, 4).toUpperCase() : 'USER'}
-                  </div>
-                  <div className="text-[11px] text-stone-500">
-                    Ngân hàng Quân Đội (MB Bank) • STK: 0987654321
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleConfirmPayment}
-                  disabled={isProcessingPayment}
-                  className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#1E4B43] hover:bg-[#163D37] text-white font-serif font-bold text-xs sm:text-sm shadow-xl border border-[#D9B76A] transition-all cursor-pointer inline-flex items-center justify-center gap-2"
-                >
-                  <CheckCircle2 className="w-4 h-4 text-[#D9B76A]" />
-                  <span>
-                    {isProcessingPayment
-                      ? 'Đang Kiểm Tra Chuyển Khoản...'
-                      : 'Xác Nhận Đã Thanh Toán (Mô Phỏng)'}
-                  </span>
-                </button>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => setShowQrCheckout(false)}
-                    className="text-xs text-stone-500 hover:underline cursor-pointer"
-                  >
-                    Thu gọn mã QR
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Payment Success Banner */}
-        {paymentSuccess && (
-          <section className="max-w-2xl mx-auto animate-in zoom-in-95 duration-300">
-            <div className="bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500 rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-xl">
-              <div className="w-14 h-14 mx-auto rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md">
-                <Check className="w-8 h-8" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-serif text-2xl font-bold text-emerald-800 dark:text-emerald-300">
-                  Chúc Mừng Bạn Đã Trở Thành Hội Viên Pro!
-                </h3>
-                <p className="text-xs sm:text-sm text-stone-700 dark:text-stone-300 max-w-md mx-auto">
-                  Bạn đã được mở khóa đặc quyền trò chuyện không giới hạn cùng trợ lý văn hóa AI và trọn bộ 63 tỉnh thành.
-                </p>
-              </div>
-
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => navigate('/bilingual-reader')}
-                  className="px-6 py-3 rounded-full bg-[#1E4B43] hover:bg-[#163D37] text-white font-serif font-bold text-xs sm:text-sm shadow-md border border-[#D9B76A] transition-all cursor-pointer inline-flex items-center gap-2"
-                >
-                  <BookOpen className="w-4 h-4 text-[#D9B76A]" />
-                  <span>Quay Lại Bài Đọc & Mở Chat AI</span>
-                  <ArrowRight className="w-4 h-4 text-[#D9B76A]" />
-                </button>
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* Detailed Feature Comparison Table (matching system_constants.md) */}
         <section className="pt-8 space-y-6">

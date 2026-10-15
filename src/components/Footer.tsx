@@ -52,7 +52,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   type="button"
-                  onClick={() => handleNav('bilingual-reader')}
+                  onClick={() => handleNav('reader')}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
                   Bilingual Reader

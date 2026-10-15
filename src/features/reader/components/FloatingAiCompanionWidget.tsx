@@ -183,7 +183,10 @@ export const FloatingAiCompanionWidget: React.FC<FloatingAiCompanionWidgetProps>
               </div>
               <button
                 type="button"
-                onClick={() => navigate('/login')}
+                onClick={() => {
+                  const currentPath = window.location.pathname + window.location.search;
+                  navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
+                }}
                 className="w-full py-2.5 rounded-xl bg-[#1E4B43] hover:bg-[#163D37] text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
                 <span>Đăng Nhập Ngay</span>

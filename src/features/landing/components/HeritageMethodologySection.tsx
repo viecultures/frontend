@@ -3,7 +3,7 @@ import { ArrowUpRight, BookOpen, Compass, Layers, MessageCircle } from 'lucide-r
 
 const STEPS = [
   { title: 'Chọn chủ đề', description: 'Một món ăn, một miền di sản hay một câu chuyện quen thuộc.', action: 'Khám phá bài đọc', icon: Compass, view: 'discovery' },
-  { title: 'Đọc & nghe', description: 'Đối chiếu song ngữ, nghe từng câu và lưu những từ muốn nhớ.', action: 'Đọc thử bài Huế', icon: BookOpen, view: '/bilingual-reader?story=imperial-hue' },
+  { title: 'Đọc & nghe', description: 'Đối chiếu song ngữ, nghe từng câu và lưu những từ muốn nhớ.', action: 'Đọc thử bài Huế', icon: BookOpen, view: '/reader?story=imperial-hue' },
   { title: 'Ôn từ đã lưu', description: 'Lật thẻ, nhớ lại nghĩa và chọn những từ cần xem lại.', action: 'Thử một lượt ôn', icon: Layers, view: null },
   { title: 'Thử vận dụng', description: 'Diễn đạt suy nghĩ, hỏi thêm hoặc thử một tình huống với AI.', action: 'Mở AI Playground', icon: MessageCircle, view: 'playground' },
 ];

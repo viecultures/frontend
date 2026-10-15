@@ -68,7 +68,7 @@ export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> =
             return (
             <article key={article.id} className={'landing-article-card landing-coverflow-card' + (isActive ? ' is-active' : '')} style={style} aria-hidden={isHidden} inert={isHidden}>
               <button type="button" className="landing-article-open" onClick={() => {
-                if (isActive) navigate('/bilingual-reader?story=' + article.id);
+                if (isActive) navigate('/reader?story=' + article.id);
                 else setCurrentIndex(index);
               }} aria-label={(isActive ? 'Đọc bài: ' : 'Chọn bài: ') + article.title}>
                 <div className="landing-article-image">

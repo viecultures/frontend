@@ -21,7 +21,7 @@ export const Link: React.FC<LinkProps> = ({ href, children, onClick, className, 
       e.preventDefault();
       let targetPath = href;
       if (href === '/flashcards' || href === '/flashcard-study-page') targetPath = '/flashcard-study';
-      else if (href === '/reader') targetPath = '/bilingual-reader';
+      else if (href === '/bilingual-reader' || href === '/learning-loop' || href === '/loop') targetPath = '/reader';
 
       window.dispatchEvent(new CustomEvent('app-navigate', { detail: targetPath }));
       navigate(targetPath);

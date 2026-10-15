@@ -39,10 +39,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const loginData = {
+      email: email.trim() || 'luanninh@viecultures.com',
+      name: fullName.trim() || email.split('@')[0] || 'Ninh Thiên Luân',
+    };
     if (onLoginSuccess) {
-      onLoginSuccess();
+      onLoginSuccess(loginData);
     } else {
-      handleNavigate('home');
+      const params = new URLSearchParams(window.location.search);
+      const redirectUrl = params.get('redirect');
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        handleNavigate('home');
+      }
     }
   };
 
@@ -230,10 +242,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
               <button
                 type="button"
                 onClick={() => {
-                  if (onLoginSuccess) onLoginSuccess();
-                  else handleNavigate('home');
+                  const googleUser = { email: 'user.google@gmail.com', name: 'Ninh Thiên Luân' };
+                  if (onLoginSuccess) {
+                    onLoginSuccess(googleUser);
+                  } else {
+                    const params = new URLSearchParams(window.location.search);
+                    const redirectUrl = params.get('redirect');
+                    if (redirectUrl) window.location.href = redirectUrl;
+                    else if (window.history.length > 1) window.history.back();
+                    else handleNavigate('home');
+                  }
                 }}
-                className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark"
+                className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark cursor-pointer"
               >
                 <Globe className="w-4 h-4 text-sky-mist" />
                 <span>Google</span>
@@ -241,10 +261,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
               <button
                 type="button"
                 onClick={() => {
-                  if (onLoginSuccess) onLoginSuccess();
-                  else handleNavigate('home');
+                  const fbUser = { email: 'user.facebook@example.com', name: 'Ninh Thiên Luân' };
+                  if (onLoginSuccess) {
+                    onLoginSuccess(fbUser);
+                  } else {
+                    const params = new URLSearchParams(window.location.search);
+                    const redirectUrl = params.get('redirect');
+                    if (redirectUrl) window.location.href = redirectUrl;
+                    else if (window.history.length > 1) window.history.back();
+                    else handleNavigate('home');
+                  }
                 }}
-                className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark"
+                className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark cursor-pointer"
               >
                 <svg className="w-4 h-4 fill-sky-mist" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>

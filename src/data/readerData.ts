@@ -305,7 +305,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
     description: "From French baguette to global culinary icon: the history behind Vietnam's favorite street food.",
     readTime: "5 min read",
     vocabCount: 8,
-    link: "/bilingual-reader",
+    link: "/reader",
   },
   {
     id: "hoi-an",
@@ -315,7 +315,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
     description: "Understanding full moon rituals, silk craftsmanship, and ancient wooden architecture along the Thu Bồn river.",
     readTime: "7 min read",
     vocabCount: 10,
-    link: "/bilingual-reader",
+    link: "/reader",
   },
   {
     id: "bat-trang",
@@ -325,7 +325,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
     description: "700 years of ceramic heritage in a traditional craft village on the Red River delta.",
     readTime: "6 min read",
     vocabCount: 9,
-    link: "/bilingual-reader",
+    link: "/reader",
   },
 ];
 

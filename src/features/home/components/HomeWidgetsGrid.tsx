@@ -133,7 +133,7 @@ export const HomeWidgetsGrid: React.FC<HomeWidgetsGridProps> = ({
 
       {/* 3. Mini Pastel Sticky Note: BÀI VIẾT ĐỀ CỬ (Recommended Reading) */}
       <div
-        onClick={() => onNavigate('bilingual-reader')}
+        onClick={() => onNavigate('reader')}
         className="w-[140px] h-[105px] bg-[#E2F0D9] text-[#1E3F20] p-3 rounded-2xl shadow-xl rotate-[3deg] hover:rotate-0 transition-transform duration-300 cursor-pointer flex flex-col justify-between border border-[#C5E1B5] select-none group"
         title="Bấm để đọc bài di sản đề cử hôm nay"
       >

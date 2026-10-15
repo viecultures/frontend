@@ -35,7 +35,7 @@ export const HomeGreetingControls: React.FC<HomeGreetingControlsProps> = ({
 
         <button
           type="button"
-          onClick={() => onNavigate('bilingual-reader')}
+          onClick={() => onNavigate('reader')}
           className="px-3.5 py-1.5 bg-heritage-dark/90 border border-antique-gold/40 hover:border-antique-gold hover:bg-antique-gold rounded-full text-xs font-bold text-warm-ivory hover:text-heritage-dark transition-all duration-200 flex items-center gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(217,183,106,0.35)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer focus-ring"
         >
           <BookOpen className="w-3.5 h-3.5 text-antique-gold group-hover:text-heritage-dark group-hover:scale-110 transition-transform" />
