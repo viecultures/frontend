@@ -9,6 +9,8 @@ import { HeritageMethodologySection } from '../components/HeritageMethodologySec
 import { InteractiveFlashcardDemoSection } from '../components/InteractiveFlashcardDemoSection';
 import { LandingFaqSection } from '../components/LandingFaqSection';
 import { ContactSection } from '../components/ContactSection';
+import { LandingPhotoCredits } from '../components/LandingPhotoCredits';
+import '../landing.css';
 
 interface LandingPageProps {
   onNavigate?: (view: string) => void;
@@ -22,17 +24,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   });
 
   const scrollToSegment = (elementId: string) => {
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
     setActiveSegment(elementId);
     if (elementId === 'hero') {
       window.history.pushState(null, '', window.location.pathname);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior });
       return;
     }
 
     window.history.pushState(null, '', `#${elementId}`);
     const el = document.getElementById(elementId);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+      el.scrollIntoView({ behavior });
     }
   };
 
@@ -69,7 +72,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
   // IntersectionObserver to auto-sync active navbar item as user scrolls
   React.useEffect(() => {
-    const sectionIds = ['hero', 'featured-articles', 'topics', 'ban-do-di-san', 'methodology', 'interactive-demo', 'trusted-community', 'faq', 'contact'];
+    const sectionIds = ['hero', 'featured-articles', 'topics', 'ban-do-di-san', 'methodology', 'flashcard-demo', 'faq', 'contact'];
     const elements = sectionIds
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
@@ -79,12 +82,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+          if (entry.isIntersecting) {
             const id = entry.target.id;
             // Map sub-sections to closest navbar item if needed
             let navTarget = id;
-            if (id === 'methodology' || id === 'interactive-demo' || id === 'flashcard-demo') {
-              navTarget = 'ban-do-di-san';
+            if (id === 'ban-do-di-san' || id === 'flashcard-demo' || id === 'faq') {
+              navTarget = 'methodology';
             }
             setActiveSegment(navTarget);
           }
@@ -92,8 +95,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       },
       {
         root: null,
-        rootMargin: '-10% 0px -50% 0px',
-        threshold: [0.3],
+        rootMargin: '-100px 0px -60% 0px',
+        threshold: 0,
       }
     );
 
@@ -111,7 +114,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
   return (
     <ThemeProvider>
-      <div className="w-full min-h-screen bg-surface text-heritage-green font-sans antialiased selection:bg-sky-mist selection:text-heritage-green transition-colors duration-300">
+      <div className="landing-page w-full min-h-screen font-sans antialiased selection:bg-sky-mist selection:text-heritage-green">
         {/* Site Header */}
         <LandingHeader
           onNavigate={handleNavigate}
@@ -119,51 +122,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           activeSegment={activeSegment}
         />
 
-        <main className="w-full overflow-x-hidden">
-          {/* 1. Hero Banner Section (Full Screen Size with Text Layer Overlay) */}
+        <div className="landing-content w-full overflow-x-hidden">
           <div id="hero">
             <LandingHeroBanner
               onNavigate={handleNavigate}
-              onScrollToDemo={() => scrollToSegment('interactive-demo')}
+              onScrollToDemo={() => scrollToSegment('flashcard-demo')}
             />
           </div>
 
-          {/* 2. Top Articles Section (3D Coverflow Slider with Auto-Advance Every 3 Seconds) */}
           <div id="featured-articles">
             <CoverflowArticlesSection onNavigate={handleNavigate} />
           </div>
 
-          {/* 3. Topics Section (The 4 Core Topics Pillars) */}
           <div id="topics">
             <FourTopicsSection onNavigate={handleNavigate} />
           </div>
 
-          {/* 4. Interactive 34-Province Vietnam Heritage Map & 3-Region Corridor */}
-          <div id="ban-do-di-san">
+          <div>
             <VietnamHeritageMapSection />
           </div>
 
-          {/* 5. 4-Pillars Heritage Methodology */}
           <div id="methodology">
-            <HeritageMethodologySection onNavigate={handleNavigate} />
+            <HeritageMethodologySection onNavigate={handleNavigate} onPreviewFlashcards={() => scrollToSegment('flashcard-demo')} />
           </div>
 
-          {/* 7. Interactive Flashcard & Spaced Repetition Preview */}
-          <div id="flashcard-demo">
+          <div>
             <InteractiveFlashcardDemoSection onNavigate={handleNavigate} />
           </div>
 
-          {/* 8. Frequently Asked Questions Section */}
-          <div id="faq">
+          <div>
             <LandingFaqSection />
           </div>
 
-          {/* 10. Contact Section */}
-          <div id="contact">
+          <div>
             <ContactSection />
           </div>
 
-        </main>
+        </div>
+        <LandingPhotoCredits />
       </div>
     </ThemeProvider>
   );
