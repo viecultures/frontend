@@ -32,3 +32,4 @@ dist-ssr
 .env
 docs
 MEMORY.md
+.agents

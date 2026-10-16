@@ -73,6 +73,7 @@ export type RewardActionType =
   | 'DAILY_CHECKIN';
 
 export interface BonusContext {
+  rewardKey?: string;
   isPerfect?: boolean;
   cardCount?: number;
   customCoins?: number;
@@ -93,6 +94,7 @@ export interface GamificationStats {
   equippedTitle: string;
   inventory: string[];
   completedMissions: Record<string, boolean>;
+  rewardedActivities?: Record<string, boolean>;
 }
 
 export interface Mission {

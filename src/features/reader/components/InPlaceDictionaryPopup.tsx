@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { SavedVocabularyContext } from '../hooks/useSavedVocabulary';
 import { createPortal } from "react-dom";
 import { Volume2, Bookmark, Check, X, Sparkles, BookOpen, ShieldAlert } from "lucide-react";
 import type { VocabItem } from "@/data/readerData";
@@ -19,7 +20,9 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
   onClose,
   themeMode = "paper",
 }) => {
-  const [isSaved, setIsSaved] = useState(false);
+  const [legacySaved, setIsSaved] = useState(false);
+  const savedVocabulary = useContext(SavedVocabularyContext);
+  const isSaved = savedVocabulary ? savedVocabulary.words.some(word => word.id === vocab?.id || word.word.toLowerCase() === vocab?.word.toLowerCase()) : legacySaved;
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
   const isLight = themeMode === "paper";
@@ -73,6 +76,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
   const handleToggleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (vocab.isProfane) return;
+    if (savedVocabulary) { savedVocabulary.toggle(vocab); return; }
     try {
       const saved: VocabItem[] = JSON.parse(localStorage.getItem("vie_saved_vocab") || "[]");
       if (isSaved) {

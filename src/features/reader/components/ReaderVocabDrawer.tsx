@@ -12,6 +12,7 @@ interface ReaderVocabDrawerProps {
   onToggleBookmarkWord: (wordId: string) => void;
   deckId?: string;
   selectedLevel?: string;
+  articleTitle?: string;
 }
 
 export function ReaderVocabDrawer({
@@ -24,6 +25,7 @@ export function ReaderVocabDrawer({
   onToggleBookmarkWord,
   deckId,
   selectedLevel = 'Level 2',
+  articleTitle = 'Tết: Renewal, Remembrance and Regional Flavours',
 }: ReaderVocabDrawerProps) {
   if (!isOpen) return null;
 
@@ -45,7 +47,7 @@ export function ReaderVocabDrawer({
                 Từ Vựng Bài Đọc
               </h3>
               <span className="text-xs text-[#6E7E79]">
-                "Tết: Renewal, Remembrance and Regional Flavours"
+                {articleTitle}
               </span>
             </div>
             <button
@@ -128,6 +130,10 @@ export function ReaderVocabDrawer({
 
         {/* Drawer Footer Actions */}
         <div className="pt-4 border-t border-[rgba(30,75,67,0.12)] space-y-2 mt-6">
+          {Object.values(bookmarkedWords).some(Boolean) && <Link
+            href={`/flashcard-study?deck=${encodeURIComponent(deckId || 'tet-holiday')}&level=${encodeURIComponent(selectedLevel)}&saved=1`}
+            className="block py-3 text-center font-bold text-heritage-green"
+          >Ôn những từ đã lưu</Link>}
           <Link
             href={`/flashcard-study?deck=${encodeURIComponent(deckId || 'tet-holiday')}&level=${encodeURIComponent(selectedLevel)}`}
             className="w-full py-3 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] flex items-center justify-center gap-2 shadow-sm border border-[#D9B76A]/50 transition-all"

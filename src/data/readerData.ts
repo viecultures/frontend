@@ -298,7 +298,7 @@ export interface RecommendedArticle {
 
 export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   {
-    id: "banh-mi",
+    id: "saigon-banh-mi",
     category: "Cuisine",
     level: "Level 2",
     title: "The Story of Saigon Bánh Mì",
@@ -308,7 +308,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
     link: "/reader",
   },
   {
-    id: "hoi-an",
+    id: "hoi-an-lanterns",
     category: "Heritage",
     level: "Level 2",
     title: "Hội An Lantern Festival Traditions",
@@ -318,7 +318,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
     link: "/reader",
   },
   {
-    id: "bat-trang",
+    id: "bat-trang-pottery",
     category: "Crafts",
     level: "Level 2",
     title: "Bát Tràng Pottery & Ceramic Arts",

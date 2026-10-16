@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Link from "@/components/Link";
-import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight, RefreshCw, Sparkles, Award } from "lucide-react";
-import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
+
+import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight, RefreshCw, Sparkles } from "lucide-react";
+import { READER_QUIZ_QUESTIONS, VOCAB_DATABASE } from "@/data/readerData";
+
 import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
 import { ReaderDictationSection } from "./ReaderDictationSection";
 import { ReaderQuickFlashcards } from "./ReaderQuickFlashcards";
@@ -195,11 +197,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
         >
           <div>
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
-              <span className={`text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-md border ${
-                isDark
-                  ? "text-[#D9B76A] bg-[#D9B76A]/10 border-[#D9B76A]/30"
-                  : "text-[#1E4B43] bg-[#1E4B43]/10 border-[#1E4B43]/20"
-              }`}>
+              <span className={`text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-md border ${isDark
+                ? "text-[#D9B76A] bg-[#D9B76A]/10 border-[#D9B76A]/30"
+                : "text-[#1E4B43] bg-[#1E4B43]/10 border-[#1E4B43]/20"
+                }`}>
                 ENGLISH ORIGINAL (BILINGUAL PARALLEL)
               </span>
               <span className="text-xs font-bold bg-[#1E4B43] text-[#FBF7EE] px-2.5 py-0.5 rounded">
@@ -241,7 +242,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               <div className="absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-white">
                 <div>
                   <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
-                    {articleData?.topicGroup || "Vietnamese Lunar New Year"}
+                    {articleData?.topic || "Vietnamese Lunar New Year"}
                   </span>
                   <h3 className="font-sans text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
                     {articleData?.titleEn || "Tết Nguyên Đán Heritage"}
@@ -474,7 +475,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               <div className="absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-white">
                 <div>
                   <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
-                    {articleData?.topicGroup || "Phong Tục & Ẩm Thực"}
+                    {articleData?.topic || "Phong Tục & Ẩm Thực"}
                   </span>
                   <h3 className="font-sans text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
                     {articleData?.titleVi || "Phong Vị Tết Cổ Truyền"}
@@ -532,106 +533,108 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
       >
         {/* Left 7 Cols: Quiz Section */}
         <div className="lg:col-span-7 pr-0 lg:pr-8 lg:border-r border-[rgba(217,183,106,0.2)]">
-          <div className="mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
-              Reading Check & Comprehension
-            </span>
-            <h2
-              className={`font-serif text-2xl font-bold mt-1 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-                }`}
-            >
-              Câu Hỏi Kiểm Tra Thấu Hiểu Bài Đọc
-            </h2>
-          </div>
-
-          {/* Quiz Q1 */}
-          <div className="mb-8">
-            <h3
-              className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-                }`}
-            >
-              {READER_QUIZ_QUESTIONS[0]?.question}
-            </h3>
-
-            <div className="space-y-2.5">
-              {READER_QUIZ_QUESTIONS[0]?.options.map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === opt.value
-                    ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                    : themeMode === "dark"
-                      ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
-                      : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                    }`}
-                >
-                  <input
-                    type="radio"
-                    name="q1"
-                    value={opt.value}
-                    checked={q1Answer === opt.value}
-                    onChange={() => setQ1Answer(opt.value)}
-                    className="mt-1 accent-[#D9B76A]"
-                  />
-                  <span className="text-xs sm:text-sm">{opt.label}</span>
-                </label>
-              ))}
+          {!articleData ? <>
+            <div className="mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
+                Reading Check & Comprehension
+              </span>
+              <h2
+                className={`font-serif text-2xl font-bold mt-1 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                  }`}
+              >
+                Câu Hỏi Kiểm Tra Thấu Hiểu Bài Đọc
+              </h2>
             </div>
-          </div>
 
-          {/* Quiz Q2 */}
-          <div className="mb-8">
-            <h3
-              className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-                }`}
-            >
-              {READER_QUIZ_QUESTIONS[1]?.question}
-            </h3>
+            {/* Quiz Q1 */}
+            <div className="mb-8">
+              <h3
+                className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                  }`}
+              >
+                {READER_QUIZ_QUESTIONS[0]?.question}
+              </h3>
 
-            <div className="space-y-2.5">
-              {READER_QUIZ_QUESTIONS[1]?.options.map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q2Answer === opt.value
-                    ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                    : themeMode === "dark"
-                      ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
-                      : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                    }`}
-                >
-                  <input
-                    type="radio"
-                    name="q2"
-                    value={opt.value}
-                    checked={q2Answer === opt.value}
-                    onChange={() => setQ2Answer(opt.value)}
-                    className="mt-1 accent-[#D9B76A]"
-                  />
-                  <span className="text-xs sm:text-sm">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Submit Quiz Action */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setQuizSubmitted(true)}
-              className="px-6 py-3 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] shadow-sm transition-all border border-[#D9B76A] cursor-pointer"
-            >
-              Kiểm Tra Đáp Án
-            </button>
-            {quizSubmitted && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ECFDF5] text-[#047857] text-xs font-bold border border-[#059669]/30">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>
-                  {q1Answer === READER_QUIZ_QUESTIONS[0]?.correctValue &&
-                    q2Answer === READER_QUIZ_QUESTIONS[1]?.correctValue
-                    ? "Chính xác! Bạn đạt 2/2 câu hỏi thấu hiểu."
-                    : "Bạn đã hoàn thành bài kiểm tra thấu hiểu."}
-                </span>
+              <div className="space-y-2.5">
+                {READER_QUIZ_QUESTIONS[0]?.options.map((opt) => (
+                  <label
+                    key={opt.value}
+                    className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === opt.value
+                      ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
+                      : themeMode === "dark"
+                        ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
+                        : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
+                      }`}
+                  >
+                    <input
+                      type="radio"
+                      name="q1"
+                      value={opt.value}
+                      checked={q1Answer === opt.value}
+                      onChange={() => setQ1Answer(opt.value)}
+                      className="mt-1 accent-[#D9B76A]"
+                    />
+                    <span className="text-xs sm:text-sm">{opt.label}</span>
+                  </label>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+
+            {/* Quiz Q2 */}
+            <div className="mb-8">
+              <h3
+                className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                  }`}
+              >
+                {READER_QUIZ_QUESTIONS[1]?.question}
+              </h3>
+
+              <div className="space-y-2.5">
+                {READER_QUIZ_QUESTIONS[1]?.options.map((opt) => (
+                  <label
+                    key={opt.value}
+                    className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q2Answer === opt.value
+                      ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
+                      : themeMode === "dark"
+                        ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
+                        : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
+                      }`}
+                  >
+                    <input
+                      type="radio"
+                      name="q2"
+                      value={opt.value}
+                      checked={q2Answer === opt.value}
+                      onChange={() => setQ2Answer(opt.value)}
+                      className="mt-1 accent-[#D9B76A]"
+                    />
+                    <span className="text-xs sm:text-sm">{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Quiz Action */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setQuizSubmitted(true)}
+                className="px-6 py-3 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] shadow-sm transition-all border border-[#D9B76A] cursor-pointer"
+              >
+                Kiểm Tra Đáp Án
+              </button>
+              {quizSubmitted && (
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ECFDF5] text-[#047857] text-xs font-bold border border-[#059669]/30">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>
+                    {q1Answer === READER_QUIZ_QUESTIONS[0]?.correctValue &&
+                      q2Answer === READER_QUIZ_QUESTIONS[1]?.correctValue
+                      ? "Chính xác! Bạn đạt 2/2 câu hỏi thấu hiểu."
+                      : "Bạn đã hoàn thành bài kiểm tra thấu hiểu."}
+                  </span>
+                </div>
+              )}
+            </div>
+          </> : <p role="status">Bài này chưa có câu hỏi đọc hiểu được biên tập. Bạn có thể tiếp tục ôn từ vựng của bài.</p>}
         </div>
 
         {/* Right 5 Cols: Practice Next Steps */}
@@ -660,11 +663,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 onClick={() => {
                   document.getElementById("reader-dictation")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer group ${
-                  themeMode === "dark"
-                    ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
-                    : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
-                }`}
+                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer group ${themeMode === "dark"
+                  ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
+                  : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                  }`}
               >
                 <span className="flex items-center gap-2">
                   <Headphones className="w-4 h-4 text-[#D9B76A]" />
@@ -679,11 +681,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 onClick={() => {
                   document.getElementById("reader-flashcards")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer group ${
-                  themeMode === "dark"
-                    ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
-                    : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
-                }`}
+                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer group ${themeMode === "dark"
+                  ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
+                  : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                  }`}
               >
                 <span className="flex items-center gap-2">
                   <Layers className="w-4 h-4 text-[#D9B76A]" />
@@ -698,8 +699,9 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 className="flex items-center justify-between px-5 py-3.5 rounded-2xl bg-[#1E4B43] text-[#FBF7EE] text-xs font-bold shadow-sm hover:bg-[#163D37] border border-[#D9B76A]/50 transition-all group"
               >
                 <span className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#D9B76A]" />
-                  Phòng Học Thẻ Toàn Diện ({articleData?.vocabularies?.length || 8} từ bài đọc)
+                  <Layers className="w-4 h-4 text-[#D9B76A]" />
+                  Ôn Tập Flashcards ({articleData ? articleData.vocabularies.length : Object.keys(VOCAB_DATABASE).length} từ bài đọc)
+
                 </span>
                 <ArrowRight className="w-4 h-4 text-[#D9B76A] group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -707,11 +709,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               {/* Community Reflection Link */}
               <Link
                 href="/community"
-                className={`flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all group ${
-                  themeMode === "dark"
-                    ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
-                    : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
-                }`}
+                className={`flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all group ${themeMode === "dark"
+                  ? "bg-[#18211E] text-[#FBF7EE] border-[#D9B76A]/20 hover:bg-[#232F2B]"
+                  : "bg-[#F6EEDC] text-[#1E4B43] border-[rgba(30,75,67,0.12)] hover:bg-[#E8DFCB]"
+                  }`}
               >
                 <span className="flex items-center gap-2">
                   <PenTool className="w-4 h-4 text-[#D9B76A]" />

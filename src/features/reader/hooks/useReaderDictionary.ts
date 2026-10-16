@@ -147,7 +147,7 @@ export function useReaderDictionary(customVocabMap?: Record<string, VocabItem> |
         position,
       });
     }
-  }, []);
+  }, [customVocabMap]);
 
   return {
     popupState,

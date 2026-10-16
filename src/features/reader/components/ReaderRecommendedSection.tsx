@@ -19,20 +19,18 @@ export function ReaderRecommendedSection({
             Continue Reading
           </span>
           <h3
-            className={`font-serif text-xl font-bold mt-0.5 ${
-              themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-            }`}
+            className={`font-serif text-xl font-bold mt-0.5 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+              }`}
           >
             Bài Đọc Đề Xuất Tiếp Theo
           </h3>
         </div>
         <Link
           href="/discovery"
-          className={`text-xs font-bold inline-flex items-center gap-1 transition-colors ${
-            themeMode === "dark"
+          className={`text-xs font-bold inline-flex items-center gap-1 transition-colors ${themeMode === "dark"
               ? "text-[#D9B76A] hover:text-white"
               : "text-[#1E4B43] hover:text-[#D9B76A]"
-          }`}
+            }`}
         >
           <span>Xem tất cả bài đọc</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -43,21 +41,20 @@ export function ReaderRecommendedSection({
         {articles.map((article) => (
           <Link
             key={article.id}
-            href={`/reader?story=${article.id}`}
-            className={`group p-5 rounded-2xl border transition-all flex flex-col justify-between ${
-              themeMode === "dark"
+
+            href={`/bilingual-reader?story=${encodeURIComponent(article.id)}&level=${encodeURIComponent(article.level)}`}
+            className={`group p-5 rounded-2xl border transition-all flex flex-col justify-between ${themeMode === "dark"
                 ? "bg-[#1E2925] border-[#D9B76A]/30 text-[#FBF7EE] shadow-md hover:border-[#D9B76A]"
                 : "bg-[#FBF7EE] border-[rgba(30,75,67,0.12)] text-[#3F5550] shadow-sm hover:shadow-md"
-            }`}
+              }`}
           >
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E4B43] bg-[#F6EEDC] px-2.5 py-1 rounded">
                 {article.category} • {article.level}
               </span>
               <h4
-                className={`font-serif text-base font-bold mt-3 group-hover:text-[#D9B76A] transition-colors ${
-                  themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-                }`}
+                className={`font-serif text-base font-bold mt-3 group-hover:text-[#D9B76A] transition-colors ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                  }`}
               >
                 {article.title}
               </h4>

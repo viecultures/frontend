@@ -3,6 +3,7 @@ import { Play, Pause, Volume2, VolumeX, Mic, Repeat, Gauge, RotateCcw, Sparkles,
 import { Button } from "@/components/ui/button";
 
 interface AudioShadowingBarProps {
+  articleTitle?: string;
   isPlaying: boolean;
   onTogglePlay: () => void;
   playbackSpeed: number;
@@ -29,6 +30,7 @@ interface AudioShadowingBarProps {
 }
 
 export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
+  articleTitle = 'Tết: Renewal',
   isPlaying,
   onTogglePlay,
   playbackSpeed,
@@ -143,7 +145,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
               <h4 className={`text-xs font-bold truncate leading-tight ${
                 isDark ? "text-[#FBF7EE]" : "text-[#1E4B43]"
               }`}>
-                Tết: Renewal
+                {articleTitle}
               </h4>
               <span className={`text-[10px] px-1.5 py-0.2 rounded font-semibold ${
                 audioScope === "full"
