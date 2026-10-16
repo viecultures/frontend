@@ -343,7 +343,7 @@ export const DECK_WORDS: Record<string, DeckData> = {
 /**
  * Resolve Lesson metadata for any deckId (supporting lessons, landmarks, and tet-holiday)
  */
-export function resolveLessonForDeck(deckId: string): Lesson {
+export function resolveLessonForDeck(deckId: string): Lesson | null {
   const normalize = (s: string) => s.toLowerCase().trim().replace(/[-_\s]+/g, '');
   const normTarget = normalize(deckId || 'imperial-hue');
 
@@ -410,7 +410,7 @@ export function resolveLessonForDeck(deckId: string): Lesson {
     };
   }
 
-  return LESSONS_DATA[0];
+  return null;
 }
 
 /**
@@ -427,59 +427,26 @@ export function resolveDeckCards(deckId: string): Flashcard[] {
     }
   }
 
-  // Match in VOCAB_DATABASE if tet
   if (normTarget === 'tetholiday' || normTarget === 'tetfestivities') {
-    return Object.values(VOCAB_DATABASE).slice(0, 5).map((v, i) => ({
-      id: `tet-card-${i}`,
-      word: v.word,
-      pos: v.pos,
-      ipa: v.ipa,
-      contextEn: v.contextSentence,
-      viMeaning: v.viMeaning,
-      viDefinition: v.enDefinition || v.viMeaning,
-      options: [v.viMeaning, 'Văn hóa ẩm thực', 'Lễ hội truyền thống', 'Phong cảnh thiên nhiên'],
-      correctIndex: 0,
+    return Object.values(VOCAB_DATABASE).map(v => ({
+      id: v.id, word: v.word, pos: v.pos, ipa: v.ipa, contextEn: v.contextSentence,
+      viMeaning: v.viMeaning, viDefinition: v.enDefinition || v.viMeaning,
     }));
   }
 
-  // Fallback to getDeckCards on resolved lesson
-  const lesson = resolveLessonForDeck(deckId);
-  return getDeckCards(lesson);
+  const landmark = VIETNAM_LANDMARKS.find(item => normalize(item.id) === normTarget);
+  if (landmark) {
+    return landmark.bilingualTerms.map((term, index) => ({
+      id: `${landmark.id}-term-${index}`, word: term.en, pos: 'phrase', ipa: '',
+      contextEn: landmark.excerptEn, viMeaning: term.vi, viDefinition: term.vi,
+    }));
+  }
+  return [];
 }
 
 export const getDeckData = (lesson: Lesson): DeckData => {
-  if (DECK_WORDS[lesson.id]) {
-    return DECK_WORDS[lesson.id];
-  }
-  return {
-    words: [lesson.id.split("-")[0], "heritage", "tradition", "culture"],
-    cards: [
-      {
-        id: `${lesson.id}-1`,
-        word: lesson.id.replace(/-/g, " "),
-        pos: "noun/concept",
-        ipa: "/ˈher.ɪ.t̬ɪdʒ/",
-        contextEn: lesson.summary,
-        viMeaning: lesson.vietnameseTitle,
-        viDefinition: `Chủ đề từ vựng di sản văn hóa: ${lesson.vietnameseTitle}`,
-        options: [lesson.vietnameseTitle, "Văn hóa ẩm thực", "Nghệ thuật dân gian", "Kiến trúc cổ"],
-        correctIndex: 0,
-      },
-      {
-        id: `${lesson.id}-2`,
-        word: "heritage",
-        pos: "noun",
-        ipa: "/ˈher.ɪ.t̬ɪdʒ/",
-        contextEn: "Preserving intangible heritage is vital for cultural identity.",
-        viMeaning: "Di sản văn hóa",
-        viDefinition: "Giá trị văn hóa quý báu kế thừa từ thế hệ trước.",
-        options: ["Di sản văn hóa", "Phát triển đô thị", "Thương mại dịch vụ", "Giao thông công cộng"],
-        correctIndex: 0,
-      },
-    ],
-  };
+  const cards = resolveDeckCards(lesson.id);
+  return { cards, words: cards.map(card => card.word) };
 };
 
-export const getDeckCards = (lesson: Lesson): Flashcard[] => {
-  return getDeckData(lesson).cards;
-};
+export const getDeckCards = (lesson: Lesson): Flashcard[] => getDeckData(lesson).cards;

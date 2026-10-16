@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import type {
   Level,
   RewardActionType,
@@ -9,6 +9,8 @@ import type {
   HeritageShopItem,
   RewardCelebrationPayload,
 } from '@/types';
+
+import { applyCompletionReward, completionRewardKey } from '@/features/learning/lib/rewardLedger';
 
 // ─── Constants & Configuration ──────────────────────────────────────────────────
 export const LEVEL_CONFIG = {
@@ -174,6 +176,7 @@ const DEFAULT_GAMIFICATION_STATS: GamificationStats = {
   equippedTitle: 'Người Kể Chuyện Văn Hóa',
   inventory: ['ai-audio'],
   completedMissions: {},
+  rewardedActivities: {},
 };
 
 // ─── Context Interface ─────────────────────────────────────────────────────────
@@ -200,7 +203,7 @@ interface GamificationContextType {
   openMissions: () => void;
   closeMissions: () => void;
   toggleMissions: () => void;
-  earnReward: (action: RewardActionType, context?: BonusContext) => RewardCelebrationPayload;
+  earnReward: (action: RewardActionType, context?: BonusContext) => Promise<RewardCelebrationPayload>;
   spendCoins: (amount: number, itemId: string, itemName?: string) => boolean;
   claimMissionReward: (missionId: string) => void;
   equipItem: (itemId: string) => void;
@@ -213,7 +216,7 @@ const GamificationContext = createContext<GamificationContextType | undefined>(u
 const LOCAL_STORAGE_KEY = 'viecultures_gamification_v1';
 
 export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [stats, setStats] = useState<GamificationStats>(() => {
+  const [stats, setStatsState] = useState<GamificationStats>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
@@ -234,14 +237,29 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [activeCelebration, setActiveCelebration] = useState<RewardCelebrationPayload | null>(null);
   const [isMissionsOpen, setIsMissionsOpen] = useState(false);
 
-  // Sync to localStorage
+  const statsRef = useRef(stats);
+  const setStats = useCallback((update: React.SetStateAction<GamificationStats>) => {
+    const next = typeof update === 'function' ? update(statsRef.current) : update;
+    statsRef.current = next;
+    setStatsState(next);
+    try { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(next)); }
+    catch (error) { console.error('Failed to save gamification', error); }
+  }, []);
+
   useEffect(() => {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stats));
-    } catch (e) {
-      console.error('Failed to save gamification stats to localStorage', e);
-    }
-  }, [stats]);
+    const sync = (event: StorageEvent) => {
+      if (event.key !== LOCAL_STORAGE_KEY || !event.newValue) return;
+      try {
+        const saved = JSON.parse(event.newValue);
+        if (!Number.isFinite(saved.xp) || !Number.isFinite(saved.coins)) return;
+        const next = { ...DEFAULT_GAMIFICATION_STATS, ...saved, level: getLevelFromXP(saved.xp) };
+        statsRef.current = next;
+        setStatsState(next);
+      } catch { /* Ignore invalid external storage updates. */ }
+    };
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, []);
 
   // Streak Multiplier
   const streakMultiplier = useMemo(() => getStreakMultiplier(stats.streakDays), [stats.streakDays]);
@@ -389,137 +407,156 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Core Earn Reward function
   const earnReward = useCallback(
-    (action: RewardActionType, context?: BonusContext): RewardCelebrationPayload => {
-      let baseCoins = 0;
-      let baseXP = 0;
-      let title = 'Phần Thưởng Học Tập!';
-      let subtitle = 'Bạn đã nỗ lực hoàn thành bài học di sản hôm nay.';
-      let bonusReason = '';
-      let isPerfectBonus = false;
-
-      switch (action) {
-        case 'READER_ARTICLE_COMPLETED':
-          baseCoins = 30;
-          baseXP = 50;
-          title = 'Hoàn Thành Bài Đọc Di Sản!';
-          subtitle = 'Bạn đã tiếp thu những góc nhìn văn hóa sâu sắc.';
-          break;
-
-        case 'READER_QUIZ_COMPLETED':
-          baseCoins = 40;
-          baseXP = 60;
-          if (context?.isPerfect) {
-            isPerfectBonus = true;
-            baseCoins = Math.round(baseCoins * 1.5);
-            baseXP = Math.round(baseXP * 1.5);
-            title = 'Điểm Tuyệt Đối 100% Reading Quiz!';
-            subtitle = 'Xuất sắc! Bạn đã thấu hiểu trọn vẹn từng chi tiết bài học.';
-            bonusReason = 'Thưởng thấu hiểu xuất sắc (+50% Xu & XP)';
-          } else {
-            title = 'Hoàn Thành Reading Quiz!';
-            subtitle = 'Kiểm tra độ thấu hiểu bài đọc thành công.';
+    async (action: RewardActionType, context?: BonusContext): Promise<RewardCelebrationPayload> => {
+      const grant = (): RewardCelebrationPayload => {
+        const noReward: RewardCelebrationPayload = { title: 'Đã ghi nhận', subtitle: 'Bạn đã nhận thưởng hoàn thành bộ từ của bài này.', coinsEarned: 0, xpEarned: 0 };
+        try {
+          const saved = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || 'null');
+          if (saved && Number.isFinite(saved.xp) && Number.isFinite(saved.coins)) {
+            statsRef.current = { ...DEFAULT_GAMIFICATION_STATS, ...saved };
           }
-          break;
+        } catch { /* Keep current in-memory stats. */ }
+        const currentStats = statsRef.current;
+        const claimKey = action === 'FLASHCARD_DECK_COMPLETED' && context?.rewardKey ? completionRewardKey(context.rewardKey) : '';
+        if (action === 'FLASHCARD_DECK_COMPLETED' && (!claimKey || !context?.cardCount || currentStats.rewardedActivities?.[claimKey])) return noReward;
+        let baseCoins = 0;
+        let baseXP = 0;
+        let title = 'Phần Thưởng Học Tập!';
+        let subtitle = 'Bạn đã nỗ lực hoàn thành bài học di sản hôm nay.';
+        let bonusReason = '';
+        let isPerfectBonus = false;
 
-        case 'FLASHCARD_DECK_COMPLETED':
-          baseCoins = 25;
-          baseXP = 40;
-          title = 'Thuần Thục Bộ Thẻ Flashcard!';
-          subtitle = `Đã ôn luyện toàn diện ${context?.cardCount || 10} từ vựng Spaced Repetition.`;
-          break;
+        switch (action) {
+          case 'READER_ARTICLE_COMPLETED':
+            baseCoins = 30;
+            baseXP = 50;
+            title = 'Hoàn Thành Bài Đọc Di Sản!';
+            subtitle = 'Bạn đã tiếp thu những góc nhìn văn hóa sâu sắc.';
+            break;
 
-        case 'FLASHCARD_WORD_MASTERED':
-          baseCoins = 5;
-          baseXP = 10;
-          title = 'Từ Vựng Đã Thuần Thục!';
-          subtitle = 'Thêm 1 từ vựng di sản được ghi nhớ bền vững.';
-          break;
+          case 'READER_QUIZ_COMPLETED':
+            baseCoins = 40;
+            baseXP = 60;
+            if (context?.isPerfect) {
+              isPerfectBonus = true;
+              baseCoins = Math.round(baseCoins * 1.5);
+              baseXP = Math.round(baseXP * 1.5);
+              title = 'Điểm Tuyệt Đối 100% Reading Quiz!';
+              subtitle = 'Xuất sắc! Bạn đã thấu hiểu trọn vẹn từng chi tiết bài học.';
+              bonusReason = 'Thưởng thấu hiểu xuất sắc (+50% Xu & XP)';
+            } else {
+              title = 'Hoàn Thành Reading Quiz!';
+              subtitle = 'Kiểm tra độ thấu hiểu bài đọc thành công.';
+            }
+            break;
 
-        case 'SHADOWING_PRACTICE':
-          baseCoins = 15;
-          baseXP = 25;
-          title = 'Luyện Phát Âm Bản Xứ!';
-          subtitle = 'Cải thiện ngữ điệu và phát âm tự nhiên.';
-          break;
+          case 'FLASHCARD_DECK_COMPLETED':
+            baseCoins = 25;
+            baseXP = 40;
+            title = 'Thuần Thục Bộ Thẻ Flashcard!';
+            subtitle = `Đã ôn luyện toàn diện ${context?.cardCount || 10} từ vựng Spaced Repetition.`;
+            break;
 
-        case 'COMMUNITY_POST_SUBMITTED':
-          baseCoins = 100;
-          baseXP = 150;
-          title = 'Đăng Bài Dự Thi Thành Công!';
-          subtitle = 'Góc nhìn văn hóa của bạn đã được lan tỏa đến toàn thể học viên.';
-          break;
+          case 'FLASHCARD_WORD_MASTERED':
+            baseCoins = 5;
+            baseXP = 10;
+            title = 'Từ Vựng Đã Thuần Thục!';
+            subtitle = 'Thêm 1 từ vựng di sản được ghi nhớ bền vững.';
+            break;
 
-        case 'COMMUNITY_VOTE':
-          baseCoins = 5;
-          baseXP = 10;
-          title = 'Tương Tác Cộng Đồng!';
-          subtitle = 'Đã bình chọn và động viên bài viết bạn học.';
-          break;
+          case 'SHADOWING_PRACTICE':
+            baseCoins = 15;
+            baseXP = 25;
+            title = 'Luyện Phát Âm Bản Xứ!';
+            subtitle = 'Cải thiện ngữ điệu và phát âm tự nhiên.';
+            break;
 
-        case 'DAILY_TASK_COMPLETED':
-          baseCoins = context?.customCoins || 15;
-          baseXP = context?.customXP || 25;
-          title = context?.title || 'Hoàn Thành Mục Tiêu!';
-          subtitle = context?.description || 'Tiến thêm một bước trên hành trình trở thành Sứ Giả Văn Hóa.';
-          break;
+          case 'COMMUNITY_POST_SUBMITTED':
+            baseCoins = 100;
+            baseXP = 150;
+            title = 'Đăng Bài Dự Thi Thành Công!';
+            subtitle = 'Góc nhìn văn hóa của bạn đã được lan tỏa đến toàn thể học viên.';
+            break;
 
-        case 'DAILY_CHECKIN':
-          baseCoins = 20;
-          baseXP = 30;
-          title = 'Điểm Danh Ngày Mới!';
-          subtitle = `Duy trì chuỗi học liên tiếp ${stats.streakDays + 1} ngày!`;
-          break;
-      }
+          case 'COMMUNITY_VOTE':
+            baseCoins = 5;
+            baseXP = 10;
+            title = 'Tương Tác Cộng Đồng!';
+            subtitle = 'Đã bình chọn và động viên bài viết bạn học.';
+            break;
 
-      // Apply streak multiplier to XP
-      const finalXP = Math.round(baseXP * streakMultiplier);
-      const finalCoins = baseCoins;
+          case 'DAILY_TASK_COMPLETED':
+            baseCoins = context?.customCoins || 15;
+            baseXP = context?.customXP || 25;
+            title = context?.title || 'Hoàn Thành Mục Tiêu!';
+            subtitle = context?.description || 'Tiến thêm một bước trên hành trình trở thành Sứ Giả Văn Hóa.';
+            break;
 
-      const previousLevel = getLevelFromXP(stats.xp);
-      const nextXP = stats.xp + finalXP;
-      const nextLevel = getLevelFromXP(nextXP);
-      const isLevelUp = nextLevel !== previousLevel;
+          case 'DAILY_CHECKIN':
+            baseCoins = 20;
+            baseXP = 30;
+            title = 'Điểm Danh Ngày Mới!';
+            subtitle = `Duy trì chuỗi học liên tiếp ${currentStats.streakDays + 1} ngày!`;
+            break;
+        }
 
-      // Check for unlockable badges
-      const newBadges = [...stats.unlockedBadges];
-      let newlyUnlockedBadge: HeritageBadge | undefined;
+        // Apply streak multiplier to XP
+        const finalXP = Math.round(baseXP * getStreakMultiplier(currentStats.streakDays));
+        const finalCoins = baseCoins;
 
-      if (action === 'READER_QUIZ_COMPLETED' && context?.isPerfect && !newBadges.includes('quiz_master')) {
-        newBadges.push('quiz_master');
-        newlyUnlockedBadge = INITIAL_HERITAGE_BADGES.find((b) => b.id === 'quiz_master');
-      }
-      if (isLevelUp && nextLevel === 'Level 3' && !newBadges.includes('ambassador_elite')) {
-        newBadges.push('ambassador_elite');
-        newlyUnlockedBadge = INITIAL_HERITAGE_BADGES.find((b) => b.id === 'ambassador_elite');
-      }
+        const previousLevel = getLevelFromXP(currentStats.xp);
+        const nextXP = currentStats.xp + finalXP;
+        const nextLevel = getLevelFromXP(nextXP);
+        const isLevelUp = nextLevel !== previousLevel;
 
-      // Update state
-      setStats((prev: GamificationStats) => ({
-        ...prev,
-        coins: prev.coins + finalCoins,
-        xp: nextXP,
-        level: nextLevel,
-        unlockedBadges: newBadges,
-      }));
+        // Check for unlockable badges
+        const newBadges = [...currentStats.unlockedBadges];
+        let newlyUnlockedBadge: HeritageBadge | undefined;
 
-      const payload: RewardCelebrationPayload = {
-        title,
-        subtitle,
-        coinsEarned: finalCoins,
-        xpEarned: finalXP,
-        bonusMultiplier: streakMultiplier > 1 ? streakMultiplier : undefined,
-        bonusReason: bonusReason || (streakMultiplier > 1 ? `Chuỗi ${stats.streakDays} ngày liên tục (+${Math.round((streakMultiplier - 1) * 100)}% XP)` : undefined),
-        isLevelUp,
-        newLevel: isLevelUp ? nextLevel : undefined,
-        unlockedBadge: newlyUnlockedBadge,
+        if (action === 'READER_QUIZ_COMPLETED' && context?.isPerfect && !newBadges.includes('quiz_master')) {
+          newBadges.push('quiz_master');
+          newlyUnlockedBadge = INITIAL_HERITAGE_BADGES.find((b) => b.id === 'quiz_master');
+        }
+        if (isLevelUp && nextLevel === 'Level 3' && !newBadges.includes('ambassador_elite')) {
+          newBadges.push('ambassador_elite');
+          newlyUnlockedBadge = INITIAL_HERITAGE_BADGES.find((b) => b.id === 'ambassador_elite');
+        }
+
+        const nextStats = claimKey
+          ? applyCompletionReward(currentStats, claimKey, finalXP, finalCoins)
+          : { ...currentStats, coins: currentStats.coins + finalCoins, xp: nextXP };
+        if (!nextStats) return noReward;
+        const updated = { ...nextStats, level: nextLevel, unlockedBadges: newBadges };
+        // Persist balance and receipt together before showing success; failed storage never grants a replayable reward.
+        if (claimKey) {
+          try { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated)); }
+          catch { return { ...noReward, subtitle: 'Chưa lưu được thưởng. Kiểm tra quyền hoặc dung lượng lưu trữ, rồi mở lại tổng kết.' }; }
+        }
+        setStats(updated);
+
+        const payload: RewardCelebrationPayload = {
+          title,
+          subtitle,
+          coinsEarned: finalCoins,
+          xpEarned: finalXP,
+          bonusMultiplier: getStreakMultiplier(currentStats.streakDays) > 1 ? getStreakMultiplier(currentStats.streakDays) : undefined,
+          bonusReason: bonusReason || (getStreakMultiplier(currentStats.streakDays) > 1 ? `Chuỗi ${currentStats.streakDays} ngày liên tục (+${Math.round((getStreakMultiplier(currentStats.streakDays) - 1) * 100)}% XP)` : undefined),
+          isLevelUp,
+          newLevel: isLevelUp ? nextLevel : undefined,
+          unlockedBadge: newlyUnlockedBadge,
+        };
+
+        // Set active celebration modal
+        setActiveCelebration(payload);
+
+        return payload;
       };
-
-      // Set active celebration modal
-      setActiveCelebration(payload);
-
-      return payload;
+      if (action === 'FLASHCARD_DECK_COMPLETED' && navigator.locks) {
+        return navigator.locks.request(LOCAL_STORAGE_KEY + ':reward', grant);
+      }
+      return grant();
     },
-    [stats.xp, stats.streakDays, stats.unlockedBadges, streakMultiplier]
+    [setStats]
   );
 
   // Spend Coins for Shop

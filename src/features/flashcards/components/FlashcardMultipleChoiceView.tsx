@@ -56,6 +56,7 @@ export function FlashcardMultipleChoiceView({
             <button
               key={opt}
               onClick={() => onSelectOption(idx)}
+              disabled={mcSelected !== null}
               className={`p-4 sm:p-5 rounded-2xl text-left text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-3.5 focus-ring ${cardStyle}`}
             >
               <div

@@ -2,9 +2,15 @@ import type { ReadingPostItem } from '@/features/admin/types/adminTypes';
 import { VOCAB_DATABASE, type VocabItem } from '@/data/readerData';
 import { LESSONS_DATA, type Lesson, type LevelDetail } from '@/data/discoveryData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
-import { DECK_WORDS } from '@/data/flashcardsData';
+import { resolveDeckCards } from '@/data/flashcardsData';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
+
+export function readerLevelFor(level: string): 'Level 1' | 'Level 2' | 'Level 3' {
+  if (level === 'A1' || level === 'A2' || level === 'Level 1') return 'Level 1';
+  if (level === 'C1' || level === 'C2' || level === 'Level 3') return 'Level 3';
+  return 'Level 2';
+}
 
 export interface CatalogLevelDetail {
   postId: string;
@@ -75,7 +81,7 @@ export const readerApiService = {
   // ─── 1. Fetch Post Detail by ID ──────────────────────────────────────────
   async getPostById(id: string): Promise<ReadingPostItem | null> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/posts/${id}`);
+      const res = await fetch(`${API_BASE_URL}/api/posts/${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(8000) });
       if (!res.ok) return null;
       return await res.json();
     } catch (err) {
@@ -115,7 +121,7 @@ export const readerApiService = {
 
   // ─── 4. Convert Backend ReadingPost to ReaderArticleData ─────────────────
   mapPostToReaderData(post: ReadingPostItem): ReaderArticleData {
-    const vocabMap: Record<string, VocabItem> = { ...VOCAB_DATABASE };
+    const vocabMap: Record<string, VocabItem> = {};
     const mappedVocabs: VocabItem[] = [];
 
     if (post.vocabularies && Array.isArray(post.vocabularies)) {
@@ -282,10 +288,17 @@ export const readerApiService = {
 
   // ─── 7. Resolve Local Article Fallback (Curated Heritage Articles) ────────
   getLocalArticle(id: string, requestedLevel: string = 'Level 2'): ReaderArticleData | null {
-    if (!id || id === 'tet-holiday') return null;
+    if (!id) return null;
 
     const normalize = (s: string) => s.toLowerCase().trim().replace(/[-_\s]+/g, '');
     const normTarget = normalize(id);
+    if (normTarget === 'tetholiday') {
+      const vocabularies = Object.values(VOCAB_DATABASE);
+      return { id: 'tet-holiday', titleEn: 'Tết: Renewal, Remembrance and Regional Flavours',
+        titleVi: 'Tết: Đổi mới, tưởng nhớ và hương vị vùng miền', topic: 'Phong tục & Lễ hội',
+        level: requestedLevel, paragraphs: [], vocabularies,
+        vocabMap: Object.fromEntries(vocabularies.map(word => [word.word.toLowerCase(), word])) };
+    }
 
     // 1. Check in LESSONS_DATA
     const lesson = LESSONS_DATA.find((l) => normalize(l.id) === normTarget);
@@ -293,12 +306,12 @@ export const readerApiService = {
       const safeLevel: 'Level 1' | 'Level 2' | 'Level 3' =
         requestedLevel === 'Level 1' || requestedLevel === 'Level 3' ? requestedLevel : 'Level 2';
       const levelDetail = lesson.levelDetails?.[safeLevel] || lesson.levelDetails?.['Level 2'];
-      const vocabMap: Record<string, VocabItem> = { ...VOCAB_DATABASE };
+      const vocabMap: Record<string, VocabItem> = {};
       const vocabList: VocabItem[] = [];
 
-      const deck = DECK_WORDS[lesson.id] || DECK_WORDS[normTarget];
-      if (deck && deck.cards.length > 0) {
-        deck.cards.forEach((c) => {
+      const cards = resolveDeckCards(lesson.id);
+      if (cards.length > 0) {
+        cards.forEach((c) => {
           const item: VocabItem = {
             id: c.id,
             word: c.word,
@@ -345,37 +358,14 @@ export const readerApiService = {
     // 2. Check in VIETNAM_LANDMARKS
     const landmark = VIETNAM_LANDMARKS.find((lm) => normalize(lm.id) === normTarget);
     if (landmark) {
-      const vocabMap: Record<string, VocabItem> = { ...VOCAB_DATABASE };
+      const vocabMap: Record<string, VocabItem> = {};
       const vocabList: VocabItem[] = [];
 
-      landmark.bilingualTerms.forEach((term, idx) => {
-        const item: VocabItem = {
-          id: `${landmark.id}-term-${idx}`,
-          word: term.en,
-          pos: 'phrase',
-          ipa: `/${term.en.toLowerCase()}/`,
-          viMeaning: term.vi,
-          contextSentence: landmark.excerptEn,
-          enDefinition: term.vi,
-        };
-        vocabMap[term.en.toLowerCase()] = item;
+      resolveDeckCards(landmark.id).forEach(card => {
+        const item: VocabItem = { id: card.id, word: card.word, pos: card.pos, ipa: card.ipa,
+          viMeaning: card.viMeaning, contextSentence: card.contextEn, enDefinition: card.viDefinition };
+        vocabMap[item.word.toLowerCase()] = item;
         vocabList.push(item);
-      });
-
-      landmark.vocabHighlights.forEach((vh, idx) => {
-        if (!vocabMap[vh.toLowerCase()]) {
-          const item: VocabItem = {
-            id: `${landmark.id}-highlight-${idx}`,
-            word: vh,
-            pos: 'cultural term',
-            ipa: `/${vh.toLowerCase()}/`,
-            viMeaning: landmark.titleVi,
-            contextSentence: landmark.speakingSentenceEn || landmark.excerptEn,
-            enDefinition: landmark.subtitle,
-          };
-          vocabMap[vh.toLowerCase()] = item;
-          vocabList.push(item);
-        }
       });
 
       return {
@@ -384,7 +374,7 @@ export const readerApiService = {
         titleVi: landmark.titleVi,
         topic: landmark.category,
         region: landmark.region === 'north' ? 'Miền Bắc' : landmark.region === 'central' ? 'Miền Trung' : 'Miền Nam',
-        level: landmark.level || requestedLevel,
+        level: requestedLevel,
         cefrLevel: landmark.level || requestedLevel,
         wordCount: 280,
         readTime: landmark.readTime,

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Link from "@/components/Link";
 import { ArrowRight, ChevronRight, Headphones, Layers, PenTool } from "lucide-react";
-import { EXTENSIVE_QUESTIONS } from "@/data/readerData";
+import { EXTENSIVE_QUESTIONS, VOCAB_DATABASE } from "@/data/readerData";
 import type { ReaderArticleData } from "../services/readerApiService";
 import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
 import { useReaderDictionary } from "../hooks/useReaderDictionary";
@@ -287,7 +287,8 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
             </h3>
           </div>
 
-          {EXTENSIVE_QUESTIONS.map((q) => {
+          {articleData && <p role="status">Bài này chưa có câu hỏi đọc hiểu được biên tập. Hãy tiếp tục ôn từ vựng của bài.</p>}
+          {(articleData ? [] : EXTENSIVE_QUESTIONS).map((q) => {
             const selected = extensiveAnswers[q.id];
             const isFocused = focusedQuestionId === q.id;
 
@@ -382,7 +383,7 @@ export const ExtensiveReaderView: React.FC<ExtensiveReaderViewProps> = ({
           >
             <span className="flex items-center gap-2.5">
               <Layers className="w-4 h-4 text-[#D9B76A]" />
-              Ôn Tập Flashcards ({articleData?.vocabularies?.length || 8} từ bài đọc)
+              Ôn Tập Flashcards ({articleData ? articleData.vocabularies.length : Object.keys(VOCAB_DATABASE).length} từ bài đọc)
             </span>
             <ArrowRight className="w-4 h-4 text-[#D9B76A] group-hover:translate-x-1 transition-transform" />
           </Link>

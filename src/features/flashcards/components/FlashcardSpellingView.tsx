@@ -6,6 +6,7 @@ interface FlashcardSpellingViewProps {
   onChangeInput: (value: string) => void;
   spellingFeedback: "correct" | "incorrect" | null;
   onCheckSpelling: () => void;
+  onNext: () => void;
 }
 
 export function FlashcardSpellingView({
@@ -14,6 +15,7 @@ export function FlashcardSpellingView({
   onChangeInput,
   spellingFeedback,
   onCheckSpelling,
+  onNext,
 }: FlashcardSpellingViewProps) {
   return (
     <div className="vocab-spelling-view w-full max-w-2xl mx-auto p-5 sm:p-6 rounded-3xl bg-surface border border-line flex flex-col justify-between text-center gap-5 animate-in fade-in duration-200">
@@ -32,20 +34,22 @@ export function FlashcardSpellingView({
             type="text"
             aria-label="Nhập từ tiếng Anh"
             value={spellingInput}
+            readOnly={spellingFeedback !== null}
             onChange={(e) => onChangeInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                onCheckSpelling();
+                if (spellingFeedback) onNext(); else onCheckSpelling();
               }
             }}
             placeholder="Gõ từ tại đây và ấn Enter..."
             className="w-full px-5 py-3.5 rounded-2xl bg-[#F6EEDC]/60 border-2 border-[rgba(30,75,67,0.2)] text-sm text-[#1E4B43] font-bold focus:outline-none focus:border-[#1E4B43]"
           />
           <button
-            onClick={onCheckSpelling}
+            onClick={spellingFeedback ? onNext : onCheckSpelling}
+            disabled={!spellingInput.trim()}
             className="px-6 py-3.5 rounded-2xl bg-[#1E4B43] hover:bg-[#163D37] text-white text-xs font-bold cursor-pointer shrink-0 shadow-sm"
           >
-            Kiểm tra
+            {spellingFeedback ? 'Tiếp tục' : 'Kiểm tra'}
           </button>
         </div>
 

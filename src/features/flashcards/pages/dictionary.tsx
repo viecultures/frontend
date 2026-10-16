@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
 import FlashcardSidebarLayout from "../components/flashcard-sidebar-layout";
+import { SavedVocabularyDecks } from '../components/SavedVocabularyDecks';
 import {
   DictionaryDailyHero,
   DictionaryQuickActionCards,
@@ -78,6 +79,7 @@ export default function DictionaryPage() {
   return (
     <FlashcardSidebarLayout>
       <div className="vocab-library-page">
+        <SavedVocabularyDecks />
         {/* Daily recommendation and quick actions */}
         <div className="space-y-4">
           <DictionaryDailyHero

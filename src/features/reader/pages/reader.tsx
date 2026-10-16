@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   AudioShadowingBar,
   BilingualReaderView,
@@ -16,8 +16,11 @@ import {
   type VocabItem,
 } from "@/data/readerData";
 import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
-import { readerApiService } from "../services/readerApiService";
+import { readerApiService, readerLevelFor } from "../services/readerApiService";
 import type { ReaderArticleData } from "../services/readerApiService";
+
+import { articleKey, cacheArticle, getCachedArticle } from '@/features/learning/lib/learningStorage';
+import { useSavedVocabulary, SavedVocabularyContext } from '../hooks/useSavedVocabulary';
 
 export default function ReaderPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -44,52 +47,42 @@ export default function ReaderPage() {
   // Dynamic Post Data from Backend API (null = fallback to Tết default)
   const [articleData, setArticleData] = useState<ReaderArticleData | null>(null);
 
-  // Fetch article data whenever postId, story, article, or id URL parameter changes
+  const targetId = searchParams.get('postId') || searchParams.get('id') || searchParams.get('story') || searchParams.get('article') || 'tet-holiday';
+  const requestedKey = articleKey(targetId, selectedLevel);
+  const [loadedKey, setLoadedKey] = useState('');
+  const [articleError, setArticleError] = useState(false);
+  const [levelError, setLevelError] = useState('');
+  const [reloadAttempt, setReloadAttempt] = useState(0);
+  const levelRequest = useRef(0);
   useEffect(() => {
-    const postId = searchParams.get("postId") || searchParams.get("id");
-    const storyId = searchParams.get("story") || searchParams.get("article");
-    const targetId = postId || storyId;
-
-    if (!targetId || targetId === "tet-holiday") {
-      setArticleData(null);
-      return;
-    }
-
-    let isMounted = true;
-    readerApiService
-      .getPostById(targetId)
-      .then((post) => {
-        if (!isMounted) return;
-        if (post) {
-          const mapped = readerApiService.mapPostToReaderData(post);
-          setArticleData(mapped);
-          if (mapped.level && (mapped.level === "Level 1" || mapped.level === "Level 2" || mapped.level === "Level 3")) {
-            setSelectedLevel(mapped.level);
-          }
-        } else {
-          // Fallback to local curated article (landmarks or discovery lessons)
-          const localArticle = readerApiService.getLocalArticle(targetId, selectedLevel);
-          if (localArticle) {
-            setArticleData(localArticle);
-            if (localArticle.level && (localArticle.level === "Level 1" || localArticle.level === "Level 2" || localArticle.level === "Level 3")) {
-              setSelectedLevel(localArticle.level as any);
-            }
-          } else {
-            setArticleData(null);
-          }
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          const localArticle = readerApiService.getLocalArticle(targetId, selectedLevel);
-          setArticleData(localArticle);
-        }
-      });
-
-    return () => {
-      isMounted = false;
+    let active = true;
+    setArticleData(null);
+    setArticleError(false);
+    const load = async () => {
+      if (targetId === 'tet-holiday') {
+        const article = readerApiService.getLocalArticle(targetId, selectedLevel);
+        if (article) cacheArticle(article, selectedLevel);
+        if (active) setLoadedKey(requestedKey);
+        return;
+      }
+      const post = await readerApiService.getPostById(targetId);
+      if (!active) return;
+      if (post && readerLevelFor(post.level) !== selectedLevel) {
+        const actualLevel = readerLevelFor(post.level);
+        setSelectedLevel(actualLevel);
+        setSearchParams(previous => { const next = new URLSearchParams(previous); next.set('level', actualLevel); return next; }, { replace: true });
+        return;
+      }
+      const article = post ? readerApiService.mapPostToReaderData(post) :
+        readerApiService.getLocalArticle(targetId, selectedLevel) || getCachedArticle(targetId, selectedLevel);
+      if (article) cacheArticle(article, selectedLevel);
+      setArticleData(article);
+      setArticleError(!article);
+      setLoadedKey(requestedKey);
     };
-  }, [searchParams.get("postId"), searchParams.get("story"), searchParams.get("article"), searchParams.get("id")]);
+    void load().catch(() => { if (active) { setArticleError(true); setLoadedKey(requestedKey); } });
+    return () => { active = false; levelRequest.current++; };
+  }, [requestedKey, reloadAttempt]);
 
   // Sync state if URL searchParams change externally
   useEffect(() => {
@@ -125,49 +118,45 @@ export default function ReaderPage() {
     );
   };
 
-  const handleLevelChange = async (newLevel: "Level 1" | "Level 2" | "Level 3") => {
-    setSelectedLevel(newLevel);
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        next.set("level", newLevel);
-        return next;
-      },
-      { replace: true }
-    );
-
-    // If currently viewing a post with topicGroup, attempt to switch to the corresponding CEFR post
-    if (articleData?.topicGroup) {
-      const levelMap: Record<string, string[]> = {
-        "Level 1": ["A1", "A2", "Level 1"],
-        "Level 2": ["B1", "B2", "Level 2"],
-        "Level 3": ["C1", "C2", "Level 3"],
-      };
-      const candidateLevels = levelMap[newLevel] || [newLevel];
-      for (const lvl of candidateLevels) {
-        const matchingPost = await readerApiService.getPostByTopicGroupAndLevel(articleData.topicGroup, lvl);
-        if (matchingPost) {
-          setArticleData(readerApiService.mapPostToReaderData(matchingPost));
-          setSearchParams(
-            (prev) => {
-              const next = new URLSearchParams(prev);
-              next.set("postId", matchingPost.id);
-              next.set("level", newLevel);
-              return next;
-            },
-            { replace: true }
-          );
-          break;
-        }
-      }
+  const handleLevelChange = async (newLevel: 'Level 1' | 'Level 2' | 'Level 3') => {
+    const request = ++levelRequest.current;
+    setLevelError('');
+    let nextId = targetId;
+    if (articleData?.cefrLevel && /^[ABC][12]$/.test(articleData.cefrLevel) && !articleData.topicGroup && newLevel !== selectedLevel) {
+      setLevelError('Bài này chưa có phiên bản ở mức bạn chọn.');
+      return;
     }
+    if (articleData?.topicGroup) {
+      const candidates = { 'Level 1': ['A1', 'A2'], 'Level 2': ['B1', 'B2'], 'Level 3': ['C1', 'C2'] };
+      let found = false;
+      for (const level of candidates[newLevel]) {
+        const post = await readerApiService.getPostByTopicGroupAndLevel(articleData.topicGroup, level);
+        if (request !== levelRequest.current) return;
+        if (post) { nextId = post.id; found = true; break; }
+      }
+      if (!found) { setLevelError('Bài này chưa có nội dung ở mức bạn chọn.'); return; }
+    }
+    if (request !== levelRequest.current) return;
+    setSelectedLevel(newLevel);
+    setSearchParams(previous => {
+      const next = new URLSearchParams(previous);
+      next.set('level', newLevel);
+      if (nextId !== targetId) {
+        next.delete('story'); next.delete('article'); next.delete('id');
+        next.set('postId', nextId);
+      }
+      return next;
+    }, { replace: true });
   };
 
   const [isVocabDrawerOpen, setIsVocabDrawerOpen] = useState<boolean>(false);
   const [selectedVocab, setSelectedVocab] = useState<VocabItem | null>(null);
-  const [bookmarkedWords, setBookmarkedWords] = useState<
-    Record<string, boolean>
-  >({});
+  const savedVocabulary = useSavedVocabulary(articleData?.id || targetId, selectedLevel);
+  const bookmarkedWords = Object.fromEntries(savedVocabulary.words.map(word => [word.id, true]));
+  useEffect(() => {
+    setIsVocabDrawerOpen(false); setSelectedVocab(null);
+    setQ1Answer(''); setQ2Answer(''); setQuizSubmitted(false);
+  }, [requestedKey]);
 
   // Quiz States (Bilingual Mode)
   const [q1Answer, setQ1Answer] = useState<string>("");
@@ -198,7 +187,7 @@ export default function ReaderPage() {
   const currentVoice: GeminiVoice =
     GEMINI_VOICES.find((v) => v.id === selectedVoiceId) || GEMINI_VOICES[0];
   const currentAudioUrl =
-    articleData?.shadowingAudioUrl ||
+    loadedKey !== requestedKey || articleError ? '' : articleData ? (articleData.shadowingAudioUrl || '') :
     (audioScope === "full"
       ? currentVoice.fullAudioUrl
       : currentVoice.sentenceAudioUrl);
@@ -212,6 +201,12 @@ export default function ReaderPage() {
     }
 
     const audio = audioRef.current;
+    audio.pause();
+    if (!currentAudioUrl) {
+      audio.removeAttribute('src');
+      setIsPlaying(false); setDuration(0); setCurrentTime(0);
+      return;
+    }
     audio.src = currentAudioUrl;
     audio.playbackRate = playbackSpeed;
     audio.muted = isMuted;
@@ -255,6 +250,8 @@ export default function ReaderPage() {
       audio.removeEventListener("pause", handlePause);
     };
   }, [currentAudioUrl]);
+
+  useEffect(() => () => { audioRef.current?.pause(); }, []);
 
   // Sync playback speed
   useEffect(() => {
@@ -318,7 +315,9 @@ export default function ReaderPage() {
   };
 
   const toggleBookmarkWord = (wordId: string) => {
-    setBookmarkedWords((prev) => ({ ...prev, [wordId]: !prev[wordId] }));
+    const word = articleData?.vocabularies.find(item => item.id === wordId) ||
+      savedVocabulary.words.find(item => item.id === wordId) || Object.values(VOCAB_DATABASE).find(item => item.id === wordId);
+    if (word) savedVocabulary.toggle(word);
   };
 
   // Dynamic style helpers based on themeMode
@@ -353,7 +352,11 @@ export default function ReaderPage() {
       ? "bg-[#1E2925] text-[#FBF7EE] border-[#D9B76A]/30 shadow-xl"
       : "bg-[#FBF7EE] text-[#3F5550] border-[rgba(30,75,67,0.12)] shadow-xl";
 
+  if (loadedKey !== requestedKey) return <main className="p-12" role="status">Đang tải bài đọc…</main>;
+  if (articleError) return <main className="p-12" role="alert"><h1>Chưa tải được bài đọc này</h1><p>Kiểm tra kết nối hoặc chọn lại bài.</p><button onClick={() => setReloadAttempt(value => value + 1)}>Thử lại</button> <Link to="/discovery">Chọn bài đọc</Link></main>;
+
   return (
+    <SavedVocabularyContext.Provider value={savedVocabulary}>
     <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
       {/* Top Reader Toolbar Control Bar (sticky at top 0) */}
       <ReaderToolbar
@@ -366,7 +369,7 @@ export default function ReaderPage() {
         onOpenVocabList={() => {
           const firstVocab = articleData && articleData.vocabularies.length > 0
             ? articleData.vocabularies[0]
-            : VOCAB_DATABASE["sacred"];
+            : articleData ? null : VOCAB_DATABASE["sacred"];
           setSelectedVocab(firstVocab);
           setIsVocabDrawerOpen(true);
         }}
@@ -378,13 +381,16 @@ export default function ReaderPage() {
         selectedVoiceFlag={currentVoice.flag}
       />
 
+      {levelError && <p role="alert" className="px-8 py-3">{levelError}</p>}
+      {!savedVocabulary.canSave && <p role="alert" className="px-8 py-3">Chưa lưu được từ vựng. Kiểm tra dung lượng hoặc quyền lưu trữ trình duyệt.</p>}
       {/* Main Canvas Container */}
       <section
         className={`py-8 px-4 sm:px-8 transition-colors duration-300 ${canvasBgClass}`}
       >
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Audio Shadowing Engine Section with Real Google Gemini Audio */}
-          <AudioShadowingBar
+          {articleData && !articleData.shadowingAudioUrl ? <p role="status">Bài này chưa có bản thu âm. Bạn có thể tiếp tục đọc và ôn từ.</p> : <AudioShadowingBar
+            articleTitle={articleData?.titleEn}
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             playbackSpeed={playbackSpeed}
@@ -405,7 +411,7 @@ export default function ReaderPage() {
             selectedVoiceGender={currentVoice.gender}
             audioScope={audioScope}
             onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
-          />
+          />}
 
           {/* Main Reading Views: Bilingual View vs Extensive Reading View */}
           {readingMode === "bilingual" ? (
@@ -463,11 +469,12 @@ export default function ReaderPage() {
         onClose={() => setIsVocabDrawerOpen(false)}
         selectedVocab={selectedVocab}
         onSelectVocab={setSelectedVocab}
-        vocabList={articleData && articleData.vocabularies.length > 0 ? articleData.vocabularies : Object.values(VOCAB_DATABASE)}
+        vocabList={articleData ? articleData.vocabularies : Object.values(VOCAB_DATABASE)}
         bookmarkedWords={bookmarkedWords}
         onToggleBookmarkWord={toggleBookmarkWord}
         deckId={articleData?.id || searchParams.get("story") || searchParams.get("article") || 'tet-holiday'}
         selectedLevel={selectedLevel}
+        articleTitle={articleData?.titleEn}
       />
 
       {/* Voice Customizer Modal (Tùy chỉnh giọng đọc Google Gemini) */}
@@ -481,5 +488,6 @@ export default function ReaderPage() {
         themeMode={themeMode}
       />
     </main>
+    </SavedVocabularyContext.Provider>
   );
 }

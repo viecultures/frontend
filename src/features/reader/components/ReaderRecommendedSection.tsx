@@ -43,7 +43,7 @@ export function ReaderRecommendedSection({
         {articles.map((article) => (
           <Link
             key={article.id}
-            href="/bilingual-reader"
+            href={`/bilingual-reader?story=${encodeURIComponent(article.id)}&level=${encodeURIComponent(article.level)}`}
             className={`group p-5 rounded-2xl border transition-all flex flex-col justify-between ${
               themeMode === "dark"
                 ? "bg-[#1E2925] border-[#D9B76A]/30 text-[#FBF7EE] shadow-md hover:border-[#D9B76A]"

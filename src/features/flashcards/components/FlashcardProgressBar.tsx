@@ -2,10 +2,11 @@ interface FlashcardProgressBarProps {
   currentIndex: number;
   totalCards: number;
   isComplete?: boolean;
+  reviewedCount?: number;
 }
 
-export function FlashcardProgressBar({ currentIndex, totalCards, isComplete = false }: FlashcardProgressBarProps) {
-  const completed = Math.min(totalCards, Math.max(0, currentIndex));
+export function FlashcardProgressBar({ currentIndex, totalCards, isComplete = false, reviewedCount = currentIndex }: FlashcardProgressBarProps) {
+  const completed = Math.min(totalCards, Math.max(0, reviewedCount));
   const percentage = totalCards > 0 ? Math.round(completed / totalCards * 100) : 0;
   return (
     <div className="vocab-study-progress">

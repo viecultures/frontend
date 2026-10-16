@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Link from "@/components/Link";
 import { CheckCircle2, ArrowRight, Layers, Headphones, PenTool, ChevronRight, RefreshCw, Sparkles } from "lucide-react";
-import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
+import { READER_QUIZ_QUESTIONS, VOCAB_DATABASE } from "@/data/readerData";
 import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
 import type { ReaderArticleData } from "../services/readerApiService";
 import { useReaderDictionary } from "../hooks/useReaderDictionary";
@@ -237,7 +237,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               <div className="absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-white">
                 <div>
                   <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
-                    {articleData?.topicGroup || "Vietnamese Lunar New Year"}
+                    {articleData?.topic || "Vietnamese Lunar New Year"}
                   </span>
                   <h3 className="font-sans text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
                     {articleData?.titleEn || "Tết Nguyên Đán Heritage"}
@@ -470,7 +470,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               <div className="absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-white">
                 <div>
                   <span className="text-xs text-[#D9B76A] font-semibold uppercase tracking-wider block mb-0.5">
-                    {articleData?.topicGroup || "Phong Tục & Ẩm Thực"}
+                    {articleData?.topic || "Phong Tục & Ẩm Thực"}
                   </span>
                   <h3 className="font-sans text-lg sm:text-xl font-bold text-[#FBF7EE] drop-shadow-md">
                     {articleData?.titleVi || "Phong Vị Tết Cổ Truyền"}
@@ -528,6 +528,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
       >
         {/* Left 7 Cols: Quiz Section */}
         <div className="lg:col-span-7 pr-0 lg:pr-8 lg:border-r border-[rgba(217,183,106,0.2)]">
+          {!articleData ? <>
           <div className="mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
             <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
               Reading Check & Comprehension
@@ -628,6 +629,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               </div>
             )}
           </div>
+          </> : <p role="status">Bài này chưa có câu hỏi đọc hiểu được biên tập. Bạn có thể tiếp tục ôn từ vựng của bài.</p>}
         </div>
 
         {/* Right 5 Cols: Practice Next Steps */}
@@ -655,7 +657,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               >
                 <span className="flex items-center gap-2">
                   <Layers className="w-4 h-4 text-[#D9B76A]" />
-                  Ôn Tập Flashcards ({articleData?.vocabularies?.length || 8} từ bài đọc)
+                  Ôn Tập Flashcards ({articleData ? articleData.vocabularies.length : Object.keys(VOCAB_DATABASE).length} từ bài đọc)
                 </span>
                 <ArrowRight className="w-4 h-4 text-[#D9B76A] group-hover:translate-x-1 transition-transform" />
               </Link>
