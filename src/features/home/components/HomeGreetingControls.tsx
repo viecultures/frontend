@@ -1,5 +1,6 @@
 import React from 'react';
 import { Compass, BookOpen, BookMarked, Users } from 'lucide-react';
+import { PATHS } from '@/routes/paths';
 
 interface HomeGreetingControlsProps {
   userName?: string;
@@ -26,7 +27,7 @@ export const HomeGreetingControls: React.FC<HomeGreetingControlsProps> = ({
       <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-1">
         <button
           type="button"
-          onClick={() => onNavigate('discovery')}
+          onClick={() => onNavigate(PATHS.discovery)}
           className="px-3.5 py-1.5 bg-heritage-dark/90 border border-antique-gold/40 hover:border-antique-gold hover:bg-antique-gold rounded-full text-xs font-bold text-warm-ivory hover:text-heritage-dark transition-all duration-200 flex items-center gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(217,183,106,0.35)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer focus-ring"
         >
           <Compass className="w-3.5 h-3.5 text-antique-gold group-hover:text-heritage-dark group-hover:scale-110 transition-transform" />
@@ -35,7 +36,7 @@ export const HomeGreetingControls: React.FC<HomeGreetingControlsProps> = ({
 
         <button
           type="button"
-          onClick={() => onNavigate('reader')}
+          onClick={() => onNavigate(PATHS.reader)}
           className="px-3.5 py-1.5 bg-heritage-dark/90 border border-antique-gold/40 hover:border-antique-gold hover:bg-antique-gold rounded-full text-xs font-bold text-warm-ivory hover:text-heritage-dark transition-all duration-200 flex items-center gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(217,183,106,0.35)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer focus-ring"
         >
           <BookOpen className="w-3.5 h-3.5 text-antique-gold group-hover:text-heritage-dark group-hover:scale-110 transition-transform" />
@@ -44,7 +45,7 @@ export const HomeGreetingControls: React.FC<HomeGreetingControlsProps> = ({
 
         <button
           type="button"
-          onClick={() => onNavigate('dictionary')}
+          onClick={() => onNavigate(PATHS.dictionary)}
           className="px-3.5 py-1.5 bg-heritage-dark/90 border border-antique-gold/40 hover:border-antique-gold hover:bg-antique-gold rounded-full text-xs font-bold text-warm-ivory hover:text-heritage-dark transition-all duration-200 flex items-center gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(217,183,106,0.35)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer focus-ring"
         >
           <BookMarked className="w-3.5 h-3.5 text-antique-gold group-hover:text-heritage-dark group-hover:scale-110 transition-transform" />
@@ -53,7 +54,7 @@ export const HomeGreetingControls: React.FC<HomeGreetingControlsProps> = ({
 
         <button
           type="button"
-          onClick={() => onNavigate('community-1')}
+          onClick={() => onNavigate(PATHS.community)}
           className="px-3.5 py-1.5 bg-heritage-dark/90 border border-antique-gold/40 hover:border-antique-gold hover:bg-antique-gold rounded-full text-xs font-bold text-warm-ivory hover:text-heritage-dark transition-all duration-200 flex items-center gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(217,183,106,0.35)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer focus-ring"
         >
           <Users className="w-3.5 h-3.5 text-antique-gold group-hover:text-heritage-dark group-hover:scale-110 transition-transform" />

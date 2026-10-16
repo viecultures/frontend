@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Check, CheckCircle2, ChevronLeft, ChevronRight, RotateCcw, RotateCw, Volume2, VolumeX } from 'lucide-react';
 import { DECK_WORDS } from '@/data/flashcardsData';
 import { speakEnglish } from '@/utils/sampleSpeech';
+import { paths } from '@/routes/paths';
 
 const DEMO_CARDS = DECK_WORDS['imperial-hue'].cards;
 type RecallRating = 'again' | 'good';
@@ -78,9 +79,8 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
   };
 
   const openDeck = () => {
-    const view = '/flashcard-study?deck=imperial-hue';
-    if (onNavigate) onNavigate(view);
-    else window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
+    const view = paths.flashcardStudy({ deck: 'imperial-hue' });
+    onNavigate?.(view);
   };
 
   return (

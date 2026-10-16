@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles, CheckSquare, Square, Plus, BookOpen, BookMarked, ArrowRight } from 'lucide-react';
+import { PATHS } from '@/routes/paths';
 
 export interface TaskItem {
   id: string;
@@ -108,7 +109,7 @@ export const HomeWidgetsGrid: React.FC<HomeWidgetsGridProps> = ({
 
       {/* 2. Mini Pastel Sticky Note: ÔN TẬP TỪ VỰNG (Flashcard SRS) */}
       <div
-        onClick={() => onNavigate('flashcard-study')}
+        onClick={() => onNavigate(PATHS.flashcardStudy)}
         className="w-[135px] h-[105px] bg-[#FEF3C7] text-[#78350F] p-3 rounded-2xl shadow-xl rotate-[-2deg] hover:rotate-0 transition-transform duration-300 cursor-pointer flex flex-col justify-between border border-[#FDE68A] select-none group"
         title="Bấm để ôn tập từ vựng SRS hôm nay"
       >
@@ -133,7 +134,7 @@ export const HomeWidgetsGrid: React.FC<HomeWidgetsGridProps> = ({
 
       {/* 3. Mini Pastel Sticky Note: BÀI VIẾT ĐỀ CỬ (Recommended Reading) */}
       <div
-        onClick={() => onNavigate('reader')}
+        onClick={() => onNavigate(PATHS.reader)}
         className="w-[140px] h-[105px] bg-[#E2F0D9] text-[#1E3F20] p-3 rounded-2xl shadow-xl rotate-[3deg] hover:rotate-0 transition-transform duration-300 cursor-pointer flex flex-col justify-between border border-[#C5E1B5] select-none group"
         title="Bấm để đọc bài di sản đề cử hôm nay"
       >

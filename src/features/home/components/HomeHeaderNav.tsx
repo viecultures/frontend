@@ -13,10 +13,12 @@ import {
 import { ProfileDropdown } from '@/components/ProfileDropdown';
 import { BrandLogo } from '@/components/BrandLogo';
 import { useSettings } from '@/context/SettingsContext';
+import { PATHS } from '@/routes/paths';
+import type { AppUser } from '@/utils/auth-storage';
 
 interface HomeHeaderNavProps {
   isLoggedIn: boolean;
-  user?: { name: string; email: string; avatar: string } | null;
+  user?: AppUser | null;
   onLogout?: () => void;
   onNavigate: (view: string) => void;
   onOpenProfile?: () => void;
@@ -47,7 +49,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
         size="md"
         theme="dark"
         badge="Phòng Học Văn Hóa"
-        onClick={() => onNavigate('landing')}
+        onClick={() => onNavigate(PATHS.landing)}
         className="focus-ring rounded-xl"
       />
 
@@ -66,7 +68,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
 
         <button
           type="button"
-          onClick={() => onNavigate('community-2')}
+          onClick={() => onNavigate(PATHS.communityContest)}
           className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-gold transition-all cursor-pointer focus-ring"
           title="Thử thách & Bảng xếp hạng"
           aria-label="Thử thách"
@@ -86,7 +88,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
 
         <button
           type="button"
-          onClick={() => onNavigate('community-2')}
+          onClick={() => onNavigate(PATHS.communityContest)}
           className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-gold transition-all cursor-pointer focus-ring"
           title="Thống kê học tập"
           aria-label="Thống kê"
@@ -146,7 +148,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
         ) : (
           <button
             type="button"
-            onClick={() => onNavigate('login')}
+            onClick={() => onNavigate(PATHS.login)}
             className="flex items-center gap-1.5 pl-3 pr-3 py-1 bg-antique-gold text-heritage-dark rounded-full text-xs font-bold hover:brightness-105 transition-all shadow-sm cursor-pointer"
             title="Đăng nhập"
           >

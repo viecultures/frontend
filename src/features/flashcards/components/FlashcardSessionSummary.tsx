@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { StudyDeck } from '../services/studyDeck';
 import type { ReviewSession } from '../lib/reviewSession';
 import type { RewardCelebrationPayload } from '@/types';
+import { PATHS, paths } from '@/routes/paths';
 
 interface FlashcardSessionSummaryProps {
   deck: StudyDeck;
@@ -32,9 +33,9 @@ export function FlashcardSessionSummary({ deck, session, level, onRestart, rewar
       <p role="status">{savedOnly ? 'Lượt ôn từ đã lưu không cấp thêm thưởng hoàn thành bài.' : reward ? reward.xpEarned > 0 ? `+${reward.xpEarned} XP · +${reward.coinsEarned} xu` : reward.subtitle : 'Đang ghi nhận thưởng…'}</p>
       <p className="text-xs">Tổng XP: <span data-testid="total-xp">{totalXP}</span> · Tổng xu: <span data-testid="total-coins">{totalCoins}</span></p>
       <div className="flex flex-wrap justify-center gap-3">
-        <button className="px-5 py-3 rounded-full bg-heritage-green text-warm-ivory" onClick={() => navigate(`/playground?story=${encodeURIComponent(deck.article.id)}&topic=${encodeURIComponent(deck.lesson.title)}&level=${encodeURIComponent(level)}`)}><Compass className="inline w-4 h-4 mr-2" />Khám phá cùng AI Map</button>
+        <button className="px-5 py-3 rounded-full bg-heritage-green text-warm-ivory" onClick={() => navigate(paths.playground({ story: deck.article.id, topic: deck.lesson.title, level }))}><Compass className="inline w-4 h-4 mr-2" />Khám phá cùng AI Map</button>
         <button className="px-5 py-3 rounded-full border border-line" onClick={onRestart}><RotateCcw className="inline w-4 h-4 mr-2" />Ôn lại bộ thẻ này</button>
-        <button className="px-5 py-3 rounded-full border border-line" onClick={() => navigate('/home')}><Home className="inline w-4 h-4 mr-2" />Về Trang Chủ</button>
+        <button className="px-5 py-3 rounded-full border border-line" onClick={() => navigate(PATHS.home)}><Home className="inline w-4 h-4 mr-2" />Về Trang Chủ</button>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, X, ArrowUpRight, Sparkles } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
+import { PATHS } from '@/routes/paths';
 
 interface LandingHeaderProps {
   onNavigate?: (view: string) => void;
@@ -32,8 +33,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onNavigate, onScro
 
   const navigate = (view: string) => {
     setIsMobileMenuOpen(false);
-    if (onNavigate) onNavigate(view);
-    else window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
+    onNavigate?.(view);
   };
 
   const scroll = (segment: string) => {
@@ -55,9 +55,9 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onNavigate, onScro
           ))}
         </nav>
         <div className="landing-header-actions">
-          <button type="button" className="landing-playground" onClick={() => navigate('playground')} aria-label="Mở AI Playground" title="AI Playground"><Sparkles size={18} aria-hidden="true" /></button>
-          <button type="button" className="landing-login" onClick={() => navigate('login')}>Đăng nhập</button>
-          <button type="button" className="landing-button landing-button-primary landing-header-cta" onClick={() => navigate('discovery')}>
+          <button type="button" className="landing-playground" onClick={() => navigate(PATHS.playground)} aria-label="Mở AI Playground" title="AI Playground"><Sparkles size={18} aria-hidden="true" /></button>
+          <button type="button" className="landing-login" onClick={() => navigate(PATHS.login)}>Đăng nhập</button>
+          <button type="button" className="landing-button landing-button-primary landing-header-cta" onClick={() => navigate(PATHS.discovery)}>
             Bắt đầu học <ArrowUpRight size={16} aria-hidden="true" />
           </button>
           <button ref={menuButtonRef} type="button" className="landing-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-expanded={isMobileMenuOpen} aria-controls="landing-mobile-menu" aria-label={isMobileMenuOpen ? 'Đóng menu' : 'Mở menu'}>
@@ -70,9 +70,9 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onNavigate, onScro
           {navLinks.map((link) => (
             <button key={link.segment} type="button" onClick={() => scroll(link.segment)} aria-current={activeSegment === link.segment ? 'location' : undefined}>{link.name}<ArrowUpRight size={16} /></button>
           ))}
-          <button type="button" onClick={() => navigate('playground')}><span className="flex items-center gap-2"><Sparkles size={16} /> AI Playground</span><ArrowUpRight size={16} /></button>
-          <button type="button" onClick={() => navigate('login')}>Đăng nhập<ArrowUpRight size={16} /></button>
-          <button type="button" className="landing-button landing-button-primary" onClick={() => navigate('discovery')}>Bắt đầu học miễn phí<ArrowUpRight size={16} /></button>
+          <button type="button" onClick={() => navigate(PATHS.playground)}><span className="flex items-center gap-2"><Sparkles size={16} /> AI Playground</span><ArrowUpRight size={16} /></button>
+          <button type="button" onClick={() => navigate(PATHS.login)}>Đăng nhập<ArrowUpRight size={16} /></button>
+          <button type="button" className="landing-button landing-button-primary" onClick={() => navigate(PATHS.discovery)}>Bắt đầu học miễn phí<ArrowUpRight size={16} /></button>
         </nav>
       )}
     </header>

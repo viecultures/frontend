@@ -14,8 +14,11 @@ import type { ProvinceMapItem } from '@/data/vietnamMapData';
 import { HERITAGE_SITES } from '@/data/vietnamCultureData';
 import type { CulturalHeritageSite } from '@/types/sampleTypes';
 import { speakEnglish } from '@/utils/sampleSpeech';
+import { PATHS } from '@/routes/paths';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 
 export const VietnamHeritageMapSection: React.FC = () => {
+  const go = useAppNavigate();
   const [selectedSite, setSelectedSite] = useState<CulturalHeritageSite | null>(
     HERITAGE_SITES[0] || null
   );
@@ -202,8 +205,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          const event = new CustomEvent('app:navigate', { detail: 'reader' });
-                          window.dispatchEvent(event);
+                          go(PATHS.reader);
                         }}
                         className="w-full py-3 px-4 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer group focus-ring"
                       >

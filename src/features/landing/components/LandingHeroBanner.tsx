@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ArrowUpRight, BookOpen, Headphones, Bookmark, RotateCcw, Pause, Play, Check } from 'lucide-react';
 import { useReducedMotion } from 'motion/react';
 import bannerVideo from '@/assets/hero-banner-v3.mp4';
+import { PATHS } from '@/routes/paths';
 
 interface LandingHeroBannerProps {
   onNavigate?: (view: string) => void;
@@ -21,8 +22,7 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({ onNavigate
   }, [reducedMotion]);
 
   const startLearning = () => {
-    if (onNavigate) onNavigate('discovery');
-    else window.dispatchEvent(new CustomEvent('app:navigate', { detail: 'discovery' }));
+    onNavigate?.(PATHS.discovery);
   };
 
   const previewFlashcard = () => {

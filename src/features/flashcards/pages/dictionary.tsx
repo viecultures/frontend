@@ -11,6 +11,7 @@ import {
   DictionaryInspectorModal,
   CreateDeckModal,
 } from "../components";
+import { paths } from '@/routes/paths';
 
 const CATEGORY_OPTIONS = [
   { label: `Tất cả (${LESSONS_DATA.length})`, value: "All" },
@@ -65,7 +66,7 @@ export default function DictionaryPage() {
   };
 
   const handleGoToStudy = (lessonId: string) => {
-    navigate(`/flashcard-study?deck=${lessonId}`);
+    navigate(paths.flashcardStudy({ deck: lessonId }));
   };
 
   const handleCreateDeck = () => {

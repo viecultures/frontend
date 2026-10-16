@@ -8,17 +8,17 @@ import { HomeBottomDock } from '../components/HomeBottomDock';
 import { HomeFloatingSidebar } from '../components/HomeFloatingSidebar';
 import { Check } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
+import { useAppNavigate } from '@/routes/useAppNavigate';
+import type { AppUser } from '@/utils/auth-storage';
 
 interface HomePageProps {
-  onNavigate?: (view: string) => void;
   isLoggedIn?: boolean;
-  user?: { name: string; email: string; avatar: string } | null;
+  user?: AppUser | null;
   onLogout?: () => void;
   onOpenProfile?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
-  onNavigate,
   isLoggedIn = false,
   user,
   onLogout,
@@ -80,13 +80,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     showToast('Đã đặt lại đồng hồ Pomodoro về 25:00');
   };
 
-  const handleNavigate = (view: string) => {
-    if (onNavigate) {
-      onNavigate(view);
-    } else {
-      window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
-    }
-  };
+  const handleNavigate = useAppNavigate();
 
   const isGradient = activeBackground.url.startsWith('linear-gradient');
 

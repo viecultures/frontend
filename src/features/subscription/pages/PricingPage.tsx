@@ -16,6 +16,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { getIsProUser } from '@/utils/auth-storage';
+import { PATHS } from '@/routes/paths';
 
 export const PricingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export const PricingPage: React.FC = () => {
   }, []);
 
   const handleSelectPro = () => {
-    navigate('/checkout');
+    navigate(PATHS.checkout);
   };
 
   return (

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Link from "@/components/Link";
 import { ArrowLeft, Columns, BookOpen, Moon, Sun, Layers, LogIn, Crown, User } from "lucide-react";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
+import { paths } from '@/routes/paths';
+import type { AppUser } from '@/utils/auth-storage';
 
 interface ReaderToolbarProps {
   fontSize: number;
@@ -19,7 +21,7 @@ interface ReaderToolbarProps {
   selectedVoiceName?: string;
   selectedVoiceFlag?: string;
   isLoggedIn?: boolean;
-  user?: { name: string; email: string; avatar: string } | null;
+  user?: AppUser | null;
   onLogout?: () => void;
   isPro?: boolean;
 }
@@ -222,10 +224,7 @@ export function ReaderToolbar({
                 onClose={() => setIsProfileOpen(false)}
                 user={user}
                 onLogout={onLogout}
-                onNavigate={(view) => {
-                  if (view.startsWith("/")) navigate(view);
-                  else navigate(`/${view}`);
-                }}
+                onNavigate={(to) => navigate(to)}
               />
             </div>
           ) : (
@@ -233,7 +232,7 @@ export function ReaderToolbar({
               type="button"
               onClick={() => {
                 const currentPath = window.location.pathname + window.location.search;
-                navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
+                navigate(paths.login({ redirect: currentPath }));
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#9E2A2B] hover:bg-[#852223] text-white font-bold text-xs shadow-sm border border-[#D9B76A]/60 transition-all cursor-pointer"
             >

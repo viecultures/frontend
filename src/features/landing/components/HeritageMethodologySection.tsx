@@ -1,11 +1,12 @@
 import React from 'react';
 import { ArrowUpRight, BookOpen, Compass, Layers, MessageCircle } from 'lucide-react';
+import { PATHS, paths } from '@/routes/paths';
 
 const STEPS = [
-  { title: 'Chọn chủ đề', description: 'Một món ăn, một miền di sản hay một câu chuyện quen thuộc.', action: 'Khám phá bài đọc', icon: Compass, view: 'discovery' },
-  { title: 'Đọc & nghe', description: 'Đối chiếu song ngữ, nghe từng câu và lưu những từ muốn nhớ.', action: 'Đọc thử bài Huế', icon: BookOpen, view: '/reader?story=imperial-hue' },
+  { title: 'Chọn chủ đề', description: 'Một món ăn, một miền di sản hay một câu chuyện quen thuộc.', action: 'Khám phá bài đọc', icon: Compass, view: PATHS.discovery },
+  { title: 'Đọc & nghe', description: 'Đối chiếu song ngữ, nghe từng câu và lưu những từ muốn nhớ.', action: 'Đọc thử bài Huế', icon: BookOpen, view: paths.reader({ story: 'imperial-hue' }) },
   { title: 'Ôn từ đã lưu', description: 'Lật thẻ, nhớ lại nghĩa và chọn những từ cần xem lại.', action: 'Thử một lượt ôn', icon: Layers, view: null },
-  { title: 'Thử vận dụng', description: 'Diễn đạt suy nghĩ, hỏi thêm hoặc thử một tình huống với AI.', action: 'Mở AI Playground', icon: MessageCircle, view: 'playground' },
+  { title: 'Thử vận dụng', description: 'Diễn đạt suy nghĩ, hỏi thêm hoặc thử một tình huống với AI.', action: 'Mở AI Playground', icon: MessageCircle, view: PATHS.playground },
 ];
 
 interface HeritageMethodologySectionProps {
@@ -22,8 +23,7 @@ export const HeritageMethodologySection: React.FC<HeritageMethodologySectionProp
       });
       return;
     }
-    if (onNavigate) onNavigate(view);
-    else window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
+    onNavigate?.(view);
   };
 
   return (

@@ -12,6 +12,7 @@ import {
   Award,
 } from 'lucide-react';
 import { READER_DEFAULT_FLASHCARDS, type QuickFlashcardItem } from '../data/learningLoopData';
+import { paths } from '@/routes/paths';
 
 interface ReaderQuickFlashcardsProps {
   themeMode?: 'paper' | 'dark';
@@ -271,7 +272,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           </div>
 
           <a
-            href={`/flashcard-study?deck=${encodeURIComponent(deckId)}&level=${encodeURIComponent(selectedLevel)}`}
+            href={paths.flashcardStudy({ deck: deckId, level: selectedLevel })}
             className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1E4B43] dark:text-[#D9B76A] hover:underline"
           >
             <span>Mở rộng sang Phòng Học Flashcards (3 chế độ)</span>

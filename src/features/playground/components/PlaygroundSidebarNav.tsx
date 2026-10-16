@@ -14,6 +14,7 @@ import {
   Home,
 } from 'lucide-react';
 import { PLAYGROUND_SCREENS } from '../types';
+import { PATHS } from '@/routes/paths';
 
 interface PlaygroundSidebarNavProps {
   currentScreenIndex: number;
@@ -57,7 +58,7 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
     <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col items-center gap-3">
       {/* Home / Exit Button */}
       <button
-        onClick={() => navigate('/home')}
+        onClick={() => navigate(PATHS.home)}
         className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-[#D4AF37]/30 text-[#D4AF37] hover:text-white hover:bg-[#1E4B43] flex items-center justify-center transition-all cursor-pointer shadow-lg mb-1"
         title="Về Phòng Học"
         aria-label="Về Phòng Học"

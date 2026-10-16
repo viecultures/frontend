@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrandLogo } from './BrandLogo';
+import { PATHS } from '@/routes/paths';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 
 export const Footer: React.FC = () => {
-  const handleNav = (view: string) => {
-    window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
-  };
+  const handleNav = useAppNavigate();
 
   const handleScrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -34,7 +34,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   type="button"
-                  onClick={() => handleNav('home')}
+                  onClick={() => handleNav(PATHS.home)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
                   Home
@@ -43,7 +43,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   type="button"
-                  onClick={() => handleNav('discovery')}
+                  onClick={() => handleNav(PATHS.discovery)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
                   Discovery Feed
@@ -52,7 +52,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   type="button"
-                  onClick={() => handleNav('reader')}
+                  onClick={() => handleNav(PATHS.reader)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
                   Bilingual Reader
@@ -61,7 +61,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   type="button"
-                  onClick={() => handleNav('dictionary')}
+                  onClick={() => handleNav(PATHS.dictionary)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
                   Flashcards
@@ -70,7 +70,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   type="button"
-                  onClick={() => handleNav('community')}
+                  onClick={() => handleNav(PATHS.community)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
                   Community
@@ -79,7 +79,7 @@ export const Footer: React.FC = () => {
               <li>
                 <button
                   type="button"
-                  onClick={() => handleNav('playground')}
+                  onClick={() => handleNav(PATHS.playground)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
                   AI Playground

@@ -2,6 +2,7 @@ import React from 'react';
 import { Landmark, Volume2, X, Sparkles, MapPin, Utensils, Bot, ChevronRight, BookOpen, ExternalLink } from 'lucide-react';
 import type { ProvinceCultureData } from '../types';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
+import { paths } from '@/routes/paths';
 
 interface ProvinceHoverCardProps {
   provinceDetail: ProvinceCultureData;
@@ -106,7 +107,7 @@ export const ProvinceHoverCard: React.FC<ProvinceHoverCardProps> = ({
             {matchingLandmarks.slice(0, 2).map((art) => (
               <a
                 key={art.id}
-                href={`/reader?article=${encodeURIComponent(art.id)}&level=${encodeURIComponent(art.level || 'Level 2')}`}
+                href={paths.reader({ article: art.id, level: art.level || 'Level 2' })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-1.5 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-[#D4AF37]/10 dark:hover:bg-[#D4AF37]/15 border border-black/5 dark:border-white/10 hover:border-[#D4AF37]/30 transition-all group text-left cursor-pointer"
