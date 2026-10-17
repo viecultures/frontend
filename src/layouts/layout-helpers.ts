@@ -16,5 +16,14 @@ export const getActiveView = (pathname: string): string => {
   if (pathname.startsWith('/pricing') || pathname.startsWith('/checkout') || pathname.startsWith('/subscription')) {
     return 'pricing';
   }
+  if (
+    pathname.startsWith('/profile') ||
+    pathname.startsWith('/account') ||
+    pathname.startsWith('/passport') ||
+    pathname.startsWith('/achievements')
+  ) {
+    return 'profile';
+  }
   return 'landing';
 };
+

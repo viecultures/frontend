@@ -59,6 +59,14 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState<boolean>(true);
   const [isMocSonModalOpen, setIsMocSonModalOpen] = useState<boolean>(false);
+  // ── Dynamic Reading Quiz State ──────────────────────────────────────────
+  const [dynamicAnswers, setDynamicAnswers] = useState<Record<number, string>>({});
+  const [dynamicSubmitted, setDynamicSubmitted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setDynamicAnswers({});
+    setDynamicSubmitted(false);
+  }, [articleData?.id]);
   // ── Shared In-Place Realtime Dictionary Hook ───────────────────────────────
   const { popupState, closeDictionary, handleTextSelection, handleVocabClick } = useReaderDictionary(articleData?.vocabMap);
 
@@ -534,108 +542,229 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
       >
         {/* Left 7 Cols: Quiz Section */}
         <div className="lg:col-span-7 pr-0 lg:pr-8 lg:border-r border-[rgba(217,183,106,0.2)]">
-          {!articleData ? <>
-            <div className="mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
-                Reading Check & Comprehension
-              </span>
-              <h2
-                className={`font-serif text-2xl font-bold mt-1 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+          {articleData?.questions && articleData.questions.length > 0 ? (
+            <>
+              <div className="mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
+                  Reading Check & Comprehension ({articleData.questions.length} câu)
+                </span>
+                <h2
+                  className={`font-serif text-2xl font-bold mt-1 ${
+                    themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
                   }`}
-              >
-                Câu Hỏi Kiểm Tra Thấu Hiểu Bài Đọc
-              </h2>
-            </div>
-
-            {/* Quiz Q1 */}
-            <div className="mb-8">
-              <h3
-                className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-                  }`}
-              >
-                {READER_QUIZ_QUESTIONS[0]?.question}
-              </h3>
-
-              <div className="space-y-2.5">
-                {READER_QUIZ_QUESTIONS[0]?.options.map((opt) => (
-                  <label
-                    key={opt.value}
-                    className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === opt.value
-                      ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                      : themeMode === "dark"
-                        ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
-                        : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
-                      }`}
-                  >
-                    <input
-                      type="radio"
-                      name="q1"
-                      value={opt.value}
-                      checked={q1Answer === opt.value}
-                      onChange={() => setQ1Answer(opt.value)}
-                      className="mt-1 accent-[#D9B76A]"
-                    />
-                    <span className="text-xs sm:text-sm">{opt.label}</span>
-                  </label>
-                ))}
+                >
+                  Câu Hỏi Kiểm Tra Thấu Hiểu Bài Đọc
+                </h2>
               </div>
-            </div>
 
-            {/* Quiz Q2 */}
-            <div className="mb-8">
-              <h3
-                className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
-                  }`}
-              >
-                {READER_QUIZ_QUESTIONS[1]?.question}
-              </h3>
-
-              <div className="space-y-2.5">
-                {READER_QUIZ_QUESTIONS[1]?.options.map((opt) => (
-                  <label
-                    key={opt.value}
-                    className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q2Answer === opt.value
-                      ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
-                      : themeMode === "dark"
-                        ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
-                        : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
+              <div className="space-y-6">
+                {articleData.questions.map((q, idx) => {
+                  const currentVal = dynamicAnswers[idx] || '';
+                  const isCorrect = dynamicSubmitted && currentVal === q.correctKey;
+                  const isIncorrect = dynamicSubmitted && currentVal !== '' && currentVal !== q.correctKey;
+                  return (
+                    <div
+                      key={q.id || idx}
+                      className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                        isDark ? 'bg-[#18211E]/80 border-[#D9B76A]/20' : 'bg-[#F6EEDC]/40 border-[rgba(30,75,67,0.12)]'
                       }`}
-                  >
-                    <input
-                      type="radio"
-                      name="q2"
-                      value={opt.value}
-                      checked={q2Answer === opt.value}
-                      onChange={() => setQ2Answer(opt.value)}
-                      className="mt-1 accent-[#D9B76A]"
-                    />
-                    <span className="text-xs sm:text-sm">{opt.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <h3
+                          className={`text-sm sm:text-base font-bold ${
+                            isDark ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                          }`}
+                        >
+                          {idx + 1}. {q.question}
+                        </h3>
+                        {dynamicSubmitted && (
+                          isCorrect ? (
+                            <span className="text-xs font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/70 dark:text-emerald-300 px-2.5 py-0.5 rounded-full shrink-0 border border-emerald-500/30">
+                              Đúng ✓
+                            </span>
+                          ) : (
+                            <span className="text-xs font-bold text-rose-700 bg-rose-100 dark:bg-rose-950/70 dark:text-rose-300 px-2.5 py-0.5 rounded-full shrink-0 border border-rose-500/30">
+                              Chưa đúng ✗
+                            </span>
+                          )
+                        )}
+                      </div>
 
-            {/* Submit Quiz Action */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setQuizSubmitted(true)}
-                className="px-6 py-3 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] shadow-sm transition-all border border-[#D9B76A] cursor-pointer"
-              >
-                Kiểm Tra Đáp Án
-              </button>
-              {quizSubmitted && (
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ECFDF5] text-[#047857] text-xs font-bold border border-[#059669]/30">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>
-                    {q1Answer === READER_QUIZ_QUESTIONS[0]?.correctValue &&
-                      q2Answer === READER_QUIZ_QUESTIONS[1]?.correctValue
-                      ? "Chính xác! Bạn đạt 2/2 câu hỏi thấu hiểu."
-                      : "Bạn đã hoàn thành bài kiểm tra thấu hiểu."}
-                  </span>
+                      <div className="space-y-2.5">
+                        {q.options.map((opt) => (
+                          <label
+                            key={opt.key}
+                            className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                              currentVal === opt.key
+                                ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
+                                : isDark
+                                ? "bg-[#141C1A] border-[#D9B76A]/15 text-[#E8DFCB] hover:bg-[#1E2925]"
+                                : "bg-white/80 border-[rgba(30,75,67,0.1)] hover:bg-[#F6EEDC]/70"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name={`dynamic-q-${idx}`}
+                              value={opt.key}
+                              checked={currentVal === opt.key}
+                              onChange={() => {
+                                setDynamicAnswers((prev) => ({ ...prev, [idx]: opt.key }));
+                                if (dynamicSubmitted) setDynamicSubmitted(false);
+                              }}
+                              className="mt-1 accent-[#D9B76A]"
+                            />
+                            <span className="text-xs sm:text-sm">
+                              <strong className="text-[#D9B76A] mr-1">{opt.key}.</strong> {opt.text}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+
+                      {dynamicSubmitted && q.explanation && (
+                        <p className="mt-3 text-xs italic text-[#D9B76A] dark:text-[#E8DFCB]/90 bg-[#1E4B43]/10 dark:bg-black/20 p-3 rounded-xl border border-antique-gold/20">
+                          💡 <strong>Ý nghĩa văn hóa:</strong> {q.explanation}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Submit Quiz Action */}
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <button
+                  onClick={() => setDynamicSubmitted(true)}
+                  className="px-6 py-3 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] shadow-sm transition-all border border-[#D9B76A] cursor-pointer"
+                >
+                  Kiểm Tra Đáp Án
+                </button>
+                {dynamicSubmitted && (
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ECFDF5] text-[#047857] text-xs font-bold border border-[#059669]/30">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>
+                      {(() => {
+                        const correctCount = articleData.questions.filter(
+                          (q, idx) => dynamicAnswers[idx] === q.correctKey
+                        ).length;
+                        return correctCount === articleData.questions.length
+                          ? `Xuất sắc! Bạn trả lời đúng ${correctCount}/${articleData.questions.length} câu hỏi thấu hiểu.`
+                          : `Bạn đã trả lời đúng ${correctCount}/${articleData.questions.length} câu hỏi thấu hiểu.`;
+                      })()}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : !articleData ? (
+            <>
+              <div className="mb-6 pb-4 border-b border-[rgba(217,183,106,0.2)]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
+                  Reading Check & Comprehension
+                </span>
+                <h2
+                  className={`font-serif text-2xl font-bold mt-1 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                    }`}
+                >
+                  Câu Hỏi Kiểm Tra Thấu Hiểu Bài Đọc
+                </h2>
+              </div>
+
+              {/* Quiz Q1 */}
+              <div className="mb-8">
+                <h3
+                  className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                    }`}
+                >
+                  {READER_QUIZ_QUESTIONS[0]?.question}
+                </h3>
+
+                <div className="space-y-2.5">
+                  {READER_QUIZ_QUESTIONS[0]?.options.map((opt) => (
+                    <label
+                      key={opt.value}
+                      className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === opt.value
+                        ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
+                        : themeMode === "dark"
+                          ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
+                          : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
+                        }`}
+                    >
+                      <input
+                        type="radio"
+                        name="q1"
+                        value={opt.value}
+                        checked={q1Answer === opt.value}
+                        onChange={() => setQ1Answer(opt.value)}
+                        className="mt-1 accent-[#D9B76A]"
+                      />
+                      <span className="text-xs sm:text-sm">{opt.label}</span>
+                    </label>
+                  ))}
                 </div>
-              )}
+              </div>
+
+              {/* Quiz Q2 */}
+              <div className="mb-8">
+                <h3
+                  className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                    }`}
+                >
+                  {READER_QUIZ_QUESTIONS[1]?.question}
+                </h3>
+
+                <div className="space-y-2.5">
+                  {READER_QUIZ_QUESTIONS[1]?.options.map((opt) => (
+                    <label
+                      key={opt.value}
+                      className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q2Answer === opt.value
+                        ? "bg-[#1E4B43]/20 border-[#D9B76A] text-[#FBF7EE] font-semibold"
+                        : themeMode === "dark"
+                          ? "bg-[#18211E] border-[#D9B76A]/20 text-[#E8DFCB] hover:bg-[#1E2925]"
+                          : "bg-[#F6EEDC]/60 border-[rgba(30,75,67,0.12)] hover:bg-[#F6EEDC]"
+                        }`}
+                    >
+                      <input
+                        type="radio"
+                        name="q2"
+                        value={opt.value}
+                        checked={q2Answer === opt.value}
+                        onChange={() => setQ2Answer(opt.value)}
+                        className="mt-1 accent-[#D9B76A]"
+                      />
+                      <span className="text-xs sm:text-sm">{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Submit Quiz Action */}
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setQuizSubmitted(true)}
+                  className="px-6 py-3 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] shadow-sm transition-all border border-[#D9B76A] cursor-pointer"
+                >
+                  Kiểm Tra Đáp Án
+                </button>
+                {quizSubmitted && (
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ECFDF5] text-[#047857] text-xs font-bold border border-[#059669]/30">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>
+                      {q1Answer === READER_QUIZ_QUESTIONS[0]?.correctValue &&
+                        q2Answer === READER_QUIZ_QUESTIONS[1]?.correctValue
+                        ? "Chính xác! Bạn đạt 2/2 câu hỏi thấu hiểu."
+                        : "Bạn đã hoàn thành bài kiểm tra thấu hiểu."}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="py-8 px-6 text-center rounded-2xl bg-white/40 dark:bg-white/5 border border-dashed border-[rgba(217,183,106,0.3)]">
+              <p role="status" className="text-xs sm:text-sm text-text-muted">
+                Bài này chưa có câu hỏi đọc hiểu được biên tập. Bạn có thể tiếp tục thực hành Dictation hoặc ôn thẻ nhớ ở bảng bên cạnh.
+              </p>
             </div>
-          </> : <p role="status">Bài này chưa có câu hỏi đọc hiểu được biên tập. Bạn có thể tiếp tục ôn từ vựng của bài.</p>}
+          )}
         </div>
 
         {/* Right 5 Cols: Practice Next Steps */}
@@ -745,8 +874,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
       <LessonCompletionFlowModal
         isOpen={isMocSonModalOpen}
         onClose={() => setIsMocSonModalOpen(false)}
+        articleId={articleData?.id || 'tet-holiday'}
         articleTitle={articleData?.titleVi || "Tết Cổ Truyền: Đổi Mới, Nhớ Về Cội Nguồn & Phong Vị Ba Miền"}
       />
+
 
       {/* ── In-Place Dictionary Popup ──────────────────────────────────────── */}
       <InPlaceDictionaryPopup

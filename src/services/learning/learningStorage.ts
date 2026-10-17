@@ -87,3 +87,27 @@ export function listSavedArticles(): Array<{ article: ReaderArticleData; level: 
     return [];
   }
 }
+
+export function getAllSavedVocabularies(): VocabItem[] {
+  try {
+    const map = new Map<string, VocabItem>();
+    for (let index = 0; index < localStorage.length; index++) {
+      const key = localStorage.key(index);
+      if (!key?.startsWith(PREFIX + 'saved-vocabulary:')) continue;
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const items = JSON.parse(raw) as VocabItem[];
+      if (Array.isArray(items)) {
+        items.forEach((item) => {
+          if (item?.word && !map.has(item.word.toLowerCase())) {
+            map.set(item.word.toLowerCase(), item);
+          }
+        });
+      }
+    }
+    return Array.from(map.values());
+  } catch {
+    return [];
+  }
+}
+

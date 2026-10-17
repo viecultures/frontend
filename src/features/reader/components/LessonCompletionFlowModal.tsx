@@ -16,10 +16,12 @@ import {
 import { READER_NEXT_LESSON_INFO } from '../data/learningLoopData';
 import { setStoredUser, getStoredUser } from '@/utils/auth-storage';
 import { PATHS, paths } from '@/routes/paths';
+import { profileService } from '@/features/profile/services/profileService';
 
 interface LessonCompletionFlowModalProps {
   isOpen: boolean;
   onClose: () => void;
+  articleId?: string;
   articleTitle?: string;
   isLoggedIn?: boolean;
   user?: { name: string; email: string; avatar?: string } | null;
@@ -31,11 +33,13 @@ type StepType = 'stamp' | 'auth' | 'survey' | 'completion';
 export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps> = ({
   isOpen,
   onClose,
+  articleId = 'tet-holiday',
   articleTitle = 'Tết Cổ Truyền: Đổi Mới, Nhớ Về Cội Nguồn & Phong Vị Ba Miền',
   isLoggedIn = false,
   user = null,
   onLoginSuccess,
 }) => {
+
   const navigate = useNavigate();
 
   // Multi-step flow state
@@ -82,8 +86,14 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
     setTimeout(() => {
       setIsStamped(true);
       setIsAnimatingStamp(false);
+      try {
+        profileService.unlockSeal(articleId || 'tet-holiday');
+      } catch {
+        // ignore
+      }
     }, 750);
   };
+
 
   const handleProceedAfterStamp = () => {
     const active = currentUser || getStoredUser();
@@ -373,6 +383,18 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
                 type="button"
                 onClick={() => {
                   onClose();
+                  navigate(paths.profile({ tab: 'passport' }));
+                }}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#D9B76A] hover:bg-[#c9a75a] text-[#122A22] font-serif font-bold text-xs sm:text-sm shadow-xl border border-[#D9B76A] transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Award className="w-4 h-4 text-[#122A22]" />
+                <span>Xem Hộ Chiếu Mộc Son</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
                   navigate(paths.reader({ postId: 'imperial-hue' }));
                 }}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#1E4B43] hover:bg-[#163D37] text-white font-serif font-bold text-xs sm:text-sm shadow-xl border border-[#D9B76A] transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
@@ -390,9 +412,10 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
                 className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-serif font-bold text-xs sm:text-sm shadow-xl border border-[#D9B76A] transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Crown className="w-4 h-4 text-[#D9B76A] fill-current" />
-                <span>Nâng Cấp Gói Pro (39.000đ)</span>
+                <span>Nâng Cấp Gói Pro (39k)</span>
               </button>
             </div>
+
 
             <div>
               <button

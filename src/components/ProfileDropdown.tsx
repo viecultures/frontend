@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { User, LogOut, ChevronRight, ExternalLink, Crown, ShieldCheck, Sparkles } from 'lucide-react';
-
-import { PATHS } from '@/routes/paths';
+import { User, LogOut, ChevronRight, ExternalLink, Crown, ShieldCheck, Sparkles, Award } from 'lucide-react';
+import { PATHS, paths } from '@/routes/paths';
 import type { AppUser } from '@/utils/auth-storage';
 
 interface ProfileDropdownProps {
@@ -70,11 +69,11 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               {/* Badges adhering to Master Color System & 0 emoji rule */}
               <div className="flex items-center gap-2 pt-0.5">
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-mist text-heritage-dark border border-[#9FCED8]">
-                  Starter
+                  Level 2
                 </span>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-antique-bright text-heritage-dark border border-antique-gold">
                   <Crown className="w-3 h-3 text-heritage-dark fill-current" />
-                  <span>2 ngày Premium</span>
+                  <span>Pro Member</span>
                 </span>
               </div>
             </div>
@@ -85,7 +84,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               <motion.button
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => handleItemClick(undefined, PATHS.home)}
+                onClick={() => handleItemClick(undefined, PATHS.profile)}
                 className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-green/70 hover:bg-mist-cloud dark:hover:bg-heritage-green border border-heritage-green/15 dark:border-white/10 hover:border-antique-gold text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
               >
                 <div className="flex items-center gap-2">
@@ -94,6 +93,21 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                 </div>
                 <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
               </motion.button>
+
+              {/* 2. Hộ chiếu Di sản */}
+              <motion.button
+                whileHover={{ x: 2, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleItemClick(undefined, paths.profile({ tab: 'passport' }))}
+                className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-green/70 hover:bg-mist-cloud dark:hover:bg-heritage-green border border-heritage-green/15 dark:border-white/10 hover:border-antique-gold text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
+              >
+                <div className="flex items-center gap-2">
+                  <Award className="w-4 h-4 text-[#9E2A2B]" />
+                  <span>Hộ chiếu Di sản (Mộc Son)</span>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-heritage-green/40 dark:text-white/40 group-hover:translate-x-0.5 group-hover:text-antique-gold transition-all" />
+              </motion.button>
+
 
               {/* 2. AI Playground */}
               <motion.button
