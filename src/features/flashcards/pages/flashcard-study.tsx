@@ -8,6 +8,7 @@ import { FlashcardStudyHeader, FlashcardProgressBar, FlashcardModeTabs, Flashcar
 import { FlashcardSessionSummary } from '../components/FlashcardSessionSummary';
 import { cardsFromVocabulary, loadStudyDeck, type StudyDeck } from '../services/studyDeck';
 import { useReviewSession } from '../hooks/useReviewSession';
+import { PATHS, paths } from '@/routes/paths';
 
 interface FlashcardStudyPlayerProps { deck: StudyDeck; level: string; savedOnly: boolean; }
 
@@ -67,7 +68,7 @@ function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerPr
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [session, currentCard, cards.length]);
 
-  if (!cards.length) return <div role="status" className="p-8 text-center"><h1>Chưa có từ vựng để ôn</h1><p>{savedOnly ? 'Hãy lưu từ trong bài đọc trước.' : 'Bài này chưa có bộ từ được biên tập.'}</p><Link to={`/bilingual-reader?postId=${encodeURIComponent(deck.article.id)}&level=${encodeURIComponent(level)}`}>Trở về bài đọc</Link></div>;
+  if (!cards.length) return <div role="status" className="p-8 text-center"><h1>Chưa có từ vựng để ôn</h1><p>{savedOnly ? 'Hãy lưu từ trong bài đọc trước.' : 'Bài này chưa có bộ từ được biên tập.'}</p><Link to={paths.reader({ postId: deck.article.id, level })}>Trở về bài đọc</Link></div>;
 
   return <div className="vocab-study-page w-full">
     <div>
@@ -119,6 +120,6 @@ export default function FlashcardStudyPage() {
   return <FlashcardSidebarLayout>
     {!result || result.key !== key ? <p role="status">Đang tải bộ từ của bài đọc…</p> : result.deck ?
       <FlashcardStudyPlayer key={key + savedOnly} deck={result.deck} level={result.deck.lesson.cefrLevel} savedOnly={savedOnly} /> :
-      <div role="alert" className="p-8 text-center"><h1>Chưa tải được bộ từ của bài này</h1><p>Kiểm tra kết nối hoặc chọn lại bài đọc.</p><button onClick={() => setAttempt(value => value + 1)}>Thử lại</button> <Link to="/discovery">Chọn bài đọc</Link></div>}
+      <div role="alert" className="p-8 text-center"><h1>Chưa tải được bộ từ của bài này</h1><p>Kiểm tra kết nối hoặc chọn lại bài đọc.</p><button onClick={() => setAttempt(value => value + 1)}>Thử lại</button> <Link to={PATHS.discovery}>Chọn bài đọc</Link></div>}
   </FlashcardSidebarLayout>;
 }

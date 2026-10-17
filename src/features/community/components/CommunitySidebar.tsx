@@ -1,5 +1,6 @@
 import { ShieldCheck, Trophy, Sparkles, TrendingUp, Award, ArrowRight, User } from "lucide-react";
 import Link from "@/components/Link";
+import { PATHS } from "@/routes/paths";
 
 interface CommunitySidebarProps {
   onSelectTopicTag?: (tag: string) => void;
@@ -41,7 +42,7 @@ export function CommunitySidebar({ onSelectTopicTag, selectedTag }: CommunitySid
         </p>
 
         <Link
-          href="/community-2"
+          to={PATHS.communityContest}
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold text-heritage-dark bg-warm-ivory hover:bg-rice-paper border border-antique-gold shadow-sm transition-all w-full focus-ring"
         >
           <span>Tham Gia Thử Thách Ngay</span>

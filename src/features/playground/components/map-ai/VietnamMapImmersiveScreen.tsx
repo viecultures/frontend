@@ -46,6 +46,7 @@ import {
   BookOpen,
   ExternalLink,
 } from 'lucide-react';
+import { paths } from '@/routes/paths';
 
 function VietnamMapImmersiveContent() {
   const { toggleSidebar, speakerMuted } = useUI();
@@ -516,7 +517,7 @@ function VietnamMapImmersiveContent() {
                         <span>Xem</span>
                       </button>
                       <a
-                        href={`/reader?article=${encodeURIComponent(art.id)}&level=${encodeURIComponent(art.level)}`}
+                        href={paths.reader({ article: art.id, level: art.level })}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-2 py-0.5 rounded text-[10px] bg-[#D4AF37]/20 hover:bg-[#D4AF37]/35 text-[#FCE5B5] border border-[#D4AF37]/40 flex items-center gap-1 cursor-pointer transition-colors"

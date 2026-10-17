@@ -10,6 +10,7 @@ import { ReaderQuickFlashcards } from "./ReaderQuickFlashcards";
 import { LessonCompletionFlowModal } from "./LessonCompletionFlowModal";
 import type { ReaderArticleData } from "../services/readerApiService";
 import { useReaderDictionary } from "../hooks/useReaderDictionary";
+import { paths } from '@/routes/paths';
 
 interface BilingualReaderViewProps {
   themeMode: "paper" | "dark";
@@ -695,7 +696,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
               {/* Full Flashcard Study Room Link */}
               <Link
-                href={`/flashcard-study?deck=${encodeURIComponent(articleData?.id || 'tet-holiday')}&level=${encodeURIComponent(selectedLevel)}`}
+                href={paths.flashcardStudy({ deck: articleData?.id || 'tet-holiday', level: selectedLevel })}
                 className="flex items-center justify-between px-5 py-3.5 rounded-2xl bg-[#1E4B43] text-[#FBF7EE] text-xs font-bold shadow-sm hover:bg-[#163D37] border border-[#D9B76A]/50 transition-all group"
               >
                 <span className="flex items-center gap-2">

@@ -3,6 +3,8 @@ import { motion, useReducedMotion } from 'motion/react';
 import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Crown, ShieldCheck, Award } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
+
+import { PATHS } from '@/routes/paths';
 import type { AppUser } from '@/utils/auth-storage';
 
 interface NavbarProps {
@@ -42,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     } else {
-      onNavigateToSection('landing');
+      onNavigateToSection(PATHS.landing);
       setTimeout(() => {
         document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -65,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
             whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
             className="cursor-pointer focus-ring-dark rounded-xl"
-            onClick={() => onNavigateToSection(isLoggedIn ? 'home' : 'landing')}
+            onClick={() => onNavigateToSection(isLoggedIn ? PATHS.home : PATHS.landing)}
           >
             <BrandLogo size="md" theme="dark" />
           </motion.div>
@@ -81,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('home')}
+                  onClick={() => onNavigateToSection(PATHS.home)}
                   className={navLinkClass(activeView === 'home')}
                   aria-current={activeView === 'home' ? 'page' : undefined}
                 >
@@ -92,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('discovery')}
+                  onClick={() => onNavigateToSection(PATHS.discovery)}
                   className={navLinkClass(activeView === 'discovery')}
                   aria-current={activeView === 'discovery' ? 'page' : undefined}
                 >
@@ -103,7 +105,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('reader')}
+                  onClick={() => onNavigateToSection(PATHS.reader)}
                   className={navLinkClass(activeView === 'reader' || activeView === 'bilingual-reader')}
                   aria-current={activeView === 'reader' || activeView === 'bilingual-reader' ? 'page' : undefined}
                 >
@@ -114,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('dictionary')}
+                  onClick={() => onNavigateToSection(PATHS.dictionary)}
                   className={navLinkClass(
                     activeView === 'dictionary' || activeView === 'flashcard-study'
                   )}
@@ -131,7 +133,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('community')}
+                  onClick={() => onNavigateToSection(PATHS.community)}
                   className={navLinkClass(
                     activeView === 'community' || activeView === 'community-contest'
                   )}
@@ -148,7 +150,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('playground')}
+                  onClick={() => onNavigateToSection(PATHS.playground)}
                   className={navLinkClass(activeView === 'playground')}
                   aria-current={activeView === 'playground' ? 'page' : undefined}
                 >
@@ -159,7 +161,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('admin')}
+                  onClick={() => onNavigateToSection(PATHS.admin)}
                   className={navLinkClass(activeView === 'admin')}
                   aria-current={activeView === 'admin' ? 'page' : undefined}
                 >
@@ -203,7 +205,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('discovery')}
+                  onClick={() => onNavigateToSection(PATHS.discovery)}
                   className={navLinkClass(activeView === 'discovery')}
                   aria-current={activeView === 'discovery' ? 'page' : undefined}
                 >
@@ -214,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <motion.button
                   whileHover={{ scale: hoverScale }}
                   whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection('playground')}
+                  onClick={() => onNavigateToSection(PATHS.playground)}
                   className={navLinkClass(activeView === 'playground')}
                   aria-current={activeView === 'playground' ? 'page' : undefined}
                 >
@@ -263,7 +265,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <motion.button
                 whileHover={{ scale: hoverScale }}
                 whileTap={{ scale: tapScale }}
-                onClick={() => onNavigateToSection('login')}
+                onClick={() => onNavigateToSection(PATHS.login)}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer focus-ring-dark ${activeView === 'login'
                   ? 'bg-antique-gold text-heritage-dark ring-2 ring-antique-gold'
                   : 'bg-heritage-green text-warm-ivory hover:bg-heritage-dark border border-antique-gold/40'

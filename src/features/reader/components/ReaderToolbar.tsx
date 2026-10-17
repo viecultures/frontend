@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Link from "@/components/Link";
 import { ArrowLeft, Columns, BookOpen, Moon, Sun, Layers, LogIn, Crown, User } from "lucide-react";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
-import type { AppUser } from "@/utils/auth-storage";
+
+import { paths } from '@/routes/paths';
+import type { AppUser } from '@/utils/auth-storage';
 
 interface ReaderToolbarProps {
   fontSize: number;
@@ -71,11 +73,10 @@ export function ReaderToolbar({
                   key={lvl}
                   type="button"
                   onClick={() => onChangeLevel(lvl)}
-                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                    selectedLevel === lvl
-                      ? 'bg-emerald-600 text-white shadow-xs font-bold ring-1 ring-antique-gold/60'
-                      : 'text-[#BFE3EA] hover:text-[#FBF7EE]'
-                  }`}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${selectedLevel === lvl
+                    ? 'bg-emerald-600 text-white shadow-xs font-bold ring-1 ring-antique-gold/60'
+                    : 'text-[#BFE3EA] hover:text-[#FBF7EE]'
+                    }`}
                   title={`Chuyển sang ${lvl}`}
                 >
                   {lvl}
@@ -109,11 +110,10 @@ export function ReaderToolbar({
           <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40 text-xs font-bold">
             <button
               onClick={() => onChangeReadingMode("bilingual")}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                readingMode === "bilingual"
-                  ? "bg-[#D9B76A] text-[#1E4B43] shadow-xs"
-                  : "text-[#BFE3EA] hover:text-[#FBF7EE]"
-              }`}
+              className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${readingMode === "bilingual"
+                ? "bg-[#D9B76A] text-[#1E4B43] shadow-xs"
+                : "text-[#BFE3EA] hover:text-[#FBF7EE]"
+                }`}
               title="Chế độ Song Ngữ (Anh - Việt)"
             >
               <Columns className="w-3.5 h-3.5" />
@@ -121,11 +121,10 @@ export function ReaderToolbar({
             </button>
             <button
               onClick={() => onChangeReadingMode("extensive")}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                readingMode === "extensive"
-                  ? "bg-[#D9B76A] text-[#1E4B43] shadow-xs"
-                  : "text-[#BFE3EA] hover:text-[#FBF7EE]"
-              }`}
+              className={`px-3 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${readingMode === "extensive"
+                ? "bg-[#D9B76A] text-[#1E4B43] shadow-xs"
+                : "text-[#BFE3EA] hover:text-[#FBF7EE]"
+                }`}
               title="Chế độ Đọc Mở Rộng Tiếng Anh (Extensive Reading)"
             >
               <BookOpen className="w-3.5 h-3.5" />
@@ -158,11 +157,10 @@ export function ReaderToolbar({
           <div className="flex items-center bg-[#163D37] p-1 rounded-xl border border-[#D9B76A]/40">
             <button
               onClick={() => onChangeThemeMode("dark")}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
-                themeMode === "dark"
-                  ? "bg-[#18211E] text-[#D9B76A]"
-                  : "text-[#BFE3EA]"
-              }`}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${themeMode === "dark"
+                ? "bg-[#18211E] text-[#D9B76A]"
+                : "text-[#BFE3EA]"
+                }`}
               title="Tối"
             >
               <Moon className="w-3 h-3 inline mr-1" />
@@ -170,11 +168,10 @@ export function ReaderToolbar({
             </button>
             <button
               onClick={() => onChangeThemeMode("paper")}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
-                themeMode === "paper"
-                  ? "bg-[#FBF7EE] text-[#1E4B43]"
-                  : "text-[#BFE3EA]"
-              }`}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${themeMode === "paper"
+                ? "bg-[#FBF7EE] text-[#1E4B43]"
+                : "text-[#BFE3EA]"
+                }`}
               title="Sáng"
             >
               <Sun className="w-3 h-3 inline mr-1" />
@@ -187,11 +184,10 @@ export function ReaderToolbar({
             <div className="relative flex items-center gap-2 pl-1 border-l border-[#D9B76A]/40">
               <Link
                 href="/pricing"
-                className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all ${
-                  isPro
-                    ? "bg-[#D9B76A] text-[#122A22] border-[#D9B76A]"
-                    : "bg-[#163D37] text-[#D9B76A] border-[#D9B76A]/40 hover:bg-[#1E4B43]"
-                }`}
+                className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all ${isPro
+                  ? "bg-[#D9B76A] text-[#122A22] border-[#D9B76A]"
+                  : "bg-[#163D37] text-[#D9B76A] border-[#D9B76A]/40 hover:bg-[#1E4B43]"
+                  }`}
                 title="Gói hội viên"
               >
                 <Crown className="w-3 h-3 fill-current" />
@@ -223,10 +219,7 @@ export function ReaderToolbar({
                 onClose={() => setIsProfileOpen(false)}
                 user={user}
                 onLogout={onLogout}
-                onNavigate={(view) => {
-                  if (view.startsWith("/")) navigate(view);
-                  else navigate(`/${view}`);
-                }}
+                onNavigate={(to) => navigate(to)}
               />
             </div>
           ) : (
@@ -234,7 +227,7 @@ export function ReaderToolbar({
               type="button"
               onClick={() => {
                 const currentPath = window.location.pathname + window.location.search;
-                navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
+                navigate(paths.login({ redirect: currentPath }));
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#9E2A2B] hover:bg-[#852223] text-white font-bold text-xs shadow-sm border border-[#D9B76A]/60 transition-all cursor-pointer"
             >

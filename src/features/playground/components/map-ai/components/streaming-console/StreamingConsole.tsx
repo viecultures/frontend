@@ -21,6 +21,7 @@ import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
 import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
 import { useTimelineSelection } from './useTimelineSelection';
 import { maskProfanity } from '@/utils/dictionary-service';
+import { paths } from '@/routes/paths';
 
 export interface VieCultureArticleItem {
   id: string;
@@ -338,7 +339,7 @@ export default function StreamingConsole() {
 
                             <div>
                               <a
-                                href={`/reader?article=${encodeURIComponent(art.id)}&level=${encodeURIComponent(art.level || 'Level 2')}`}
+                                href={paths.reader({ article: art.id, level: art.level || 'Level 2' })}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="group/title inline-block"
@@ -394,7 +395,7 @@ export default function StreamingConsole() {
                                 <span>Đàm thoại bài này</span>
                               </button>
                               <a
-                                href={`/reader?article=${encodeURIComponent(art.id)}&level=${encodeURIComponent(art.level || 'Level 2')}`}
+                                href={paths.reader({ article: art.id, level: art.level || 'Level 2' })}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-[#D4AF37]/15 hover:bg-[#D4AF37]/25 text-[#FCE5B5] border border-[#D4AF37]/35 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"

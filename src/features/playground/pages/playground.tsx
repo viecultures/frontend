@@ -9,6 +9,7 @@ import { VideoDictationShadowingScreen } from '../components/screens/VideoDictat
 import { VietnamMapAiScreen } from '../components/screens/VietnamMapAiScreen';
 import { VietnamMapImmersiveScreen } from '../components/screens/VietnamMapImmersiveScreen';
 import { LiveAPIProvider } from '../components/map-ai/contexts/LiveAPIContext';
+import { PATHS } from '@/routes/paths';
 
 export const PlaygroundPage: React.FC = () => {
   const navigate = useNavigate();
@@ -85,7 +86,7 @@ export const PlaygroundPage: React.FC = () => {
       {/* Mobile / Tablet Quick Exit to Home */}
       <div className="xl:hidden fixed top-3 right-3 z-50">
         <button
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(PATHS.home)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E2925]/90 backdrop-blur-md border border-[#D4AF37]/40 text-[#D4AF37] hover:text-white text-xs font-semibold shadow-lg cursor-pointer"
           title="Về Phòng Học"
           aria-label="Về Phòng Học"

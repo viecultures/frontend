@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, Bot, MessageSquare, Settings, Sparkles } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
+import { PATHS } from '@/routes/paths';
 
 interface HomeFloatingSidebarProps {
   onNavigate: (view: string) => void;
@@ -18,7 +19,7 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
     >
       <button
         type="button"
-        onClick={() => onNavigate('discovery')}
+        onClick={() => onNavigate(PATHS.discovery)}
         className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
         title="Tìm kiếm bài đọc"
         aria-label="Tìm kiếm bài đọc"
@@ -31,7 +32,7 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
 
       <button
         type="button"
-        onClick={() => onNavigate('playground')}
+        onClick={() => onNavigate(PATHS.playground)}
         className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
         title="AI Playground"
         aria-label="AI Playground"
@@ -44,7 +45,7 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
 
       <button
         type="button"
-        onClick={() => onNavigate('community-1')}
+        onClick={() => onNavigate(PATHS.community)}
         className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
         title="Trợ lý AI Companion"
         aria-label="Trợ lý AI Companion"
@@ -57,7 +58,7 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
 
       <button
         type="button"
-        onClick={() => onNavigate('community-1')}
+        onClick={() => onNavigate(PATHS.community)}
         className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
         title="Cộng đồng Thảo luận"
         aria-label="Cộng đồng thảo luận"

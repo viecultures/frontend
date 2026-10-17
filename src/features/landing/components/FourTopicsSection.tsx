@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpRight, Landmark, UtensilsCrossed, Palette, Sparkles } from 'lucide-react';
+import { PATHS } from '@/routes/paths';
 
 const TOPICS = [
   { title: 'Lịch sử & di sản', english: 'History & Heritage', description: 'Những dấu xưa, những câu chuyện còn sống mãi.', image: '/images/landing/hue-citadel.jpg', icon: Landmark },
@@ -14,8 +15,7 @@ interface FourTopicsSectionProps {
 
 export const FourTopicsSection: React.FC<FourTopicsSectionProps> = ({ onNavigate }) => {
   const explore = () => {
-    if (onNavigate) onNavigate('discovery');
-    else window.dispatchEvent(new CustomEvent('app:navigate', { detail: 'discovery' }));
+    onNavigate?.(PATHS.discovery);
   };
 
   return (

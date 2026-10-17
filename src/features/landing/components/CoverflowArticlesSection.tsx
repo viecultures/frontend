@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { Clock, ArrowUpRight, ArrowRight, ChevronLeft, ChevronRight, Headphones, Pause, Play } from 'lucide-react';
+import { PATHS, paths } from '@/routes/paths';
 
 const ARTICLES = [
   { id: 'hoi-an-lanterns', category: 'Lễ hội & đời sống', title: 'Một đêm đèn lồng Hội An', englishTitle: 'Hoi An Full-Moon Lantern Festival', image: '/images/landing/hoi-an-lanterns.jpg', readTime: '6 phút', description: 'Theo ánh đèn trên sông Hoài, tìm lại câu chuyện của phố cổ và những người giữ nghề.' },
@@ -31,8 +32,7 @@ export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> =
 
   const step = (direction: number) => setCurrentIndex((index) => (index + direction + totalCards) % totalCards);
   const navigate = (view: string) => {
-    if (onNavigate) onNavigate(view);
-    else window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
+    onNavigate?.(view);
   };
 
   return (
@@ -43,7 +43,7 @@ export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> =
             <span className="landing-eyebrow">01 / NHỮNG CÂU CHUYỆN ĐÁNG ĐỌC</span>
             <h2 id="landing-articles-title">Bắt đầu từ một điều <em>bạn thích.</em></h2>
           </div>
-          <button type="button" className="landing-text-link" onClick={() => navigate('discovery')}>Tất cả bài đọc <ArrowUpRight size={18} aria-hidden="true" /></button>
+          <button type="button" className="landing-text-link" onClick={() => navigate(PATHS.discovery)}>Tất cả bài đọc <ArrowUpRight size={18} aria-hidden="true" /></button>
         </div>
         <p className="landing-section-description">Một chút tò mò về Việt Nam. Một cách mới để học tiếng Anh mỗi ngày.</p>
         <div className="landing-coverflow" role="region" aria-roledescription="carousel" aria-label="Bài đọc song ngữ — slider 3D"
@@ -68,7 +68,7 @@ export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> =
             return (
             <article key={article.id} className={'landing-article-card landing-coverflow-card' + (isActive ? ' is-active' : '')} style={style} aria-hidden={isHidden} inert={isHidden}>
               <button type="button" className="landing-article-open" onClick={() => {
-                if (isActive) navigate('/reader?story=' + article.id);
+                if (isActive) navigate(paths.reader({ story: article.id }));
                 else setCurrentIndex(index);
               }} aria-label={(isActive ? 'Đọc bài: ' : 'Chọn bài: ') + article.title}>
                 <div className="landing-article-image">

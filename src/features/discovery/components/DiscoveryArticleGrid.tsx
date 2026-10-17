@@ -16,6 +16,7 @@ import {
   getLessonStatsForLevel,
 } from '@/data/discoveryData';
 import { ArticleCardSkeleton } from '@/components/ui/skeleton';
+import { paths } from '@/routes/paths';
 
 interface DiscoveryArticleGridProps {
   isLoading: boolean;
@@ -140,7 +141,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                 {/* Top Section: Title, Subtitle, and Summary with fixed line heights */}
                 <div className="space-y-1.5 flex-1">
                   <Link
-                    href={`/reader?story=${lesson.id}&level=${encodeURIComponent(activeLevel)}`}
+                    href={paths.reader({ story: lesson.id, level: activeLevel })}
                     className="block group/link focus-ring rounded-lg"
                   >
                     <h3 className="font-serif text-xl font-bold text-heritage-green leading-snug group-hover/link:text-antique-rich transition-colors ink-underline line-clamp-2 h-[3.25rem] flex items-start">
@@ -167,7 +168,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                         return (
                           <Link
                             key={lvl}
-                            href={`/reader?story=${lesson.id}&level=${encodeURIComponent(lvl)}`}
+                            href={paths.reader({ story: lesson.id, level: lvl })}
                             className={`px-2.5 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider border transition-all focus-ring hover:scale-105 active:scale-95 ${
                               selectedCefr === 'All'
                                 ? getCefrBadgeStyle(lvl) + ' shadow-2xs'
@@ -195,7 +196,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                       <span>{currentStats.vocabCount} Từ vựng di sản</span>
                     </span>
                     <Link
-                      href={`/reader?story=${lesson.id}&level=${encodeURIComponent(activeLevel)}`}
+                      href={paths.reader({ story: lesson.id, level: activeLevel })}
                       className="font-bold text-heritage-green group-hover:text-antique-rich inline-flex items-center gap-1 transition-colors focus-ring rounded"
                     >
                       <span>Đọc bài</span>
@@ -248,7 +249,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                       return (
                         <Link
                           key={lvl}
-                          href={`/reader?story=${lesson.id}&level=${encodeURIComponent(lvl)}`}
+                          href={paths.reader({ story: lesson.id, level: lvl })}
                           className={`px-1.5 py-0.5 rounded text-[9px] uppercase font-bold border transition-all hover:scale-105 active:scale-95 ${
                             selectedCefr === 'All'
                               ? getCefrBadgeStyle(lvl)
@@ -274,7 +275,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   )}
                 </div>
                 <Link
-                  href={`/reader?story=${lesson.id}&level=${encodeURIComponent(activeLevel)}`}
+                  href={paths.reader({ story: lesson.id, level: activeLevel })}
                   className="block group/title focus-ring rounded"
                 >
                   <h3 className="font-serif text-lg font-bold text-heritage-green group-hover/title:text-antique-rich transition-colors leading-snug ink-underline">
@@ -314,7 +315,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   )}
                 </button>
                 <Link
-                  href={`/reader?story=${lesson.id}&level=${encodeURIComponent(activeLevel)}`}
+                  href={paths.reader({ story: lesson.id, level: activeLevel })}
                   className="px-4 py-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory font-bold inline-flex items-center gap-1.5 transition-all shadow-xs focus-ring hover:scale-102"
                 >
                   <span>Đọc bài</span>

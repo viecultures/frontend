@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Sparkles, ArrowLeft, CheckCircle2, Crown, Globe } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
+import { PATHS } from '@/routes/paths';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 
 interface LoginPageProps {
   onLoginSuccess?: (userData?: { email?: string; name?: string }) => void;
-  onNavigate?: (view: string) => void;
 }
 
 // ─── Shared input class — dark glass style ─────────────────────────────────────
@@ -22,20 +23,14 @@ const LABEL_CLASS =
   'block text-[11px] font-semibold text-white/80 uppercase tracking-wider mb-1';
 
 // ─── Component ─────────────────────────────────────────────────────────────────
-export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
 
-  const handleNavigate = (view: string) => {
-    if (onNavigate) {
-      onNavigate(view);
-    } else {
-      window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
-    }
-  };
+  const handleNavigate = useAppNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +48,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
       } else if (window.history.length > 1) {
         window.history.back();
       } else {
-        handleNavigate('home');
+        handleNavigate(PATHS.home);
       }
     }
   };
@@ -83,7 +78,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
               <BrandLogo
                 size="md"
                 theme="dark"
-                onClick={() => handleNavigate('landing')}
+                onClick={() => handleNavigate(PATHS.landing)}
                 className="focus-ring-dark rounded-xl"
               />
             </div>
@@ -250,7 +245,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
                     const redirectUrl = params.get('redirect');
                     if (redirectUrl) window.location.href = redirectUrl;
                     else if (window.history.length > 1) window.history.back();
-                    else handleNavigate('home');
+                    else handleNavigate(PATHS.home);
                   }
                 }}
                 className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark cursor-pointer"
@@ -269,7 +264,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
                     const redirectUrl = params.get('redirect');
                     if (redirectUrl) window.location.href = redirectUrl;
                     else if (window.history.length > 1) window.history.back();
-                    else handleNavigate('home');
+                    else handleNavigate(PATHS.home);
                   }
                 }}
                 className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark cursor-pointer"
@@ -285,7 +280,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNavigate
           {/* Back link */}
           <div className="pt-2 text-xs text-white/50 flex items-center justify-between">
             <button
-              onClick={() => handleNavigate('landing')}
+              onClick={() => handleNavigate(PATHS.landing)}
               className="text-antique-bright hover:underline font-semibold flex items-center gap-1 focus-ring-dark rounded"
             >
               <ArrowLeft className="w-3.5 h-3.5" />

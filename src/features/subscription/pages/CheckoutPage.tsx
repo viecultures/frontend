@@ -14,6 +14,7 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { setIsProUser, getStoredUser } from '@/utils/auth-storage';
+import { PATHS } from '@/routes/paths';
 
 export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ export const CheckoutPage: React.FC = () => {
         <div>
           <button
             type="button"
-            onClick={() => navigate('/pricing')}
+            onClick={() => navigate(PATHS.pricing)}
             className="inline-flex items-center gap-2 text-xs font-bold text-stone-600 dark:text-stone-300 hover:text-[#1E4B43] dark:hover:text-[#D9B76A] transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -85,7 +86,7 @@ export const CheckoutPage: React.FC = () => {
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 type="button"
-                onClick={() => navigate('/reader')}
+                onClick={() => navigate(PATHS.reader)}
                 className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-serif font-bold text-xs sm:text-sm shadow-xl border border-[#D9B76A] transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-105"
               >
                 <BookOpen className="w-4 h-4 text-[#D9B76A]" />
@@ -95,7 +96,7 @@ export const CheckoutPage: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => navigate('/home')}
+                onClick={() => navigate(PATHS.home)}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-full border border-white/20 text-stone-300 hover:text-white hover:bg-white/5 text-xs font-bold transition-all cursor-pointer"
               >
                 Về Trang Chủ

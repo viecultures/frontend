@@ -8,10 +8,11 @@ import { HomeBottomDock } from '../components/HomeBottomDock';
 import { HomeFloatingSidebar } from '../components/HomeFloatingSidebar';
 import { Check } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
+
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import type { AppUser } from '@/utils/auth-storage';
 
 interface HomePageProps {
-  onNavigate?: (view: string) => void;
   isLoggedIn?: boolean;
   user?: AppUser | null;
   onLogout?: () => void;
@@ -19,7 +20,6 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
-  onNavigate,
   isLoggedIn = false,
   user,
   onLogout,
@@ -81,13 +81,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     showToast('Đã đặt lại đồng hồ Pomodoro về 25:00');
   };
 
-  const handleNavigate = (view: string) => {
-    if (onNavigate) {
-      onNavigate(view);
-    } else {
-      window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
-    }
-  };
+  const handleNavigate = useAppNavigate();
 
   const isGradient = activeBackground.url.startsWith('linear-gradient');
 
@@ -157,13 +151,12 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* 6. Subtle Photo Location Credit (Bottom-Right Corner) */}
       <div className="fixed bottom-2.5 right-4 z-20 text-[11px] text-white/40 select-none pointer-events-none hidden sm:block tracking-wide font-normal">
         {backgroundMode === 'auto'
-          ? `Nền tự động (${
-              currentTimePeriod === 'morning'
-                ? 'Buổi Sáng'
-                : currentTimePeriod === 'afternoon'
-                ? 'Buổi Chiều'
-                : 'Buổi Tối'
-            }): ${activeBackground.name}`
+          ? `Nền tự động (${currentTimePeriod === 'morning'
+            ? 'Buổi Sáng'
+            : currentTimePeriod === 'afternoon'
+              ? 'Buổi Chiều'
+              : 'Buổi Tối'
+          }): ${activeBackground.name}`
           : `Nền: ${activeBackground.name}`}
       </div>
     </div>

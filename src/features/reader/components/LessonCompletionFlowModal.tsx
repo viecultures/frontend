@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { READER_NEXT_LESSON_INFO } from '../data/learningLoopData';
 import { setStoredUser, getStoredUser } from '@/utils/auth-storage';
+import { PATHS, paths } from '@/routes/paths';
 
 interface LessonCompletionFlowModalProps {
   isOpen: boolean;
@@ -207,7 +208,7 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
                 onClick={() => {
                   onClose();
                   const currentPath = window.location.pathname + window.location.search;
-                  navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
+                  navigate(paths.login({ redirect: currentPath }));
                 }}
                 className="w-full py-3.5 px-6 rounded-full bg-[#1E4B43] hover:bg-[#163D37] text-white font-serif font-bold text-sm shadow-xl border border-[#D9B76A] transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-[1.02]"
               >
@@ -372,7 +373,7 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
                 type="button"
                 onClick={() => {
                   onClose();
-                  navigate('/reader?postId=imperial-hue&story=imperial-hue');
+                  navigate(paths.reader({ postId: 'imperial-hue' }));
                 }}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#1E4B43] hover:bg-[#163D37] text-white font-serif font-bold text-xs sm:text-sm shadow-xl border border-[#D9B76A] transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
               >
@@ -384,7 +385,7 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
                 type="button"
                 onClick={() => {
                   onClose();
-                  navigate('/pricing');
+                  navigate(PATHS.pricing);
                 }}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-serif font-bold text-xs sm:text-sm shadow-xl border border-[#D9B76A] transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
               >

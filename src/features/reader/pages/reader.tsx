@@ -23,6 +23,7 @@ import { getStoredUser, setStoredUser, getIsProUser, type AppUser } from "@/util
 
 import { articleKey, cacheArticle, getCachedArticle } from '@/features/learning/lib/learningStorage';
 import { useSavedVocabulary, SavedVocabularyContext } from '../hooks/useSavedVocabulary';
+import { PATHS } from '@/routes/paths';
 
 export default function ReaderPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -375,7 +376,7 @@ export default function ReaderPage() {
       : "bg-[#FBF7EE] text-[#3F5550] border-[rgba(30,75,67,0.12)] shadow-xl";
 
   if (loadedKey !== requestedKey) return <main className="p-12" role="status">Đang tải bài đọc…</main>;
-  if (articleError) return <main className="p-12" role="alert"><h1>Chưa tải được bài đọc này</h1><p>Kiểm tra kết nối hoặc chọn lại bài.</p><button onClick={() => setReloadAttempt(value => value + 1)}>Thử lại</button> <Link to="/discovery">Chọn bài đọc</Link></main>;
+  if (articleError) return <main className="p-12" role="alert"><h1>Chưa tải được bài đọc này</h1><p>Kiểm tra kết nối hoặc chọn lại bài.</p><button onClick={() => setReloadAttempt(value => value + 1)}>Thử lại</button> <Link to={PATHS.discovery}>Chọn bài đọc</Link></main>;
 
   return (
     <SavedVocabularyContext.Provider value={savedVocabulary}>

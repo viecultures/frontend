@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, LogOut, ChevronRight, ExternalLink, Crown, ShieldCheck, Sparkles } from 'lucide-react';
+
+import { PATHS } from '@/routes/paths';
 import type { AppUser } from '@/utils/auth-storage';
 
 interface ProfileDropdownProps {
@@ -83,7 +85,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               <motion.button
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => handleItemClick(undefined, 'home')}
+                onClick={() => handleItemClick(undefined, PATHS.home)}
                 className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-green/70 hover:bg-mist-cloud dark:hover:bg-heritage-green border border-heritage-green/15 dark:border-white/10 hover:border-antique-gold text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
               >
                 <div className="flex items-center gap-2">
@@ -97,7 +99,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               <motion.button
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => handleItemClick(undefined, 'playground')}
+                onClick={() => handleItemClick(undefined, PATHS.playground)}
                 className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-green/70 hover:bg-mist-cloud dark:hover:bg-heritage-green border border-heritage-green/15 dark:border-white/10 hover:border-antique-gold text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
               >
                 <div className="flex items-center gap-2">
@@ -111,7 +113,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               <motion.button
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => handleItemClick(undefined, 'admin')}
+                onClick={() => handleItemClick(undefined, PATHS.admin)}
                 className="w-full px-3 py-2.5 rounded-xl bg-antique-gold/15 hover:bg-antique-gold/25 border border-antique-gold/40 text-xs font-bold text-heritage-dark dark:text-antique-bright flex items-center justify-between transition-colors shadow-sm group cursor-pointer focus-ring"
               >
                 <div className="flex items-center gap-2">

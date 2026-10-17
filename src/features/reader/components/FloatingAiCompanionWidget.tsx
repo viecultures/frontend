@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { READER_AI_QUICK_PROMPTS } from '../data/learningLoopData';
 import { getStoredUser, getIsProUser, type AppUser } from '@/utils/auth-storage';
+import { PATHS, paths } from '@/routes/paths';
 
 interface FloatingAiCompanionWidgetProps {
   articleTitle?: string;
@@ -60,11 +61,11 @@ export const FloatingAiCompanionWidget: React.FC<FloatingAiCompanionWidgetProps>
 
   const handleSendMessage = (textToSend?: string) => {
     if (!isLoggedIn) {
-      navigate('/login');
+      navigate(PATHS.login);
       return;
     }
     if (!isPro) {
-      navigate('/pricing');
+      navigate(PATHS.pricing);
       return;
     }
 
@@ -185,7 +186,7 @@ export const FloatingAiCompanionWidget: React.FC<FloatingAiCompanionWidgetProps>
                 type="button"
                 onClick={() => {
                   const currentPath = window.location.pathname + window.location.search;
-                  navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
+                  navigate(paths.login({ redirect: currentPath }));
                 }}
                 className="w-full py-2.5 rounded-xl bg-[#1E4B43] hover:bg-[#163D37] text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
@@ -205,7 +206,7 @@ export const FloatingAiCompanionWidget: React.FC<FloatingAiCompanionWidgetProps>
               </p>
               <button
                 type="button"
-                onClick={() => navigate('/pricing')}
+                onClick={() => navigate(PATHS.pricing)}
                 className="w-full py-2.5 rounded-xl bg-[#9E2A2B] hover:bg-[#852223] text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md border border-[#D9B76A]"
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#D9B76A]" />

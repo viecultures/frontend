@@ -4,6 +4,7 @@ import { MapPin, BookOpen, Sparkles, Clock } from 'lucide-react';
 import VietnamMapCarousel from '@/features/discovery/components/vietnam-map-carousel';
 import { VIETNAM_LANDMARKS, type LandmarkArticle } from '@/data/landmarksData';
 import type { ProvinceMapItem } from '@/data/vietnamMapData';
+import { paths } from '@/routes/paths';
 
 interface DiscoverySpotlightProps {
   activePinIndex: number;
@@ -136,7 +137,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-heritage-green/10">
             <Link
-              href={`/reader?story=${activeLandmark.id}`}
+              href={paths.reader({ story: activeLandmark.id })}
               className="px-5 py-2.5 text-xs font-extrabold flex items-center gap-2 rounded-full bg-heritage-green text-warm-ivory hover:bg-heritage-dark shadow-md hover:scale-102 transition-all focus-ring"
             >
               <BookOpen className="w-4 h-4" />

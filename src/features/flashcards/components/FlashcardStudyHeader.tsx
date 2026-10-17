@@ -1,6 +1,7 @@
 import { Volume2, Shuffle, Mic, ChevronDown, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Lesson } from "@/data/discoveryData";
+import { PATHS } from '@/routes/paths';
 
 interface FlashcardStudyHeaderProps {
   activeLesson: Lesson;
@@ -15,7 +16,7 @@ interface FlashcardStudyHeaderProps {
 export function FlashcardStudyHeader({ activeLesson, isShuffled, onToggleShuffle, isAutoAudio, onToggleAutoAudio, accentVoice, onChangeVoice }: FlashcardStudyHeaderProps) {
   return (
     <header className="vocab-study-heading">
-      <Link to="/dictionary" className="vocab-back-link"><ArrowLeft size={15} />Trở về kho từ vựng</Link>
+      <Link to={PATHS.dictionary} className="vocab-back-link"><ArrowLeft size={15} />Trở về kho từ vựng</Link>
       <div className="vocab-study-title-row">
         <div className="vocab-study-title"><h1>{activeLesson.title}</h1><span className="vocab-study-category">{activeLesson.categoryVi}</span></div>
         <div className="vocab-study-toolbar" aria-label="Tùy chọn ôn tập">

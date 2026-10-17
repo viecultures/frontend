@@ -11,13 +11,13 @@ import { LandingFaqSection } from '../components/LandingFaqSection';
 import { ContactSection } from '../components/ContactSection';
 import { LandingPhotoCredits } from '../components/LandingPhotoCredits';
 import '../landing.css';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 
 interface LandingPageProps {
-  onNavigate?: (view: string) => void;
   onOpenDocs?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
+export const LandingPage: React.FC<LandingPageProps> = () => {
   const [activeSegment, setActiveSegment] = React.useState<string>(() => {
     const hash = window.location.hash.replace('#', '');
     return hash || 'hero';
@@ -104,13 +104,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
     return () => observer.disconnect();
   }, []);
 
-  const handleNavigate = (view: string) => {
-    if (onNavigate) {
-      onNavigate(view);
-    } else {
-      window.dispatchEvent(new CustomEvent('app:navigate', { detail: view }));
-    }
-  };
+  const handleNavigate = useAppNavigate();
 
   return (
     <ThemeProvider>

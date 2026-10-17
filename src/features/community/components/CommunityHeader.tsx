@@ -1,5 +1,6 @@
 import { MessageSquare, Plus, Trophy, Sparkles, PenTool } from "lucide-react";
 import Link from "@/components/Link";
+import { PATHS } from "@/routes/paths";
 
 interface CommunityHeaderProps {
   isEditorOpen: boolean;
@@ -40,7 +41,7 @@ export function CommunityHeader({
         {/* Community Views Switcher */}
         <div className="flex items-center gap-2 mt-4">
           <Link
-            href="/community"
+            to={PATHS.community}
             className={`px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-2 transition-all ${
               !isContest
                 ? 'bg-heritage-green text-warm-ivory shadow-sm'
@@ -52,7 +53,7 @@ export function CommunityHeader({
           </Link>
 
           <Link
-            href="/community-2"
+            to={PATHS.communityContest}
             className={`px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-2 transition-all ${
               isContest
                 ? 'bg-heritage-green text-warm-ivory shadow-sm'

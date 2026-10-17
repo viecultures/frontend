@@ -10,6 +10,7 @@ import {
   BookOpen,
   ArrowRight,
 } from "lucide-react";
+import { PATHS } from '@/routes/paths';
 
 interface FlashcardSidebarLayoutProps {
   children: React.ReactNode;
@@ -50,11 +51,11 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
   };
 
   return (
-    <div className={`vocab-shell ${currentPath === "/flashcard-study" ? "vocab-study-shell" : ""} text-text-body flex flex-col lg:flex-row font-sans selection:bg-sky-mist selection:text-heritage-green`}>
+    <div className={`vocab-shell ${currentPath === PATHS.flashcardStudy ? "vocab-study-shell" : ""} text-text-body flex flex-col lg:flex-row font-sans selection:bg-sky-mist selection:text-heritage-green`}>
       <nav className="vocab-mobile-nav lg:hidden" aria-label="Điều hướng từ vựng trên điện thoại">
-        <button onClick={() => handleNav("/dictionary")} aria-current={currentPath === "/dictionary" ? "page" : undefined}><BookMarked size={16} />Thư viện</button>
+        <button onClick={() => handleNav(PATHS.dictionary)} aria-current={currentPath === PATHS.dictionary ? "page" : undefined}><BookMarked size={16} />Thư viện</button>
         <button onClick={handleOpenAddWord}><PlusCircle size={16} />Thêm từ</button>
-        <button onClick={() => handleNav("/flashcard-study")} aria-current={currentPath === "/flashcard-study" ? "page" : undefined}><Sparkles size={16} />Ôn tập</button>
+        <button onClick={() => handleNav(PATHS.flashcardStudy)} aria-current={currentPath === PATHS.flashcardStudy ? "page" : undefined}><Sparkles size={16} />Ôn tập</button>
       </nav>
 
       {/* LEFT NAVIGATION SIDEBAR */}
@@ -67,10 +68,10 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
           <nav className="space-y-1.5" aria-label="Điều hướng Flashcards">
             {/* TAB 1: THƯ VIỆN */}
             <button
-              onClick={() => handleNav("/dictionary")}
-              aria-current={currentPath === "/dictionary" ? "page" : undefined}
+              onClick={() => handleNav(PATHS.dictionary)}
+              aria-current={currentPath === PATHS.dictionary ? "page" : undefined}
               className={`w-full px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer focus-ring ${
-                currentPath === "/dictionary" || currentPath === "/flashcard-library"
+                currentPath === PATHS.dictionary || currentPath === "/flashcard-library"
                   ? "bg-rice-paper text-heritage-green border border-antique-gold/50 shadow-xs"
                   : "text-text-body hover:bg-rice-paper/60 hover:text-heritage-green"
               }`}
@@ -90,10 +91,10 @@ export const FlashcardSidebarLayout: React.FC<FlashcardSidebarLayoutProps> = ({
 
             {/* TAB 3: ÔN TẬP SRS */}
             <button
-              onClick={() => handleNav("/flashcard-study")}
-              aria-current={currentPath === "/flashcard-study" ? "page" : undefined}
+              onClick={() => handleNav(PATHS.flashcardStudy)}
+              aria-current={currentPath === PATHS.flashcardStudy ? "page" : undefined}
               className={`w-full px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer focus-ring ${
-                currentPath === "/flashcard-study" && !location.search.includes("mode=match")
+                currentPath === PATHS.flashcardStudy && !location.search.includes("mode=match")
                   ? "bg-rice-paper text-heritage-green border border-antique-gold/50 shadow-xs"
                   : "text-text-body hover:bg-rice-paper/60 hover:text-heritage-green"
               }`}

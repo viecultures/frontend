@@ -1,6 +1,7 @@
 import Link from "@/components/Link";
 import { ArrowRight } from "lucide-react";
 import type { RecommendedArticle } from "@/data/readerData";
+import { paths } from '@/routes/paths';
 
 interface ReaderRecommendedSectionProps {
   articles: RecommendedArticle[];
@@ -42,7 +43,7 @@ export function ReaderRecommendedSection({
           <Link
             key={article.id}
 
-            href={`/bilingual-reader?story=${encodeURIComponent(article.id)}&level=${encodeURIComponent(article.level)}`}
+            href={paths.reader({ story: article.id, level: article.level })}
             className={`group p-5 rounded-2xl border transition-all flex flex-col justify-between ${themeMode === "dark"
                 ? "bg-[#1E2925] border-[#D9B76A]/30 text-[#FBF7EE] shadow-md hover:border-[#D9B76A]"
                 : "bg-[#FBF7EE] border-[rgba(30,75,67,0.12)] text-[#3F5550] shadow-sm hover:shadow-md"
