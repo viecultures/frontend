@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, LogOut, ChevronRight, ExternalLink, Crown, ShieldCheck, Sparkles } from 'lucide-react';
+import type { AppUser } from '@/utils/auth-storage';
 
 interface ProfileDropdownProps {
   isOpen: boolean;
   onClose: () => void;
-  user?: { name: string; email: string; avatar: string } | null;
+  user?: AppUser | null;
   onLogout?: () => void;
   onNavigate?: (view: string) => void;
 }

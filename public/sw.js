@@ -37,6 +37,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip Vite dev server paths, websocket tokens and source files
+  const url = new URL(event.request.url);
+  if (
+    url.pathname.startsWith('/src/') ||
+    url.pathname.startsWith('/@') ||
+    url.pathname.includes('node_modules') ||
+    url.searchParams.has('token')
+  ) {
+    return;
+  }
+
   // Network first with cache fallback for navigation / documents
   if (event.request.mode === 'navigate') {
     event.respondWith(
@@ -64,7 +75,12 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => cachedResponse);
+        .catch((err) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          throw err;
+        });
 
       return cachedResponse || fetchPromise;
     })

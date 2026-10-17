@@ -2,30 +2,37 @@
  * MascotCharacter
  *
  * Dedicated Cultural Mascot component anchored at the bottom-left of VietnamMapImmersiveScreen.
- * Uses official mascot artwork from assets (mascot.png).
+ * Uses the shared animated owl, driven by immersive audio and activity.
  * - Sits firmly at the bottom-left of the left column.
  * - Dynamic audio-reactive foot glow when AI speaks.
  * - Supports custom element override via `customSvg` prop.
  */
 
 import React from 'react';
-import mascotPng from '@/assets/mascot.png';
+import { OwlMascot } from '@/components/mascot/OwlMascot';
+import type { OwlState } from '@/components/mascot/OwlMascot';
 
 export interface MascotCharacterProps {
   customSvg?: React.ReactNode;
   className?: string;
   isPlaying?: boolean;
+  state?: OwlState;
+  active?: boolean;
+  onWake?: () => void;
 }
 
 export const MascotCharacter: React.FC<MascotCharacterProps> = ({
   customSvg,
   className = '',
   isPlaying = false,
+  state = isPlaying ? 'talking' : 'idle',
+  active = true,
+  onWake = () => {},
 }) => {
   return (
     <div
       className={`relative select-none pointer-events-none flex items-end justify-start ${className}`}
-      style={{ minHeight: '260px' }}
+      style={{ minHeight: '180px' }}
     >
       {/* Dynamic ambient foot glow when AI speaks */}
       <div
@@ -42,14 +49,9 @@ export const MascotCharacter: React.FC<MascotCharacterProps> = ({
           {customSvg}
         </div>
       ) : (
-        /* Official Mascot Artwork from assets/mascot.png */
-        <img
-          src={mascotPng}
-          alt="VieCultures AI Mascot"
-          className="relative z-10 w-56 sm:w-64 md:w-72 h-auto max-h-[330px] object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.65)]"
-          draggable={false}
-          loading="eager"
-        />
+        <div className="immersive-mascot pointer-events-auto relative z-10 drop-shadow-[0_16px_32px_rgba(0,0,0,0.65)]">
+          <OwlMascot state={state} size={280} active={active} onWake={onWake} />
+        </div>
       )}
     </div>
   );

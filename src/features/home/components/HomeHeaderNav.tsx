@@ -13,10 +13,11 @@ import {
 import { ProfileDropdown } from '@/components/ProfileDropdown';
 import { BrandLogo } from '@/components/BrandLogo';
 import { useSettings } from '@/context/SettingsContext';
+import type { AppUser } from '@/utils/auth-storage';
 
 interface HomeHeaderNavProps {
   isLoggedIn: boolean;
-  user?: { name: string; email: string; avatar: string } | null;
+  user?: AppUser | null;
   onLogout?: () => void;
   onNavigate: (view: string) => void;
   onOpenProfile?: () => void;

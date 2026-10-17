@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Link from "@/components/Link";
 import { ArrowLeft, Columns, BookOpen, Moon, Sun, Layers, LogIn, Crown, User } from "lucide-react";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
+import type { AppUser } from "@/utils/auth-storage";
 
 interface ReaderToolbarProps {
   fontSize: number;
@@ -19,7 +20,7 @@ interface ReaderToolbarProps {
   selectedVoiceName?: string;
   selectedVoiceFlag?: string;
   isLoggedIn?: boolean;
-  user?: { name: string; email: string; avatar: string } | null;
+  user?: AppUser | null;
   onLogout?: () => void;
   isPro?: boolean;
 }

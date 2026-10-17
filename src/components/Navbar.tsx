@@ -3,11 +3,12 @@ import { motion, useReducedMotion } from 'motion/react';
 import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Crown, ShieldCheck, Award } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
+import type { AppUser } from '@/utils/auth-storage';
 
 interface NavbarProps {
   activeView?: string;
   isLoggedIn?: boolean;
-  user?: { name: string; email: string; avatar: string } | null;
+  user?: AppUser | null;
   onNavigateToSection: (sectionId: string) => void;
   onLogout?: () => void;
   onOpenProfile?: () => void;

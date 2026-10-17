@@ -23,8 +23,9 @@ const PlaygroundPage = React.lazy(() => import('@/features/playground/pages/play
 const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
 const PricingPage = React.lazy(() => import('@/features/subscription/pages/PricingPage'));
 const CheckoutPage = React.lazy(() => import('@/features/subscription/pages/CheckoutPage'));
+const MascotDemoPage = React.lazy(() => import('@/features/mascot-demo/MascotDemoPage').then(module => ({ default: module.MascotDemoPage })));
 
-import { getStoredUser, setStoredUser } from '@/utils/auth-storage';
+import { getStoredUser, setStoredUser, type AppUser } from '@/utils/auth-storage';
 import type { Lesson } from '@/types';
 
 // Redirect legacy /bilingual-reader or /loop routes to canonical /reader while preserving search query
@@ -38,8 +39,8 @@ export const App: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const defaultUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
-  const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(() => getStoredUser());
+  const defaultUser: AppUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
+  const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser());
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export const App: React.FC = () => {
   }, []);
 
   const handleLoginSuccess = (customUserData?: { email?: string; name?: string }) => {
-    const activeUser = customUserData
+    const activeUser: AppUser = customUserData
       ? {
           name: customUserData.name || customUserData.email?.split('@')[0] || defaultUser.name,
           email: customUserData.email || defaultUser.email,
@@ -111,6 +112,7 @@ export const App: React.FC = () => {
       case '/community-contest':
         return 'community-contest';
       case '/playground':
+      case '/mascot-demo':
         return 'playground';
       case '/admin':
       case '/admin/posts':
@@ -312,6 +314,10 @@ export const App: React.FC = () => {
             <Route
               path="/community-contest"
               element={<Navigate to="/community-2" replace />}
+            />
+            <Route
+              path="/mascot-demo"
+              element={<MascotDemoPage />}
             />
             <Route
               path="/playground"

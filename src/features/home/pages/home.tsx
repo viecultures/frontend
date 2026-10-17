@@ -8,11 +8,12 @@ import { HomeBottomDock } from '../components/HomeBottomDock';
 import { HomeFloatingSidebar } from '../components/HomeFloatingSidebar';
 import { Check } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
+import type { AppUser } from '@/utils/auth-storage';
 
 interface HomePageProps {
   onNavigate?: (view: string) => void;
   isLoggedIn?: boolean;
-  user?: { name: string; email: string; avatar: string } | null;
+  user?: AppUser | null;
   onLogout?: () => void;
   onOpenProfile?: () => void;
 }

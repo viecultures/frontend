@@ -14,7 +14,7 @@
  * - 100% Lucide React SVG icons (RULE[user_global]: Zero raw emojis).
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import './map-ai.css';
 import Sidebar from './components/Sidebar';
 import { useLiveAPIContext } from './contexts/LiveAPIContext';
@@ -30,6 +30,7 @@ import { useMapAiDebugStore } from './lib/debug-logger';
 import MascotCharacter from './components/MascotCharacter';
 import MascotChatBubble from './components/MascotChatBubble';
 import ImmersiveTopicTray, { type CulturalTopicItem } from './components/ImmersiveTopicTray';
+import { useImmersiveMascot } from './hooks/useImmersiveMascot';
 import {
   Play,
   Pause,
@@ -87,6 +88,14 @@ function VietnamMapImmersiveContent() {
   const turns = useLogStore((s) => s.turns);
   const hasHistory = turns.some((turn) => turn.role !== 'system');
   const isAwaitingFunctionResponse = useLogStore((s) => s.isAwaitingFunctionResponse);
+  const [ttsPlaying, setTtsPlaying] = useState(false);
+  const ttsRequest = useRef(0);
+  const ttsUtterance = useRef<SpeechSynthesisUtterance | null>(null);
+  const mascot = useImmersiveMascot({
+    active,
+    speaking: (isPlaying && !speakerMuted) || ttsPlaying,
+    busy: connecting || ending || isSending || isRestoringContext || isAwaitingResponse || isAwaitingFunctionResponse || recording,
+  });
 
   const [manualFocus, setManualFocus] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
@@ -108,6 +117,7 @@ function VietnamMapImmersiveContent() {
 
   const handleSelectProvince = (province: ProvinceMapItem | null) => {
     if (!active) return;
+    if (province && province.id !== selectedProvinceId) mascot.celebrate();
     if (province) selectProvince(province.id, 'user');
     else clearSelection();
     setManualFocus(Boolean(province));
@@ -121,6 +131,7 @@ function VietnamMapImmersiveContent() {
 
   const handleSelectLandmark = (landmark: LandmarkArticle) => {
     if (!active) return;
+    if (landmark.id !== selectedLandmarkId) mascot.celebrate();
     selectLandmark(landmark.id, 'user');
     setManualFocus(true);
   };
@@ -184,13 +195,40 @@ function VietnamMapImmersiveContent() {
   const handleSpeakText = (text: string) => {
     if (!active) return;
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const request = ++ttsRequest.current;
       window.speechSynthesis.cancel();
+      setTtsPlaying(false);
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'vi-VN';
       utterance.rate = 0.95;
+      ttsUtterance.current = utterance;
+      utterance.onstart = () => { if (request === ttsRequest.current) setTtsPlaying(true); };
+      const finish = () => {
+        if (request === ttsRequest.current) {
+          ttsUtterance.current = null;
+          setTtsPlaying(false);
+        }
+      };
+      utterance.onend = finish;
+      utterance.onerror = finish;
       window.speechSynthesis.speak(utterance);
     }
   };
+
+  useEffect(() => {
+    const stopOwnedSpeech = () => {
+      ttsRequest.current++;
+      if (ttsUtterance.current) {
+        window.speechSynthesis?.cancel();
+        ttsUtterance.current = null;
+      }
+    };
+    if (!active) {
+      stopOwnedSpeech();
+      setTtsPlaying(false);
+    }
+    return stopOwnedSpeech;
+  }, [active]);
 
   const handleToggleConversation = () => {
     if (!active) return;
@@ -262,7 +300,13 @@ function VietnamMapImmersiveContent() {
   }, [retrievedArticles]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-[#030706] select-none text-[#FBF7EE]">
+    <div
+      className="relative w-full h-full overflow-hidden bg-[#030706] select-none text-[#FBF7EE]"
+      onPointerMoveCapture={mascot.wake}
+      onPointerDownCapture={mascot.wake}
+      onKeyDownCapture={mascot.wake}
+      onWheelCapture={mascot.wake}
+    >
       {active && <Sidebar />}
 
       {/* Far-Left Diagnostic Drawer Trigger */}
@@ -407,7 +451,7 @@ function VietnamMapImmersiveContent() {
       {/* ============================================================ */}
       {/* 2. FLOATING COMIC CHAT BUBBLES & RETRIEVED ARTICLES */}
       {/* ============================================================ */}
-      <div className="absolute bottom-[300px] sm:bottom-[320px] left-6 sm:left-10 z-20 w-fit max-w-[calc(92vw-40px)] lg:max-w-[42vw] xl:max-w-[600px] pointer-events-auto flex flex-col items-start gap-3">
+      <div className="immersive-mascot-dialogue absolute left-6 sm:left-10 z-20 w-fit max-w-[calc(92vw-40px)] lg:max-w-[42vw] xl:max-w-[600px] pointer-events-auto flex flex-col items-start gap-3">
         {/* Main Comic Dialogue Bubble */}
         <MascotChatBubble
           latestText={latestAgentText}
@@ -496,6 +540,9 @@ function VietnamMapImmersiveContent() {
       <div className="absolute bottom-2 left-6 sm:left-10 z-20 pointer-events-none">
         <MascotCharacter
           isPlaying={isPlaying}
+          state={mascot.state}
+          active={mascot.enabled}
+          onWake={mascot.wake}
           className="flex items-end justify-start"
         />
       </div>
