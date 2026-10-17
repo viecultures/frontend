@@ -33,7 +33,7 @@ const CheckoutPage = React.lazy(() => import('@/features/subscription/pages/Chec
 const ProfilePage = React.lazy(() => import('@/features/profile/pages/ProfilePage'));
 const MascotDemoPage = React.lazy(() => import('@/features/mascot-demo/MascotDemoPage').then(module => ({ default: module.MascotDemoPage })));
 const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
-import { getStoredUser, setStoredUser, setStoredToken, type AppUser } from '@/utils/auth-storage';
+import { getStoredUser, setStoredUser, setStoredToken, getStoredToken, clearAuthStorage, type AppUser } from '@/utils/auth-storage';
 import { PATHS } from '@/routes/paths';
 
 // Redirect legacy /bilingual-reader or /loop routes to canonical /reader while preserving search query
@@ -61,13 +61,14 @@ export const App: React.FC = () => {
     }
     return stored;
   });
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser());
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser() || !!getStoredToken());
 
   useEffect(() => {
     const handleAuthChange = () => {
       const stored = getStoredUser();
+      const token = getStoredToken();
       setUser(stored);
-      setIsLoggedIn(!!stored);
+      setIsLoggedIn(!!stored || !!token);
     };
     window.addEventListener('auth:change', handleAuthChange);
     return () => window.removeEventListener('auth:change', handleAuthChange);
@@ -97,11 +98,10 @@ export const App: React.FC = () => {
   };
 
   const handleLogout = () => {
+    clearAuthStorage();
     setIsLoggedIn(false);
     setUser(null);
-    setStoredUser(null);
-    setStoredToken(null);
-    navigate(PATHS.landing);
+    navigate(PATHS.landing, { replace: true });
   };
 
   const googleClientId =

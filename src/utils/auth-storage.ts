@@ -32,6 +32,50 @@ export const getStoredUser = (): AppUser | null => {
   }
 };
 
+export const clearAuthStorage = () => {
+  try {
+    localStorage.removeItem(AUTH_USER_KEY);
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(PRO_STATUS_KEY);
+    
+    // Xóa các key JWT / token / auth dự phòng hoặc legacy
+    const knownAuthKeys = [
+      'token',
+      'jwt',
+      'authToken',
+      'accessToken',
+      'access_token',
+      'vie_token',
+      'vie_jwt',
+      'user',
+      'currentUser',
+      'auth',
+      'viecultures_user_profile',
+    ];
+    knownAuthKeys.forEach((key) => localStorage.removeItem(key));
+
+    // Quét sạch bất kỳ key nào chứa token hoặc auth (ngoại trừ app settings/theme)
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k) {
+        const lower = k.toLowerCase();
+        if (
+          lower.includes('token') ||
+          lower.includes('jwt') ||
+          (lower.includes('auth') && !lower.includes('author'))
+        ) {
+          localStorage.removeItem(k);
+        }
+      }
+    }
+
+    sessionStorage.clear();
+  } catch (err) {
+    console.error('[auth-storage] Lỗi khi dọn dẹp bộ nhớ xác thực:', err);
+  }
+  window.dispatchEvent(new CustomEvent('auth:change'));
+};
+
 export const setStoredUser = (user: AppUser | null) => {
   if (user) {
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
@@ -43,7 +87,7 @@ export const setStoredUser = (user: AppUser | null) => {
 
 export const getStoredToken = (): string | null => {
   try {
-    return localStorage.getItem(AUTH_TOKEN_KEY);
+    return localStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem('token') || localStorage.getItem('jwt');
   } catch {
     return null;
   }
@@ -54,6 +98,8 @@ export const setStoredToken = (token: string | null) => {
     localStorage.setItem(AUTH_TOKEN_KEY, token);
   } else {
     localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem('token');
+    localStorage.removeItem('jwt');
   }
   window.dispatchEvent(new CustomEvent('auth:change'));
 };

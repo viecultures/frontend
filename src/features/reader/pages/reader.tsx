@@ -19,7 +19,7 @@ import {
 import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
 import { readerApiService, readerLevelFor } from "../services/readerApiService";
 import type { ReaderArticleData } from "../services/readerApiService";
-import { getStoredUser, setStoredUser, getIsProUser, type AppUser } from "@/utils/auth-storage";
+import { getStoredUser, setStoredUser, clearAuthStorage, getIsProUser, type AppUser } from "@/utils/auth-storage";
 
 import { articleKey, cacheArticle, getCachedArticle } from '@/services/learning/learningStorage';
 import { useSavedVocabulary, SavedVocabularyContext } from '../hooks/useSavedVocabulary';
@@ -405,7 +405,7 @@ export default function ReaderPage() {
         isLoggedIn={isLoggedIn}
         user={user}
         onLogout={() => {
-          setStoredUser(null);
+          clearAuthStorage();
           setIsLoggedIn(false);
           setUser(null);
         }}

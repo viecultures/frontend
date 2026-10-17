@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, LogOut, ChevronRight, ExternalLink, Crown, ShieldCheck, Sparkles, Award } from 'lucide-react';
 import { PATHS, paths } from '@/routes/paths';
-import type { AppUser } from '@/utils/auth-storage';
+import { clearAuthStorage, type AppUser } from '@/utils/auth-storage';
 
 interface ProfileDropdownProps {
   isOpen: boolean;
@@ -28,12 +28,26 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
     }
   };
 
+  const handleLogoutClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onClose();
+    clearAuthStorage();
+    if (onLogout) {
+      onLogout();
+    } else if (onNavigate) {
+      onNavigate(PATHS.landing);
+    } else {
+      window.location.href = PATHS.landing;
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Invisible backdrop to dismiss dropdown when clicking outside */}
-          <div className="fixed inset-0 z-40 bg-transparent" onClick={onClose} />
+          <div className="fixed inset-0 z-[99] bg-transparent" onClick={onClose} />
 
           {/* Inline Dropdown Card attached directly underneath the avatar button */}
           <motion.div
@@ -41,7 +55,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.96 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 top-full mt-2.5 w-64 bg-rice-paper dark:bg-heritage-forest border-2 border-antique-gold rounded-2xl p-3.5 shadow-[0_10px_35px_heritage-green/30] z-50 text-text-body dark:text-warm-ivory space-y-3"
+            className="absolute right-0 top-full mt-2.5 w-64 bg-rice-paper dark:bg-heritage-forest border-2 border-antique-gold rounded-2xl p-3.5 shadow-[0_10px_35px_heritage-green/30] z-[100] text-text-body dark:text-warm-ivory space-y-3"
           >
             {/* Header: User Info & Master Badges */}
             <div className="pb-3 border-b border-heritage-green/15 dark:border-white/10 space-y-2">
@@ -141,9 +155,10 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
             {/* 2. Đăng xuất */}
             <div className="pt-1.5 border-t border-heritage-green/15 dark:border-white/10">
               <motion.button
+                type="button"
                 whileHover={{ x: 2, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => handleItemClick(onLogout)}
+                onClick={handleLogoutClick}
                 className="w-full px-3 py-2.5 rounded-xl bg-[#E8B7B2]/30 hover:bg-[#E8B7B2]/50 dark:bg-rose-500/20 dark:hover:bg-rose-500/30 border border-[#E8B7B2] dark:border-rose-500/40 text-xs font-bold text-[#991B1B] dark:text-rose-200 flex items-center justify-between transition-colors group cursor-pointer focus-ring"
               >
                 <div className="flex items-center gap-2">

@@ -204,7 +204,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="student@example.com"
+                    placeholder="admin@viecultures.com"
                     required
                     autoComplete="email"
                     className={INPUT_WITH_ICON}
@@ -214,7 +214,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
               <div>
                 <label className={LABEL_CLASS} htmlFor="password">
-                  Mật Khẩu / Password
+                  Mật Khẩu / Password (Mặc định 123456)
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/40" aria-hidden="true">

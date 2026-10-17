@@ -44,7 +44,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 flex items-center justify-between z-10">
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 flex items-center justify-between relative z-50">
       {/* Brand & Room Badge */}
       <BrandLogo
         size="md"
@@ -55,7 +55,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
       />
 
       {/* Header Icon Quick Links & Profile Dropdown */}
-      <div className="flex items-center gap-2 sm:gap-3 bg-heritage-dark/80 backdrop-blur-md p-1.5 rounded-full border border-white/15 shadow-xl">
+      <div className="flex items-center gap-2 sm:gap-3 bg-heritage-dark/80 backdrop-blur-md p-1.5 rounded-full border border-white/15 shadow-xl relative z-50">
         <button
           type="button"
           onClick={() => handleActionToast('Bạn có 2 bài ôn tập từ vựng mới hôm nay!')}
@@ -118,7 +118,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
         </button>
 
         {isLoggedIn ? (
-          <div className="relative">
+          <div className="relative z-50">
             <button
               type="button"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
