@@ -224,9 +224,10 @@ export const FloatingAiCompanionWidget: React.FC<FloatingAiCompanionWidgetProps>
                     key={idx}
                     type="button"
                     onClick={() => handleSendMessage(prompt.labelEn)}
-                    className="whitespace-nowrap text-[10px] px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-black/30 hover:bg-stone-200 text-stone-800 dark:text-stone-200 border border-stone-300 dark:border-white/10 shrink-0 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 whitespace-nowrap text-[10px] px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-black/30 hover:bg-stone-200 text-stone-800 dark:text-stone-200 border border-stone-300 dark:border-white/10 shrink-0 cursor-pointer"
                   >
-                    💬 {prompt.labelVi}
+                    <MessageSquare className="w-3 h-3 text-[#D9B76A]" />
+                    <span>{prompt.labelVi}</span>
                   </button>
                 ))}
               </div>

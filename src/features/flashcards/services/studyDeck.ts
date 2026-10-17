@@ -2,7 +2,7 @@ import type { Lesson } from '@/data/discoveryData';
 import type { Flashcard } from '@/data/flashcardsData';
 import { VOCAB_DATABASE, type VocabItem } from '@/data/readerData';
 import { readerApiService, readerLevelFor, type ReaderArticleData } from '@/features/reader/services/readerApiService';
-import { cacheArticle, getCachedArticle } from '@/features/learning/lib/learningStorage';
+import { cacheArticle, getCachedArticle } from '@/services/learning/learningStorage';
 
 export interface StudyDeck {
   article: ReaderArticleData;

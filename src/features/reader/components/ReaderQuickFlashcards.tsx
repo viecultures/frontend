@@ -10,6 +10,7 @@ import {
   Sparkles,
   ExternalLink,
   Award,
+  BookOpen,
 } from 'lucide-react';
 import { READER_DEFAULT_FLASHCARDS, type QuickFlashcardItem } from '../data/learningLoopData';
 import { paths } from '@/routes/paths';
@@ -209,8 +210,9 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               <h4 className="font-serif text-xl sm:text-2xl font-bold text-[#1E4B43] dark:text-white">
                 {currentCard.viMeaning}
               </h4>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-md mx-auto bg-amber-500/10 p-3 rounded-xl border border-amber-500/20">
-                📜 <strong>Ý niệm văn hóa:</strong> {currentCard.culturalFact}
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-md mx-auto bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 flex items-start justify-center gap-1.5 text-left">
+                <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <span><strong>Ý niệm văn hóa:</strong> {currentCard.culturalFact}</span>
               </p>
             </div>
           )}

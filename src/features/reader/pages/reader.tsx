@@ -21,7 +21,7 @@ import { readerApiService, readerLevelFor } from "../services/readerApiService";
 import type { ReaderArticleData } from "../services/readerApiService";
 import { getStoredUser, setStoredUser, getIsProUser, type AppUser } from "@/utils/auth-storage";
 
-import { articleKey, cacheArticle, getCachedArticle } from '@/features/learning/lib/learningStorage';
+import { articleKey, cacheArticle, getCachedArticle } from '@/services/learning/learningStorage';
 import { useSavedVocabulary, SavedVocabularyContext } from '../hooks/useSavedVocabulary';
 import { PATHS } from '@/routes/paths';
 

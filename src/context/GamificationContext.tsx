@@ -10,7 +10,7 @@ import type {
   RewardCelebrationPayload,
 } from '@/types';
 
-import { applyCompletionReward, completionRewardKey } from '@/features/learning/lib/rewardLedger';
+import { applyCompletionReward, completionRewardKey } from '@/services/learning/rewardLedger';
 
 // ─── Constants & Configuration ──────────────────────────────────────────────────
 export const LEVEL_CONFIG = {

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useGamification } from '@/context/GamificationContext';
 import type { RewardCelebrationPayload } from '@/types';
-import { articleKey, readSavedVocabulary } from '@/features/learning/lib/learningStorage';
+import { articleKey, readSavedVocabulary } from '@/services/learning/learningStorage';
 import FlashcardSidebarLayout from '../components/flashcard-sidebar-layout';
 import { FlashcardStudyHeader, FlashcardProgressBar, FlashcardModeTabs, FlashcardFlipView, FlashcardMultipleChoiceView, FlashcardSpellingView } from '../components';
 import { FlashcardSessionSummary } from '../components/FlashcardSessionSummary';

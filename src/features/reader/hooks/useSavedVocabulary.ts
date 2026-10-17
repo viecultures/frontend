@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import type { VocabItem } from '@/data/readerData';
-import { articleKey, readSavedVocabulary, saveVocabulary } from '@/features/learning/lib/learningStorage';
+import { articleKey, readSavedVocabulary, saveVocabulary } from '@/services/learning/learningStorage';
 
 export interface SavedVocabularyState {
   words: VocabItem[];

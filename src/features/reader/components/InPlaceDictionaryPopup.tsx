@@ -244,7 +244,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
             {isSaved ? (
               <>
                 <Check className="w-3.5 h-3.5" />
-                <span>✓ ĐÃ LƯU VÀO SỔ TAY</span>
+                <span>ĐÃ LƯU VÀO SỔ TAY</span>
               </>
             ) : (
               <>

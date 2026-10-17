@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Check, CheckCircle2, ChevronLeft, ChevronRight, RotateCcw, RotateCw, Volume2, VolumeX } from 'lucide-react';
 import { DECK_WORDS } from '@/data/flashcardsData';
-import { speakEnglish } from '@/utils/sampleSpeech';
+import { speakEnglish } from '@/utils/speechUtils';
 import { paths } from '@/routes/paths';
 
 const DEMO_CARDS = DECK_WORDS['imperial-hue'].cards;

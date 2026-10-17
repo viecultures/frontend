@@ -96,3 +96,11 @@ export function speakText(
     if (onError) onError(err);
   }
 }
+
+/**
+ * Browser-native Web Speech API helper for English pronunciation (educational default)
+ */
+export function speakEnglish(text: string, onEnd?: () => void): void {
+  speakText(text, undefined, onEnd, onEnd);
+}
+

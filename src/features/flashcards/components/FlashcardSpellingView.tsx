@@ -1,3 +1,4 @@
+import { Check, X } from "lucide-react";
 import type { Flashcard } from "@/data/flashcardsData";
 
 interface FlashcardSpellingViewProps {
@@ -54,13 +55,15 @@ export function FlashcardSpellingView({
         </div>
 
         {spellingFeedback === "correct" && (
-          <div className="p-3.5 rounded-2xl bg-[#ECFDF5] text-[#059669] text-xs font-bold border border-[#059669]/30">
-            ✓ Chính xác! "{card.word}"
+          <div className="p-3.5 rounded-2xl bg-[#ECFDF5] text-[#059669] text-xs font-bold border border-[#059669]/30 flex items-center justify-center gap-2">
+            <Check className="w-4 h-4 shrink-0" />
+            <span>Chính xác! "{card.word}"</span>
           </div>
         )}
         {spellingFeedback === "incorrect" && (
-          <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200">
-            ✕ Chưa đúng. Đáp án là: "{card.word}"
+          <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200 flex items-center justify-center gap-2">
+            <X className="w-4 h-4 shrink-0" />
+            <span>Chưa đúng. Đáp án là: "{card.word}"</span>
           </div>
         )}
       </div>

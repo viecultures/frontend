@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadStudyDeck, studyDeckFromArticle } from './studyDeck';
 import { readerApiService } from '@/features/reader/services/readerApiService';
-import { cacheArticle } from '@/features/learning/lib/learningStorage';
+import { cacheArticle } from '@/services/learning/learningStorage';
 import type { ReadingPostItem } from '@/features/admin/types/adminTypes';
 
 const post: ReadingPostItem = { id: 'backend-test-id', topicGroup: 'ao-dai', titleEn: 'Ao Dai', titleVi: 'Áo dài', topic: 'Crafts', level: 'A2', vocabularies: [

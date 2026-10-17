@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent, type MouseEvent } from 'react';
 import type { ConversationTurn } from '../../lib/state';
 import { extractSentenceContext, type VocabItem } from '@/data/readerData';
-import { lookupWordInstant, sanitizeChatWord } from '../../lib/dictionary-service';
+import { lookupWordInstant, sanitizeChatWord } from '@/utils/dictionary-service';
 import { debugLog } from '../../lib/debug-logger';
 
 /** Keeps dictionary selection anchored to the text the learner actually selected. */

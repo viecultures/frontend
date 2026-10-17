@@ -3,9 +3,19 @@ import assert from 'node:assert/strict';
 import { applyCompletionReward, completionRewardKey } from './rewardLedger';
 import type { GamificationStats } from '@/types';
 
-const initial: GamificationStats = { coins: 0, xp: 0, level: 'Level 1', streakDays: 0,
-  lastActiveDate: '', streakProtected: false, streakFreezeCount: 0, unlockedBadges: [],
-  equippedTitle: '', inventory: [], completedMissions: {} };
+const initial: GamificationStats = {
+  coins: 0,
+  xp: 0,
+  level: 'Level 1',
+  streakDays: 0,
+  lastActiveDate: '',
+  streakProtected: false,
+  streakFreezeCount: 0,
+  unlockedBadges: [],
+  equippedTitle: '',
+  inventory: [],
+  completedMissions: {},
+};
 
 test('completion grants once and persisted state rejects replay', () => {
   const key = completionRewardKey('article-1');

@@ -9,11 +9,11 @@ import {
   BookOpen,
   Award
 } from 'lucide-react';
-import { VietnamMap } from '@/components/VietnamMap';
+import { VietnamMap } from '@/components/map/VietnamMap';
 import type { ProvinceMapItem } from '@/data/vietnamMapData';
 import { HERITAGE_SITES } from '@/data/vietnamCultureData';
 import type { CulturalHeritageSite } from '@/types/sampleTypes';
-import { speakEnglish } from '@/utils/sampleSpeech';
+import { speakEnglish } from '@/utils/speechUtils';
 import { PATHS } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 

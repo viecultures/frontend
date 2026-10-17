@@ -8,7 +8,7 @@ import {
   VIETNAM_SVG_PATHS,
 } from '@/data/vietnamCultureData';
 import type { CulturalHeritageSite } from '@/types/sampleTypes';
-import { speakEnglish } from '@/utils/sampleSpeech';
+import { speakEnglish } from '@/utils/speechUtils';
 
 interface VietnamHeritageMapProps {
   selectedSiteId?: string | null;

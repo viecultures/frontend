@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
-import { VietnamMap } from '@/components/VietnamMap';
+import { VietnamMap } from '@/components/map/VietnamMap';
 import { type ProvinceMapItem } from '@/data/vietnamMapData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 

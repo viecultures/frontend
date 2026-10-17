@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { listSavedArticles } from '@/features/learning/lib/learningStorage';
+import { listSavedArticles } from '@/services/learning/learningStorage';
 import { paths } from '@/routes/paths';
 
 export function SavedVocabularyDecks() {

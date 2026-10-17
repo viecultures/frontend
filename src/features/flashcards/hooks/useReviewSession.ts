@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Flashcard } from '@/data/flashcardsData';
-import { readReviewSession, saveReviewSession } from '@/features/learning/lib/learningStorage';
+import { readReviewSession, saveReviewSession } from '@/services/learning/learningStorage';
 import { createReviewSession, rateCard, restoreReviewSession, type CardRating, type ReviewSession } from '../lib/reviewSession';
 
 export function useReviewSession(cards: Flashcard[], key: string, onComplete: () => void) {

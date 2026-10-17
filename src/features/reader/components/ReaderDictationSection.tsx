@@ -10,6 +10,7 @@ import {
   RotateCcw,
   Sparkles,
   Trophy,
+  Lightbulb,
 } from 'lucide-react';
 import { READER_DICTATION_ITEMS, type DictationItem } from '../data/learningLoopData';
 
@@ -254,8 +255,9 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
 
         {/* Hint Box */}
         {showHints[currentItem?.id] && (
-          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300">
-            💡 <strong>Gợi ý:</strong> {currentItem?.hint}
+          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+            <Lightbulb className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <span><strong>Gợi ý:</strong> {currentItem?.hint}</span>
           </div>
         )}
       </div>

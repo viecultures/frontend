@@ -74,7 +74,7 @@ test('Sesame flow and pedagogical profanity boundary are present in free convers
 });
 
 test('profanity filtering blocks vulgar words and prevents raw translations', async () => {
-  const { isProfaneWord, lookupWordInstant, maskProfanity } = await import('./dictionary-service');
+  const { isProfaneWord, lookupWordInstant, maskProfanity } = await import('@/utils/dictionary-service');
   assert.equal(isProfaneWord('fuck'), true);
   assert.equal(isProfaneWord('What the fuck?'), true);
   assert.equal(isProfaneWord('shit'), true);

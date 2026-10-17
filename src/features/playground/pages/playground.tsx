@@ -6,8 +6,8 @@ import { Feather, Radio, Zap, Sparkles, Home } from 'lucide-react';
 
 // Experimental Screen Components
 import { VideoDictationShadowingScreen } from '../components/screens/VideoDictationShadowingScreen';
-import { VietnamMapAiScreen } from '../components/screens/VietnamMapAiScreen';
-import { VietnamMapImmersiveScreen } from '../components/screens/VietnamMapImmersiveScreen';
+import { VietnamMapAiScreen } from '../components/map-ai/VietnamMapAiScreen';
+import { VietnamMapImmersiveScreen } from '../components/map-ai/VietnamMapImmersiveScreen';
 import { LiveAPIProvider } from '../components/map-ai/contexts/LiveAPIContext';
 import { PATHS } from '@/routes/paths';
 

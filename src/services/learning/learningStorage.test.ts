@@ -6,10 +6,13 @@ import { VOCAB_DATABASE } from '@/data/readerData';
 test('saved vocabulary persists separately for each article and level', () => {
   const values = new Map<string, string>();
   const original = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
-  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: {
-    getItem: (key: string) => values.get(key) || null,
-    setItem: (key: string, value: string) => values.set(key, value),
-  } });
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: (key: string) => values.get(key) || null,
+      setItem: (key: string, value: string) => values.set(key, value),
+    },
+  });
   try {
     assert.equal(saveVocabulary('a', 'Level 1', [VOCAB_DATABASE.sacred]), true);
     assert.equal(readSavedVocabulary('a', 'Level 1')[0].word, 'sacred');
@@ -25,7 +28,12 @@ test('saved vocabulary persists separately for each article and level', () => {
 
 test('blocked storage reports failure without throwing', () => {
   const original = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
-  Object.defineProperty(globalThis, 'localStorage', { configurable: true, get() { throw new Error('Storage blocked'); } });
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    get() {
+      throw new Error('Storage blocked');
+    },
+  });
   try {
     assert.equal(writeLearningValue('anything', {}), false);
     assert.deepEqual(readSavedVocabulary('a', 'Level 1'), []);

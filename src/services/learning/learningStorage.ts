@@ -1,13 +1,22 @@
 import type { ReaderArticleData } from '@/features/reader/services/readerApiService';
-import type { ReviewSession } from '@/features/flashcards/lib/reviewSession';
 import type { VocabItem } from '@/data/readerData';
 
 const PREFIX = 'viecultures_learning_v1:';
 
+export interface LearningSessionRecord {
+  deckId: string;
+  totalCards: number;
+  completedCards: number;
+  masteredCards: number;
+  reviewLaterCards: number;
+  updatedAt?: number;
+  [key: string]: unknown;
+}
+
 export function readLearningValue<T>(key: string): T | null {
   try {
     const value = localStorage.getItem(PREFIX + key);
-    return value ? JSON.parse(value) as T : null;
+    return value ? (JSON.parse(value) as T) : null;
   } catch {
     return null;
   }
@@ -35,18 +44,26 @@ export function getCachedArticle(id: string, level: string) {
 
 export function readSavedVocabulary(id: string, level: string): VocabItem[] {
   const value = readLearningValue<VocabItem[]>('saved-vocabulary:' + articleKey(id, level));
-  return Array.isArray(value) ? value.filter(word => word && typeof word.id === 'string' && typeof word.word === 'string' && typeof word.viMeaning === 'string') : [];
+  return Array.isArray(value)
+    ? value.filter(
+        (word) =>
+          word &&
+          typeof word.id === 'string' &&
+          typeof word.word === 'string' &&
+          typeof word.viMeaning === 'string'
+      )
+    : [];
 }
 
 export function saveVocabulary(id: string, level: string, words: VocabItem[]) {
   return writeLearningValue('saved-vocabulary:' + articleKey(id, level), words);
 }
 
-export function readReviewSession(key: string) {
-  return readLearningValue<ReviewSession>('session:' + key);
+export function readReviewSession(key: string): LearningSessionRecord | null {
+  return readLearningValue<LearningSessionRecord>('session:' + key);
 }
 
-export function saveReviewSession(key: string, session: ReviewSession) {
+export function saveReviewSession(key: string, session: LearningSessionRecord | unknown) {
   return writeLearningValue('session:' + key, session);
 }
 
@@ -58,8 +75,12 @@ export function listSavedArticles(): Array<{ article: ReaderArticleData; level: 
       if (!key?.startsWith(PREFIX + 'article:')) continue;
       const [id, level] = JSON.parse(key.slice((PREFIX + 'article:').length)) as [string, string];
       const article = getCachedArticle(id, level);
-      const count = readSavedVocabulary(id, level).length;
-      if (article && count) result.push({ article, level, count });
+      if (!article) continue;
+      result.push({
+        article,
+        level,
+        count: readSavedVocabulary(id, level).length,
+      });
     }
     return result;
   } catch {
