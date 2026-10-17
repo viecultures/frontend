@@ -3,8 +3,7 @@ import { VOCAB_DATABASE, type VocabItem } from '@/data/readerData';
 import { LESSONS_DATA, type Lesson, type LevelDetail } from '@/data/discoveryData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { resolveDeckCards } from '@/data/flashcardsData';
-
-const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
+import { API_BASE_URL } from '@/config/apiConfig';
 
 export function readerLevelFor(level: string): 'Level 1' | 'Level 2' | 'Level 3' {
   if (level === 'A1' || level === 'A2' || level === 'Level 1') return 'Level 1';

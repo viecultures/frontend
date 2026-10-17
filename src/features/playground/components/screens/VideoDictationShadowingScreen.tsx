@@ -27,6 +27,7 @@ import {
   dictationApiService,
   generateHintScaffold
 } from '../../services/dictationService';
+import { API_BASE_URL } from '@/config/apiConfig';
 import type {
   YtbTranscriptSnippet,
   YtbTranscriptData,
@@ -80,7 +81,7 @@ export const VideoDictationShadowingScreen: React.FC = () => {
   // Backend connection status
   const [backendStatus, setBackendStatus] = useState<{ isOnline: boolean; message: string }>({
     isOnline: false,
-    message: 'Đang kiểm tra kết nối localhost:8080...'
+    message: 'Đang kiểm tra kết nối Backend API...'
   });
 
   // Universal In-place Dictionary Hook
@@ -997,7 +998,7 @@ export const VideoDictationShadowingScreen: React.FC = () => {
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-            Endpoint: GET http://localhost:8080/api/v1/ytb-transcript
+            Endpoint: GET {API_BASE_URL}/api/v1/ytb-transcript
           </span>
           <span className="hidden sm:inline-block text-[#5D706A]">
             • Bôi đen hoặc nhấp đúp từ vựng để tra cứu từ điển &amp; phiên âm IPA tức thì

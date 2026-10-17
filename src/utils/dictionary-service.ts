@@ -1,5 +1,6 @@
 import type { VocabItem } from '@/data/readerData';
 import { VOCAB_DATABASE, extractSentenceContext } from '@/data/readerData';
+import { API_BASE_URL } from '@/config/apiConfig';
 
 // In-memory cache for ultra-fast instantaneous lookups (0ms on repeat)
 const VOCAB_MEMORY_CACHE = new Map<string, VocabItem>();
@@ -556,7 +557,7 @@ export async function lookupWordInstant(
   const lookupPromise = (async (): Promise<VocabItem> => {
     // 0. Primary: Call Backend On-Demand Dictionary API (Cached & auto-persisted in PostgreSQL DB)
     try {
-      const apiBase = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
+      const apiBase = API_BASE_URL;
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 3500);
       const url = `${apiBase}/api/vocabularies/lookup?word=${encodeURIComponent(cleanWord)}${

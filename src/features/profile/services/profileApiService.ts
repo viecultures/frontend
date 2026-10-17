@@ -1,7 +1,6 @@
 import { getStoredToken, getStoredUser, setStoredUser, type AppUser } from '@/utils/auth-storage';
 import type { UserProfileData } from '../types';
-
-const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
+import { API_BASE_URL } from '@/config/apiConfig';
 
 export interface BackendUserInfo {
   id: string;

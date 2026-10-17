@@ -5,8 +5,7 @@ import type {
   ApiResponseEnvelope,
 } from '../types/adminTypes';
 import { getStoredToken } from '@/utils/auth-storage';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+import { API_BASE_URL } from '@/config/apiConfig';
 
 const getAuthHeaders = (): Record<string, string> => {
   const token = getStoredToken();
