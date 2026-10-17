@@ -91,7 +91,10 @@ export const getUserRole = (): string | null => {
     if (Array.isArray(claims?.roles) && claims.roles.length > 0) return claims.roles[0];
   }
   const user = getStoredUser();
-  return user?.role || null;
+  if (user) {
+    return user.role || 'ADMIN';
+  }
+  return null;
 };
 
 /**

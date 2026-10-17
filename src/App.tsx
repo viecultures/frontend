@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import { SettingsModal } from './components/SettingsModal';
 import { PwaInstallBanner } from './components/pwa';
@@ -45,8 +46,21 @@ const RedirectToReader: React.FC<{ defaultParams?: string }> = ({ defaultParams 
 export const App: React.FC = () => {
   const navigate = useNavigate();
 
-  const defaultUser: AppUser = { name: 'Ninh Thiên Luân', email: 'luanninh@viecultures.com', avatar: 'NL' };
-  const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
+  const defaultUser: AppUser = {
+    name: 'Ninh Thiên Luân',
+    email: 'luanninh@viecultures.com',
+    avatar: 'NL',
+    role: 'ADMIN',
+  };
+  const [user, setUser] = useState<AppUser | null>(() => {
+    const stored = getStoredUser();
+    if (stored && !stored.role) {
+      const updated = { ...stored, role: 'ADMIN' };
+      setStoredUser(updated);
+      return updated;
+    }
+    return stored;
+  });
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser());
 
   useEffect(() => {
@@ -59,12 +73,13 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('auth:change', handleAuthChange);
   }, []);
 
-  const handleLoginSuccess = (customUserData?: { email?: string; name?: string }) => {
+  const handleLoginSuccess = (customUserData?: { email?: string; name?: string; role?: string }) => {
     const activeUser: AppUser = customUserData
       ? {
         name: customUserData.name || customUserData.email?.split('@')[0] || defaultUser.name,
         email: customUserData.email || defaultUser.email,
         avatar: (customUserData.name || customUserData.email || 'NL').substring(0, 2).toUpperCase(),
+        role: customUserData.role || defaultUser.role || 'ADMIN',
       }
       : defaultUser;
     setIsLoggedIn(true);
@@ -89,127 +104,141 @@ export const App: React.FC = () => {
     navigate(PATHS.landing);
   };
 
+  const googleClientId =
+    import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+    '160434008286-3pe876kb2gc2qeh9jqofqri9crqcq3s3.apps.googleusercontent.com';
+
   return (
-    <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
-      {/* Main Content Area with Route-driven Layouts */}
-      <React.Suspense
-        fallback={
-          <div className="min-h-[60vh] flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-[#1E4B43]/20 border-t-[#1E4B43] rounded-full animate-spin" />
-          </div>
-        }
-      >
-        <Routes>
-          {/* 1. Public Landing Layout */}
-          <Route element={<PublicLayout />}>
-            <Route path={PATHS.landing} element={<LandingPage />} />
-            <Route path="/landing" element={<Navigate to={PATHS.landing} replace />} />
-          </Route>
+    <GoogleOAuthProvider clientId={googleClientId} locale="vi">
+      <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
+        {/* Main Content Area with Route-driven Layouts */}
+        <React.Suspense
+          fallback={
+            <div className="min-h-[60vh] flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-[#1E4B43]/20 border-t-[#1E4B43] rounded-full animate-spin" />
+            </div>
+          }
+        >
+          <Routes>
+            {/* 1. Public Landing Layout */}
+            <Route element={<PublicLayout />}>
+              <Route path={PATHS.landing} element={<LandingPage />} />
+              <Route path="/landing" element={<Navigate to={PATHS.landing} replace />} />
+            </Route>
 
-          {/* 2. Standard App Layout (Navbar + Outlet + Footer) */}
-          <Route element={<AppLayout isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />}>
-            <Route path={PATHS.discovery} element={<DiscoveryPage />} />
-            <Route path={PATHS.dictionary} element={<DictionaryPage />} />
-            <Route path="/flashcard-library" element={<Navigate to={PATHS.dictionary} replace />} />
+            {/* 2. Standard App Layout (Navbar + Outlet + Footer) */}
+            <Route element={<AppLayout isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />}>
+              <Route path={PATHS.discovery} element={<DiscoveryPage />} />
+              <Route path={PATHS.dictionary} element={<DictionaryPage />} />
+              <Route path="/flashcard-library" element={<Navigate to={PATHS.dictionary} replace />} />
 
-            <Route path={PATHS.community} element={<CommunityPage />} />
-            <Route path="/community-1" element={<Navigate to={PATHS.community} replace />} />
-            <Route path={PATHS.communityContest} element={<CommunityContestPage />} />
-            <Route path="/community-2" element={<Navigate to={PATHS.communityContest} replace />} />
+              <Route path={PATHS.community} element={<CommunityPage />} />
+              <Route path="/community-1" element={<Navigate to={PATHS.community} replace />} />
+              <Route path={PATHS.communityContest} element={<CommunityContestPage />} />
+              <Route path="/community-2" element={<Navigate to={PATHS.communityContest} replace />} />
 
-            <Route path={PATHS.pricing} element={<PricingPage />} />
-            <Route path="/subscription" element={<Navigate to={PATHS.pricing} replace />} />
-            <Route path="/upgrade" element={<Navigate to={PATHS.pricing} replace />} />
+              <Route path={PATHS.pricing} element={<PricingPage />} />
+              <Route path="/subscription" element={<Navigate to={PATHS.pricing} replace />} />
+              <Route path="/upgrade" element={<Navigate to={PATHS.pricing} replace />} />
 
-            {/* Auth Protected: Checkout */}
-            <Route
-              path={PATHS.checkout}
-              element={
-                <RequireAuth>
-                  <CheckoutPage />
-                </RequireAuth>
-              }
-            />
-            <Route path="/checkout" element={<Navigate to={PATHS.checkout} replace />} />
+              {/* Auth Protected: Checkout */}
+              <Route
+                path={PATHS.checkout}
+                element={
+                  <RequireAuth>
+                    <CheckoutPage />
+                  </RequireAuth>
+                }
+              />
+              <Route path="/checkout" element={<Navigate to={PATHS.checkout} replace />} />
 
-            {/* Auth Protected: User Profile & Cultural Passport */}
-            <Route
-              path={PATHS.profile}
-              element={
-                <RequireAuth>
-                  <ProfilePage />
-                </RequireAuth>
-              }
-            />
-            <Route path="/account" element={<Navigate to={PATHS.profile} replace />} />
-            <Route path="/passport" element={<Navigate to={`${PATHS.profile}?tab=passport`} replace />} />
-            <Route path="/achievements" element={<Navigate to={`${PATHS.profile}?tab=badges`} replace />} />
+              {/* Auth Protected: User Profile & Cultural Passport */}
+              <Route
+                path={PATHS.profile}
+                element={
+                  <RequireAuth>
+                    <ProfilePage />
+                  </RequireAuth>
+                }
+              />
+              <Route path="/account" element={<Navigate to={PATHS.profile} replace />} />
+              <Route path="/passport" element={<Navigate to={`${PATHS.profile}?tab=passport`} replace />} />
+              <Route path="/achievements" element={<Navigate to={`${PATHS.profile}?tab=badges`} replace />} />
 
-            {/* Role Protected: Admin CMS */}
-            <Route
-              path={PATHS.admin}
-              element={
-                <RequireRole role="ADMIN">
-                  <AdminPage />
-                </RequireRole>
-              }
-            />
-            <Route path="/admin/posts" element={<Navigate to={PATHS.admin} replace />} />
+              {/* Role Protected: Admin CMS */}
+              <Route
+                path={PATHS.admin}
+                element={
+                  <RequireRole role="ADMIN">
+                    <AdminPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path={`${PATHS.admin}/*`}
+                element={
+                  <RequireRole role="ADMIN">
+                    <AdminPage />
+                  </RequireRole>
+                }
+              />
+              <Route path="/admin/posts" element={<Navigate to={PATHS.admin} replace />} />
 
-            {/* 404 Not Found Page within App shell */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
+              {/* 404 Not Found Page within App shell */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
 
-          {/* 3. Study Layout (Navbar + Outlet, no Footer) */}
-          <Route element={<StudyLayout isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />}>
-            <Route path={PATHS.flashcardStudy} element={<FlashcardStudyPage />} />
-            <Route path="/flashcards" element={<Navigate to={PATHS.flashcardStudy} replace />} />
-            <Route path="/flashcard-study-page" element={<Navigate to={PATHS.flashcardStudy} replace />} />
-          </Route>
+            {/* 3. Study Layout (Navbar + Outlet, no Footer) */}
+            <Route element={<StudyLayout isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />}>
+              <Route path={PATHS.flashcardStudy} element={<FlashcardStudyPage />} />
+              <Route path="/flashcards" element={<Navigate to={PATHS.flashcardStudy} replace />} />
+              <Route path="/flashcard-study-page" element={<Navigate to={PATHS.flashcardStudy} replace />} />
+            </Route>
 
-          {/* 4. Focus Full-screen Layout (No Navbar, No Footer) */}
-          <Route element={<FocusLayout />}>
-            {/* Guest Only: Login */}
-            <Route
-              path={PATHS.login}
-              element={
-                <GuestOnly>
-                  <LoginPage onLoginSuccess={handleLoginSuccess} />
-                </GuestOnly>
-              }
-            />
+            {/* 4. Focus Full-screen Layout (No Navbar, No Footer) */}
+            <Route element={<FocusLayout />}>
+              {/* Guest Only: Login */}
+              <Route
+                path={PATHS.login}
+                element={
+                  <GuestOnly>
+                    <LoginPage onLoginSuccess={handleLoginSuccess} />
+                  </GuestOnly>
+                }
+              />
 
-            {/* Auth Protected: Home Dashboard */}
-            <Route
-              path={PATHS.home}
-              element={
-                <RequireAuth>
-                  <HomePage
-                    isLoggedIn={isLoggedIn}
-                    user={user}
-                    onLogout={handleLogout}
-                  />
-                </RequireAuth>
-              }
-            />
+              {/* Auth Protected: Home Dashboard */}
+              <Route
+                path={PATHS.home}
+                element={
+                  <RequireAuth>
+                    <HomePage
+                      isLoggedIn={isLoggedIn}
+                      user={user}
+                      onLogout={handleLogout}
+                    />
+                  </RequireAuth>
+                }
+              />
 
-            {/* Reader & Playground Workspaces */}
-            <Route path={PATHS.reader} element={<ReaderPage />} />
-            <Route path="/bilingual-reader" element={<RedirectToReader />} />
-            <Route path="/extensive-reader" element={<RedirectToReader defaultParams="?mode=extensive" />} />
-            <Route path="/learning-loop" element={<RedirectToReader />} />
-            <Route path="/loop" element={<RedirectToReader />} />
+              {/* Reader & Playground Workspaces */}
+              <Route path={PATHS.reader} element={<ReaderPage />} />
+              <Route path="/bilingual-reader" element={<RedirectToReader />} />
+              <Route path="/extensive-reader" element={<RedirectToReader defaultParams="?mode=extensive" />} />
+              <Route path="/learning-loop" element={<RedirectToReader />} />
+              <Route path="/loop" element={<RedirectToReader />} />
 
-            <Route path={PATHS.playground} element={<PlaygroundPage />} />
-            <Route path="/mascot-demo" element={<MascotDemoPage />} />
-          </Route>
-        </Routes>
-      </React.Suspense>
+              <Route path={PATHS.playground} element={<PlaygroundPage />} />
+              <Route path="/mascot-demo" element={<MascotDemoPage />} />
+            </Route>
+          </Routes>
+        </React.Suspense>
 
-      {/* Global Modals & Banners */}
-      <SettingsModal />
-      <PwaInstallBanner />
-    </div>
+        {/* Global Modals & Banners */}
+        <SettingsModal />
+        <PwaInstallBanner />
+      </div>
+    </GoogleOAuthProvider>
   );
 };
 

@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Sparkles, ArrowLeft, CheckCircle2, Crown, Globe } from 'lucide-react';
+import { Mail, Lock, Sparkles, ArrowLeft, CheckCircle2, Crown, Loader2, AlertCircle } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 import { BrandLogo } from '@/components/BrandLogo';
 import { PATHS } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
+import { ForgotPasswordModal } from '../components/ForgotPasswordModal';
+import { authService } from '@/services/authService';
+import { setStoredToken, setStoredUser } from '@/utils/auth-storage';
 
 interface LoginPageProps {
-  onLoginSuccess?: (userData?: { email?: string; name?: string }) => void;
+  onLoginSuccess?: (userData?: { email?: string; name?: string; role?: string }) => void;
 }
 
 // ─── Shared input class — dark glass style ─────────────────────────────────────
@@ -29,14 +33,52 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleNavigate = useAppNavigate();
 
+  const handleGoogleSuccess = async (idToken: string) => {
+    try {
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      const result = await authService.loginWithGoogle(idToken);
+
+      // Persist token & user profile to local storage
+      setStoredToken(result.token);
+      setStoredUser(result.user);
+
+      if (onLoginSuccess) {
+        onLoginSuccess(result.user);
+      } else {
+        const params = new URLSearchParams(window.location.search);
+        const redirectUrl = params.get('redirect');
+        if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
+          window.location.href = redirectUrl;
+        } else if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          handleNavigate(PATHS.home);
+        }
+      }
+    } catch (err: unknown) {
+      console.error('Google Sign-In failed:', err);
+      const msg = err instanceof Error ? err.message : 'Đăng nhập Google thất bại. Vui lòng thử lại sau.';
+      setErrorMessage(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
     const loginData = {
       email: email.trim() || 'luanninh@viecultures.com',
       name: fullName.trim() || email.split('@')[0] || 'Ninh Thiên Luân',
+      role: 'ADMIN',
     };
     if (onLoginSuccess) {
       onLoginSuccess(loginData);
@@ -205,7 +247,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 {authTab === 'login' && (
                   <button
                     type="button"
-                    onClick={() => alert('Chức năng Quên mật khẩu đang được phát triển.')}
+                    onClick={() => setIsForgotPasswordOpen(true)}
                     className="text-xs text-antique-bright hover:underline font-medium focus-ring-dark rounded"
                   >
                     Quên mật khẩu?
@@ -232,31 +274,56 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               </span>
             </div>
 
-            {/* Social Buttons */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  const googleUser = { email: 'user.google@gmail.com', name: 'Ninh Thiên Luân' };
-                  if (onLoginSuccess) {
-                    onLoginSuccess(googleUser);
-                  } else {
-                    const params = new URLSearchParams(window.location.search);
-                    const redirectUrl = params.get('redirect');
-                    if (redirectUrl) window.location.href = redirectUrl;
-                    else if (window.history.length > 1) window.history.back();
-                    else handleNavigate(PATHS.home);
-                  }
-                }}
-                className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark cursor-pointer"
+            {/* Error Feedback Banner */}
+            {errorMessage && (
+              <div
+                role="alert"
+                className="p-3 rounded-xl bg-red-950/70 border border-red-500/40 text-red-200 text-xs flex items-start gap-2.5 animate-fadeIn"
               >
-                <Globe className="w-4 h-4 text-sky-mist" />
-                <span>Google</span>
-              </button>
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-semibold text-red-300">Đăng nhập không thành công</p>
+                  <p className="text-white/80 text-[11px] mt-0.5 leading-relaxed">{errorMessage}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Social Authentication */}
+            <div className="space-y-2.5">
+              {/* Google Sign-In with Official GIS Button */}
+              <div className="relative w-full flex justify-center [&>div]:w-full [&>div>iframe]:!w-full [&>div]:flex [&>div]:justify-center">
+                {isLoading ? (
+                  <div className="w-full py-2.5 px-3 bg-black/40 border border-antique-bright/30 rounded-xl text-xs font-semibold text-antique-bright flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-antique-bright" />
+                    <span>Đang xác thực với Google...</span>
+                  </div>
+                ) : (
+                  <GoogleLogin
+                    onSuccess={(credentialResponse) => {
+                      if (credentialResponse.credential) {
+                        handleGoogleSuccess(credentialResponse.credential);
+                      } else {
+                        setErrorMessage('Không nhận được mã xác thực Google từ trình duyệt.');
+                      }
+                    }}
+                    onError={() => {
+                      setErrorMessage('Đăng nhập bằng Google không thành công hoặc cửa sổ đăng nhập đã bị đóng.');
+                    }}
+                    theme="filled_black"
+                    shape="rectangular"
+                    size="large"
+                    text="continue_with"
+                    width="100%"
+                  />
+                )}
+              </div>
+
+              {/* Facebook Button (Fallback / Demo) */}
               <button
                 type="button"
+                disabled={isLoading}
                 onClick={() => {
-                  const fbUser = { email: 'user.facebook@example.com', name: 'Ninh Thiên Luân' };
+                  const fbUser = { email: 'user.facebook@example.com', name: 'Ninh Thiên Luân', role: 'ADMIN' };
                   if (onLoginSuccess) {
                     onLoginSuccess(fbUser);
                   } else {
@@ -267,12 +334,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     else handleNavigate(PATHS.home);
                   }
                 }}
-                className="flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark cursor-pointer disabled:opacity-50"
               >
                 <svg className="w-4 h-4 fill-sky-mist" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
-                <span>Facebook</span>
+                <span>Tiếp tục với Facebook</span>
               </button>
             </div>
           </div>
@@ -339,6 +406,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         </div>
 
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+        initialEmail={email}
+        onSuccessLogin={(newEmail) => {
+          setEmail(newEmail);
+          setIsForgotPasswordOpen(false);
+        }}
+      />
     </div>
   );
 };
