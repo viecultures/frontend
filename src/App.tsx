@@ -29,6 +29,7 @@ const PlaygroundPage = React.lazy(() => import('@/features/playground/pages/play
 const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
 const PricingPage = React.lazy(() => import('@/features/subscription/pages/PricingPage'));
 const CheckoutPage = React.lazy(() => import('@/features/subscription/pages/CheckoutPage'));
+const ProfilePage = React.lazy(() => import('@/features/profile/pages/ProfilePage'));
 const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
 
 import { getStoredUser, setStoredUser, setStoredToken, type AppUser } from '@/utils/auth-storage';
@@ -130,6 +131,19 @@ export const App: React.FC = () => {
               }
             />
             <Route path="/checkout" element={<Navigate to={PATHS.checkout} replace />} />
+
+            {/* Auth Protected: User Profile & Cultural Passport */}
+            <Route
+              path={PATHS.profile}
+              element={
+                <RequireAuth>
+                  <ProfilePage />
+                </RequireAuth>
+              }
+            />
+            <Route path="/account" element={<Navigate to={PATHS.profile} replace />} />
+            <Route path="/passport" element={<Navigate to={`${PATHS.profile}?tab=passport`} replace />} />
+            <Route path="/achievements" element={<Navigate to={`${PATHS.profile}?tab=badges`} replace />} />
 
             {/* Role Protected: Admin CMS */}
             <Route

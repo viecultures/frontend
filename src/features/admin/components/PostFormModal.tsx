@@ -29,6 +29,8 @@ import type {
   CefrLevel,
   AudioTrackDto,
   VoiceModelItem,
+  QuizQuestionDto,
+  QuizOptionDto,
 } from '../types/adminTypes';
 import { postAdminService } from '../services/postAdminService';
 
@@ -77,7 +79,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   onSuccess,
   initialData,
 }) => {
-  const [activeTab, setActiveTab] = useState<'info' | 'bilingual' | 'vocab' | 'voices' | 'tsv'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'bilingual' | 'vocab' | 'voices' | 'quiz' | 'tsv'>('info');
 
   // Form states
   const [topicGroup, setTopicGroup] = useState('');
@@ -100,6 +102,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
 
   // Vocabularies
   const [vocabularies, setVocabularies] = useState<VocabItemDto[]>([]);
+
+  // Quiz Questions
+  const [questions, setQuestions] = useState<QuizQuestionDto[]>([]);
 
   // Voice Tracks & Models
   const [voiceTracks, setVoiceTracks] = useState<AudioTrackDto[]>([]);
@@ -146,6 +151,41 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
       setParagraphs(initialData.paragraphs || []);
       setVocabularies(initialData.vocabularies || []);
 
+      if (initialData.questions) {
+        try {
+          const rawQ = initialData.questions;
+          const parsed = typeof rawQ === 'string' ? JSON.parse(rawQ) : rawQ;
+          if (Array.isArray(parsed)) {
+            setQuestions(
+              parsed.map((q: any, idx: number) => {
+                let opts = q.options;
+                if (typeof opts === 'string') {
+                  try {
+                    opts = JSON.parse(opts);
+                  } catch {
+                    opts = [];
+                  }
+                }
+                return {
+                  id: q.id,
+                  orderIndex: q.orderIndex ?? idx,
+                  question: q.question || '',
+                  options: Array.isArray(opts) ? opts : [],
+                  correctKey: q.correctKey || 'A',
+                  explanation: q.explanation || '',
+                };
+              })
+            );
+          } else {
+            setQuestions([]);
+          }
+        } catch {
+          setQuestions([]);
+        }
+      } else {
+        setQuestions([]);
+      }
+
       if (initialData.audioTracks) {
         try {
           const parsed =
@@ -187,6 +227,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
     setContentVi('');
     setParagraphs([]);
     setVocabularies([]);
+    setQuestions([]);
     setVoiceTracks([]);
     setFastVocabInput('');
     setTsvRawRow('');
@@ -363,6 +404,68 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
+  // Quiz helper functions
+  const handleAddQuestion = () => {
+    const newQ: QuizQuestionDto = {
+      orderIndex: questions.length,
+      question: '',
+      options: [
+        { key: 'A', text: '' },
+        { key: 'B', text: '' },
+        { key: 'C', text: '' },
+        { key: 'D', text: '' },
+      ],
+      correctKey: 'A',
+      explanation: '',
+    };
+    setQuestions((prev) => [...prev, newQ]);
+  };
+
+  const handleRemoveQuestion = (index: number) => {
+    setQuestions((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateQuestionText = (index: number, text: string) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], question: text };
+      return updated;
+    });
+  };
+
+  const handleUpdateOptionText = (qIndex: number, optKey: string, optText: string) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      const currentOpts: QuizOptionDto[] = Array.isArray(updated[qIndex].options)
+        ? [...(updated[qIndex].options as QuizOptionDto[])]
+        : [];
+      const targetIdx = currentOpts.findIndex((o) => o.key === optKey);
+      if (targetIdx >= 0) {
+        currentOpts[targetIdx] = { ...currentOpts[targetIdx], text: optText };
+      } else {
+        currentOpts.push({ key: optKey, text: optText });
+      }
+      updated[qIndex] = { ...updated[qIndex], options: currentOpts };
+      return updated;
+    });
+  };
+
+  const handleUpdateCorrectKey = (qIndex: number, key: string) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[qIndex] = { ...updated[qIndex], correctKey: key };
+      return updated;
+    });
+  };
+
+  const handleUpdateExplanation = (qIndex: number, exp: string) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[qIndex] = { ...updated[qIndex], explanation: exp };
+      return updated;
+    });
+  };
+
   // Set as primary shadowing audio
   const handleSetPrimaryAudio = (url: string, name: string, speedLabel: string) => {
     setShadowingAudioUrl(url);
@@ -407,6 +510,11 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
         contentVi: contentVi.trim() || undefined,
         paragraphs: paragraphs.length > 0 ? paragraphs : undefined,
         vocabularies: vocabularies.length > 0 ? vocabularies : undefined,
+        questions: questions.length > 0 ? questions.map((q, idx) => ({
+          ...q,
+          orderIndex: idx,
+          options: typeof q.options === 'string' ? q.options : JSON.stringify(q.options),
+        })) : undefined,
       };
 
       let result;
@@ -508,6 +616,18 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
           >
             <Radio className="w-3.5 h-3.5 text-antique-gold" />
             <span>4. Giọng đọc AI ({voiceTracks.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('quiz')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              activeTab === 'quiz'
+                ? 'bg-heritage-green text-warm-ivory shadow-xs'
+                : 'text-text-body dark:text-warm-ivory/70 hover:bg-white/40 dark:hover:bg-white/5'
+            }`}
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-antique-gold" />
+            <span>5. Câu hỏi đọc hiểu ({questions.length})</span>
           </button>
           <button
             type="button"
@@ -1416,7 +1536,180 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
             </div>
           )}
 
-          {/* ════ TAB 5: TRÌNH NHẬP NHANH TSV (FAST LOADER) ════ */}
+          {/* ════ TAB 5: BỘ CÂU HỎI ĐỌC HIỂU (READING COMPREHENSION QUIZ) ════ */}
+          {activeTab === 'quiz' && (
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-antique-gold/15 border border-antique-gold/30">
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-heritage-dark dark:text-antique-bright">
+                    <HelpCircle className="w-5 h-5 text-antique-gold" />
+                    <span>Bộ Câu Hỏi Thấu Hiểu Bài Đọc (Reading Comprehension Quiz)</span>
+                  </div>
+                  <p className="text-xs text-text-body dark:text-warm-ivory/80 mt-1">
+                    Biên soạn 2-4 câu hỏi trắc nghiệm A, B, C, D về bối cảnh văn hóa & ý nghĩa phong tục để kiểm tra mức độ thấu hiểu của người học ở cuối bài.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddQuestion}
+                  className="px-4 py-2 rounded-xl bg-heritage-green text-warm-ivory font-bold text-xs flex items-center gap-2 hover:bg-heritage-dark transition-all cursor-pointer shadow-sm shrink-0"
+                >
+                  <Plus className="w-4 h-4 text-antique-gold" />
+                  <span>Thêm Câu Hỏi Mới</span>
+                </button>
+              </div>
+
+              {questions.length === 0 ? (
+                <div className="text-center py-12 px-4 rounded-2xl border-2 border-dashed border-antique-gold/30 bg-warm-ivory/40 dark:bg-heritage-dark/30">
+                  <HelpCircle className="w-10 h-10 mx-auto text-antique-gold/60 mb-3" />
+                  <h4 className="text-sm font-bold text-text-body dark:text-warm-ivory mb-1">
+                    Chưa có câu hỏi đọc hiểu nào được thêm
+                  </h4>
+                  <p className="text-xs text-text-muted max-w-md mx-auto mb-4">
+                    Thêm các câu hỏi trắc nghiệm để người học ôn luyện kiến thức văn hóa sau khi đọc xong bài.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleAddQuestion}
+                    className="px-4 py-2 rounded-xl bg-heritage-green text-warm-ivory font-bold text-xs inline-flex items-center gap-2 hover:bg-heritage-dark transition-all cursor-pointer shadow-sm"
+                  >
+                    <Plus className="w-4 h-4 text-antique-gold" />
+                    <span>+ Thêm Câu Hỏi Đầu Tiên</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  {questions.map((q, qIdx) => {
+                    const opts: QuizOptionDto[] = Array.isArray(q.options)
+                      ? (q.options as QuizOptionDto[])
+                      : [
+                          { key: 'A', text: '' },
+                          { key: 'B', text: '' },
+                          { key: 'C', text: '' },
+                          { key: 'D', text: '' },
+                        ];
+                    const defaultKeys = ['A', 'B', 'C', 'D'];
+                    const fullOpts = defaultKeys.map(
+                      (k) => opts.find((o) => o.key === k) || { key: k, text: '' }
+                    );
+
+                    return (
+                      <div
+                        key={q.id || qIdx}
+                        className="p-5 rounded-2xl bg-white/70 dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-xs space-y-4"
+                      >
+                        <div className="flex items-center justify-between pb-3 border-b border-antique-gold/20">
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-lg bg-heritage-green text-warm-ivory text-xs font-bold flex items-center justify-center">
+                              {qIdx + 1}
+                            </span>
+                            <span className="text-xs font-bold text-heritage-dark dark:text-warm-ivory">
+                              Câu hỏi #{qIdx + 1}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveQuestion(qIdx)}
+                            className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                            title="Xóa câu hỏi này"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Question Text */}
+                        <div>
+                          <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
+                            Nội Dung Câu Hỏi (Tiếng Anh hoặc Song Ngữ) <span className="text-red-500">*</span>
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={q.question}
+                            onChange={(e) => handleUpdateQuestionText(qIdx, e.target.value)}
+                            placeholder="VD: According to the article, what is the historical origin of Tết traced back to?"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory/80 dark:bg-heritage-forest border border-antique-gold/40 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                          />
+                        </div>
+
+                        {/* Options A, B, C, D */}
+                        <div className="space-y-2.5 pt-1">
+                          <label className="block text-xs font-bold text-text-body dark:text-warm-ivory">
+                            Các Lựa Chọn Đáp Án (Tích chọn nút tròn để xác định ĐÁP ÁN ĐÚNG):
+                          </label>
+                          <div className="grid grid-cols-1 gap-2.5">
+                            {fullOpts.map((opt) => {
+                              const isCorrect = q.correctKey === opt.key;
+                              return (
+                                <div
+                                  key={opt.key}
+                                  className={`flex items-center gap-3 p-2.5 rounded-xl border transition-all ${
+                                    isCorrect
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500/60 shadow-xs'
+                                      : 'bg-warm-ivory/40 dark:bg-heritage-forest/60 border-antique-gold/25'
+                                  }`}
+                                >
+                                  <label className="flex items-center gap-2 cursor-pointer shrink-0">
+                                    <input
+                                      type="radio"
+                                      name={`correct-${qIdx}`}
+                                      checked={isCorrect}
+                                      onChange={() => handleUpdateCorrectKey(qIdx, opt.key)}
+                                      className="accent-heritage-green w-4 h-4 cursor-pointer"
+                                    />
+                                    <span
+                                      className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-extrabold ${
+                                        isCorrect
+                                          ? 'bg-emerald-600 text-white'
+                                          : 'bg-antique-gold/20 text-heritage-dark dark:text-warm-ivory'
+                                      }`}
+                                    >
+                                      {opt.key}
+                                    </span>
+                                  </label>
+
+                                  <input
+                                    type="text"
+                                    value={opt.text}
+                                    onChange={(e) =>
+                                      handleUpdateOptionText(qIdx, opt.key, e.target.value)
+                                    }
+                                    placeholder={`Nội dung lựa chọn ${opt.key}...`}
+                                    className="flex-1 px-3 py-1.5 rounded-lg bg-white/90 dark:bg-heritage-dark/90 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                                  />
+
+                                  {isCorrect && (
+                                    <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 px-2 py-0.5 rounded shrink-0">
+                                      Đáp án đúng ✓
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Cultural Explanation */}
+                        <div>
+                          <label className="block text-xs font-semibold text-text-muted mb-1">
+                            Giải Thích Văn Hóa / Ngữ Cảnh (Hiển thị sau khi người học nộp bài):
+                          </label>
+                          <input
+                            type="text"
+                            value={q.explanation || ''}
+                            onChange={(e) => handleUpdateExplanation(qIdx, e.target.value)}
+                            placeholder="VD: Ngày Tết bắt nguồn từ nền văn minh lúa nước gắn liền với chu kỳ mùa vụ của phương Đông."
+                            className="w-full px-3 py-2 rounded-xl bg-warm-ivory/60 dark:bg-heritage-forest/80 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ════ TAB 6: TRÌNH NHẬP NHANH TSV (FAST LOADER) ════ */}
           {activeTab === 'tsv' && (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-antique-gold/15 border border-antique-gold/40 space-y-3">
@@ -1490,7 +1783,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
 
             <div className="flex items-center gap-3">
               <span className="text-xs text-text-muted">
-                {paragraphs.length} đoạn • {vocabularies.length} từ vựng
+                {paragraphs.length} đoạn • {vocabularies.length} từ vựng • {questions.length} câu hỏi
               </span>
               <button
                 type="submit"
