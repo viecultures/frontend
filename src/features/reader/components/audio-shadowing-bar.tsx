@@ -174,8 +174,8 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
           </div>
         </div>
 
-        {/* 2. Center: All Controls + Scrubber in ONE Single Horizontal Line */}
-        <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center min-w-0">
+        {/* Mobile controls use a full row, with the timeline below them. */}
+        <div className="order-last flex basis-full flex-wrap items-center gap-2 sm:gap-3 flex-1 justify-center min-w-0 md:order-none md:basis-auto md:flex-nowrap">
           
           {/* Icons on the LEFT of Play: Replay & Loop */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
@@ -220,7 +220,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             variant="gold"
             size="icon"
             onClick={onTogglePlay}
-            className={`rounded-full w-8 h-8 sm:w-9 sm:h-9 shadow-md shrink-0 transition-transform active:scale-95 cursor-pointer ${
+            className={`rounded-full size-11 shrink-0 ${
               isDark
                 ? "bg-[#D9B76A] hover:bg-[#c9a657] text-[#1E4B43]"
                 : "bg-[#1E4B43] hover:bg-[#163D37] text-[#FBF7EE]"
@@ -236,7 +236,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
           </Button>
 
           {/* Scrubber / Progress Bar */}
-          <div className="flex items-center gap-2 flex-1 max-w-[240px] sm:max-w-xs min-w-[100px] select-none">
+          <div className="order-last flex basis-full items-center gap-2 flex-1 min-w-[100px] select-none md:order-none md:basis-auto md:max-w-xs">
             <span
               style={{
                 fontVariantNumeric: "tabular-nums",

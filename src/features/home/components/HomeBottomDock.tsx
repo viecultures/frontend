@@ -56,34 +56,34 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-6 relative z-10">
+    <div className="home-classic-dock max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-6 relative z-10">
       <div className="flex items-center gap-3">
         {/* Unified Floating Bottom Control Dock Container */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-heritage-dark/85 border border-white/20 backdrop-blur-xl shadow-2xl p-2 rounded-2xl w-full sm:w-auto">
+        <div className="home-dock-surface flex flex-wrap items-center gap-2 sm:gap-3 backdrop-blur-xl p-2 w-full sm:w-auto">
           {/* Streak Sub-card */}
-          <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-black/40 rounded-xl border border-white/10">
-            <div className="p-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              <Flame className="w-4 h-4 fill-amber-400" />
+          <div className="home-dock-stat flex items-center gap-2.5 px-3.5 py-1.5">
+            <div className="home-dock-icon p-1 text-antique-bright">
+              <Flame className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-amber-300">CHUỖI HỌC TẬP</div>
-              <div className="text-xs font-extrabold text-white">2 Ngày Liên Tiếp</div>
+              <div className="home-dock-label">Study streak</div>
+              <div className="home-dock-detail">2 consecutive days</div>
             </div>
           </div>
 
           {/* Daily Challenge Sub-card */}
           <div
-            className="flex items-center gap-2.5 px-3.5 py-1.5 bg-black/40 rounded-xl border border-white/10"
-            title="Đếm ngược đến 00:00 GMT+7 (Làm mới thử thách hằng ngày)"
+            className="home-dock-stat flex items-center gap-2.5 px-3.5 py-1.5"
+            title="Daily challenge refreshes at midnight (GMT+7)"
           >
-            <div className="p-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <div className="home-dock-icon p-1">
               <Clock className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">THỬ THÁCH HẰNG NGÀY</div>
-              <div className="text-xs font-bold text-white flex items-center gap-2">
-                <span>Còn lại</span>
-                <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-[11px] font-mono border border-emerald-500/30 font-bold">
+              <div className="home-dock-label">Daily challenge</div>
+              <div className="home-dock-detail flex items-center gap-2">
+                <span>Time left</span>
+                <span className="home-dock-countdown tabular-nums">
                   {dailyCountdown}
                 </span>
               </div>
@@ -94,14 +94,15 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
           <div className="hidden md:block w-px h-7 bg-white/15 mx-0.5" />
 
           {/* Mode Switcher Dock (Study / Pomodoro) */}
-          <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10">
+          <div className="home-dock-modes flex flex-wrap items-center gap-1.5 p-1">
             <button
               type="button"
               onClick={() => onSelectDockMode('study')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer focus-ring ${
+              aria-pressed={activeDockMode === 'study'}
+              className={`home-dock-mode px-3.5 py-1.5 transition-colors cursor-pointer focus-ring ${
                 activeDockMode === 'study'
-                  ? 'bg-antique-gold text-heritage-dark shadow-md'
-                  : 'text-white/80 hover:text-white'
+                  ? 'home-dock-mode-active'
+                  : 'home-dock-mode-idle'
               }`}
             >
               Study Mode
@@ -110,15 +111,16 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
             <button
               type="button"
               onClick={() => onSelectDockMode('pomodoro')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer focus-ring ${
+              aria-pressed={activeDockMode === 'pomodoro'}
+              className={`home-dock-mode px-3.5 py-1.5 transition-colors flex items-center gap-1.5 cursor-pointer focus-ring ${
                 activeDockMode === 'pomodoro'
-                  ? 'bg-antique-gold text-heritage-dark shadow-md'
-                  : 'text-white/80 hover:text-white'
+                  ? 'home-dock-mode-active'
+                  : 'home-dock-mode-idle'
               }`}
             >
               <span>Pomodoro</span>
               {activeDockMode === 'pomodoro' && (
-                <span className="font-mono text-[11px] bg-heritage-dark/30 px-1.5 py-0.5 rounded text-heritage-dark font-bold">
+                <span className="home-dock-timer tabular-nums">
                   {formatPomoTime(pomoSeconds)}
                 </span>
               )}
@@ -129,18 +131,19 @@ export const HomeBottomDock: React.FC<HomeBottomDockProps> = ({
                 <button
                   type="button"
                   onClick={onTogglePomo}
-                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+                  className="home-dock-timer-action px-2.5 py-1 transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   {isPomoRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                  <span>{isPomoRunning ? 'Tạm dừng' : 'Bắt đầu'}</span>
+                  <span>{isPomoRunning ? 'Pause' : 'Start'}</span>
                 </button>
 
                 {onResetPomo && (
                   <button
                     type="button"
                     onClick={onResetPomo}
-                    className="p-1 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                    title="Đặt lại 25 phút"
+                    className="home-dock-reset p-1 transition-colors cursor-pointer"
+                    aria-label="Reset to 25 minutes"
+                    title="Reset to 25 minutes"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>

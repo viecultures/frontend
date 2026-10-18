@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { BookOpen, Sparkles, Compass, Home, User, MapPin, Layers, Users, BookMarked, Crown, ShieldCheck, Award } from 'lucide-react';
+import { BookOpen, Compass, Home, User, MapPin, Layers, Users, BookMarked, Menu, X } from 'lucide-react';
+import { Button } from './ui/button';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
 
@@ -18,12 +19,12 @@ interface NavbarProps {
 
 // ─── Nav link class helpers ────────────────────────────────────────────────────
 const NAV_LINK_BASE =
-  'transition-all py-2 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer focus-ring-dark';
+  'min-h-11 transition-colors py-2 px-3 rounded-lg flex items-center gap-2 cursor-pointer focus-ring-dark';
 
 const navLinkClass = (isActive: boolean) =>
   `${NAV_LINK_BASE} ${isActive
-    ? 'bg-heritage-green text-warm-ivory border border-antique-gold/50 shadow-sm font-bold'
-    : 'text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50'
+    ? 'bg-white/10 text-warm-ivory font-semibold'
+    : 'text-warm-ivory/85 hover:text-warm-ivory hover:bg-white/10'
   }`;
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -35,8 +36,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
 }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
-  const hoverScale = shouldReduceMotion ? 1 : 1.03;
+  const hoverScale = 1;
   const tapScale = shouldReduceMotion ? 1 : 0.97;
 
   const scrollToAnchor = (anchorId: string) => {
@@ -63,19 +65,23 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between h-20">
 
           {/* ── Brand Logo ──────────────────────────────────────────────── */}
-          <motion.div
+          <motion.button
+            type="button"
+            aria-label="VieCultures home"
             whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
             whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
             className="cursor-pointer focus-ring-dark rounded-xl"
             onClick={() => onNavigateToSection(isLoggedIn ? PATHS.home : PATHS.landing)}
           >
             <BrandLogo size="md" theme="dark" />
-          </motion.div>
+          </motion.button>
 
           {/* ── Center Nav Links (desktop only) ─────────────────────────── */}
           <nav
-            className="hidden lg:flex items-center gap-2 text-xs font-semibold tracking-wider text-warm-ivory/90"
-            aria-label="Điều hướng chính"
+            id="main-navigation"
+            className={`${isMenuOpen ? 'flex' : 'hidden'} absolute inset-x-0 top-full max-h-[calc(100dvh-5rem)] overflow-y-auto border-b border-white/10 bg-heritage-dark p-4 flex-col gap-1 text-xs font-medium text-warm-ivory/90 xl:static xl:flex xl:flex-row xl:items-center xl:overflow-visible xl:border-0 xl:bg-transparent xl:p-0`}
+            aria-label="Main navigation"
+            onClick={() => setIsMenuOpen(false)}
           >
             {isLoggedIn ? (
               /* LOGGED IN: Functional App Pages */
@@ -88,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   aria-current={activeView === 'home' ? 'page' : undefined}
                 >
                   <Home className="w-4 h-4 text-antique-gold" />
-                  <span>Phòng Học</span>
+                  <span>Study room</span>
                 </motion.button>
 
                 <motion.button
@@ -99,7 +105,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   aria-current={activeView === 'discovery' ? 'page' : undefined}
                 >
                   <Compass className="w-4 h-4 text-antique-gold" />
-                  <span>Khám Phá</span>
+                  <span>Discover</span>
                 </motion.button>
 
                 <motion.button
@@ -110,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   aria-current={activeView === 'reader' || activeView === 'bilingual-reader' ? 'page' : undefined}
                 >
                   <BookOpen className="w-4 h-4 text-antique-gold" />
-                  <span>Đọc Song Ngữ</span>
+                  <span>Read</span>
                 </motion.button>
 
                 <motion.button
@@ -127,7 +133,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }
                 >
                   <BookMarked className="w-4 h-4 text-antique-gold" />
-                  <span>Kho Từ Vựng</span>
+                  <span>Vocabulary</span>
                 </motion.button>
 
                 <motion.button
@@ -144,30 +150,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }
                 >
                   <Users className="w-4 h-4 text-antique-gold" />
-                  <span>Cộng Đồng</span>
+                  <span>Community</span>
                 </motion.button>
 
-                <motion.button
-                  whileHover={{ scale: hoverScale }}
-                  whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection(PATHS.playground)}
-                  className={navLinkClass(activeView === 'playground')}
-                  aria-current={activeView === 'playground' ? 'page' : undefined}
-                >
-                  <Sparkles className="w-4 h-4 text-antique-gold" />
-                  <span>AI Playground</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: hoverScale }}
-                  whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection(PATHS.admin)}
-                  className={navLinkClass(activeView === 'admin')}
-                  aria-current={activeView === 'admin' ? 'page' : undefined}
-                >
-                  <ShieldCheck className="w-4 h-4 text-antique-gold" />
-                  <span>Admin CMS</span>
-                </motion.button>
               </>
             ) : (
               /* LOGGED OUT: Landing Page anchor navigation */
@@ -179,7 +164,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
                 >
                   <MapPin className="w-4 h-4 text-antique-gold" />
-                  <span>Bản Đồ Di Sản</span>
+                  <span>Cultural map</span>
                 </motion.button>
 
                 <motion.button
@@ -189,7 +174,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
                 >
                   <Layers className="w-4 h-4 text-antique-gold" />
-                  <span>Chủ Đề Văn Hóa</span>
+                  <span>Culture topics</span>
                 </motion.button>
 
                 <motion.button
@@ -199,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
                 >
                   <BookOpen className="w-4 h-4 text-antique-gold" />
-                  <span>Đọc Thử Song Ngữ</span>
+                  <span>Try reading</span>
                 </motion.button>
 
                 <motion.button
@@ -210,36 +195,39 @@ export const Navbar: React.FC<NavbarProps> = ({
                   aria-current={activeView === 'discovery' ? 'page' : undefined}
                 >
                   <Compass className="w-4 h-4 text-antique-gold" />
-                  <span>Kho Bài Đọc</span>
+                  <span>Discover</span>
                 </motion.button>
 
-                <motion.button
-                  whileHover={{ scale: hoverScale }}
-                  whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection(PATHS.playground)}
-                  className={navLinkClass(activeView === 'playground')}
-                  aria-current={activeView === 'playground' ? 'page' : undefined}
-                >
-                  <Sparkles className="w-4 h-4 text-antique-gold" />
-                  <span>AI Playground</span>
-                </motion.button>
               </>
             )}
           </nav>
 
           {/* ── Right Actions ────────────────────────────────────────────── */}
           <div className="flex items-center gap-2.5">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="xl:hidden text-warm-ivory enabled:hover:bg-white/10 enabled:hover:text-warm-ivory focus-ring-dark"
+              aria-label={isMenuOpen ? 'Close navigation' : 'Open navigation'}
+              aria-expanded={isMenuOpen}
+              aria-controls="main-navigation"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </Button>
 
             {isLoggedIn ? (
               <div className="relative">
                 <motion.button
-                  whileHover={{ scale: 1.08 }}
-                  whileTap={{ scale: 0.94 }}
+                  whileHover={{ scale: hoverScale }}
+                  whileTap={{ scale: tapScale }}
                   onClick={handleProfileClick}
-                  className="relative flex items-center justify-center w-10 h-10 rounded-full bg-heritage-green border border-antique-gold/60 shadow-lg cursor-pointer group focus-ring-dark overflow-hidden p-0.5"
-                  title="Mở Profile Menu"
-                  aria-label="Mở menu hồ sơ cá nhân"
+                  className="relative flex items-center justify-center w-11 h-11 rounded-full bg-heritage-green border border-warm-ivory/30 cursor-pointer group focus-ring-dark overflow-hidden p-0.5"
+                  title="Account menu"
+                  aria-label="Account menu"
                   aria-expanded={isProfileOpen}
+                  aria-haspopup="menu"
                 >
                   {user?.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? (
                     <img src={user.avatar} alt={user?.name || 'User'} className="w-full h-full object-cover rounded-full" />
@@ -248,9 +236,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                       {user?.avatar || 'NL'}
                     </span>
                   )}
-                  <span className="absolute -top-0.5 -right-0.5 p-0.5 rounded-full bg-antique-gold text-heritage-dark shadow-xs" aria-hidden="true">
-                    <Crown className="w-2.5 h-2.5 fill-current" />
-                  </span>
                 </motion.button>
 
                 <ProfileDropdown
@@ -266,14 +251,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 whileHover={{ scale: hoverScale }}
                 whileTap={{ scale: tapScale }}
                 onClick={() => onNavigateToSection(PATHS.login)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer focus-ring-dark ${activeView === 'login'
+                className={`min-h-11 min-w-11 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer focus-ring-dark ${activeView === 'login'
                   ? 'bg-antique-gold text-heritage-dark ring-2 ring-antique-gold'
                   : 'bg-heritage-green text-warm-ivory hover:bg-heritage-dark border border-antique-gold/40'
                   }`}
-                aria-label="Đăng nhập vào VieCultures"
+                aria-label="Sign in to VieCultures"
               >
                 <User className="w-4 h-4 text-antique-gold" />
-                <span>Đăng Nhập</span>
+                <span className="hidden sm:inline">Sign in</span>
               </motion.button>
             )}
           </div>

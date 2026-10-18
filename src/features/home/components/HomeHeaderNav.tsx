@@ -44,45 +44,45 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 flex items-center justify-between z-10">
+    <div className="home-classic-header max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 flex items-center justify-between z-10">
       {/* Brand & Room Badge */}
       <BrandLogo
         size="md"
         theme="dark"
-        badge="Phòng Học Văn Hóa"
+        badge="Culture study room"
         onClick={() => onNavigate(PATHS.landing)}
         className="focus-ring rounded-xl"
       />
 
       {/* Header Icon Quick Links & Profile Dropdown */}
-      <div className="flex items-center gap-2 sm:gap-3 bg-heritage-dark/80 backdrop-blur-md p-1.5 rounded-full border border-white/15 shadow-xl">
+      <div className="home-classic-header-tools flex items-center gap-2 sm:gap-3 bg-heritage-dark/80 backdrop-blur-md p-1.5 rounded-2xl border border-white/15 shadow-xl">
         <button
           type="button"
-          onClick={() => handleActionToast('Bạn có 2 bài ôn tập từ vựng mới hôm nay!')}
-          className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-gold transition-all relative cursor-pointer focus-ring"
-          title="Thông báo"
-          aria-label="Thông báo"
+          onClick={() => handleActionToast('You have 2 vocabulary reviews today.')}
+          className="p-2 rounded-xl hover:bg-white/10 text-warm-ivory/90 hover:text-antique-gold transition-all relative cursor-pointer focus-ring"
+          title="Notifications"
+          aria-label="Notifications"
         >
           <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-xl bg-antique-gold" />
         </button>
 
         <button
           type="button"
           onClick={() => onNavigate(PATHS.communityContest)}
-          className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-gold transition-all cursor-pointer focus-ring"
-          title="Thử thách & Bảng xếp hạng"
-          aria-label="Thử thách"
+          className="p-2 rounded-xl hover:bg-white/10 text-warm-ivory/90 hover:text-antique-gold transition-all cursor-pointer focus-ring"
+          title="Challenges & leaderboard"
+          aria-label="Challenges"
         >
           <Trophy className="w-4 h-4 text-antique-rich" />
         </button>
 
         <button
           type="button"
-          onClick={() => handleActionToast('Lịch học: Chuỗi 2 ngày đang được duy trì liên tục!')}
-          className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-gold transition-all cursor-pointer focus-ring"
-          title="Lịch học"
-          aria-label="Lịch học"
+          onClick={() => handleActionToast('Study schedule: your 2-day streak is active.')}
+          className="p-2 rounded-xl hover:bg-white/10 text-warm-ivory/90 hover:text-antique-gold transition-all cursor-pointer focus-ring"
+          title="Study schedule"
+          aria-label="Study schedule"
         >
           <Calendar className="w-4 h-4" />
         </button>
@@ -90,19 +90,19 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
         <button
           type="button"
           onClick={() => onNavigate(PATHS.communityContest)}
-          className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-gold transition-all cursor-pointer focus-ring"
-          title="Thống kê học tập"
-          aria-label="Thống kê"
+          className="p-2 rounded-xl hover:bg-white/10 text-warm-ivory/90 hover:text-antique-gold transition-all cursor-pointer focus-ring"
+          title="Study statistics"
+          aria-label="Statistics"
         >
           <BarChart3 className="w-4 h-4" />
         </button>
 
         <button
           type="button"
-          onClick={() => handleActionToast('Heritage Shop: Đã mở khóa Huy hiệu Sứ Giả Cố Đô!')}
-          className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-gold transition-all cursor-pointer focus-ring"
+          onClick={() => handleActionToast('Heritage Shop: Imperial City Explorer badge unlocked!')}
+          className="p-2 rounded-xl hover:bg-white/10 text-warm-ivory/90 hover:text-antique-gold transition-all cursor-pointer focus-ring"
           title="Heritage Shop"
-          aria-label="Cửa hàng"
+          aria-label="Shop"
         >
           <ShoppingBag className="w-4 h-4" />
         </button>
@@ -110,9 +110,9 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
         <button
           type="button"
           onClick={openSettings}
-          className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-antique-gold transition-all cursor-pointer focus-ring"
-          title="Cài đặt Trang chủ (Màu sắc & Hình nền)"
-          aria-label="Cài đặt Trang chủ"
+          className="p-2 rounded-xl hover:bg-white/10 text-warm-ivory/90 hover:text-antique-gold transition-all cursor-pointer focus-ring"
+          title="Room settings (colours & background)"
+          aria-label="Room settings"
         >
           <Settings className="w-4 h-4" />
         </button>
@@ -122,18 +122,20 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
             <button
               type="button"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="relative flex items-center justify-center w-8 h-8 rounded-full bg-heritage-green border border-antique-gold/60 shadow-lg hover:scale-105 active:scale-95 transition-all group overflow-hidden cursor-pointer focus-ring"
-              title="Mở Profile Menu"
-              aria-label="Menu cá nhân"
+              className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-heritage-green border border-antique-gold/60 shadow-lg hover:scale-105 active:scale-95 transition-all group overflow-hidden cursor-pointer focus-ring"
+              title="Account menu"
+              aria-label="Account menu"
+              aria-expanded={isProfileOpen}
+              aria-haspopup="menu"
             >
               {user?.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? (
-                <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+                <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover rounded-xl" />
               ) : (
                 <span className="text-xs font-bold text-antique-gold">
                   {user?.avatar || 'NL'}
                 </span>
               )}
-              <span className="absolute -top-0.5 -right-0.5 p-0.5 rounded-full bg-antique-gold text-heritage-dark shadow-xs">
+              <span className="absolute -top-0.5 -right-0.5 p-0.5 rounded-xl bg-antique-gold text-heritage-dark shadow-xs">
                 <Crown className="w-2.5 h-2.5 fill-current" />
               </span>
             </button>
@@ -150,11 +152,11 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
           <button
             type="button"
             onClick={() => onNavigate(PATHS.login)}
-            className="flex items-center gap-1.5 pl-3 pr-3 py-1 bg-antique-gold text-heritage-dark rounded-full text-xs font-bold hover:brightness-105 transition-all shadow-sm cursor-pointer"
-            title="Đăng nhập"
+            className="flex items-center gap-1.5 pl-3 pr-3 py-1 bg-antique-gold text-heritage-dark rounded-xl text-xs font-bold hover:brightness-105 transition-all shadow-sm cursor-pointer"
+            title="Sign in"
           >
             <User className="w-3.5 h-3.5" />
-            <span>Đăng Nhập</span>
+            <span>Sign in</span>
           </button>
         )}
       </div>

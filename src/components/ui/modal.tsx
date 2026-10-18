@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import React from "react";
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { Button } from "./button";
 
 export interface ModalProps {
   isOpen: boolean;
@@ -11,58 +12,33 @@ export interface ModalProps {
   className?: string;
 }
 
-export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, className }) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-          />
-
-          {/* Dialog Container */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ type: "spring", duration: 0.3 }}
-            className={cn(
-              "relative z-10 w-full max-w-lg rounded-2xl border border-amber-500/30 bg-amber-50/95 dark:bg-zinc-900/95 p-6 shadow-2xl backdrop-blur-xl text-zinc-900 dark:text-zinc-100",
-              className
-            )}
-          >
-            <div className="flex items-center justify-between border-b border-amber-500/20 pb-4 mb-4">
-              {title && <h3 className="text-lg font-bold font-serif text-amber-900 dark:text-amber-300">{title}</h3>}
-              <button
-                onClick={onClose}
-                className="rounded-lg p-1.5 text-zinc-500 hover:bg-amber-500/10 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div>{children}</div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
-};
+export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, className }) => (
+  <Dialog open={isOpen} onClose={onClose} className="fixed inset-0 z-50">
+    <DialogBackdrop
+      transition
+      className="fixed inset-0 bg-heritage-forest/60 transition-opacity duration-200 data-closed:opacity-0 motion-reduce:transition-none"
+    />
+    <div className="fixed inset-0 overflow-y-auto">
+      <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
+        <DialogPanel
+          data-slot="modal-panel"
+          transition
+          className={cn(
+            "relative w-full max-w-lg rounded-2xl border border-line bg-surface-raised p-6 text-ink-soft shadow-xl transition duration-200 data-closed:translate-y-2 data-closed:opacity-0 motion-reduce:transition-none",
+            className
+          )}
+        >
+          <div className="mb-6 flex items-start justify-between gap-4">
+            <DialogTitle className={title ? "pt-2 text-xl font-semibold text-ink" : "sr-only"}>
+              {title || "Dialog"}
+            </DialogTitle>
+            <Button variant="ghost" size="icon" type="button" onClick={onClose} aria-label="Close dialog" className="ml-auto" data-autofocus>
+              <X className="size-5" aria-hidden="true" />
+            </Button>
+          </div>
+          {children}
+        </DialogPanel>
+      </div>
+    </div>
+  </Dialog>
+);

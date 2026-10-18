@@ -18,7 +18,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
         textAnchor="middle"
         opacity="0.4"
       >
-        VỊNH BẮC BỘ
+        GULF OF TONKIN
       </text>
 
       {/* Biển Đông watermark */}
@@ -32,7 +32,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
         textAnchor="middle"
         opacity="0.45"
       >
-        BIỂN ĐÔNG
+        EAST SEA
       </text>
 
       {/* Hoàng Sa & Trường Sa Islands */}

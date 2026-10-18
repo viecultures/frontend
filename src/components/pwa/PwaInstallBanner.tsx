@@ -79,7 +79,7 @@ export const PwaInstallBanner: React.FC = () => {
           {/* Close Button */}
           <button
             onClick={dismissPrompt}
-            aria-label="Đóng gợi ý"
+            aria-label="Dismiss install suggestion"
             className="absolute top-3.5 right-3.5 p-2 rounded-full text-[#3F5550] dark:text-[#9db6af] hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all"
           >
             <X size={20} />
@@ -105,13 +105,13 @@ export const PwaInstallBanner: React.FC = () => {
             <div className="flex-1">
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#163D37]/10 dark:bg-[#DCA842]/15 text-[#163D37] dark:text-[#DCA842] text-[11px] font-semibold tracking-wide uppercase">
                 <Sparkles size={12} className="text-[#DCA842]" />
-                Web App di động
+                Mobile web app
               </div>
               <h3 className="text-base font-bold font-serif text-[#163D37] dark:text-[#FBF7EE] leading-snug mt-0.5">
-                Cài đặt ứng dụng VieCultures
+                Add VieCultures to your home screen
               </h3>
               <p className="text-xs text-[#3F5550] dark:text-[#a5bcb7]">
-                Đọc song ngữ & luyện phát âm mượt mà
+                Read, listen and practise wherever you are.
               </p>
             </div>
           </div>
@@ -120,15 +120,15 @@ export const PwaInstallBanner: React.FC = () => {
           <div className="mt-3.5 grid grid-cols-3 gap-2 py-2.5 px-3 rounded-2xl bg-white/70 dark:bg-black/20 border border-[#163D37]/10 dark:border-white/5">
             <div className="flex flex-col items-center text-center">
               <Zap size={16} className="text-[#DCA842] mb-1" />
-              <span className="text-[11px] font-medium leading-tight">Mở tức thì 1 chạm</span>
+              <span className="text-[11px] font-medium leading-tight">One-tap access</span>
             </div>
             <div className="flex flex-col items-center text-center border-x border-[#163D37]/10 dark:border-white/10 px-1">
               <BookOpen size={16} className="text-[#2D7A6E] dark:text-[#42a899] mb-1" />
-              <span className="text-[11px] font-medium leading-tight">Toàn màn hình</span>
+              <span className="text-[11px] font-medium leading-tight">Full screen</span>
             </div>
             <div className="flex flex-col items-center text-center">
               <Smartphone size={16} className="text-[#DCA842] mb-1" />
-              <span className="text-[11px] font-medium leading-tight">0MB tốn máy</span>
+              <span className="text-[11px] font-medium leading-tight">Browser based</span>
             </div>
           </div>
 
@@ -141,7 +141,7 @@ export const PwaInstallBanner: React.FC = () => {
             >
               <div className="font-semibold text-sm text-[#163D37] dark:text-[#DCA842] flex items-center gap-1.5">
                 <Smartphone size={16} />
-                Hướng dẫn thêm vào màn hình chính {isIOS ? '(iOS Safari)' : ''}:
+                Add to your home screen {isIOS ? '(iOS Safari)' : ''}:
               </div>
               <ol className="space-y-2 text-[#3F5550] dark:text-[#d3e5e0]">
                 {isIOS ? (
@@ -149,19 +149,19 @@ export const PwaInstallBanner: React.FC = () => {
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#163D37] text-white flex items-center justify-center text-[10px] font-bold">1</span>
                       <span>
-                        Chạm biểu tượng <span className="font-semibold text-[#007AFF] inline-flex items-center gap-1"><Share size={13} /> Chia sẻ (Share)</span> ở thanh dưới trình duyệt Safari.
+                        Tap <span className="font-semibold text-[#007AFF] inline-flex items-center gap-1"><Share size={13} /> Share</span> in the Safari toolbar.
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#163D37] text-white flex items-center justify-center text-[10px] font-bold">2</span>
                       <span>
-                        Cuộn xuống danh sách và chọn <span className="font-semibold text-[#163D37] dark:text-[#DCA842] inline-flex items-center gap-1"><PlusSquare size={13} /> Thêm vào MH chính</span> (Add to Home Screen).
+                        Scroll down and select <span className="font-semibold text-[#163D37] dark:text-[#DCA842] inline-flex items-center gap-1"><PlusSquare size={13} /> Add to Home Screen</span>.
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#163D37] text-white flex items-center justify-center text-[10px] font-bold">3</span>
                       <span>
-                        Nhấn nút <strong className="text-[#163D37] dark:text-[#FBF7EE]">Thêm (Add)</strong> ở góc trên bên phải màn hình để hoàn tất.
+                        Tap <strong className="text-[#163D37] dark:text-[#FBF7EE]">Add</strong> in the top-right corner to finish.
                       </span>
                     </li>
                   </>
@@ -170,13 +170,13 @@ export const PwaInstallBanner: React.FC = () => {
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#163D37] text-white flex items-center justify-center text-[10px] font-bold">1</span>
                       <span>
-                        Nhấn vào biểu tượng Menu <span className="font-semibold">(⋮ hoặc ☰)</span> ở góc trên trình duyệt.
+                        Open the browser menu <span className="font-semibold">(⋮ or ☰)</span> in the browser toolbar.
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#163D37] text-white flex items-center justify-center text-[10px] font-bold">2</span>
                       <span>
-                        Chọn <strong className="text-[#163D37] dark:text-[#DCA842]">"Cài đặt ứng dụng"</strong> hoặc <strong className="text-[#163D37] dark:text-[#DCA842]">"Thêm vào màn hình chính"</strong>.
+                        Choose <strong className="text-[#163D37] dark:text-[#DCA842]">"Install app"</strong> or <strong className="text-[#163D37] dark:text-[#DCA842]">"Add to Home Screen"</strong>.
                       </span>
                     </li>
                   </>
@@ -191,7 +191,7 @@ export const PwaInstallBanner: React.FC = () => {
               onClick={dismissPrompt}
               className="flex-1 py-2.5 px-4 rounded-xl border border-[#3F5550]/20 dark:border-white/10 text-xs font-semibold text-[#3F5550] dark:text-[#a0b8b2] hover:bg-black/5 dark:hover:bg-white/5 active:scale-98 transition-all"
             >
-              Để sau
+              Maybe later
             </button>
 
             {showIOSGuide ? (
@@ -200,7 +200,7 @@ export const PwaInstallBanner: React.FC = () => {
                 className="flex-1 py-2.5 px-4 rounded-xl bg-[#163D37] hover:bg-[#1c4c45] text-white dark:bg-[#DCA842] dark:text-[#0F2924] dark:hover:bg-[#e4b55a] font-semibold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-1.5"
               >
                 <CheckCircle2 size={15} />
-                Đã hiểu
+                Got it
               </button>
             ) : (
               <button
@@ -209,7 +209,7 @@ export const PwaInstallBanner: React.FC = () => {
                 className="flex-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#163D37] to-[#25574f] hover:from-[#1b4841] hover:to-[#2c635a] text-white dark:from-[#DCA842] dark:to-[#e4b55a] dark:text-[#0F2924] font-bold text-xs shadow-md shadow-[#163D37]/20 active:scale-98 transition-all flex items-center justify-center gap-1.5"
               >
                 <Download size={15} className={isInstalling ? 'animate-bounce' : ''} />
-                {isIOS ? 'Xem hướng dẫn cài đặt' : canInstall ? 'Cài đặt ứng dụng' : 'Thêm vào màn hình chính'}
+                {isIOS ? 'Installation guide' : canInstall ? 'Install app' : 'Add to Home Screen'}
               </button>
             )}
           </div>

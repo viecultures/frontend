@@ -15,7 +15,7 @@ export const MapRegionTabs: React.FC<MapRegionTabsProps> = ({
     >
       <div
         role="tablist"
-        aria-label="Chọn vùng miền trên bản đồ"
+        aria-label="Choose a map region"
         className="flex items-center gap-1.5 bg-heritage-forest border border-antique-gold/40 p-1 rounded-2xl shadow-lg"
       >
         {tabs.map((tab) => {

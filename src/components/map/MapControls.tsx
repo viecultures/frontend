@@ -25,8 +25,8 @@ export const MapControls: React.FC<MapControlsProps> = ({
           onZoomIn();
         }}
         className="p-2 rounded-xl text-warm-ivory hover:bg-white/10 hover:text-antique-rich transition-colors cursor-pointer focus-ring-dark"
-        title="Phóng to (+)"
-        aria-label="Phóng to bản đồ"
+        title="Zoom in (+)"
+        aria-label="Zoom in on map"
       >
         <ZoomIn className="w-4 h-4" />
       </button>
@@ -38,8 +38,8 @@ export const MapControls: React.FC<MapControlsProps> = ({
           onZoomOut();
         }}
         className="p-2 rounded-xl text-warm-ivory hover:bg-white/10 hover:text-antique-rich transition-colors cursor-pointer focus-ring-dark"
-        title="Thu nhỏ (-)"
-        aria-label="Thu nhỏ bản đồ"
+        title="Zoom out (-)"
+        aria-label="Zoom out on map"
       >
         <ZoomOut className="w-4 h-4" />
       </button>
@@ -52,8 +52,8 @@ export const MapControls: React.FC<MapControlsProps> = ({
             onResetZoom();
           }}
           className="p-2 rounded-xl text-antique-rich hover:bg-white/10 transition-colors cursor-pointer focus-ring-dark animate-in fade-in zoom-in duration-200"
-          title="Đặt lại toàn bộ bản đồ (Toàn Quốc)"
-          aria-label="Đặt lại toàn bộ bản đồ"
+          title="Reset map to all places"
+          aria-label="Reset map"
         >
           <RotateCcw className="w-4 h-4" />
         </button>

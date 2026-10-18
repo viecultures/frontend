@@ -50,21 +50,12 @@ export function usePWAInstall(): PWAInstallState {
       return;
     }
 
-    // Check if dismissed in the current session
-    const isDismissed = sessionStorage.getItem('viecultures_pwa_dismissed') === 'true';
-
     // 4. Capture beforeinstallprompt event (Android / Chromium)
     const handleBeforeInstallPrompt = (e: Event) => {
       const installEvent = e as BeforeInstallPromptEvent;
       installEvent.preventDefault();
       setDeferredPrompt(installEvent);
 
-      if (isMobileDevice && !isDismissed) {
-        // Small delay to allow the mobile UI to settle before showing prompt
-        setTimeout(() => {
-          setShowPrompt(true);
-        }, 1200);
-      }
     };
 
     // 5. Handle appinstalled event
@@ -77,23 +68,14 @@ export function usePWAInstall(): PWAInstallState {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
-
-    // For iOS mobile users or browsers without beforeinstallprompt event:
-    if (isMobileDevice && !standaloneActive && !isDismissed) {
-      // Delay showing prompt slightly so it feels organic
-      const timer = setTimeout(() => {
-        setShowPrompt(true);
-      }, 1500);
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        window.removeEventListener('appinstalled', handleAppInstalled);
-      };
-    }
+    // Installation is available from room settings, without interrupting learning.
+    const handleInstallRequest = () => setShowPrompt(true);
+    window.addEventListener('viecultures:request-install', handleInstallRequest);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
+      window.removeEventListener('viecultures:request-install', handleInstallRequest);
     };
   }, []);
 
@@ -124,7 +106,7 @@ export function usePWAInstall(): PWAInstallState {
   }, []);
 
   const openPrompt = useCallback(() => {
-    setShowPrompt(true);
+    window.dispatchEvent(new Event('viecultures:request-install'));
   }, []);
 
   return {

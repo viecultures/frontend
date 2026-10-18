@@ -11,6 +11,7 @@ import { useSettings } from '@/context/SettingsContext';
 
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import type { AppUser } from '@/utils/auth-storage';
+import '../home-classic.css';
 
 interface HomePageProps {
   isLoggedIn?: boolean;
@@ -27,10 +28,10 @@ export const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const { activeBackground, backgroundMode, currentTimePeriod } = useSettings();
   const [tasks, setTasks] = useState<TaskItem[]>([
-    { id: 'task1', label: 'Đọc bài di sản Hoàng Thành Huế (5 phút)', completed: true },
-    { id: 'task2', label: 'Ôn tập 10 thẻ Flashcard SRS', completed: true },
-    { id: 'task3', label: 'Luyện phát âm AI Shadowing 1 đoạn văn', completed: false },
-    { id: 'task4', label: 'Viết bài cảm nhận thử thách tuần', completed: false },
+    { id: 'task1', label: 'Read about Hue Citadel (5 min)', completed: true },
+    { id: 'task2', label: 'Review 10 vocabulary cards', completed: true },
+    { id: 'task3', label: 'Shadow one short passage', completed: false },
+    { id: 'task4', label: 'Write a weekly challenge reflection', completed: false },
   ]);
 
   const [activeDockMode, setActiveDockMode] = useState<'study' | 'pomodoro'>('study');
@@ -52,7 +53,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       }, 1000);
     } else if (pomoSeconds === 0) {
       setIsPomoRunning(false);
-      showToast('Hoàn thành 1 chu kỳ Pomodoro 25 phút! Hãy nghỉ ngơi 5 phút nhé.');
+      showToast('Your 25-minute focus session is complete. Take a 5-minute break.');
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -72,13 +73,13 @@ export const HomePage: React.FC<HomePageProps> = ({
       completed: false,
     };
     setTasks((prev) => [...prev, newTask]);
-    showToast('Đã thêm mục tiêu học tập mới!');
+    showToast('Study task added.');
   };
 
   const handleResetPomo = () => {
     setIsPomoRunning(false);
     setPomoSeconds(25 * 60);
-    showToast('Đã đặt lại đồng hồ Pomodoro về 25:00');
+    showToast('Pomodoro reset to 25:00.');
   };
 
   const handleNavigate = useAppNavigate();
@@ -86,7 +87,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const isGradient = activeBackground.url.startsWith('linear-gradient');
 
   return (
-    <div className="min-h-screen bg-heritage-dark text-white flex flex-col justify-between relative overflow-hidden selection:bg-antique-gold selection:text-heritage-dark">
+    <div className="home-classic min-h-screen bg-heritage-dark text-warm-ivory flex flex-col justify-between relative overflow-hidden selection:bg-antique-gold selection:text-heritage-dark">
       {/* 1. Dynamic Background Image Layer with Ambient Overlay */}
       {isGradient ? (
         <div
@@ -104,7 +105,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap">
+        <div role="status" className="home-classic-toast fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-2xl bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw]">
           <Check className="w-4 h-4 text-antique-gold shrink-0" />
           <span>{toastMessage}</span>
         </div>
@@ -123,7 +124,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* 3. Main Hero Study Room Content */}
       <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex-1 flex flex-col justify-center relative z-10">
         <HomeGreetingControls
-          userName={user?.name || 'Học Viên'}
+          userName={user?.name || 'Learner'}
           onNavigate={handleNavigate}
         />
 
@@ -149,15 +150,15 @@ export const HomePage: React.FC<HomePageProps> = ({
       <HomeFloatingSidebar onNavigate={handleNavigate} />
 
       {/* 6. Subtle Photo Location Credit (Bottom-Right Corner) */}
-      <div className="fixed bottom-2.5 right-4 z-20 text-[11px] text-white/40 select-none pointer-events-none hidden sm:block tracking-wide font-normal">
+      <div className="home-classic-credit fixed bottom-2.5 right-4 z-20 text-xs text-warm-ivory/70 select-none pointer-events-none hidden sm:block tracking-wide font-normal">
         {backgroundMode === 'auto'
-          ? `Nền tự động (${currentTimePeriod === 'morning'
-            ? 'Buổi Sáng'
+          ? `Automatic background (${currentTimePeriod === 'morning'
+            ? 'Morning'
             : currentTimePeriod === 'afternoon'
-              ? 'Buổi Chiều'
-              : 'Buổi Tối'
-          }): ${activeBackground.name}`
-          : `Nền: ${activeBackground.name}`}
+              ? 'Afternoon'
+              : 'Evening'
+          }): ${activeBackground.nameEn}`
+          : `Background: ${activeBackground.nameEn}`}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 .landing-page {
+  --font-heading: var(--font-serif);
   --color-surface: #fbf8f1;
   --color-rice-paper: #f3ede1;
   --color-line: #dedfd5;

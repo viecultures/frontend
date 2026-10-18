@@ -57,7 +57,7 @@ export const PlaygroundPage: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't trigger if user is typing in textarea or input
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+      if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'AUDIO'].includes((e.target as HTMLElement)?.tagName) || (e.target as HTMLElement)?.isContentEditable) {
         return;
       }
 
@@ -113,7 +113,7 @@ export const PlaygroundPage: React.FC = () => {
           id="screen-dictation-shadowing"
           className="w-full h-screen snap-start flex flex-col justify-center border-b border-[#1E4B43]/10 overflow-hidden"
         >
-          <VideoDictationShadowingScreen />
+          <VideoDictationShadowingScreen isActive={currentScreenIndex === 0} />
         </section>
 
         {/* Screen 2: Vietnam Map AI & Cultural Assistant */}

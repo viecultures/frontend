@@ -7,7 +7,17 @@
   /* ── Typography ─────────────────────────────────────── */
   --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-serif: "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-heading: "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-heading: var(--font-sans);
+
+  /* Shared UI scale; long-form learning content uses text-reading. */
+  --text-xs: 0.875rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.6;
+  --text-base: 1rem;
+  --text-base--line-height: 1.65;
+  --text-reading: 1.125rem;
+  --text-reading--line-height: 1.8;
 
   /* ── Brand Colors ───────────────────────────────────── */
   --color-warm-ivory: #FBF7EE;
@@ -33,11 +43,12 @@
 
   /* ── Semantic Text ──────────────────────────────────── */
   --color-text-body: #3F5550;
-  --color-text-secondary: #6E7E79;
-  --color-text-muted: #8C9692;
+  --color-text-secondary: #52665F;
+  --color-text-muted: #5F716A;
 
   /* ── Semantic Surfaces (light mode defaults) ────────── */
   --color-surface: #FBF7EE;
+  --color-surface-raised: #FFFDF8;
   --color-surface-muted: #F6EEDC;
   --color-surface-sunken: #E8DFCB;
   --color-surface-hover: #E8DFCB;
@@ -47,7 +58,23 @@
   /* ── Ink (text on any surface) ──────────────────────── */
   --color-ink: #163D37;
   --color-ink-soft: #3F5550;
-  --color-ink-faint: #6E7E79;
+  --color-ink-faint: #5F716A;
+
+  /* Interaction and feedback roles. Gold remains a decorative brand accent. */
+  --color-action: #1E4B43;
+  --color-action-hover: #163D37;
+  --color-on-action: #FBF7EE;
+  --color-focus: #246B5A;
+  --color-accent-ink: #795B25;
+  --color-accent-soft: #F3E8CE;
+  --color-success: #286047;
+  --color-success-soft: #E8F1EA;
+  --color-info: #285F7B;
+  --color-info-soft: #E8F0F5;
+  --color-warning: #7B551B;
+  --color-warning-soft: #F6ECD5;
+  --color-danger: #9A3E3A;
+  --color-danger-soft: #FAECE9;
 
   /* ── Glass Elevation Opacity Scale ─────────────────── */
   /* Level 1 — Card/Tile: hòa vào nền, blur nhẹ           */
@@ -86,7 +113,9 @@
 
 /* ── Dark Mode Surface & Ink overrides ─────────────────── */
 .dark {
+  color-scheme: dark;
   --color-surface: #0b1a17;
+  --color-surface-raised: #142E27;
   --color-surface-muted: #122924;
   --color-surface-sunken: #16332d;
   --color-surface-hover: #1e453c;
@@ -96,6 +125,23 @@
   --color-ink: #FBF7EE;
   --color-ink-soft: #d0deda;
   --color-ink-faint: #98ada7;
+  --color-text-body: #d0deda;
+  --color-text-secondary: #B7C9C2;
+  --color-text-muted: #98ada7;
+  --color-action: #B9D9CB;
+  --color-action-hover: #D0E9DE;
+  --color-on-action: #122A22;
+  --color-focus: #B9D9CB;
+  --color-accent-ink: #E8CE94;
+  --color-accent-soft: #3A3220;
+  --color-success: #AFD8BC;
+  --color-success-soft: #1C382A;
+  --color-info: #B2D6EC;
+  --color-info-soft: #193440;
+  --color-warning: #E8CE94;
+  --color-warning-soft: #3A3220;
+  --color-danger: #F1B8B0;
+  --color-danger-soft: #402824;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -107,6 +153,7 @@
   }
 
   html {
+    color-scheme: light;
     scroll-behavior: smooth;
     scroll-padding-top: 5.5rem;
   }
@@ -116,11 +163,13 @@
   #root {
     min-height: 100%;
     margin: 0;
-    cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, auto;
+    cursor: auto;
   }
 
   body {
     font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.65;
     color: var(--color-text-body);
     background-color: var(--color-surface);
     -webkit-font-smoothing: antialiased;
@@ -135,6 +184,16 @@
     font-family: var(--font-heading);
   }
 
+  :where(button, a, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  :where(input, textarea)::placeholder {
+    color: var(--color-text-muted);
+    opacity: 1;
+  }
+
   /* ── Interactive cursor ─────────────────────────────── */
   button,
   a,
@@ -144,7 +203,7 @@
   [role="button"],
   [role="tab"],
   .cursor-pointer {
-    cursor: url('./assets/cursor/turtle_cursor_48.png') 4 4, pointer;
+    cursor: pointer;
   }
 
   button:disabled,
@@ -193,15 +252,13 @@
    Hòa nhẹ vào nền, chỉ cần phân biệt với background.
    Dùng cho: ArticleCard, Widget, FeatureCard */
 .glass-card {
-  background: var(--glass-card-bg-light);
-  backdrop-filter: blur(var(--glass-card-blur));
-  -webkit-backdrop-filter: blur(var(--glass-card-blur));
-  border: 1px solid rgba(30, 75, 67, 0.12);
-  box-shadow: 0 2px 8px rgba(30, 75, 67, 0.06);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  box-shadow: 0 1px 3px rgba(18, 42, 34, 0.04);
 }
 .dark .glass-card {
-  background: var(--glass-card-bg-dark);
-  border: 1px solid rgba(217, 183, 106, 0.14);
+  background: var(--color-surface-raised);
+  border-color: var(--color-line);
 }
 
 /* Level 2 — Sticky Toolbar trên light surface
@@ -270,7 +327,7 @@
 .focus-ring {
   @apply focus-visible:outline-none
          focus-visible:ring-2
-         focus-visible:ring-antique-gold
+         focus-visible:ring-focus
          focus-visible:ring-offset-2
          focus-visible:ring-offset-surface;
 }

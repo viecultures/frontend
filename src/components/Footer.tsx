@@ -21,13 +21,13 @@ export const Footer: React.FC = () => {
           <div className="lg:col-span-2 space-y-4">
             <BrandLogo size="md" theme="dark" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
             <p className="text-xs sm:text-sm text-warm-ivory/80 leading-relaxed max-w-sm font-normal">
-              Nền tảng EdTech học tiếng Anh qua ngữ cảnh văn hóa Việt Nam. Nâng tầm vốn từ &amp; trở thành sứ giả văn hóa.
+              Learn English through the stories, places and traditions of Vietnam.
             </p>
           </div>
 
           {/* Col 1: Navigation */}
           <div className="space-y-3">
-            <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-antique-gold">
+            <h4 className="font-sans text-sm font-bold uppercase tracking-wider text-antique-gold">
               Navigation
             </h4>
             <ul className="space-y-2 text-xs text-warm-ivory/80 font-medium">
@@ -46,7 +46,7 @@ export const Footer: React.FC = () => {
                   onClick={() => handleNav(PATHS.discovery)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
-                  Discovery Feed
+                  Discover stories
                 </button>
               </li>
               <li>
@@ -55,7 +55,7 @@ export const Footer: React.FC = () => {
                   onClick={() => handleNav(PATHS.reader)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
-                  Bilingual Reader
+                  Read
                 </button>
               </li>
               <li>
@@ -64,7 +64,7 @@ export const Footer: React.FC = () => {
                   onClick={() => handleNav(PATHS.dictionary)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
-                  Flashcards
+                  Vocabulary
                 </button>
               </li>
               <li>
@@ -82,7 +82,7 @@ export const Footer: React.FC = () => {
                   onClick={() => handleNav(PATHS.playground)}
                   className="hover:text-antique-bright transition-colors cursor-pointer"
                 >
-                  AI Playground
+                  Practice
                 </button>
               </li>
             </ul>
@@ -90,7 +90,7 @@ export const Footer: React.FC = () => {
 
           {/* Col 2: Topics */}
           <div className="space-y-3">
-            <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-antique-gold">
+            <h4 className="font-sans text-sm font-bold uppercase tracking-wider text-antique-gold">
               Topics
             </h4>
             <ul className="space-y-2 text-xs text-warm-ivory/80 font-medium">
@@ -135,7 +135,7 @@ export const Footer: React.FC = () => {
 
           {/* Col 3: Contact & Legal */}
           <div className="space-y-3">
-            <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-antique-gold">
+            <h4 className="font-sans text-sm font-bold uppercase tracking-wider text-antique-gold">
               Contact &amp; Legal
             </h4>
             <ul className="space-y-2 text-xs text-warm-ivory/80 font-medium">
@@ -149,12 +149,12 @@ export const Footer: React.FC = () => {
                 </button>
               </li>
               <li>
-                <span className="hover:text-antique-bright transition-colors cursor-pointer">
+                <span>
                   Privacy Policy
                 </span>
               </li>
               <li>
-                <span className="hover:text-antique-bright transition-colors cursor-pointer">
+                <span>
                   Terms of Service
                 </span>
               </li>
@@ -165,7 +165,7 @@ export const Footer: React.FC = () => {
         {/* Bottom copyright row */}
         <div className="pt-8 border-t border-antique-gold/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-warm-ivory/60 font-medium">
           <p>&copy; 2026 VieCultures • VN Culture Reader. All rights reserved.</p>
-          <p>Nâng Tầm Tiếng Anh — Trở Thành Sứ Giả Văn Hóa Việt</p>
+          <p>Small words. Wonderful worlds.</p>
         </div>
       </div>
     </footer>

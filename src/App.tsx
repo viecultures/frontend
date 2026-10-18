@@ -31,6 +31,9 @@ const PricingPage = React.lazy(() => import('@/features/subscription/pages/Prici
 const CheckoutPage = React.lazy(() => import('@/features/subscription/pages/CheckoutPage'));
 const MascotDemoPage = React.lazy(() => import('@/features/mascot-demo/MascotDemoPage').then(module => ({ default: module.MascotDemoPage })));
 const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
+const DesignSystemPage = import.meta.env.DEV
+  ? React.lazy(() => import('@/pages/DesignSystemPage'))
+  : null;
 
 import type { Lesson } from '@/types';
 import { getStoredUser, setStoredUser, setStoredToken, type AppUser } from '@/utils/auth-storage';
@@ -91,7 +94,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF7EE] dark:bg-[#0b1a17] text-[#3F5550] dark:text-[#FBF7EE] flex flex-col font-sans vn-pattern-bg">
+    <div className="min-h-screen bg-surface text-ink-soft flex flex-col font-sans">
       {/* Main Content Area with Route-driven Layouts */}
       <React.Suspense
         fallback={
@@ -101,6 +104,7 @@ export const App: React.FC = () => {
         }
       >
         <Routes>
+          {DesignSystemPage && <Route path="/design-system" element={<DesignSystemPage />} />}
           {/* 1. Public Landing Layout */}
           <Route element={<PublicLayout />}>
             <Route path={PATHS.landing} element={<LandingPage />} />

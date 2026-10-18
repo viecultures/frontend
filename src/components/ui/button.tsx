@@ -9,47 +9,38 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", children, disabled, ...props }, ref) => {
-    // Base: sử dụng design tokens thay vì hex cứng
-    // focus-ring class từ index.css (WCAG 2.1 AA gold ring)
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-all duration-200 " +
+      "inline-flex shrink-0 items-center justify-center text-center font-sans font-semibold leading-snug transition-colors duration-200 " +
       "focus-ring " +
-      "active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none rounded-xl";
+      "disabled:opacity-50 disabled:cursor-not-allowed rounded-xl";
 
     const variants = {
       // Heritage green — primary action
       primary:
-        "bg-heritage-green hover:bg-heritage-dark text-warm-ivory " +
-        "border border-antique-gold/40 shadow-sm",
+        "bg-action text-on-action enabled:hover:bg-action-hover border border-transparent",
 
       // Rice paper — secondary action (light surface)
       secondary:
-        "bg-warm-ivory dark:bg-surface-muted text-heritage-green dark:text-ink " +
-        "border border-antique-gold hover:bg-rice-paper dark:hover:bg-surface-hover",
+        "bg-surface-muted text-ink border border-transparent enabled:hover:bg-surface-hover",
 
       // Outline — tertiary, minimal
       outline:
-        "border border-heritage-green/25 dark:border-antique-gold/30 " +
-        "text-heritage-dark dark:text-ink " +
-        "hover:bg-heritage-green/10 dark:hover:bg-antique-gold/10",
+        "border border-ink-faint/50 text-ink enabled:hover:bg-surface-muted",
 
       // Ghost — icon context, toolbar
       ghost:
-        "text-heritage-dark dark:text-ink " +
-        "hover:bg-heritage-green/10 dark:hover:bg-antique-gold/10",
+        "border border-transparent text-ink-soft enabled:hover:bg-surface-muted enabled:hover:text-ink",
 
-      // Gold — highlight CTA, featured action
+      // Kept for existing consumers; use primary for the main action.
       gold:
-        "bg-antique-gold hover:bg-[#C5A457] text-heritage-dark font-semibold " +
-        "border border-heritage-dark/20 shadow-sm " +
-        "hover:shadow-[0_4px_16px_rgba(217,183,106,0.35)]",
+        "bg-accent-soft text-accent-ink border border-transparent enabled:hover:border-accent-ink/40",
     };
 
     const sizes = {
-      sm: "h-8 px-3 text-xs gap-1.5",
-      md: "h-10 px-4 text-sm gap-2",
-      lg: "h-12 px-6 text-base gap-2.5",
-      icon: "h-10 w-10 p-0 rounded-xl",
+      sm: "min-h-11 px-3 py-2 text-sm gap-1.5",
+      md: "min-h-12 px-5 py-3 text-base gap-2",
+      lg: "min-h-13 px-6 py-3.5 text-base gap-2.5",
+      icon: "size-11 p-0",
     };
 
     return (

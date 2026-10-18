@@ -15,30 +15,30 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
   return (
     <aside
       className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-40 flex-col gap-2 bg-heritage-dark/85 border border-white/20 p-2 rounded-2xl backdrop-blur-xl shadow-2xl"
-      aria-label="Thanh công cụ nhanh"
+      aria-label="Quick tools"
     >
       <button
         type="button"
         onClick={() => onNavigate(PATHS.discovery)}
-        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
-        title="Tìm kiếm bài đọc"
-        aria-label="Tìm kiếm bài đọc"
+        className="p-3 rounded-xl hover:bg-antique-gold text-warm-ivory/90 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        title="Find a story"
+        aria-label="Find a story"
       >
         <Search className="w-5 h-5" />
-        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
-          Tìm kiếm bài đọc
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-heritage-forest/95 text-warm-ivory text-xs font-semibold rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
+          Find a story
         </span>
       </button>
 
       <button
         type="button"
         onClick={() => onNavigate(PATHS.playground)}
-        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        className="p-3 rounded-xl hover:bg-antique-gold text-warm-ivory/90 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
         title="AI Playground"
         aria-label="AI Playground"
       >
         <Sparkles className="w-5 h-5 text-antique-gold group-hover:text-heritage-dark transition-colors" />
-        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-heritage-forest/95 text-warm-ivory text-xs font-semibold rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
           AI Playground
         </span>
       </button>
@@ -46,39 +46,39 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
       <button
         type="button"
         onClick={() => onNavigate(PATHS.community)}
-        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
-        title="Trợ lý AI Companion"
-        aria-label="Trợ lý AI Companion"
+        className="p-3 rounded-xl hover:bg-antique-gold text-warm-ivory/90 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        title="AI companion"
+        aria-label="AI companion"
       >
-        <Bot className="w-5 h-5 text-emerald-400 group-hover:text-heritage-dark transition-colors" />
-        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
-          Trợ lý AI Companion
+        <Bot className="w-5 h-5 text-success-soft group-hover:text-heritage-dark transition-colors" />
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-heritage-forest/95 text-warm-ivory text-xs font-semibold rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
+          AI companion
         </span>
       </button>
 
       <button
         type="button"
         onClick={() => onNavigate(PATHS.community)}
-        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
-        title="Cộng đồng Thảo luận"
-        aria-label="Cộng đồng thảo luận"
+        className="p-3 rounded-xl hover:bg-antique-gold text-warm-ivory/90 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        title="Community discussion"
+        aria-label="Community discussion"
       >
         <MessageSquare className="w-5 h-5" />
-        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
-          Cộng đồng Thảo luận
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-heritage-forest/95 text-warm-ivory text-xs font-semibold rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
+          Community discussion
         </span>
       </button>
 
       <button
         type="button"
         onClick={openSettings}
-        className="p-3 rounded-xl hover:bg-antique-gold text-white/80 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
-        title="Cài đặt Trang chủ (Màu sắc & Hình nền)"
-        aria-label="Cài đặt Trang chủ"
+        className="p-3 rounded-xl hover:bg-antique-gold text-warm-ivory/90 hover:text-heritage-dark hover:scale-105 transition-all relative group cursor-pointer focus-ring"
+        title="Room settings (colours & background)"
+        aria-label="Room settings"
       >
         <Settings className="w-5 h-5" />
-        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-black/90 text-warm-ivory text-[11px] font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
-          Cài đặt Trang chủ
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-heritage-forest/95 text-warm-ivory text-xs font-semibold rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
+          Room settings
         </span>
       </button>
     </aside>

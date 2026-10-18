@@ -7,20 +7,20 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 export const Badge: React.FC<BadgeProps> = ({ className, variant = "gold", children, ...props }) => {
-  const base = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide transition-colors";
+  const base = "inline-flex items-center px-2.5 py-1 rounded-md text-xs leading-normal font-medium";
 
   const variants = {
-    "level-1": "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40",
-    "level-2": "bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-300/40",
-    "level-3": "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300/40",
-    "cefr-a2": "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40",
-    "cefr-b1": "bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-300/40",
-    "cefr-b2": "bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-400/40",
-    "cefr-c1": "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300/40",
-    gold: "bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30",
-    bamboo: "bg-emerald-500/15 text-emerald-900 dark:text-emerald-300 border border-emerald-500/30",
-    lacquer: "bg-rose-500/15 text-rose-900 dark:text-rose-300 border border-rose-500/30",
-    outline: "border border-heritage-green/25 dark:border-antique-gold/30 text-heritage-dark dark:text-ink"
+    "level-1": "bg-success-soft text-success",
+    "level-2": "bg-info-soft text-info",
+    "level-3": "bg-warning-soft text-warning",
+    "cefr-a2": "bg-success-soft text-success",
+    "cefr-b1": "bg-info-soft text-info",
+    "cefr-b2": "bg-warning-soft text-warning",
+    "cefr-c1": "bg-accent-soft text-accent-ink",
+    gold: "bg-accent-soft text-accent-ink",
+    bamboo: "bg-success-soft text-success",
+    lacquer: "bg-danger-soft text-danger",
+    outline: "border border-line text-ink-soft"
   };
 
   return (
