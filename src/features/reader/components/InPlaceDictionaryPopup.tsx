@@ -132,7 +132,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
               {!vocab.isProfane && (
                 <button
                   onClick={handlePlayAudio}
-                  title="Nghe phát âm chuẩn"
+                  title="Play pronunciation"
                   className={`p-1 rounded-lg transition-colors cursor-pointer ${
                     isPlayingAudio
                       ? "bg-[#D9B76A] text-[#1E4B43]"
@@ -163,7 +163,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
         <button
           onClick={onClose}
           className="p-1 rounded-lg text-current/60 hover:text-current hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
-          title="Đóng popup tra từ"
+          title="Close definition"
         >
           <X className="w-4 h-4" />
         </button>
@@ -175,7 +175,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
           <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-200 space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold">
               <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
-              <span>Ngôn từ nhạy cảm</span>
+              <span>Sensitive language</span>
             </div>
             <p className="text-[11px] leading-relaxed opacity-90">
               {vocab.viMeaning}
@@ -189,7 +189,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
             {/* Tiếng Việt */}
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#059669] dark:text-[#6EE7B7] block">
-                Nghĩa Tiếng Việt:
+                Vietnamese meaning:
               </span>
               <p className="font-medium mt-0.5 leading-relaxed text-current">
                 {vocab.viMeaning}
@@ -213,7 +213,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
               <div className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-[rgba(217,183,106,0.15)]">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-[#D9B76A] flex items-center gap-1">
                   <BookOpen className="w-3 h-3" />
-                  Ngữ cảnh bài học:
+                  Article context:
                 </span>
                 <p className="text-[11px] opacity-80 mt-1 line-clamp-2 leading-normal">
                   "{maskProfanity(vocab.contextSentence)}"
@@ -228,7 +228,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
       <div className="pt-2 border-t border-[rgba(217,183,106,0.25)] flex items-center justify-between gap-2">
         {vocab.isProfane ? (
           <div className="w-full py-1.5 px-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center text-[11px] font-medium opacity-60">
-            Không hỗ trợ lưu từ ngữ nhạy cảm
+            Saving sensitive language is unavailable
           </div>
         ) : (
           <button
@@ -244,12 +244,12 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
             {isSaved ? (
               <>
                 <Check className="w-3.5 h-3.5" />
-                <span>ĐÃ LƯU VÀO SỔ TAY</span>
+                <span>Saved to vocabulary</span>
               </>
             ) : (
               <>
                 <Bookmark className="w-3.5 h-3.5" />
-                <span>{isPhrase ? "+ LƯU CỤM TỪ KÈM NGỮ CẢNH" : "+ LƯU TỪ VỰNG KÈM NGỮ CẢNH"}</span>
+                <span>{isPhrase ? "Save phrase with context" : "Save word with context"}</span>
               </>
             )}
           </button>

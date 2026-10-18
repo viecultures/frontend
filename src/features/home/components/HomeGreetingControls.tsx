@@ -23,46 +23,22 @@ export const HomeGreetingControls: React.FC<HomeGreetingControlsProps> = ({
         </p>
       </div>
 
-      {/* Quick Practice Shortcut Pills Row */}
       <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-1">
-        <button
-          type="button"
-          onClick={() => onNavigate(PATHS.discovery)}
-          className="px-3.5 py-1.5 bg-heritage-dark/90 border border-antique-gold/40 hover:border-antique-gold hover:bg-antique-gold rounded-xl text-xs font-bold text-warm-ivory hover:text-heritage-dark transition-all duration-200 flex items-center gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(217,183,106,0.35)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer focus-ring"
-        >
-          <Compass className="w-3.5 h-3.5 text-antique-gold group-hover:text-heritage-dark group-hover:scale-110 transition-transform" />
-          <span>Discover stories</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onNavigate(PATHS.reader)}
-          className="px-3.5 py-1.5 bg-heritage-dark/90 border border-antique-gold/40 hover:border-antique-gold hover:bg-antique-gold rounded-xl text-xs font-bold text-warm-ivory hover:text-heritage-dark transition-all duration-200 flex items-center gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(217,183,106,0.35)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer focus-ring"
-        >
-          <BookOpen className="w-3.5 h-3.5 text-antique-gold group-hover:text-heritage-dark group-hover:scale-110 transition-transform" />
-          <span>Bilingual reading</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onNavigate(PATHS.dictionary)}
-          className="px-3.5 py-1.5 bg-heritage-dark/90 border border-antique-gold/40 hover:border-antique-gold hover:bg-antique-gold rounded-xl text-xs font-bold text-warm-ivory hover:text-heritage-dark transition-all duration-200 flex items-center gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(217,183,106,0.35)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer focus-ring"
-        >
-          <BookMarked className="w-3.5 h-3.5 text-antique-gold group-hover:text-heritage-dark group-hover:scale-110 transition-transform" />
-          <span>Vocabulary cards</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onNavigate(PATHS.community)}
-          className="px-3.5 py-1.5 bg-heritage-dark/90 border border-antique-gold/40 hover:border-antique-gold hover:bg-antique-gold rounded-xl text-xs font-bold text-warm-ivory hover:text-heritage-dark transition-all duration-200 flex items-center gap-1.5 shadow-md hover:shadow-[0_0_15px_rgba(217,183,106,0.35)] hover:-translate-y-0.5 active:scale-95 group cursor-pointer focus-ring"
-        >
-          <Users className="w-3.5 h-3.5 text-antique-gold group-hover:text-heritage-dark group-hover:scale-110 transition-transform" />
-          <span>Community</span>
-        </button>
+        {[
+          { label: 'Discover stories', icon: Compass, path: PATHS.discovery },
+          { label: 'Bilingual reading', icon: BookOpen, path: PATHS.reader },
+          { label: 'Vocabulary cards', icon: BookMarked, path: PATHS.dictionary },
+          { label: 'Community', icon: Users, path: PATHS.community },
+        ].map(({ label, icon: Icon, path }) => (
+          <button key={path} type="button" className="home-study-shortcut" onClick={() => onNavigate(path)}>
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        ))}
       </div>
     </div>
   );
 };
 
 export default HomeGreetingControls;
+

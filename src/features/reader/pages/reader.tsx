@@ -1,3 +1,4 @@
+import '../reader-components.css';
 import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -349,22 +350,6 @@ export default function ReaderPage() {
       ? "bg-[#141C1A] text-[#E8DFCB]"
       : "bg-[#F6EEDC] text-[#3F5550]";
 
-  const paperSheetBgClass =
-    themeMode === "dark"
-      ? "bg-[#1E2925] text-[#FBF7EE] border-[#D9B76A]/35 shadow-[0_12px_45px_rgba(0,0,0,0.6)]"
-      : "bg-[#FBF7EE] text-[#2C3B37] border-[rgba(30,75,67,0.12)] shadow-md";
-
-  const paperTitleColor =
-    themeMode === "dark"
-      ? "text-[#FBF7EE] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
-      : "text-[#1E4B43]";
-
-  const paperSubtitleColor =
-    themeMode === "dark" ? "text-[#BFE3EA]" : "text-[#4B5563]";
-
-  const paperBodyTextColor =
-    themeMode === "dark" ? "text-[#F6EEDC]/95" : "text-[#2C3B37]";
-
   const vocabBtnClass =
     themeMode === "dark"
       ? "ink-underline border-b-2 border-dashed border-antique-gold bg-antique-gold/30 font-semibold text-antique-gold hover:bg-antique-gold/45 px-1 rounded transition-colors cursor-pointer shadow-xs focus-ring-dark"
@@ -380,7 +365,7 @@ export default function ReaderPage() {
 
   return (
     <SavedVocabularyContext.Provider value={savedVocabulary}>
-    <main className="min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
+    <main className="reader-component-theme min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
       {/* Top Reader Toolbar Control Bar (sticky at top 0) */}
       <ReaderToolbar
         fontSize={fontSize}
@@ -449,10 +434,6 @@ export default function ReaderPage() {
             <BilingualReaderView
               themeMode={themeMode}
               fontSize={fontSize}
-              paperSheetBgClass={paperSheetBgClass}
-              paperTitleColor={paperTitleColor}
-              paperSubtitleColor={paperSubtitleColor}
-              paperBodyTextColor={paperBodyTextColor}
               vocabBtnClass={vocabBtnClass}
               bottomCardBgClass={bottomCardBgClass}
               openVocab={openVocab}
@@ -470,10 +451,6 @@ export default function ReaderPage() {
             <ExtensiveReaderView
               themeMode={themeMode}
               fontSize={fontSize}
-              paperSheetBgClass={paperSheetBgClass}
-              paperTitleColor={paperTitleColor}
-              paperSubtitleColor={paperSubtitleColor}
-              paperBodyTextColor={paperBodyTextColor}
               vocabBtnClass={vocabBtnClass}
               bottomCardBgClass={bottomCardBgClass}
               openVocab={openVocab}

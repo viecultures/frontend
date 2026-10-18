@@ -115,32 +115,32 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
     : 'bg-[#FBF7EE] text-[#3F5550] border-[rgba(30,75,67,0.12)] shadow-xl';
 
   return (
-    <div className={`rounded-3xl p-6 sm:p-10 transition-colors duration-300 border space-y-6 ${containerBgClass}`}>
+    <div data-practice-theme={themeMode} className={`reader-practice-surface reader-practice-card reader-study-component reader-flashcards-component rounded-3xl p-6 sm:p-10 transition-colors duration-300 border space-y-6 ${containerBgClass}`}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[rgba(217,183,106,0.25)]">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
-              Ôn Thẻ Nhớ (Active Recall)
+              Quick flashcards
             </span>
           </div>
           <h2 className={`font-serif text-2xl font-bold ${isDark ? 'text-[#FBF7EE]' : 'text-[#1E4B43]'}`}>
-            Lật Thẻ Ôn Tập & Khắc Sâu Ký Ức Văn Hóa
+            Flip, recall and review
           </h2>
           <p className="text-xs sm:text-sm opacity-80 mt-1 leading-relaxed">
-            Lấy cảm hứng từ phương pháp Spaced Repetition của Quizlet: Lật thẻ 2 mặt và tự đánh giá để hoàn thành bài học.
+            Flip each card to check its meaning, then choose whether to review it again or mark it as remembered.
           </p>
         </div>
 
         {/* Stats Pill */}
-        <div className="flex items-center gap-2">
+        <div className="reader-quick-stats flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Đã nhớ: {rememberedIds.size}</span>
+            <span>Remembered: {rememberedIds.size}</span>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-bold">
             <XCircle className="w-3.5 h-3.5" />
-            <span>Cần ôn: {reviewLaterIds.size}</span>
+            <span>Review: {reviewLaterIds.size}</span>
           </div>
         </div>
       </div>
@@ -158,7 +158,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               setIsFlipped(!isFlipped);
             }
           }}
-          className={`relative min-h-[260px] sm:min-h-[290px] rounded-3xl p-6 sm:p-8 cursor-pointer transition-all duration-300 transform hover:scale-[1.01] border-2 shadow-lg flex flex-col justify-between ${
+          className={`reader-quick-card relative min-h-[260px] sm:min-h-[290px] rounded-3xl p-6 sm:p-8 cursor-pointer transition-all duration-300 transform hover:scale-[1.01] border-2 shadow-lg flex flex-col justify-between ${
             isDark
               ? 'bg-[#141C1A] border-[#D9B76A]/50 hover:border-[#D9B76A]'
               : 'bg-[#F6EEDC] border-[#D9B76A]/70 hover:border-[#D9B76A]'
@@ -168,11 +168,11 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           <div className="flex items-center justify-between text-xs font-bold opacity-75">
             <span className="flex items-center gap-1 text-[#D9B76A]">
               <Layers className="w-3.5 h-3.5" />
-              Thẻ {currentIndex + 1} / {cards.length}
+              Card {currentIndex + 1} / {cards.length}
             </span>
             <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-stone-500">
               <RotateCw className="w-3 h-3" />
-              {isFlipped ? 'Mặt Sau (Nghĩa)' : 'Mặt Trước (Bấm để lật)'}
+              {isFlipped ? 'Back · Meaning' : 'Front · Click to flip'}
             </span>
           </div>
 
@@ -190,7 +190,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
                     playAudio(currentCard.word);
                   }}
                   className="p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
-                  title="Phát âm"
+                  title="Play pronunciation"
                 >
                   <Volume2 className="w-5 h-5 text-[#D9B76A]" />
                 </button>
@@ -212,14 +212,14 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               </h4>
               <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-md mx-auto bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 flex items-start justify-center gap-1.5 text-left">
                 <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                <span><strong>Ý niệm văn hóa:</strong> {currentCard.culturalFact}</span>
+                <span><strong>Cultural context:</strong> {currentCard.culturalFact}</span>
               </p>
             </div>
           )}
 
           {/* Card Footer Helper */}
           <div className="text-center text-[11px] opacity-60">
-            Nhấn phím Space để lật thẻ • Phím mũi tên để chuyển thẻ
+            Space to flip · Arrow keys to change cards
           </div>
         </div>
 
@@ -228,27 +228,29 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           <button
             type="button"
             onClick={markReviewLater}
-            className={`flex items-center justify-center gap-2 py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
+            aria-pressed={reviewLaterIds.has(currentCard.id)}
+            className={`reader-quick-review flex items-center justify-center gap-2 py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
               reviewLaterIds.has(currentCard.id)
                 ? 'bg-rose-500 text-white border-rose-600 shadow-md'
                 : 'border-rose-500/40 text-rose-700 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/20'
             }`}
           >
             <XCircle className="w-4 h-4" />
-            <span>Chưa Nhớ</span>
+            <span>Review again</span>
           </button>
 
           <button
             type="button"
             onClick={markRemembered}
-            className={`flex items-center justify-center gap-2 py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
+            aria-pressed={rememberedIds.has(currentCard.id)}
+            className={`reader-quick-remember flex items-center justify-center gap-2 py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
               rememberedIds.has(currentCard.id)
                 ? 'bg-emerald-600 text-white border-emerald-700 shadow-md'
                 : 'border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/20'
             }`}
           >
             <CheckCircle2 className="w-4 h-4" />
-            <span>Đã Thuộc</span>
+            <span>Remembered</span>
           </button>
         </div>
 
@@ -259,7 +261,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               type="button"
               onClick={handlePrev}
               className="p-2 rounded-xl border border-[rgba(217,183,106,0.3)] hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
-              title="Thẻ trước"
+              title="Previous card"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
@@ -267,7 +269,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               type="button"
               onClick={handleNext}
               className="p-2 rounded-xl border border-[rgba(217,183,106,0.3)] hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
-              title="Thẻ tiếp"
+              title="Next card"
             >
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -275,9 +277,9 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
 
           <a
             href={paths.flashcardStudy({ deck: deckId, level: selectedLevel })}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1E4B43] dark:text-[#D9B76A] hover:underline"
+            className="reader-quick-deck-link inline-flex items-center gap-1.5 text-xs font-bold text-[#1E4B43] dark:text-[#D9B76A] hover:underline"
           >
-            <span>Mở rộng sang Phòng Học Flashcards (3 chế độ)</span>
+            <span>Open full flashcard deck</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
@@ -285,21 +287,21 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
 
       {/* ── MILESTONE BANNER: ĐÓNG MỘC SON ─────────────────────────────────── */}
       <div className="mt-8 pt-6 border-t border-[rgba(217,183,106,0.3)]">
-        <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#9E2A2B]/15 via-[#1E4B43]/10 to-[#D9B76A]/20 border-2 border-[#D9B76A] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="reader-quick-milestone rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#9E2A2B]/15 via-[#1E4B43]/10 to-[#D9B76A]/20 border-2 border-[#D9B76A] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-1.5 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#9E2A2B] text-white">
-                Thành Tựu Hoàn Thành
+                Lesson milestone
               </span>
               <span className="text-xs text-stone-500 font-sans">
-                Kích hoạt chuỗi ngày học Daily Streak
+                Keep your study streak going
               </span>
             </div>
             <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#9E2A2B] dark:text-[#FBF7EE]">
-              Bạn Đã Hoàn Thành Toàn Bộ Nội Dung Bài Học!
+              You’ve completed this lesson!
             </h3>
             <p className="text-xs sm:text-sm text-stone-700 dark:text-stone-300 max-w-xl">
-              Nghi thức đóng dấu <strong>Mộc Son đỏ</strong> đang chờ bạn xác nhận để ghi danh chứng thư di sản và thắp sáng ngọn lửa chuỗi học.
+              Add your <strong>heritage stamp</strong> to celebrate this lesson and continue your study streak.
             </p>
           </div>
 
@@ -309,7 +311,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
             className="w-full md:w-auto px-8 py-4 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-serif font-bold text-sm sm:text-base shadow-[0_4px_25px_rgba(158,42,43,0.45)] border-2 border-[#D9B76A] transition-all transform hover:scale-105 flex items-center justify-center gap-3 cursor-pointer shrink-0"
           >
             <Award className="w-5 h-5 text-[#D9B76A]" />
-            <span>Đóng Mộc Son & Hoàn Tất Bài Học</span>
+            <span>Stamp and finish lesson</span>
             <Sparkles className="w-4 h-4 text-[#D9B76A]" />
           </button>
         </div>

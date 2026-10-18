@@ -1,0 +1,16 @@
+/* Shared article presentation for both Reader modes; layout and scroll behavior stay with each view. */
+.reader-language-sheet { font-family: var(--font-sans); --sheet-line: rgb(30 75 67 / .12); --sheet-muted: #52665F; --sheet-soft: rgb(30 75 67 / .035); border: 1px solid var(--sheet-line); box-shadow: 0 6px 20px rgb(0 0 0 / .06); }
+.reader-language-sheet[data-reader-theme="dark"] { --sheet-line: rgb(251 247 238 / .12); --sheet-muted: #B7C9C2; --sheet-soft: rgb(251 247 238 / .04); box-shadow: 0 6px 20px rgb(0 0 0 / .12); }
+.reader-language-sheet h1 { font-weight: 500; filter: none; }
+.reader-sheet-heading { border-color: var(--sheet-line); }
+.reader-sheet-heading > span { font-size: 12px; font-weight: 400; line-height: 1.5; letter-spacing: 0; text-transform: none; color: var(--sheet-muted); background: var(--sheet-soft); border: 1px solid var(--sheet-line); border-radius: 8px; }
+.reader-sheet-heading > span:first-child { font-weight: 500; }
+.reader-sheet-heading > span:last-child { font-size: 11px; background: transparent; }
+.reader-sheet-banner { border-color: var(--sheet-line); box-shadow: 0 2px 8px rgb(0 0 0 / .06); }
+.reader-sheet-banner > .inset-2 { border-color: rgb(251 247 238 / .12); }
+.reader-sheet-banner .font-bold, .reader-sheet-banner .font-semibold { font-weight: 400; }
+.reader-sheet-banner h3.font-bold { font-weight: 500; filter: none; }
+.reader-sheet-banner .uppercase { font-size: 12px; letter-spacing: .02em; text-transform: none; color: var(--color-warm-ivory); }
+.reader-sheet-banner .absolute.top-4 > span { background: rgb(18 42 34 / .7); color: var(--color-warm-ivory); border-color: rgb(251 247 238 / .12); }
+.reader-language-sheet .ink-underline { font-weight: 400; border-bottom-width: 1px; border-bottom-style: solid; background: transparent; box-shadow: none; }
+.reader-language-sheet .ink-underline:hover { background: var(--sheet-soft); }

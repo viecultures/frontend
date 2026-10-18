@@ -69,3 +69,8 @@
 @media (min-width: 1024px) { .home-classic-header, .home-classic > main { padding-right: 96px; } }
 @media (max-width: 639px) { .home-classic-header-tools { gap: 2px; } }
 @media (max-width: 639px) { .home-task-input { font-size: 16px; } }
+
+.home-study-shortcut { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1px solid color-mix(in srgb, var(--color-on-action) 12%, transparent); background: color-mix(in srgb, var(--color-heritage-forest) 82%, transparent); color: var(--color-on-action); box-shadow: 0 6px 20px rgb(0 0 0 / .12); cursor: pointer; }
+.home-study-shortcut svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--color-antique-bright); }
+.home-study-shortcut:hover { border-color: color-mix(in srgb, var(--color-on-action) 28%, transparent); }
+.home-study-shortcut:focus-visible { outline: 2px solid var(--color-antique-bright); outline-offset: 3px; }

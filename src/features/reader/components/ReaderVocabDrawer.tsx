@@ -45,7 +45,7 @@ export function ReaderVocabDrawer({
           <div className="flex items-center justify-between pb-4 border-b border-[rgba(30,75,67,0.12)] mb-6">
             <div>
               <h3 className="font-serif text-lg font-bold text-[#1E4B43]">
-                Từ Vựng Bài Đọc
+                Article vocabulary
               </h3>
               <span className="text-xs text-[#6E7E79]">
                 {articleTitle}
@@ -54,7 +54,7 @@ export function ReaderVocabDrawer({
             <button
               onClick={onClose}
               className="p-1.5 rounded-full hover:bg-[#F6EEDC] text-[#1E4B43] transition-colors cursor-pointer"
-              aria-label="Đóng bảng từ vựng"
+              aria-label="Close vocabulary"
             >
               <X className="w-5 h-5" />
             </button>
@@ -89,12 +89,12 @@ export function ReaderVocabDrawer({
                   {bookmarkedWords[selectedVocab.id] ? (
                     <>
                       <BookmarkCheck className="w-4 h-4 fill-[#1E4B43]" />
-                      <span>Đã lưu vào bộ sưu tập</span>
+                      <span>Saved to vocabulary</span>
                     </>
                   ) : (
                     <>
                       <Bookmark className="w-4 h-4" />
-                      <span>Lưu từ vựng này</span>
+                      <span>Save word</span>
                     </>
                   )}
                 </button>
@@ -105,7 +105,7 @@ export function ReaderVocabDrawer({
           {/* List of All Vocabulary in Article */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#6E7E79] mb-2">
-              Tất cả từ vựng trong bài ({vocabList.length})
+              All article vocabulary ({vocabList.length})
             </h4>
             {vocabList.map((item) => (
               <div
@@ -134,12 +134,12 @@ export function ReaderVocabDrawer({
           {Object.values(bookmarkedWords).some(Boolean) && <Link
             href={paths.flashcardStudy({ deck: deckId || 'tet-holiday', level: selectedLevel, saved: true })}
             className="block py-3 text-center font-bold text-heritage-green"
-          >Ôn những từ đã lưu</Link>}
+          >Review saved words</Link>}
           <Link
             href={paths.flashcardStudy({ deck: deckId || 'tet-holiday', level: selectedLevel })}
             className="w-full py-3 rounded-full text-xs font-bold text-[#FBF7EE] bg-[#1E4B43] hover:bg-[#163D37] flex items-center justify-center gap-2 shadow-sm border border-[#D9B76A]/50 transition-all"
           >
-            <span>Ôn Tập Flashcards từ vựng</span>
+            <span>Review vocabulary cards</span>
             <ArrowRight className="w-3.5 h-3.5 text-[#D9B76A]" />
           </Link>
         </div>

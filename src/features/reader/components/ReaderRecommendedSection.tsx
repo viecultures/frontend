@@ -13,17 +13,17 @@ export function ReaderRecommendedSection({
   themeMode,
 }: ReaderRecommendedSectionProps) {
   return (
-    <div className="pt-8 border-t border-[rgba(217,183,106,0.2)]">
+    <div data-practice-theme={themeMode} className="reader-practice-surface reader-recommended-component pt-8 border-t border-[rgba(217,183,106,0.2)]">
       <div className="flex items-center justify-between mb-6">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
-            Continue Reading
+            Continue reading
           </span>
           <h3
             className={`font-serif text-xl font-bold mt-0.5 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
               }`}
           >
-            Bài Đọc Đề Xuất Tiếp Theo
+            Recommended articles
           </h3>
         </div>
         <Link
@@ -33,7 +33,7 @@ export function ReaderRecommendedSection({
               : "text-[#1E4B43] hover:text-[#D9B76A]"
             }`}
         >
-          <span>Xem tất cả bài đọc</span>
+          <span>View all</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -44,14 +44,14 @@ export function ReaderRecommendedSection({
             key={article.id}
 
             href={paths.reader({ story: article.id, level: article.level })}
-            className={`group p-5 rounded-2xl border transition-all flex flex-col justify-between ${themeMode === "dark"
+            className={`reader-recommended-card group p-5 rounded-2xl border transition-all flex flex-col justify-between ${themeMode === "dark"
                 ? "bg-[#1E2925] border-[#D9B76A]/30 text-[#FBF7EE] shadow-md hover:border-[#D9B76A]"
                 : "bg-[#FBF7EE] border-[rgba(30,75,67,0.12)] text-[#3F5550] shadow-sm hover:shadow-md"
               }`}
           >
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E4B43] bg-[#F6EEDC] px-2.5 py-1 rounded">
-                {article.category} • {article.level}
+                {article.category}
               </span>
               <h4
                 className={`font-serif text-base font-bold mt-3 group-hover:text-[#D9B76A] transition-colors ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
@@ -65,10 +65,10 @@ export function ReaderRecommendedSection({
             </div>
             <div className="mt-4 pt-3 border-t border-[rgba(217,183,106,0.2)] flex items-center justify-between text-xs font-semibold opacity-80">
               <span>
-                {article.readTime} • {article.vocabCount} Vocab
+                {article.readTime} • {article.vocabCount} words
               </span>
               <span className="text-[#D9B76A] group-hover:translate-x-1 transition-transform inline-block font-bold">
-                Đọc ngay →
+                Read →
               </span>
             </div>
           </Link>

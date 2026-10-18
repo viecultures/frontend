@@ -105,7 +105,8 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
 
   return (
     <div
-      className={`transition-transform transition-opacity duration-300 ${
+      data-audio-theme={themeMode}
+      className={`reader-component-audio transition-transform transition-opacity duration-300 ${
         isAtTop
           ? "relative w-full max-w-7xl mx-auto z-20 p-2.5 sm:px-6 sm:py-3 rounded-2xl sm:rounded-3xl border-2 shadow-md"
           : `fixed top-14 left-4 right-4 max-w-4xl mx-auto z-40 p-2 sm:px-5 sm:py-2.5 rounded-2xl border-2 backdrop-blur-xl transform ${
@@ -147,12 +148,12 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
               }`}>
                 {articleTitle}
               </h4>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded font-semibold ${
+              <span className={`reader-audio-scope text-[10px] px-1.5 py-0.2 rounded font-semibold ${
                 audioScope === "full"
                   ? "bg-[#2563EB]/15 text-[#2563EB] dark:text-[#93C5FD]"
                   : "bg-[#D9B76A]/20 text-[#D9B76A]"
               }`}>
-                {audioScope === "full" ? "Toàn bài" : "Shadowing"}
+                {audioScope === "full" ? "Full article" : "Shadowing"}
               </span>
             </div>
 
@@ -164,10 +165,10 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 className={`text-[10px] font-bold flex items-center gap-1 group transition-colors cursor-pointer hover:underline ${
                   isDark ? "text-[#D9B76A]" : "text-[#1E4B43]"
                 }`}
-                title="Bấm để chọn giọng đọc Google Gemini"
+                title="Choose reading voice"
               >
                 <span>{selectedVoiceFlag}</span>
-                <span>Giọng: {selectedVoiceName}</span>
+                <span>Voice: {selectedVoiceName}</span>
                 <SlidersHorizontal className="w-2.5 h-2.5 opacity-70 group-hover:opacity-100" />
               </button>
             )}
@@ -182,13 +183,13 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             {/* Replay */}
             <button
               onClick={onRestart}
-              title="Nghe lại từ đầu"
+              title="Restart audio"
               className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer shrink-0 ${
                 isDark
                   ? "text-[#BFE3EA] hover:text-[#D9B76A] hover:bg-white/10"
                   : "text-[#1E4B43] hover:text-[#D9B76A] hover:bg-[#1E4B43]/10"
               }`}
-              aria-label="Nghe lại từ đầu"
+              aria-label="Restart audio"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -196,7 +197,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             {/* Loop / Repeat */}
             <button
               onClick={onToggleRepeatLoop}
-              title={isRepeatLoop ? "Đang bật lặp lại câu" : "Bật lặp lại câu"}
+              title={isRepeatLoop ? "Sentence repeat is on" : "Enable sentence repeat"}
               className={`p-1.5 sm:p-2 rounded-full border transition-colors relative cursor-pointer shrink-0 ${
                 isRepeatLoop
                   ? isDark
@@ -206,7 +207,8 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                   ? "text-[#BFE3EA]/70 hover:text-[#D9B76A] border-transparent hover:bg-white/10"
                   : "text-[#1E4B43]/70 hover:text-[#1E4B43] border-transparent hover:bg-[#1E4B43]/10"
               }`}
-              aria-label="Lặp lại câu"
+              aria-label="Repeat sentence"
+              aria-pressed={isRepeatLoop}
             >
               <Repeat className="w-3.5 h-3.5" />
               {isRepeatLoop && (
@@ -225,8 +227,8 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 ? "bg-[#D9B76A] hover:bg-[#c9a657] text-[#1E4B43]"
                 : "bg-[#1E4B43] hover:bg-[#163D37] text-[#FBF7EE]"
             }`}
-            title={isPlaying ? "Tạm dừng" : "Phát audio Google Gemini"}
-            aria-label={isPlaying ? "Tạm dừng" : "Phát audio"}
+            title={isPlaying ? "Pause" : "Play audio"}
+            aria-label={isPlaying ? "Pause" : "Play audio"}
           >
             {isPlaying ? (
               <Pause className="w-4 h-4 fill-current" />
@@ -267,7 +269,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                     ? "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#D9B76A] [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#D9B76A] [&::-moz-range-thumb]:border-none"
                     : "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1E4B43] [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1E4B43] [&::-moz-range-thumb]:border-none"
                 }`}
-                aria-label="Thanh thời gian đọc"
+                aria-label="Audio progress"
               />
             </div>
 
@@ -289,7 +291,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             {/* Shadow Mic */}
             <button
               onClick={() => setIsRecording(!isRecording)}
-              title={isRecording ? "Đang thu âm (Nhấp để dừng)" : "Bật thu âm AI Shadowing"}
+              title={isRecording ? "Recording (click to stop)" : "Start shadowing recording"}
               className={`p-1.5 sm:p-2 rounded-full border transition-colors cursor-pointer shrink-0 ${
                 isRecording
                   ? "bg-red-500/25 text-red-400 border-red-400 animate-pulse shadow-sm"
@@ -297,7 +299,8 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                   ? "text-[#BFE3EA] hover:text-[#D9B76A] hover:bg-white/10 border-transparent"
                   : "text-[#1E4B43] hover:text-[#D9B76A] hover:bg-[#1E4B43]/10 border-transparent"
               }`}
-              aria-label="Thu âm AI Shadowing"
+              aria-label="Record shadowing"
+              aria-pressed={isRecording}
             >
               <Mic className="w-3.5 h-3.5" />
             </button>
@@ -305,13 +308,13 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             {/* Speed Selector */}
             <button
               onClick={handleCycleSpeed}
-              title={`Tốc độ đọc: ${playbackSpeed}x. Nhấp để đổi.`}
+              title={`Playback speed: ${playbackSpeed}x. Click to change.`}
               className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-bold transition-colors cursor-pointer shrink-0 ${
                 isDark
                   ? "bg-[#141C1A] border-[#D9B76A]/50 text-[#D9B76A] hover:bg-[#D9B76A]/20"
                   : "bg-[#1E4B43]/10 border-[#1E4B43]/30 text-[#1E4B43] hover:bg-[#1E4B43]/20"
               }`}
-              aria-label={`Tốc độ đọc ${playbackSpeed}x`}
+              aria-label={`Playback speed ${playbackSpeed}x`}
             >
               <Gauge className="w-3 h-3" />
               <span className="font-mono tabular-nums text-[10px]">{playbackSpeed}x</span>
@@ -330,16 +333,16 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                   ? "bg-[#D9B76A]/20 border-[#D9B76A]/60 text-[#D9B76A] hover:bg-[#D9B76A]/30"
                   : "bg-[#1E4B43]/10 border-[#1E4B43]/30 text-[#1E4B43] hover:bg-[#1E4B43]/15"
               }`}
-              title="Mở giao diện tùy chỉnh giọng đọc Google Gemini"
+              title="Open voice settings"
             >
               <SlidersHorizontal className="w-3 h-3" />
-              <span className="hidden sm:inline">Chỉnh giọng đọc</span>
+              <span className="hidden sm:inline">Voice settings</span>
             </button>
           )}
 
           <button
             onClick={onToggleMute}
-            title={isMuted ? "Bật âm thanh" : "Tắt âm thanh"}
+            title={isMuted ? "Unmute" : "Mute"}
             className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
               isMuted
                 ? "bg-red-500/20 text-red-400 border-red-500/40"
@@ -347,17 +350,12 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 ? "bg-[#141C1A] border-[#D9B76A]/40 text-[#D9B76A] hover:bg-[#D9B76A]/20"
                 : "bg-[#1E4B43]/10 border-[#1E4B43]/20 text-[#1E4B43] hover:bg-[#1E4B43]/20"
             }`}
-            aria-label={isMuted ? "Bật âm thanh" : "Tắt âm thanh"}
+            aria-label={isMuted ? "Unmute" : "Mute"}
+            aria-pressed={isMuted}
           >
             {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border shrink-0 ${
-            isDark
-              ? "border-[#D9B76A]/40 bg-[#D9B76A]/15 text-[#D9B76A]"
-              : "border-[#1E4B43]/30 bg-[#1E4B43]/10 text-[#1E4B43]"
-          }`}>
-            {selectedLevel}
-          </span>
+
         </div>
 
       </div>
