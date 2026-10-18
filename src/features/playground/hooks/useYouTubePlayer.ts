@@ -17,11 +17,11 @@ function loadYouTubeAPI(): Promise<YouTubeAPI> {
   if (apiPromise) return apiPromise;
   apiPromise = new Promise<YouTubeAPI>((resolve, reject) => {
     const previous = host.onYouTubeIframeAPIReady;
-    const timeout = window.setTimeout(() => { cleanup(); reject(new Error('Không tải được YouTube. Kiểm tra mạng rồi tải lại player.')); }, 20000);
+    const timeout = window.setTimeout(() => { cleanup(); reject(new Error('YouTube could not load. Check your connection and reload the player.')); }, 20000);
     const ready = () => {
       try { previous?.(); } finally {
         cleanup();
-        if (host.YT?.Player) resolve(host.YT); else reject(new Error('YouTube API chưa sẵn sàng.'));
+        if (host.YT?.Player) resolve(host.YT); else reject(new Error('The YouTube player is not ready.'));
       }
     };
     function cleanup() {
@@ -32,7 +32,7 @@ function loadYouTubeAPI(): Promise<YouTubeAPI> {
     let script = document.querySelector<HTMLScriptElement>('script[src="https://www.youtube.com/iframe_api"]');
     if (!script) {
       script = document.createElement('script'); script.src = 'https://www.youtube.com/iframe_api'; script.async = true;
-      script.onerror = () => { cleanup(); script?.remove(); reject(new Error('Không kết nối được YouTube.')); };
+      script.onerror = () => { cleanup(); script?.remove(); reject(new Error('Unable to connect to YouTube.')); };
       document.head.appendChild(script);
     }
   }).catch(error => { apiPromise = null; throw error; });
@@ -68,18 +68,27 @@ export function useYouTubePlayer(videoId: string) {
             if (cancelled) return;
             playerRef.current = event.target; setReady(true); setDuration(event.target.getDuration());
             const iframe = mount.querySelector('iframe');
-            if (iframe) { iframe.title = 'Video luyện shadowing'; iframe.className = 'w-full h-full'; }
+            if (iframe) { iframe.title = 'Practice video'; iframe.className = 'w-full h-full'; }
           },
-          onStateChange: event => { if (!cancelled) { setState(event.data); setDuration(event.target.getDuration()); setTime(event.target.getCurrentTime()); } },
-          onError: event => { if (!cancelled) { setState(-1); setError(`YouTube không phát được video (mã ${event.data}). Kiểm tra video có cho phép nhúng.`); } },
-          onAutoplayBlocked: () => { if (!cancelled) { setState(2); setError('Trình duyệt chặn phát. Bấm Play trên video rồi thử lại.'); } },
+          onStateChange: event => { if (!cancelled) {
+            setState(event.data); setDuration(event.target.getDuration()); setTime(event.target.getCurrentTime());
+            // A successful manual Play recovers from autoplay/network failures.
+            if (event.data === 1) { setError(null); setReady(true); }
+          } },
+          onError: event => { if (!cancelled) {
+            setState(-1); setReady(false);
+            setError(event.data === 101 || event.data === 150
+              ? `This video does not allow embedded playback (YouTube ${event.data}). Choose another video.`
+              : `YouTube could not play this video (code ${event.data}). Reload the player or choose another video.`);
+          } },
+          onAutoplayBlocked: () => { if (!cancelled) { setState(2); setReady(false); setError('Playback was blocked by the browser. Press Play on the video, then try again.'); } },
         },
       });
       interval = setInterval(() => {
         if (cancelled || !playerRef.current) return;
         setTime(playerRef.current.getCurrentTime()); setDuration(playerRef.current.getDuration());
       }, 100);
-    }).catch(reason => { if (!cancelled) setError(reason instanceof Error ? reason.message : 'Không tải được player.'); });
+    }).catch(reason => { if (!cancelled) setError(reason instanceof Error ? reason.message : 'Unable to load the video player.'); });
     return () => {
       cancelled = true; clearInterval(interval); playerRef.current = null;
       instance?.destroy(); node.remove(); mount.replaceChildren();

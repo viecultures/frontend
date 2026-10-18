@@ -14,7 +14,7 @@ const errors = [], uploads = [];
 let failBackend = false;
 page.on('pageerror', error => errors.push(error.message));
 page.on('request', request => { if (/shadowing\/evaluate|recordings|upload/.test(request.url()) && request.method() === 'POST') uploads.push(request.url()); });
-await page.route('http://localhost:8080/**', async route => {
+await page.route('**/api/**', async route => {
   if (!route.request().url().includes('/ytb-transcript')) return route.fulfill({ status: 404, body: '{}' });
   if (failBackend) return route.fulfill({ status: 503, body: 'Transcript unavailable' });
   const starts = [2, 5, 62, 65, 122, 125];
@@ -61,10 +61,11 @@ await page.addInitScript(() => {
 try {
   await page.goto(`${baseURL}/playground`);
   await page.waitForLoadState('networkidle');
-  await page.getByLabel('Link video YouTube', { exact: true }).fill('https://www.youtube.com/watch?v=kXYiU_JCYtU');
-  await page.getByRole('button', { name: 'Lấy transcript từ BE', exact: true }).click();
+  await page.getByLabel('YouTube video URL', { exact: true }).fill('https://www.youtube.com/watch?v=kXYiU_JCYtU');
+  await page.getByRole('button', { name: 'Open video', exact: true }).click();
+  await page.getByRole('button', { name: 'Edit transcript', exact: true }).click();
   await page.getByRole('heading', { name: 'Biên tập trước khi luyện' }).waitFor();
-  assert.equal(await page.getByRole('button', { name: 'Lấy transcript từ BE', exact: true }).isDisabled(), true);
+  assert.equal(await page.getByRole('button', { name: 'Practice settings', exact: true }).isDisabled(), true);
   await page.getByLabel('Nội dung câu 1', { exact: true }).fill('An edited sentence for the first part.');
   await page.getByLabel('Bắt đầu câu 1', { exact: true }).fill('2.1');
   await page.getByLabel('Bắt đầu phần mới tại câu 3', { exact: true }).check();
@@ -72,105 +73,111 @@ try {
   await page.getByLabel('Bắt đầu phần mới tại câu 5', { exact: true }).check();
   await page.getByLabel('Tên phần tại câu 5', { exact: true }).fill('Third topic');
   await page.getByRole('button', { name: 'Áp dụng và luyện', exact: true }).click();
-  await page.getByRole('heading', { name: 'Lồng tiếng từng câu' }).waitFor();
-  const navigation = page.getByRole('navigation', { name: 'Các phần luyện' });
+  await page.getByRole('heading', { name: 'Make the sentence your own' }).waitFor();
+  await page.locator('summary').filter({ hasText: 'Browse parts' }).click();
+  const navigation = page.getByRole('navigation', { name: 'Practice parts' });
   assert.equal(await navigation.getByRole('button').count(), 3);
-  assert.match(await page.getByRole('region', { name: 'Luyện shadowing' }).innerText(), /0\/6 câu/);
+  assert.match(await page.getByRole('region', { name: 'Shadowing practice' }).innerText(), /0\/6 sentences/);
 
   async function record() {
-    await page.getByRole('button', { name: /^(Thu câu này|Thu lại câu này)$/ }).click();
-    await page.getByRole('button', { name: /Dừng thu ·/ }).waitFor();
+    await page.getByRole('button', { name: /^(Record sentence|Record again)$/ }).click();
+    await page.getByRole('button', { name: /Stop recording ·/ }).waitFor();
     await page.waitForTimeout(500);
-    await page.getByRole('button', { name: /Dừng thu ·/ }).click();
-    await page.getByLabel('Bản thu câu đang chọn', { exact: true }).waitFor();
+    await page.getByRole('button', { name: /Stop recording ·/ }).click();
+    await page.getByLabel('Selected sentence recording', { exact: true }).waitFor();
   }
   await record();
-  assert.match(await navigation.getByRole('button').nth(0).innerText(), /1\/2 câu/);
+  assert.match(await navigation.getByRole('button').nth(0).innerText(), /1\/2 sentences/);
   await navigation.getByRole('button').nth(1).click();
   await record();
-  assert.match(await navigation.getByRole('button').nth(1).innerText(), /1\/2 câu/);
+  assert.match(await navigation.getByRole('button').nth(1).innerText(), /1\/2 sentences/);
   await navigation.getByRole('button').nth(0).click();
-  await page.getByLabel('Bản thu câu đang chọn', { exact: true }).waitFor();
-  assert.match(await page.getByRole('region', { name: 'Luyện shadowing' }).innerText(), /2\/6 câu/);
+  await page.getByLabel('Selected sentence recording', { exact: true }).waitFor();
+  assert.match(await page.getByRole('region', { name: 'Shadowing practice' }).innerText(), /2\/6 sentences/);
 
   failBackend = true;
-  await page.getByRole('button', { name: 'Lấy transcript từ BE', exact: true }).click();
+  await page.getByRole('button', { name: 'Practice settings', exact: true }).click();
+  await page.getByRole('button', { name: 'Reload transcript', exact: true }).click();
   await page.getByRole('alert').filter({ hasText: 'HTTP 503' }).waitFor();
-  assert.match(await page.getByRole('region', { name: 'Luyện shadowing' }).innerText(), /2\/6 câu/);
+  assert.match(await page.getByRole('region', { name: 'Shadowing practice' }).innerText(), /2\/6 sentences/);
   failBackend = false;
 
   // Leaving this mounted screen must cancel the pending take and close the mic.
-  await page.getByRole('button', { name: 'Thu lại câu này', exact: true }).click();
-  await page.getByRole('button', { name: /Dừng thu ·/ }).waitFor();
+  await page.getByRole('button', { name: 'Record again', exact: true }).click();
+  await page.getByRole('button', { name: /Stop recording ·/ }).waitFor();
   await page.locator('#screen-vietnam-map-ai').scrollIntoViewIfNeeded();
   await page.waitForFunction(() => window.__shStreams.every(stream => stream.getTracks().every(track => track.readyState === 'ended')));
   await page.locator('#screen-dictation-shadowing').scrollIntoViewIfNeeded();
-  await page.getByRole('button', { name: 'Thu lại câu này', exact: true }).waitFor();
-  assert.match(await page.getByRole('region', { name: 'Luyện shadowing' }).innerText(), /2\/6 câu/);
+  await page.getByRole('button', { name: 'Record again', exact: true }).waitFor();
+  assert.match(await page.getByRole('region', { name: 'Shadowing practice' }).innerText(), /2\/6 sentences/);
 
   // Retry failure must preserve the previous committed Blob and progress.
   await page.evaluate(() => { window.__shGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices); navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException('Microphone denied', 'NotAllowedError')); });
-  await page.getByRole('button', { name: 'Thu lại câu này', exact: true }).click();
-  await page.getByRole('alert').filter({ hasText: 'Chưa được cấp quyền microphone' }).waitFor();
-  assert.match(await navigation.getByRole('button').nth(0).innerText(), /1\/2 câu/);
+  await page.getByRole('button', { name: 'Record again', exact: true }).click();
+  await page.getByRole('alert').filter({ hasText: 'Microphone access was denied' }).waitFor();
+  assert.match(await navigation.getByRole('button').nth(0).innerText(), /1\/2 sentences/);
   await page.evaluate(() => { navigator.mediaDevices.getUserMedia = window.__shGetUserMedia; });
 
   // Section replay must stop at its end and restore source volume.
-  await page.getByRole('button', { name: 'Nghe lại phần này', exact: true }).click();
+  await page.locator('summary').filter({ hasText: 'Review your voice' }).click();
+  await page.getByRole('button', { name: 'Replay this part', exact: true }).click();
   await page.waitForFunction(() => window.__shPlayer.state === 1 && window.__shPlayer.volume === 20);
   await page.waitForTimeout(100);
   await page.evaluate(() => window.__shPlayer.seekTo(61.85));
-  await page.getByRole('button', { name: 'Về luyện câu', exact: true }).waitFor({ state: 'hidden' });
+  await page.getByRole('button', { name: 'Back to practice', exact: true }).waitFor({ state: 'hidden' });
   assert.equal(await page.evaluate(() => window.__shPlayer.state), 2);
   assert.equal(await page.evaluate(() => window.__shPlayer.volume), 100);
 
   // Full replay crosses section boundaries; seek into the middle of a valid take.
-  await page.getByRole('button', { name: 'Phát lại toàn video', exact: true }).click();
+  await page.getByRole('button', { name: 'Replay full video', exact: true }).click();
   await page.waitForTimeout(150);
   await page.evaluate(() => window.__shPlayer.seekTo(62.15));
   await page.waitForFunction(() => window.__shAudios.some(audio => !audio.paused));
-  await page.getByRole('button', { name: 'Dừng / tiếp tục', exact: true }).click();
+  await page.getByRole('button', { name: 'Pause / resume', exact: true }).click();
   await page.waitForFunction(() => window.__shAudios.every(audio => audio.paused));
-  await page.getByRole('button', { name: 'Dừng / tiếp tục', exact: true }).click();
+  await page.getByRole('button', { name: 'Pause / resume', exact: true }).click();
   await page.waitForFunction(() => window.__shPlayer.state === 1);
-  await page.getByRole('button', { name: 'Về luyện câu', exact: true }).click();
+  await page.getByRole('button', { name: 'Back to practice', exact: true }).click();
 
   // Edit one sentence's timing. Other section keeps its valid take.
-  await page.getByRole('button', { name: 'Biên tập', exact: true }).click();
+  await page.getByRole('button', { name: 'Edit transcript', exact: true }).click();
   await page.getByLabel('Kết thúc câu 1', { exact: true }).fill('4.2');
   await page.getByRole('button', { name: 'Áp dụng và luyện', exact: true }).click();
-  await page.getByText('Timing đã đổi. Cần thu lại câu này trước khi nghe toàn bài.', { exact: true }).waitFor();
-  assert.match(await navigation.getByRole('button').nth(1).innerText(), /1\/2 câu/);
+  await page.getByText('Timing changed. Record this sentence again before replaying the lesson.', { exact: true }).waitFor();
+  await page.locator('summary').filter({ hasText: 'Browse parts' }).click();
+  assert.match(await navigation.getByRole('button').nth(1).innerText(), /1\/2 sentences/);
   await record();
-  assert.match(await page.getByRole('region', { name: 'Luyện shadowing' }).innerText(), /2\/6 câu/);
+  assert.match(await page.getByRole('region', { name: 'Shadowing practice' }).innerText(), /2\/6 sentences/);
   const liveURLs = await page.evaluate(() => window.__shURLs.size);
   assert.ok(liveURLs <= 1, `Leaked audio object URLs: ${liveURLs}`);
 
   // A fresh BE candidate is a draft, not an overwrite of existing recordings.
-  await page.getByRole('button', { name: 'Lấy transcript từ BE', exact: true }).click();
+  await page.getByRole('button', { name: 'Practice settings', exact: true }).click();
+  await page.getByRole('button', { name: 'Reload transcript', exact: true }).click();
+  await page.getByRole('button', { name: 'Edit transcript', exact: true }).click();
   await page.getByRole('heading', { name: 'Biên tập trước khi luyện' }).waitFor();
   await page.getByRole('button', { name: 'Hủy thay đổi', exact: true }).click();
-  assert.match(await page.getByRole('region', { name: 'Luyện shadowing' }).innerText(), /2\/6 câu/);
+  assert.match(await page.getByRole('region', { name: 'Shadowing practice' }).innerText(), /2\/6 sentences/);
 
   await page.getByRole('tab', { name: 'Dictation', exact: true }).click();
-  await page.getByLabel('Bài chép chính tả', { exact: true }).fill('An edited sentence for the first part.');
-  await page.getByRole('button', { name: 'Kiểm tra', exact: true }).click();
-  await page.getByText('Độ khớp từ: 100%', { exact: true }).waitFor();
+  await page.getByLabel('Your dictation', { exact: true }).fill('An edited sentence for the first part.');
+  await page.getByRole('button', { name: 'Check answer', exact: true }).click();
+  await page.getByText('Word match: 100%', { exact: true }).waitFor();
   await page.getByRole('tab', { name: 'Shadowing', exact: true }).click();
-  assert.match(await page.getByRole('region', { name: 'Luyện shadowing' }).innerText(), /2\/6 câu/);
+  assert.match(await page.getByRole('region', { name: 'Shadowing practice' }).innerText(), /2\/6 sentences/);
   await page.screenshot({ path: 'docs/ai_log/shadowing-desktop.png', fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: 'docs/ai_log/shadowing-mobile.png', fullPage: true });
   const videoBox = await page.locator('.sh-video').boundingBox();
   assert.ok(videoBox && videoBox.x + videoBox.width <= 390, `Mobile video is clipped: ${JSON.stringify(videoBox)}`);
-  await page.getByRole('button', { name: 'Thu lại câu này', exact: true }).scrollIntoViewIfNeeded();
+  await page.getByRole('button', { name: 'Record again', exact: true }).scrollIntoViewIfNeeded();
   const practiceBox = await page.locator('.sh-content').boundingBox();
   assert.ok(practiceBox && practiceBox.x + practiceBox.width <= 390, `Mobile practice is clipped: ${JSON.stringify(practiceBox)}`);
   await page.screenshot({ path: 'docs/ai_log/shadowing-mobile-practice.png', fullPage: true });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   assert.deepEqual(uploads, []);
   assert.deepEqual(errors, []);
-  await page.getByRole('button', { name: 'Về Phòng Học', exact: true }).click();
+  await page.getByRole('link', { name: 'Back to study room', exact: true }).click();
   await page.waitForFunction(() => window.__shURLs.size === 0);
   console.log('PASS: BE editor, 3 parts, real microphone/Blob capture, RAM across parts, retry/BE failure, scoped replay, pause/resume, timing invalidation, screen cleanup, Dictation, responsive layout, no uploads.');
 } catch (error) {

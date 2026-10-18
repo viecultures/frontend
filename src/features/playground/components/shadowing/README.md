@@ -2,9 +2,17 @@
 
 Start Vite with `npm run dev`, open `/playground`, paste a YouTube URL and request the transcript from `/api/v1/ytb-transcript` on `VITE_API_BASE_URL` (or localhost on `VITE_BACKEND_PORT`). Configure these variables using `.env.example`. The video must allow embedding. No hard-coded demo video is requested on mount.
 
+## Workspace entry and preferences
+
+The first screen opens with a YouTube URL field and Open video. Source settings contains transcript language, sentence grouping and music-label filtering. Loading a source opens a preparation summary; Start practice uses the existing draft validation. Invalid drafts or changes removing recorded sentences require the existing editor/acknowledgement before applying.
+
+The navbar keeps Dictation/Shadowing and Practice settings. Settings contains sample speed, loop, auto-pause, local Paper/Dark appearance, Change video, Edit transcript and Reload transcript. These controls reuse the existing player/session hooks. Mobile settings use a bottom sheet and the video can collapse while idle. Returning from the source dialog or cancelling a draft preserves the current lesson/takes.
+
+The learning panels use the shared workspace theme and English labels. Shadowing focuses on the active sentence, Listen and Record, with part/sentence browsers and voice replay behind expandable sections. Dictation puts listening and the answer field first; hints, answers, grading, search and transcript copying retain their existing behavior. Previous/Next sentence navigation is available in both modes. Detailed transcript editing and the player/recorder engines are retained.
+
 ## Workflow
 
-1. Review the BE draft: edit text and start/end in seconds, preview a sentence, add/split/merge/remove sentences.
+1. Open a video, then start directly when its transcript/timing is valid, or choose Edit transcript. Review the draft: edit text and start/end in seconds, preview a sentence, add/split/merge/remove sentences.
 2. Mark sentences that begin a new content part and name each part. Apply when timing is valid. New BE requests are disabled while a draft is open, so edits cannot be overwritten accidentally. Transcript JSON export contains no user recordings.
 3. Record sentences at 1x with the video muted as a visual cue. One committed compressed Blob is retained per sentence. A retry only replaces it after successful completion.
 4. Listen to a part or the entire video with separate original-video and voice volumes. Part playback stops at its boundary; whole-video playback continues across parts.
@@ -27,4 +35,13 @@ All timestamps are absolute on the source video. Part boundaries are derived fro
 - `npm run build`: TypeScript and production bundle.
 - `scripts/test-shadowing-browser.mjs`: run against Vite on port 5186, or set `SHADOWING_TEST_URL`. Requires Playwright and installed Chromium. `SHADOWING_PLAYWRIGHT_MODULE` and `SHADOWING_CHROMIUM_EXECUTABLE` may point to existing installations without adding application dependencies.
 
+
 Browser tests use BE and YouTube fixtures, with real Chromium `MediaRecorder` and a synthetic microphone. They cover multiple parts, retry/backend errors, pause/resume, timing invalidation, mic cleanup when scrolling away, route cleanup, Dictation, mobile layout and absence of uploads. YouTube SDK playback/seek/auto-pause were additionally checked against its official demo video. Safari/iPhone hardware behavior is not yet verified.
+
+
+Workspace/browser checks: `scripts/test-practice-workspace.mjs` uses the same `SHADOWING_TEST_URL`, `SHADOWING_PLAYWRIGHT_MODULE` and `SHADOWING_CHROMIUM_EXECUTABLE` overrides. It covers the empty entry, source preferences, validated start, settings, Paper/Dark, mobile video collapse, editor cancellation, Dictation compatibility and layout at 320/375/768/1440px. API fixture routing follows `/api/**` and does not depend on a fixed backend port.
+
+
+Live practice checks: `scripts/test-practice-live.mjs` requires the backend running at the configured API origin and internet access. It uses the real YouTube SDK, media and transcript endpoint, with Chromium synthetic microphone input only. It runs at 1440/375px, tests Start practice, adjacent/repeated sentence boundaries, Dictation exact matching, automatic recording completion, native take playback, take preservation across modes, part/full replay, pause/resume and microphone cleanup. The default official YouTube demo (`M7lc1UVf-VE`) uses SENTENCE grouping (235 sentences) to stay within the existing 300-sentence limit; `SHADOWING_VIDEO_ID` can choose another embeddable video. It does not measure pronunciation or prove source-caption/audio alignment. Screenshots are under ignored `docs/ai_log/practice-live/`.
+
+`scripts/test-player-recovery-browser.mjs` uses deterministic API/player fixtures to reproduce YouTube error/autoplay-blocked events. Failed players disable practice playback/recording; a successful manual Play clears the error and restores readiness. This complements the live media check. Both scripts accept the existing Playwright/Chromium path and server URL environment overrides.

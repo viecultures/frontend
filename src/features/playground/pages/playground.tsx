@@ -84,7 +84,7 @@ export const PlaygroundPage: React.FC = () => {
     <LiveAPIProvider activeView={currentScreenIndex === 1 ? 'chat' : currentScreenIndex === 2 ? 'immersive' : null}>
     <div className="relative w-full h-screen overflow-hidden bg-[#FBF7EE] dark:bg-[#0b1a17]">
       {/* Mobile / Tablet Quick Exit to Home */}
-      <div className="xl:hidden fixed top-3 right-3 z-50">
+      {currentScreenIndex !== 0 && <div className="xl:hidden fixed top-3 right-3 z-50">
         <button
           onClick={() => navigate(PATHS.home)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E2925]/90 backdrop-blur-md border border-[#D4AF37]/40 text-[#D4AF37] hover:text-white text-xs font-semibold shadow-lg cursor-pointer"
@@ -94,7 +94,7 @@ export const PlaygroundPage: React.FC = () => {
           <Home className="w-3.5 h-3.5" />
           <span>Về Phòng Học</span>
         </button>
-      </div>
+      </div>}
 
       {/* Floating Sidebar Navigation */}
       <PlaygroundSidebarNav

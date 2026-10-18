@@ -16,14 +16,14 @@ export function useTranscriptSource() {
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; ++generation.current; }; }, []);
   const load = useCallback(async (url: string, language: string, mode: TranscriptMode, clean: boolean): Promise<YtbTranscriptData | null> => {
     const videoId = extractYouTubeId(url);
-    if (!videoId) { setError('Nhập link YouTube hoặc video ID hợp lệ.'); return null; }
+    if (!videoId) { setError('Enter a valid YouTube URL or video ID.'); return null; }
     const request = ++generation.current; setLoading(true); setError(null);
     const result = await dictationApiService.fetchYtbTranscript(url, language, mode, clean);
     if (!mounted.current || request !== generation.current) return null;
     setLoading(false);
     const data = result.data?.success ? result.data.data : null;
     if (!data || !transcriptSchema.safeParse(data).success || data.videoId !== videoId) {
-      setError(result.error || 'Transcript BE không hợp lệ hoặc không khớp video. Kiểm tra lời và timing ở BE rồi thử lại.'); return null;
+      setError(result.error || 'The transcript is invalid or does not match this video. Check its sentences and timing, then try again.'); return null;
     }
     return data;
   }, []);

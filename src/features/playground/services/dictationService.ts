@@ -218,36 +218,31 @@ export class DictationApiService {
     mode: 'SHADOWING' | 'SENTENCE' | 'COMMA' | 'RAW' = 'SHADOWING',
     clean = true
   ): Promise<{ data: YtbTranscriptResponse | null; error: string | null }> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
-      const params = new URLSearchParams({
-        videoUrl,
-        lang,
-        mode,
-        clean: String(clean)
-      });
-
-      const endpoint = `${this.backendUrl}/api/v1/ytb-transcript?${params.toString()}`;
+      const params = new URLSearchParams({ videoUrl, lang, mode, clean: String(clean) });
+      const endpoint = `${this.backendUrl.replace(/\/$/, '')}/api/v1/ytb-transcript?${params.toString()}`;
       const res = await fetch(endpoint, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' },
-        signal: controller.signal
+        method: 'GET', headers: { Accept: 'application/json' }, signal: controller.signal,
       });
-      clearTimeout(timeoutId);
-
-      if (res.ok) {
-        const json: YtbTranscriptResponse = await res.json();
-        return { data: json, error: null };
-      } else {
-        const errText = await res.text();
-        return { data: null, error: `Lỗi từ Backend (HTTP ${res.status}): ${errText || res.statusText}` };
+      if (!res.ok) {
+        const message = res.status === 404
+          ? 'The transcript service was not found (HTTP 404). Check the backend API address and route.'
+          : `The transcript service returned HTTP ${res.status}. Please try again or check the available captions.`;
+        return { data: null, error: message };
       }
-    } catch (err: any) {
-      return {
-        data: null,
-        error: `Không thể kết nối tới ${this.backendUrl}/api/v1/ytb-transcript. Vui lòng đảm bảo backend đang hoạt động và đã bật CORS.`
-      };
+      if (!res.headers.get('content-type')?.includes('application/json')) {
+        return { data: null, error: 'The transcript request reached a web page instead of the API. Check the backend API address.' };
+      }
+      const json: YtbTranscriptResponse = await res.json();
+      return { data: json, error: null };
+    } catch (error: unknown) {
+      return { data: null, error: error instanceof Error && error.name === 'AbortError'
+        ? 'The transcript request timed out. Please try again.'
+        : 'Unable to reach the transcript service. Check that the backend is running and allows requests from this app.' };
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

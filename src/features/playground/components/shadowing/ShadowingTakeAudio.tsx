@@ -12,5 +12,5 @@ export function ShadowingTakeAudio({ take, active, stopToken, onPlay }: Props) {
     const audio = audioRef.current;
     return () => { audio?.pause(); audio?.removeAttribute('src'); audio?.load(); URL.revokeObjectURL(url); };
   }, [take.blob]);
-  return <audio ref={audioRef} aria-label="Bản thu câu đang chọn" src={url || undefined} onPlay={onPlay} controls className="w-full h-10" />;
+  return <audio ref={audioRef} aria-label="Selected sentence recording" src={url || undefined} onPlay={onPlay} controls className="w-full h-10" />;
 }
