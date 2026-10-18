@@ -3,8 +3,7 @@ import { VOCAB_DATABASE, type VocabItem } from '@/data/readerData';
 import { LESSONS_DATA, type Lesson, type LevelDetail } from '@/data/discoveryData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { resolveDeckCards } from '@/data/flashcardsData';
-
-const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
+import { API_BASE_URL } from '@/config/apiConfig';
 
 export function readerLevelFor(level: string): 'Level 1' | 'Level 2' | 'Level 3' {
   if (level === 'A1' || level === 'A2' || level === 'Level 1') return 'Level 1';
@@ -51,6 +50,20 @@ export interface CatalogResponseData {
   topicCounts: Record<string, number>;
 }
 
+export interface QuizOptionItem {
+  key: string;
+  text: string;
+}
+
+export interface QuizQuestionItem {
+  id?: string;
+  orderIndex: number;
+  question: string;
+  options: QuizOptionItem[];
+  correctKey: string;
+  explanation?: string;
+}
+
 export interface ReaderArticleData {
   id: string;
   topicGroup?: string;
@@ -75,6 +88,7 @@ export interface ReaderArticleData {
   }>;
   vocabularies: VocabItem[];
   vocabMap: Record<string, VocabItem>;
+  questions?: QuizQuestionItem[];
 }
 
 export const readerApiService = {
@@ -145,6 +159,31 @@ export const readerApiService = {
     const defaultImg =
       'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80';
 
+    const mappedQuestions: QuizQuestionItem[] = [];
+    if (post.questions && Array.isArray(post.questions)) {
+      post.questions.forEach((q) => {
+        let parsedOptions: QuizOptionItem[] = [];
+        if (typeof q.options === 'string') {
+          try {
+            parsedOptions = JSON.parse(q.options);
+          } catch {
+            parsedOptions = [];
+          }
+        } else if (Array.isArray(q.options)) {
+          parsedOptions = q.options;
+        }
+
+        mappedQuestions.push({
+          id: q.id,
+          orderIndex: q.orderIndex,
+          question: q.question,
+          options: parsedOptions,
+          correctKey: q.correctKey,
+          explanation: q.explanation,
+        });
+      });
+    }
+
     return {
       id: post.id,
       topicGroup: post.topicGroup,
@@ -170,6 +209,7 @@ export const readerApiService = {
           ],
       vocabularies: mappedVocabs,
       vocabMap,
+      questions: mappedQuestions,
     };
   },
 

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '@/config/apiConfig';
+
 export interface YtbTranscriptSnippet {
   text: string;
   start: number; // in seconds
@@ -43,7 +45,7 @@ export interface ShadowingEvaluationResult {
   feedback: string;
 }
 
-export const DEFAULT_BACKEND_URL = 'http://localhost:8080';
+export const DEFAULT_BACKEND_URL = API_BASE_URL;
 
 // Calculate local diff algorithm when checking text
 export function computeLocalDictationDiff(userText: string, targetText: string): DictationCheckResult {
@@ -244,7 +246,7 @@ export class DictationApiService {
     } catch (err: any) {
       return {
         data: null,
-        error: `Không thể kết nối tới ${this.backendUrl}/api/v1/ytb-transcript. Vui lòng đảm bảo backend đang chạy ở cổng 8080 và đã bật CORS.`
+        error: `Không thể kết nối tới ${this.backendUrl}/api/v1/ytb-transcript. Vui lòng đảm bảo backend đang hoạt động và đã bật CORS.`
       };
     }
   }

@@ -44,7 +44,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
   };
 
   return (
-    <div className="home-classic-header max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 flex items-center justify-between z-10">
+    <div className="home-classic-header max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 flex items-center justify-between relative z-50">
       {/* Brand & Room Badge */}
       <BrandLogo
         size="md"
@@ -55,7 +55,7 @@ export const HomeHeaderNav: React.FC<HomeHeaderNavProps> = ({
       />
 
       {/* Header Icon Quick Links & Profile Dropdown */}
-      <div className="home-classic-header-tools flex items-center gap-2 sm:gap-3 bg-heritage-dark/80 backdrop-blur-md p-1.5 rounded-2xl border border-white/15 shadow-xl">
+      <div className="home-classic-header-tools flex items-center gap-2 sm:gap-3 bg-heritage-dark/80 backdrop-blur-md p-1.5 rounded-2xl border border-white/15 shadow-xl relative z-50">
         <button
           type="button"
           onClick={() => handleActionToast('You have 2 vocabulary reviews today.')}

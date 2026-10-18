@@ -14,11 +14,11 @@ export const PLAYGROUND_SCREENS: PlaygroundScreenConfig[] = [
     id: 'dictation-shadowing',
     number: '01',
     title: 'Video Dictation & Shadowing Hub',
-    subtitle: 'Luyện Nghe Chép Chính Tả & Shadowing Đồng Bộ Video (Backend: localhost:8080)',
+    subtitle: 'Luyện Nghe Chép Chính Tả & Shadowing Đồng Bộ Video (Backend API)',
     category: 'Video & Acoustics Engine',
     status: 'Interactive Prototype',
     iconName: 'Headphones',
-    description: 'Khung video iframe bên trái kết hợp bảng bài làm chép chính tả, thu âm shadowing và kết nối API localhost:8080.'
+    description: 'Khung video iframe bên trái kết hợp bảng bài làm chép chính tả, thu âm shadowing và kết nối Backend API.'
   },
   {
     id: 'vietnam-map-ai',

@@ -1,6 +1,6 @@
 # Playground video shadowing
 
-Start Vite with `npm run dev`, open `/playground`, paste a YouTube URL and request the transcript from the existing `http://localhost:8080/api/v1/ytb-transcript` endpoint. The video must allow embedding. No hard-coded demo video is requested on mount.
+Start Vite with `npm run dev`, open `/playground`, paste a YouTube URL and request the transcript from `/api/v1/ytb-transcript` on `VITE_API_BASE_URL` (or localhost on `VITE_BACKEND_PORT`). Configure these variables using `.env.example`. The video must allow embedding. No hard-coded demo video is requested on mount.
 
 ## Workflow
 

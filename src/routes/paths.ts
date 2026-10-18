@@ -18,6 +18,7 @@ export const PATHS = {
   admin: '/admin',
   pricing: '/pricing',
   checkout: '/pricing/checkout',
+  profile: '/profile',
 } as const;
 
 export type AppPath = (typeof PATHS)[keyof typeof PATHS];
@@ -39,6 +40,9 @@ export const withQuery = (path: string, query: Record<string, QueryValue> = {}):
 export const paths = {
   login: (opts: { redirect?: string } = {}) => withQuery(PATHS.login, opts),
 
+  profile: (opts: { tab?: 'passport' | 'badges' | 'vocab' | 'subscription' } = {}) =>
+    withQuery(PATHS.profile, opts),
+
   reader: (opts: {
     postId?: string;
     story?: string;
@@ -53,3 +57,4 @@ export const paths = {
   playground: (opts: { story?: string; topic?: string; level?: string } = {}) =>
     withQuery(PATHS.playground, opts),
 };
+

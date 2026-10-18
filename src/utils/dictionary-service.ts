@@ -1,5 +1,6 @@
 import type { VocabItem } from '@/data/readerData';
 import { VOCAB_DATABASE, extractSentenceContext } from '@/data/readerData';
+import { API_BASE_URL } from '@/config/apiConfig';
 
 // In-memory cache for ultra-fast instantaneous lookups (0ms on repeat)
 const VOCAB_MEMORY_CACHE = new Map<string, VocabItem>();
@@ -554,6 +555,36 @@ export async function lookupWordInstant(
   }
 
   const lookupPromise = (async (): Promise<VocabItem> => {
+    // 0. Primary: Call Backend On-Demand Dictionary API (Cached & auto-persisted in PostgreSQL DB)
+    try {
+      const apiBase = API_BASE_URL;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 3500);
+      const url = `${apiBase}/api/vocabularies/lookup?word=${encodeURIComponent(cleanWord)}${
+        contextSentence ? `&contextSentence=${encodeURIComponent(contextSentence)}` : ''
+      }`;
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+      if (res.ok) {
+        const beData = await res.json();
+        if (beData && beData.word && beData.viMeaning) {
+          const item: VocabItem = {
+            id: beData.id || lowerWord.replace(/\s+/g, '-'),
+            word: beData.word,
+            pos: beData.pos || 'Từ vựng tiếng Anh',
+            ipa: beData.ipa || `/${lowerWord}/`,
+            viMeaning: beData.viMeaning,
+            enDefinition: beData.enDefinition,
+            contextSentence: beData.contextSentence || contextSentence || `"${cleanWord}" in conversation.`,
+          };
+          VOCAB_MEMORY_CACHE.set(lowerWord, item);
+          return item;
+        }
+      }
+    } catch {
+      // Backend unavailable or timeout -> fallback to browser client-side lookup
+    }
+
     // Multi-word phrase branch
     if (lowerWord.includes(' ')) {
       try {

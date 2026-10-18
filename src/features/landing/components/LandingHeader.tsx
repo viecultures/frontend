@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Menu, X, ArrowUpRight, Sparkles } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { PATHS } from '@/routes/paths';
+import { getStoredUser, getStoredToken } from '@/utils/auth-storage';
 
 interface LandingHeaderProps {
   onNavigate?: (view: string) => void;
@@ -11,7 +12,16 @@ interface LandingHeaderProps {
 
 export const LandingHeader: React.FC<LandingHeaderProps> = ({ onNavigate, onScrollToSegment, activeSegment = 'hero' }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser() || !!getStoredToken());
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setIsLoggedIn(!!getStoredUser() || !!getStoredToken());
+    };
+    window.addEventListener('auth:change', handleAuthChange);
+    return () => window.removeEventListener('auth:change', handleAuthChange);
+  }, []);
   const navLinks = [
     { name: 'Khám phá', segment: 'featured-articles' },
     { name: 'Chủ đề', segment: 'topics' },
@@ -56,7 +66,15 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onNavigate, onScro
         </nav>
         <div className="landing-header-actions">
           <button type="button" className="landing-playground" onClick={() => navigate(PATHS.playground)} aria-label="Mở AI Playground" title="AI Playground"><Sparkles size={18} aria-hidden="true" /></button>
-          <button type="button" className="landing-login" onClick={() => navigate(PATHS.login)}>Đăng nhập</button>
+          {isLoggedIn ? (
+            <button type="button" className="landing-login" onClick={() => navigate(PATHS.home)}>
+              Vào phòng học
+            </button>
+          ) : (
+            <button type="button" className="landing-login" onClick={() => navigate(PATHS.login)}>
+              Đăng nhập
+            </button>
+          )}
           <button type="button" className="landing-button landing-button-primary landing-header-cta" onClick={() => navigate(PATHS.discovery)}>
             Bắt đầu học <ArrowUpRight size={16} aria-hidden="true" />
           </button>
@@ -71,7 +89,11 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onNavigate, onScro
             <button key={link.segment} type="button" onClick={() => scroll(link.segment)} aria-current={activeSegment === link.segment ? 'location' : undefined}>{link.name}<ArrowUpRight size={16} /></button>
           ))}
           <button type="button" onClick={() => navigate(PATHS.playground)}><span className="flex items-center gap-2"><Sparkles size={16} /> AI Playground</span><ArrowUpRight size={16} /></button>
-          <button type="button" onClick={() => navigate(PATHS.login)}>Đăng nhập<ArrowUpRight size={16} /></button>
+          {isLoggedIn ? (
+            <button type="button" onClick={() => navigate(PATHS.home)}>Vào phòng học<ArrowUpRight size={16} /></button>
+          ) : (
+            <button type="button" onClick={() => navigate(PATHS.login)}>Đăng nhập<ArrowUpRight size={16} /></button>
+          )}
           <button type="button" className="landing-button landing-button-primary" onClick={() => navigate(PATHS.discovery)}>Bắt đầu học miễn phí<ArrowUpRight size={16} /></button>
         </nav>
       )}
