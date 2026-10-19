@@ -1,0 +1,46 @@
+/* Keep the CMS palette and depth; share Reader typography and geometry. */
+.admin-ui, .admin-dialog { font-family: var(--font-sans); font-weight: 400; }
+.admin-ui { min-width: 0; }
+:is(.admin-ui, .admin-dialog) :is(button, input, textarea, select) { font-family: inherit; }
+:is(.admin-ui, .admin-dialog) :is(button, input, textarea, select):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+:is(.admin-ui, .admin-dialog) .bg-heritage-green button:focus-visible { outline-color: var(--color-antique-bright); }
+:is(.admin-ui, .admin-dialog) button { min-height: 44px; min-width: 44px; font-size: 14px; font-weight: 500; line-height: 1.5; cursor: pointer; }
+:is(.admin-ui, .admin-dialog) button:disabled { cursor: not-allowed; }
+:is(.admin-ui, .admin-dialog) :is(input:not([type='checkbox']):not([type='radio']), select, textarea) { min-height: 44px; min-width: 0; font-size: 15px; font-weight: 400; line-height: 1.65; }
+:is(.admin-ui, .admin-dialog) :is(label, th) { font-size: 14px; font-weight: 500; line-height: 1.5; }
+:is(.admin-ui, .admin-dialog) :is(.font-bold, .font-extrabold, .font-semibold) { font-weight: 500; }
+:is(.admin-ui, .admin-dialog) .font-light { font-weight: 400; }
+.admin-ui h1 { font-size: clamp(26px, 2.5vw, 34px); line-height: 1.35; font-weight: 500; letter-spacing: -.025em; }
+:is(.admin-ui, .admin-dialog) :is(h2, h3) { font-weight: 500; line-height: 1.4; letter-spacing: -.015em; }
+:is(.admin-ui, .admin-dialog) p { line-height: 1.7; }
+:is(.admin-ui, .admin-dialog) :is([class*='text-[9px]'], [class*='text-[10px]'], [class*='text-[11px]']):not(button):not(label):not(th) { font-size: 12px; line-height: 1.6; }
+:is(.admin-ui, .admin-dialog) :is(.rounded-3xl, .rounded-2xl) { border-radius: 16px; }
+:is(.admin-ui, .admin-dialog) :is(button, input, select, textarea, .rounded-xl) { border-radius: 12px; }
+:is(.admin-ui, .admin-dialog) table { font-size: 14px; line-height: 1.6; }
+:is(.admin-ui, .admin-dialog) thead { text-transform: none; letter-spacing: normal; }
+:is(.admin-ui, .admin-dialog) th { white-space: nowrap; }
+:is(.admin-ui, .admin-dialog) td { vertical-align: middle; }
+:is(.admin-ui, .admin-dialog) td button { display: inline-flex; align-items: center; justify-content: center; }
+:is(.admin-ui, .admin-dialog) .text-antique-gold:not(svg) { color: var(--color-accent-ink); }
+:is(.admin-ui, .admin-dialog) .bg-heritage-green .text-antique-gold { color: var(--color-antique-bright); }
+.admin-dialog .font-serif { font-family: var(--font-sans); font-size: 16px; line-height: 1.8; }
+.admin-dialog [class*='max-h-'] { max-height: calc(100dvh - 48px); }
+.admin-dialog [class*='max-w-md'] { margin-inline: auto; }
+.admin-dialog [class*='overflow-x-auto'] > button { flex-shrink: 0; white-space: nowrap; }
+.admin-dialog form > :last-child { flex-wrap: wrap; gap: 16px; }
+.admin-dialog form > :last-child > div { flex-wrap: wrap; }
+.admin-ui .admin-search { display: flex; align-items: center; gap: 8px; }
+.admin-ui .admin-search > input { padding-left: 40px; }
+.admin-ui .admin-search > button { flex-shrink: 0; }
+@media (max-width: 639px) {
+  .admin-ui { padding: 20px 16px; }
+  .admin-ui [class*='grid-cols-2'] { grid-template-columns: minmax(0, 1fr); }
+  .admin-ui [class*='md:flex-row'] > div:has(> select) { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .admin-ui select { width: 100%; }
+  .admin-dialog :is(.p-6, .px-6) { padding-inline: 16px; }
+  .admin-dialog [class*='grid-cols-3'] { grid-template-columns: minmax(0, 1fr); }
+  .admin-dialog :is(input, select, textarea) { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.admin-ui, .admin-dialog) *, :is(.admin-ui, .admin-dialog) *::before, :is(.admin-ui, .admin-dialog) *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

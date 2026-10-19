@@ -1,6 +1,7 @@
 import { getStoredToken, getStoredUser, setStoredUser, type AppUser } from '@/utils/auth-storage';
 import type { UserProfileData } from '../types';
 import { API_BASE_URL } from '@/config/apiConfig';
+import { isLocalAuthMode } from '@/config/authConfig';
 
 export interface BackendUserInfo {
   id: string;
@@ -27,6 +28,7 @@ export const profileApiService = {
    * Nếu server offline hoặc token không có/hết hạn -> trả về null để client dùng LocalStorage mượt mà.
    */
   async fetchCurrentUser(): Promise<BackendUserInfo | null> {
+    if (isLocalAuthMode) return null;
     const token = getStoredToken();
     if (!token) {
       return null;

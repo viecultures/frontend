@@ -58,13 +58,18 @@ export const RequireRole: React.FC<RequireRoleProps> = ({
 };
 
 /**
- * Restricts access to guest users only. If logged in, redirects to /home.
+ * Restricts access to guests, preserving a local return URL after authentication.
  */
 export const GuestOnly: React.FC<GuardProps> = ({ children }) => {
+  const location = useLocation();
   const isLoggedIn = !!getStoredUser() || !!getStoredToken();
 
   if (isLoggedIn) {
-    return <Navigate to={PATHS.home} replace />;
+    const redirect = new URLSearchParams(location.search).get('redirect');
+    const destination = redirect?.startsWith('/') && !redirect.startsWith('//')
+      ? redirect
+      : PATHS.home;
+    return <Navigate to={destination} replace />;
   }
 
   return children;

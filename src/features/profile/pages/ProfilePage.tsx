@@ -1,3 +1,4 @@
+import '../profile-ui.css';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Award, BookMarked, Crown, Sparkles, Check, ArrowLeft } from 'lucide-react';
@@ -51,7 +52,7 @@ export const ProfilePage: React.FC = () => {
   // Sync activeTab with URL search params
   useEffect(() => {
     const currentParam = searchParams.get('tab') as TabKey;
-    if (currentParam && currentParam !== activeTab) {
+    if (currentParam && ['passport', 'badges', 'vocab', 'subscription'].includes(currentParam) && currentParam !== activeTab) {
       setActiveTab(currentParam);
     }
   }, [searchParams]);
@@ -111,40 +112,40 @@ export const ProfilePage: React.FC = () => {
   const handleSaveProfile = (updates: Partial<UserProfileData>) => {
     const updated = profileService.updateProfileData(updates);
     setProfile(updated);
-    showToast('Đã lưu thông tin hồ sơ thành công!');
+    showToast('Profile saved.');
   };
 
   const unlockedSealsCount = seals.filter((s) => s.isUnlocked).length;
 
   return (
-    <div className="w-full min-h-[85vh] text-[#3F5550] dark:text-[#FBF7EE] font-sans pb-16">
+    <div className="profile-ui w-full min-h-[85vh] text-[#3F5550] dark:text-warm-ivory font-sans pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 space-y-6 sm:space-y-8">
         {/* Back navigation & Page breadcrumb */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => navigate(PATHS.home)}
-            className="inline-flex items-center gap-2 text-xs font-bold text-[#1E4B43] dark:text-[#D9B76A] hover:underline cursor-pointer"
+            className="inline-flex items-center gap-2 text-xs font-bold text-heritage-green dark:text-antique-gold hover:underline cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Quay lại Phòng học</span>
+            <ArrowLeft aria-hidden="true" className="w-4 h-4" />
+            <span>Back to study room</span>
           </button>
 
           <div className="flex items-center gap-3">
             {isServerConnected === true && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Đã kết nối API máy chủ</span>
+                <span>Profile synced</span>
               </span>
             )}
             {isServerConnected === false && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-stone-200 dark:bg-white/10 text-stone-600 dark:text-stone-400">
-                <span>Chế độ lưu ngoại tuyến (Offline)</span>
+                <span>Saved on this browser</span>
               </span>
             )}
 
-            <span className="text-xs font-serif font-bold text-[#D9B76A] tracking-wider uppercase hidden sm:inline">
-              ❖ HỒ SƠ & THÀNH TỰU HỌC VIÊN ❖
+            <span className="text-xs font-serif font-bold text-antique-gold tracking-wider uppercase hidden sm:inline">
+              Profile & achievements
             </span>
           </div>
         </div>
@@ -152,8 +153,8 @@ export const ProfilePage: React.FC = () => {
 
         {/* Toast notification */}
         {toastMessage && (
-          <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-[#1E4B43] text-[#FBF7EE] shadow-2xl border border-[#D9B76A] flex items-center gap-2 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-2">
-            <Check className="w-4 h-4 text-[#D9B76A]" />
+          <div role="status" className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green text-warm-ivory shadow-2xl border border-antique-gold flex items-center gap-2 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-2">
+            <Check aria-hidden="true" className="w-4 h-4 text-antique-gold" />
             <span>{toastMessage}</span>
           </div>
         )}
@@ -172,57 +173,61 @@ export const ProfilePage: React.FC = () => {
         />
 
         {/* 3. Main Navigation Tab Bar */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-[#D9B76A]/30 pb-2">
+        <div className="profile-tabs flex flex-wrap items-center gap-2 border-b border-antique-gold/30 pb-2">
           <button
             type="button"
+            aria-pressed={activeTab === 'passport'}
             onClick={() => handleSelectTab('passport')}
             className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'passport'
-                ? 'bg-[#1E4B43] text-[#FBF7EE] shadow-md border border-[#D9B76A]/40'
-                : 'text-stone-600 dark:text-stone-300 hover:bg-[#F6EEDC] dark:hover:bg-white/5'
+                ? 'bg-heritage-green text-warm-ivory shadow-md border border-antique-gold/40'
+                : 'text-stone-600 dark:text-stone-300 hover:bg-rice-paper dark:hover:bg-white/5'
             }`}
           >
-            <Award className="w-4 h-4 text-[#D9B76A]" />
-            <span>Hộ Chiếu Mộc Son ({unlockedSealsCount}/{seals.length})</span>
+            <Award aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+            <span>Heritage passport ({unlockedSealsCount}/{seals.length})</span>
           </button>
 
           <button
             type="button"
+            aria-pressed={activeTab === 'badges'}
             onClick={() => handleSelectTab('badges')}
             className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'badges'
-                ? 'bg-[#1E4B43] text-[#FBF7EE] shadow-md border border-[#D9B76A]/40'
-                : 'text-stone-600 dark:text-stone-300 hover:bg-[#F6EEDC] dark:hover:bg-white/5'
+                ? 'bg-heritage-green text-warm-ivory shadow-md border border-antique-gold/40'
+                : 'text-stone-600 dark:text-stone-300 hover:bg-rice-paper dark:hover:bg-white/5'
             }`}
           >
-            <Sparkles className="w-4 h-4 text-[#D9B76A]" />
-            <span>Huy Hiệu & Cột Mốc ({badges.filter((b) => b.isUnlocked).length}/{badges.length})</span>
+            <Sparkles aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+            <span>Badges & milestones ({badges.filter((b) => b.isUnlocked).length}/{badges.length})</span>
           </button>
 
           <button
             type="button"
+            aria-pressed={activeTab === 'vocab'}
             onClick={() => handleSelectTab('vocab')}
             className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'vocab'
-                ? 'bg-[#1E4B43] text-[#FBF7EE] shadow-md border border-[#D9B76A]/40'
-                : 'text-stone-600 dark:text-stone-300 hover:bg-[#F6EEDC] dark:hover:bg-white/5'
+                ? 'bg-heritage-green text-warm-ivory shadow-md border border-antique-gold/40'
+                : 'text-stone-600 dark:text-stone-300 hover:bg-rice-paper dark:hover:bg-white/5'
             }`}
           >
-            <BookMarked className="w-4 h-4 text-[#D9B76A]" />
-            <span>Sổ Tay Từ Vựng ({profile.totalVocabMastered + profile.totalVocabLearning})</span>
+            <BookMarked aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+            <span>Vocabulary notebook ({profile.totalVocabMastered + profile.totalVocabLearning})</span>
           </button>
 
           <button
             type="button"
+            aria-pressed={activeTab === 'subscription'}
             onClick={() => handleSelectTab('subscription')}
             className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'subscription'
-                ? 'bg-[#1E4B43] text-[#FBF7EE] shadow-md border border-[#D9B76A]/40'
-                : 'text-stone-600 dark:text-stone-300 hover:bg-[#F6EEDC] dark:hover:bg-white/5'
+                ? 'bg-heritage-green text-warm-ivory shadow-md border border-antique-gold/40'
+                : 'text-stone-600 dark:text-stone-300 hover:bg-rice-paper dark:hover:bg-white/5'
             }`}
           >
-            <Crown className="w-4 h-4 text-[#D9B76A]" />
-            <span>Gói Hội Viên & Cài Đặt</span>
+            <Crown aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+            <span>Membership & settings</span>
           </button>
         </div>
 

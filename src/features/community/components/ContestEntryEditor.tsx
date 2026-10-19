@@ -31,21 +31,21 @@ export function ContestEntryEditor({
   const appliedCount = Object.values(selectedVocab).filter(Boolean).length;
 
   return (
-    <div className="mb-10 p-6 sm:p-10 rounded-3xl bg-rice-paper border-2 border-antique-gold/60 shadow-xl space-y-6 animate-in fade-in duration-300">
+    <div id="contest-editor" className="community-editor mb-10 p-6 sm:p-10 rounded-3xl bg-rice-paper border-2 border-antique-gold/60 shadow-xl space-y-6 animate-in fade-in duration-300">
       <div className="flex items-center justify-between pb-4 border-b border-heritage-green/12">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
             <Coins className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Hoàn thành bài viết nhận ngay +100 Xu Văn Hóa</span>
+            <span>Complete an entry to receive +100 cultural coins</span>
           </span>
           <h2 className="font-serif text-2xl font-bold text-heritage-green mt-0.5">
-            Gửi Bài Viết Thử Thách Chủ Đề Tuần
+            Submit your weekly challenge entry
           </h2>
         </div>
         <button
           onClick={onClose}
           className="p-1.5 rounded-full hover:bg-mist-cloud text-heritage-green transition-colors cursor-pointer focus-ring"
-          aria-label="Đóng form gửi bài"
+          aria-label="Close contest editor"
         >
           <X className="w-5 h-5" />
         </button>
@@ -56,25 +56,26 @@ export function ContestEntryEditor({
         <div>
           <label className="block text-xs font-bold text-heritage-green uppercase mb-1.5 flex items-center gap-1.5">
             <Landmark className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Góc nhìn bài viết:</span>
+            <span>Writing perspective</span>
           </label>
-          <select className="w-full px-4 py-2.5 rounded-xl bg-surface border border-heritage-green/15 text-xs font-bold text-heritage-green focus:outline-none focus:ring-2 focus:ring-antique-gold/40">
-            <option>Cảm Nhận Kiến Trúc & Di Sản (Architecture & Heritage)</option>
-            <option>Kỷ Niệm Chuyến Đi & Ảnh Đẹp (Travel Photo Story)</option>
-            <option>Lịch Sử & Lễ Hội Cố Đô (History & Customs)</option>
+          <select aria-label="Writing perspective" className="w-full px-4 py-2.5 rounded-xl bg-surface border border-heritage-green/15 text-xs font-bold text-heritage-green focus:outline-none focus:ring-2 focus:ring-antique-gold/40">
+            <option>Architecture & heritage</option>
+            <option>Travel photo story</option>
+            <option>History & customs</option>
           </select>
         </div>
 
         <div>
           <label className="block text-xs font-bold text-heritage-green uppercase mb-1.5 flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Tiêu đề bài viết:</span>
+            <span>Entry title</span>
           </label>
           <input
+            aria-label="Entry title"
             type="text"
             value={entryTitle}
             onChange={(e) => onChangeTitle(e.target.value)}
-            placeholder="Nhập tiêu đề cho bài dự thi của bạn..."
+            placeholder="Enter a title for your challenge entry…"
             className="w-full px-4 py-2.5 rounded-xl bg-surface border border-heritage-green/15 text-xs font-bold text-heritage-green focus:outline-none focus:ring-2 focus:ring-antique-gold/40"
           />
         </div>
@@ -85,10 +86,10 @@ export function ContestEntryEditor({
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Đánh dấu từ vựng đưa vào bài (Ứng dụng 3+ từ để nhận Xu):</span>
+            <span>Select the vocabulary used in your entry (use 3+ words to earn coins):</span>
           </span>
           <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-            Đã tích hợp: {appliedCount}/3 từ
+            Selected: {appliedCount}/3 words
           </span>
         </div>
         <div className="flex flex-wrap gap-4 text-xs font-bold text-heritage-green pt-1">
@@ -111,35 +112,36 @@ export function ContestEntryEditor({
       {/* Textarea */}
       <div className="space-y-1.5">
         <textarea
+          aria-label="Contest entry text"
           value={entryText}
           onChange={(e) => onChangeText(e.target.value)}
-          placeholder="Chia sẻ góc nhìn hoặc câu chuyện của bạn bằng tiếng Anh (100 - 300 từ)..."
+          placeholder="Share your perspective or story in English (100–300 words)…"
           className="w-full h-40 p-4 rounded-2xl bg-surface border border-heritage-green/15 text-sm text-heritage-green placeholder:text-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-antique-gold/40 leading-relaxed font-sans"
         />
         <div className="flex items-center justify-between text-xs text-text-secondary px-1">
-          <span>Khuyến khích diễn đạt tự nhiên theo phong cách bài đọc di sản.</span>
-          <span className="font-semibold">{wordCount} từ</span>
+          <span>Express yourself naturally, inspired by the heritage stories you read.</span>
+          <span className="font-semibold">{wordCount} words</span>
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex items-center justify-between pt-2 border-t border-heritage-green/10">
         <span className="text-xs text-text-secondary italic hidden sm:inline">
-          Không áp lực ngữ pháp • Tự tin truyền tải tình yêu văn hóa
+          No grammar pressure · Share your love of culture
         </span>
         <div className="flex items-center gap-3 ml-auto">
           <button
             onClick={onClose}
             className="px-5 py-2.5 rounded-full text-xs font-bold text-heritage-green bg-surface border border-line hover:bg-mist-cloud cursor-pointer focus-ring"
           >
-            Hủy
+            Cancel
           </button>
           <button
             onClick={onSubmit}
             className="px-6 py-2.5 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm border border-antique-gold/60 inline-flex items-center gap-2 focus-ring cursor-pointer"
           >
             <Send className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Nộp Bài Dự Thi (+100 Xu)</span>
+            <span>Submit entry (+100 coins)</span>
           </button>
         </div>
       </div>

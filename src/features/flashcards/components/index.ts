@@ -12,3 +12,8 @@ export { DictionaryCategoryFilter } from "./DictionaryCategoryFilter";
 export { DictionaryLibraryGrid } from "./DictionaryLibraryGrid";
 export { DictionaryInspectorModal } from "./DictionaryInspectorModal";
 export { CreateDeckModal } from "./CreateDeckModal";
+
+export { VocabularySidebar } from "./VocabularySidebar";
+export { VocabularyMobileNav } from "./VocabularyMobileNav";
+export { AddWordModal } from "./AddWordModal";
+export { VocabularyDeckCard } from "./VocabularyDeckCard";

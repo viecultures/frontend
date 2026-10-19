@@ -13,11 +13,11 @@ export function useLiveApi({ apiKey, activeView }: { apiKey: string; activeView:
     // Defer missing-key validation to a user action so the map remains usable offline.
     const client = new GenAILiveClient(apiKey || 'missing-key', model);
     const audio = new ConversationAudio(state => controller.updateAudio(state));
-    const controller = new SessionController({
+    const controller: SessionController = new SessionController({
       client, audio,
       configuration: () => {
         if (!apiKey) throw new Error('Vui lòng nhập Gemini API key trong Cài đặt để bắt đầu.');
-        return buildSessionConfiguration(useSettings.getState(), useTools.getState().tools);
+        return buildSessionConfiguration(useSettings.getState(), useTools.getState().tools, controller.getSnapshot().activeView);
       },
       toolPolicy: () => ({
         allowMapTools: useSettings.getState().mapContextMode !== 'off',

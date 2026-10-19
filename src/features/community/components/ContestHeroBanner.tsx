@@ -33,7 +33,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
   }, []);
 
   return (
-    <section className="mb-10 rounded-3xl bg-surface border border-antique-gold/40 shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden transition-all">
+    <section className="community-contest-hero mb-10 rounded-3xl bg-surface border border-antique-gold/40 shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden transition-all">
       <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
         {/* LEFT COLUMN (40% Width): Authentic Hue Imperial Photography */}
         <div className="lg:col-span-5 relative min-h-[260px] lg:min-h-[360px] bg-heritage-green overflow-hidden group">
@@ -52,7 +52,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
           <div className="absolute top-5 left-5 z-10">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-heritage-dark/90 text-antique-gold text-xs font-bold uppercase tracking-wider backdrop-blur-md border border-antique-gold/50 shadow-md">
               <Trophy className="w-3.5 h-3.5 text-antique-rich fill-current" />
-              <span>Thử Thách Tuần 14</span>
+              <span>Week 14 challenge</span>
             </span>
           </div>
 
@@ -60,7 +60,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
           <div className="absolute bottom-5 left-5 z-10">
             <span className="text-xs font-serif font-bold text-warm-ivory bg-heritage-dark/80 px-3.5 py-1.5 rounded-full backdrop-blur-md border border-antique-gold/30 shadow-sm flex items-center gap-1.5">
               <Landmark className="w-3.5 h-3.5 text-antique-gold" />
-              <span>Cố Đô Huế • Ngọ Môn Hoàng Thành</span>
+              <span>Imperial Hue · Ngọ Môn Gate</span>
             </span>
           </div>
         </div>
@@ -71,14 +71,14 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-line">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-antique-gold/15 text-heritage-green text-xs font-bold border border-antique-gold/30 w-fit">
               <Landmark className="w-3.5 h-3.5 text-antique-rich" />
-              <span>Chủ Đề Di Sản Tiêu Điểm</span>
+              <span>Heritage spotlight</span>
             </span>
 
             {/* HIGH-CONTRAST GOLD/DARK COUNTDOWN BADGE (Nổi bật, không chìm) */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-heritage-dark text-warm-ivory border-2 border-antique-gold/60 shadow-md w-fit self-start sm:self-auto">
+            <div className="community-countdown inline-flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-heritage-dark text-warm-ivory border-2 border-antique-gold/60 shadow-md w-fit self-start sm:self-auto">
               <div className="flex items-center gap-1.5 text-xs font-bold text-antique-gold">
                 <Clock className="w-3.5 h-3.5 text-antique-gold" />
-                <span className="uppercase tracking-wider text-[11px]">Hạn nộp:</span>
+                <span className="uppercase tracking-wider text-[11px]">Closes in:</span>
               </div>
 
               {/* Digital Bold Timer Numbers */}
@@ -109,7 +109,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
           {/* Heading */}
           <div className="space-y-1">
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-heritage-green leading-snug">
-              Kiến Trúc & Di Sản Cố Đô Huế
+              Imperial Hue architecture & heritage
             </h2>
             <p className="text-xs sm:text-sm text-text-secondary font-sans font-medium">
               Imperial Hue Architecture & Heritage Essay Challenge
@@ -119,13 +119,13 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
           {/* Prompt & Required Vocab Box */}
           <div className="p-4 rounded-2xl bg-rice-paper/70 border border-line space-y-2.5">
             <p className="text-xs sm:text-sm text-text-body leading-relaxed">
-              Viết bài chia sẻ ngắn (100–300 từ) bằng tiếng Anh về nét đẹp kiến trúc hoặc kỷ niệm của bạn tại Cố Đô Huế. Ứng dụng ít nhất 3 từ vựng di sản:
+              Write a short reflection (100–300 words) in English about the architecture or your memories of Imperial Hue. Use at least three heritage vocabulary words:
             </p>
 
             <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
               <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-antique-gold" />
-                <span>Từ khóa gợi ý:</span>
+                <span>Suggested vocabulary:</span>
               </span>
               {["architectural", "intangible", "geomancy", "fortress"].map((word) => (
                 <span
@@ -144,15 +144,15 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
             <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
               <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-800 border border-emerald-500/20 flex items-center gap-1.5">
                 <Coins className="w-3.5 h-3.5 text-antique-gold" />
-                <span>+100 Xu tham gia</span>
+                <span>+100 coins for entering</span>
               </span>
               <span className="px-3 py-1 rounded-full bg-antique-gold/20 text-heritage-green border border-antique-gold/40 flex items-center gap-1.5">
                 <Trophy className="w-3.5 h-3.5 text-antique-rich" />
-                <span>+500 Xu Top 1</span>
+                <span>+500 coins · 1st place</span>
               </span>
               <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 flex items-center gap-1.5">
                 <Medal className="w-3.5 h-3.5 text-rose-600" />
-                <span>Huy hiệu Sứ Giả</span>
+                <span>Ambassador badge</span>
               </span>
             </div>
 
@@ -163,7 +163,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
                 className="px-6 py-3 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm border border-antique-gold/60 inline-flex items-center gap-2 transition-all focus-ring cursor-pointer"
               >
                 <PenTool className="w-4 h-4 text-antique-gold" />
-                <span>Viết Bài Dự Thi (+100 Xu)</span>
+                <span>Write an entry (+100 coins)</span>
               </button>
 
               <a
@@ -171,7 +171,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
                 className="px-5 py-3 rounded-full text-xs font-semibold text-heritage-green bg-rice-paper hover:bg-mist-cloud border border-line inline-flex items-center gap-1.5 transition-all focus-ring"
               >
                 <ShoppingBag className="w-3.5 h-3.5 text-antique-gold" />
-                <span>Cửa Hàng Đổi Quà</span>
+                <span>Reward shop</span>
               </a>
             </div>
           </div>

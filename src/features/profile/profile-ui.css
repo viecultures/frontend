@@ -1,0 +1,45 @@
+/* Match the Reader and account surfaces without changing shared navigation. */
+.profile-ui, .profile-dialog { font-family: var(--font-sans); font-weight: 400; color: var(--color-ink-soft); }
+:is(.profile-ui, .profile-dialog) :is(button, input, select, textarea) { font-family: inherit; }
+:is(.profile-ui, .profile-dialog) .font-serif { font-family: var(--font-sans); }
+:is(.profile-ui, .profile-dialog) :is(.font-bold, .font-extrabold, .font-black, .font-semibold) { font-weight: 500; }
+:is(.profile-ui, .profile-dialog) :is(h1, h2, h3, h4) { font-weight: 500; letter-spacing: -.02em; line-height: 1.4; }
+.profile-ui h1 { font-size: clamp(26px, 2.5vw, 34px); }
+:is(.profile-ui, .profile-dialog) p { line-height: 1.7; }
+:is(.profile-ui, .profile-dialog) :is(.rounded-3xl, .rounded-2xl) { border-radius: 16px; }
+:is(.profile-ui, .profile-dialog) .rounded-xl { border-radius: 12px; }
+:is(.profile-ui, .profile-dialog) :is(button, a[class*='inline-flex']) { min-height: 44px; min-width: 44px; font-size: 14px; font-weight: 500; line-height: 1.5; cursor: pointer; }
+:is(.profile-ui, .profile-dialog) button:not(.rounded-full) { border-radius: 12px; }
+:is(.profile-ui, .profile-dialog) :is(input, select, textarea) { min-height: 44px; min-width: 0; border-radius: 12px; font-size: 15px; font-weight: 400; line-height: 1.65; }
+:is(.profile-ui, .profile-dialog) :is(button, a, input, select, textarea):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+.profile-ui .bg-heritage-green :is(button, a):focus-visible { outline-color: var(--color-antique-bright); }
+:is(.profile-ui, .profile-dialog) :is([class*='text-[8px]'], [class*='text-[9px]'], [class*='text-[10px]'], [class*='text-[11px]']):not(button):not(label) { font-size: 12px; line-height: 1.6; }
+:is(.profile-ui, .profile-dialog) label { font-size: 14px; font-weight: 500; text-transform: none; letter-spacing: normal; }
+:is(.profile-ui, .profile-dialog) :is(.text-stone-400, .text-stone-500) { color: var(--color-ink-faint); }
+:is(.profile-ui, .profile-dialog) .text-antique-gold:not(svg) { color: var(--color-accent-ink); }
+.profile-ui :is(.bg-heritage-green.text-antique-gold, .bg-heritage-green .text-antique-gold) { color: var(--color-antique-bright); }
+.profile-ui .bg-heritage-green .text-stone-300 { color: #d6e2dd; }
+.profile-ui :is(.font-mono:not(code), .uppercase:not(.profile-stamp-label)) { font-family: var(--font-sans); letter-spacing: normal; text-transform: none; }
+.profile-ui .profile-stamp-button { border-radius: 16px; }
+.profile-ui .profile-stamp-button:disabled { cursor: default; }
+.profile-ui .profile-stamp-button > div { transform: none; }
+.profile-ui .profile-stamp-button:enabled:hover > div { background-color: rgb(158 42 43 / .09); }
+.profile-ui .profile-tabs { display: flex; flex-wrap: wrap; }
+.profile-ui .profile-identity { min-width: 0; }
+.profile-ui .profile-identity p { overflow-wrap: anywhere; }
+.profile-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
+.profile-dialog h2, .profile-dialog h3 { padding-right: 8px; }
+.profile-dialog .profile-editor-actions { flex-wrap: wrap; }
+.profile-dialog button:disabled { cursor: not-allowed; }
+@media (max-width: 639px) {
+  .profile-ui .profile-filter-bar { flex-wrap: wrap; }
+  .profile-ui .profile-filter-bar button { flex: 1 0 auto; }
+ .profile-ui .profile-stats-grid .items-baseline { flex-wrap: wrap; }
+  .profile-ui .profile-membership-header { flex-wrap: wrap; }
+  .profile-ui .profile-membership-header > div { min-width: 0; }
+  .profile-dialog :is(input, select, textarea) { font-size: 16px; }
+  .profile-dialog .profile-avatar-options { gap: 8px; flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.profile-ui, .profile-dialog) *, :is(.profile-ui, .profile-dialog) *::before, :is(.profile-ui, .profile-dialog) *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}

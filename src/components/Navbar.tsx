@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { BookOpen, Compass, Home, User, MapPin, Layers, Users, BookMarked, Menu, X } from 'lucide-react';
+import { BookOpen, Compass, Home, User, Users, BookMarked, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
@@ -41,18 +41,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const hoverScale = 1;
   const tapScale = shouldReduceMotion ? 1 : 0.97;
 
-  const scrollToAnchor = (anchorId: string) => {
-    const el = document.getElementById(anchorId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      onNavigateToSection(PATHS.landing);
-      setTimeout(() => {
-        document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-  };
-
   const handleProfileClick = () => {
     setIsProfileOpen(!isProfileOpen);
   };
@@ -83,8 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-label="Main navigation"
             onClick={() => setIsMenuOpen(false)}
           >
-            {isLoggedIn ? (
-              /* LOGGED IN: Functional App Pages */
+              {/* Shared app navigation for guests and signed-in learners. */}
               <>
                 <motion.button
                   whileHover={{ scale: hoverScale }}
@@ -154,52 +141,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </motion.button>
 
               </>
-            ) : (
-              /* LOGGED OUT: Landing Page anchor navigation */
-              <>
-                <motion.button
-                  whileHover={{ scale: hoverScale }}
-                  whileTap={{ scale: tapScale }}
-                  onClick={() => scrollToAnchor('vietnam-map')}
-                  className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
-                >
-                  <MapPin className="w-4 h-4 text-antique-gold" />
-                  <span>Cultural map</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: hoverScale }}
-                  whileTap={{ scale: tapScale }}
-                  onClick={() => scrollToAnchor('topics')}
-                  className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
-                >
-                  <Layers className="w-4 h-4 text-antique-gold" />
-                  <span>Culture topics</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: hoverScale }}
-                  whileTap={{ scale: tapScale }}
-                  onClick={() => scrollToAnchor('interactive-demo')}
-                  className={`${NAV_LINK_BASE} text-warm-ivory/90 hover:text-antique-gold hover:bg-heritage-green/50`}
-                >
-                  <BookOpen className="w-4 h-4 text-antique-gold" />
-                  <span>Try reading</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: hoverScale }}
-                  whileTap={{ scale: tapScale }}
-                  onClick={() => onNavigateToSection(PATHS.discovery)}
-                  className={navLinkClass(activeView === 'discovery')}
-                  aria-current={activeView === 'discovery' ? 'page' : undefined}
-                >
-                  <Compass className="w-4 h-4 text-antique-gold" />
-                  <span>Discover</span>
-                </motion.button>
-
-              </>
-            )}
           </nav>
 
           {/* ── Right Actions ────────────────────────────────────────────── */}

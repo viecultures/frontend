@@ -15,7 +15,7 @@ Nền tảng học tiếng Anh song ngữ kết hợp khám phá văn hóa, phon
 * **Icons:** Lucide React
 * **Routing:** React Router DOM v7
 * **Audio & Speech:** Web Speech API, HTML5 Audio Player với mốc thời gian (Timestamps)
-* **Backend Target:** Spring Boot 3 REST API (`http://localhost:8080`)
+* **Backend Target:** repo `backend`, Spring Boot 3 REST API (`http://localhost:8080`)
 
 ---
 
@@ -53,8 +53,18 @@ npm install
 ### 3. Cấu Hình Biến Môi Trường (`.env`)
 Tạo file `.env` tại thư mục gốc `frontend/` (nếu chưa có):
 ```env
+VITE_PORT=5174
 VITE_API_BASE_URL=http://localhost:8080
+VITE_BACKEND_PORT=8080
+VITE_AUTH_MODE=local
+VITE_GOOGLE_CLIENT_ID=<cùng GOOGLE_CLIENT_ID trong backend/.env>
 ```
+
+Backend chính là repo `backend` (`D:\GitHub\backend`), có API đăng nhập, hồ sơ, bài viết, từ vựng, voice và transcript. Đặt file `.env` của team tại thư mục backend với `PORT=8080`, rồi chạy `mvn spring-boot:run` tại đó. Cấu hình database, JWT và các khóa bí mật chỉ nằm ở backend; frontend chỉ cần Google Client ID công khai cùng giá trị với backend. Không dùng repo `viecultures_be` làm API chung cho frontend này.
+
+Đăng nhập hiện mặc định chạy dùng thử trên trình duyệt (`VITE_AUTH_MODE=local`): nhập email hợp lệ và mật khẩu bất kỳ từ 6 ký tự; mật khẩu không được lưu hoặc gửi đi. Hai nút Google/Facebook đăng nhập ngay với hồ sơ `Thien Luan` có quyền `ROLE_ADMIN` để vào `/admin`, không mở OAuth và không gọi backend. Đăng ký và đăng nhập email tạo hồ sơ học viên. “Ghi nhớ đăng nhập” lưu phiên qua lần mở trình duyệt; bỏ chọn để chỉ lưu trong tab hiện tại. OTP và đồng bộ hồ sơ xác thực tạm tắt. Đây là phiên dùng thử, không cấp quyền API backend.
+
+Để nối lại xác thực backend, đặt `VITE_AUTH_MODE=backend` rồi khởi động lại Vite và đăng nhập lại. Form email/mật khẩu sẽ gọi `/api/v1/auth/login` hoặc `/api/v1/auth/register`; hồ sơ gọi `/api/v1/auth/me` với JWT. Đăng nhập Google cần cấu hình các JavaScript origin của frontend trong Google Cloud Console. Các API tính năng khác vẫn dùng cấu hình backend hiện tại. Khi đổi `PORT` của backend, cập nhật hai biến API frontend tương ứng và khởi động lại Vite.
 
 ### 4. Khởi Chạy Môi Trường Phát Triển (Dev Server)
 ```bash

@@ -1,0 +1,62 @@
+/* Reader typography and shared geometry; retain Dictionary palette and elevation.
+   Scope to content/dialogs so desktop and mobile navigation stay unchanged. */
+.vocab-library-page, .dictionary-dialog { font-family: var(--font-sans); font-weight: 400; }
+.vocab-library-page :is(button, input, select), .dictionary-dialog :is(button, input, textarea) { font-family: inherit; }
+.vocab-library-page :is(button, input, select):focus-visible, .dictionary-dialog :is(button, input, textarea):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+.vocab-library-page .vocab-page-heading h1 { font-size: clamp(26px, 2.5vw, 34px); font-weight: 500; letter-spacing: -.025em; line-height: 1.35; }
+.vocab-library-page .vocab-page-heading h1 span { font-weight: 500; }
+.vocab-library-page .vocab-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .06em; line-height: 1.6; }
+.vocab-library-page .vocab-description { font-size: 14px; font-weight: 400; line-height: 1.7; }
+.vocab-library-page .vocab-date { font-size: 12px; }
+.vocab-library-page .vocab-search { border-radius: var(--radius-xl); }
+.vocab-library-page .vocab-search input { font-size: 14px; font-weight: 400; }
+.vocab-library-page .vocab-search button { min-width: 44px; min-height: 44px; border-radius: var(--radius-xl); }
+.vocab-library-page :is(.vocab-featured, .vocab-action-tile, .vocab-deck, .vocab-empty) { border-radius: var(--radius-2xl); }
+.vocab-library-page .vocab-featured-label { font-size: 11px; font-weight: 500; letter-spacing: .06em; }
+.vocab-library-page .vocab-featured h2 { font-size: clamp(26px, 2.1vw, 32px); font-weight: 500; line-height: 1.4; }
+.vocab-library-page .vocab-featured p { font-size: 13px; font-weight: 400; line-height: 1.7; }
+.vocab-library-page .vocab-featured-footer > span { font-size: 12px; }
+.vocab-library-page .vocab-button { min-height: 44px; border-radius: var(--radius-xl); font-size: 13px; font-weight: 400; }
+.vocab-library-page .vocab-tile-icon { border-radius: var(--radius-xl); }
+.vocab-library-page .vocab-tile-copy strong { font-size: 14px; font-weight: 500; }
+.vocab-library-page .vocab-tile-copy > span { font-size: 12px; font-weight: 400; line-height: 1.65; }
+.vocab-library-page .vocab-library-heading h2 { font-size: 24px; font-weight: 500; line-height: 1.4; letter-spacing: -.02em; }
+.vocab-library-page .vocab-library-heading h2 > span { flex-shrink: 0; font-weight: 400; border-radius: var(--radius-lg); }
+.vocab-library-page .vocab-sort, .vocab-library-page .vocab-sort select { font-size: 12px; font-weight: 400; }
+.vocab-library-page .vocab-sort select { border-radius: var(--radius-xl); }
+.vocab-library-page .vocab-category-filter button { min-height: 44px; border-radius: var(--radius-xl); font-size: 12px; font-weight: 400; }
+.vocab-library-page .vocab-category-filter button[aria-pressed="true"] { font-weight: 500; }
+.vocab-library-page .vocab-results { font-size: 12px; font-weight: 400; }
+.vocab-library-page :is(.vocab-deck-category, .vocab-deck-level) { font-size: 11px; font-weight: 400; border-radius: var(--radius-lg); }
+.vocab-library-page .vocab-deck-meta { font-size: 12px; }
+.vocab-library-page .vocab-deck-meta span { font-size: 11px; letter-spacing: .03em; }
+.vocab-library-page .vocab-deck h3 { font-size: 18px; font-weight: 500; line-height: 1.5; }
+.vocab-library-page .vocab-deck h3 button { font: inherit; }
+.vocab-library-page .vocab-deck-subtitle { font-size: 13px; font-weight: 400; line-height: 1.7; }
+.vocab-library-page .vocab-deck-footer button { min-height: 44px; border-radius: var(--radius-xl); font-size: 12px; font-weight: 400; }
+.vocab-library-page .vocab-empty h3 { font-family: var(--font-sans); font-size: 22px; font-weight: 500; }
+.vocab-library-page .vocab-empty p { font-size: 14px; line-height: 1.7; }
+
+/* Portalled dialogs opt in explicitly; Flashcard keeps its existing styling. */
+.dictionary-dialog .dictionary-dialog-panel { border-radius: var(--radius-2xl); }
+.dictionary-dialog .font-bold { font-weight: 400; }
+.dictionary-dialog .font-serif { font-family: var(--font-sans); font-weight: 500; line-height: 1.5; }
+.dictionary-dialog .text-xs { font-size: 13px; line-height: 1.65; }
+.dictionary-dialog [class~="text-[10px]"] { font-size: 11px; font-weight: 400; }
+.dictionary-dialog .dictionary-preview-word { font-size: 15px; font-weight: 500; }
+.dictionary-dialog .rounded-2xl { border-radius: var(--radius-xl); }
+.dictionary-dialog button { min-height: 44px; font-size: 13px; font-weight: 400; border-radius: var(--radius-xl); }
+.dictionary-dialog button[aria-label] { min-width: 44px; }
+.dictionary-dialog :is(input, textarea) { font-size: 16px; font-weight: 400; border-radius: var(--radius-xl); }
+.dictionary-dialog .dictionary-dialog-panel > .space-y-3 > div { min-width: 0; }
+.dictionary-dialog .dictionary-preview-copy { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 767px) {
+  .vocab-library-page .vocab-search input { font-size: 16px; }
+  .vocab-library-page .vocab-library-heading { flex-wrap: wrap; align-items: center; }
+  .vocab-library-page .vocab-library-heading h2 { font-size: 22px; }
+  .vocab-library-page .vocab-sort { margin-left: auto; }
+  .dictionary-dialog .dictionary-dialog-panel { max-height: 85dvh; overflow-y: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vocab-library-page *, .dictionary-dialog * { animation: none; transition: none; }
+}

@@ -13,15 +13,20 @@ import {
   useUI,
 } from '../../lib/state';
 import { useMapStore } from '../../lib/map-state';
+import { useChatWorkspace } from '../../lib/chat-workspace';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { User, Sparkles, RefreshCw, BookOpen, MessageSquareText, Compass, MapPin, Clock, ExternalLink } from 'lucide-react';
 import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '@/data/lessonAgentCatalog';
-import { PROFICIENCY_LEVELS, type ProficiencyLevel } from '../../lib/prompt-scaffolder';
+import type { ProficiencyLevel } from '../../lib/prompt-scaffolder';
 import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
 import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
 import { useTimelineSelection } from './useTimelineSelection';
 import { maskProfanity } from '@/utils/dictionary-service';
 import { paths } from '@/routes/paths';
+import { ReaderWorkspaceReference } from '../ReaderWorkspaceReference';
+import { AiWorkspaceWelcome } from '../AiWorkspaceWelcome';
+import { AiWorkspaceChatHeader } from '../AiWorkspaceChatHeader';
+import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 
 export interface VieCultureArticleItem {
   id: string;
@@ -80,40 +85,40 @@ const formatTimestamp = (date: Date) => {
 // Lesson Prompt Recommendations Map (Strictly SVG icons / Clean text)
 const LESSON_QUICK_ACTIONS: Record<string, Array<{ text: string; label: string }>> = {
   'pho-hanoi-history': [
-    { text: 'Can you summarize the main story of Hanoi Pho in English?', label: 'Nước dùng Phở Hà Nội' },
-    { text: 'How does Hanoi-style Pho differ from Southern Vietnamese Pho?', label: 'So sánh Phở Bắc & Nam' },
-    { text: 'Let’s practice using the phrase "culinary heritage" in a natural sentence.', label: 'Luyện từ "Culinary Heritage"' },
-    { text: 'Could you ask me a comprehension question about Hanoi Pho?', label: 'Đố vui nghe hiểu' },
+    { text: 'Can you summarize the main story of Hanoi Pho in English?', label: 'Hanoi phở broth' },
+    { text: 'How does Hanoi-style Pho differ from Southern Vietnamese Pho?', label: 'Northern & Southern phở' },
+    { text: 'Let’s practice using the phrase "culinary heritage" in a natural sentence.', label: 'Practise “culinary heritage”' },
+    { text: 'Could you ask me a comprehension question about Hanoi Pho?', label: 'Listening quiz' },
   ],
   'ha-long-bay': [
-    { text: 'Why is Ha Long Bay recognized as a UNESCO World Natural Heritage site?', label: 'Kỳ quan Vịnh Hạ Long' },
-    { text: 'Tell me the legend of the descending dragons in English.', label: 'Truyền thuyết Rồng Giáng' },
-    { text: 'Let’s practice discussing sustainable tourism in Ha Long Bay.', label: 'Thảo luận du lịch xanh' },
+    { text: 'Why is Ha Long Bay recognized as a UNESCO World Natural Heritage site?', label: 'Ha Long Bay' },
+    { text: 'Tell me the legend of the descending dragons in English.', label: 'The dragon legend' },
+    { text: 'Let’s practice discussing sustainable tourism in Ha Long Bay.', label: 'Sustainable tourism' },
   ],
   'gong-culture-tay-nguyen': [
-    { text: 'Tell me about the UNESCO Gong Culture in Central Highlands.', label: 'Không Gian Cồng Chiêng' },
-    { text: 'What spiritual role do bronze gongs play in ethnic minority communities?', label: 'Nghi lễ tâm linh' },
-    { text: 'Let’s practice using the phrase "intangible heritage" in a sentence.', label: 'Luyện từ "Intangible Heritage"' },
+    { text: 'Tell me about the UNESCO Gong Culture in Central Highlands.', label: 'Gong culture' },
+    { text: 'What spiritual role do bronze gongs play in ethnic minority communities?', label: 'Spiritual traditions' },
+    { text: 'Let’s practice using the phrase "intangible heritage" in a sentence.', label: 'Practise “intangible heritage”' },
   ],
   'non-la-culture': [
-    { text: 'What makes the Hue poem-hat (nón bài thơ) so special in Vietnamese culture?', label: 'Nón bài thơ xứ Huế' },
-    { text: 'Let’s practice describing traditional craft materials in English.', label: 'Làng nghề nón lá' },
+    { text: 'What makes the Hue poem-hat (nón bài thơ) so special in Vietnamese culture?', label: 'Hue poem hats' },
+    { text: 'Let’s practice describing traditional craft materials in English.', label: 'Traditional hat making' },
   ],
   'my-son-sanctuary': [
-    { text: 'Tell me about the ancient Champa brick towers at My Son Sanctuary.', label: 'Thánh địa Mỹ Sơn' },
-    { text: 'What architectural mystery makes Champa mortarless brickwork unique?', label: 'Bí ẩn gạch không vữa' },
+    { text: 'Tell me about the ancient Champa brick towers at My Son Sanctuary.', label: 'My Son Sanctuary' },
+    { text: 'What architectural mystery makes Champa mortarless brickwork unique?', label: 'Champa brickwork' },
   ],
   'floating-markets-mekong': [
-    { text: 'How does Cai Rang Floating Market operate early in the morning?', label: 'Chợ nổi Cái Răng' },
-    { text: 'What is a "cay beo" bamboo sample pole used for?', label: 'Ý nghĩa Cây Bẹo' },
+    { text: 'How does Cai Rang Floating Market operate early in the morning?', label: 'Cai Rang floating market' },
+    { text: 'What is a "cay beo" bamboo sample pole used for?', label: 'Floating market signs' },
   ],
   'nem-ran-spring-rolls': [
-    { text: 'What ingredients make traditional northern Nem Ran so crispy?', label: 'Bí quyết Nem Rán' },
-    { text: 'Let’s roleplay explaining how to wrap Vietnamese spring rolls in English.', label: 'Hướng dẫn gói nem' },
+    { text: 'What ingredients make traditional northern Nem Ran so crispy?', label: 'Crispy spring rolls' },
+    { text: 'Let’s roleplay explaining how to wrap Vietnamese spring rolls in English.', label: 'Describe wrapping spring rolls' },
   ],
   'dong-ho-paintings': [
-    { text: 'How do Dong Ho village artisans make natural colors from plants and shells?', label: 'Màu sắc tranh Đông Hồ' },
-    { text: 'What cultural blessings do traditional woodblock prints represent?', label: 'Ý nghĩa lời chúc dân gian' },
+    { text: 'How do Dong Ho village artisans make natural colors from plants and shells?', label: 'Natural colours in Dong Ho prints' },
+    { text: 'What cultural blessings do traditional woodblock prints represent?', label: 'Traditional blessings' },
   ],
 };
 
@@ -125,6 +130,7 @@ export default function StreamingConsole() {
   const active = activeView === 'chat';
   const busy = !active || connecting || ending || isSending || isRestoringContext;
   const { activeLessonId, proficiencyLevel, tutorMode } = useSettings();
+  const readerContext = useReaderHandoff(state => state.context);
   const turns = useLogStore(state => state.turns);
   const sessionId = useLogStore(state => state.sessionMetadata?.sessionId);
   const { showSystemMessages } = useUI();
@@ -139,15 +145,18 @@ export default function StreamingConsole() {
 
   const guidedActions =
     LESSON_QUICK_ACTIONS[activeLesson.id] || [
-      { text: `Tell me about the history and importance of ${activeLesson.vietnameseTitle}.`, label: `Tìm hiểu về ${activeLesson.vietnameseTitle}` },
-      { text: `What key English vocabulary should I know about this cultural topic?`, label: `Học từ vựng chủ đề` },
-      { text: `Let's practice discussing ${activeLesson.vietnameseTitle} together.`, label: `Bắt đầu đàm thoại` },
+      { text: `Tell me about the history and importance of ${activeLesson.vietnameseTitle}.`, label: `Explore the story` },
+      { text: `What key English vocabulary should I know about this cultural topic?`, label: `Practise vocabulary` },
+      { text: `Let's practice discussing ${activeLesson.vietnameseTitle} together.`, label: `Start a conversation` },
     ];
-  const conversationActions = [
-    { text: 'Let’s have a natural conversation about Vietnamese food and regional flavors.', label: 'Ẩm thực Việt Nam' },
-    { text: 'Let’s talk about a Vietnamese festival and what it means to local people.', label: 'Lễ hội Việt Nam' },
-    { text: 'Let’s discuss Vietnamese family traditions in everyday life.', label: 'Đời sống & gia đình' },
-    { text: 'Let’s compare cultural life in Northern, Central, and Southern Vietnam.', label: 'So sánh ba miền' },
+  const conversationActions = readerContext ? [
+    { text: `Let's practise speaking about “${readerContext.title}”. Keep your turns brief so I can speak.`, label: 'Talk about this story' },
+    { text: `Help me express my opinion about “${readerContext.title}” in English.`, label: 'Express an opinion' },
+  ] : [
+    { text: 'Let’s have a natural conversation about Vietnamese food and regional flavors.', label: 'Food & flavours' },
+    { text: 'Let’s talk about a Vietnamese festival and what it means to local people.', label: 'Festivals' },
+    { text: 'Let’s discuss Vietnamese family traditions in everyday life.', label: 'Family & everyday life' },
+    { text: 'Let’s compare cultural life in Northern, Central, and Southern Vietnam.', label: 'Compare the regions' },
   ];
   const quickActions = tutorMode === 'free-conversation' ? conversationActions : guidedActions;
 
@@ -159,7 +168,9 @@ export default function StreamingConsole() {
     await changeLevel(level);
   };
   const handleFocusLandmarkOnMap = (landmarkId: string) => {
+    if (!active) return;
     useMapStore.getState().selectLandmark(landmarkId, { source: 'user' });
+    useChatWorkspace.getState().openMap();
   };
   const handleDiscussArticle = async (article: VieCultureArticleItem) => {
     if (busy) return;
@@ -173,79 +184,9 @@ export default function StreamingConsole() {
   return (
     <div className="transcription-container flex flex-col h-full bg-[#121619] text-[#f1f3f4]">
       <AiMapLessonProgressBar />
-      {/* Target Lesson Header Banner */}
-      <div className="flex-shrink-0 p-3 bg-[#181d20] border-b border-white/10 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 overflow-hidden">
-          <div className="w-8 h-8 rounded-lg bg-[#1E4B43] text-[#D4AF37] flex items-center justify-center font-bold flex-shrink-0 shadow border border-[#D4AF37]/30">
-            <BookOpen className="w-4 h-4" />
-          </div>
-          <div className="overflow-hidden">
-            <div className="flex items-center gap-1.5">
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase tracking-wider bg-[#D4AF37]/20 text-[#FCE5B5] font-semibold border border-[#D4AF37]/30">
-                {tutorMode === 'free-conversation' ? 'Đàm Thoại Tự Do' : `Bài Đọc · ${activeLesson.category}`}
-              </span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase font-bold bg-[#1E4B43] text-[#D4AF37] border border-[#D4AF37]/40">
-                {proficiencyLevel}
-              </span>
-              {tutorMode !== 'free-conversation' && activeLesson.provinceName && (
-                <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
-                  <MapPin className="w-3 h-3 text-[#D4AF37]" />
-                  {activeLesson.provinceName}
-                </span>
-              )}
-            </div>
-            <h2 className="text-xs font-serif font-bold text-white truncate max-w-[260px] sm:max-w-[320px]">
-              {tutorMode === 'free-conversation' ? 'Trò chuyện về Việt Nam · Khám phá map tự do' : activeLesson.vietnameseTitle}
-            </h2>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0 ml-auto">
-            {/* 2-Mode Quick Switcher */}
-            <div className="flex items-center bg-black/40 p-0.5 rounded-lg border border-white/10 text-[10px]">
-              <button
-                type="button"
-                disabled={connected || busy}
-                aria-pressed={tutorMode === 'free-conversation'}
-                onClick={() => useSettings.getState().setTutorMode('free-conversation')}
-                className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
-                  tutorMode === 'free-conversation'
-                    ? 'bg-[#1E4B43] text-[#D4AF37] font-bold shadow-sm'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-                title="Đàm thoại tự do về văn hóa Việt Nam"
-              >
-                Đàm thoại
-              </button>
-              <button
-                type="button"
-                disabled={connected || busy}
-                aria-pressed={tutorMode === 'guided-lesson'}
-                onClick={() => useSettings.getState().setTutorMode('guided-lesson')}
-                className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
-                  tutorMode === 'guided-lesson'
-                    ? 'bg-[#1E4B43] text-[#D4AF37] font-bold shadow-sm'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-                title="Luyện tập bài đọc & bài học di sản"
-              >
-                Bài đọc
-              </button>
-            </div>
-
-            <div className="level-quick-switch" aria-label="Quick level switch">
-              {(['Level 1', 'Level 2', 'Level 3'] as const).map(level => (
-                <button
-                  key={level}
-                  type="button"
-                  disabled={busy}
-                  aria-pressed={proficiencyLevel === level}
-                  onClick={() => void handleLevelSwitch(level)}
-                  title={`Chuyển sang ${level}: ${PROFICIENCY_LEVELS[level].description}`}
-                >{level.replace('Level ', 'L')}</button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <AiWorkspaceChatHeader title={tutorMode === 'free-conversation' ? readerContext?.title || 'English through Vietnamese culture' : activeLesson.title}
+        mode={tutorMode} level={proficiencyLevel} busy={busy} connected={connected}
+        onModeChange={mode => useSettings.getState().setTutorMode(mode)} onLevelChange={level => void handleLevelSwitch(level)} />
 
       {/* Message Timeline */}
       <div
@@ -257,35 +198,9 @@ export default function StreamingConsole() {
         onMouseUp={handleTextSelection}
         onDoubleClick={handleTextSelection}
       >
+        <ReaderWorkspaceReference active={active} />
         {displayedTurns.length === 0 && !isAwaitingFunctionResponse ? (
-          <div className="empty-state text-center py-10 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#1E4B43]/60 text-[#D4AF37] flex items-center justify-center mx-auto shadow-lg border border-[#D4AF37]/30">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-serif font-bold text-white">
-                Sứ Giả Văn Hóa AI — Luyện Nói &amp; Luyện Nghe
-              </h3>
-              <p className="text-xs text-gray-400 max-w-sm mx-auto leading-relaxed">
-                Đàm thoại tiếng Anh thời gian thực cùng trợ lý AI về chủ đề <strong>{tutorMode === 'free-conversation' ? 'văn hóa Việt Nam' : activeLesson.vietnameseTitle}</strong>. Bấm nút <strong>Play</strong> bên dưới hoặc chọn gợi ý để bắt đầu.
-              </p>
-            </div>
-
-            {/* Quick Action Suggestion Chips */}
-            <div className="pt-2 flex flex-wrap gap-2 justify-center max-w-md mx-auto">
-              {quickActions.map((action, idx) => (
-                <button
-                  key={idx}
-                  disabled={busy}
-                  onClick={() => handleSendPrompt(action.text)}
-                  className="px-3 py-1.5 rounded-full bg-[#1E4B43]/30 hover:bg-[#1E4B43] border border-[#D4AF37]/30 text-[#FCE5B5] text-xs transition-all shadow-sm flex items-center gap-1.5 cursor-pointer text-left"
-                >
-                  <MessageSquareText className="w-3.5 h-3.5 text-[#D4AF37] flex-shrink-0" />
-                  <span>{action.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+          <AiWorkspaceWelcome hasReading={!!readerContext || tutorMode === 'guided-lesson'} actions={quickActions} busy={busy} onChoose={text => void handleSendPrompt(text)} />
         ) : (
           <>
             {displayedTurns.map(turn => {
@@ -305,12 +220,12 @@ export default function StreamingConsole() {
                     <div
                       key={t.id}
                       data-turn-id={t.id}
-                      className="p-3.5 rounded-xl bg-[#1E4B43]/20 border border-[#D4AF37]/30 text-xs text-[#E8ECE9] shadow-sm space-y-3 animate-fadeIn"
+                      className="chat-tool-message p-3.5 rounded-xl bg-[#1E4B43]/20 border border-[#D4AF37]/30 text-xs text-[#E8ECE9] shadow-sm space-y-3 animate-fadeIn"
                     >
                       <div className="flex items-center justify-between text-[11px] font-mono text-[#D4AF37] border-b border-[#D4AF37]/20 pb-2">
                         <span className="font-bold flex items-center gap-1.5">
                           <BookOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
-                          Thư Viện Bài Đọc VieCultures ({articlePayload.length} bài đề cử)
+                          VieCultures stories ({articlePayload.length})
                         </span>
                         <span className="text-gray-400 text-[10px]">{formatTimestamp(t.timestamp)}</span>
                       </div>
@@ -338,17 +253,16 @@ export default function StreamingConsole() {
                             </div>
 
                             <div>
-                              <a
-                                href={paths.reader({ article: art.id, level: art.level || 'Level 2' })}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group/title inline-block"
-                                title="Mở bài đọc song ngữ trên VieCultures trong tab mới"
+                              <button
+                                type="button"
+                                onClick={() => active && useChatWorkspace.getState().openArticle(art.id)}
+                                className="group/title inline-block text-left cursor-pointer"
+                                title="Open story details"
                               >
                                 <h4 className="text-xs font-serif font-bold text-white group-hover/title:text-[#FCE5B5] group-hover/title:underline transition-colors leading-snug">
                                   {art.titleVi}
                                 </h4>
-                              </a>
+                              </button>
                               <p className="text-[11px] text-gray-400 italic">
                                 {art.title}
                               </p>
@@ -356,7 +270,7 @@ export default function StreamingConsole() {
 
                             {art.vocabHighlights && art.vocabHighlights.length > 0 && (
                               <div className="flex items-center gap-1 flex-wrap pt-0.5">
-                                <span className="text-[10px] text-[#D4AF37] font-medium mr-0.5">Từ vựng:</span>
+                                <span className="text-[10px] text-[#D4AF37] font-medium mr-0.5">Vocabulary:</span>
                                 {art.vocabHighlights.map((vocab, vIdx) => (
                                   <span
                                     key={vIdx}
@@ -377,32 +291,39 @@ export default function StreamingConsole() {
                             <div className="flex items-center justify-end gap-1.5 pt-1 border-t border-white/5 flex-wrap">
                               <button
                                 type="button"
+                                onClick={() => active && useChatWorkspace.getState().openArticle(art.id)}
+                                className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 flex items-center gap-1 cursor-pointer"
+                              >
+                                <BookOpen className="w-3 h-3 text-[#D4AF37]" /> Story details
+                              </button>
+                              <button
+                                type="button"
                                 onClick={() => handleFocusLandmarkOnMap(art.id)}
                                 className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-[#1E4B43]/40 hover:bg-[#1E4B43] text-[#FCE5B5] border border-[#D4AF37]/30 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
-                                title="Định vị và làm nổi bật địa danh này trên bản đồ"
+                                title="Locate this place on the map"
                               >
                                 <Compass className="w-3 h-3 text-[#D4AF37]" />
-                                <span>Xem trên bản đồ</span>
+                                <span>Show on map</span>
                               </button>
                               <button
                                 type="button"
                                 disabled={busy}
                                 onClick={() => handleDiscussArticle(art)}
                                 className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 hover:border-white/20 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
-                                title="Gửi yêu cầu đàm thoại về bài đọc này tới AI"
+                                title="Discuss this story with AI"
                               >
                                 <MessageSquareText className="w-3 h-3 text-[#D4AF37]" />
-                                <span>Đàm thoại bài này</span>
+                                <span>Discuss this story</span>
                               </button>
                               <a
                                 href={paths.reader({ article: art.id, level: art.level || 'Level 2' })}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-[#D4AF37]/15 hover:bg-[#D4AF37]/25 text-[#FCE5B5] border border-[#D4AF37]/35 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
-                                title="Mở bài đọc song ngữ trên VieCultures trong tab mới"
+                                title="Open the full story in a new tab"
                               >
                                 <BookOpen className="w-3 h-3 text-[#D4AF37]" />
-                                <span>Đọc bài viết</span>
+                                <span>Read story</span>
                                 <ExternalLink className="w-2.5 h-2.5 text-[#D4AF37]/70" />
                               </a>
                             </div>
@@ -417,11 +338,11 @@ export default function StreamingConsole() {
                   <div
                     key={t.id}
                   data-turn-id={t.id}
-                    className="p-3 rounded-xl bg-[#1E4B43]/20 border border-[#D4AF37]/30 text-xs text-[#E8ECE9] shadow-sm space-y-1 animate-fadeIn"
+                    className="chat-tool-message p-3 rounded-xl bg-[#1E4B43]/20 border border-[#D4AF37]/30 text-xs text-[#E8ECE9] shadow-sm space-y-1 animate-fadeIn"
                   >
                     <div className="flex items-center justify-between text-[10px] font-mono text-[#D4AF37]">
                       <span className="font-bold flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" /> Trợ Lý Văn Hóa &amp; Ngôn Ngữ
+                        <Sparkles className="w-3 h-3" /> Cultural companion
                       </span>
                       <span>{formatTimestamp(t.timestamp)}</span>
                     </div>
@@ -450,7 +371,7 @@ export default function StreamingConsole() {
                   </div>
 
                   <div
-                    className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
+                    className={`chat-message-bubble max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
                       isUser
                         ? 'bg-[#2563EB] text-white rounded-tr-sm shadow-md'
                         : 'bg-[#232729] text-[#f1f3f4] border border-white/10 rounded-tl-sm shadow-md'
@@ -467,7 +388,7 @@ export default function StreamingConsole() {
             {active && (isAwaitingFunctionResponse || isAwaitingResponse) && (
               <div className="flex items-center gap-2 text-xs text-[#D4AF37] p-2 bg-[#1E4B43]/20 rounded-lg border border-[#D4AF37]/20">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                <span>Gia sư AI đang đồng bộ bản đồ &amp; chuẩn bị bài luyện tập...</span>
+                <span>Opening your learning tools…</span>
               </div>
             )}
 
@@ -488,13 +409,13 @@ export default function StreamingConsole() {
           </>
         )}
       </div>
-      {active && hasNewMessages && <button type="button" onClick={scrollToLatest} className="mx-auto my-2 rounded-full bg-[#1E4B43] px-4 py-2 text-xs text-[#D4AF37]">Tin nhắn mới ↓</button>}
+      {active && hasNewMessages && <button type="button" onClick={scrollToLatest} className="mx-auto my-2 rounded-full bg-[#1E4B43] px-4 py-2 text-xs text-[#D4AF37]">New messages ↓</button>}
       <InPlaceDictionaryPopup
         isOpen={active && Boolean(selectedWord && wordPosition)}
         vocab={selectedWord}
         position={wordPosition}
         onClose={closeSelection}
-        themeMode="dark"
+        themeMode={useSettings.getState().theme === 'light' ? 'paper' : 'dark'}
       />
     </div>
   );

@@ -20,7 +20,7 @@ export function FlashcardMultipleChoiceView({
     <div className="vocab-quiz-view w-full max-w-2xl mx-auto p-5 sm:p-6 rounded-3xl bg-surface border border-line flex flex-col justify-between gap-4 animate-in fade-in duration-300">
       <div className="text-center space-y-2.5 my-auto">
         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rice-paper text-heritage-green font-bold text-xs border border-antique-gold/40">
-          Trắc Nghiệm Nhanh
+          Choose the meaning
         </span>
         <h3 className="font-serif text-3xl sm:text-4xl font-extrabold text-heritage-green">
           {card.word}
@@ -37,18 +37,18 @@ export function FlashcardMultipleChoiceView({
           const label = OPTION_LABELS[idx] || `${idx + 1}`;
 
           let cardStyle =
-            "bg-surface text-heritage-green border-2 border-line hover:border-antique-gold hover:bg-rice-paper/50";
-          let badgeStyle = "bg-rice-paper text-heritage-green border-line";
+            "vocab-answer";
+          let badgeStyle = "vocab-answer-marker";
 
           if (mcSelected !== null) {
             if (isCorrect) {
               cardStyle =
-                "bg-emerald-50 text-emerald-900 border-2 border-emerald-500 shadow-md";
-              badgeStyle = "bg-emerald-600 text-white border-emerald-600";
+                "vocab-answer is-correct";
+              badgeStyle = "vocab-answer-marker";
             } else if (isSelected && !isCorrect) {
               cardStyle =
-                "bg-rose-50 text-rose-900 border-2 border-rose-400 shadow-md";
-              badgeStyle = "bg-rose-600 text-white border-rose-600";
+                "vocab-answer is-incorrect";
+              badgeStyle = "vocab-answer-marker";
             }
           }
 
@@ -63,9 +63,9 @@ export function FlashcardMultipleChoiceView({
                 className={`w-8 h-8 rounded-xl flex items-center justify-center font-extrabold text-xs shrink-0 border ${badgeStyle}`}
               >
                 {mcSelected !== null && isCorrect ? (
-                  <Check className="w-4 h-4" />
+                  <><Check className="w-4 h-4" /><span className="sr-only">Correct answer: </span></>
                 ) : mcSelected !== null && isSelected && !isCorrect ? (
-                  <X className="w-4 h-4" />
+                  <><X className="w-4 h-4" /><span className="sr-only">Incorrect answer: </span></>
                 ) : (
                   label
                 )}
@@ -77,12 +77,13 @@ export function FlashcardMultipleChoiceView({
       </div>
 
       {mcSelected !== null && (
-        <div className="text-center pt-2">
+        <div className="text-center pt-2" role="status">
+          <p className={mcSelected === card.correctIndex ? "vocab-feedback-correct" : "vocab-feedback-incorrect"}>{mcSelected === card.correctIndex ? "Correct!" : "Not quite. The correct answer is highlighted."}</p>
           <button
             onClick={onNextQuestion}
-            className="px-8 py-3.5 rounded-full text-xs font-bold text-warm-ivory bg-gradient-to-r from-heritage-green to-teal-800 hover:from-heritage-dark hover:to-teal-900 cursor-pointer inline-flex items-center gap-2 shadow-lg border border-antique-gold/40 transition-all focus-ring hover:scale-105"
+            className="vocab-study-primary"
           >
-            <span>Câu tiếp theo</span>
+            <span>Next card</span>
             <ChevronRight className="w-4 h-4 text-antique-gold" />
           </button>
         </div>

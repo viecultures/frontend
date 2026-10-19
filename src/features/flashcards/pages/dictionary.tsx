@@ -2,7 +2,6 @@ import { useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
 import FlashcardSidebarLayout from "../components/flashcard-sidebar-layout";
-import { SavedVocabularyDecks } from '../components/SavedVocabularyDecks';
 import {
   DictionaryDailyHero,
   DictionaryQuickActionCards,
@@ -12,14 +11,12 @@ import {
   CreateDeckModal,
 } from "../components";
 import { paths } from '@/routes/paths';
+import { VOCABULARY_CATEGORY_LABELS } from '../lib/vocabulary-catalog';
+import '../dictionary-components.css';
 
 const CATEGORY_OPTIONS = [
-  { label: `Tất cả (${LESSONS_DATA.length})`, value: "All" },
-  { label: "Lịch sử & Di sản", value: "Heritage" },
-  { label: "Ẩm thực & Cà phê", value: "Cuisine" },
-  { label: "Nghệ thuật & Làng nghề", value: "Crafts" },
-  { label: "Danh thắng Thiên nhiên", value: "Nature" },
-  { label: "Lễ hội & Tín ngưỡng", value: "Folklore" },
+  { label: `All (${LESSONS_DATA.length})`, value: "All" },
+  ...Object.entries(VOCABULARY_CATEGORY_LABELS).map(([value, label]) => ({ value, label })),
 ];
 
 export default function DictionaryPage() {
@@ -49,7 +46,7 @@ export default function DictionaryPage() {
         lesson.summary.toLowerCase().includes(q);
       return matchCat && matchSearch;
     });
-    if (sortOrder === "name") lessons.sort((a, b) => a.vietnameseTitle.localeCompare(b.vietnameseTitle, "vi"));
+    if (sortOrder === "name") lessons.sort((a, b) => a.title.localeCompare(b.title, "en"));
     if (sortOrder === "newest") lessons.sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
     return lessons;
   }, [selectedCategory, searchQuery, sortOrder]);
@@ -71,7 +68,7 @@ export default function DictionaryPage() {
 
   const handleCreateDeck = () => {
     if (customDeckName.trim()) {
-      alert(`Đã khởi tạo bộ từ "${customDeckName}" vào tủ sách cá nhân!`);
+      alert(`Created "${customDeckName}" in your personal library!`);
       setIsCreateDeckOpen(false);
       setCustomDeckName("");
     }
@@ -80,7 +77,6 @@ export default function DictionaryPage() {
   return (
     <FlashcardSidebarLayout>
       <div className="vocab-library-page">
-        <SavedVocabularyDecks />
         {/* Daily recommendation and quick actions */}
         <div className="space-y-4">
           <DictionaryDailyHero
@@ -101,8 +97,8 @@ export default function DictionaryPage() {
         {/* Cultural vocabulary catalog */}
         <section ref={libraryRef} className="vocab-library-section" aria-labelledby="vocab-library-title">
           <div className="vocab-library-heading">
-            <div><p className="vocab-eyebrow">HỌC NGÔN NGỮ QUA DI SẢN</p><h2 id="vocab-library-title">Thư viện bộ từ <span>{LESSONS_DATA.length}</span></h2></div>
-            <label className="vocab-sort"><span>Sắp xếp:</span><select aria-label="Sắp xếp bộ từ" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}><option value="default">Đề xuất</option><option value="newest">Mới nhất</option><option value="name">Tên A – Z</option></select></label>
+            <div><p className="vocab-eyebrow">LEARN LANGUAGE THROUGH HERITAGE</p><h2 id="vocab-library-title">Vocabulary decks <span>{LESSONS_DATA.length}</span></h2></div>
+            <label className="vocab-sort"><span>Sort by:</span><select aria-label="Sort vocabulary decks" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}><option value="default">Recommended</option><option value="newest">Newest</option><option value="name">Name A–Z</option></select></label>
           </div>
 
           {/* Category Filter Pills */}
@@ -112,7 +108,7 @@ export default function DictionaryPage() {
             onSelectCategory={setSelectedCategory}
           />
 
-          <p className="vocab-results" role="status">{searchQuery ? `Tìm thấy ${filteredLessons.length} bộ từ cho “${searchQuery}”` : `${filteredLessons.length} bộ từ để bạn khám phá`}</p>
+          <p className="vocab-results" role="status">{searchQuery ? `${filteredLessons.length} decks found for “${searchQuery}”` : `${filteredLessons.length} decks to explore`}</p>
 
           {/* Library Cards Grid */}
           <DictionaryLibraryGrid

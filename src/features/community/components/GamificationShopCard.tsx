@@ -1,3 +1,4 @@
+import { communityLabel } from "../community-copy";
 import { ShoppingBag, Coins, Headphones, Palette, Medal, Sparkles, Check } from "lucide-react";
 
 interface GamificationShopCardProps {
@@ -44,11 +45,11 @@ export function GamificationShopCard({
       <div className="flex items-center justify-between pb-3 border-b border-line">
         <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
           <ShoppingBag className="w-4 h-4 text-antique-gold" />
-          <span>Cửa Hàng Xu & Đổi Quà</span>
+          <span>Coin & reward shop</span>
         </h3>
         <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
           <Coins className="w-3.5 h-3.5 text-antique-gold" />
-          <span>Ví: {userCoins} Xu</span>
+          <span>Balance: {userCoins} coins</span>
         </span>
       </div>
 
@@ -69,15 +70,16 @@ export function GamificationShopCard({
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-heritage-green">
-                      {item.name}
+                      {communityLabel(item.name)}
                     </h4>
                     <span className="text-[10px] text-antique-rich font-semibold uppercase">
-                      {item.tag}
+                      {communityLabel(item.tag)}
                     </span>
                   </div>
                 </div>
 
                 <button
+                  aria-label={`Redeem ${communityLabel(item.name)} for ${item.cost} coins`}
                   onClick={() => onRedeem(item.name, item.cost)}
                   className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1 shrink-0 cursor-pointer focus-ring ${
                     canAfford
@@ -86,12 +88,12 @@ export function GamificationShopCard({
                   }`}
                 >
                   <Coins className="w-3 h-3 text-antique-gold" />
-                  <span>{item.cost} Xu</span>
+                  <span>{item.cost} coins</span>
                 </button>
               </div>
 
               <p className="text-[11px] text-text-secondary leading-relaxed pl-10">
-                {item.desc}
+                {communityLabel(item.desc)}
               </p>
             </div>
           );

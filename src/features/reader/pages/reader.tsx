@@ -497,9 +497,16 @@ export default function ReaderPage() {
       />
 
       {/* Floating AI Companion Chatbot at bottom-right corner */}
-      <FloatingAiCompanionWidget
-        articleTitle={articleData?.titleVi || "Tết Cổ Truyền: Đổi Mới, Nhớ Về Cội Nguồn & Phong Vị Ba Miền"}
-      />
+      {loadedKey === requestedKey && !articleError && <FloatingAiCompanionWidget
+        key={`${articleData?.id || targetId}-${selectedLevel}`}
+        articleTitle={articleData?.titleEn || "Tết: Renewal, Remembrance & Regional Flavours"}
+        articleId={articleData?.id || targetId || 'tet-holiday'}
+        articleSummary={articleData?.summary || articleData?.paragraphs[0]?.enText}
+        level={selectedLevel}
+        vocabulary={articleData ? articleData.vocabularies : Object.values(VOCAB_DATABASE)}
+        onOpenVocabulary={() => setIsVocabDrawerOpen(true)}
+        themeMode={themeMode}
+      />}
     </main>
     </SavedVocabularyContext.Provider>
   );

@@ -1,5 +1,6 @@
 import { ShieldCheck, Trophy, Sparkles, TrendingUp, Award, ArrowRight, User } from "lucide-react";
 import Link from "@/components/Link";
+import { communityLabel } from "../community-copy";
 import { PATHS } from "@/routes/paths";
 
 interface CommunitySidebarProps {
@@ -23,29 +24,29 @@ const TOP_AMBASSADORS = [
 
 export function CommunitySidebar({ onSelectTopicTag, selectedTag }: CommunitySidebarProps) {
   return (
-    <aside className="space-y-6">
+    <aside className="community-sidebar space-y-6">
       {/* Contest Banner Card */}
       <div className="p-6 rounded-3xl bg-gradient-to-br from-heritage-green via-[#2A665B] to-heritage-dark text-warm-ivory border border-antique-gold/40 space-y-4 shadow-md relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-antique-gold/10 rounded-full blur-2xl pointer-events-none" />
         
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-antique-gold text-heritage-dark text-[11px] font-bold uppercase tracking-wider">
           <Trophy className="w-3.5 h-3.5" />
-          <span>Thử Thách Tuần Này</span>
+          <span>This week’s challenge</span>
         </div>
 
         <h3 className="font-serif text-lg font-bold text-warm-ivory leading-snug">
-          Kiến Trúc & Di Sản Cố Đô Huế (Imperial Hue)
+          Imperial Hue architecture & heritage
         </h3>
 
         <p className="text-xs text-sky-mist leading-relaxed">
-          Viết bài chia sẻ ngắn ứng dụng từ vựng di sản để tích lũy Xu Văn Hóa và vinh danh trên Bảng Xếp Hạng.
+          Write a short reflection using heritage vocabulary to earn cultural coins and join the leaderboard.
         </p>
 
         <Link
           to={PATHS.communityContest}
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold text-heritage-dark bg-warm-ivory hover:bg-rice-paper border border-antique-gold shadow-sm transition-all w-full focus-ring"
         >
-          <span>Tham Gia Thử Thách Ngay</span>
+          <span>Join the challenge</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -55,7 +56,7 @@ export function CommunitySidebar({ onSelectTopicTag, selectedTag }: CommunitySid
         <div className="flex items-center justify-between">
           <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-antique-gold" />
-            <span>Chủ Đề Di Sản Sôi Nổi</span>
+            <span>Trending heritage topics</span>
           </h3>
         </div>
 
@@ -82,7 +83,7 @@ export function CommunitySidebar({ onSelectTopicTag, selectedTag }: CommunitySid
         <div className="flex items-center justify-between pb-2 border-b border-line">
           <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
             <Award className="w-4 h-4 text-antique-gold" />
-            <span>Sứ Giả Văn Hóa Tuần</span>
+            <span>This week’s ambassadors</span>
           </h3>
           <span className="text-[11px] font-bold text-antique-rich">Top 3</span>
         </div>
@@ -100,7 +101,7 @@ export function CommunitySidebar({ onSelectTopicTag, selectedTag }: CommunitySid
                 </span>
                 <div>
                   <h4 className="font-bold text-heritage-green">{amb.name}</h4>
-                  <span className="text-[10px] text-text-secondary">{amb.role}</span>
+                  <span className="text-[10px] text-text-secondary">{communityLabel(amb.role)}</span>
                 </div>
               </div>
               <span className="font-bold text-emerald-700 text-[11px]">{amb.points}</span>
@@ -117,13 +118,13 @@ export function CommunitySidebar({ onSelectTopicTag, selectedTag }: CommunitySid
             aria-hidden="true"
           />
           <h3 className="font-serif text-sm font-bold text-heritage-green">
-            Quy Tắc Cộng Đồng VieCultures
+            Community guidelines
           </h3>
         </div>
         <ul className="text-xs text-text-body space-y-2 list-disc list-inside leading-relaxed">
-          <li>Tự do diễn đạt suy nghĩ bằng tiếng Anh không sợ sai ngữ pháp.</li>
-          <li>Tôn trọng sự đa dạng văn hóa và góc nhìn đa chiều.</li>
-          <li>Khuyến khích đưa từ vựng bài đọc vào ngữ cảnh tự nhiên.</li>
+          <li>Express your thoughts in English without fear of grammar mistakes.</li>
+          <li>Respect cultural diversity and different perspectives.</li>
+          <li>Use vocabulary from your reading in natural contexts.</li>
         </ul>
       </div>
     </aside>

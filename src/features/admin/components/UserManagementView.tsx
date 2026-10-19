@@ -24,10 +24,13 @@ import {
 import type { AdminUserItem, CefrLevel } from '../types/adminTypes';
 import { adminUserService } from '../services/adminUserService';
 import { getStoredUser, getStoredToken, parseJwt } from '@/utils/auth-storage';
+import { AdminDialog } from './AdminDialog';
+import { isLocalAuthMode } from '@/config/authConfig';
 
 export const UserManagementView: React.FC = () => {
   const [users, setUsers] = useState<AdminUserItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoadedUsers, setHasLoadedUsers] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
@@ -42,14 +45,6 @@ export const UserManagementView: React.FC = () => {
     }
     return null;
   }, []);
-
-  // Auto dismiss error message after 6 seconds
-  useEffect(() => {
-    if (errorMsg) {
-      const timer = setTimeout(() => setErrorMsg(null), 6000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorMsg]);
 
   // Filters & Pagination
   const [searchQuery, setSearchQuery] = useState('');
@@ -88,9 +83,13 @@ export const UserManagementView: React.FC = () => {
       setUsers(res.content || []);
       setTotalPages(res.totalPages || 1);
       setTotalElements(res.totalElements || 0);
-    } catch (err: any) {
+      setHasLoadedUsers(true);
+    } catch (err: unknown) {
+      setHasLoadedUsers(false);
       console.error('Lỗi tải người dùng:', err);
-      setErrorMsg(err.message || 'Không thể tải danh sách người dùng từ hệ thống.');
+      setErrorMsg(isLocalAuthMode && !getStoredToken()
+        ? 'User management requires a backend administrator session. Local sign-in only unlocks the admin interface.'
+        : 'Unable to load users. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -116,11 +115,11 @@ export const UserManagementView: React.FC = () => {
         prev.map((u) => (u.id === user.id ? { ...u, enabled: updated.enabled } : u))
       );
       setSuccessToast(
-        `Đã ${nextStatus ? 'kích hoạt' : 'tạm khóa'} tài khoản "${user.name}" thành công!`
+        `${user.name} has been ${nextStatus ? 'enabled' : 'disabled'}.`
       );
       setTimeout(() => setSuccessToast(null), 3000);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Lỗi khi cập nhật trạng thái người dùng.');
+    } catch (err: unknown) {
+      setErrorMsg((err instanceof Error ? err.message : '') || 'Unable to update the account status.');
     } finally {
       setUpdatingStatusId(null);
     }
@@ -141,11 +140,11 @@ export const UserManagementView: React.FC = () => {
       setUsers((prev) =>
         prev.map((u) => (u.id === roleModalUser.id ? { ...u, role: updated.role } : u))
       );
-      setSuccessToast(`Đã đổi vai trò của "${roleModalUser.name}" sang ${updated.role}!`);
+      setSuccessToast(`Role updated for ${roleModalUser.name}.`);
       setTimeout(() => setSuccessToast(null), 3000);
       setRoleModalUser(null);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Lỗi khi đổi quyền người dùng.');
+    } catch (err: unknown) {
+      setErrorMsg((err instanceof Error ? err.message : '') || 'Unable to update the user role.');
     } finally {
       setIsUpdatingRole(false);
     }
@@ -156,7 +155,7 @@ export const UserManagementView: React.FC = () => {
     if (!isoStr) return '—';
     try {
       const d = new Date(isoStr);
-      return d.toLocaleDateString('vi-VN', {
+      return d.toLocaleDateString('en-GB', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -203,60 +202,61 @@ export const UserManagementView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-text-muted text-xs">Tổng Người Dùng Toàn Hệ Thống</span>
+            <span className="text-text-muted text-xs">Registered users</span>
             <div className="text-2xl sm:text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
-              {summaryStats.total}
+              {hasLoadedUsers ? summaryStats.total : '—'}
             </div>
-            <p className="text-[11px] text-text-secondary">Tài khoản học viên & quản trị</p>
+            <p className="text-[11px] text-text-secondary">Learner and administrator accounts</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-antique-gold/15 border border-antique-gold/30 flex items-center justify-center text-heritage-green dark:text-antique-gold">
-            <Users className="w-6 h-6" />
+            <Users aria-hidden="true" className="w-6 h-6" />
           </div>
         </div>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-text-muted text-xs">Đang Hoạt Động (Trang Hiện Tại)</span>
+            <span className="text-text-muted text-xs">Enabled on this page</span>
             <div className="text-2xl sm:text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
-              {summaryStats.activeInPage} / {users.length}
+              {hasLoadedUsers ? `${summaryStats.activeInPage} / ${users.length}` : '—'}
             </div>
-            <p className="text-[11px] text-text-secondary">Trạng thái Enabled</p>
+            <p className="text-[11px] text-text-secondary">Accounts with active access</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <UserCheck className="w-6 h-6" />
+            <UserCheck aria-hidden="true" className="w-6 h-6" />
           </div>
         </div>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-text-muted text-xs">Quản Trị Viên (Trang Hiện Tại)</span>
+            <span className="text-text-muted text-xs">Administrators on this page</span>
             <div className="text-2xl sm:text-3xl font-heading font-bold text-antique-gold dark:text-antique-bright">
-              {summaryStats.adminInPage}
+              {hasLoadedUsers ? summaryStats.adminInPage : '—'}
             </div>
-            <p className="text-[11px] text-text-secondary">Quyền hạn ROLE_ADMIN</p>
+            <p className="text-[11px] text-text-secondary">Accounts with administrator access</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 flex items-center justify-center text-amber-700 dark:text-antique-gold">
-            <ShieldCheck className="w-6 h-6" />
+            <ShieldCheck aria-hidden="true" className="w-6 h-6" />
           </div>
         </div>
       </div>
 
       {/* ── Search & Filters Bar ───────────────────────────────────────── */}
       <div className="p-4 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
-        <form onSubmit={handleSearchSubmit} className="relative w-full md:w-96">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-          <input
+        <form onSubmit={handleSearchSubmit} className="admin-search relative w-full md:w-96" role="search">
+          <Search aria-hidden="true" className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+          <input aria-label="Search users"
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm theo tên hoặc email người dùng..."
+            placeholder="Search names or email addresses…"
             className="w-full pl-10 pr-4 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
           />
+          <button type="submit" className="rounded-xl bg-heritage-green px-3 text-warm-ivory">Search</button>
         </form>
 
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
           {/* Role Filter */}
-          <select
+          <select aria-label="Filter users by role"
             value={selectedRole}
             onChange={(e) => {
               setSelectedRole(e.target.value);
@@ -264,13 +264,13 @@ export const UserManagementView: React.FC = () => {
             }}
             className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
           >
-            <option value="">Tất cả Vai trò</option>
-            <option value="ROLE_ADMIN">Quản Trị Viên (ADMIN)</option>
-            <option value="ROLE_USER">Học Viên (USER)</option>
+            <option value="">All roles</option>
+            <option value="ROLE_ADMIN">Administrator</option>
+            <option value="ROLE_USER">Learner</option>
           </select>
 
           {/* Status Filter */}
-          <select
+          <select aria-label="Filter users by status"
             value={selectedStatus}
             onChange={(e) => {
               setSelectedStatus(e.target.value);
@@ -278,13 +278,13 @@ export const UserManagementView: React.FC = () => {
             }}
             className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
           >
-            <option value="">Tất cả Trạng thái</option>
-            <option value="enabled">Đang Hoạt Động</option>
-            <option value="disabled">Bị Tạm Khóa</option>
+            <option value="">All statuses</option>
+            <option value="enabled">Enabled</option>
+            <option value="disabled">Disabled</option>
           </select>
 
           {/* Page Size Filter */}
-          <select
+          <select aria-label="Users per page"
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
@@ -292,9 +292,9 @@ export const UserManagementView: React.FC = () => {
             }}
             className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
           >
-            <option value={10}>10 dòng/trang</option>
-            <option value={20}>20 dòng/trang</option>
-            <option value={50}>50 dòng/trang</option>
+            <option value={10}>10 per page</option>
+            <option value={20}>20 per page</option>
+            <option value={50}>50 per page</option>
           </select>
 
           {/* Reset button */}
@@ -308,7 +308,7 @@ export const UserManagementView: React.FC = () => {
               }}
               className="px-3 py-2 rounded-xl bg-white/40 dark:bg-white/10 hover:bg-white/60 text-xs font-bold text-text-muted cursor-pointer transition-colors"
             >
-              Xóa lọc
+              Clear filters
             </button>
           )}
 
@@ -317,29 +317,29 @@ export const UserManagementView: React.FC = () => {
             onClick={fetchUsers}
             disabled={isLoading}
             className="p-2 rounded-xl bg-white/40 dark:bg-white/10 hover:bg-white/60 border border-antique-gold/30 text-text-body dark:text-warm-ivory cursor-pointer transition-colors"
-            title="Tải lại danh sách"
+            title="Refresh users" aria-label="Refresh users"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* ── Alerts & Toasts ───────────────────────────────────────────── */}
       {errorMsg && (
-        <div className="p-4 rounded-2xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 text-red-800 dark:text-red-200 text-xs flex items-center justify-between">
+        <div role="alert" className="p-4 rounded-2xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 text-red-800 dark:text-red-200 text-xs flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
+            <AlertCircle aria-hidden="true" className="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
             <span>{errorMsg}</span>
           </div>
-          <button onClick={() => setErrorMsg(null)} className="cursor-pointer">
-            <X className="w-4 h-4" />
+          <button aria-label="Dismiss error" onClick={() => setErrorMsg(null)} className="cursor-pointer">
+            <X aria-hidden="true" className="w-4 h-4" />
           </button>
         </div>
       )}
 
       {successToast && (
-        <div className="p-4 rounded-2xl bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-800 text-green-800 dark:text-green-200 text-xs flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400" />
+        <div role="status" className="p-4 rounded-2xl bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-800 text-green-800 dark:text-green-200 text-xs flex items-center gap-2">
+          <CheckCircle2 aria-hidden="true" className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400" />
           <span>{successToast}</span>
         </div>
       )}
@@ -349,17 +349,18 @@ export const UserManagementView: React.FC = () => {
         {isLoading ? (
           <div className="py-20 text-center space-y-3">
             <div className="inline-block animate-spin w-8 h-8 border-3 border-antique-gold border-t-transparent rounded-full" />
-            <p className="text-xs text-text-muted">Đang tải danh sách người dùng...</p>
+            <p className="text-xs text-text-muted">Loading users…</p>
           </div>
         ) : users.length === 0 ? (
           <div className="py-20 text-center space-y-4">
-            <Users className="w-12 h-12 text-antique-gold/40 mx-auto" />
+            <Users aria-hidden="true" className="w-12 h-12 text-antique-gold/40 mx-auto" />
             <div className="space-y-1">
-              <h3 className="font-heading text-lg font-bold">Không tìm thấy người dùng nào</h3>
+              <h3 className="font-heading text-lg font-bold">{!hasLoadedUsers ? 'Users unavailable' : 'No users found'}</h3>
               <p className="text-xs text-text-muted max-w-sm mx-auto">
-                Không có tài khoản nào phù hợp với bộ lọc hiện tại. Thử xóa bớt tiêu chí tìm kiếm.
+                {!hasLoadedUsers ? 'We could not load the user list. Please try again.' : 'No accounts match the current filters. Try a different search.'}
               </p>
             </div>
+            {!hasLoadedUsers && <button type="button" onClick={fetchUsers} className="rounded-xl bg-heritage-green px-4 py-2 text-warm-ivory">Try again</button>}
             {(searchQuery || selectedRole || selectedStatus) && (
               <button
                 type="button"
@@ -371,7 +372,7 @@ export const UserManagementView: React.FC = () => {
                 }}
                 className="px-4 py-2 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold hover:bg-heritage-dark transition-colors cursor-pointer"
               >
-                Xóa bộ lọc tìm kiếm
+                Clear filters
               </button>
             )}
           </div>
@@ -380,13 +381,13 @@ export const UserManagementView: React.FC = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-warm-ivory/80 dark:bg-heritage-dark/80 border-b border-antique-gold/20 text-text-secondary uppercase text-[10px] font-bold tracking-wider">
                 <tr>
-                  <th className="px-5 py-3.5">Người Dùng</th>
-                  <th className="px-4 py-3.5">Vai Trò</th>
-                  <th className="px-4 py-3.5">Trình Độ CEFR</th>
-                  <th className="px-4 py-3.5 text-center">Từ Vựng Đã Lưu</th>
-                  <th className="px-4 py-3.5">Ngày Tham Gia</th>
-                  <th className="px-4 py-3.5">Trạng Thái</th>
-                  <th className="px-5 py-3.5 text-right">Thao Tác</th>
+                  <th className="px-5 py-3.5">Users</th>
+                  <th className="px-4 py-3.5">Role</th>
+                  <th className="px-4 py-3.5">CEFR level</th>
+                  <th className="px-4 py-3.5 text-center">Saved words</th>
+                  <th className="px-4 py-3.5">Joined</th>
+                  <th className="px-4 py-3.5">Status</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-antique-gold/15">
@@ -422,7 +423,7 @@ export const UserManagementView: React.FC = () => {
                               </span>
                               {isSelf && (
                                 <span className="inline-block px-1.5 py-0.2 rounded text-[9px] font-bold bg-antique-gold/25 text-heritage-green dark:text-antique-bright border border-antique-gold/40">
-                                  Bạn
+                                  You
                                 </span>
                               )}
                               <span className="inline-block px-1.5 py-0.2 rounded text-[9px] font-semibold bg-white/60 dark:bg-white/10 border border-antique-gold/20 text-text-secondary">
@@ -443,15 +444,15 @@ export const UserManagementView: React.FC = () => {
                               ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border-amber-300 hover:ring-2 hover:ring-amber-400'
                               : 'bg-rice-paper dark:bg-white/5 text-text-body dark:text-warm-ivory border-antique-gold/30 hover:border-antique-gold'
                           }`}
-                          title="Bấm để đổi vai trò"
+                          title="Change role" aria-label="Change role"
                         >
                           {isAdmin ? (
-                            <ShieldCheck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                            <ShieldCheck aria-hidden="true" className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                           ) : (
-                            <Users className="w-3.5 h-3.5 text-text-muted" />
+                            <Users aria-hidden="true" className="w-3.5 h-3.5 text-text-muted" />
                           )}
-                          <span>{isAdmin ? 'Quản Trị Viên' : 'Người Học'}</span>
-                          <Edit2 className="w-2.5 h-2.5 opacity-60 ml-0.5" />
+                          <span>{isAdmin ? 'Administrator' : 'Learner'}</span>
+                          <Edit2 aria-hidden="true" className="w-2.5 h-2.5 opacity-60 ml-0.5" />
                         </button>
                       </td>
 
@@ -463,17 +464,17 @@ export const UserManagementView: React.FC = () => {
                               user.englishLevel
                             )}`}
                           >
-                            Trình độ {user.englishLevel}
+                            Level {user.englishLevel}
                           </span>
                         ) : (
-                          <span className="text-text-muted text-[11px] italic">Chưa chọn</span>
+                          <span className="text-text-muted text-[11px] italic">Not set</span>
                         )}
                       </td>
 
                       {/* Saved Vocab Count */}
                       <td className="px-4 py-4 whitespace-nowrap text-center">
                         <span className="inline-inline-flex items-center gap-1 font-semibold text-text-body dark:text-warm-ivory text-xs">
-                          <BookMarked className="w-3.5 h-3.5 inline text-antique-gold mr-1" />
+                          <BookMarked aria-hidden="true" className="w-3.5 h-3.5 inline text-antique-gold mr-1" />
                           {user.savedVocabCount || 0}
                         </span>
                       </td>
@@ -481,7 +482,7 @@ export const UserManagementView: React.FC = () => {
                       {/* Join Date */}
                       <td className="px-4 py-4 whitespace-nowrap text-text-secondary text-[11px]">
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-text-muted" />
+                          <Calendar aria-hidden="true" className="w-3 h-3 text-text-muted" />
                           <span>{formatDate(user.createdAt)}</span>
                         </div>
                       </td>
@@ -500,21 +501,21 @@ export const UserManagementView: React.FC = () => {
                           }`}
                           title={
                             isSelf && user.enabled
-                              ? 'Không thể tự khóa tài khoản quản trị của chính bạn'
+                              ? 'You cannot disable your own administrator account'
                               : user.enabled
-                              ? 'Bấm để tạm khóa tài khoản'
-                              : 'Bấm để kích hoạt lại'
+                              ? 'Disable account'
+                              : 'Enable account'
                           }
                         >
                           {user.enabled ? (
                             <>
-                              <Unlock className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                              <span>Hoạt động</span>
+                              <Unlock aria-hidden="true" className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                              <span>Enabled</span>
                             </>
                           ) : (
                             <>
-                              <Lock className="w-3 h-3 text-red-600 dark:text-red-400" />
-                              <span>Đã khóa</span>
+                              <Lock aria-hidden="true" className="w-3 h-3 text-red-600 dark:text-red-400" />
+                              <span>Disabled</span>
                             </>
                           )}
                         </button>
@@ -526,7 +527,7 @@ export const UserManagementView: React.FC = () => {
                           onClick={() => handleOpenRoleModal(user)}
                           className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-antique-gold/15 text-heritage-green dark:text-antique-bright hover:bg-antique-gold/30 transition-colors cursor-pointer"
                         >
-                          Đổi vai trò
+                          Change role
                         </button>
                       </td>
                     </tr>
@@ -540,9 +541,9 @@ export const UserManagementView: React.FC = () => {
         {/* ── Pagination Footer ─────────────────────────────────────────── */}
         <div className="px-5 py-3.5 bg-warm-ivory/80 dark:bg-heritage-dark/80 border-t border-antique-gold/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-secondary">
           <div>
-            Trang <span className="font-bold text-heritage-green dark:text-warm-ivory">{currentPage + 1}</span> /{' '}
-            <span className="font-bold">{totalPages || 1}</span> (Tổng cộng{' '}
-            <span className="font-bold text-heritage-green dark:text-warm-ivory">{totalElements}</span> người dùng)
+            Page <span className="font-bold text-heritage-green dark:text-warm-ivory">{currentPage + 1}</span> /{' '}
+            <span className="font-bold">{totalPages || 1}</span> (Total{' '}
+            <span className="font-bold text-heritage-green dark:text-warm-ivory">{hasLoadedUsers ? totalElements : '—'}</span> users)
           </div>
 
           <div className="flex items-center gap-2">
@@ -551,8 +552,8 @@ export const UserManagementView: React.FC = () => {
               disabled={currentPage <= 0 || isLoading}
               className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-white/60 dark:bg-white/10 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition-colors cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Trước</span>
+              <ChevronLeft aria-hidden="true" className="w-4 h-4" />
+              <span>Previous</span>
             </button>
 
             <button
@@ -560,17 +561,17 @@ export const UserManagementView: React.FC = () => {
               disabled={currentPage >= totalPages - 1 || isLoading}
               className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-white/60 dark:bg-white/10 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition-colors cursor-pointer"
             >
-              <span>Sau</span>
-              <ChevronRight className="w-4 h-4" />
+              <span>Next</span>
+              <ChevronRight aria-hidden="true" className="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* ── Modal Đổi Vai Trò (Role Modal) ─────────────────────────────── */}
+      {/* ── Modal Đổi Role (Role Modal) ─────────────────────────────── */}
       <AnimatePresence>
         {roleModalUser && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-heritage-dark/80 backdrop-blur-md">
+          <AdminDialog title="Change user role" onClose={() => { if (!isUpdatingRole) setRoleModalUser(null); }}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -581,20 +582,20 @@ export const UserManagementView: React.FC = () => {
               <div className="flex items-center justify-between border-b border-antique-gold/20 pb-3">
                 <div className="flex items-center gap-2.5">
                   <div className="p-2 rounded-xl bg-antique-gold/20 text-antique-gold">
-                    <ShieldCheck className="w-5 h-5" />
+                    <ShieldCheck aria-hidden="true" className="w-5 h-5" />
                   </div>
                   <div>
                     <h3 className="font-heading font-bold text-base text-heritage-green dark:text-warm-ivory">
-                      Phân Quyền Người Dùng
+                      Change user role
                     </h3>
-                    <p className="text-[11px] text-text-muted">Thay đổi quyền hạn truy cập hệ thống</p>
+                    <p className="text-[11px] text-text-muted">Manage access to administration tools</p>
                   </div>
                 </div>
-                <button
+                <button aria-label="Close role dialog"
                   onClick={() => setRoleModalUser(null)}
                   className="p-1.5 rounded-xl hover:bg-white/10 text-text-muted cursor-pointer"
                 >
-                  <X className="w-4 h-4" />
+                  <X aria-hidden="true" className="w-4 h-4" />
                 </button>
               </div>
 
@@ -605,7 +606,7 @@ export const UserManagementView: React.FC = () => {
                 </div>
                 <div className="text-text-muted text-[11px]">{roleModalUser.email}</div>
                 <div className="text-[11px] text-text-secondary pt-1">
-                  Vai trò hiện tại:{' '}
+                  Current role:{' '}
                   <span className="font-bold text-antique-gold">
                     {roleModalUser.role || 'ROLE_USER'}
                   </span>
@@ -614,10 +615,11 @@ export const UserManagementView: React.FC = () => {
 
               {/* Role selection radio cards */}
               <div className="space-y-2.5">
-                <label className="text-xs font-bold text-text-secondary">Chọn vai trò mới:</label>
+                <label className="text-xs font-bold text-text-secondary">Choose a role:</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
+                    aria-pressed={newRole === 'ROLE_USER'}
                     onClick={() => setNewRole('ROLE_USER')}
                     className={`p-3.5 rounded-2xl border text-left cursor-pointer transition-all ${
                       newRole === 'ROLE_USER'
@@ -626,19 +628,20 @@ export const UserManagementView: React.FC = () => {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <Users className="w-4 h-4 text-heritage-green dark:text-warm-ivory" />
+                      <Users aria-hidden="true" className="w-4 h-4 text-heritage-green dark:text-warm-ivory" />
                       {newRole === 'ROLE_USER' && (
-                        <CheckCircle2 className="w-4 h-4 text-antique-gold" />
+                        <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                       )}
                     </div>
                     <div className="font-heading font-bold text-xs text-text-body dark:text-warm-ivory">
-                      Học Viên
+                      Learner
                     </div>
-                    <div className="text-[10px] text-text-muted">ROLE_USER (Mặc định)</div>
+                    <div className="text-[10px] text-text-muted">Learner access</div>
                   </button>
 
                   <button
                     type="button"
+                    aria-pressed={newRole === 'ROLE_ADMIN'}
                     onClick={() => setNewRole('ROLE_ADMIN')}
                     className={`p-3.5 rounded-2xl border text-left cursor-pointer transition-all ${
                       newRole === 'ROLE_ADMIN'
@@ -647,15 +650,15 @@ export const UserManagementView: React.FC = () => {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <ShieldCheck aria-hidden="true" className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                       {newRole === 'ROLE_ADMIN' && (
-                        <CheckCircle2 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                        <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                       )}
                     </div>
                     <div className="font-heading font-bold text-xs text-text-body dark:text-warm-ivory">
-                      Quản Trị Viên
+                      Administrator
                     </div>
-                    <div className="text-[10px] text-text-muted">ROLE_ADMIN (Toàn quyền)</div>
+                    <div className="text-[10px] text-text-muted">Administrator access</div>
                   </button>
                 </div>
               </div>
@@ -663,9 +666,9 @@ export const UserManagementView: React.FC = () => {
               {/* Warning notice when self-demoting */}
               {roleModalUser && currentAdminEmail && roleModalUser.email?.toLowerCase() === currentAdminEmail && newRole !== 'ROLE_ADMIN' && (
                 <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 text-[11px] text-red-800 dark:text-red-300 flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
+                  <AlertCircle aria-hidden="true" className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
                   <span>
-                    Bạn không thể tự hạ cấp tài khoản của chính mình xuống Học viên để tránh mất quyền quản trị hệ thống.
+                    You cannot remove your own administrator role.
                   </span>
                 </div>
               )}
@@ -673,10 +676,9 @@ export const UserManagementView: React.FC = () => {
               {/* Warning notice when promoting */}
               {newRole === 'ROLE_ADMIN' && (
                 <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
-                  <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
+                  <ShieldAlert aria-hidden="true" className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
                   <span>
-                    Tài khoản được cấp quyền Quản Trị Viên sẽ có toàn quyền chỉnh sửa bài đọc, quản lý
-                    người dùng và xem dữ liệu hệ thống.
+                    Administrators can edit articles, manage accounts and view system data.
                   </span>
                 </div>
               )}
@@ -689,7 +691,7 @@ export const UserManagementView: React.FC = () => {
                   disabled={isUpdatingRole}
                   className="px-4 py-2 rounded-xl border border-antique-gold/30 text-xs font-bold hover:bg-white/10 transition-colors cursor-pointer"
                 >
-                  Hủy bỏ
+                  Cancel
                 </button>
                 <button
                   type="button"
@@ -708,18 +710,18 @@ export const UserManagementView: React.FC = () => {
                   {isUpdatingRole ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-heritage-dark border-t-transparent rounded-full animate-spin" />
-                      <span>Đang lưu...</span>
+                      <span>Saving…</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Xác Nhận Đổi Quyền</span>
+                      <CheckCircle2 aria-hidden="true" className="w-3.5 h-3.5" />
+                      <span>Save role</span>
                     </>
                   )}
                 </button>
               </div>
             </motion.div>
-          </div>
+          </AdminDialog>
         )}
       </AnimatePresence>
     </div>

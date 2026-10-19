@@ -105,11 +105,11 @@ const INITIAL_POSTS: CommunityPost[] = [
 ];
 
 const CATEGORIES = [
-  { id: "all", label: "Tất Cả Bài Viết" },
-  { id: "Imperial Hue", label: "Cố Đô Huế" },
-  { id: "Saigon Bánh Mì", label: "Ẩm Thực Sài Gòn" },
-  { id: "Hội An Lanterns", label: "Phố Cổ Hội An" },
-  { id: "my-posts", label: "Bài Của Tôi" },
+  { id: "all", label: "All posts" },
+  { id: "Imperial Hue", label: "Imperial Hue" },
+  { id: "Saigon Bánh Mì", label: "Saigon food" },
+  { id: "Hội An Lanterns", label: "Hoi An lanterns" },
+  { id: "my-posts", label: "My posts" },
 ];
 
 export default function CommunityPage() {
@@ -164,8 +164,8 @@ export default function CommunityPage() {
           }
           showToast(
             !isBookmarked
-              ? "Đã lưu bài viết vào danh sách yêu thích!"
-              : "Đã gỡ bài viết khỏi danh sách lưu."
+              ? "Post saved to your favorites."
+              : "Post removed from your saved list."
           );
           return updated;
         }
@@ -201,13 +201,13 @@ export default function CommunityPage() {
         return post;
       })
     );
-    showToast("Đã đăng bình luận thành công!");
+    showToast("Your comment has been posted.");
   };
 
   // Publish New Reflection
   const handlePublish = () => {
     if (!reflectionText.trim()) {
-      alert("Vui lòng nhập nội dung bài cảm nhận của bạn!");
+      alert("Enter your reflection before publishing.");
       return;
     }
 
@@ -219,7 +219,7 @@ export default function CommunityPage() {
       timeAgo: "Vừa xong",
       lessonTag: selectedLesson,
       topicCategory: "general",
-      title: postTitle.trim() || `Cảm nhận về ${selectedLesson}`,
+      title: postTitle.trim() || `Reflections on ${selectedLesson}`,
       contentEn: reflectionText.trim(),
       highlightWords: [],
       heartsCount: 1,
@@ -234,7 +234,7 @@ export default function CommunityPage() {
     setPostTitle("");
     setReflectionText("");
     setIsEditorOpen(false);
-    showToast("Bài viết cảm nhận của bạn đã được đăng thành công!");
+    showToast("Your reflection has been published.");
   };
 
   // Filtered Posts
@@ -264,10 +264,10 @@ export default function CommunityPage() {
   }, [posts, selectedCategory, searchQuery]);
 
   return (
-    <main className="min-h-screen bg-surface text-text-body relative">
+    <main className="community-ui min-h-screen bg-surface text-text-body relative">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap">
+        <div role="status" className="community-toast fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap">
           <Check className="w-4 h-4 text-antique-gold shrink-0" />
           <span>{toastMessage}</span>
         </div>
@@ -295,13 +295,14 @@ export default function CommunityPage() {
         />
 
         {/* Filter Toolbar & Search Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="community-filter-toolbar flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           {/* Category Tabs */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="community-category-tabs flex flex-wrap items-center gap-2" role="group" aria-label="Filter reflections">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
+                aria-pressed={selectedCategory === cat.id}
                 className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer focus-ring ${
                   selectedCategory === cat.id
                     ? "bg-heritage-green text-warm-ivory shadow-sm"
@@ -320,7 +321,8 @@ export default function CommunityPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tìm theo chủ đề, từ khóa, tác giả..."
+              aria-label="Search community posts"
+              placeholder="Search topics, keywords or authors…"
               className="w-full pl-9 pr-4 py-2 rounded-full bg-surface border border-line text-xs text-heritage-green placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-antique-gold/40"
             />
           </div>
@@ -333,7 +335,7 @@ export default function CommunityPage() {
             <div className="flex items-center justify-between pb-2">
               <h2 className="font-serif text-xl font-bold text-heritage-green flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-antique-gold" />
-                <span>Bài Viết Cảm Nhận Từ Cộng Đồng ({filteredPosts.length})</span>
+                <span>Community reflections ({filteredPosts.length})</span>
               </h2>
             </div>
 
@@ -347,7 +349,7 @@ export default function CommunityPage() {
                   onOpenDetail={(p) => setActiveModalPost(p)}
                   onShare={() => {
                     navigator.clipboard?.writeText(window.location.href);
-                    showToast("Đã sao chép liên kết bài viết!");
+                    showToast("Post link copied.");
                   }}
                 />
               ))
@@ -355,10 +357,10 @@ export default function CommunityPage() {
               <div className="p-12 text-center rounded-3xl bg-surface border border-line space-y-3">
                 <MessageSquare className="w-8 h-8 text-text-secondary/40 mx-auto" />
                 <h3 className="font-serif text-base font-bold text-heritage-green">
-                  Chưa tìm thấy bài viết phù hợp
+                  No matching posts
                 </h3>
                 <p className="text-xs text-text-secondary max-w-sm mx-auto">
-                  Hãy thử thay đổi từ khóa tìm kiếm hoặc bấm nút "Viết Bài Cảm Nhận" để trở thành người đầu tiên chia sẻ về chủ đề này!
+                  Try another search or choose “Write a reflection” to share your perspective.
                 </p>
               </div>
             )}
@@ -391,9 +393,9 @@ export default function CommunityPage() {
           setIsEditorOpen(true);
           window.scrollTo({ top: 120, behavior: "smooth" });
         }}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-heritage-green text-warm-ivory font-bold shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-antique-gold z-40 focus-ring cursor-pointer"
-        title="Viết bài cảm nhận"
-        aria-label="Mở trình soạn bài cảm nhận"
+        className="community-fab fixed bottom-8 right-8 w-14 h-14 rounded-full bg-heritage-green text-warm-ivory font-bold shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-antique-gold z-40 focus-ring cursor-pointer"
+        title="Write a reflection"
+        aria-label="Open reflection editor"
       >
         <Plus className="w-6 h-6 text-antique-gold" />
       </button>

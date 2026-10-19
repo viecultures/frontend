@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { PLAYGROUND_SCREENS } from '../types';
 import { PlaygroundSidebarNav } from '../components/PlaygroundSidebarNav';
 import { Feather, Radio, Zap, Sparkles, Home } from 'lucide-react';
@@ -9,13 +9,22 @@ import { VideoDictationShadowingScreen } from '../components/screens/VideoDictat
 import { VietnamMapAiScreen } from '../components/map-ai/VietnamMapAiScreen';
 import { VietnamMapImmersiveScreen } from '../components/map-ai/VietnamMapImmersiveScreen';
 import { LiveAPIProvider } from '../components/map-ai/contexts/LiveAPIContext';
-import { PATHS } from '@/routes/paths';
+import { PATHS, paths } from '@/routes/paths';
 
 export const PlaygroundPage: React.FC = () => {
   const navigate = useNavigate();
-  const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
+  const [searchParams] = useSearchParams();
+  const enterChat = searchParams.get('view') === 'chat' || !!searchParams.get('story');
+  const [currentScreenIndex, setCurrentScreenIndex] = useState(enterChat ? 1 : 0);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const screenRefs = useRef<(HTMLElement | null)[]>([]);
+
+  useLayoutEffect(() => {
+    if (enterChat) {
+      setCurrentScreenIndex(1);
+      screenRefs.current[1]?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+  }, [enterChat]);
 
   // Scroll to selected screen index
   const scrollToScreen = (index: number) => {
@@ -79,6 +88,8 @@ export const PlaygroundPage: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentScreenIndex]);
+
+  if (enterChat) return <Navigate replace to={paths.aiWorkspace({ story: searchParams.get('story') || undefined, topic: searchParams.get('topic') || undefined, level: searchParams.get('level') || undefined })} />;
 
   return (
     <LiveAPIProvider activeView={currentScreenIndex === 1 ? 'chat' : currentScreenIndex === 2 ? 'immersive' : null}>

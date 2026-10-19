@@ -24,7 +24,7 @@ const PRO_STATUS_KEY = 'vie_user_is_pro';
 
 export const getStoredUser = (): AppUser | null => {
   try {
-    const raw = localStorage.getItem(AUTH_USER_KEY);
+    const raw = globalThis.sessionStorage?.getItem(AUTH_USER_KEY) || localStorage.getItem(AUTH_USER_KEY);
     if (!raw) return null;
     return JSON.parse(raw);
   } catch {
@@ -32,7 +32,7 @@ export const getStoredUser = (): AppUser | null => {
   }
 };
 
-export const clearAuthStorage = () => {
+const removeAuthStorage = () => {
   try {
     localStorage.removeItem(AUTH_USER_KEY);
     localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -59,21 +59,35 @@ export const clearAuthStorage = () => {
   } catch (err) {
     console.error('[auth-storage] Lỗi khi dọn dẹp bộ nhớ xác thực:', err);
   }
+};
+
+export const clearAuthStorage = () => {
+  removeAuthStorage();
+  window.dispatchEvent(new CustomEvent('auth:change'));
+};
+
+export const setAuthSession = (user: AppUser, token: string | null, rememberMe: boolean) => {
+  removeAuthStorage();
+  const storage = rememberMe ? localStorage : sessionStorage;
+  storage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+  if (token) storage.setItem(AUTH_TOKEN_KEY, token);
   window.dispatchEvent(new CustomEvent('auth:change'));
 };
 
 export const setStoredUser = (user: AppUser | null) => {
   if (user) {
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+    const storage = sessionStorage.getItem(AUTH_USER_KEY) ? sessionStorage : localStorage;
+    storage.setItem(AUTH_USER_KEY, JSON.stringify(user));
   } else {
     localStorage.removeItem(AUTH_USER_KEY);
+    sessionStorage.removeItem(AUTH_USER_KEY);
   }
   window.dispatchEvent(new CustomEvent('auth:change'));
 };
 
 export const getStoredToken = (): string | null => {
   try {
-    return localStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem('token') || localStorage.getItem('jwt');
+    return globalThis.sessionStorage?.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem('token') || localStorage.getItem('jwt');
   } catch {
     return null;
   }
@@ -81,11 +95,13 @@ export const getStoredToken = (): string | null => {
 
 export const setStoredToken = (token: string | null) => {
   if (token) {
-    localStorage.setItem(AUTH_TOKEN_KEY, token);
+    const storage = sessionStorage.getItem(AUTH_USER_KEY) ? sessionStorage : localStorage;
+    storage.setItem(AUTH_TOKEN_KEY, token);
   } else {
     localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem('token');
     localStorage.removeItem('jwt');
+    sessionStorage.removeItem(AUTH_TOKEN_KEY);
   }
   window.dispatchEvent(new CustomEvent('auth:change'));
 };

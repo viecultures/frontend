@@ -13,12 +13,12 @@ interface CommunityPostEditorProps {
 }
 
 const TOPIC_OPTIONS = [
-  { value: "Imperial Hue", label: "Kiến trúc & Di sản Cố Đô Huế (Imperial Hue)" },
-  { value: "Saigon Bánh Mì", label: "Ẩm thực Bánh Mì Sài Gòn (Saigon Bánh Mì)" },
-  { value: "Hội An Lanterns", label: "Đêm Rằm & Phố Cổ Hội An (Hội An Lanterns)" },
-  { value: "Bát Tràng Pottery", label: "Nghệ thuật Gốm Sứ Bát Tràng (Bát Tràng Pottery)" },
-  { value: "Egg Coffee", label: "Văn hóa Cà Phê Trứng Hà Nội (Egg Coffee)" },
-  { value: "Dong Ho Folk Art", label: "Tranh Dân Gian Đông Hồ (Dong Ho Art)" },
+  { value: "Imperial Hue", label: "Imperial Hue architecture & heritage" },
+  { value: "Saigon Bánh Mì", label: "Saigon bánh mì & food culture" },
+  { value: "Hội An Lanterns", label: "Hoi An lanterns & full moon nights" },
+  { value: "Bát Tràng Pottery", label: "Bát Tràng pottery & craftsmanship" },
+  { value: "Egg Coffee", label: "Hanoi egg coffee culture" },
+  { value: "Dong Ho Folk Art", label: "Đông Hồ folk art" },
 ];
 
 export function CommunityPostEditor({
@@ -39,27 +39,27 @@ export function CommunityPostEditor({
   return (
     <div
       id="reflection-editor"
-      className="mb-10 p-6 sm:p-8 rounded-3xl bg-rice-paper border-2 border-antique-gold/60 shadow-xl space-y-6 animate-in fade-in slide-in-from-top-4 duration-300"
+      className="community-editor mb-10 p-6 sm:p-8 rounded-3xl bg-rice-paper border-2 border-antique-gold/60 shadow-xl space-y-6 animate-in fade-in slide-in-from-top-4 duration-300"
     >
       <div className="flex items-center justify-between pb-4 border-b border-line">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full bg-antique-gold/20 text-heritage-green text-[11px] font-bold border border-antique-gold/30 flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-antique-gold" />
-              <span>Góc Nhìn Học Viên</span>
+              <span>Learner perspective</span>
             </span>
           </div>
           <h2 className="font-serif text-xl sm:text-2xl font-bold text-heritage-green">
-            Viết Bài Cảm Nhận Văn Hóa Của Bạn
+            Write your cultural reflection
           </h2>
           <span className="text-xs text-text-secondary">
-            Ứng dụng từ vựng bài đọc để viết bài chia sẻ tự nhiên. Không áp lực ngữ pháp đỏ.
+            Use vocabulary from your reading to express your thoughts. No grammar pressure.
           </span>
         </div>
         <button
           onClick={onClose}
           className="p-1.5 rounded-full hover:bg-mist-cloud text-heritage-green transition-colors focus-ring cursor-pointer"
-          aria-label="Đóng trình soạn bài"
+          aria-label="Close reflection editor"
         >
           <X className="w-5 h-5" />
         </button>
@@ -74,7 +74,7 @@ export function CommunityPostEditor({
             className="block text-xs font-bold text-heritage-green uppercase mb-2 flex items-center gap-1.5"
           >
             <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Chủ đề / Bài học liên quan:</span>
+            <span>Related topic or lesson</span>
           </label>
           <select
             id="lesson-select"
@@ -97,14 +97,14 @@ export function CommunityPostEditor({
             className="block text-xs font-bold text-heritage-green uppercase mb-2 flex items-center gap-1.5"
           >
             <Tag className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Tiêu đề bài viết (Tùy chọn):</span>
+            <span>Post title (optional)</span>
           </label>
           <input
             id="title-input"
             type="text"
             value={postTitle}
             onChange={(e) => onChangePostTitle?.(e.target.value)}
-            placeholder="Ví dụ: My unforgettable morning at Ngọ Môn Gate..."
+            placeholder="e.g. My unforgettable morning at Ngọ Môn Gate…"
             className="w-full px-4 py-2.5 rounded-xl bg-surface border border-heritage-green/15 text-xs font-medium text-heritage-green placeholder:text-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-antique-gold/40"
           />
         </div>
@@ -115,34 +115,34 @@ export function CommunityPostEditor({
         <textarea
           value={reflectionText}
           onChange={(e) => onChangeReflectionText(e.target.value)}
-          placeholder="Chia sẻ kỷ niệm, cảm xúc hoặc suy nghĩ của bạn bằng tiếng Anh..."
+          placeholder="Share a memory, feeling or thought in English…"
           className="w-full h-40 p-4 rounded-2xl bg-surface border border-heritage-green/15 text-sm text-heritage-green placeholder:text-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-antique-gold/40 leading-relaxed font-sans"
-          aria-label="Nội dung bài cảm nhận"
+          aria-label="Reflection text"
         />
         <div className="flex items-center justify-between text-xs text-text-secondary px-1">
-          <span>Khuyến khích dùng ít nhất 2 từ vựng vừa học để tạo thói quen nhớ sâu.</span>
-          <span className="font-semibold">{wordCount} từ</span>
+          <span>Try using at least two words you have learned.</span>
+          <span className="font-semibold">{wordCount} words</span>
         </div>
       </div>
 
       {/* Editor Actions */}
       <div className="flex items-center justify-between pt-2 border-t border-line">
         <span className="text-xs text-text-secondary italic hidden sm:inline">
-          Thực hành diễn đạt tự do • Lan tỏa vẻ đẹp văn hóa Việt
+          Express yourself freely · Share Vietnamese culture
         </span>
         <div className="flex items-center gap-3 ml-auto">
           <button
             onClick={onClose}
             className="px-5 py-2.5 rounded-full text-xs font-bold text-heritage-green bg-surface border border-line hover:bg-mist-cloud transition-colors focus-ring cursor-pointer"
           >
-            Hủy
+            Cancel
           </button>
           <button
             onClick={onPublish}
             className="px-6 py-2.5 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm border border-antique-gold/60 inline-flex items-center gap-2 transition-all focus-ring cursor-pointer"
           >
             <Send className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Đăng Bài Cảm Nhận</span>
+            <span>Publish reflection</span>
           </button>
         </div>
       </div>

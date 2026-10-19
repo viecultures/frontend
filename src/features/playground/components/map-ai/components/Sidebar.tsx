@@ -13,7 +13,7 @@ import {
   type CorrectionMode,
   type MapContextMode,
 } from '../lib/state';
-import c from 'classnames';
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import {
   AVAILABLE_VOICES_FULL,
   AVAILABLE_VOICES_LIMITED,
@@ -38,7 +38,7 @@ import {
   type LessonAgentMetadata,
   type ProficiencyLevel,
 } from '@/data/lessonAgentCatalog';
-import { PROFICIENCY_LEVELS } from '../lib/prompt-scaffolder';
+import { useMapAiDebugStore } from '../lib/debug-logger';
 
 const AVAILABLE_MODELS = ['gemini-3.1-flash-live-preview', 'gemini-2.0-flash-realtime-exp'];
 
@@ -146,13 +146,15 @@ export default function Sidebar() {
   if (!activeView) return null;
 
   return (
-    <aside className={c('sidebar', { open: isSidebarOpen })}>
+    <Dialog open={isSidebarOpen} onClose={toggleSidebar} className={`map-ai-app ai-chat-ui ai-workspace-settings-dialog ${theme === 'light' ? 'light-theme' : ''}`}>
+      <DialogBackdrop className="ai-workspace-settings-backdrop" />
+      <DialogPanel className="sidebar open">
       <div className="sidebar-header">
         <div className="flex items-center gap-2 text-[#D4AF37]">
           <Sparkles className="w-5 h-5 text-[#D4AF37]" />
-          <h3 className="font-serif font-bold text-base text-white">Cài Đặt Gia Sư AI</h3>
+          <DialogTitle as="h3" className="font-serif font-bold text-base text-white">Speaking settings</DialogTitle>
         </div>
-        <button onClick={toggleSidebar} className="close-button" aria-label="Đóng cài đặt">
+        <button onClick={toggleSidebar} className="close-button" aria-label="Close settings">
           <X className="w-5 h-5 text-gray-400 hover:text-white" />
         </button>
       </div>
@@ -175,7 +177,7 @@ export default function Sidebar() {
             }}
           >
             <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>Tạm dừng buổi học để áp dụng các thay đổi cấu hình.</span>
+            <span>Pause the conversation to change these settings.</span>
           </div>
         )}
 
@@ -184,22 +186,22 @@ export default function Sidebar() {
           {tutorMode !== 'free-conversation' && <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Bài Đọc Văn Hóa Mục Tiêu</span>
+              <span>Story to practise</span>
             </label>
             <select
-              value={activeLessonId}
+              aria-label="Story to practise" value={activeLessonId}
               disabled={connected}
               onChange={e => handleLessonChange(e.target.value)}
               className="w-full text-xs font-serif"
             >
               {LESSON_AGENT_CATALOG.map((lesson: LessonAgentMetadata) => (
                 <option key={lesson.id} value={lesson.id}>
-                  {lesson.vietnameseTitle} ({lesson.provinceName})
+                  {lesson.title} ({lesson.provinceName})
                 </option>
               ))}
             </select>
             <p className="text-[11px] text-gray-400">
-              Gia sư AI sẽ đồng bộ bản đồ, từ vựng và câu hỏi theo bài học này.
+              Use this story for guided listening and speaking.
             </p>
           </div>}
 
@@ -207,22 +209,22 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Trình Độ Luyện Nói &amp; Nội Dung</span>
+              <span>Speaking level</span>
             </label>
             <select
-              value={proficiencyLevel}
+              aria-label="Speaking level" value={proficiencyLevel}
               disabled={busy}
               onChange={e => void handleLevelChange(e.target.value as ProficiencyLevel)}
               className="w-full text-xs font-semibold"
             >
-              <option value="Level 1">Level 1 (A1) — Nói CHẬM · Câu 5-10 từ · Ngữ pháp A1 &amp; Starters/Movers</option>
-              <option value="Level 2">Level 2 (B1–B2) — Trung cấp · Đàm thoại tự nhiên &amp; So sánh vùng miền</option>
-              <option value="Level 3">Level 3 (B2–C1) — Cao cấp · Di sản chuyên sâu &amp; Phản biện</option>
+              <option value="Level 1">Level 1 (A1) — Slow pace · Short, simple sentences</option>
+              <option value="Level 2">Level 2 (B1–B2) — Intermediate · Natural conversation</option>
+              <option value="Level 3">Level 3 (B2–C1) — Advanced · Detailed discussion</option>
             </select>
             <p className="text-[11px] text-gray-400">
-              {proficiencyLevel === 'Level 1' && 'Level 1: AI nói chậm, chia 2-3 đoạn ngắn, mỗi câu 1 ý chính (5-10 từ), ngữ pháp A1 (There is, People make), kèm mẫu câu gợi ý.'}
-              {proficiencyLevel === 'Level 2' && 'Level 2: Tốc độ tự nhiên, câu ghép 10-18 từ, từ vựng văn hóa tiêu chuẩn, câu hỏi so sánh vùng miền.'}
-              {proficiencyLevel === 'Level 3' && 'Level 3: Tốc độ lưu loát bản ngữ, câu phức học thuật, thuật ngữ di sản chuyên sâu, tư duy phản biện & bảo tồn.'}
+              {proficiencyLevel === 'Level 1' && 'Short sentences, slower speech and sentence starters.'}
+              {proficiencyLevel === 'Level 2' && 'Natural speech, cultural vocabulary and comparisons.'}
+              {proficiencyLevel === 'Level 3' && 'Fluent speech, richer vocabulary and critical discussion.'}
             </p>
           </div>
 
@@ -230,7 +232,7 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
               <Mic className="w-3.5 h-3.5" />
-              <span>Chế Độ Học &amp; Đàm Thoại</span>
+              <span>Practice mode</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -243,7 +245,7 @@ export default function Sidebar() {
                     : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
                 }`}
               >
-                Đàm thoại tự do
+                Free talk
               </button>
               <button
                 type="button"
@@ -255,33 +257,33 @@ export default function Sidebar() {
                     : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
                 }`}
               >
-                Luyện tập bài đọc
+                Story practice
               </button>
             </div>
             <p className="text-[11px] text-gray-400 mt-1">
               {tutorMode === 'guided-lesson'
-                ? 'Luyện theo bài học di sản: AI dẫn dắt Nghe, Nói, Từ vựng và Đọc hiểu.'
-                : 'Trò chuyện tự do: Đàm thoại tiếng Anh tự nhiên về văn hóa, địa danh Việt Nam.'}
+                ? 'Practise listening, speaking and comprehension with a story.'
+                : 'Have a natural conversation about Vietnamese culture.'}
             </p>
           </div>
 
           {tutorMode === 'free-conversation' && (
             <>
               <div className="space-y-1.5 mb-4">
-                <label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Sửa lỗi trong hội thoại</label>
-                <select value={correctionMode} disabled={connected} onChange={e => setCorrectionMode(e.target.value as CorrectionMode)} className="w-full text-xs">
-                  <option value="off">Tắt sửa lỗi</option>
-                  <option value="after-turn">Sửa sau mỗi lượt nói</option>
-                  <option value="end-of-session">Tổng hợp cuối buổi</option>
+                <label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Corrections</label>
+                <select aria-label="Corrections" value={correctionMode} disabled={connected} onChange={e => setCorrectionMode(e.target.value as CorrectionMode)} className="w-full text-xs">
+                  <option value="off">Off</option>
+                  <option value="after-turn">After each turn</option>
+                  <option value="end-of-session">At the end</option>
                 </select>
               </div>
               <div className="space-y-1.5 mb-4">
-                <label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">AI điều khiển bản đồ</label>
-                <select value={mapContextMode} disabled={connected} onChange={e => setMapContextMode(e.target.value as MapContextMode)} className="w-full text-xs">
-                  <option value="off">Tắt điều khiển bằng AI</option>
-                  <option value="on-demand">Khi tôi yêu cầu chỉ địa điểm</option>
+                <label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">AI map controls</label>
+                <select aria-label="AI map controls" value={mapContextMode} disabled={connected} onChange={e => setMapContextMode(e.target.value as MapContextMode)} className="w-full text-xs">
+                  <option value="off">Off</option>
+                  <option value="on-demand">When I ask for a place</option>
                 </select>
-                <p className="text-[11px] text-gray-400">Bạn luôn có thể khám phá map độc lập. Bấm Hỏi AI để đưa địa điểm vào cuộc trò chuyện.</p>
+                <p className="text-[11px] text-gray-400">Explore the map any time. Choose Ask AI to discuss a place.</p>
               </div>
             </>
           )}
@@ -290,10 +292,10 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
               <Volume2 className="w-3.5 h-3.5" />
-              <span>Giọng Nói &amp; Ngữ Điệu Gia Sư AI</span>
+              <span>Voice</span>
             </label>
             <select
-              value={voice}
+              aria-label="Voice" value={voice}
               disabled={connected}
               onChange={e => setVoice(e.target.value)}
               className="w-full text-xs"
@@ -310,14 +312,15 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
               <Key className="w-3.5 h-3.5" />
-              <span>Gemini API Key (Tùy Chọn)</span>
+              <span>Gemini API key (optional)</span>
             </label>
             <input
               type="password"
+              aria-label="Gemini API key"
               value={customGeminiApiKey}
               disabled={connected}
               onChange={e => setCustomGeminiApiKey(e.target.value)}
-              placeholder="Nhập API Key để ghi đè .env (nếu có)..."
+              placeholder="Enter your API key…"
               className="w-full text-xs font-mono"
             />
           </div>
@@ -337,44 +340,46 @@ export default function Sidebar() {
               htmlFor="system-message-toggle"
               className="settings-toggle-label text-xs"
             >
-              Hiển thị thẻ từ vựng &amp; góp ý luyện nói
+              Show vocabulary and speaking feedback
             </label>
           </div>
 
           {/* Color Theme */}
           <div className="settings-toggle-item" style={{ marginTop: '16px', borderTop: '1px solid var(--gray-850)', paddingTop: '16px' }}>
             <label htmlFor="theme-select" className="settings-toggle-label text-xs" style={{ flex: 1 }}>
-              Giao Diện
+              Appearance
             </label>
             <select
               id="theme-select"
               value={theme}
               onChange={e => setTheme(e.target.value as 'dark' | 'light')}
-              style={{ width: '110px', padding: '6px', borderRadius: '6px', background: 'var(--gray-1000)', border: '1px solid var(--gray-800)', color: 'var(--text)' }}
+              style={{ width: '110px', padding: '6px', background: 'var(--gray-1000)', border: '1px solid var(--gray-800)', color: 'var(--text)' }}
             >
-              <option value="dark">Tối (Dark)</option>
-              <option value="light">Sáng (Light)</option>
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
             </select>
           </div>
         </div>
 
         {/* Footer Actions */}
         <div className="sidebar-actions">
-          <button onClick={handleExportLogs} title="Xuất lịch sử buổi luyện nói">
+          <button onClick={handleExportLogs} title="Export conversation history">
             <Download className="w-4 h-4 mr-1.5" />
-            Xuất Nhật Ký
+            Export history
           </button>
           <button
             onClick={() => {
               if (activeView) resetConversation();
             }}
-            title="Làm mới phiên luyện tập"
+            title="Start a new conversation"
           >
             <RefreshCw className="w-4 h-4 mr-1.5" />
-            Cuộc trò chuyện mới
+            New conversation
           </button>
         </div>
+        <button type="button" className="ai-workspace-developer-link" onClick={() => { useMapAiDebugStore.getState().setDrawerOpen(true); toggleSidebar(); }}>Developer tools</button>
       </div>
-    </aside>
+      </DialogPanel>
+    </Dialog>
   );
 }

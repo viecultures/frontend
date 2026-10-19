@@ -1,5 +1,13 @@
 # AI Map conversation refactor — verification
 
+## AI Map Chat panels (2026-10-19)
+
+AI Map Chat starts with the conversation at full width. `openMap({ provinceName? , region? })` opens the map; pass either a province or a region, or omit both for the whole country. Existing `highlightMapProvince` and `focusMapRegion` calls also reveal the map in chat. `getVieCultureArticles` continues to return library suggestions; `openArticleDetail({ articleId })` opens bilingual details from that catalog inside the chat, with a link to the full Reader. Closing the panel or pressing Escape returns to the full-width chat. New conversation closes the panel.
+
+The new declarations and panel instructions are available only in chat sessions. Immersive keeps its existing map, UI, prompt and tool declarations.
+
+Validation: `npm run test:map-ai`, `npm run build`, and `node scripts/test-map-ai-panels.mjs` (Vite on port 5196, or set `MAP_AI_BASE_URL`). The browser script uses the existing `PLAYWRIGHT_MODULE` / `PLAYWRIGHT_EXECUTABLE_PATH` overrides. It exercises the real session controller and tool dispatcher with mocked Gemini transport at 1440px and 390px, including panel open/close, article cards, map selection and immersive isolation. Live Gemini tool choice and voice recognition require a live session.
+
 Date: 2026-10-13. Frontend-only; no new SDK/dependencies, backend changes, transcript persistence, model changes, or Reader edits.
 
 ## Implementation / review slices

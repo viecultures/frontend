@@ -1,5 +1,6 @@
 import React from "react";
 import { Heart, MessageSquare, Bookmark, Share2, Landmark, Sparkles, User } from "lucide-react";
+import { communityLabel, communityTime } from "../community-copy";
 import type { CommunityPost } from "../types";
 
 interface CommunityPostCardProps {
@@ -18,9 +19,9 @@ export function CommunityPostCard({
   onShare,
 }: CommunityPostCardProps) {
   return (
-    <article className="p-6 sm:p-8 rounded-3xl bg-surface border border-line shadow-[0_4px_20px_-4px_rgba(30,75,67,0.06)] hover:shadow-md transition-all space-y-5">
+    <article className="community-post-card p-6 sm:p-8 rounded-3xl bg-surface border border-line shadow-[0_4px_20px_-4px_rgba(30,75,67,0.06)] hover:shadow-md transition-all space-y-5">
       {/* Author Info Bar */}
-      <div className="flex items-center justify-between">
+      <div className="community-author-bar flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
             className="w-11 h-11 rounded-full bg-heritage-green text-antique-gold font-bold text-sm flex items-center justify-center border border-antique-gold/40 shadow-sm"
@@ -31,14 +32,14 @@ export function CommunityPostCard({
           <div>
             <div className="flex items-center gap-2">
               <h4 className="font-bold text-sm text-heritage-green">
-                {post.authorName}
+                {communityLabel(post.authorName)}
               </h4>
               <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-antique-gold/15 text-heritage-green border border-antique-gold/30">
-                {post.authorRole}
+                {communityLabel(post.authorRole)}
               </span>
             </div>
             <span className="text-xs text-text-secondary font-medium">
-              {post.timeAgo}
+              {communityTime(post.timeAgo)}
             </span>
           </div>
         </div>
@@ -52,14 +53,9 @@ export function CommunityPostCard({
       {/* Content */}
       <div className="space-y-3">
         {post.title && (
-          <h3 
-            onClick={() => onOpenDetail?.(post)}
-            className="font-serif text-lg font-bold text-heritage-green hover:text-antique-rich transition-colors cursor-pointer"
-          >
-            {post.title}
-          </h3>
+          <h3 className="font-serif text-lg font-bold text-heritage-green"><button className="community-post-title hover:text-antique-rich transition-colors cursor-pointer" onClick={() => onOpenDetail?.(post)}>{post.title}</button></h3>
         )}
-        <p className="text-sm sm:text-base text-text-body leading-relaxed font-normal">
+        <p className="community-post-body text-sm sm:text-base text-text-body leading-relaxed font-normal">
           {post.contentEn}
         </p>
       </div>
@@ -69,7 +65,7 @@ export function CommunityPostCard({
         <div className="flex flex-wrap items-center gap-2 pt-1">
           <span className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1">
             <Sparkles className="w-3 h-3 text-antique-gold" />
-            <span>Từ vựng di sản:</span>
+            <span>Heritage vocabulary:</span>
           </span>
           {post.highlightWords.map((item, idx) => {
             const wordText = typeof item === "string" ? item : item.word;
@@ -88,12 +84,13 @@ export function CommunityPostCard({
       {/* Attached Photo Banner (Clickable to inspect) */}
       <div
         onClick={() => onOpenDetail?.(post)}
-        className={`relative h-52 sm:h-60 w-full rounded-2xl bg-gradient-to-br ${
+        className={`community-photo relative h-52 sm:h-60 w-full rounded-2xl bg-gradient-to-br ${
           post.imageBgGradient || "from-heritage-green via-[#2A665B] to-heritage-dark"
         } p-6 text-white flex flex-col justify-between overflow-hidden shadow-inner border border-antique-gold/30 cursor-pointer group`}
         role="button"
         tabIndex={0}
-        aria-label={`Xem ảnh di sản: ${post.imageCaption}`}
+        onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenDetail?.(post); } }}
+        aria-label={`View heritage photo: ${post.imageCaption}`}
       >
         <div
           className="absolute inset-2 border border-antique-gold/30 rounded-xl pointer-events-none group-hover:border-antique-gold/60 transition-colors"
@@ -105,22 +102,22 @@ export function CommunityPostCard({
         </div>
         <div className="text-center my-auto z-10">
           <span className="font-serif text-base sm:text-lg font-bold text-warm-ivory group-hover:scale-105 transition-transform duration-200 block">
-            {post.imageCaption || "Di sản văn hóa Việt Nam"}
+            {communityLabel(post.imageCaption, "Vietnamese cultural heritage")}
           </span>
           <span className="text-xs text-antique-gold/90 mt-1 block">
-            Nhấn để xem bài viết & thảo luận chi tiết
+            Open the post and discussion
           </span>
         </div>
       </div>
 
       {/* Footer Actions */}
-      <div className="pt-4 border-t border-line flex items-center justify-between text-xs">
+      <div className="community-post-actions pt-4 border-t border-line flex items-center justify-between text-xs">
         <div className="flex items-center gap-3">
           <button
             onClick={() => onToggleHeart(post.id)}
             aria-label={`${
-              post.userLiked ? "Bỏ thích" : "Thích"
-            } bài viết của ${post.authorName}`}
+              post.userLiked ? "Unlike" : "Like"
+            } post by ${communityLabel(post.authorName)}`}
             aria-pressed={post.userLiked}
             className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold transition-all focus-ring cursor-pointer ${
               post.userLiked
@@ -133,7 +130,7 @@ export function CommunityPostCard({
                 post.userLiked ? "fill-red-500 text-red-500" : ""
               }`}
             />
-            <span>{post.heartsCount} Thả tim</span>
+            <span>{post.heartsCount} likes</span>
           </button>
 
           <button
@@ -141,7 +138,7 @@ export function CommunityPostCard({
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold bg-rice-paper text-heritage-green hover:bg-mist-cloud transition-all focus-ring cursor-pointer"
           >
             <MessageSquare className="w-4 h-4 text-antique-gold" />
-            <span>{post.comments?.length || post.commentsCount || 0} Bình luận</span>
+            <span>{post.comments?.length || post.commentsCount || 0} comments</span>
           </button>
         </div>
 
@@ -154,8 +151,9 @@ export function CommunityPostCard({
                   ? "bg-antique-gold/20 text-heritage-green"
                   : "hover:bg-rice-paper text-text-secondary hover:text-heritage-green"
               }`}
-              title="Lưu bài viết"
-              aria-label="Lưu bài viết"
+              title={post.userBookmarked ? "Unsave post" : "Save post"}
+              aria-label={post.userBookmarked ? "Unsave post" : "Save post"}
+              aria-pressed={!!post.userBookmarked}
             >
               <Bookmark className={`w-4 h-4 ${post.userBookmarked ? "fill-current text-heritage-green" : ""}`} />
             </button>
@@ -165,8 +163,8 @@ export function CommunityPostCard({
             <button
               onClick={() => onShare(post)}
               className="p-2 rounded-full hover:bg-rice-paper text-text-secondary hover:text-heritage-green transition-colors focus-ring cursor-pointer"
-              title="Chia sẻ bài viết"
-              aria-label="Chia sẻ bài viết"
+              title="Share post"
+              aria-label="Share post"
             >
               <Share2 className="w-4 h-4" />
             </button>

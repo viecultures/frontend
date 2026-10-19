@@ -1,0 +1,75 @@
+/* Reader-style typography and geometry, scoped to the two Community views.
+   Existing heritage colors, artwork, gradients, borders and shadows stay intact. */
+.community-ui { font-family: var(--font-sans); font-weight: 400; }
+.community-ui .font-serif { font-family: var(--font-sans); }
+.community-ui :is(.font-bold, .font-semibold, .font-extrabold) { font-weight: 400; }
+.community-ui :is(h1, h2, h3, h4)[class] { font-weight: 500; filter: none; }
+.community-ui h1 { font-size: clamp(26px, 3vw, 34px); line-height: 1.35; }
+.community-ui h2 { line-height: 1.45; }
+.community-ui :is(button, input, textarea, select) { font-family: inherit; }
+.community-ui .rounded-3xl { border-radius: var(--radius-2xl); }
+.community-ui .rounded-2xl { border-radius: var(--radius-xl); }
+.community-ui :is(button, a) { min-height: 44px; border-radius: var(--radius-xl); font-weight: 400; }
+.community-ui button[aria-label]:has(> svg:only-child) { min-width: 44px; }
+.community-ui :is(button, a, input, textarea, select, [role="button"]):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+.community-ui :is(input:not([type="checkbox"]), textarea, select) { min-width: 0; min-height: 44px; font-weight: 400; border-radius: var(--radius-xl); }
+.community-ui .text-xs { font-size: 12px; line-height: 1.65; }
+.community-ui .text-sm { font-size: 14px; line-height: 1.7; }
+.community-ui :is([class~="text-[10px]"], [class~="text-[11px]"]) { font-size: 11px; line-height: 1.5; }
+.community-ui .uppercase { letter-spacing: .04em; }
+.community-ui .community-header > div { min-width: 0; }
+.community-ui .community-header > button { white-space: normal; }
+.community-ui .community-view-tabs { flex-wrap: wrap; }
+.community-ui .community-view-tabs a { font-size: 12px; }
+.community-ui .community-category-tabs button { font-size: 12px; }
+.community-ui .community-post-title { display: block; padding: 0; text-align: left; font: inherit; line-height: 1.5; }
+.community-ui .community-post-body { font-family: var(--font-sans); font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; }
+.community-ui :is(.community-post-card, .community-entry-card) h3 { font-size: 20px; line-height: 1.5; }
+.community-ui .community-photo { border-radius: var(--radius-2xl); }
+.community-ui .community-photo span { overflow-wrap: anywhere; }
+.community-ui .community-photo:hover .group-hover\:scale-105 { transform: none; }
+.community-ui .community-author-bar { flex-wrap: wrap; align-items: flex-start; gap: 12px; }
+.community-ui .community-author-bar > div:first-child { min-width: 0; max-width: 100%; }
+.community-ui .community-author-bar > div > div:first-child { flex-shrink: 0; }
+.community-ui .community-author-bar > div > div:last-child { min-width: 0; }
+.community-ui .community-author-bar > div > div:last-child > div { flex-wrap: wrap; gap: 4px 8px; }
+.community-ui :is(.community-post-actions, .community-entry-actions) { flex-wrap: wrap; gap: 12px; }
+.community-ui .community-post-actions > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.community-ui .community-post-actions button { font-size: 12px; }
+.community-ui .community-post-actions button[aria-label] { min-width: 44px; }
+.community-ui .community-sidebar :is(h3, h4) { line-height: 1.5; }
+.community-ui .community-editor label { text-transform: none; letter-spacing: 0; }
+.community-ui .community-editor > div:first-child { align-items: flex-start; gap: 12px; }
+.community-ui .community-editor > div:first-child > button { flex-shrink: 0; }
+.community-ui .community-editor > .space-y-1\.5 > div { flex-wrap: wrap; gap: 8px; }
+.community-ui .community-editor > .space-y-1\.5 > div > span:last-child { white-space: nowrap; }
+.community-ui .community-editor input[type="checkbox"] { flex-shrink: 0; }
+.community-ui .community-toast { white-space: normal; width: max-content; max-width: calc(100vw - 32px); border-radius: var(--radius-xl); }
+.community-ui .community-fab { border-radius: 50%; }
+.community-ui .community-fab:hover { transform: none; }
+.community-ui .community-contest-filters { flex-wrap: wrap; }
+.community-ui .community-contest-hero h2 { font-size: clamp(24px, 2.5vw, 30px); }
+.community-ui .community-countdown { flex-wrap: wrap; gap: 8px; }
+.community-ui .community-detail-panel { border-radius: var(--radius-2xl); }
+.community-ui .community-detail-author { align-items: flex-start; gap: 12px; }
+.community-ui .community-detail-author > div { min-width: 0; }
+.community-ui .community-detail-author > div > div:first-child { flex-shrink: 0; }
+.community-ui .community-detail-author > div > div:last-child { min-width: 0; }
+.community-ui .community-detail-author > div > div:last-child > div { flex-wrap: wrap; }
+.community-ui .community-detail-author > button { flex-shrink: 0; }
+.community-ui .community-comment-form input { flex: 1; width: 0; }
+.community-ui .community-comment-form button { flex-shrink: 0; }
+@media (max-width: 767px) {
+  .community-ui > .max-w-7xl { padding-inline: 16px; padding-block: 24px; }
+  .community-ui :is(.community-post-card, .community-entry-card, .community-editor) { padding: 20px; }
+  .community-ui .community-sidebar > div { padding: 20px; }
+  .community-ui :is(input:not([type="checkbox"]), textarea, select) { font-size: 16px; }
+  .community-ui .community-contest-filters { width: 100%; }
+  .community-ui .community-detail-panel > div:first-child { padding-inline: 16px; }
+  .community-ui .community-detail-panel > div:nth-child(2) { padding: 20px 16px; }
+  .community-ui .community-post-actions > div { gap: 6px; }
+  .community-ui .community-editor .flex.items-center.justify-between:has(> .uppercase) { flex-wrap: wrap; gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .community-ui *, .community-ui *::after { animation: none; transition: none; scroll-behavior: auto; }
+}

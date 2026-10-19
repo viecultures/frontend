@@ -6,6 +6,13 @@ import type {
   CefrLevel,
 } from '../types/adminTypes';
 import { API_BASE_URL } from '@/config/apiConfig';
+import { getStoredToken } from '@/utils/auth-storage';
+
+const getPostAuthHeaders = (): Record<string, string> => {
+  const token = getStoredToken();
+  if (!token) throw new Error('Vui lòng đăng nhập trước khi thay đổi bài viết.');
+  return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+};
 
 export interface PostFilterParams {
   topic?: string;
@@ -45,9 +52,7 @@ export const postAdminService = {
   async createPost(payload: ReadingPostPayload): Promise<ReadingPostItem> {
     const res = await fetch(`${API_BASE_URL}/api/posts`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getPostAuthHeaders(),
       body: JSON.stringify(payload),
     });
 
@@ -61,9 +66,7 @@ export const postAdminService = {
   async updatePost(id: string, payload: ReadingPostPayload): Promise<ReadingPostItem> {
     const res = await fetch(`${API_BASE_URL}/api/posts/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getPostAuthHeaders(),
       body: JSON.stringify(payload),
     });
 
@@ -77,6 +80,7 @@ export const postAdminService = {
   async deletePost(id: string): Promise<{ success: boolean; message: string }> {
     const res = await fetch(`${API_BASE_URL}/api/posts/${id}`, {
       method: 'DELETE',
+      headers: getPostAuthHeaders(),
     });
 
     if (!res.ok) {

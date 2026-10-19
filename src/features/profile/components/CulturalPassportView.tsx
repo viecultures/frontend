@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Award, Compass, Lock, CheckCircle2, MapPin, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
+import { Flower2, Lock, CheckCircle2, MapPin, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { paths } from '@/routes/paths';
+import { ProfileSealIcon } from './ProfileSealIcon';
 import { SealDetailModal } from './SealDetailModal';
 import type { CulturalSeal, RegionType, UserProfileData } from '../types';
 
@@ -30,39 +31,39 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
   return (
     <div className="space-y-6">
       {/* 1. Cultural Passport Header Banner */}
-      <div className="relative rounded-3xl bg-[#1E4B43] text-[#FBF7EE] p-6 sm:p-8 shadow-xl border-2 border-[#D9B76A] overflow-hidden">
+      <div className="relative rounded-3xl bg-heritage-green text-warm-ivory p-6 sm:p-8 shadow-xl border-2 border-antique-gold overflow-hidden">
         {/* Subtle Background Pattern */}
-        <div className="absolute inset-0 bg-radial from-[#D9B76A]/10 to-transparent pointer-events-none" />
-        <div className="absolute -right-8 -bottom-8 w-48 h-48 rounded-full border-4 border-[#D9B76A]/20 pointer-events-none flex items-center justify-center">
-          <div className="w-36 h-36 rounded-full border border-[#D9B76A]/30 text-5xl flex items-center justify-center opacity-30 select-none">
-            🪷
+        <div className="absolute inset-0 bg-radial from-antique-gold/10 to-transparent pointer-events-none" />
+        <div className="absolute -right-8 -bottom-8 w-48 h-48 rounded-full border-4 border-antique-gold/20 pointer-events-none flex items-center justify-center">
+          <div className="w-36 h-36 rounded-full border border-antique-gold/30 text-5xl flex items-center justify-center opacity-30 select-none">
+            <Flower2 className="size-14" aria-hidden="true" />
           </div>
         </div>
 
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D9B76A]/20 text-[#D9B76A] text-xs font-bold uppercase tracking-widest border border-[#D9B76A]/40">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Hộ Chiếu Văn Hóa Cá Nhân</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-antique-gold/20 text-antique-gold text-xs font-bold uppercase tracking-widest border border-antique-gold/40">
+              <Sparkles aria-hidden="true" className="w-3.5 h-3.5" />
+              <span>Your cultural passport</span>
             </div>
-            <h2 className="font-serif text-2xl sm:text-3xl font-extrabold tracking-tight text-[#FBF7EE]">
-              Hành Trình Khám Phá Di Sản Ba Miền
+            <h2 className="font-serif text-2xl sm:text-3xl font-extrabold tracking-tight text-warm-ivory">
+              Stories across three regions
             </h2>
             <p className="text-xs sm:text-sm text-stone-300 max-w-xl font-sans leading-relaxed">
-              Mỗi bài đọc song ngữ hoàn thành được dập một con dấu <strong>Mộc Son Đỏ</strong> chính thống lên Hộ chiếu. Thu thập đủ bộ Mộc Son để xác lập danh hiệu <em>Sứ Giả Văn Hóa Việt</em>.
+              Explore cultural stories and collect heritage stamps along the way.
             </p>
           </div>
 
           {/* Passport Identity Seal Badge */}
-          <div className="shrink-0 p-4 rounded-2xl bg-black/30 border border-[#D9B76A]/50 text-center space-y-1 min-w-[200px] backdrop-blur-sm">
-            <span className="text-[10px] uppercase tracking-widest text-[#D9B76A] font-bold block">
-              SỐ HỘ CHIẾU DI SẢN
+          <div className="shrink-0 p-4 rounded-2xl bg-black/30 border border-antique-gold/50 text-center space-y-1 min-w-[200px] backdrop-blur-sm">
+            <span className="text-[10px] uppercase tracking-widest text-antique-gold font-bold block">
+              Passport reference
             </span>
             <div className="font-mono text-sm sm:text-base font-bold text-white tracking-widest">
               VC-PASSPORT-2026
             </div>
             <div className="text-[11px] text-stone-300 font-serif pt-1 border-t border-white/10">
-              Chủ sở hữu: <strong className="text-[#D9B76A]">{profile.name}</strong>
+              Belongs to: <strong className="text-antique-gold">{profile.name}</strong>
             </div>
           </div>
         </div>
@@ -71,28 +72,28 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
         <div className="mt-6 pt-5 border-t border-white/15 grid grid-cols-3 gap-2 text-center text-xs">
           <div className="bg-white/5 py-2 px-3 rounded-xl border border-white/10">
             <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">
-              Miền Bắc
+              North
             </span>
-            <span className="font-serif font-bold text-sm sm:text-base text-[#D9B76A]">
-              {northCount} / 3 Mộc
-            </span>
-          </div>
-
-          <div className="bg-white/5 py-2 px-3 rounded-xl border border-white/10">
-            <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">
-              Miền Trung
-            </span>
-            <span className="font-serif font-bold text-sm sm:text-base text-[#D9B76A]">
-              {centralCount} / 3 Mộc
+            <span className="font-serif font-bold text-sm sm:text-base text-antique-gold">
+              {northCount} / 3 stamps
             </span>
           </div>
 
           <div className="bg-white/5 py-2 px-3 rounded-xl border border-white/10">
             <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">
-              Miền Nam
+              Central
             </span>
-            <span className="font-serif font-bold text-sm sm:text-base text-[#D9B76A]">
-              {southCount} / 3 Mộc
+            <span className="font-serif font-bold text-sm sm:text-base text-antique-gold">
+              {centralCount} / 3 stamps
+            </span>
+          </div>
+
+          <div className="bg-white/5 py-2 px-3 rounded-xl border border-white/10">
+            <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">
+              South
+            </span>
+            <span className="font-serif font-bold text-sm sm:text-base text-antique-gold">
+              {southCount} / 3 stamps
             </span>
           </div>
         </div>
@@ -100,55 +101,59 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
 
       {/* 2. Regional Filter Tabs */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#F6EEDC] dark:bg-[#122A22] border border-[#D9B76A]/40 shadow-xs">
+        <div className="profile-filter-bar flex items-center gap-1.5 p-1 rounded-2xl bg-rice-paper dark:bg-heritage-forest border border-antique-gold/40 shadow-xs">
           <button
             type="button"
+            aria-pressed={selectedRegion === 'all'}
             onClick={() => setSelectedRegion('all')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedRegion === 'all'
-                ? 'bg-[#1E4B43] text-[#FBF7EE] shadow-sm'
-                : 'text-stone-600 dark:text-stone-300 hover:text-[#1E4B43] dark:hover:text-[#D9B76A]'
+                ? 'bg-heritage-green text-warm-ivory shadow-sm'
+                : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green dark:hover:text-antique-gold'
             }`}
           >
-            Tất Cả ({seals.length})
+            All ({seals.length})
           </button>
           <button
             type="button"
+            aria-pressed={selectedRegion === 'north'}
             onClick={() => setSelectedRegion('north')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedRegion === 'north'
-                ? 'bg-[#1E4B43] text-[#FBF7EE] shadow-sm'
-                : 'text-stone-600 dark:text-stone-300 hover:text-[#1E4B43] dark:hover:text-[#D9B76A]'
+                ? 'bg-heritage-green text-warm-ivory shadow-sm'
+                : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green dark:hover:text-antique-gold'
             }`}
           >
-            Miền Bắc
+            North
           </button>
           <button
             type="button"
+            aria-pressed={selectedRegion === 'central'}
             onClick={() => setSelectedRegion('central')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedRegion === 'central'
-                ? 'bg-[#1E4B43] text-[#FBF7EE] shadow-sm'
-                : 'text-stone-600 dark:text-stone-300 hover:text-[#1E4B43] dark:hover:text-[#D9B76A]'
+                ? 'bg-heritage-green text-warm-ivory shadow-sm'
+                : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green dark:hover:text-antique-gold'
             }`}
           >
-            Miền Trung
+            Central
           </button>
           <button
             type="button"
+            aria-pressed={selectedRegion === 'south'}
             onClick={() => setSelectedRegion('south')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedRegion === 'south'
-                ? 'bg-[#1E4B43] text-[#FBF7EE] shadow-sm'
-                : 'text-stone-600 dark:text-stone-300 hover:text-[#1E4B43] dark:hover:text-[#D9B76A]'
+                ? 'bg-heritage-green text-warm-ivory shadow-sm'
+                : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green dark:hover:text-antique-gold'
             }`}
           >
-            Miền Nam
+            South
           </button>
         </div>
 
         <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-          Đã đạt <strong>{unlockedCount}</strong> / {seals.length} con dấu di sản
+          Collected <strong>{unlockedCount}</strong> / {seals.length} heritage stamps
         </span>
       </div>
 
@@ -159,8 +164,8 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
             key={seal.id}
             className={`relative rounded-3xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between border-2 ${
               seal.isUnlocked
-                ? 'bg-[#FBF7EE] dark:bg-[#122A22] border-[#9E2A2B]/40 hover:border-[#9E2A2B] shadow-sm hover:shadow-md'
-                : 'bg-[#F6EEDC]/60 dark:bg-[#122A22]/50 border-stone-300 dark:border-stone-800 border-dashed opacity-80'
+                ? 'bg-warm-ivory dark:bg-heritage-forest border-[#9E2A2B]/40 hover:border-[#9E2A2B] shadow-sm hover:shadow-md'
+                : 'bg-rice-paper/60 dark:bg-heritage-forest/50 border-stone-300 dark:border-stone-800 border-dashed opacity-80'
             }`}
           >
             {/* Top Status & Code */}
@@ -171,55 +176,58 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
 
               {seal.isUnlocked ? (
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#9E2A2B] dark:text-[#E07A5F] bg-[#9E2A2B]/10 px-2 py-0.5 rounded-full border border-[#9E2A2B]/30">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>ĐÃ DẬP MỘC</span>
+                  <CheckCircle2 aria-hidden="true" className="w-3 h-3" />
+                  <span>Collected</span>
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-stone-500 bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-full">
-                  <Lock className="w-3 h-3" />
-                  <span>CHƯA MỞ</span>
+                  <Lock aria-hidden="true" className="w-3 h-3" />
+                  <span>Locked</span>
                 </span>
               )}
             </div>
 
             {/* Stamp Stamp Center Visual */}
-            <div
-              onClick={() => seal.isUnlocked && setInspectingSeal(seal)}
-              className={`my-3 py-4 flex flex-col items-center justify-center text-center cursor-pointer group ${
+            <button
+              type="button"
+              disabled={!seal.isUnlocked}
+              aria-label={`View stamp: ${seal.titleEn}`}
+              onClick={() => setInspectingSeal(seal)}
+              className={`profile-stamp-button my-3 py-4 flex flex-col items-center justify-center text-center cursor-pointer group ${
                 !seal.isUnlocked && 'cursor-default'
               }`}
             >
               {seal.isUnlocked ? (
-                <div className="relative p-4 rounded-full border-2 border-dashed border-[#9E2A2B] bg-[#9E2A2B]/5 shadow-xs w-28 h-28 flex flex-col items-center justify-center group-hover:scale-105 group-hover:rotate-2 transition-all">
-                  <span className="text-3xl mb-0.5">{seal.badgeIcon}</span>
-                  <span className="font-serif font-black text-[9px] uppercase tracking-wider text-[#9E2A2B]">
-                    MỘC SON
+                <div className="relative p-3 rounded-full border-2 border-dashed border-[#9E2A2B] bg-[#9E2A2B]/5 shadow-xs w-32 h-32 flex flex-col items-center justify-center transition-all">
+                  <ProfileSealIcon postId={seal.postId} className="size-8 mb-1 text-[#9E2A2B] dark:text-[#E07A5F]" />
+                  <span className="font-serif font-black text-[9px] text-[#9E2A2B] dark:text-[#E07A5F]">
+                    Heritage stamp
                   </span>
-                  <span className="text-[8px] font-mono text-[#9E2A2B]/80 font-bold truncate max-w-[80px]">
+                  <span className="text-[8px] font-mono text-[#9E2A2B]/80 dark:text-[#E07A5F] font-bold truncate max-w-[80px]">
                     {seal.province}
                   </span>
                   <div className="absolute inset-1 rounded-full border border-[#9E2A2B]/20 pointer-events-none" />
                 </div>
               ) : (
                 <div className="p-4 rounded-full border-2 border-dashed border-stone-300 dark:border-stone-700 w-28 h-28 flex flex-col items-center justify-center text-stone-400 dark:text-stone-600">
-                  <span className="text-3xl mb-1 grayscale opacity-40">{seal.badgeIcon}</span>
+                  <ProfileSealIcon postId={seal.postId} className="size-8 mb-1 opacity-50" />
                   <span className="text-[9px] uppercase font-bold tracking-wider">
-                    KHÓA
+                    Locked
                   </span>
                 </div>
               )}
-            </div>
+            </button>
 
             {/* Title & Province */}
             <div className="text-center space-y-1 mb-4">
-              <h4 className="font-serif font-bold text-base sm:text-lg text-[#1E4B43] dark:text-[#FBF7EE] line-clamp-1">
-                {seal.titleVi}
+              <h4 className="font-serif font-bold text-base sm:text-lg text-heritage-green dark:text-warm-ivory line-clamp-1">
+                {seal.titleEn}
               </h4>
               <p className="text-xs text-stone-500 dark:text-stone-400 font-sans line-clamp-1 italic">
-                {seal.titleEn}
+                {seal.titleVi}
               </p>
               <div className="flex items-center justify-center gap-1 text-[11px] text-stone-400 pt-0.5">
-                <MapPin className="w-3 h-3 text-[#D9B76A]" />
+                <MapPin aria-hidden="true" className="w-3 h-3 text-antique-gold" />
                 <span>{seal.province}</span>
               </div>
             </div>
@@ -229,24 +237,24 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
               {seal.isUnlocked ? (
                 <>
                   <span className="text-[11px] text-stone-500 font-mono">
-                    Ngày: {seal.stampedAt}
+                    Collected: {seal.stampedAt}
                   </span>
                   <button
                     type="button"
                     onClick={() => setInspectingSeal(seal)}
-                    className="font-bold text-[#1E4B43] dark:text-[#D9B76A] hover:underline flex items-center gap-1 cursor-pointer"
+                    className="font-bold text-heritage-green dark:text-antique-gold hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    <span>Xem Mộc</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <span>View stamp</span>
+                    <ArrowRight aria-hidden="true" className="w-3 h-3" />
                   </button>
                 </>
               ) : (
                 <Link
                   to={paths.reader({ postId: seal.postId })}
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#1E4B43]/10 hover:bg-[#1E4B43] text-[#1E4B43] hover:text-[#FBF7EE] dark:text-[#D9B76A] dark:hover:text-[#122A22] font-bold text-xs transition-all cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-heritage-green/10 hover:bg-heritage-green text-heritage-green hover:text-warm-ivory dark:text-antique-gold dark:hover:text-warm-ivory font-bold text-xs transition-all cursor-pointer"
                 >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>Học bài này để dập Mộc</span>
+                  <BookOpen aria-hidden="true" className="w-3.5 h-3.5" />
+                  <span>Explore this story</span>
                 </Link>
               )}
             </div>

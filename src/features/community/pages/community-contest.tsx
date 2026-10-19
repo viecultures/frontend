@@ -8,6 +8,7 @@ import {
   GamificationMilestonesCard,
 } from "../components";
 import { CommunityHeader } from "../components/CommunityHeader";
+import { communityLabel } from "../community-copy";
 import { Trophy, Coins, Sparkles, TrendingUp, Clock, Plus, Check, Heart } from "lucide-react";
 
 const INITIAL_CONTEST_ENTRIES: ContestEntry[] = [
@@ -97,8 +98,8 @@ export default function CommunityContestPage() {
           };
           showToast(
             !voted
-              ? "Đã bình chọn bài viết! Bạn nhận được +10 XP tương tác."
-              : "Đã hủy bình chọn."
+              ? "Vote recorded. You receive +10 interaction XP."
+              : "Vote removed."
           );
           return updated;
         }
@@ -111,18 +112,18 @@ export default function CommunityContestPage() {
   const handleRedeem = (itemName: string, cost: number) => {
     if (userCoins < cost) {
       showToast(
-        `Bạn cần ${cost} Xu để đổi quà này (Ví hiện có: ${userCoins} Xu). Hãy nộp bài thử thách để tích lũy thêm!`
+        `This reward costs ${cost} coins. Your balance is ${userCoins} coins. Submit a challenge entry to earn more.`
       );
       return;
     }
     setUserCoins((prev) => prev - cost);
-    showToast(`Chúc mừng! Bạn đã đổi thành công "${itemName}" với ${cost} Xu!`);
+    showToast(`You redeemed "${communityLabel(itemName)}" for ${cost} coins!`);
   };
 
   // Submit Contest Entry
   const handleSubmitEntry = () => {
     if (!entryTitle.trim() || !entryText.trim()) {
-      alert("Vui lòng nhập tiêu đề và nội dung bài dự thi của bạn!");
+      alert("Enter a title and your challenge entry.");
       return;
     }
 
@@ -149,7 +150,7 @@ export default function CommunityContestPage() {
     setEntryTitle("");
     setEntryText("");
     setIsFormOpen(false);
-    showToast("Chúc mừng! Bạn đã gửi bài thành công và nhận ngay +100 Xu Văn Hóa!");
+    showToast("Your entry has been submitted. You received +100 cultural coins!");
   };
 
   // Filtered Entries
@@ -165,10 +166,10 @@ export default function CommunityContestPage() {
   }, [entries, filterMode]);
 
   return (
-    <main className="min-h-screen bg-surface text-text-body relative selection:bg-sky-mist selection:text-heritage-green">
+    <main className="community-ui min-h-screen bg-surface text-text-body relative selection:bg-sky-mist selection:text-heritage-green">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap">
+        <div role="status" className="community-toast fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap">
           <Check className="w-4 h-4 text-antique-gold shrink-0" />
           <span>{toastMessage}</span>
         </div>
@@ -212,12 +213,13 @@ export default function CommunityContestPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
               <h2 className="font-serif text-2xl font-bold text-heritage-green flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-antique-gold" />
-                <span>Bài Viết Nổi Bật Theo Chủ Đề Tuần ({filteredEntries.length})</span>
+                <span>Weekly challenge entries ({filteredEntries.length})</span>
               </h2>
 
-              <div className="flex items-center gap-1 bg-rice-paper p-1 rounded-xl border border-line text-xs font-bold">
+              <div className="community-contest-filters flex items-center gap-1 bg-rice-paper p-1 rounded-xl border border-line text-xs font-bold">
                 <button
                   onClick={() => setFilterMode("top")}
+                  aria-pressed={filterMode === "top"}
                   className={`px-3 py-1.5 rounded-lg transition-all focus-ring cursor-pointer flex items-center gap-1.5 ${
                     filterMode === "top"
                       ? "bg-heritage-green text-warm-ivory shadow-sm"
@@ -225,10 +227,11 @@ export default function CommunityContestPage() {
                   }`}
                 >
                   <TrendingUp className="w-3.5 h-3.5" />
-                  <span>Bình chọn nhiều nhất</span>
+                  <span>Most voted</span>
                 </button>
                 <button
                   onClick={() => setFilterMode("new")}
+                  aria-pressed={filterMode === "new"}
                   className={`px-3 py-1.5 rounded-lg transition-all focus-ring cursor-pointer flex items-center gap-1.5 ${
                     filterMode === "new"
                       ? "bg-heritage-green text-warm-ivory shadow-sm"
@@ -236,17 +239,18 @@ export default function CommunityContestPage() {
                   }`}
                 >
                   <Clock className="w-3.5 h-3.5" />
-                  <span>Mới nhất</span>
+                  <span>Newest</span>
                 </button>
                 <button
                   onClick={() => setFilterMode("mine")}
+                  aria-pressed={filterMode === "mine"}
                   className={`px-3 py-1.5 rounded-lg transition-all focus-ring cursor-pointer flex items-center gap-1.5 ${
                     filterMode === "mine"
                       ? "bg-heritage-green text-warm-ivory shadow-sm"
                       : "text-heritage-green hover:bg-mist-cloud"
                   }`}
                 >
-                  <span>Bài của tôi</span>
+                  <span>My entries</span>
                 </button>
               </div>
             </div>
@@ -263,10 +267,10 @@ export default function CommunityContestPage() {
               <div className="p-12 text-center rounded-3xl bg-surface border border-line space-y-3">
                 <Trophy className="w-8 h-8 text-text-secondary/40 mx-auto" />
                 <h3 className="font-serif text-base font-bold text-heritage-green">
-                  Bạn chưa có bài dự thi nào trong tuần này
+                  You have no entries this week
                 </h3>
                 <p className="text-xs text-text-secondary max-w-sm mx-auto">
-                  Hãy bấm nút "Viết Bài Dự Thi" phía trên để chia sẻ cảm nhận và nhận ngay +100 Xu Văn Hóa!
+                  Choose “Submit an entry” to share your perspective and receive +100 cultural coins.
                 </p>
               </div>
             )}
@@ -289,9 +293,9 @@ export default function CommunityContestPage() {
           setIsFormOpen(true);
           window.scrollTo({ top: 350, behavior: "smooth" });
         }}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-heritage-green text-warm-ivory font-bold shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-antique-gold z-40 focus-ring cursor-pointer"
-        title="Gửi bài dự thi"
-        aria-label="Mở form gửi bài dự thi"
+        className="community-fab fixed bottom-8 right-8 w-14 h-14 rounded-full bg-heritage-green text-warm-ivory font-bold shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-antique-gold z-40 focus-ring cursor-pointer"
+        title="Submit an entry"
+        aria-label="Open contest editor"
       >
         <Plus className="w-6 h-6 text-antique-gold" />
       </button>

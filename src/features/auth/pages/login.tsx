@@ -5,8 +5,10 @@ import { BrandLogo } from '@/components/BrandLogo';
 import { PATHS } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import { ForgotPasswordModal } from '../components/ForgotPasswordModal';
-import { authService } from '@/services/authService';
-import { setStoredToken, setStoredUser, type AppUser } from '@/utils/auth-storage';
+import { authService, type AuthResult } from '@/services/authService';
+import { setAuthSession, type AppUser } from '@/utils/auth-storage';
+import { isLocalAuthMode } from '@/config/authConfig';
+import { localAuthService } from '@/services/localAuthService';
 
 interface LoginPageProps {
   onLoginSuccess?: (userData: AppUser) => void;
@@ -39,30 +41,42 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
   const handleNavigate = useAppNavigate();
 
+  const completeLogin = (result: AuthResult) => {
+    setAuthSession(result.user, result.token, rememberMe);
+    if (onLoginSuccess) {
+      onLoginSuccess(result.user);
+      return;
+    }
+    const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+    if (redirectUrl?.startsWith('/') && !redirectUrl.startsWith('//')) {
+      window.location.href = redirectUrl;
+    } else {
+      handleNavigate(PATHS.home);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      completeLogin(await localAuthService.loginDemo());
+    } catch (error: unknown) {
+      setErrorMessage(error instanceof Error ? error.message : 'Không thể đăng nhập. Vui lòng thử lại.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleGoogleSuccess = async (idToken: string) => {
+    if (isLoading) return;
     try {
       setIsLoading(true);
       setErrorMessage(null);
 
       const result = await authService.loginWithGoogle(idToken);
 
-      // Persist token & user profile to local storage
-      setStoredToken(result.token);
-      setStoredUser(result.user);
-
-      if (onLoginSuccess) {
-        onLoginSuccess(result.user);
-      } else {
-        const params = new URLSearchParams(window.location.search);
-        const redirectUrl = params.get('redirect');
-        if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
-          window.location.href = redirectUrl;
-        } else if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          handleNavigate(PATHS.home);
-        }
-      }
+      completeLogin(result);
     } catch (err: unknown) {
       console.error('Google Sign-In failed:', err);
       const msg = err instanceof Error ? err.message : 'Đăng nhập Google thất bại. Vui lòng thử lại sau.';
@@ -72,26 +86,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     setErrorMessage(null);
-    const loginData = {
-      email: email.trim() || 'luanninh@viecultures.com',
-      name: fullName.trim() || email.split('@')[0] || 'Ninh Thiên Luân',
-      role: 'ROLE_USER',
-    };
-    if (onLoginSuccess) {
-      onLoginSuccess(loginData);
-    } else {
-      const params = new URLSearchParams(window.location.search);
-      const redirectUrl = params.get('redirect');
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      } else if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        handleNavigate(PATHS.home);
-      }
+    setIsLoading(true);
+    try {
+      const result = authTab === 'register'
+        ? await authService.register(email, password, fullName)
+        : await authService.login(email, password);
+      completeLogin(result);
+    } catch (error: unknown) {
+      setErrorMessage(error instanceof Error ? error.message : 'Không thể đăng nhập. Vui lòng thử lại.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -135,6 +143,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 type="button"
                 role="tab"
                 aria-selected={authTab === 'login'}
+                disabled={isLoading}
                 onClick={() => setAuthTab('login')}
                 className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all focus-ring-dark ${
                   authTab === 'login'
@@ -148,6 +157,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 type="button"
                 role="tab"
                 aria-selected={authTab === 'register'}
+                disabled={isLoading}
                 onClick={() => setAuthTab('register')}
                 className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all focus-ring-dark ${
                   authTab === 'register'
@@ -162,7 +172,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             {/* Header */}
             <div>
               <h1 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-1">
-                {authTab === 'login' ? 'Welcome Back' : 'Tạo Tài Khoản Mới'}
+                {authTab === 'login' ? 'Welcome Back' : isLocalAuthMode ? 'Tạo Hồ Sơ Dùng Thử' : 'Tạo Tài Khoản Mới'}
               </h1>
               <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-normal">
                 {authTab === 'login'
@@ -204,7 +214,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@viecultures.com"
+                    placeholder="learner@example.com"
                     required
                     autoComplete="email"
                     className={INPUT_WITH_ICON}
@@ -214,7 +224,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
               <div>
                 <label className={LABEL_CLASS} htmlFor="password">
-                  Mật Khẩu / Password (Mặc định 123456)
+                  Mật Khẩu / Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/40" aria-hidden="true">
@@ -228,6 +238,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     placeholder="••••••••"
                     required
                     autoComplete={authTab === 'login' ? 'current-password' : 'new-password'}
+                    minLength={isLocalAuthMode || authTab === 'register' ? 6 : undefined}
                     className={INPUT_WITH_ICON}
                   />
                 </div>
@@ -244,7 +255,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   />
                   <span>Ghi nhớ đăng nhập</span>
                 </label>
-                {authTab === 'login' && (
+                {!isLocalAuthMode && authTab === 'login' && (
                   <button
                     type="button"
                     onClick={() => setIsForgotPasswordOpen(true)}
@@ -258,9 +269,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               {/* Submit */}
               <button
                 type="submit"
+                disabled={isLoading}
                 className="w-full py-2.5 px-4 bg-gradient-to-r from-antique-bright to-antique-gold text-heritage-forest font-bold rounded-xl text-sm shadow-lg hover:brightness-105 active:scale-[0.99] transition-all mt-1 focus-ring-dark"
               >
-                {authTab === 'login' ? 'Đăng Nhập Ngay' : 'Đăng Ký Tài Khoản'}
+                {isLoading ? 'Đang đăng nhập...' : authTab === 'login' ? 'Đăng Nhập Ngay' : isLocalAuthMode ? 'Tạo Hồ Sơ Dùng Thử' : 'Đăng Ký Tài Khoản'}
               </button>
             </form>
 
@@ -289,13 +301,41 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             )}
 
             {/* Social Authentication */}
-            <div className="space-y-2.5">
+            {isLocalAuthMode ? (
+              <div className="space-y-2.5">
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={handleDemoLogin}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white text-[#1f1f1f] border border-white/20 rounded-xl text-xs font-semibold hover:bg-white/90 transition-all focus-ring-dark disabled:opacity-50"
+                >
+                  <svg aria-hidden="true" className="w-4 h-4" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.39-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.89-1.74 2.98-4.3 2.98-7.36Z" />
+                    <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.41l-3.24-2.51c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.13H3.07v2.59A10 10 0 0 0 12 22Z" />
+                    <path fill="#FBBC05" d="M6.41 13.91a6 6 0 0 1 0-3.82V7.5H3.07a10 10 0 0 0 0 9l3.34-2.59Z" />
+                    <path fill="#EA4335" d="M12 5.96c1.47 0 2.79.51 3.83 1.51l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.93 5.5l3.34 2.59C7.2 7.72 9.4 5.96 12 5.96Z" />
+                  </svg>
+                  <span>Login with Google</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={handleDemoLogin}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-[#1877F2] text-white border border-white/15 rounded-xl text-xs font-semibold hover:brightness-110 transition-all focus-ring-dark disabled:opacity-50"
+                >
+                  <svg aria-hidden="true" className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                  <span>Login with Facebook</span>
+                </button>
+              </div>
+            ) : <div className="space-y-2.5">
               {/* Google Sign-In with Official GIS Button */}
               <div className="relative w-full flex justify-center [&>div]:w-full [&>div>iframe]:!w-full [&>div]:flex [&>div]:justify-center">
                 {isLoading ? (
                   <div className="w-full py-2.5 px-3 bg-black/40 border border-antique-bright/30 rounded-xl text-xs font-semibold text-antique-bright flex items-center justify-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin text-antique-bright" />
-                    <span>Đang xác thực với Google...</span>
+                    <span>Đang xác thực...</span>
                   </div>
                 ) : import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
                   <GoogleLogin
@@ -320,30 +360,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 )}
               </div>
 
-              {/* Facebook Button (Fallback / Demo) */}
+              {/* Facebook authentication has no backend endpoint yet. */}
               <button
                 type="button"
-                disabled={isLoading}
-                onClick={() => {
-                  const fbUser = { email: 'user.facebook@example.com', name: 'Ninh Thiên Luân', role: 'ROLE_USER' };
-                  if (onLoginSuccess) {
-                    onLoginSuccess(fbUser);
-                  } else {
-                    const params = new URLSearchParams(window.location.search);
-                    const redirectUrl = params.get('redirect');
-                    if (redirectUrl) window.location.href = redirectUrl;
-                    else if (window.history.length > 1) window.history.back();
-                    else handleNavigate(PATHS.home);
-                  }
-                }}
+                disabled
+                title="Đăng nhập Facebook chưa được hỗ trợ."
                 className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark cursor-pointer disabled:opacity-50"
               >
                 <svg className="w-4 h-4 fill-sky-mist" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
-                <span>Tiếp tục với Facebook</span>
+                <span>Facebook — Sắp ra mắt</span>
               </button>
-            </div>
+            </div>}
           </div>
 
           {/* Back link */}
@@ -410,7 +439,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       </div>
 
       {/* Forgot Password Modal */}
-      <ForgotPasswordModal
+      {!isLocalAuthMode && <ForgotPasswordModal
         isOpen={isForgotPasswordOpen}
         onClose={() => setIsForgotPasswordOpen(false)}
         initialEmail={email}
@@ -418,7 +447,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           setEmail(newEmail);
           setIsForgotPasswordOpen(false);
         }}
-      />
+      />}
     </div>
   );
 };

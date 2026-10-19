@@ -9,6 +9,28 @@ import type { FunctionResponseScheduling } from '@google/genai';
 
 export const culturalSpeakingTools: FunctionCall[] = [
   {
+    name: 'openMap',
+    description: 'Opens the Vietnam map panel in AI Map Chat. Call when the learner asks to open or see the map. Optionally focus one province or region. Without arguments, show the whole country.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        provinceName: { type: 'STRING', description: 'Province or city name, e.g. Hà Nội. Omit region when using this.' },
+        region: { type: 'STRING', enum: ['north', 'central', 'south', 'all'], description: 'Optional region. Omit provinceName when using this.' },
+      },
+    },
+    isEnabled: true,
+  },
+  {
+    name: 'openArticleDetail',
+    description: 'Opens the bilingual article detail panel inside AI Map Chat while keeping the conversation available. Use when the learner asks to open or read a specific article. Obtain the exact articleId from getVieCultureArticles; never invent IDs.',
+    parameters: {
+      type: 'OBJECT',
+      properties: { articleId: { type: 'STRING', description: 'Exact article id returned by getVieCultureArticles.' } },
+      required: ['articleId'],
+    },
+    isEnabled: true,
+  },
+  {
     name: 'listCulturalLessons',
     description:
       'Discovers and returns a curated list of Vietnamese cultural reading/speaking lessons based on region, topic category, proficiency level (Level 1, Level 2, Level 3), or search keyword.',

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import type {
   ReadingPostPayload,
+  ReadingPostItem,
   ParagraphPairDto,
   VocabItemDto,
   CefrLevel,
@@ -33,11 +34,13 @@ import type {
   QuizOptionDto,
 } from '../types/adminTypes';
 import { postAdminService } from '../services/postAdminService';
+import { AdminDialog } from './AdminDialog';
+import { adminTopicLabel } from '../admin-presentation';
 
 interface PostFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (savedPost: any) => void;
+  onSuccess: (savedPost: ReadingPostItem) => void;
   initialData?: ReadingPostPayload | null;
 }
 
@@ -237,7 +240,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   // Auto split bilingual paragraphs
   const handleAutoSplit = () => {
     if (!contentEn.trim() && !contentVi.trim()) {
-      setErrorMsg('Vui lòng nhập nội dung toàn văn tiếng Anh hoặc tiếng Việt trước khi tách đoạn.');
+      setErrorMsg('Add English or Vietnamese article content before creating paragraph pairs.');
       return;
     }
     const pairs = postAdminService.autoSplitBilingual(contentEn, contentVi);
@@ -248,7 +251,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
       setWordCount(words);
       setReadTime(`${Math.max(1, Math.ceil(words / 100))} phút`);
     }
-    setSuccessToast(`Đã tự động tách thành ${pairs.length} cặp đoạn song ngữ.`);
+    setSuccessToast(`Created ${pairs.length} bilingual paragraph pairs.`);
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
@@ -257,24 +260,24 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
     if (!fastVocabInput.trim()) return;
     const parsed = postAdminService.parseKeyVocabularyText(fastVocabInput, level);
     if (parsed.length === 0) {
-      setErrorMsg('Không tìm thấy từ vựng hợp lệ. Hãy kiểm tra định dạng (ví dụ: word — nghĩa).');
+      setErrorMsg('No vocabulary found. Use one word and Vietnamese meaning per line, separated by a tab or dash.');
       return;
     }
     setVocabularies((prev) => [...prev, ...parsed]);
     setFastVocabInput('');
-    setSuccessToast(`Đã thêm thành công ${parsed.length} từ vựng vào danh sách.`);
+    setSuccessToast(`Added ${parsed.length} vocabulary items.`);
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
   // Parse TSV Raw Row
   const handleTsvImport = () => {
     if (!tsvRawRow.trim()) {
-      setErrorMsg('Vui lòng dán 1 dòng từ file TSV vào ô bên dưới.');
+      setErrorMsg('Paste a TSV row below.');
       return;
     }
     const result = postAdminService.parseTsvRow(tsvRawRow, tsvLevelChoice);
     if (!result) {
-      setErrorMsg('Không thể nhận diện dữ liệu dòng TSV. Vui lòng đảm bảo dán đúng định dạng các cột.');
+      setErrorMsg('Unable to read the TSV row. Check the column order.');
       return;
     }
 
@@ -291,7 +294,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
     if (result.paragraphs) setParagraphs(result.paragraphs);
     if (result.vocabularies) setVocabularies(result.vocabularies);
 
-    setSuccessToast(`Nhập TSV thành công! Đã tự động điền nội dung, ${result.paragraphs?.length || 0} đoạn và ${result.vocabularies?.length || 0} từ vựng.`);
+    setSuccessToast(`Imported article content, ${result.paragraphs?.length || 0} paragraph pairs and ${result.vocabularies?.length || 0} vocabulary items.`);
     setActiveTab('info');
     setTimeout(() => setSuccessToast(null), 4000);
   };
@@ -348,7 +351,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
         .join('\n\n');
 
     if (!readingText) {
-      setErrorMsg('Vui lòng nhập nội dung bài đọc tiếng Anh (Toàn văn ở Tab 1 hoặc Cặp đoạn ở Tab 2) trước khi tạo giọng đọc.');
+      setErrorMsg('Add English content in Article details or Paragraph pairs before generating audio.');
       return;
     }
 
@@ -388,10 +391,10 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
         setShadowingAudioUrl(defaultAudioUrl);
       }
 
-      setSuccessToast(`Đã tạo thành công giọng đọc AI "${model.name}" với 2 phiên bản (Nguyên bản mặc định & Chậm)!`);
+      setSuccessToast(`Created normal and slow audio for ${model.name}.`);
       setTimeout(() => setSuccessToast(null), 4000);
-    } catch (err: any) {
-      setErrorMsg(err.message || `Lỗi khi tạo giọng đọc với ${model.name}`);
+    } catch (err: unknown) {
+      setErrorMsg((err instanceof Error ? err.message : '') || `Unable to generate audio for ${model.name}.`);
     } finally {
       setGeneratingVoiceId(null);
     }
@@ -400,7 +403,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   // Remove voice track
   const handleRemoveVoiceTrack = (voiceId: string) => {
     setVoiceTracks((prev) => prev.filter((t) => t.voiceId !== voiceId));
-    setSuccessToast('Đã xóa bản ghi âm khỏi bài đọc.');
+    setSuccessToast('Audio track removed.');
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
@@ -469,7 +472,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   // Set as primary shadowing audio
   const handleSetPrimaryAudio = (url: string, name: string, speedLabel: string) => {
     setShadowingAudioUrl(url);
-    setSuccessToast(`Đã chọn bản "${name} (${speedLabel})" làm Audio Shadowing mặc định!`);
+    setSuccessToast(`${name} (${speedLabel}) is now the default shadowing audio.`);
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
@@ -480,12 +483,12 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
 
     // Validation
     if (!titleEn.trim()) {
-      setErrorMsg('Vui lòng nhập tiêu đề tiếng Anh.');
+      setErrorMsg('Enter an English title.');
       setActiveTab('info');
       return;
     }
     if (!titleVi.trim()) {
-      setErrorMsg('Vui lòng nhập tiêu đề tiếng Việt.');
+      setErrorMsg('Enter a Vietnamese title.');
       setActiveTab('info');
       return;
     }
@@ -526,8 +529,8 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
 
       onSuccess(result);
       onClose();
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Có lỗi xảy ra khi lưu bài viết.');
+    } catch (err: unknown) {
+      setErrorMsg((err instanceof Error ? err.message : '') || 'Unable to save the article.');
     } finally {
       setIsSubmitting(false);
     }
@@ -536,7 +539,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-heritage-dark/80 backdrop-blur-md overflow-y-auto">
+    <AdminDialog title={initialData?.id ? 'Edit article' : 'New article'} onClose={() => { if (!isSubmitting) onClose(); }} wide>
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -548,22 +551,22 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
         <div className="px-6 py-5 bg-heritage-green text-warm-ivory border-b border-antique-gold/30 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-antique-gold/20 border border-antique-gold/40 flex items-center justify-center text-antique-gold">
-              <BookOpen className="w-5 h-5" />
+              <BookOpen aria-hidden="true" className="w-5 h-5" />
             </div>
             <div>
               <h2 className="font-heading text-lg sm:text-xl font-bold tracking-wide">
-                {initialData?.id ? 'Chỉnh Sửa Bài Đọc' : 'Đăng Bài Đọc Mới'}
+                {initialData?.id ? 'Edit article' : 'New article'}
               </h2>
               <p className="text-xs text-warm-ivory/80">
-                Nhập liệu bài học song ngữ, cặp đoạn đối xứng và từ vựng học thuật
+                Create bilingual lessons, paragraph pairs and vocabulary.
               </p>
             </div>
           </div>
-          <button
+          <button aria-label="Close editor"
             onClick={onClose}
             className="p-2 rounded-xl text-warm-ivory/70 hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X aria-hidden="true" className="w-5 h-5" />
           </button>
         </div>
 
@@ -571,6 +574,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
         <div className="px-6 bg-warm-ivory/70 dark:bg-heritage-dark/50 border-b border-antique-gold/20 flex gap-2 overflow-x-auto shrink-0 py-2">
           <button
             type="button"
+            aria-pressed={activeTab === 'info'}
             onClick={() => setActiveTab('info')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'info'
@@ -578,11 +582,12 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 : 'text-text-body dark:text-warm-ivory/70 hover:bg-white/40 dark:hover:bg-white/5'
             }`}
           >
-            <Layers className="w-3.5 h-3.5 text-antique-gold" />
-            <span>1. Thông tin văn hóa</span>
+            <Layers aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+            <span>Article details</span>
           </button>
           <button
             type="button"
+            aria-pressed={activeTab === 'bilingual'}
             onClick={() => setActiveTab('bilingual')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'bilingual'
@@ -590,11 +595,12 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 : 'text-text-body dark:text-warm-ivory/70 hover:bg-white/40 dark:hover:bg-white/5'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-            <span>2. Cặp đoạn song ngữ ({paragraphs.length})</span>
+            <BookOpen aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+            <span>Paragraph pairs ({paragraphs.length})</span>
           </button>
           <button
             type="button"
+            aria-pressed={activeTab === 'vocab'}
             onClick={() => setActiveTab('vocab')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'vocab'
@@ -602,11 +608,12 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 : 'text-text-body dark:text-warm-ivory/70 hover:bg-white/40 dark:hover:bg-white/5'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
-            <span>3. Từ vựng trọng tâm ({vocabularies.length})</span>
+            <Sparkles aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+            <span>Vocabulary ({vocabularies.length})</span>
           </button>
           <button
             type="button"
+            aria-pressed={activeTab === 'voices'}
             onClick={() => setActiveTab('voices')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'voices'
@@ -614,11 +621,12 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 : 'text-text-body dark:text-warm-ivory/70 hover:bg-white/40 dark:hover:bg-white/5'
             }`}
           >
-            <Radio className="w-3.5 h-3.5 text-antique-gold" />
-            <span>4. Giọng đọc AI ({voiceTracks.length})</span>
+            <Radio aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+            <span>Audio ({voiceTracks.length})</span>
           </button>
           <button
             type="button"
+            aria-pressed={activeTab === 'quiz'}
             onClick={() => setActiveTab('quiz')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'quiz'
@@ -626,11 +634,12 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 : 'text-text-body dark:text-warm-ivory/70 hover:bg-white/40 dark:hover:bg-white/5'
             }`}
           >
-            <HelpCircle className="w-3.5 h-3.5 text-antique-gold" />
-            <span>5. Câu hỏi đọc hiểu ({questions.length})</span>
+            <HelpCircle aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+            <span>Reading quiz ({questions.length})</span>
           </button>
           <button
             type="button"
+            aria-pressed={activeTab === 'tsv'}
             onClick={() => setActiveTab('tsv')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'tsv'
@@ -638,21 +647,21 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 : 'text-antique-gold hover:bg-antique-gold/10'
             }`}
           >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
-            <span>⚡ Nhập từ File TSV</span>
+            <FileSpreadsheet aria-hidden="true" className="w-3.5 h-3.5" />
+            <span>Import TSV</span>
           </button>
         </div>
 
         {/* Alerts */}
         {errorMsg && (
-          <div className="mx-6 mt-4 p-3.5 rounded-xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 text-red-800 dark:text-red-200 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
+          <div role="alert" className="mx-6 mt-4 p-3.5 rounded-xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 text-red-800 dark:text-red-200 text-xs flex items-center gap-2">
+            <AlertCircle aria-hidden="true" className="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
             <span>{errorMsg}</span>
           </div>
         )}
         {successToast && (
-          <div className="mx-6 mt-4 p-3.5 rounded-xl bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-800 text-green-800 dark:text-green-200 text-xs flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400" />
+          <div role="status" className="mx-6 mt-4 p-3.5 rounded-xl bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-800 text-green-800 dark:text-green-200 text-xs flex items-center gap-2">
+            <CheckCircle2 aria-hidden="true" className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400" />
             <span>{successToast}</span>
           </div>
         )}
@@ -666,27 +675,27 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 {/* Topic Group */}
                 <div>
                   <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                    Cụm Chủ Đề / Nhóm Câu Chuyện (Story Group)
+                    Story group
                   </label>
-                  <input
+                  <input aria-label="Story group"
                     type="text"
                     value={topicGroup}
                     onChange={(e) => setTopicGroup(e.target.value)}
-                    placeholder="VD: Tục kéo vợ người Mông, Chợ tình Khâu Vai..."
+                    placeholder="e.g. Mong wedding traditions, Khau Vai love market"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                   />
                   <p className="text-[10px] text-text-muted mt-1">
-                    Dùng để nhóm các bài học cùng câu chuyện ở các cấp độ (Level 1, Level 2, Level 3).
+                    Group different reading levels of the same story.
                   </p>
                 </div>
 
                 {/* Region */}
                 <div>
                   <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                    Vùng Miền / Tỉnh Thành (Region)
+                    Region / province
                   </label>
                   <div className="flex gap-2">
-                    <select
+                    <select aria-label="Region / province"
                       value={region}
                       onChange={(e) => setRegion(e.target.value)}
                       className="px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
@@ -697,11 +706,11 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                         </option>
                       ))}
                     </select>
-                    <input
+                    <input aria-label="Region / province"
                       type="text"
                       value={region}
                       onChange={(e) => setRegion(e.target.value)}
-                      placeholder="Hoặc gõ địa danh tự do"
+                      placeholder="Or enter a location"
                       className="flex-1 px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                     />
                   </div>
@@ -710,14 +719,14 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 {/* Title EN */}
                 <div>
                   <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                    Tiêu Đề Tiếng Anh (English Title) <span className="text-red-500">*</span>
+                    English title <span className="text-red-500">*</span>
                   </label>
-                  <input
+                  <input aria-label="English title"
                     type="text"
                     required
                     value={titleEn}
                     onChange={(e) => setTitleEn(e.target.value)}
-                    placeholder="VD: Kéo Vợ – A Mông Wedding Tradition"
+                    placeholder="e.g. A Mong wedding tradition"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                   />
                 </div>
@@ -725,14 +734,14 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 {/* Title VI */}
                 <div>
                   <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                    Tiêu Đề Tiếng Việt (Vietnamese Title) <span className="text-red-500">*</span>
+                    Vietnamese title <span className="text-red-500">*</span>
                   </label>
-                  <input
+                  <input aria-label="Vietnamese title"
                     type="text"
                     required
                     value={titleVi}
                     onChange={(e) => setTitleVi(e.target.value)}
-                    placeholder="VD: Kéo Vợ – Một phong tục cưới hỏi của người Mông"
+                    placeholder="e.g. Một phong tục cưới hỏi của người Mông"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                   />
                 </div>
@@ -740,16 +749,16 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 {/* Topic / Category */}
                 <div>
                   <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                    Chuyên Mục Văn Hóa
+                    Cultural category
                   </label>
-                  <select
+                  <select aria-label="Cultural category"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                   >
                     {TOPIC_OPTIONS.map((t) => (
                       <option key={t} value={t}>
-                        {t}
+                        {adminTopicLabel(t)}
                       </option>
                     ))}
                   </select>
@@ -759,9 +768,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                      Cấp Độ CEFR
+                      CEFR level
                     </label>
-                    <select
+                    <select aria-label="CEFR level"
                       value={level}
                       onChange={(e) => setLevel(e.target.value as CefrLevel)}
                       className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
@@ -775,9 +784,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                      Số Lượng Từ
+                      Word count
                     </label>
-                    <input
+                    <input aria-label="Word count"
                       type="number"
                       value={wordCount || ''}
                       onChange={(e) => {
@@ -787,19 +796,19 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                           setReadTime(`${Math.max(1, Math.ceil(count / 100))} phút`);
                         }
                       }}
-                      placeholder="VD: 89"
+                      placeholder="e.g. 89"
                       className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                      Thời Lượng Đọc
+                      Reading time
                     </label>
-                    <input
+                    <input aria-label="Reading time"
                       type="text"
                       value={readTime}
                       onChange={(e) => setReadTime(e.target.value)}
-                      placeholder="VD: 3 phút"
+                      placeholder="e.g. 3 min"
                       className="w-full px-3 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                     />
                   </div>
@@ -808,9 +817,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 {/* Image URL */}
                 <div>
                   <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                    Link Ảnh Bìa (Cover Image URL)
+                    Cover image URL
                   </label>
-                  <input
+                  <input aria-label="Cover image URL"
                     type="url"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
@@ -823,33 +832,34 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                      Link Audio Shadowing (.mp3)
+                      Shadowing audio URL (.mp3)
                     </label>
                     <button
                       type="button"
-                      onClick={() => setActiveTab('voices')}
+                      aria-label="Open audio tab"
+            onClick={() => setActiveTab('voices')}
                       className="text-[11px] text-antique-gold hover:underline font-bold flex items-center gap-1 cursor-pointer"
                     >
-                      <Radio className="w-3 h-3" />
-                      <span>Tạo Voice AI ({voiceTracks.length}) ➔</span>
+                      <Radio aria-hidden="true" className="w-3 h-3" />
+                      <span>Generate audio ({voiceTracks.length}) →</span>
                     </button>
                   </div>
-                  <input
+                  <input aria-label="Shadowing audio URL"
                     type="url"
                     value={shadowingAudioUrl}
                     onChange={(e) => setShadowingAudioUrl(e.target.value)}
-                    placeholder="https://example.com/audio.mp3 hoặc tạo từ Tab Giọng đọc AI"
+                    placeholder="https://example.com/audio.mp3 or generate audio in the Audio tab"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                   />
                   <p className="text-[10px] text-text-muted mt-1">
-                    Audio chính cho học viên luyện nói Shadowing. Bạn có thể tự động tạo âm thanh ở tab 4 "Giọng đọc AI".
+                    Default audio for shadowing practice. Generate tracks in the Audio tab.
                   </p>
                 </div>
               </div>
 
               {/* Featured Checkbox Toggle */}
               <div className="flex items-center gap-3 p-3 rounded-xl bg-warm-ivory/80 dark:bg-heritage-dark/50 border border-antique-gold/30">
-                <input
+                <input aria-label="Feature this article"
                   type="checkbox"
                   id="featured-checkbox"
                   checked={featured}
@@ -857,20 +867,20 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                   className="w-4 h-4 rounded text-heritage-green accent-heritage-green cursor-pointer"
                 />
                 <label htmlFor="featured-checkbox" className="text-xs font-bold text-text-body dark:text-warm-ivory cursor-pointer select-none">
-                  ⭐ Đánh dấu bài viết nổi bật (Featured) – Hiển thị huy hiệu Tiêu Điểm trên trang Khám phá
+                  Feature this article in Discover
                 </label>
               </div>
 
               {/* Summary */}
               <div>
                 <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                  Tóm Tắt Bài Đọc (Summary)
+                  Summary
                 </label>
-                <textarea
+                <textarea aria-label="Summary"
                   rows={2}
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
-                  placeholder="Mô tả vắn tắt 1-2 câu về nét đẹp văn hóa của bài viết..."
+                  placeholder="Describe the story in one or two sentences…"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold resize-none"
                 />
               </div>
@@ -880,13 +890,13 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                      Toàn Văn Bài Đọc (English Reading)
+                      English article
                     </label>
                     <span className="text-[10px] text-text-muted">
-                      {contentEn.split(/\s+/).filter(Boolean).length} từ
+                      {contentEn.split(/\s+/).filter(Boolean).length} words
                     </span>
                   </div>
-                  <textarea
+                  <textarea aria-label="English article"
                     rows={6}
                     value={contentEn}
                     onChange={(e) => {
@@ -895,7 +905,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                       setWordCount(w);
                       setReadTime(`${Math.max(1, Math.ceil(w / 100))} phút`);
                     }}
-                    placeholder="Dán toàn văn bài đọc tiếng Anh tại đây..."
+                    placeholder="Paste the full English article…"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold font-sans leading-relaxed"
                   />
                 </div>
@@ -903,22 +913,22 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                      Toàn Văn Bản Dịch (Vietnamese Translation)
+                      Vietnamese translation
                     </label>
                     <button
                       type="button"
                       onClick={handleAutoSplit}
                       className="px-2.5 py-1 rounded-lg bg-antique-gold/20 text-heritage-dark dark:text-antique-bright hover:bg-antique-gold/30 text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
                     >
-                      <Wand2 className="w-3 h-3" />
-                      <span>⚡ Tự động tách cặp đoạn</span>
+                      <Wand2 aria-hidden="true" className="w-3 h-3" />
+                      <span>Create paragraph pairs</span>
                     </button>
                   </div>
-                  <textarea
+                  <textarea aria-label="Vietnamese translation"
                     rows={6}
                     value={contentVi}
                     onChange={(e) => setContentVi(e.target.value)}
-                    placeholder="Dán toàn văn bản dịch tiếng Việt tại đây..."
+                    placeholder="Paste the Vietnamese translation…"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold font-sans leading-relaxed"
                   />
                 </div>
@@ -932,10 +942,10 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               <div className="flex items-center justify-between bg-warm-ivory/80 dark:bg-heritage-dark/60 p-3 rounded-2xl border border-antique-gold/30">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-heritage-green dark:text-antique-bright">
-                    Tổng số: {paragraphs.length} cặp đoạn song ngữ
+                    {paragraphs.length} bilingual paragraph pairs
                   </span>
                   <span className="text-[11px] text-text-muted">
-                    (Mỗi đoạn tiếng Anh tương ứng 1 đoạn dịch tiếng Việt để luyện Shadowing/Dictation)
+                    Each English paragraph is paired with its Vietnamese translation.
                   </span>
                 </div>
                 <div className="flex gap-2">
@@ -944,26 +954,26 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                     onClick={handleAutoSplit}
                     className="px-3 py-1.5 rounded-xl bg-antique-gold/20 hover:bg-antique-gold/30 text-heritage-dark dark:text-antique-bright text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
                   >
-                    <Wand2 className="w-3.5 h-3.5" />
-                    <span>Tách lại từ Toàn văn</span>
+                    <Wand2 aria-hidden="true" className="w-3.5 h-3.5" />
+                    <span>Rebuild from article</span>
                   </button>
                   <button
                     type="button"
                     onClick={handleAddParagraph}
                     className="px-3 py-1.5 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-heritage-dark transition-colors"
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Thêm cặp đoạn</span>
+                    <Plus aria-hidden="true" className="w-3.5 h-3.5" />
+                    <span>Add paragraph pair</span>
                   </button>
                 </div>
               </div>
 
               {paragraphs.length === 0 ? (
                 <div className="text-center py-12 border-2 border-dashed border-antique-gold/30 rounded-2xl">
-                  <BookOpen className="w-8 h-8 text-antique-gold/50 mx-auto mb-2" />
-                  <p className="text-xs text-text-muted">Chưa có đoạn văn nào.</p>
+                  <BookOpen aria-hidden="true" className="w-8 h-8 text-antique-gold/50 mx-auto mb-2" />
+                  <p className="text-xs text-text-muted">No paragraph pairs yet.</p>
                   <p className="text-[11px] text-text-muted mt-1">
-                    Bạn có thể bấm "⚡ Tự động tách cặp đoạn" ở Tab 1 hoặc bấm "Thêm cặp đoạn" ở trên.
+                    Create pairs from Article details or add a pair manually.
                   </p>
                 </div>
               ) : (
@@ -975,13 +985,13 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                     >
                       <div className="flex items-center justify-between">
                         <span className="px-2.5 py-0.5 rounded-full bg-heritage-green text-warm-ivory text-[11px] font-bold">
-                          Đoạn #{idx + 1}
+                          Paragraph {idx + 1}
                         </span>
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-1.5 text-[11px] text-text-muted">
-                            <Clock className="w-3 h-3 text-antique-gold" />
-                            <span>Audio mốc:</span>
-                            <input
+                            <Clock aria-hidden="true" className="w-3 h-3 text-antique-gold" />
+                            <span>Audio timing:</span>
+                            <input aria-label="Paragraph audio start in seconds"
                               type="number"
                               step="0.1"
                               value={p.audioTimestampStart ?? 0}
@@ -996,8 +1006,8 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                               placeholder="Start(s)"
                               className="w-14 px-1.5 py-0.5 rounded border border-antique-gold/30 text-center text-xs"
                             />
-                            <span>s ➔</span>
-                            <input
+                            <span>s →</span>
+                            <input aria-label="Paragraph audio end in seconds"
                               type="number"
                               step="0.1"
                               value={p.audioTimestampEnd ?? 0}
@@ -1018,9 +1028,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                             type="button"
                             onClick={() => handleRemoveParagraph(idx)}
                             className="p-1 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
-                            title="Xóa cặp đoạn"
+                            title="Delete paragraph pair" aria-label="Delete paragraph pair"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 aria-hidden="true" className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
@@ -1028,9 +1038,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-[11px] font-bold text-text-body dark:text-warm-ivory mb-1">
-                            Tiếng Anh (English)
+                            English
                           </label>
-                          <textarea
+                          <textarea aria-label="English paragraph"
                             rows={3}
                             value={p.enText}
                             onChange={(e) => {
@@ -1039,16 +1049,16 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                                 prev.map((item, i) => (i === idx ? { ...item, enText: val } : item))
                               );
                             }}
-                            placeholder="Nhập đoạn tiếng Anh..."
+                            placeholder="Enter the English paragraph…"
                             className="w-full px-3 py-2 rounded-xl bg-white/70 dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold resize-none"
                           />
                         </div>
 
                         <div>
                           <label className="block text-[11px] font-bold text-text-body dark:text-warm-ivory mb-1">
-                            Tiếng Việt (Vietnamese Translation)
+                            Vietnamese
                           </label>
-                          <textarea
+                          <textarea aria-label="Vietnamese paragraph"
                             rows={3}
                             value={p.viText}
                             onChange={(e) => {
@@ -1057,7 +1067,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                                 prev.map((item, i) => (i === idx ? { ...item, viText: val } : item))
                               );
                             }}
-                            placeholder="Nhập đoạn tiếng Việt tương ứng..."
+                            placeholder="Enter the Vietnamese translation…"
                             className="w-full px-3 py-2 rounded-xl bg-white/70 dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold resize-none"
                           />
                         </div>
@@ -1076,22 +1086,22 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               <div className="p-4 rounded-2xl bg-antique-gold/10 border border-antique-gold/30 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-heritage-dark dark:text-antique-bright">
-                    <ListPlus className="w-4 h-4 text-antique-gold" />
-                    <span>⚡ Nhập nhanh danh sách từ vựng (Fast Paste)</span>
+                    <ListPlus aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                    <span>Paste vocabulary</span>
                   </div>
                   <button
                     type="button"
                     onClick={handleFastVocabImport}
                     className="px-3 py-1 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold hover:bg-heritage-dark transition-colors cursor-pointer"
                   >
-                    Nạp vào danh sách
+                    Add to vocabulary
                   </button>
                 </div>
-                <textarea
+                <textarea aria-label="Paste vocabulary"
                   rows={3}
                   value={fastVocabInput}
                   onChange={(e) => setFastVocabInput(e.target.value)}
-                  placeholder={`Dán danh sách từ theo dạng:\n- tradition — phong tục, truyền thống\n- marriage custom \t phong tục cưới hỏi\n- spring festival — lễ hội mùa xuân`}
+                  placeholder={`Paste words and Vietnamese meanings:\n- tradition — phong tục, truyền thống\n- marriage custom \t phong tục cưới hỏi\n- spring festival — lễ hội mùa xuân`}
                   className="w-full px-3 py-2 rounded-xl bg-white/80 dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-mono text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold resize-none"
                 />
               </div>
@@ -1099,24 +1109,24 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               {/* Vocab Items List */}
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-heritage-green dark:text-antique-bright">
-                  Danh sách từ vựng ({vocabularies.length} từ/cụm từ)
+                  Vocabulary ({vocabularies.length} items)
                 </span>
                 <button
                   type="button"
                   onClick={handleAddVocab}
                   className="px-3 py-1.5 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-heritage-dark transition-colors"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Thêm 1 từ mới</span>
+                  <Plus aria-hidden="true" className="w-3.5 h-3.5" />
+                  <span>Add word</span>
                 </button>
               </div>
 
               {vocabularies.length === 0 ? (
                 <div className="text-center py-10 border-2 border-dashed border-antique-gold/30 rounded-2xl">
-                  <Sparkles className="w-8 h-8 text-antique-gold/50 mx-auto mb-2" />
-                  <p className="text-xs text-text-muted">Chưa có từ vựng nào.</p>
+                  <Sparkles aria-hidden="true" className="w-8 h-8 text-antique-gold/50 mx-auto mb-2" />
+                  <p className="text-xs text-text-muted">No vocabulary yet.</p>
                   <p className="text-[11px] text-text-muted mt-1">
-                    Hãy dùng ô Nhập nhanh bên trên hoặc bấm Thêm 1 từ mới.
+                    Paste a vocabulary list or add a word manually.
                   </p>
                 </div>
               ) : (
@@ -1129,9 +1139,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                       {/* Word / Phrase */}
                       <div className="md:col-span-3">
                         <label className="block text-[10px] font-bold text-text-muted mb-0.5">
-                          Từ / Cụm từ (Word/Phrase)
+                          Word / phrase
                         </label>
-                        <input
+                        <input aria-label="Word / phrase"
                           type="text"
                           value={v.word}
                           onChange={(e) => {
@@ -1140,7 +1150,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                               prev.map((item, i) => (i === idx ? { ...item, word: val } : item))
                             );
                           }}
-                          placeholder="VD: tradition"
+                          placeholder="e.g. tradition"
                           className="w-full px-2.5 py-1.5 rounded-lg bg-white/70 dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-bold text-text-body dark:text-warm-ivory focus:outline-none"
                         />
                       </div>
@@ -1148,9 +1158,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                       {/* Meaning */}
                       <div className="md:col-span-3">
                         <label className="block text-[10px] font-bold text-text-muted mb-0.5">
-                          Nghĩa tiếng Việt
+                          Vietnamese meaning
                         </label>
-                        <input
+                        <input aria-label="Vietnamese meaning"
                           type="text"
                           value={v.viMeaning}
                           onChange={(e) => {
@@ -1159,7 +1169,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                               prev.map((item, i) => (i === idx ? { ...item, viMeaning: val } : item))
                             );
                           }}
-                          placeholder="VD: truyền thống, phong tục"
+                          placeholder="e.g. truyền thống, phong tục"
                           className="w-full px-2.5 py-1.5 rounded-lg bg-white/70 dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory focus:outline-none"
                         />
                       </div>
@@ -1167,9 +1177,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                       {/* POS */}
                       <div className="md:col-span-2">
                         <label className="block text-[10px] font-bold text-text-muted mb-0.5">
-                          Loại từ (POS)
+                          Part of speech
                         </label>
-                        <input
+                        <input aria-label="Part of speech"
                           type="text"
                           value={v.pos || ''}
                           onChange={(e) => {
@@ -1186,9 +1196,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                       {/* IPA */}
                       <div className="md:col-span-2">
                         <label className="block text-[10px] font-bold text-text-muted mb-0.5">
-                          Phiên âm IPA
+                          IPA pronunciation
                         </label>
-                        <input
+                        <input aria-label="IPA pronunciation"
                           type="text"
                           value={v.ipa || ''}
                           onChange={(e) => {
@@ -1204,7 +1214,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
 
                       {/* Level & Delete */}
                       <div className="md:col-span-2 flex items-center justify-between pt-4">
-                        <select
+                        <select aria-label="Vocabulary CEFR level"
                           value={v.level || level}
                           onChange={(e) => {
                             const val = e.target.value as CefrLevel;
@@ -1225,13 +1235,13 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                           onClick={() => handleRemoveVocab(idx)}
                           className="p-1.5 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 aria-hidden="true" className="w-4 h-4" />
                         </button>
                       </div>
 
                       {/* Context Sentence */}
                       <div className="md:col-span-12">
-                        <input
+                        <input aria-label="Context sentence"
                           type="text"
                           value={v.contextSentence || ''}
                           onChange={(e) => {
@@ -1240,7 +1250,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                               prev.map((item, i) => (i === idx ? { ...item, contextSentence: val } : item))
                             );
                           }}
-                          placeholder="Câu ngữ cảnh trong bài đọc (Context sentence)..."
+                          placeholder="Example sentence from the article…"
                           className="w-full px-2.5 py-1 rounded-lg bg-white/40 dark:bg-heritage-dark/50 border border-antique-gold/20 text-[11px] text-text-body dark:text-warm-ivory italic focus:outline-none"
                         />
                       </div>
@@ -1258,34 +1268,34 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               <div className="p-4 rounded-2xl bg-warm-ivory/80 dark:bg-heritage-dark/60 border border-antique-gold/30 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Radio className="w-5 h-5 text-antique-gold" />
+                    <Radio aria-hidden="true" className="w-5 h-5 text-antique-gold" />
                     <h3 className="text-sm font-bold text-heritage-green dark:text-antique-bright">
-                      Bộ Sinh Giọng Đọc AI Đa Tốc Độ (Azure Speech Neural)
+                      Generate article audio
                     </h3>
                   </div>
                   <span className="px-2.5 py-1 rounded-full bg-antique-gold/20 text-heritage-dark dark:text-antique-bright text-[11px] font-bold">
-                    {voiceTracks.length} giọng đã tạo
+                    {voiceTracks.length} voices generated
                   </span>
                 </div>
                 <p className="text-xs text-text-body dark:text-warm-ivory/80 leading-relaxed">
-                  Khi bạn chọn 1 model giọng đọc và nhấn <strong>Tạo Giọng Đọc</strong>, hệ thống sẽ tự động tổng hợp toàn bộ bài đọc tiếng Anh thành <strong>2 phiên bản tốc độ</strong>:
-                  <span className="inline-block mx-1 font-semibold text-emerald-700 dark:text-emerald-300">⭐ Nguyên bản (Chuẩn 100% - Mặc định bài học)</span> và
-                  <span className="inline-block mx-1 font-semibold text-blue-700 dark:text-blue-300">🐢 Chậm (-15% cho người mới học / Shadowing)</span>.
+                  Choose a voice and select <strong>Generate audio</strong> to create the English article in <strong>two playback speeds</strong>:
+                  <span className="inline-block mx-1 font-semibold text-emerald-700 dark:text-emerald-300">Normal speed (default)</span> and
+                  <span className="inline-block mx-1 font-semibold text-blue-700 dark:text-blue-300">Slow speed (15% slower)</span>.
                 </p>
 
                 {/* Context Status */}
                 {!contentEn.trim() && paragraphs.length === 0 ? (
                   <div className="mt-2 p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+                    <AlertCircle aria-hidden="true" className="w-4 h-4 shrink-0 text-amber-600" />
                     <span>
-                      Chưa có nội dung tiếng Anh. Vui lòng nhập ở <strong>Tab 1 (Toàn văn)</strong> hoặc <strong>Tab 2 (Cặp đoạn)</strong> trước khi tạo giọng đọc.
+                      Add English content in <strong>Article details</strong> or <strong>Paragraph pairs</strong> before generating audio.
                     </span>
                   </div>
                 ) : (
                   <div className="mt-2 flex items-center gap-2 text-[11px] text-text-muted">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <CheckCircle2 aria-hidden="true" className="w-3.5 h-3.5 text-emerald-600" />
                     <span>
-                      Đã sẵn sàng tạo âm thanh cho nội dung ({contentEn.trim() ? `${contentEn.trim().split(/\s+/).filter(Boolean).length} từ toàn văn` : `${paragraphs.length} đoạn văn`}).
+                      Ready to generate audio ({contentEn.trim() ? `${contentEn.trim().split(/\s+/).filter(Boolean).length} words` : `${paragraphs.length} paragraphs`}).
                     </span>
                   </div>
                 )}
@@ -1295,24 +1305,24 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-text-body dark:text-warm-ivory uppercase tracking-wider flex items-center gap-2">
-                    <Headphones className="w-4 h-4 text-antique-gold" />
-                    <span>Giọng Đọc Đã Tạo Cho Bài Viết ({voiceTracks.length})</span>
+                    <Headphones aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                    <span>Article audio tracks ({voiceTracks.length})</span>
                   </h4>
                   {voiceTracks.length > 0 && (
                     <span className="text-[11px] text-text-muted">
-                      Bản Nguyên bản được ưu tiên làm audio mặc định cho bài đọc
+                      Normal-speed audio is used as the default.
                     </span>
                   )}
                 </div>
 
                 {voiceTracks.length === 0 ? (
                   <div className="text-center py-8 border-2 border-dashed border-antique-gold/30 rounded-2xl p-4">
-                    <Headphones className="w-8 h-8 text-antique-gold/40 mx-auto mb-2" />
+                    <Headphones aria-hidden="true" className="w-8 h-8 text-antique-gold/40 mx-auto mb-2" />
                     <p className="text-xs font-medium text-text-body dark:text-warm-ivory">
-                      Chưa có giọng đọc AI nào được tạo cho bài viết này.
+                      No audio tracks yet.
                     </p>
                     <p className="text-[11px] text-text-muted mt-1">
-                      Hãy chọn một model bên dưới (khuyên dùng <strong>Amanda</strong> hoặc <strong>Dustin</strong>) rồi bấm "Tạo Giọng Đọc".
+                      Choose a voice below (recommended: <strong>Amanda</strong> or <strong>Dustin</strong>) and select Generate audio.
                     </p>
                   </div>
                 ) : (
@@ -1331,7 +1341,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                           <div className="flex items-center justify-between flex-wrap gap-2">
                             <div className="flex items-center gap-2">
                               <div className="w-8 h-8 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/10 flex items-center justify-center text-heritage-green dark:text-antique-bright font-bold">
-                                <Volume2 className="w-4 h-4" />
+                                <Volume2 aria-hidden="true" className="w-4 h-4" />
                               </div>
                               <div>
                                 <div className="flex items-center gap-2">
@@ -1343,7 +1353,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                                   </span>
                                 </div>
                                 <span className="text-[10px] text-text-muted">
-                                  Đã tạo lúc {track.createdAt ? new Date(track.createdAt).toLocaleTimeString('vi-VN') : 'vừa xong'}
+                                  Created {track.createdAt ? new Date(track.createdAt).toLocaleTimeString('en-GB') : 'just now'}
                                 </span>
                               </div>
                             </div>
@@ -1353,10 +1363,10 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                                 type="button"
                                 onClick={() => handleRemoveVoiceTrack(track.voiceId)}
                                 className="p-1.5 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer text-xs flex items-center gap-1"
-                                title="Xóa giọng này khỏi bài viết"
+                                title="Remove audio track" aria-label="Remove audio track"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                <span>Xóa</span>
+                                <Trash2 aria-hidden="true" className="w-3.5 h-3.5" />
+                                <span>Remove</span>
                               </button>
                             </div>
                           </div>
@@ -1373,18 +1383,18 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                             >
                               <div className="flex items-center justify-between mb-2">
                                 <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold flex items-center gap-1">
-                                  ⭐ Tốc độ Nguyên bản (Chuẩn 100% - Mặc định)
+                                  Normal speed (default)
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() => handleSetPrimaryAudio(normalAudioUrl, track.voiceName, 'Nguyên bản')}
+                                  onClick={() => handleSetPrimaryAudio(normalAudioUrl, track.voiceName, 'Normal')}
                                   className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
                                     isNormalPrimary
                                       ? 'bg-antique-gold text-heritage-dark font-extrabold'
                                       : 'text-text-muted hover:text-antique-gold hover:bg-antique-gold/10'
                                   }`}
                                 >
-                                  {isNormalPrimary ? '★ Audio mặc định chính' : 'Đặt làm Audio chính'}
+                                  {isNormalPrimary ? 'Default audio' : 'Use as default'}
                                 </button>
                               </div>
                               <audio
@@ -1405,18 +1415,18 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                             >
                               <div className="flex items-center justify-between mb-2">
                                 <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 text-[10px] font-bold">
-                                  🐢 Tốc độ Chậm (-15%)
+                                  Slow speed (15% slower)
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() => handleSetPrimaryAudio(track.slowUrl, track.voiceName, 'Chậm')}
+                                  onClick={() => handleSetPrimaryAudio(track.slowUrl, track.voiceName, 'Slow')}
                                   className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
                                     isSlowPrimary
                                       ? 'bg-antique-gold text-heritage-dark font-extrabold'
                                       : 'text-text-muted hover:text-antique-gold hover:bg-antique-gold/10'
                                   }`}
                                 >
-                                  {isSlowPrimary ? '★ Audio mặc định chính' : 'Đặt làm Audio chính'}
+                                  {isSlowPrimary ? 'Default audio' : 'Use as default'}
                                 </button>
                               </div>
                               <audio
@@ -1438,13 +1448,13 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               <div className="space-y-3 pt-2 border-t border-antique-gold/20">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-text-body dark:text-warm-ivory uppercase tracking-wider flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-antique-gold" />
-                    <span>Chọn Model Để Tạo Voice (Dev Predefined)</span>
+                    <Sparkles aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                    <span>Available voices</span>
                   </h4>
                   {isLoadingModels && (
                     <span className="text-[11px] text-text-muted flex items-center gap-1">
-                      <Loader2 className="w-3 h-3 animate-spin text-antique-gold" />
-                      Đang tải danh sách model...
+                      <Loader2 aria-hidden="true" className="w-3 h-3 animate-spin text-antique-gold" />
+                      Loading voices…
                     </span>
                   )}
                 </div>
@@ -1472,19 +1482,19 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                               </span>
                               {model.isPrimary && (
                                 <span className="px-2 py-0.5 rounded-full bg-antique-gold/20 text-heritage-dark dark:text-antique-bright text-[10px] font-extrabold flex items-center gap-0.5">
-                                  <Star className="w-2.5 h-2.5 fill-current" />
-                                  <span>Khuyên dùng</span>
+                                  <Star aria-hidden="true" className="w-2.5 h-2.5 fill-current" />
+                                  <span>Recommended</span>
                                 </span>
                               )}
                               {model.isMultilingual && (
                                 <span className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-medium">
-                                  Đa ngôn ngữ
+                                  Multilingual
                                 </span>
                               )}
                             </div>
 
                             <span className="text-[10px] text-text-muted font-mono">
-                              {model.gender === 'Female' ? 'Nữ' : 'Nam'}
+                              {model.gender === 'Female' ? 'Female' : 'Male'}
                             </span>
                           </div>
 
@@ -1512,18 +1522,18 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                           >
                             {isGenerating ? (
                               <>
-                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                <span>Đang tổng hợp...</span>
+                                <Loader2 aria-hidden="true" className="w-3.5 h-3.5 animate-spin" />
+                                <span>Generating…</span>
                               </>
                             ) : isExisting ? (
                               <>
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                                <span>Tạo lại giọng này</span>
+                                <CheckCircle2 aria-hidden="true" className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                <span>Regenerate audio</span>
                               </>
                             ) : (
                               <>
-                                <Wand2 className="w-3.5 h-3.5 text-antique-gold" />
-                                <span>Tạo Giọng Đọc</span>
+                                <Wand2 aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                                <span>Generate audio</span>
                               </>
                             )}
                           </button>
@@ -1542,11 +1552,11 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-antique-gold/15 border border-antique-gold/30">
                 <div>
                   <div className="flex items-center gap-2 text-sm font-bold text-heritage-dark dark:text-antique-bright">
-                    <HelpCircle className="w-5 h-5 text-antique-gold" />
-                    <span>Bộ Câu Hỏi Thấu Hiểu Bài Đọc (Reading Comprehension Quiz)</span>
+                    <HelpCircle aria-hidden="true" className="w-5 h-5 text-antique-gold" />
+                    <span>Reading comprehension quiz</span>
                   </div>
                   <p className="text-xs text-text-body dark:text-warm-ivory/80 mt-1">
-                    Biên soạn 2-4 câu hỏi trắc nghiệm A, B, C, D về bối cảnh văn hóa & ý nghĩa phong tục để kiểm tra mức độ thấu hiểu của người học ở cuối bài.
+                    Create two to four multiple-choice questions about the story and its cultural context.
                   </p>
                 </div>
                 <button
@@ -1554,27 +1564,27 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                   onClick={handleAddQuestion}
                   className="px-4 py-2 rounded-xl bg-heritage-green text-warm-ivory font-bold text-xs flex items-center gap-2 hover:bg-heritage-dark transition-all cursor-pointer shadow-sm shrink-0"
                 >
-                  <Plus className="w-4 h-4 text-antique-gold" />
-                  <span>Thêm Câu Hỏi Mới</span>
+                  <Plus aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                  <span>Add question</span>
                 </button>
               </div>
 
               {questions.length === 0 ? (
                 <div className="text-center py-12 px-4 rounded-2xl border-2 border-dashed border-antique-gold/30 bg-warm-ivory/40 dark:bg-heritage-dark/30">
-                  <HelpCircle className="w-10 h-10 mx-auto text-antique-gold/60 mb-3" />
+                  <HelpCircle aria-hidden="true" className="w-10 h-10 mx-auto text-antique-gold/60 mb-3" />
                   <h4 className="text-sm font-bold text-text-body dark:text-warm-ivory mb-1">
-                    Chưa có câu hỏi đọc hiểu nào được thêm
+                    No questions yet
                   </h4>
                   <p className="text-xs text-text-muted max-w-md mx-auto mb-4">
-                    Thêm các câu hỏi trắc nghiệm để người học ôn luyện kiến thức văn hóa sau khi đọc xong bài.
+                    Add questions to help learners check their understanding.
                   </p>
                   <button
                     type="button"
                     onClick={handleAddQuestion}
                     className="px-4 py-2 rounded-xl bg-heritage-green text-warm-ivory font-bold text-xs inline-flex items-center gap-2 hover:bg-heritage-dark transition-all cursor-pointer shadow-sm"
                   >
-                    <Plus className="w-4 h-4 text-antique-gold" />
-                    <span>+ Thêm Câu Hỏi Đầu Tiên</span>
+                    <Plus aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                    <span>Add the first question</span>
                   </button>
                 </div>
               ) : (
@@ -1604,29 +1614,29 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                               {qIdx + 1}
                             </span>
                             <span className="text-xs font-bold text-heritage-dark dark:text-warm-ivory">
-                              Câu hỏi #{qIdx + 1}
+                              Question {qIdx + 1}
                             </span>
                           </div>
                           <button
                             type="button"
                             onClick={() => handleRemoveQuestion(qIdx)}
                             className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
-                            title="Xóa câu hỏi này"
+                            title="Delete question" aria-label="Delete question"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 aria-hidden="true" className="w-4 h-4" />
                           </button>
                         </div>
 
                         {/* Question Text */}
                         <div>
                           <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                            Nội Dung Câu Hỏi (Tiếng Anh hoặc Song Ngữ) <span className="text-red-500">*</span>
+                            Question (English or bilingual) <span className="text-red-500">*</span>
                           </label>
-                          <textarea
+                          <textarea aria-label="Question"
                             rows={2}
                             value={q.question}
                             onChange={(e) => handleUpdateQuestionText(qIdx, e.target.value)}
-                            placeholder="VD: According to the article, what is the historical origin of Tết traced back to?"
+                            placeholder="e.g. According to the article, where did Tet originate?"
                             className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory/80 dark:bg-heritage-forest border border-antique-gold/40 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                           />
                         </div>
@@ -1634,7 +1644,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                         {/* Options A, B, C, D */}
                         <div className="space-y-2.5 pt-1">
                           <label className="block text-xs font-bold text-text-body dark:text-warm-ivory">
-                            Các Lựa Chọn Đáp Án (Tích chọn nút tròn để xác định ĐÁP ÁN ĐÚNG):
+                            Answer options (select the correct answer):
                           </label>
                           <div className="grid grid-cols-1 gap-2.5">
                             {fullOpts.map((opt) => {
@@ -1649,7 +1659,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                                   }`}
                                 >
                                   <label className="flex items-center gap-2 cursor-pointer shrink-0">
-                                    <input
+                                        <input aria-label={`Mark answer ${opt.key} as correct`}
                                       type="radio"
                                       name={`correct-${qIdx}`}
                                       checked={isCorrect}
@@ -1667,19 +1677,19 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                                     </span>
                                   </label>
 
-                                  <input
+                                  <input aria-label="Answer option"
                                     type="text"
                                     value={opt.text}
                                     onChange={(e) =>
                                       handleUpdateOptionText(qIdx, opt.key, e.target.value)
                                     }
-                                    placeholder={`Nội dung lựa chọn ${opt.key}...`}
+                                    placeholder={`Answer ${opt.key}…`}
                                     className="flex-1 px-3 py-1.5 rounded-lg bg-white/90 dark:bg-heritage-dark/90 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                                   />
 
                                   {isCorrect && (
                                     <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 px-2 py-0.5 rounded shrink-0">
-                                      Đáp án đúng ✓
+                                      Correct answer
                                     </span>
                                   )}
                                 </div>
@@ -1691,13 +1701,13 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                         {/* Cultural Explanation */}
                         <div>
                           <label className="block text-xs font-semibold text-text-muted mb-1">
-                            Giải Thích Văn Hóa / Ngữ Cảnh (Hiển thị sau khi người học nộp bài):
+                            Explanation (shown after submission):
                           </label>
-                          <input
+                          <input aria-label="Answer explanation"
                             type="text"
                             value={q.explanation || ''}
                             onChange={(e) => handleUpdateExplanation(qIdx, e.target.value)}
-                            placeholder="VD: Ngày Tết bắt nguồn từ nền văn minh lúa nước gắn liền với chu kỳ mùa vụ của phương Đông."
+                            placeholder="Explain the answer using the story and its cultural context…"
                             className="w-full px-3 py-2 rounded-xl bg-warm-ivory/60 dark:bg-heritage-forest/80 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                           />
                         </div>
@@ -1714,24 +1724,24 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-antique-gold/15 border border-antique-gold/40 space-y-3">
                 <div className="flex items-center gap-2 text-sm font-bold text-heritage-dark dark:text-antique-bright">
-                  <FileSpreadsheet className="w-5 h-5 text-antique-gold" />
-                  <span>Trình Nhập Dữ Liệu TSV Siêu Tốc (Auto TSV Row Parser)</span>
+                  <FileSpreadsheet aria-hidden="true" className="w-5 h-5 text-antique-gold" />
+                  <span>Import from TSV</span>
                 </div>
                 <p className="text-xs text-text-body dark:text-warm-ivory/90 leading-relaxed">
-                  Công cụ hỗ trợ copy <strong>1 dòng hoàn chỉnh</strong> từ file TSV của bạn (chẳng hạn dòng{' '}
-                  <em>"Tục kéo vợ người Mông"</em> trong file <code className="bg-black/10 px-1 py-0.5 rounded">10_10 EXE101 - Minh Bảo.tsv</code>).
-                  Hệ thống sẽ tự động bóc tách: Tiêu đề, Vùng miền, Toàn văn bài đọc, Số lượng từ, Bản dịch tiếng Việt, và Bảng từ vựng tương ứng!
+                  Paste <strong>one complete row</strong> from your TSV file (for example,{' '}
+                  <em>"Tục kéo vợ người Mông"</em> in <code className="bg-black/10 px-1 py-0.5 rounded">10_10 EXE101 - Minh Bảo.tsv</code>).
+                  The importer fills the title, region, article, word count, Vietnamese translation and vocabulary.
                 </p>
 
                 <div className="flex items-center gap-3 pt-2">
                   <span className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                    Chọn Cấp độ cần nhập từ dòng TSV:
+                    Choose a reading level to import:
                   </span>
                   <div className="flex gap-2">
                     {[
-                      { idx: 1, label: 'Level 1 (A1 - Cột 3)' },
-                      { idx: 2, label: 'Level 2 (B1 - Cột 4)' },
-                      { idx: 3, label: 'Level 3 (B2/C1 - Cột 5)' },
+                      { idx: 1, label: 'Level 1 (A1 - column 3)' },
+                      { idx: 2, label: 'Level 2 (B1 - column 4)' },
+                      { idx: 3, label: 'Level 3 (B2/C1 - column 5)' },
                     ].map((opt) => (
                       <button
                         key={opt.idx}
@@ -1749,11 +1759,11 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                   </div>
                 </div>
 
-                <textarea
+                <textarea aria-label="TSV row"
                   rows={8}
                   value={tsvRawRow}
                   onChange={(e) => setTsvRawRow(e.target.value)}
-                  placeholder="Dán 1 dòng TSV tại đây (chứa các cột Topic, Vùng miền, Level 1, Level 2, Level 3 ngăn cách bởi dấu tab)..."
+                  placeholder="Paste one TSV row with Topic, Region, Level 1, Level 2 and Level 3 columns…"
                   className="w-full px-3.5 py-3 rounded-xl bg-white/90 dark:bg-heritage-dark/90 border border-antique-gold/40 text-xs font-mono text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                 />
 
@@ -1763,8 +1773,8 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                     onClick={handleTsvImport}
                     className="px-5 py-2.5 rounded-xl bg-heritage-green text-warm-ivory font-bold text-xs flex items-center gap-2 hover:bg-heritage-dark transition-all cursor-pointer shadow-md"
                   >
-                    <Sparkles className="w-4 h-4 text-antique-gold" />
-                    <span>⚡ Bóc Tách & Nạp Dữ Liệu Vào Form Ngay</span>
+                    <Sparkles aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                    <span>Import into editor</span>
                   </button>
                 </div>
               </div>
@@ -1778,12 +1788,12 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               onClick={onClose}
               className="px-4 py-2.5 rounded-xl border border-antique-gold/40 text-xs font-bold text-text-body dark:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
             >
-              Hủy bỏ
+              Cancel
             </button>
 
             <div className="flex items-center gap-3">
               <span className="text-xs text-text-muted">
-                {paragraphs.length} đoạn • {vocabularies.length} từ vựng • {questions.length} câu hỏi
+                {paragraphs.length} pairs · {vocabularies.length} words · {questions.length} questions
               </span>
               <button
                 type="submit"
@@ -1793,14 +1803,14 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 {isSubmitting ? (
                   <span className="inline-block animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
                 ) : (
-                  <CheckCircle2 className="w-4 h-4 text-antique-gold" />
+                  <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                 )}
-                <span>{initialData?.id ? 'Lưu Thay Đổi' : 'Đăng Bài Viết (Publish)'}</span>
+                <span>{initialData?.id ? 'Save changes' : 'Publish article'}</span>
               </button>
             </div>
           </div>
         </form>
       </motion.div>
-    </div>
+    </AdminDialog>
   );
 };

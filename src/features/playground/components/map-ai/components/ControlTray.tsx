@@ -15,10 +15,10 @@ import {
   MicOff,
   Keyboard,
   Send,
-  Sparkles,
 } from 'lucide-react';
 import { useLogStore, useUI } from '../lib/state';
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
+import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -45,9 +45,17 @@ export type ControlTrayProps = {
 export function ControlTray({ trayRef }: ControlTrayProps) {
   const { speakerMuted, toggleSidebar } = useUI();
   const [textPrompt, setTextPrompt] = useState('');
+  const handoffRevision = useReaderHandoff(state => state.draftRevision);
   const connectButtonRef = useRef<HTMLButtonElement>(null);
   const isMobile = useMediaQuery('(max-width: 768px), (orientation: landscape) and (max-height: 768px)');
   const [isTextEntryVisible, setIsTextEntryVisible] = useState(false);
+  useEffect(() => {
+    if (useReaderHandoff.getState().draft) {
+      setTextPrompt(useReaderHandoff.getState().draft);
+      setIsTextEntryVisible(true);
+      useReaderHandoff.getState().consumeDraft(handoffRevision);
+    }
+  }, [handoffRevision]);
   const isLandscape = useMediaQuery('(orientation: landscape) and (max-height: 768px)');
   const turns = useLogStore(state => state.turns);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -55,13 +63,9 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      if (!textPrompt) {
-        textarea.style.height = '20px';
-      } else {
-        textarea.style.height = '20px';
-        const scrollHeight = textarea.scrollHeight;
-        textarea.style.height = `${Math.min(scrollHeight, 120)}px`;
-      }
+      textarea.style.height = 'auto';
+      textarea.style.height = `${Math.min(Math.max(textarea.scrollHeight, 48), 144)}px`;
+      textarea.style.overflowY = textarea.scrollHeight > 144 ? 'auto' : 'hidden';
     }
   }, [textPrompt]);
 
@@ -111,25 +115,25 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     toggleSidebar();
   };
 
-  const micButtonTitle = muted ? 'Mở microphone' : 'Tắt microphone';
-  const connectButtonTitle = connected || connecting || ending ? 'Dừng đàm thoại' : hasHistory ? 'Tiếp tục đàm thoại' : 'Bắt đầu đàm thoại';
+  const micButtonTitle = muted ? 'Turn microphone on' : 'Turn microphone off';
+  const connectButtonTitle = connected || connecting || ending ? 'Pause conversation' : hasHistory ? 'Resume conversation' : 'Start speaking';
 
   if (!active) return null;
 
   return (
     <section className="control-tray" ref={trayRef}>
       <div role="status" className="px-3 py-1 text-xs text-slate-400">
-        {connecting ? 'Đang kết nối…' : ending ? 'Đang tổng kết… Có thể dừng ngay.' : isRestoringContext ? 'Đang khôi phục ngữ cảnh…' : isPlaying ? 'AI đang nói' : isAwaitingResponse || isSending ? 'Đang chờ AI phản hồi…' : connected ? recording ? 'Đang nghe' : 'Mic đã tắt · Có thể nhập tin nhắn' : hasHistory ? 'Chưa kết nối · Play để tiếp tục' : 'Chưa kết nối · Play bắt đầu phiên mới'}
+        {connecting ? 'Connecting…' : ending ? 'Wrapping up… You can stop now.' : isRestoringContext ? 'Restoring context…' : isPlaying ? 'AI is speaking' : isAwaitingResponse || isSending ? 'Waiting for a reply…' : connected ? recording ? 'Listening' : 'Mic off · You can type a message' : hasHistory ? 'Paused · Press Play to resume' : 'Ready when you are · Press Play to speak'}
         {recording && <meter className="ml-2 w-16" min={0} max={1} value={inputVolume} aria-label="Âm lượng microphone" />}
-        {connectionError && <div role="alert">{connectionError} <button type="button" disabled={busy} onClick={() => void handleRetry()}>Thử lại</button></div>}
-        {connected && !busy && <button type="button" className="ml-3 underline" onClick={() => void endConversation()}>Kết thúc và tổng kết</button>}
-        {!connected && !busy && hasHistory && <button type="button" className="ml-3 underline" onClick={() => void resumeConversation({ input: 'text' })}>Tiếp tục từ lịch sử</button>}
+        {connectionError && <div role="alert">{connectionError} <button type="button" disabled={busy} onClick={() => void handleRetry()}>Retry</button></div>}
+        {connected && !busy && <button type="button" className="ml-3 underline" onClick={() => void endConversation()}>Finish and recap</button>}
+        {!connected && !busy && hasHistory && <button type="button" className="ml-3 underline" onClick={() => void resumeConversation({ input: 'text' })}>Resume conversation</button>}
       </div>
       <nav className={cn('actions-nav', { 'text-entry-visible-landscape': isLandscape && isTextEntryVisible })}>
         <button
           className={cn('action-button')}
           onClick={handleSettingsClick}
-          title="Cài đặt buổi học"
+          title="Speaking settings"
           aria-label="Settings"
         >
           <SlidersHorizontal className="w-5 h-5" />
@@ -150,31 +154,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           >
             {connected || connecting || ending ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
           </button>
-          {!connected && turns.length === 0 && (
-            <div
-              className="start-here-bubble animate-bounce flex items-center gap-1.5"
-              style={{
-                position: 'absolute',
-                bottom: '100%',
-                left: '-12px',
-                marginBottom: '20px',
-                background: '#1E4B43',
-                color: '#D4AF37',
-                border: '1px solid rgba(212, 175, 55, 0.4)',
-                padding: '8px 16px',
-                borderRadius: '12px',
-                fontSize: '13px',
-                fontWeight: 'bold',
-                whiteSpace: 'nowrap',
-                boxShadow: '0 6px 16px rgba(30, 75, 67, 0.5)',
-                pointerEvents: 'none',
-                zIndex: 1000,
-              }}
-            >
-              <Sparkles className="w-4 h-4 text-[#D4AF37]" />
-              <span>Bắt đầu luyện nói tại đây</span>
-            </div>
-          )}
+
         </div>
         <button
           type="button"
@@ -198,6 +178,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           disabled={busy || !connected}
           onClick={handleMicClick}
           title={micButtonTitle}
+          aria-label={micButtonTitle}
         >
           {!muted ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
         </button>
@@ -205,6 +186,8 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           className={cn('action-button keyboard-toggle-button')}
           onClick={() => setIsTextEntryVisible(!isTextEntryVisible)}
           title="Toggle text input"
+          aria-label="Toggle text input"
+          aria-expanded={isTextEntryVisible}
         >
           <Keyboard className="w-5 h-5" />
         </button>
@@ -216,7 +199,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             ref={textareaRef}
             className="prompt-input"
             placeholder={
-              connected ? 'Nhập tin nhắn đàm thoại...' : 'Nhập câu hỏi để bắt đầu bằng bàn phím...'
+              connected ? 'Type a message…' : 'Type a message to begin…'
             }
             value={textPrompt}
             onChange={e => setTextPrompt(e.target.value)}
@@ -232,7 +215,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             aria-label="Send message"
             title={
               !connected
-                ? 'Kết nối và gửi câu hỏi'
+                ? 'Connect and send'
                 : !textPrompt.trim()
                 ? 'Type a message to send'
                 : 'Send message'

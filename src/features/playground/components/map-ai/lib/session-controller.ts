@@ -6,6 +6,7 @@ import { buildResumeHistory } from './conversation-history';
 import { useLogStore } from './conversation-state';
 import { PROFICIENCY_LEVELS } from './prompt-scaffolder';
 import type { CulturalTutorMode } from './state';
+import { useChatWorkspace } from './chat-workspace';
 
 export type ActiveView = 'chat' | 'immersive' | null;
 export type ActionResult = { status: 'ok' | 'busy' | 'inactive' | 'cancelled' | 'error'; message?: string };
@@ -25,7 +26,7 @@ export interface SessionDependencies {
   audio: ConversationAudioPort;
   configuration: () => { config: LiveConnectConfig; systemPrompt: string; model: string };
   toolPolicy: () => { allowMapTools: boolean; tutorMode: CulturalTutorMode };
-  dispatchTool: (name: string, args: unknown, context: { allowMapTools: boolean; tutorMode: CulturalTutorMode; isCurrent: () => boolean }) => Promise<string | object>;
+  dispatchTool: (name: string, args: unknown, context: { allowMapTools: boolean; tutorMode: CulturalTutorMode; view?: ActiveView; isCurrent: () => boolean }) => Promise<string | object>;
   setLevel: (level: ProficiencyLevel) => void;
   setMuted: (muted: boolean) => void;
   clearMarkers: () => void;
@@ -167,7 +168,7 @@ export class SessionController {
         log.setIsAwaitingFunctionResponse(true, name);
         let response: { result?: string | object; error?: string };
         try {
-          const result = await this.deps.dispatchTool(name, call.args, { ...(this.sessionPolicy ?? this.deps.toolPolicy()), isCurrent });
+          const result = await this.deps.dispatchTool(name, call.args, { ...(this.sessionPolicy ?? this.deps.toolPolicy()), view: this.state.activeView, isCurrent });
           response = { result };
         } catch (error) {
           response = { error: error instanceof Error ? error.message : String(error) };
@@ -210,6 +211,7 @@ export class SessionController {
 
   resetConversation = () => {
     this.stopConversation('reset');
+    if (this.state.activeView === 'chat') useChatWorkspace.getState().closePanel();
     useLogStore.getState().clearTurns();
     this.deps.clearMarkers();
   };

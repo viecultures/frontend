@@ -1,3 +1,4 @@
+import '../flashcard-study.css';
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useGamification } from '@/context/GamificationContext';
@@ -68,7 +69,7 @@ function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerPr
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [session, currentCard, cards.length]);
 
-  if (!cards.length) return <div role="status" className="p-8 text-center"><h1>Chưa có từ vựng để ôn</h1><p>{savedOnly ? 'Hãy lưu từ trong bài đọc trước.' : 'Bài này chưa có bộ từ được biên tập.'}</p><Link to={paths.reader({ postId: deck.article.id, level })}>Trở về bài đọc</Link></div>;
+  if (!cards.length) return <div role="status" className="p-8 text-center"><h1>No vocabulary to review</h1><p>{savedOnly ? 'Save words in the Reader first.' : 'This story does not have a vocabulary deck yet.'}</p><Link to={paths.reader({ postId: deck.article.id, level })}>Back to the story</Link></div>;
 
   return <div className="vocab-study-page w-full">
     <div>
@@ -84,8 +85,8 @@ function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerPr
         return { ...value, order, currentIndex: Math.max(0, order.indexOf(currentCard?.id || '')) };
       });
     }} isAutoAudio={isAutoAudio} onToggleAutoAudio={setIsAutoAudio} accentVoice={accentVoice} onChangeVoice={setAccentVoice} />
-    <p className="text-xs text-text-secondary">{level} · Tiến độ lưu trên trình duyệt này{savedOnly ? ' · Ôn từ đã lưu, không cấp thêm thưởng hoàn thành bài' : ''}</p>
-    {!canSave && <p role="alert">Trình duyệt chưa lưu được tiến độ. Hãy kiểm tra dung lượng hoặc quyền lưu trữ.</p>}
+    <p className="vocab-study-storage">Progress saved in this browser{savedOnly ? ' · Saved words review does not earn an additional completion reward' : ''}</p>
+    {!canSave && <p role="alert">Progress could not be saved. Check browser storage space or permissions.</p>}
     </div>
     <FlashcardProgressBar currentIndex={session.currentIndex} reviewedCount={Object.keys(session.ratings).length} totalCards={cards.length} isComplete={session.complete} />
     <FlashcardModeTabs playerMode={session.mode} onChangeMode={mode => { clearAnswer(); update(value => ({ ...value, mode })); }} />
@@ -99,7 +100,7 @@ function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerPr
         }} onNext={() => { if (spellingFeedback) rate(spellingFeedback === 'correct'); }} />}
       </>}
     </div>
-    <p className="vocab-study-tip">Một ít mỗi ngày, nhớ lâu hơn. Hãy đọc to từ vựng trước khi xem đáp án.</p>
+    <p className="vocab-study-tip">A little practice each day. Say the word aloud before revealing the meaning.</p>
   </div>;
 }
 
@@ -118,8 +119,8 @@ export default function FlashcardStudyPage() {
     return () => { active = false; };
   }, [key, attempt]);
   return <FlashcardSidebarLayout>
-    {!result || result.key !== key ? <p role="status">Đang tải bộ từ của bài đọc…</p> : result.deck ?
+    {!result || result.key !== key ? <p role="status">Loading the story’s vocabulary…</p> : result.deck ?
       <FlashcardStudyPlayer key={key + savedOnly} deck={result.deck} level={result.deck.lesson.cefrLevel} savedOnly={savedOnly} /> :
-      <div role="alert" className="p-8 text-center"><h1>Chưa tải được bộ từ của bài này</h1><p>Kiểm tra kết nối hoặc chọn lại bài đọc.</p><button onClick={() => setAttempt(value => value + 1)}>Thử lại</button> <Link to={PATHS.discovery}>Chọn bài đọc</Link></div>}
+      <div role="alert" className="p-8 text-center"><h1>Unable to load this vocabulary deck</h1><p>Check your connection or choose another story.</p><button onClick={() => setAttempt(value => value + 1)}>Try again</button> <Link to={PATHS.discovery}>Choose a story</Link></div>}
   </FlashcardSidebarLayout>;
 }

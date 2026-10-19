@@ -8,6 +8,7 @@ import { type MapMarker, useMapStore } from '../map-state';
 import { dispatchTool } from './tool-dispatcher';
 import { findProvinceById, findProvinceByName, svgCoordsToLatLng } from '../svg-map-controller';
 import { debugLog } from '../debug-logger';
+import { useChatWorkspace } from '../chat-workspace';
 import { buildAiMapLessonPayload } from '../lesson-payload';
 import { useAiMapLessonStore } from '../lesson-state';
 import type { AiMapQuizResult } from '../../types';
@@ -110,6 +111,7 @@ export function findLandmarkByTopicOrName(topic: string, provinceId?: string): L
  * Context object passed to tool implementations.
  */
 export interface ToolContext {
+  view?: 'chat' | 'immersive' | null;
   setHeldGroundedResponse?: (response: any) => void;
   setHeldGroundingChunks?: (chunks: any) => void;
   allowMapTools?: boolean;
@@ -140,6 +142,18 @@ export type ToolImplementation = (
  * Registry of tool functions called by Gemini Live API.
  */
 export const toolImplementations: Record<string, ToolImplementation> = {
+  openMap: async (params: { provinceName?: string; region?: 'north' | 'central' | 'south' | 'all' }, context) => {
+    if (params.provinceName) return executeHighlightMapProvince({ provinceName: params.provinceName }, context);
+    return executeFocusMapRegion({ region: params.region ?? 'all' }, context);
+  },
+
+  openArticleDetail: async (params: { articleId: string }, context) => {
+    const article = VIETNAM_LANDMARKS.find(item => item.id === params.articleId);
+    if (!article) return { error: 'ARTICLE_NOT_FOUND', message: 'Unknown article ID. Use getVieCultureArticles to find an available article first.' };
+    mutate(context, () => useChatWorkspace.getState().openArticle(article.id));
+    return { status: 'opened', articleId: article.id, title: article.title, titleVi: article.titleVi,
+      excerptEn: article.excerptEn, excerptVi: article.excerptVi, vocabHighlights: article.vocabHighlights };
+  },
   listCulturalLessons: async (params: {
     category?: 'Cuisine' | 'Heritage' | 'Crafts' | 'Nature' | 'Folklore';
     region?: 'north' | 'central' | 'south' | 'all';
@@ -194,7 +208,7 @@ export const toolRegistry: Record<string, ToolImplementation> = Object.fromEntri
   Object.keys(toolImplementations).map(name => [name, (args: unknown, context?: ToolContext) => dispatchTool(name, args, context)]),
 );
 
-export const MAP_TOOL_NAMES = new Set(['highlightMapProvince', 'focusMapRegion']);
+export const MAP_TOOL_NAMES = new Set(['openMap', 'highlightMapProvince', 'focusMapRegion']);
 
 /**
  * Discovers and lists cultural lessons.
@@ -337,7 +351,10 @@ async function executeHighlightMapProvince(params: {
     : undefined;
 
   if (matchedLandmark) {
-    mutate(context, () => useMapStore.getState().selectLandmark(matchedLandmark.id, { source: 'ai' }));
+    mutate(context, () => {
+      useMapStore.getState().selectLandmark(matchedLandmark.id, { source: 'ai' });
+      if (context?.view === 'chat') useChatWorkspace.getState().openMap();
+    });
     debugLog.tool('highlightMapProvince', 'success', params, {
       matchedProvinceId: province.id,
       matchedLandmarkId: matchedLandmark.id,
@@ -348,7 +365,10 @@ async function executeHighlightMapProvince(params: {
   }
 
   // If no landmark is matched, select the province with no synthetic text markers to avoid overlapping map labels
-  mutate(context, () => useMapStore.getState().selectProvince(province.id, { source: 'ai', markers: [] }));
+  mutate(context, () => {
+    useMapStore.getState().selectProvince(province.id, { source: 'ai', markers: [] });
+    if (context?.view === 'chat') useChatWorkspace.getState().openMap();
+  });
 
   debugLog.tool('highlightMapProvince', 'success', params, {
     matchedId: province.id,
@@ -461,7 +481,10 @@ async function executeFocusMapRegion(params: {
 }, context?: ToolContext): Promise<string> {
   const { region } = params;
   if (!mapToolsAllowed(context)) return 'Map tools are disabled.';
-  mutate(context, () => useMapStore.getState().selectRegion(region, 'ai'));
+  mutate(context, () => {
+    useMapStore.getState().selectRegion(region, 'ai');
+    if (context?.view === 'chat') useChatWorkspace.getState().openMap();
+  });
   const labels: Record<string, string> = {
     north: 'Miền Bắc (Northern Vietnam)',
     central: 'Miền Trung (Central Vietnam)',

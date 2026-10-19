@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { isLocalAuthMode } from '@/config/authConfig';
 
 import { SettingsModal } from './components/SettingsModal';
 import { PwaInstallBanner } from './components/pwa';
@@ -27,6 +28,7 @@ const FlashcardStudyPage = React.lazy(() => import('@/features/flashcards/pages/
 const CommunityPage = React.lazy(() => import('@/features/community/pages/community'));
 const CommunityContestPage = React.lazy(() => import('@/features/community/pages/community-contest'));
 const PlaygroundPage = React.lazy(() => import('@/features/playground/pages/playground'));
+const AiWorkspacePage = React.lazy(() => import('@/features/playground/pages/ai-workspace'));
 const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
 const PricingPage = React.lazy(() => import('@/features/subscription/pages/PricingPage'));
 const CheckoutPage = React.lazy(() => import('@/features/subscription/pages/CheckoutPage'));
@@ -88,8 +90,7 @@ export const App: React.FC = () => {
   const googleClientId =
     import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
-  return (
-    <GoogleOAuthProvider clientId={googleClientId} locale="vi">
+  const content = (
       <div className="min-h-screen bg-surface text-ink-soft flex flex-col font-sans">
         {/* Main Content Area with Route-driven Layouts */}
         <React.Suspense
@@ -210,6 +211,7 @@ export const App: React.FC = () => {
               <Route path="/loop" element={<RedirectToReader />} />
 
               <Route path={PATHS.playground} element={<PlaygroundPage />} />
+              <Route path={PATHS.aiWorkspace} element={<AiWorkspacePage />} />
               <Route path="/mascot-demo" element={<MascotDemoPage />} />
             </Route>
           </Routes>
@@ -219,7 +221,10 @@ export const App: React.FC = () => {
         <SettingsModal />
         <PwaInstallBanner />
       </div>
-    </GoogleOAuthProvider>
+  );
+
+  return isLocalAuthMode ? content : (
+    <GoogleOAuthProvider clientId={googleClientId} locale="vi">{content}</GoogleOAuthProvider>
   );
 };
 

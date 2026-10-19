@@ -6,11 +6,11 @@ interface FlashcardModeTabsProps {
   onChangeMode: (mode: PlayerMode) => void;
 }
 const modes = [
-  { id: "flip", label: "Lật thẻ", icon: Layers },
-  { id: "mc", label: "Trắc nghiệm", icon: Target },
-  { id: "spelling", label: "Gõ từ", icon: PenTool },
+  { id: "flip", label: "Flip cards", icon: Layers },
+  { id: "mc", label: "Quiz", icon: Target },
+  { id: "spelling", label: "Spelling", icon: PenTool },
 ] as const;
 
 export function FlashcardModeTabs({ playerMode, onChangeMode }: FlashcardModeTabsProps) {
-  return <div className="vocab-mode-tabs" role="group" aria-label="Chế độ học">{modes.map(({ id, label, icon: Icon }) => <button key={id} aria-pressed={playerMode === id} onClick={() => onChangeMode(id)}><Icon size={16} /><span>{label}</span></button>)}</div>;
+  return <div className="vocab-mode-tabs" role="group" aria-label="Study mode">{modes.map(({ id, label, icon: Icon }) => <button key={id} aria-pressed={playerMode === id} onClick={() => onChangeMode(id)}><Icon size={16} /><span>{label}</span></button>)}</div>;
 }

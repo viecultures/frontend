@@ -15,6 +15,7 @@ export const PATHS = {
   community: '/community',
   communityContest: '/community-contest',
   playground: '/playground',
+  aiWorkspace: '/ai-workspace',
   admin: '/admin',
   pricing: '/pricing',
   checkout: '/pricing/checkout',
@@ -54,7 +55,9 @@ export const paths = {
   flashcardStudy: (opts: { deck?: string; level?: string; saved?: boolean } = {}) =>
     withQuery(PATHS.flashcardStudy, opts),
 
-  playground: (opts: { story?: string; topic?: string; level?: string } = {}) =>
+  playground: (opts: { view?: 'chat'; story?: string; topic?: string; level?: string } = {}) =>
     withQuery(PATHS.playground, opts),
+  aiWorkspace: (opts: { story?: string; topic?: string; level?: string } = {}) =>
+    withQuery(PATHS.aiWorkspace, opts),
 };
 

@@ -1,0 +1,25 @@
+.map-ai-app .reader-workspace-reference,
+.map-ai-app .reader-workspace-panel { font-family: var(--font-sans); font-weight: 400; color: #f4f0e5; }
+.map-ai-app .reader-workspace-reference { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; padding: 6px 12px; margin-bottom: 8px; border: 1px solid #d9b76a55; border-radius: var(--radius-2xl); background: linear-gradient(125deg, #214b43, #183c34); box-shadow: 0 4px 16px #0002; }
+.map-ai-app .reader-workspace-reference-label { font-size: 12px; color: #e2c88d; white-space: nowrap; }
+.map-ai-app .reader-workspace-reference-actions { display: flex; align-items: center; gap: 8px; }
+.map-ai-app .reader-workspace-reference :is(button, a) { display: inline-flex; min-width: 44px; min-height: 44px; justify-content: center; align-items: center; gap: 6px; padding-inline: 8px; cursor: pointer; border-radius: var(--radius-xl); font-size: 14px; white-space: nowrap; }
+@media (max-width: 640px) {
+  .map-ai-app .reader-workspace-reference { gap: 4px; padding-inline: 8px; }
+  .map-ai-app .reader-workspace-reference-actions { gap: 2px; }
+  .map-ai-app .reader-workspace-reference-actions :is(button, a) > span { display: none; }
+}
+.map-ai-app .reader-workspace-reference :is(button, a):hover { background: #ffffff0d; }
+.map-ai-app .reader-workspace-reference :is(button, a):focus-visible,
+.map-ai-app .reader-workspace-panel a:focus-visible { outline: 2px solid #e1c27b; outline-offset: 3px; }
+.map-ai-app .reader-workspace-panel { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 24px; background: #132820; font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
+.map-ai-app .reader-workspace-panel > span { font-size: 12px; color: #e2c88d; }
+.map-ai-app .reader-workspace-panel h2 { font-family: inherit; font-size: 22px; font-weight: 500; line-height: 1.4; margin-top: 8px; }
+.map-ai-app .reader-workspace-panel h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+.map-ai-app .reader-workspace-panel :is(section, details) { margin-top: 24px; }
+.map-ai-app .reader-workspace-panel p { white-space: pre-wrap; }
+.map-ai-app .reader-workspace-panel dt { color: #e2c88d; }
+.map-ai-app .reader-workspace-panel dl > div + div { margin-top: 16px; }
+.map-ai-app .reader-workspace-panel dd { color: #cad7ce; margin-top: 4px; }
+.map-ai-app .reader-workspace-panel > a { display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; min-height: 44px; border-radius: var(--radius-xl); }
+.map-ai-app .reader-workspace-panel summary { cursor: pointer; min-height: 44px; }

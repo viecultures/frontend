@@ -578,6 +578,7 @@ function VietnamMapImmersiveContent() {
       {active && selectedProvinceDetail && (
         <div className="absolute top-4 right-4 z-30 animate-in fade-in slide-in-from-right-4 duration-300">
           <ProvinceHoverCard
+            key={selectedProvinceDetail.id}
             provinceDetail={selectedProvinceDetail}
             onClose={() => handleSelectProvince(null)}
             onSpeak={handleSpeakText}

@@ -1,6 +1,6 @@
 import { test, type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { clearAuthStorage, getStoredToken, getUserRole, isAdminUser } from './auth-storage';
+import { clearAuthStorage, getStoredToken, getStoredUser, getUserRole, isAdminUser, setAuthSession, setStoredUser } from './auth-storage';
 
 function storage() {
   const values = new Map<string, string>();
@@ -65,4 +65,30 @@ test('explicit backend admin roles remain supported', t => {
   const { local } = setup(t);
   local.setItem('vie_current_user', JSON.stringify({ role: 'ROLE_ADMIN' }));
   assert.equal(isAdminUser(), true);
+});
+
+test('local sign-in replaces legacy backend tokens and remember-me selects the correct store', t => {
+  const { local, session, events } = setup(t);
+  local.setItem('token', 'stale-backend-token');
+  local.setItem('vie_auth_token', 'stale-backend-token');
+  local.setItem('vie_current_user', JSON.stringify({ role: 'ROLE_ADMIN' }));
+  const user = { name: 'Local Learner', email: 'learner@example.com', role: 'ROLE_USER' };
+  const observed: unknown[] = [];
+  events.addEventListener('auth:change', () => observed.push(getStoredUser()));
+
+  setAuthSession(user, null, false);
+  assert.equal(getStoredToken(), null);
+  assert.equal(isAdminUser(), false);
+  assert.equal(local.getItem('vie_current_user'), null);
+  assert.deepEqual(getStoredUser(), user);
+  assert.deepEqual(observed, [user]);
+  setStoredUser({ ...user, name: 'Updated Learner' });
+  assert.equal(local.getItem('vie_current_user'), null);
+  assert.equal(getStoredUser()?.name, 'Updated Learner');
+
+  setAuthSession(user, null, true);
+  assert.equal(session.getItem('vie_current_user'), null);
+  assert.deepEqual(JSON.parse(local.getItem('vie_current_user')!), user);
+  clearAuthStorage();
+  assert.equal(getStoredUser(), null);
 });
