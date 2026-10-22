@@ -83,7 +83,7 @@ export const MapLabelsLayer: React.FC<MapLabelsLayerProps> = ({
             className={`transition-all duration-300 ${labelClass}`}
             style={{
               paintOrder: 'stroke',
-              stroke: '#122A22',
+              stroke: 'var(--color-heritage-forest)',
               strokeWidth,
               strokeLinejoin: 'round',
             }}

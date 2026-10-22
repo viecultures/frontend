@@ -43,7 +43,7 @@ export const BACKGROUND_PRESETS: BackgroundPreset[] = [
     id: 'minimal-none',
     name: 'None',
     nameEn: 'None',
-    url: 'linear-gradient(135deg, #122A22 0%, #163D37 50%, #0B1A17 100%)',
+    url: 'var(--color-surface)',
     thumbnailUrl: '',
     category: 'minimal',
   },

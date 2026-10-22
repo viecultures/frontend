@@ -1,5 +1,5 @@
-.sh-practice-workspace, .sh-overlay-theme { --sh-bg: #FBF7EE; --sh-raised: #FFFDF8; --sh-soft: #F6EEDC; --sh-ink: #163D37; --sh-muted: #52665F; --sh-line: rgb(30 75 67 / .12); --sh-accent: #F3E8CE; --sh-accent-ink: #795B25; font-family: var(--font-sans); color: var(--sh-ink); color-scheme: light; }
-.sh-practice-workspace[data-theme="dark"], .sh-overlay-theme[data-theme="dark"] { --sh-bg: #0B1A17; --sh-raised: #142E27; --sh-soft: #1C382E; --sh-ink: #FBF7EE; --sh-muted: #B7C9C2; --sh-line: rgb(251 247 238 / .12); --sh-accent: #3A3220; --sh-accent-ink: #E8CE94; color-scheme: dark; }
+.sh-practice-workspace, .sh-overlay-theme { --sh-bg: var(--color-warm-ivory); --sh-raised: var(--color-surface-raised); --sh-soft: var(--color-rice-paper); --sh-ink: var(--color-heritage-dark); --sh-muted: var(--color-text-secondary); --sh-line: color-mix(in srgb, var(--color-heritage-green) 12%, transparent); --sh-accent: #F3E8CE; --sh-accent-ink: var(--color-accent-ink); font-family: var(--font-sans); color: var(--sh-ink); color-scheme: light; }
+.sh-practice-workspace[data-theme="dark"], .sh-overlay-theme[data-theme="dark"] { --sh-bg: #0B1A17; --sh-raised: #142E27; --sh-soft: #1C382E; --sh-ink: var(--color-warm-ivory); --sh-muted: #B7C9C2; --sh-line: color-mix(in srgb, var(--color-warm-ivory) 12%, transparent); --sh-accent: #3A3220; --sh-accent-ink: #E8CE94; color-scheme: dark; }
 .sh-hub.sh-practice-workspace { padding: 16px 20px; background: var(--sh-bg); color: var(--sh-ink); gap: 20px; }
 .sh-practice-workspace h2, .sh-practice-workspace h3, .sh-overlay-theme h2, .sh-overlay-theme h3 { font-family: var(--font-sans); font-weight: 500; }
 .sh-practice-workspace strong { font-weight: 500; }
@@ -18,11 +18,11 @@
 .sh-header-title > div { min-width: 0; }
 .sh-header-title h2 { font-size: 14px; line-height: 1.5; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .sh-eyebrow { display: block; font-size: 12px; font-weight: 400; color: var(--sh-muted); line-height: 1.6; }
-.sh-header .sh-eyebrow { color: rgb(251 247 238 / .65); font-size: 11px; }
+.sh-header .sh-eyebrow { color: color-mix(in srgb, var(--color-warm-ivory) 65%, transparent); font-size: 11px; }
 .sh-back { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; color: var(--color-antique-bright); border-radius: var(--radius-xl); }
-.sh-header .sh-tabs { padding: 2px; gap: 2px; border-radius: var(--radius-xl); background: rgb(251 247 238 / .035); }
-.sh-header .sh-btn { background: transparent; color: rgb(251 247 238 / .8); border-color: transparent; padding: 8px 12px; }
-.sh-header .sh-tabs [aria-selected="true"] { background: rgb(251 247 238 / .08); border-color: rgb(251 247 238 / .12); color: var(--color-warm-ivory); }
+.sh-header .sh-tabs { padding: 2px; gap: 2px; border-radius: var(--radius-xl); background: color-mix(in srgb, var(--color-warm-ivory) 3.5%, transparent); }
+.sh-header .sh-btn { background: transparent; color: color-mix(in srgb, var(--color-warm-ivory) 80%, transparent); border-color: transparent; padding: 8px 12px; }
+.sh-header .sh-tabs [aria-selected="true"] { background: color-mix(in srgb, var(--color-warm-ivory) 8%, transparent); border-color: color-mix(in srgb, var(--color-warm-ivory) 12%, transparent); color: var(--color-warm-ivory); }
 .sh-settings-trigger { justify-self: end; }
 .sh-start-screen { display: flex; flex: 1; min-height: 0; overflow: auto; padding: 20px 0; }
 .sh-start-card { width: 100%; max-width: 680px; margin: auto; padding: 32px; border: 1px solid var(--sh-line); border-radius: var(--radius-2xl); background: var(--sh-raised); box-shadow: 0 6px 20px rgb(0 0 0 / .06); }

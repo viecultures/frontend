@@ -3,10 +3,10 @@ import { ArrowUpRight, BookOpen, Compass, Layers, MessageCircle } from 'lucide-r
 import { PATHS, paths } from '@/routes/paths';
 
 const STEPS = [
-  { title: 'Chọn chủ đề', description: 'Một món ăn, một miền di sản hay một câu chuyện quen thuộc.', action: 'Khám phá bài đọc', icon: Compass, view: PATHS.discovery },
-  { title: 'Đọc & nghe', description: 'Đối chiếu song ngữ, nghe từng câu và lưu những từ muốn nhớ.', action: 'Đọc thử bài Huế', icon: BookOpen, view: paths.reader({ story: 'imperial-hue' }) },
-  { title: 'Ôn từ đã lưu', description: 'Lật thẻ, nhớ lại nghĩa và chọn những từ cần xem lại.', action: 'Thử một lượt ôn', icon: Layers, view: null },
-  { title: 'Thử vận dụng', description: 'Diễn đạt suy nghĩ, hỏi thêm hoặc thử một tình huống với AI.', action: 'Mở AI Playground', icon: MessageCircle, view: PATHS.playground },
+  { title: 'Choose a topic', description: 'A dish, a heritage site, or a story that feels familiar.', action: 'Explore stories', icon: Compass, view: PATHS.discovery },
+  { title: 'Read & listen', description: 'Compare both languages, listen sentence by sentence, and save words to remember.', action: 'Read the Hue story', icon: BookOpen, view: paths.reader({ story: 'imperial-hue' }) },
+  { title: 'Review saved words', description: 'Flip a card, recall its meaning, and choose what to review again.', action: 'Try a short review', icon: Layers, view: null },
+  { title: 'Put it into practice', description: 'Share your thoughts, ask questions, or try a scenario with AI.', action: 'Try the AI companion', icon: MessageCircle, view: PATHS.playground },
 ];
 
 interface HeritageMethodologySectionProps {
@@ -31,11 +31,11 @@ export const HeritageMethodologySection: React.FC<HeritageMethodologySectionProp
       <div className="landing-container">
         <div className="landing-section-heading">
           <div>
-            <span className="landing-eyebrow">03 / HỌC THEO NHỊP CỦA BẠN</span>
-            <h2 id="landing-journey-title">Từ một câu chuyện, đến <em>một thói quen.</em></h2>
+            <span className="landing-eyebrow">03 / LEARN AT YOUR OWN PACE</span>
+            <h2 id="landing-journey-title">One story can become <em>a lasting habit.</em></h2>
           </div>
         </div>
-        <p className="landing-section-description">Bắt đầu từ điều bạn tò mò. Hiểu một câu chuyện, nhớ vài từ và thử dùng chúng.</p>
+        <p className="landing-section-description">Start with what sparks your curiosity. Understand a story, remember a few words, and put them to use.</p>
         <ol className="landing-journey-grid">
           {STEPS.map(({ title, description, action, icon: Icon, view }, index) => (
             <li key={title} className="landing-journey-step">
@@ -44,7 +44,7 @@ export const HeritageMethodologySection: React.FC<HeritageMethodologySectionProp
                 <Icon size={22} strokeWidth={1.5} aria-hidden="true" />
               </div>
               <div className="landing-journey-step-copy">
-                <h3>{title}{index === 3 && <span className="landing-journey-optional">Tùy chọn</span>}</h3>
+                <h3>{title}{index === 3 && <span className="landing-journey-optional">Optional</span>}</h3>
                 <p>{description}</p>
                 <button type="button" className="landing-text-link" onClick={() => chooseStep(view)}>{action}<ArrowUpRight size={16} aria-hidden="true" /></button>
               </div>

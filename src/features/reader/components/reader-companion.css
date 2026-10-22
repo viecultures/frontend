@@ -2,7 +2,7 @@
   --companion-ink: var(--color-heritage-green);
   --companion-muted: var(--color-text-muted);
   --companion-paper: var(--color-warm-ivory);
-  --companion-surface: #fffdf8;
+  --companion-surface: var(--color-surface-raised);
   --companion-line: #e5ddcb;
   --companion-radius: var(--radius-2xl, 16px);
   --companion-control-radius: var(--radius-xl, 12px);
@@ -17,8 +17,8 @@
 .reader-companion button:disabled { cursor: default; opacity: .45; }
 .reader-companion :is(button, input, textarea):focus-visible { outline: 2px solid #a7792f; outline-offset: 3px; }
 .reader-companion-panel { width: min(404px, calc(100vw - 32px)); height: min(700px, calc(100dvh - 106px)); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #c6b37e; border-radius: var(--companion-radius); background: var(--companion-paper); box-shadow: 0 18px 60px #163d3738, 0 3px 12px #163d3714; }
-.reader-companion-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; color: #fffaf0; background: linear-gradient(120deg, #214f46, #163d37); border-bottom: 1px solid #d9b76a55; }
-.reader-companion-avatar { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; color: #e1c27b; border: 1px solid #d9b76a66; border-radius: 12px; background: #ffffff08; }
+.reader-companion-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; color: #fffaf0; background: linear-gradient(120deg, #214f46, var(--color-heritage-dark)); border-bottom: 1px solid color-mix(in srgb, var(--color-antique-gold) 33.33%, transparent); }
+.reader-companion-avatar { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; color: #e1c27b; border: 1px solid color-mix(in srgb, var(--color-antique-gold) 40.00%, transparent); border-radius: 12px; background: #ffffff08; }
 .reader-companion-heading { flex: 1; min-width: 0; }
 .reader-companion-heading h2 { font: inherit; font-size: 14px; font-weight: 500; line-height: 1.5; margin: 0; }
 .reader-companion-heading p { margin: 2px 0 0; font-size: 12px; color: #d3dfd7; }
@@ -51,7 +51,7 @@
 .reader-companion-lookup { display: flex; gap: 7px; margin-top: 8px; }
 .reader-companion-lookup input, .reader-companion-composer textarea { min-width: 0; flex: 1; border: 1px solid var(--companion-line); border-radius: var(--companion-control-radius); background: var(--companion-paper); color: var(--companion-ink); padding: 10px; }
 .reader-companion-primary { border-radius: var(--companion-control-radius); background: #214f46; color: #fffaf0; padding: 10px 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; flex-shrink: 0; box-shadow: 0 3px 8px #183e3614; }
-.reader-companion-primary:hover:not(:disabled) { background: #163d37; }
+.reader-companion-primary:hover:not(:disabled) { background: var(--color-heritage-dark); }
 .reader-companion-word-suggestions { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; margin-top: 8px; font-size: 14px; }
 .reader-companion-word-suggestions > span { color: var(--companion-muted); width: 100%; }
 .reader-companion-word-suggestions button { border: 1px solid var(--companion-line); padding: 0 9px; border-radius: 12px; max-width: 100%; overflow-wrap: anywhere; }
@@ -76,7 +76,7 @@
 .reader-companion-header, .reader-companion-context, .reader-companion-toolbar { flex-shrink: 0; }
 .reader-companion-gate > p { display: flex; align-items: center; gap: 6px; justify-content: center; font-size: 14px; margin: 0 0 8px; }
 .reader-companion-gate button { width: 100%; }
-.reader-companion-launcher { display: flex; align-items: center; gap: 8px; border: 1px solid #d9b76a; border-radius: 999px; padding: 10px 16px; background: linear-gradient(120deg, #214f46, #163d37); color: #fffaf0; box-shadow: 0 6px 24px #163d3738; }
+.reader-companion-launcher { display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-antique-gold); border-radius: 999px; padding: 10px 16px; background: linear-gradient(120deg, #214f46, var(--color-heritage-dark)); color: #fffaf0; box-shadow: 0 6px 24px #163d3738; }
 .reader-companion-launcher svg { color: #e1c27b; }
 @media (max-width: 480px) {
   .reader-companion-composer textarea, .reader-companion-lookup input { font-size: 16px; }

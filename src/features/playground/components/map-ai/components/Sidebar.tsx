@@ -146,12 +146,12 @@ export default function Sidebar() {
   if (!activeView) return null;
 
   return (
-    <Dialog open={isSidebarOpen} onClose={toggleSidebar} className={`map-ai-app ai-chat-ui ai-workspace-settings-dialog ${theme === 'light' ? 'light-theme' : ''}`}>
+    <Dialog open={isSidebarOpen} onClose={toggleSidebar} className={`map-ai-app ai-chat-ui ai-workspace-settings-dialog ${theme === 'light' ? 'light-theme' : 'dark'}`}>
       <DialogBackdrop className="ai-workspace-settings-backdrop" />
       <DialogPanel className="sidebar open">
       <div className="sidebar-header">
-        <div className="flex items-center gap-2 text-[#D4AF37]">
-          <Sparkles className="w-5 h-5 text-[#D4AF37]" />
+        <div className="flex items-center gap-2 text-antique-gold">
+          <Sparkles className="w-5 h-5 text-antique-gold" />
           <DialogTitle as="h3" className="font-serif font-bold text-base text-white">Speaking settings</DialogTitle>
         </div>
         <button onClick={toggleSidebar} className="close-button" aria-label="Close settings">
@@ -184,7 +184,7 @@ export default function Sidebar() {
         <div className="sidebar-section">
           {/* Target Reading Lesson Selector */}
           {tutorMode !== 'free-conversation' && <div className="space-y-1.5 mb-4">
-            <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <BookOpen className="w-3.5 h-3.5" />
               <span>Story to practise</span>
             </label>
@@ -207,7 +207,7 @@ export default function Sidebar() {
 
           {/* Proficiency Level Selector (Level 1, Level 2, Level 3) */}
           <div className="space-y-1.5 mb-4">
-            <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Speaking level</span>
             </label>
@@ -230,7 +230,7 @@ export default function Sidebar() {
 
           {/* Cultural Tutor Mode */}
           <div className="space-y-1.5 mb-4">
-            <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <Mic className="w-3.5 h-3.5" />
               <span>Practice mode</span>
             </label>
@@ -241,7 +241,7 @@ export default function Sidebar() {
                 onClick={() => setTutorMode('free-conversation')}
                 className={`py-2 px-2 rounded-lg text-xs font-semibold text-center border transition-all ${
                   tutorMode === 'free-conversation'
-                    ? 'bg-[#1E4B43] text-[#D4AF37] border-[#D4AF37]/60 shadow-md font-bold'
+                    ? 'bg-heritage-green text-antique-gold border-antique-gold/60 shadow-md font-bold'
                     : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
                 }`}
               >
@@ -253,7 +253,7 @@ export default function Sidebar() {
                 onClick={() => setTutorMode('guided-lesson')}
                 className={`py-2 px-2 rounded-lg text-xs font-semibold text-center border transition-all ${
                   tutorMode === 'guided-lesson'
-                    ? 'bg-[#1E4B43] text-[#D4AF37] border-[#D4AF37]/60 shadow-md font-bold'
+                    ? 'bg-heritage-green text-antique-gold border-antique-gold/60 shadow-md font-bold'
                     : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
                 }`}
               >
@@ -270,7 +270,7 @@ export default function Sidebar() {
           {tutorMode === 'free-conversation' && (
             <>
               <div className="space-y-1.5 mb-4">
-                <label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Corrections</label>
+                <label className="text-xs font-bold text-antique-gold uppercase tracking-wider">Corrections</label>
                 <select aria-label="Corrections" value={correctionMode} disabled={connected} onChange={e => setCorrectionMode(e.target.value as CorrectionMode)} className="w-full text-xs">
                   <option value="off">Off</option>
                   <option value="after-turn">After each turn</option>
@@ -278,7 +278,7 @@ export default function Sidebar() {
                 </select>
               </div>
               <div className="space-y-1.5 mb-4">
-                <label className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">AI map controls</label>
+                <label className="text-xs font-bold text-antique-gold uppercase tracking-wider">AI map controls</label>
                 <select aria-label="AI map controls" value={mapContextMode} disabled={connected} onChange={e => setMapContextMode(e.target.value as MapContextMode)} className="w-full text-xs">
                   <option value="off">Off</option>
                   <option value="on-demand">When I ask for a place</option>
@@ -290,7 +290,7 @@ export default function Sidebar() {
 
           {/* Voice Selection */}
           <div className="space-y-1.5 mb-4">
-            <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <Volume2 className="w-3.5 h-3.5" />
               <span>Voice</span>
             </label>
@@ -310,7 +310,7 @@ export default function Sidebar() {
 
           {/* Gemini API Key */}
           <div className="space-y-1.5 mb-4">
-            <label className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <Key className="w-3.5 h-3.5" />
               <span>Gemini API key (optional)</span>
             </label>

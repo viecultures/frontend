@@ -3,7 +3,7 @@ import type { MapPoiLayerProps } from './types';
 import { geoToSvg } from '@/utils/vietnamMapUtils';
 
 const CATEGORY_COLORS: Record<string, { stroke: string; dot: string; ping: string }> = {
-  Heritage: { stroke: '#D9B76A', dot: '#F5D280', ping: '#F5D280' },
+  Heritage: { stroke: 'var(--color-antique-gold)', dot: 'var(--color-antique-rich)', ping: 'var(--color-antique-rich)' },
   Nature: { stroke: '#10B981', dot: '#34D399', ping: '#34D399' },
   Cuisine: { stroke: '#F59E0B', dot: '#FBBF24', ping: '#FBBF24' },
   Crafts: { stroke: '#8B5CF6', dot: '#A78BFA', ping: '#A78BFA' },
@@ -130,7 +130,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
               cy="0"
               r={isHighlighted ? 4.0 : isPoiHovered ? 3.4 : 2.5}
               fill={isHighlighted || isPoiHovered ? catColor.dot : catColor.stroke}
-              stroke="#122A22"
+              stroke="var(--color-heritage-forest)"
               strokeWidth={isHighlighted || isPoiHovered ? '1.0' : '0.8'}
               className="drop-shadow-sm pointer-events-none"
             />
@@ -140,7 +140,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
               cx="0"
               cy="0"
               r={isHighlighted ? 1.6 : 1.1}
-              fill="#122A22"
+              fill="var(--color-heritage-forest)"
               className="pointer-events-none"
             />
 
@@ -156,7 +156,7 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
                   width={badgeWidth}
                   height="13"
                   rx="6.5"
-                  fill={isPoiHovered ? catColor.stroke : '#122A22'}
+                  fill={isPoiHovered ? catColor.stroke : 'var(--color-heritage-forest)'}
                   stroke={isPoiHovered ? '#FFFFFF' : catColor.stroke}
                   strokeWidth={isPoiHovered ? '1.0' : '0.8'}
                   opacity="0.95"
@@ -166,14 +166,14 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
                 <path
                   d="M3.2 1.2C2.1 1.2 1.2 2.1 1.2 3.2c0 1.5 2 3.6 2 3.6s2-2.1 2-3.6c0-1.1-.9-2-2-2zm0 2.6c-.35 0-.64-.29-.64-.64s.29-.64.64-.64.64.29.64.64-.29.64-.64.64z"
                   transform={`translate(${-halfWidth + 4}, -4.2)`}
-                  fill={isPoiHovered ? '#122A22' : catColor.dot}
+                  fill={isPoiHovered ? 'var(--color-heritage-forest)' : catColor.dot}
                 />
                 <text
                   x={4}
                   y="0.8"
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  fill={isPoiHovered ? '#122A22' : '#FCE5B5'}
+                  fill={isPoiHovered ? 'var(--color-heritage-forest)' : 'var(--color-antique-bright)'}
                   fontSize="6.8"
                   fontWeight="800"
                   letterSpacing="0.1px"

@@ -82,7 +82,7 @@ export function FlashcardPracticeModesGrid({
           </div>
 
           {/* 4. Gamification Reward */}
-          <div className="p-5 rounded-3xl text-white space-y-3 shadow-md flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-[#1E4B43] via-[#2A665B] to-[#163D37] border border-antique-gold/50">
+          <div className="p-5 rounded-3xl text-white space-y-3 shadow-md flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-heritage-green via-[#2A665B] to-heritage-dark border border-antique-gold/50">
             <div className="w-11 h-11 rounded-2xl bg-antique-gold text-heritage-dark flex items-center justify-center shadow-sm">
               <Trophy className="w-6 h-6 text-heritage-dark" />
             </div>

@@ -83,7 +83,7 @@ export const RewardCelebrationModal: React.FC = () => {
               transition={{ delay: 0.1, type: 'spring', damping: 15 }}
               className="relative"
             >
-              <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-antique-gold to-antique-rich p-0.5 shadow-[0_0_30px_rgba(217,183,106,0.5)] flex items-center justify-center">
+              <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-antique-gold to-antique-rich p-0.5 shadow-[0_0_30px_color-mix(in_srgb,_var(--color-antique-gold)_50%,_transparent)] flex items-center justify-center">
                 <div className="w-full h-full rounded-[14px] bg-heritage-dark flex items-center justify-center">
                   {isLevelUp ? (
                     <Crown className="w-10 h-10 text-antique-gold animate-bounce" />
@@ -204,7 +204,7 @@ export const RewardCelebrationModal: React.FC = () => {
           {/* CTA Button */}
           <button
             onClick={dismissCelebration}
-            className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-antique-gold to-antique-rich text-heritage-dark font-extrabold text-sm shadow-[0_4px_20px_rgba(217,183,106,0.4)] hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer focus-ring"
+            className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-antique-gold to-antique-rich text-heritage-dark font-extrabold text-sm shadow-[0_4px_20px_color-mix(in_srgb,_var(--color-antique-gold)_40%,_transparent)] hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer focus-ring"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Tuyệt Vời! Tiếp Tục Học</span>

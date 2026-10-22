@@ -43,7 +43,7 @@ export function FlashcardSpellingView({
               }
             }}
             placeholder="Type the word and press Enter…"
-            className="w-full px-5 py-3.5 rounded-2xl bg-[#F6EEDC]/60 border-2 border-[rgba(30,75,67,0.2)] text-sm text-[#1E4B43] font-bold focus:outline-none focus:border-[#1E4B43]"
+            className="w-full px-5 py-3.5 rounded-2xl bg-rice-paper/60 border-2 border-heritage-green/20 text-sm text-heritage-green font-bold focus:outline-none focus:border-heritage-green"
           />
           <button
             onClick={spellingFeedback ? onNext : onCheckSpelling}

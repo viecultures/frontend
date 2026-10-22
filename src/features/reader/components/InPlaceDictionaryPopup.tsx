@@ -117,16 +117,16 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
       style={{ top: `${top}px`, left: `${left}px`, width: `${popupWidth}px` }}
       className={`in-place-dictionary-popup fixed z-[9999] p-4 rounded-2xl shadow-2xl border backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200 ${
         isLight
-          ? "bg-[#FBF7EE]/98 text-[#1E4B43] border-[#D9B76A]/60 shadow-[0_16px_45px_rgba(30,75,67,0.2)]"
-          : "bg-[#141C1A]/98 text-[#FBF7EE] border-[#D9B76A]/80 shadow-[0_16px_50px_rgba(0,0,0,0.8)]"
+          ? "bg-warm-ivory/98 text-heritage-green border-antique-gold/60 shadow-[0_16px_45px_color-mix(in_srgb,_var(--color-heritage-green)_20%,_transparent)]"
+          : "bg-[#141C1A]/98 text-warm-ivory border-antique-gold/80 shadow-[0_16px_50px_rgba(0,0,0,0.8)]"
       }`}
     >
       {/* Header */}
-      <div className="flex items-start justify-between gap-2 pb-2.5 border-b border-[rgba(217,183,106,0.25)]">
+      <div className="flex items-start justify-between gap-2 pb-2.5 border-b border-antique-gold/25">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-serif font-bold text-base sm:text-lg leading-tight truncate text-current">
+              <h3 className="font-sans font-bold text-base sm:text-lg leading-tight truncate text-current">
                 {vocab.isProfane ? '*****' : vocab.word}
               </h3>
               {!vocab.isProfane && (
@@ -135,8 +135,8 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
                   title="Play pronunciation"
                   className={`p-1 rounded-lg transition-colors cursor-pointer ${
                     isPlayingAudio
-                      ? "bg-[#D9B76A] text-[#1E4B43]"
-                      : "hover:bg-[#D9B76A]/20 text-[#D9B76A]"
+                      ? "bg-antique-gold text-heritage-green"
+                      : "hover:bg-antique-gold/20 text-antique-gold"
                   }`}
                 >
                   <Volume2 className={`w-4 h-4 ${isPlayingAudio ? "animate-pulse" : ""}`} />
@@ -145,14 +145,14 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
             </div>
             <div className="flex items-center gap-2 mt-0.5">
               {!vocab.isProfane && vocab.ipa && vocab.ipa !== '/-/' && (
-                <span className="font-mono text-xs text-[#D9B76A] font-semibold">
+                <span className="font-mono text-xs text-antique-gold font-semibold">
                   {vocab.ipa}
                 </span>
               )}
               <span className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
                 vocab.isProfane
                   ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"
-                  : "bg-[#1E4B43]/10 dark:bg-white/10 text-[#1E4B43] dark:text-[#BFE3EA]"
+                  : "bg-heritage-green/10 dark:bg-white/10 text-heritage-green dark:text-sky-mist"
               }`}>
                 {vocab.pos}
               </span>
@@ -199,7 +199,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
             {/* English Definition */}
             {vocab.enDefinition && (
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-heritage-green dark:text-[#D9B76A] block">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-heritage-green dark:text-antique-gold block">
                   English Definition:
                 </span>
                 <p className="opacity-90 italic mt-0.5 leading-relaxed">
@@ -210,8 +210,8 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
 
             {/* Ngữ Cảnh Bài Đọc */}
             {vocab.contextSentence && (
-              <div className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-[rgba(217,183,106,0.15)]">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#D9B76A] flex items-center gap-1">
+              <div className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-antique-gold/15">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-antique-gold flex items-center gap-1">
                   <BookOpen className="w-3 h-3" />
                   Article context:
                 </span>
@@ -225,7 +225,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
       </div>
 
       {/* Footer Action: + LƯU TỪ / Disabled for Profanity */}
-      <div className="pt-2 border-t border-[rgba(217,183,106,0.25)] flex items-center justify-between gap-2">
+      <div className="pt-2 border-t border-antique-gold/25 flex items-center justify-between gap-2">
         {vocab.isProfane ? (
           <div className="w-full py-1.5 px-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center text-[11px] font-medium opacity-60">
             Saving sensitive language is unavailable
@@ -237,8 +237,8 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
               isSaved
                 ? "bg-[#059669] text-white hover:bg-[#047857]"
                 : isLight
-                ? "bg-[#1E4B43] text-[#FBF7EE] hover:bg-[#163D37]"
-                : "bg-[#D9B76A] text-[#1E4B43] hover:bg-[#c9a657]"
+                ? "bg-heritage-green text-warm-ivory hover:bg-heritage-dark"
+                : "bg-antique-gold text-heritage-green hover:bg-[#c9a657]"
             }`}
           >
             {isSaved ? (

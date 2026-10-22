@@ -29,7 +29,7 @@ export const READER_DICTATION_ITEMS: DictationItem[] = [
     audioPromptText: 'Bánh Chưng is wrapped in green dong leaves, representing gratitude to Heaven and Earth.',
     sentenceTemplateEn: 'Bánh Chưng is wrapped in green {blank} leaves, representing gratitude to Heaven and Earth.',
     missingWord: 'dong',
-    hint: 'Tên loại lá rừng xanh mướt dùng để gói bánh Chưng (bắt đầu bằng chữ "d")',
+    hint: 'The green leaves used to wrap bánh chưng (starts with "d").',
     viTranslation: 'Bánh Chưng được gói bằng lá dong xanh mướt, tượng trưng cho lòng biết ơn Trời Đất.',
   },
   {
@@ -37,7 +37,7 @@ export const READER_DICTATION_ITEMS: DictationItem[] = [
     audioPromptText: 'Tết marks the passage from the old year to the new one, embodying family reunion.',
     sentenceTemplateEn: 'Tết marks the passage from the old year to the new one, embodying family {blank}.',
     missingWord: 'reunion',
-    hint: 'Từ vựng tiếng Anh nghĩa là "sự đoàn tụ, sum họp" (bắt đầu bằng "r-e...")',
+    hint: 'A word for family members coming together again (starts with "re").',
     viTranslation: 'Tết đánh dấu sự chuyển giao năm cũ sang năm mới, kết tinh ý nghĩa sum họp gia đình.',
   },
   {
@@ -45,7 +45,7 @@ export const READER_DICTATION_ITEMS: DictationItem[] = [
     audioPromptText: 'In Vietnamese culture, Tết is described as the most important and sacred holiday.',
     sentenceTemplateEn: 'In Vietnamese culture, Tết is described as the most important and {blank} holiday.',
     missingWord: 'sacred',
-    hint: 'Tính từ mang nghĩa "thiêng liêng, trang trọng" (bắt đầu bằng "s-a...")',
+    hint: 'An adjective meaning holy or spiritually important (starts with "sa").',
     viTranslation: 'Trong văn hóa Việt, Tết được xem là ngày lễ quan trọng và thiêng liêng bậc nhất.',
   },
 ];

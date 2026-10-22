@@ -58,9 +58,9 @@ export function useReaderDictionary(customVocabMap?: Record<string, VocabItem> |
         vocab: {
           id: cleanText.toLowerCase(),
           word: cleanText,
-          pos: cleanText.includes(' ') ? 'Cụm từ / Phrase' : 'Đang tra cứu...',
+          pos: cleanText.includes(' ') ? 'Phrase' : 'Looking up…',
           ipa: '/.../',
-          viMeaning: 'Đang tải nghĩa & phiên âm IPA...',
+          viMeaning: 'Loading meaning & IPA pronunciation…',
           enDefinition: 'Fetching dictionary definition...',
           contextSentence: fullSentence,
         },
@@ -131,9 +131,9 @@ export function useReaderDictionary(customVocabMap?: Record<string, VocabItem> |
       vocab: {
         id: key,
         word: targetWord,
-        pos: 'Đang tra cứu...',
+        pos: 'Looking up…',
         ipa: '/.../',
-        viMeaning: 'Đang tải nghĩa & phiên âm IPA...',
+        viMeaning: 'Loading meaning & IPA pronunciation…',
         contextSentence: fullSentence,
       },
       position,

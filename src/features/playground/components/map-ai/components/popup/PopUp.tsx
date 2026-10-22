@@ -14,8 +14,8 @@ export const PopUp: React.FC<PopUpProps> = ({ onClose }) => {
   return (
     <div className="popup-overlay">
       <div className="popup-content">
-        <div className="flex items-center gap-2 mb-2 text-[#D4AF37]">
-          <Sparkles className="w-6 h-6 text-[#D4AF37]" />
+        <div className="flex items-center gap-2 mb-2 text-antique-gold">
+          <Sparkles className="w-6 h-6 text-antique-gold" />
           <h2 className="text-xl font-serif font-bold text-white m-0">
             Sứ Giả Văn Hóa AI — Luyện Nói &amp; Luyện Nghe
           </h2>
@@ -32,11 +32,11 @@ export const PopUp: React.FC<PopUpProps> = ({ onClose }) => {
             <li className="flex items-start gap-3">
               <PlayCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
               <div className="text-xs text-gray-300 leading-relaxed">
-                <strong className="text-white">Bật đàm thoại: </strong>Bấm nút <span className="px-2 py-0.5 rounded bg-[#1E4B43] text-[#D4AF37] font-bold">▶ Play</span> để bắt đầu nói chuyện tự nhiên qua micro bằng tiếng Anh hoặc gõ tin nhắn văn bản.
+                <strong className="text-white">Bật đàm thoại: </strong>Bấm nút <span className="px-2 py-0.5 rounded bg-heritage-green text-antique-gold font-bold">▶ Play</span> để bắt đầu nói chuyện tự nhiên qua micro bằng tiếng Anh hoặc gõ tin nhắn văn bản.
               </div>
             </li>
             <li className="flex items-start gap-3">
-              <BookOpen className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
+              <BookOpen className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
               <div className="text-xs text-gray-300 leading-relaxed">
                 <strong className="text-white">Luyện theo bài đọc: </strong>Chọn bài đọc văn hóa mục tiêu (Tết Nguyên Đán, Bánh Mì Sài Gòn, Cố Đô Huế, Phở Hà Nội, v.v.) để gia sư AI hỏi đáp, giải thích từ vựng và đố vui đọc hiểu.
               </div>
@@ -50,7 +50,7 @@ export const PopUp: React.FC<PopUpProps> = ({ onClose }) => {
           </ol>
         </div>
 
-        <button onClick={onClose} className="mt-4 px-4 py-2 bg-[#1E4B43] hover:bg-[#153630] text-[#D4AF37] font-bold rounded-xl shadow cursor-pointer transition-all">
+        <button onClick={onClose} className="mt-4 px-4 py-2 bg-heritage-green hover:bg-[#153630] text-antique-gold font-bold rounded-xl shadow cursor-pointer transition-all">
           Bắt Đầu Luyện Nói Ngay!
         </button>
       </div>

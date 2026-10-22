@@ -65,7 +65,7 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
     stopAudio();
     const nextRatings = { ...ratings, [currentCard.id]: rating };
     setRatings(nextRatings);
-    setFeedback(currentCard.word + ': ' + (rating === 'good' ? 'đã nhớ.' : 'cần xem lại.'));
+    setFeedback(currentCard.word + ': ' + (rating === 'good' ? 'remembered.' : 'review again.'));
     setIsFlipped(false);
     if (Object.keys(nextRatings).length < DEMO_CARDS.length) {
       const nextIndex = DEMO_CARDS.findIndex((card) => !nextRatings[card.id]);
@@ -87,65 +87,65 @@ export const InteractiveFlashcardDemoSection: React.FC<InteractiveFlashcardDemoS
     <section id="flashcard-demo" className="landing-flashcards landing-section" aria-labelledby="landing-flashcards-title">
       <div className="landing-container landing-flashcard-grid">
         <div className="landing-flashcard-copy">
-          <span className="landing-eyebrow">04 / THỬ MỘT LƯỢT ÔN NGẮN</span>
-          <h2 id="landing-flashcards-title">Từ đã gặp.<br /><em>Nhớ thêm một chút.</em></h2>
-          <p>Từ mới dễ nhớ hơn khi gắn với một câu chuyện. Thử vài thẻ từ bài Huế, rồi tự chọn những từ bạn muốn ôn lại.</p>
+          <span className="landing-eyebrow">04 / TRY A QUICK REVIEW</span>
+          <h2 id="landing-flashcards-title">Words you’ve met.<br /><em>Remember a little more.</em></h2>
+          <p>New words are easier to remember in a story. Try a few cards from the Hue lesson, then choose what you want to review.</p>
           <ol className="landing-recall-steps">
-            <li><span>01</span> Nhớ lại nghĩa của từ</li>
-            <li><span>02</span> Lật thẻ để kiểm tra</li>
-            <li><span>03</span> Chọn “Đã nhớ” hoặc “Cần ôn lại”</li>
+            <li><span>01</span> Recall the word’s meaning</li>
+            <li><span>02</span> Flip the card to check</li>
+            <li><span>03</span> Choose “Remembered” or “Review again”</li>
           </ol>
-          <button type="button" className="landing-button landing-button-primary" onClick={openDeck}>Mở bộ thẻ bài Huế<ArrowUpRight size={17} aria-hidden="true" /></button>
+          <button type="button" className="landing-button landing-button-primary" onClick={openDeck}>Open the Hue deck<ArrowUpRight size={17} aria-hidden="true" /></button>
         </div>
 
         <div className="landing-demo">
-          <div className="landing-demo-header"><span>HUẾ / TỪ VỰNG TRONG NGỮ CẢNH</span><span>{DEMO_CARDS.length} thẻ mẫu</span></div>
-          <div className="landing-demo-progress" role="progressbar" aria-label="Số thẻ đã ôn trong lượt thử" aria-valuenow={reviewedCount} aria-valuemin={0} aria-valuemax={DEMO_CARDS.length}><span style={{ width: (reviewedCount / DEMO_CARDS.length) * 100 + '%' }} /></div>
+          <div className="landing-demo-header"><span>HUE / WORDS IN CONTEXT</span><span>{DEMO_CARDS.length} sample cards</span></div>
+          <div className="landing-demo-progress" role="progressbar" aria-label="Cards reviewed in this preview" aria-valuenow={reviewedCount} aria-valuemin={0} aria-valuemax={DEMO_CARDS.length}><span style={{ width: (reviewedCount / DEMO_CARDS.length) * 100 + '%' }} /></div>
 
           {isComplete ? (
             <div className="landing-demo-summary" role="status">
               <span className="landing-demo-complete-icon"><CheckCircle2 size={28} aria-hidden="true" /></span>
-              <h3>Bạn đã thử {DEMO_CARDS.length} thẻ.</h3>
-              <p>{rememberedCount} từ đã nhớ · {DEMO_CARDS.length - rememberedCount} từ cần ôn lại</p>
-              <span>Mỗi lượt ngắn là một lần gặp lại những từ quen.</span>
-              <button type="button" className="landing-text-link" onClick={restart}>Thử lại<RotateCcw size={16} aria-hidden="true" /></button>
+              <h3>You reviewed {DEMO_CARDS.length} cards.</h3>
+              <p>{rememberedCount} remembered · {DEMO_CARDS.length - rememberedCount} to review again</p>
+              <span>A short review gives familiar words another chance to stick.</span>
+              <button type="button" className="landing-text-link" onClick={restart}>Try again<RotateCcw size={16} aria-hidden="true" /></button>
             </div>
           ) : (
             <>
               <div className="landing-demo-navigation">
-                <button type="button" onClick={() => changeCard(activeCardIndex - 1)} disabled={activeCardIndex === 0} aria-label="Thẻ trước"><ChevronLeft size={18} /></button>
-                <span>Thẻ {activeCardIndex + 1} / {DEMO_CARDS.length}</span>
-                <button type="button" onClick={() => changeCard(activeCardIndex + 1)} disabled={activeCardIndex === DEMO_CARDS.length - 1} aria-label="Thẻ sau"><ChevronRight size={18} /></button>
+                <button type="button" onClick={() => changeCard(activeCardIndex - 1)} disabled={activeCardIndex === 0} aria-label="Previous card"><ChevronLeft size={18} /></button>
+                <span>Card {activeCardIndex + 1} / {DEMO_CARDS.length}</span>
+                <button type="button" onClick={() => changeCard(activeCardIndex + 1)} disabled={activeCardIndex === DEMO_CARDS.length - 1} aria-label="Next card"><ChevronRight size={18} /></button>
               </div>
               <div className="landing-demo-card">
-                <button type="button" className="landing-demo-audio" onClick={playAudio} disabled={!canSpeak} aria-label={isPlayingAudio ? 'Dừng phát âm' : 'Nghe phát âm ' + currentCard.word}>
+                <button type="button" className="landing-demo-audio" onClick={playAudio} disabled={!canSpeak} aria-label={isPlayingAudio ? 'Stop pronunciation' : 'Hear pronunciation of ' + currentCard.word}>
                   {isPlayingAudio ? <VolumeX size={18} /> : <Volume2 size={18} />}
                 </button>
-                <button type="button" className={'landing-demo-flip' + (isFlipped ? ' is-flipped' : '')} onClick={() => setIsFlipped(!isFlipped)} aria-pressed={isFlipped} aria-label={isFlipped ? 'Xem lại từ tiếng Anh' : 'Lật thẻ để xem nghĩa tiếng Việt'}>
+                <button type="button" className={'landing-demo-flip' + (isFlipped ? ' is-flipped' : '')} onClick={() => setIsFlipped(!isFlipped)} aria-pressed={isFlipped} aria-label={isFlipped ? 'See the English word again' : 'Flip the card to see its Vietnamese meaning'}>
                   <span className="landing-demo-flip-inner">
                     <span className="landing-demo-face landing-demo-front" aria-hidden={isFlipped}>
                       <span className="landing-demo-word">{currentCard.word}</span>
                       <span className="landing-demo-ipa">{currentCard.ipa} · {currentCard.pos}</span>
                       <span className="landing-demo-example">{currentCard.contextEn}</span>
-                      <span className="landing-demo-flip-hint"><RotateCw size={14} aria-hidden="true" /> Lật thẻ để xem nghĩa</span>
+                      <span className="landing-demo-flip-hint"><RotateCw size={14} aria-hidden="true" /> Flip to see the meaning</span>
                     </span>
                     <span className="landing-demo-face landing-demo-back" aria-hidden={!isFlipped}>
-                      <span className="landing-demo-answer-label">NGHĨA TIẾNG VIỆT</span>
+                      <span className="landing-demo-answer-label">VIETNAMESE MEANING</span>
                       <span className="landing-demo-meaning">{currentCard.viMeaning}</span>
                       <span className="landing-demo-definition">{currentCard.viDefinition}</span>
-                      <span className="landing-demo-flip-hint"><RotateCw size={14} aria-hidden="true" /> Xem lại từ tiếng Anh</span>
+                      <span className="landing-demo-flip-hint"><RotateCw size={14} aria-hidden="true" /> Flip to see the English word</span>
                     </span>
                   </span>
                 </button>
               </div>
               <div className="landing-demo-ratings">
-                <button type="button" onClick={() => rateCard('again')} disabled={!isFlipped}><RotateCcw size={16} aria-hidden="true" />Cần ôn lại</button>
-                <button type="button" onClick={() => rateCard('good')} disabled={!isFlipped}><Check size={16} aria-hidden="true" />Đã nhớ</button>
+                <button type="button" onClick={() => rateCard('again')} disabled={!isFlipped}><RotateCcw size={16} aria-hidden="true" />Review again</button>
+                <button type="button" onClick={() => rateCard('good')} disabled={!isFlipped}><Check size={16} aria-hidden="true" />Remembered</button>
               </div>
-              <p className="landing-demo-feedback" role="status">{feedback || (isFlipped ? 'Bạn nhớ từ này ở mức nào?' : 'Thử nhớ nghĩa trước khi lật thẻ.')}</p>
+              <p className="landing-demo-feedback" role="status">{feedback || (isFlipped ? 'How well do you remember this word?' : 'Try to recall the meaning before you flip.')}</p>
             </>
           )}
-          <p className="landing-demo-note">Lượt thử này không lưu tiến độ. Mở bộ thẻ để tiếp tục học.</p>
+          <p className="landing-demo-note">This preview does not save your progress. Open the deck to keep learning.</p>
         </div>
       </div>
     </section>

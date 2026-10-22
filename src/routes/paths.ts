@@ -49,7 +49,8 @@ export const paths = {
     story?: string;
     article?: string;
     level?: string;
-    mode?: 'bilingual' | 'extensive';
+    mode?: 'bilingual' | 'practice' | 'extensive';
+    practice?: 'questions' | 'dictation' | 'shadowing';
   } = {}) => withQuery(PATHS.reader, opts),
 
   flashcardStudy: (opts: { deck?: string; level?: string; saved?: boolean } = {}) =>

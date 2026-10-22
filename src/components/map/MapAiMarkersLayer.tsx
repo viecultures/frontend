@@ -33,9 +33,9 @@ export function MapAiMarkersLayer({ markers, onSelectMarker }: MapAiMarkersLayer
           >
             <title>{marker.label}</title>
             <circle r="12" fill="transparent" />
-            <circle r="5" fill="#F5D280" stroke="#122A22" strokeWidth="2" />
+            <circle r="5" fill="var(--color-antique-rich)" stroke="var(--color-heritage-forest)" strokeWidth="2" />
             {marker.showLabel && Boolean(displayLabel) && (
-              <text y="-11" textAnchor="middle" fontSize="8" fontWeight="700" fill="#F5D280" stroke="#122A22" strokeWidth="2.5" paintOrder="stroke" pointerEvents="none">
+              <text y="-11" textAnchor="middle" fontSize="8" fontWeight="700" fill="var(--color-antique-rich)" stroke="var(--color-heritage-forest)" strokeWidth="2.5" paintOrder="stroke" pointerEvents="none">
                 {displayLabel}
               </text>
             )}

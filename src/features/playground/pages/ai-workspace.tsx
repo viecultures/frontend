@@ -10,7 +10,7 @@ export default function AiWorkspacePage() {
   const theme = useSettings(state => state.theme);
   const context = useReaderHandoff(state => state.context);
   return (
-    <main className="ai-workspace-page" data-theme={theme}>
+    <main className={`ai-workspace-page${theme === 'dark' ? ' dark' : ''}`} data-theme={theme}>
       <header className="ai-workspace-page-header">
         <Link to={context?.readerUrl || PATHS.home} className="ai-workspace-back"><ArrowLeft size={18} /><span>{context ? 'Reader' : 'Study room'}</span></Link>
         <div className="ai-workspace-page-title"><Bot size={21} /><h1>AI workspace</h1><span>Speaking practice</span></div>

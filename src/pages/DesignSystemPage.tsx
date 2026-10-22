@@ -17,6 +17,18 @@ const colors = [
   { name: 'Điểm nhấn', className: 'bg-accent-soft', value: 'accent-soft' },
 ];
 
+const brandColors = [
+  { name: 'Kem sáng', className: 'bg-warm-ivory', token: 'warm-ivory', role: 'Nền chính' },
+  { name: 'Kem giấy', className: 'bg-rice-paper', token: 'rice-paper', role: 'Nền phụ' },
+  { name: 'Xanh trời', className: 'bg-sky-mist', token: 'sky-mist', role: 'Section và banner' },
+  { name: 'Xanh horizon', className: 'bg-horizon-blue', token: 'horizon-blue', role: 'Card nổi bật' },
+  { name: 'Teal núi', className: 'bg-mountain-teal', token: 'mountain-teal', role: 'Minh họa' },
+  { name: 'Xanh di sản', className: 'bg-heritage-green', token: 'heritage-green', role: 'Chữ và nút chính' },
+  { name: 'Vàng cổ', className: 'bg-antique-gold', token: 'antique-gold', role: 'Viền và trang trí' },
+  { name: 'Hồng sen', className: 'bg-lotus-pink', token: 'lotus-pink', role: 'Điểm nhấn nhẹ' },
+  { name: 'Be mây', className: 'bg-mist-cloud', token: 'mist-cloud', role: 'Divider và nền trung gian' },
+];
+
 const skills = [
   { icon: BookOpen, title: 'Đọc để hiểu', content: 'Bài đọc là trọng tâm. Bản dịch và từ vựng xuất hiện khi cần, không cạnh tranh với nội dung.' },
   { icon: Headphones, title: 'Nghe và chép', content: 'Một đoạn âm thanh, một ô trả lời. Transcript chỉ mở sau khi thử nghe hoặc khi người học cần hỗ trợ.' },
@@ -97,6 +109,17 @@ export default function DesignSystemPage() {
 
           <section aria-labelledby="color-heading" className="space-y-6">
             <h2 id="color-heading" className="text-2xl font-semibold text-ink">Màu sắc có nhiệm vụ</h2>
+            <p>Nền kem chiếm phần lớn giao diện, xanh trời dành cho các vùng nổi bật. Xanh đậm dành cho chữ và hành động chính; vàng và hồng chỉ làm điểm nhấn.</p>
+            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
+              {brandColors.map(color => (
+                <div key={color.token} className="space-y-2">
+                  <div className={`h-20 rounded-xl border border-line ${color.className}`} aria-hidden="true" />
+                  <p className="text-sm font-medium text-ink">{color.name} · {color.role}</p>
+                  <p className="text-xs text-ink-faint">{color.token}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-ink-soft">Component dùng các vai trò bên dưới để tự cập nhật khi bảng màu chung thay đổi. Không gán lại màu thương hiệu trong CSS của từng trang.</p>
             <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
               {colors.map(color => (
                 <div key={color.value} className="space-y-3">

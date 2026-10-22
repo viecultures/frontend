@@ -37,7 +37,7 @@ export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
           currentFill = palette.hover;
           currentStroke = '#FFFFFF';
           strokeWidth = '2px';
-          dropShadow = 'drop-shadow(0 0 12px rgba(217,183,106,0.85))';
+          dropShadow = 'drop-shadow(0 0 12px color-mix(in srgb, var(--color-antique-gold) 85%, transparent))';
         }
 
         let opacityClass = 'opacity-95 hover:opacity-100';

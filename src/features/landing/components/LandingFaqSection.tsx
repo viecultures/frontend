@@ -12,50 +12,50 @@ interface FaqItem {
 const FAQS: FaqItem[] = [
   {
     id: 'faq-1',
-    question: 'VieCultures khác biệt gì so với các ứng dụng học tiếng Anh truyền thống?',
+    question: 'How is VieCultures different from traditional English learning apps?',
     answer:
-      'Thay vì học qua các bài đọc mẫu phương Tây xa lạ, VieCultures kết hợp 100% ngữ liệu di sản văn hóa Việt Nam (ẩm thực, làng nghề, lịch sử triều đại, phong tục) với chuẩn tiếng Anh học thuật quốc tế (Level 1 - 3). Người học vừa nâng cao phản xạ tiếng Anh, vừa sở hữu vốn collocations chuẩn xác để tự hào chia sẻ văn hóa Việt với bạn bè thế giới.',
-    category: 'Phương pháp',
+      'Instead of relying on unfamiliar Western reading passages, VieCultures combines 100% Vietnamese cultural heritage material—from food and craft villages to history and traditions—with internationally aligned English content across Levels 1–3. Learners build English fluency and learn useful word combinations to confidently share Vietnamese culture with the world.',
+    category: 'Our approach',
     icon: <BookOpen className="w-4 h-4 text-antique-gold" />,
   },
   {
     id: 'faq-2',
-    question: 'Tính năng Đọc Song Ngữ và tra từ 1 chạm hoạt động như thế nào?',
+    question: 'How do bilingual reading and one-tap word lookup work?',
     answer:
-      'Mỗi bài đọc trên VieCultures được biên soạn đối chiếu song ngữ chuẩn xác. Bạn có thể bấm vào bất kỳ từ vựng gạch chân nào để mở ngay bảng tra cứu IPA, từ loại, định nghĩa tiếng Việt, câu ví dụ thực tế và nghe phát âm AI bản ngữ chuẩn xác ở nhiều tốc độ (0.75x - 1.5x).',
-    category: 'Bài đọc',
+      'Each VieCultures story is carefully prepared in both Vietnamese and English. Tap any underlined word to see its pronunciation (IPA), part of speech, Vietnamese definition, and an example sentence, or hear native-style AI pronunciation at different speeds (0.75x–1.5x).',
+    category: 'Reading',
     icon: <Sparkles className="w-4 h-4 text-antique-gold" />,
   },
   {
     id: 'faq-3',
-    question: 'Thuật toán Spaced Repetition (SRS) trong Flashcard giúp ghi nhớ ra sao?',
+    question: 'How does spaced repetition (SRS) help you remember words?',
     answer:
-      'VieCultures áp dụng biến thể tối ưu của thuật toán SM-2 (tương tự Anki). Dựa trên đánh giá của bạn sau mỗi lần lật thẻ ("Cần Ôn Lại", "Khó", "Đã Nhớ", "Rất Dễ"), hệ thống sẽ tự động tính toán thời điểm lặp lại lý tưởng (10 phút, 1 ngày, 3 ngày, 7 ngày...) theo đường cong quên lãng Ebbinghaus, giúp khắc sâu từ vựng vào trí nhớ dài hạn mà không tốn công ôn tập tràn lan.',
-    category: 'Flashcard & Trí nhớ',
+      'VieCultures uses an adaptation of the SM-2 algorithm, similar to Anki. After each card, rate how well you remembered the word (“Review again,” “Hard,” “Remembered,” or “Easy”). The system schedules the next review—from 10 minutes to several days later—using the forgetting curve to help move vocabulary into long-term memory without excessive repetition.',
+    category: 'Memory',
     icon: <Brain className="w-4 h-4 text-antique-gold" />,
   },
   {
     id: 'faq-4',
-    question: 'AI Audio Shadowing hỗ trợ luyện phát âm ngữ điệu như thế nào?',
+    question: 'How does listening and repeating help with pronunciation and intonation?',
     answer:
-      'Công nghệ tổng hợp giọng đọc chuẩn bản ngữ cho phép người học nghe từng câu đơn, nhại theo (shadowing) với tốc độ tùy chỉnh, chú trọng vào trọng âm từ (word stress), ngữ điệu câu (intonation) và nối âm bản xứ (connected speech) để nói tiếng Anh tự nhiên và trôi chảy.',
-    category: 'Luyện âm',
+      'AI-generated native-speaker audio lets you listen to each sentence and repeat at your preferred speed. Focus on word stress, sentence intonation, and connected speech to speak English more naturally and fluently.',
+    category: 'Pronunciation',
     icon: <Mic className="w-4 h-4 text-antique-gold" />,
   },
   {
     id: 'faq-5',
-    question: 'Không gian Safe Reflections là gì và tại sao không chấm điểm bằng bút đỏ?',
+    question: 'What is Safe Reflections, and why doesn’t it mark every mistake?',
     answer:
-      'Safe Reflections là không gian cộng đồng truyền cảm hứng, nơi người học tự do viết cảm nhận về bài đọc di sản mà không bị áp lực bởi những nét gạch đỏ soi lỗi ngữ pháp. Chúng tôi tin rằng sự tự tin và cảm xúc chân thực là chìa khóa để một người học trở thành Sứ Giả Văn Hóa thực thụ.',
-    category: 'Cộng đồng',
+      'Safe Reflections is a community space where learners can write about heritage stories without the pressure of having every grammar mistake marked. We believe confidence and genuine curiosity help learners share Vietnamese culture in their own way.',
+    category: 'Community',
     icon: <ShieldCheck className="w-4 h-4 text-antique-gold" />,
   },
   {
     id: 'faq-6',
-    question: 'Tôi có thể bắt đầu học miễn phí trên VieCultures không?',
+    question: 'Can I start learning with VieCultures for free?',
     answer:
-      'Có! Toàn bộ bài đọc tiêu biểu, tính năng đọc song ngữ 1 chạm, nghe phát âm AI Shadowing và bộ thẻ Flashcards cốt lõi đều được mở miễn phí cho mọi người học. Bạn có thể tạo tài khoản chỉ trong vài giây để lưu lại tiến độ học tập của mình.',
-    category: 'Tài khoản',
+      'Yes. You can explore featured stories, look up words, listen to pronunciation, and try the core review deck for free. Create an account to save your learning progress.',
+    category: 'Getting started',
     icon: <Sparkles className="w-4 h-4 text-antique-gold" />,
   },
 ];
@@ -75,17 +75,17 @@ export const LandingFaqSection: React.FC = () => {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rice-paper text-heritage-green border border-antique-gold/40 text-xs font-bold shadow-xs">
             <HelpCircle className="w-3.5 h-3.5 text-antique-gold" />
             <span className="uppercase tracking-widest text-[11px] font-extrabold">
-              GIẢI ĐÁP THẮC MẮC
+              FREQUENTLY ASKED QUESTIONS
             </span>
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-text-main tracking-tight leading-tight">
-            Câu Hỏi Thường Gặp <br className="hidden sm:inline" />
-            <span className="italic text-antique-gold font-serif">Về VieCultures</span>
+            Your questions, <br className="hidden sm:inline" />
+            <span className="italic text-antique-gold font-serif">answered.</span>
           </h2>
 
           <p className="text-xs sm:text-sm text-text-muted max-w-lg mx-auto font-normal leading-relaxed">
-            Mọi điều bạn cần biết về phương pháp học tiếng Anh qua lăng kính di sản văn hóa Việt Nam cùng VieCultures.
+            Learn how VieCultures helps you study English through the stories and heritage of Vietnam.
           </p>
         </div>
 

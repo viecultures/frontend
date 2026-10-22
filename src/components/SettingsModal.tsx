@@ -20,7 +20,7 @@ export function SettingsModal() {
           {BACKGROUND_PRESETS.map(background => {
             const selected = activeBackground.id === background.id;
             return <button key={background.id} type="button" aria-pressed={selected} onClick={() => setBackground(background.id)} className={`focus-ring relative overflow-hidden rounded-2xl border bg-surface-muted text-left ${selected ? 'border-action ring-2 ring-action/30' : 'border-line'}`}>
-              <span className="block aspect-[16/9] bg-action" style={background.url.startsWith('linear-gradient') ? { background: background.url } : { backgroundImage: `url(${background.thumbnailUrl || background.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }} aria-hidden="true" />
+              <span className="block aspect-[16/9] bg-surface" style={background.id === 'minimal-none' ? { background: background.url } : { backgroundImage: `url(${background.thumbnailUrl || background.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }} aria-hidden="true" />
               <span className="flex min-h-12 items-center justify-between gap-2 px-3 py-2 text-sm font-medium text-ink">{background.nameEn}{selected && <Check className="size-4 shrink-0" aria-hidden="true" />}</span>
             </button>;
           })}

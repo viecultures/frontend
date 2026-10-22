@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run check:palette && tsc -b && vite build",
+    "check:palette": "node scripts/check-palette.mjs",
     "preview": "vite preview",
     "test:learning": "tsx --tsconfig tsconfig.app.json --test src/features/flashcards/lib/*.test.ts src/features/flashcards/services/*.test.ts src/services/learning/*.test.ts",
     "test:shadowing": "tsx --tsconfig tsconfig.app.json --test src/features/playground/lib/*.test.ts src/features/playground/services/dictationService.test.ts",

@@ -76,8 +76,8 @@ export const useSettings = create<{
       : '',
   theme:
     typeof window !== 'undefined'
-      ? ((localStorage.getItem('theme') || 'dark') as 'dark' | 'light')
-      : 'dark',
+      ? (localStorage.getItem('theme') === 'dark' ? 'dark' : 'light')
+      : 'light',
   setSystemPrompt: prompt => set({ systemPrompt: prompt }),
   setModel: model => set({ model }),
   setVoice: voice => { savePreference('voice', voice); set({ voice }); },

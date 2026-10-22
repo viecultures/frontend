@@ -43,18 +43,18 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
       />
 
       {/* Drawer container */}
-      <div className="relative w-full max-w-md sm:max-w-lg bg-white dark:bg-[#14231F] text-[#1E2925] dark:text-[#E8EFEA] h-full shadow-2xl z-50 flex flex-col border-r border-[#1E4B43]/20 dark:border-white/10 animate-in slide-in-from-left duration-300 select-text">
+      <div className="relative w-full max-w-md sm:max-w-lg bg-white dark:bg-[#14231F] text-[#1E2925] dark:text-[#E8EFEA] h-full shadow-2xl z-50 flex flex-col border-r border-heritage-green/20 dark:border-white/10 animate-in slide-in-from-left duration-300 select-text">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-black/10 dark:border-white/10 flex items-center justify-between bg-[#1E4B43] text-[#FBF7EE] shrink-0">
+        <div className="p-4 sm:p-5 border-b border-black/10 dark:border-white/10 flex items-center justify-between bg-heritage-green text-warm-ivory shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-antique-gold/20 text-antique-gold flex items-center justify-center">
               <Settings className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="font-serif font-bold text-base leading-tight text-[#FBF7EE]">
+              <h2 className="font-serif font-bold text-base leading-tight text-warm-ivory">
                 Cấu Hình Trợ Lý &amp; Giọng Nói
               </h2>
-              <p className="text-[11px] text-[#D4AF37]">
+              <p className="text-[11px] text-antique-gold">
                 Tùy chỉnh mô hình, âm sắc AI và chế độ bản đồ
               </p>
             </div>
@@ -74,7 +74,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
           {/* 1. Voice Selection Section */}
           <div>
             <div className="flex items-center justify-between mb-2.5">
-              <label className="font-semibold text-xs text-[#1E4B43] dark:text-[#D4AF37] flex items-center gap-1.5">
+              <label className="font-semibold text-xs text-heritage-green dark:text-antique-gold flex items-center gap-1.5">
                 <Volume2 className="w-4 h-4" />
                 <span>LỰA CHỌN GIỌNG ĐỌC AI</span>
               </label>
@@ -91,12 +91,12 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
                       onUpdateSettings((prev) => ({ ...prev, selectedVoice: v.id }))
                     }
                     className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${isSelected
-                      ? 'bg-[#1E4B43]/10 dark:bg-[#D4AF37]/15 border-[#1E4B43] dark:border-[#D4AF37] shadow-sm ring-1 ring-[#1E4B43] dark:ring-[#D4AF37]'
+                      ? 'bg-heritage-green/10 dark:bg-antique-gold/15 border-heritage-green dark:border-antique-gold shadow-sm ring-1 ring-heritage-green dark:ring-antique-gold'
                       : 'bg-gray-50/80 dark:bg-[#1E2E2A]/60 border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
                       }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-xs text-[#1E4B43] dark:text-[#FBF7EE]">
+                      <span className="font-bold text-xs text-heritage-green dark:text-warm-ivory">
                         {v.name}
                       </span>
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 font-mono text-gray-600 dark:text-gray-300">
@@ -113,7 +113,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
                         onUpdateSettings((prev) => ({ ...prev, selectedVoice: v.id }));
                         onPreviewVoice(v);
                       }}
-                      className="w-full py-1 rounded-lg bg-white dark:bg-[#14231F] border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-[11px] font-medium text-[#1E4B43] dark:text-[#D4AF37] flex items-center justify-center gap-1 transition-all"
+                      className="w-full py-1 rounded-lg bg-white dark:bg-[#14231F] border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-[11px] font-medium text-heritage-green dark:text-antique-gold flex items-center justify-center gap-1 transition-all"
                     >
                       <Volume1 className="w-3.5 h-3.5" />
                       <span>Nghe thử giọng</span>
@@ -142,7 +142,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
                     speechRate: parseFloat(e.target.value),
                   }))
                 }
-                className="w-full accent-[#1E4B43] dark:accent-[#D4AF37] cursor-pointer"
+                className="w-full accent-heritage-green dark:accent-antique-gold cursor-pointer"
               />
             </div>
 
@@ -162,14 +162,14 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
                     speechPitch: parseFloat(e.target.value),
                   }))
                 }
-                className="w-full accent-[#1E4B43] dark:accent-[#D4AF37] cursor-pointer"
+                className="w-full accent-heritage-green dark:accent-antique-gold cursor-pointer"
               />
             </div>
           </div>
 
           {/* 3. Model Selection */}
           <div>
-            <label className="font-semibold text-xs text-[#1E4B43] dark:text-[#D4AF37] flex items-center gap-1.5 mb-2">
+            <label className="font-semibold text-xs text-heritage-green dark:text-antique-gold flex items-center gap-1.5 mb-2">
               <Cpu className="w-4 h-4" />
               <span>MÔ HÌNH GEMINI AI</span>
             </label>
@@ -181,11 +181,11 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
                     onUpdateSettings((prev) => ({ ...prev, selectedModel: m.id }))
                   }
                   className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${settings.selectedModel === m.id
-                    ? 'bg-[#1E4B43]/10 dark:bg-[#D4AF37]/15 border-[#1E4B43] dark:border-[#D4AF37] ring-1 ring-[#1E4B43] dark:ring-[#D4AF37]'
+                    ? 'bg-heritage-green/10 dark:bg-antique-gold/15 border-heritage-green dark:border-antique-gold ring-1 ring-heritage-green dark:ring-antique-gold'
                     : 'bg-gray-50/80 dark:bg-[#1E2E2A]/60 border-gray-200 dark:border-white/10'
                     }`}
                 >
-                  <div className="font-bold text-xs text-[#1E4B43] dark:text-[#FBF7EE]">{m.name}</div>
+                  <div className="font-bold text-xs text-heritage-green dark:text-warm-ivory">{m.name}</div>
                   <p className="text-[10.5px] text-gray-500 dark:text-gray-400 mt-0.5">{m.desc}</p>
                 </button>
               ))}
@@ -194,7 +194,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
 
           {/* 4. Persona Preset */}
           <div>
-            <label className="font-semibold text-xs text-[#1E4B43] dark:text-[#D4AF37] flex items-center gap-1.5 mb-2">
+            <label className="font-semibold text-xs text-heritage-green dark:text-antique-gold flex items-center gap-1.5 mb-2">
               <Bot className="w-4 h-4" />
               <span>PHONG CÁCH TRỢ LÝ (AI PERSONA)</span>
             </label>
@@ -206,7 +206,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
                     onUpdateSettings((prev) => ({ ...prev, selectedPersona: p.id }))
                   }
                   className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${settings.selectedPersona === p.id
-                    ? 'bg-[#1E4B43]/10 dark:bg-[#D4AF37]/15 border-[#1E4B43] dark:border-[#D4AF37]'
+                    ? 'bg-heritage-green/10 dark:bg-antique-gold/15 border-heritage-green dark:border-antique-gold'
                     : 'bg-gray-50/80 dark:bg-[#1E2E2A]/60 border-gray-200 dark:border-white/10'
                     }`}
                 >
@@ -215,7 +215,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
                     <p className="text-[11px] text-gray-500">{p.desc}</p>
                   </div>
                   {settings.selectedPersona === p.id && (
-                    <Check className="w-4 h-4 text-[#1E4B43] dark:text-[#D4AF37]" />
+                    <Check className="w-4 h-4 text-heritage-green dark:text-antique-gold" />
                   )}
                 </div>
               ))}
@@ -224,7 +224,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
 
           {/* 5. Custom API Key override (Optional) */}
           <div>
-            <label className="font-semibold text-xs text-[#1E4B43] dark:text-[#D4AF37] flex items-center gap-1.5 mb-1.5">
+            <label className="font-semibold text-xs text-heritage-green dark:text-antique-gold flex items-center gap-1.5 mb-1.5">
               <Key className="w-4 h-4" />
               <span>API KEY (TÙY CHỌN)</span>
             </label>
@@ -235,7 +235,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
                 onUpdateSettings((prev) => ({ ...prev, customApiKey: e.target.value }))
               }
               placeholder="Mặc định sử dụng VITE_GEMINI_API_KEY từ file .env"
-              className="w-full px-3.5 py-2 rounded-xl bg-gray-50 dark:bg-[#1E2E2A] border border-gray-200 dark:border-white/10 text-xs focus:outline-none focus:ring-2 focus:ring-[#1E4B43] dark:focus:ring-[#D4AF37]"
+              className="w-full px-3.5 py-2 rounded-xl bg-gray-50 dark:bg-[#1E2E2A] border border-gray-200 dark:border-white/10 text-xs focus:outline-none focus:ring-2 focus:ring-heritage-green dark:focus:ring-antique-gold"
             />
             <p className="text-[10px] text-gray-500 mt-1">
               Khóa API được lưu an toàn trong phiên làm việc trình duyệt.
@@ -254,7 +254,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
               onChange={(e) =>
                 onUpdateSettings((prev) => ({ ...prev, autoSyncMap: e.target.checked }))
               }
-              className="w-4 h-4 accent-[#1E4B43] dark:accent-[#D4AF37] cursor-pointer"
+              className="w-4 h-4 accent-heritage-green dark:accent-antique-gold cursor-pointer"
             />
           </div>
         </div>
@@ -271,7 +271,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
 
           <button
             onClick={onApplySettings}
-            className="px-4 py-2 rounded-xl bg-[#1E4B43] hover:bg-[#15342F] text-[#D4AF37] text-xs font-bold transition-all cursor-pointer shadow-md flex items-center gap-1.5"
+            className="px-4 py-2 rounded-xl bg-heritage-green hover:bg-[#15342F] text-antique-gold text-xs font-bold transition-all cursor-pointer shadow-md flex items-center gap-1.5"
           >
             <Check className="w-4 h-4" />
             <span>Áp Dụng Cấu Hình</span>

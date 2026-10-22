@@ -73,11 +73,11 @@ export function DictionaryInspectorModal({
 
               <button
                 onClick={() => onPlayAudio(card.word)}
-                className="p-2.5 rounded-full bg-[#1E4B43] text-white hover:bg-[#163D37] cursor-pointer shrink-0 shadow-xs"
+                className="p-2.5 rounded-full bg-heritage-green text-white hover:bg-heritage-dark cursor-pointer shrink-0 shadow-xs"
                 title="Play pronunciation"
                 aria-label={`Pronounce ${card.word}`}
               >
-                <Volume2 className="w-4 h-4 text-[#D9B76A]" />
+                <Volume2 className="w-4 h-4 text-antique-gold" />
               </button>
             </div>
           ))}
@@ -90,10 +90,10 @@ export function DictionaryInspectorModal({
               onClose();
               onGoToStudy(lid);
             }}
-            className="px-6 py-2.5 rounded-full bg-[#1E4B43] text-white text-xs font-bold hover:bg-[#163D37] cursor-pointer shadow-xs inline-flex items-center gap-1.5"
+            className="px-6 py-2.5 rounded-full bg-heritage-green text-white text-xs font-bold hover:bg-heritage-dark cursor-pointer shadow-xs inline-flex items-center gap-1.5"
           >
             <span>Study these cards</span>
-            <ArrowRight className="w-4 h-4 text-[#D9B76A]" />
+            <ArrowRight className="w-4 h-4 text-antique-gold" />
           </button>
         </div>
       </DialogPanel>

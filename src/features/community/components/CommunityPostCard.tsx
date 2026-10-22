@@ -19,7 +19,7 @@ export function CommunityPostCard({
   onShare,
 }: CommunityPostCardProps) {
   return (
-    <article className="community-post-card p-6 sm:p-8 rounded-3xl bg-surface border border-line shadow-[0_4px_20px_-4px_rgba(30,75,67,0.06)] hover:shadow-md transition-all space-y-5">
+    <article className="community-post-card p-6 sm:p-8 rounded-3xl bg-surface border border-line shadow-[0_4px_20px_-4px_color-mix(in_srgb,_var(--color-heritage-green)_6%,_transparent)] hover:shadow-md transition-all space-y-5">
       {/* Author Info Bar */}
       <div className="community-author-bar flex items-center justify-between">
         <div className="flex items-center gap-3">

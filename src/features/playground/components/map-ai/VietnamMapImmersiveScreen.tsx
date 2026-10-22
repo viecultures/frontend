@@ -302,7 +302,7 @@ function VietnamMapImmersiveContent() {
 
   return (
     <div
-      className="relative w-full h-full overflow-hidden bg-[#030706] select-none text-[#FBF7EE]"
+      className="relative w-full h-full overflow-hidden bg-[#030706] select-none text-warm-ivory"
       onPointerMoveCapture={mascot.wake}
       onPointerDownCapture={mascot.wake}
       onKeyDownCapture={mascot.wake}
@@ -325,10 +325,10 @@ function VietnamMapImmersiveContent() {
         }`}
         style={{
           background: isPlaying
-            ? 'radial-gradient(ellipse 75% 65% at 55% 50%, rgba(212, 175, 55, 0.35) 0%, rgba(30, 75, 67, 0.45) 36%, transparent 75%)'
+            ? 'radial-gradient(ellipse 75% 65% at 55% 50%, rgba(212, 175, 55, 0.35) 0%, color-mix(in srgb, var(--color-heritage-green) 45%, transparent) 36%, transparent 75%)'
             : recording && inputVolume > 0.05
-              ? 'radial-gradient(ellipse 70% 60% at 55% 50%, rgba(16, 185, 129, 0.28) 0%, rgba(30, 75, 67, 0.4) 36%, transparent 72%)'
-              : 'radial-gradient(ellipse 65% 55% at 55% 50%, rgba(30, 75, 67, 0.4) 0%, rgba(212, 175, 55, 0.15) 38%, transparent 72%)',
+              ? 'radial-gradient(ellipse 70% 60% at 55% 50%, rgba(16, 185, 129, 0.28) 0%, color-mix(in srgb, var(--color-heritage-green) 40%, transparent) 36%, transparent 72%)'
+              : 'radial-gradient(ellipse 65% 55% at 55% 50%, color-mix(in srgb, var(--color-heritage-green) 40%, transparent) 0%, rgba(212, 175, 55, 0.15) 38%, transparent 72%)',
         }}
       />
 
@@ -350,10 +350,10 @@ function VietnamMapImmersiveContent() {
           type="button"
           disabled={busy}
           onClick={handleRequestArticles}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-[#1E4B43] text-gray-200 hover:text-[#D4AF37] border border-white/10 text-xs font-medium transition-all cursor-pointer shadow-sm disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-heritage-green text-gray-200 hover:text-antique-gold border border-white/10 text-xs font-medium transition-all cursor-pointer shadow-sm disabled:opacity-50"
           title="Yêu cầu Sứ Giả AI tìm bài đọc văn hóa cho địa danh hiện tại"
         >
-          <BookOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
+          <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
           <span>Bài đọc văn hóa</span>
         </button>
 
@@ -364,7 +364,7 @@ function VietnamMapImmersiveContent() {
           className={`p-2 rounded-xl transition-all cursor-pointer shadow-md border ${
             connected
               ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-400/50'
-              : 'bg-[#1E4B43] hover:bg-[#153a33] text-[#D4AF37] border-[#D4AF37]/50'
+              : 'bg-heritage-green hover:bg-[#153a33] text-antique-gold border-antique-gold/50'
           }`}
           title={
             connected || connecting || ending
@@ -428,7 +428,7 @@ function VietnamMapImmersiveContent() {
           }}
           className={`p-2 rounded-xl transition-all cursor-pointer border ${
             isFocused
-              ? 'bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/50'
+              ? 'bg-antique-gold/20 text-antique-gold border-antique-gold/50'
               : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10'
           }`}
           title="Khôi phục toàn cảnh (ESC)"
@@ -441,7 +441,7 @@ function VietnamMapImmersiveContent() {
         <button
           type="button"
           onClick={toggleSidebar}
-          className="p-2 rounded-xl bg-white/5 hover:bg-[#1E4B43] text-gray-300 hover:text-[#D4AF37] border border-white/10 transition-colors cursor-pointer"
+          className="p-2 rounded-xl bg-white/5 hover:bg-heritage-green text-gray-300 hover:text-antique-gold border border-white/10 transition-colors cursor-pointer"
           title="Cài đặt giọng nói &amp; chủ đề"
           aria-label="Cài đặt"
         >
@@ -464,10 +464,10 @@ function VietnamMapImmersiveContent() {
 
         {/* Interactive Articles Card Retrieved via AI getVieCultureArticles Tool */}
         {showArticlesCard && retrievedArticles && retrievedArticles.length > 0 && (
-          <div className="w-[calc(100vw-48px)] sm:w-[480px] lg:w-[540px] xl:w-[580px] max-w-[calc(92vw-40px)] lg:max-w-[42vw] p-3.5 rounded-2xl bg-[#0d1d19]/95 border border-[#D4AF37]/40 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="w-[calc(100vw-48px)] sm:w-[480px] lg:w-[540px] xl:w-[580px] max-w-[calc(92vw-40px)] lg:max-w-[42vw] p-3.5 rounded-2xl bg-[#0d1d19]/95 border border-antique-gold/40 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-xs">
-              <span className="font-serif font-bold text-[#FCE5B5] flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span className="font-serif font-bold text-antique-bright flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
                 Bài Đọc Được AI Đề Cử ({retrievedArticles.length} bài)
               </span>
               <button
@@ -485,13 +485,13 @@ function VietnamMapImmersiveContent() {
               {retrievedArticles.map((art) => (
                 <div
                   key={art.id}
-                  className="p-2.5 rounded-xl bg-black/40 border border-white/10 hover:border-[#D4AF37]/50 transition-all flex flex-col gap-1.5 group"
+                  className="p-2.5 rounded-xl bg-black/40 border border-white/10 hover:border-antique-gold/50 transition-all flex flex-col gap-1.5 group"
                 >
                   <div className="flex items-center justify-between gap-1 text-[11px]">
-                    <span className="font-semibold text-white group-hover:text-[#FCE5B5] transition-colors line-clamp-1">
+                    <span className="font-semibold text-white group-hover:text-antique-bright transition-colors line-clamp-1">
                       {art.titleVi}
                     </span>
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-[#1E4B43] text-[#D4AF37] border border-[#D4AF37]/30 shrink-0">
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-heritage-green text-antique-gold border border-antique-gold/30 shrink-0">
                       {art.level} · {art.readTime}
                     </span>
                   </div>
@@ -502,7 +502,7 @@ function VietnamMapImmersiveContent() {
 
                   <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/5">
                     {art.vocabHighlights && (
-                      <div className="flex items-center gap-1 overflow-hidden text-[9px] text-[#D4AF37]">
+                      <div className="flex items-center gap-1 overflow-hidden text-[9px] text-antique-gold">
                         <span className="truncate">{art.vocabHighlights.slice(0, 2).join(', ')}</span>
                       </div>
                     )}
@@ -510,7 +510,7 @@ function VietnamMapImmersiveContent() {
                       <button
                         type="button"
                         onClick={() => selectLandmark(art.id, 'user')}
-                        className="px-2 py-0.5 rounded text-[10px] bg-white/5 hover:bg-[#1E4B43] text-[#FCE5B5] border border-white/10 flex items-center gap-1 cursor-pointer transition-colors"
+                        className="px-2 py-0.5 rounded text-[10px] bg-white/5 hover:bg-heritage-green text-antique-bright border border-white/10 flex items-center gap-1 cursor-pointer transition-colors"
                         title="Xem trên bản đồ"
                       >
                         <Compass className="w-2.5 h-2.5" />
@@ -520,7 +520,7 @@ function VietnamMapImmersiveContent() {
                         href={paths.reader({ article: art.id, level: art.level })}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-2 py-0.5 rounded text-[10px] bg-[#D4AF37]/20 hover:bg-[#D4AF37]/35 text-[#FCE5B5] border border-[#D4AF37]/40 flex items-center gap-1 cursor-pointer transition-colors"
+                        className="px-2 py-0.5 rounded text-[10px] bg-antique-gold/20 hover:bg-antique-gold/35 text-antique-bright border border-antique-gold/40 flex items-center gap-1 cursor-pointer transition-colors"
                         title="Mở bài đọc song ngữ trên tab mới"
                       >
                         <ExternalLink className="w-2.5 h-2.5" />
@@ -552,10 +552,10 @@ function VietnamMapImmersiveContent() {
       {/* 4. ACTIVE PROVINCE TAG (Top Center) */}
       {/* ============================================================ */}
       {active && selectedProvinceDetail && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#12231F]/90 backdrop-blur-md border border-[#D4AF37]/50 shadow-2xl text-xs animate-in fade-in zoom-in-95 duration-200">
-          <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-ping" />
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#12231F]/90 backdrop-blur-md border border-antique-gold/50 shadow-2xl text-xs animate-in fade-in zoom-in-95 duration-200">
+          <span className="w-2 h-2 rounded-full bg-antique-gold animate-ping" />
           <span className="font-serif font-bold text-white flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <MapPin className="w-3.5 h-3.5 text-antique-gold" />
             {selectedProvinceDetail.name}
           </span>
           <span className="text-[10px] text-[#A2B5AD] font-medium">

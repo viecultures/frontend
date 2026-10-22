@@ -13,14 +13,14 @@ export function ReaderRecommendedSection({
   themeMode,
 }: ReaderRecommendedSectionProps) {
   return (
-    <div data-practice-theme={themeMode} className="reader-practice-surface reader-recommended-component pt-8 border-t border-[rgba(217,183,106,0.2)]">
+    <div data-practice-theme={themeMode} className="reader-practice-surface reader-recommended-component pt-8 border-t border-antique-gold/20">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
+          <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
             Continue reading
           </span>
           <h3
-            className={`font-serif text-xl font-bold mt-0.5 ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+            className={`font-sans text-xl font-bold mt-0.5 ${themeMode === "dark" ? "text-warm-ivory" : "text-heritage-green"
               }`}
           >
             Recommended articles
@@ -29,8 +29,8 @@ export function ReaderRecommendedSection({
         <Link
           href="/discovery"
           className={`text-xs font-bold inline-flex items-center gap-1 transition-colors ${themeMode === "dark"
-              ? "text-[#D9B76A] hover:text-white"
-              : "text-[#1E4B43] hover:text-[#D9B76A]"
+              ? "text-antique-gold hover:text-white"
+              : "text-heritage-green hover:text-antique-gold"
             }`}
         >
           <span>View all</span>
@@ -45,16 +45,16 @@ export function ReaderRecommendedSection({
 
             href={paths.reader({ story: article.id, level: article.level })}
             className={`reader-recommended-card group p-5 rounded-2xl border transition-all flex flex-col justify-between ${themeMode === "dark"
-                ? "bg-[#1E2925] border-[#D9B76A]/30 text-[#FBF7EE] shadow-md hover:border-[#D9B76A]"
-                : "bg-[#FBF7EE] border-[rgba(30,75,67,0.12)] text-[#3F5550] shadow-sm hover:shadow-md"
+                ? "bg-[#1E2925] border-antique-gold/30 text-warm-ivory shadow-md hover:border-antique-gold"
+                : "bg-warm-ivory border-heritage-green/12 text-ink-soft shadow-sm hover:shadow-md"
               }`}
           >
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E4B43] bg-[#F6EEDC] px-2.5 py-1 rounded">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-heritage-green bg-rice-paper px-2.5 py-1 rounded">
                 {article.category}
               </span>
               <h4
-                className={`font-serif text-base font-bold mt-3 group-hover:text-[#D9B76A] transition-colors ${themeMode === "dark" ? "text-[#FBF7EE]" : "text-[#1E4B43]"
+                className={`font-sans text-base font-bold mt-3 group-hover:text-antique-gold transition-colors ${themeMode === "dark" ? "text-warm-ivory" : "text-heritage-green"
                   }`}
               >
                 {article.title}
@@ -63,11 +63,11 @@ export function ReaderRecommendedSection({
                 {article.description}
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[rgba(217,183,106,0.2)] flex items-center justify-between text-xs font-semibold opacity-80">
+            <div className="mt-4 pt-3 border-t border-antique-gold/20 flex items-center justify-between text-xs font-semibold opacity-80">
               <span>
                 {article.readTime} • {article.vocabCount} words
               </span>
-              <span className="text-[#D9B76A] group-hover:translate-x-1 transition-transform inline-block font-bold">
+              <span className="text-antique-gold group-hover:translate-x-1 transition-transform inline-block font-bold">
                 Read →
               </span>
             </div>

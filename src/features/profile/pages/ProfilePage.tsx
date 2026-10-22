@@ -118,7 +118,7 @@ export const ProfilePage: React.FC = () => {
   const unlockedSealsCount = seals.filter((s) => s.isUnlocked).length;
 
   return (
-    <div className="profile-ui w-full min-h-[85vh] text-[#3F5550] dark:text-warm-ivory font-sans pb-16">
+    <div className="profile-ui w-full min-h-[85vh] text-ink-soft dark:text-warm-ivory font-sans pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 space-y-6 sm:space-y-8">
         {/* Back navigation & Page breadcrumb */}
         <div className="flex flex-wrap items-center justify-between gap-3">

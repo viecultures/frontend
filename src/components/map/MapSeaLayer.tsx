@@ -11,7 +11,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
       <text
         x="365"
         y="285"
-        fill="#BFE3EA"
+        fill="var(--color-sky-mist)"
         fontSize="9.5"
         fontWeight="700"
         letterSpacing="3px"
@@ -25,7 +25,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
       <text
         x="580"
         y="660"
-        fill="#BFE3EA"
+        fill="var(--color-sky-mist)"
         fontSize="13"
         fontWeight="700"
         letterSpacing="6px"
@@ -44,7 +44,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
               cx={pt.cx}
               cy={pt.cy}
               r={pt.r}
-              fill="#F5D280"
+              fill="var(--color-antique-rich)"
               className="opacity-95 animate-pulse"
             />
           ))}
@@ -53,7 +53,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
             y1={island.y}
             x2={island.x}
             y2={island.y + 24}
-            stroke="#D9B76A"
+            stroke="var(--color-antique-gold)"
             strokeWidth="1.2"
             strokeDasharray="2,2"
             className="opacity-80"
@@ -64,15 +64,15 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
             width={90}
             height={20}
             rx={4}
-            fill="#122A22"
-            stroke="#D9B76A"
+            fill="var(--color-heritage-forest)"
+            stroke="var(--color-antique-gold)"
             strokeWidth="1"
           />
           <text
             x={island.x}
             y={island.y + 37}
             textAnchor="middle"
-            fill="#FCE5B5"
+            fill="var(--color-antique-bright)"
             fontSize="8.5"
             fontWeight="700"
           >

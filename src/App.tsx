@@ -96,7 +96,7 @@ export const App: React.FC = () => {
         <React.Suspense
           fallback={
             <div className="min-h-[60vh] flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-[#1E4B43]/20 border-t-[#1E4B43] rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-heritage-green/20 border-t-heritage-green rounded-full animate-spin" />
             </div>
           }
         >
@@ -206,7 +206,7 @@ export const App: React.FC = () => {
               {/* Reader & Playground Workspaces */}
               <Route path={PATHS.reader} element={<ReaderPage />} />
               <Route path="/bilingual-reader" element={<RedirectToReader />} />
-              <Route path="/extensive-reader" element={<RedirectToReader defaultParams="?mode=extensive" />} />
+              <Route path="/extensive-reader" element={<RedirectToReader defaultParams="?mode=practice" />} />
               <Route path="/learning-loop" element={<RedirectToReader />} />
               <Route path="/loop" element={<RedirectToReader />} />
 

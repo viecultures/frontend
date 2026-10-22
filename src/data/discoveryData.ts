@@ -244,7 +244,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 10,
     summary:
       "Sail between thousands of limestone islets, emerald sea waters, and ancient fishing villages while mastering natural geographic terms.",
-    gradient: "from-[#2A665B] via-[#488E9E] to-[#1E4B43]",
+    gradient: "from-[#2A665B] via-[#488E9E] to-heritage-green",
     iconSymbol: "Mountain",
     imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-21",
@@ -360,7 +360,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 14,
     summary:
       "Explore UNESCO dual heritage karst mountains, ancient temples, and subterranean rivers using advanced Level 3 academic vocabulary.",
-    gradient: "from-[#1E4B43] via-[#336F64] to-[#143630]",
+    gradient: "from-heritage-green via-[#336F64] to-[#143630]",
     iconSymbol: "Mountain",
     imageUrl: "https://images.unsplash.com/photo-1540611025311-01df3cef54b5?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-16",
@@ -383,7 +383,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 12,
     summary:
       "Discover the citadel gates, royal tombs, and court cuisine of the Nguyen Dynasty while building academic vocabulary in historical architecture and conservation.",
-    gradient: "from-[#1E4B43] via-[#2A665B] to-[#163D37]",
+    gradient: "from-heritage-green via-[#2A665B] to-heritage-dark",
     iconSymbol: "Landmark",
     imageUrl: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80",
     featured: true,
@@ -430,7 +430,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 10,
     summary:
       "Understand full moon rituals, silk craftsmanship, and ancient wooden architecture along the Thu Bồn River using rich descriptive storytelling.",
-    gradient: "from-[#E8B7B2]/90 via-[#D69690] to-[#B86E67]",
+    gradient: "from-lotus-pink/90 via-[#D69690] to-[#B86E67]",
     iconSymbol: "Flame",
     imageUrl: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-12",
@@ -453,7 +453,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 8,
     summary:
       "From French baguette to global culinary icon: trace the history behind Vietnam's favorite street food and learn key culinary descriptive adjectives.",
-    gradient: "from-[#D9B76A]/90 via-[#C59B48] to-[#9E7728]",
+    gradient: "from-antique-gold/90 via-[#C59B48] to-[#9E7728]",
     iconSymbol: "UtensilsCrossed",
     imageUrl: "https://images.unsplash.com/photo-1626804475297-41608e074eb1?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-10",
@@ -476,7 +476,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 9,
     summary:
       "Explore 700 years of ceramic craftsmanship in a traditional village on the Red River delta while learning terminology for artisan techniques.",
-    gradient: "from-[#6E9FA1] via-[#528385] to-[#3B6668]",
+    gradient: "from-mountain-teal via-[#528385] to-[#3B6668]",
     iconSymbol: "Palette",
     imageUrl: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-08",
@@ -499,7 +499,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 7,
     summary:
       "Journey through the golden harvest season in northern highlands and discover the ecological wisdom of ethnic minority communities.",
-    gradient: "from-[#2A665B] via-[#4A887C] to-[#1E4B43]",
+    gradient: "from-[#2A665B] via-[#4A887C] to-heritage-green",
     iconSymbol: "Mountain",
     imageUrl: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-05",
@@ -522,7 +522,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 10,
     summary:
       "Trace the evolution of the national garment from Royal court attire to modern high fashion, exploring textile and design terminology.",
-    gradient: "from-[#D9B76A] via-[#B89240] to-[#806120]",
+    gradient: "from-antique-gold via-[#B89240] to-[#806120]",
     iconSymbol: "Palette",
     imageUrl: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-03",
@@ -545,7 +545,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 11,
     summary:
       "Step into the flooded rice paddies of Northern Vietnam to discover a unique thousand-year-old performing art and folk mythology.",
-    gradient: "from-[#9FCED8] via-[#75B2C0] to-[#488E9E]",
+    gradient: "from-horizon-blue via-[#75B2C0] to-[#488E9E]",
     iconSymbol: "Sparkles",
     imageUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-01",
@@ -568,7 +568,7 @@ export const LESSONS_DATA: Lesson[] = [
     vocabCount: 5,
     summary:
       "Revisit King Le Loi's mythical sword and the sacred turtle of Hanoi in accessible Level 1 English tailored for foundational learners.",
-    gradient: "from-[#E8B7B2] via-[#C88A84] to-[#995852]",
+    gradient: "from-lotus-pink via-[#C88A84] to-[#995852]",
     iconSymbol: "Sparkles",
     imageUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-02-28",

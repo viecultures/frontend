@@ -35,7 +35,7 @@ export const PROFICIENCY_LEVELS: Record<ProficiencyLevel, LevelMetadata> = {
     cefrRange: 'B1–B2',
     subTitle: 'Trung Cấp (Intermediate)',
     description: 'Tốc độ đàm thoại vừa phải, câu ghép 10–18 từ, từ vựng văn hóa tiêu chuẩn, câu hỏi so sánh vùng miền.',
-    badgeStyle: 'bg-amber-950/70 text-[#D4AF37] border-[#D4AF37]/50',
+    badgeStyle: 'bg-amber-950/70 text-antique-gold border-antique-gold/50',
     switchPrompt:
       'Please adjust your speaking and teaching level to Level 2 (B1-B2 intermediate). Speak at a moderate, natural conversational pace. Use compound sentences (10-18 words), standard cultural idioms, and open-ended questions comparing Vietnamese regions and personal cultural memories.',
   },

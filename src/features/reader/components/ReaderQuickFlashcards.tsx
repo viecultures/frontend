@@ -111,20 +111,20 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
   const isAllReviewed = totalReviewed >= Math.min(cards.length, 3);
 
   const containerBgClass = isDark
-    ? 'bg-[#1E2925] text-[#FBF7EE] border-[#D9B76A]/30 shadow-xl'
-    : 'bg-[#FBF7EE] text-[#3F5550] border-[rgba(30,75,67,0.12)] shadow-xl';
+    ? 'bg-[#1E2925] text-warm-ivory border-antique-gold/30 shadow-xl'
+    : 'bg-warm-ivory text-ink-soft border-heritage-green/12 shadow-xl';
 
   return (
     <div data-practice-theme={themeMode} className={`reader-practice-surface reader-practice-card reader-study-component reader-flashcards-component rounded-3xl p-6 sm:p-10 transition-colors duration-300 border space-y-6 ${containerBgClass}`}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[rgba(217,183,106,0.25)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-antique-gold/25">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#D9B76A]">
+            <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
               Quick flashcards
             </span>
           </div>
-          <h2 className={`font-serif text-2xl font-bold ${isDark ? 'text-[#FBF7EE]' : 'text-[#1E4B43]'}`}>
+          <h2 className={`font-sans text-2xl font-bold ${isDark ? 'text-warm-ivory' : 'text-heritage-green'}`}>
             Flip, recall and review
           </h2>
           <p className="text-xs sm:text-sm opacity-80 mt-1 leading-relaxed">
@@ -160,13 +160,13 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           }}
           className={`reader-quick-card relative min-h-[260px] sm:min-h-[290px] rounded-3xl p-6 sm:p-8 cursor-pointer transition-all duration-300 transform hover:scale-[1.01] border-2 shadow-lg flex flex-col justify-between ${
             isDark
-              ? 'bg-[#141C1A] border-[#D9B76A]/50 hover:border-[#D9B76A]'
-              : 'bg-[#F6EEDC] border-[#D9B76A]/70 hover:border-[#D9B76A]'
+              ? 'bg-[#141C1A] border-antique-gold/50 hover:border-antique-gold'
+              : 'bg-rice-paper border-antique-gold/70 hover:border-antique-gold'
           }`}
         >
           {/* Card Top Indicator */}
           <div className="flex items-center justify-between text-xs font-bold opacity-75">
-            <span className="flex items-center gap-1 text-[#D9B76A]">
+            <span className="flex items-center gap-1 text-antique-gold">
               <Layers className="w-3.5 h-3.5" />
               Card {currentIndex + 1} / {cards.length}
             </span>
@@ -180,7 +180,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           {!isFlipped ? (
             <div className="text-center py-6 space-y-3">
               <div className="flex items-center justify-center gap-2">
-                <h3 className="font-serif text-3xl sm:text-4xl font-extrabold text-[#1E4B43] dark:text-[#D9B76A]">
+                <h3 className="font-sans text-3xl sm:text-4xl font-extrabold text-heritage-green dark:text-antique-gold">
                   {currentCard.word}
                 </h3>
                 <button
@@ -192,7 +192,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
                   className="p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
                   title="Play pronunciation"
                 >
-                  <Volume2 className="w-5 h-5 text-[#D9B76A]" />
+                  <Volume2 className="w-5 h-5 text-antique-gold" />
                 </button>
               </div>
               <span className="inline-block px-3 py-0.5 rounded-full text-xs font-mono bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
@@ -204,10 +204,10 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
             </div>
           ) : (
             <div className="text-center py-6 space-y-3 animate-in fade-in duration-200">
-              <div className="text-sm font-mono text-[#D9B76A] font-bold">
+              <div className="text-sm font-mono text-antique-gold font-bold">
                 {currentCard.ipa}
               </div>
-              <h4 className="font-serif text-xl sm:text-2xl font-bold text-[#1E4B43] dark:text-white">
+              <h4 className="font-sans text-xl sm:text-2xl font-bold text-heritage-green dark:text-white">
                 {currentCard.viMeaning}
               </h4>
               <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-md mx-auto bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 flex items-start justify-center gap-1.5 text-left">
@@ -260,7 +260,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
             <button
               type="button"
               onClick={handlePrev}
-              className="p-2 rounded-xl border border-[rgba(217,183,106,0.3)] hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+              className="p-2 rounded-xl border border-antique-gold/30 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
               title="Previous card"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -268,7 +268,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
             <button
               type="button"
               onClick={handleNext}
-              className="p-2 rounded-xl border border-[rgba(217,183,106,0.3)] hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+              className="p-2 rounded-xl border border-antique-gold/30 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
               title="Next card"
             >
               <ArrowRight className="w-4 h-4" />
@@ -277,7 +277,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
 
           <a
             href={paths.flashcardStudy({ deck: deckId, level: selectedLevel })}
-            className="reader-quick-deck-link inline-flex items-center gap-1.5 text-xs font-bold text-[#1E4B43] dark:text-[#D9B76A] hover:underline"
+            className="reader-quick-deck-link inline-flex items-center gap-1.5 text-xs font-bold text-heritage-green dark:text-antique-gold hover:underline"
           >
             <span>Open full flashcard deck</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -286,8 +286,8 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
       </div>
 
       {/* ── MILESTONE BANNER: ĐÓNG MỘC SON ─────────────────────────────────── */}
-      <div className="mt-8 pt-6 border-t border-[rgba(217,183,106,0.3)]">
-        <div className="reader-quick-milestone rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#9E2A2B]/15 via-[#1E4B43]/10 to-[#D9B76A]/20 border-2 border-[#D9B76A] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+      <div className="mt-8 pt-6 border-t border-antique-gold/30">
+        <div className="reader-quick-milestone rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#9E2A2B]/15 via-heritage-green/10 to-antique-gold/20 border-2 border-antique-gold flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-1.5 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#9E2A2B] text-white">
@@ -297,7 +297,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
                 Keep your study streak going
               </span>
             </div>
-            <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#9E2A2B] dark:text-[#FBF7EE]">
+            <h3 className="font-sans text-xl sm:text-2xl font-bold text-[#9E2A2B] dark:text-warm-ivory">
               You’ve completed this lesson!
             </h3>
             <p className="text-xs sm:text-sm text-stone-700 dark:text-stone-300 max-w-xl">
@@ -308,11 +308,11 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           <button
             type="button"
             onClick={onOpenMocSonModal}
-            className="w-full md:w-auto px-8 py-4 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-serif font-bold text-sm sm:text-base shadow-[0_4px_25px_rgba(158,42,43,0.45)] border-2 border-[#D9B76A] transition-all transform hover:scale-105 flex items-center justify-center gap-3 cursor-pointer shrink-0"
+            className="w-full md:w-auto px-8 py-4 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-sans font-bold text-sm sm:text-base shadow-[0_4px_25px_rgba(158,42,43,0.45)] border-2 border-antique-gold transition-all transform hover:scale-105 flex items-center justify-center gap-3 cursor-pointer shrink-0"
           >
-            <Award className="w-5 h-5 text-[#D9B76A]" />
+            <Award className="w-5 h-5 text-antique-gold" />
             <span>Stamp and finish lesson</span>
-            <Sparkles className="w-4 h-4 text-[#D9B76A]" />
+            <Sparkles className="w-4 h-4 text-antique-gold" />
           </button>
         </div>
       </div>

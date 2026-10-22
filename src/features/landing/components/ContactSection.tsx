@@ -26,16 +26,16 @@ export const ContactSection: React.FC = () => {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rice-paper text-heritage-green border border-antique-gold/40 text-xs font-bold shadow-xs">
             <Mail className="w-3.5 h-3.5 text-antique-gold" />
             <span className="uppercase tracking-widest text-[11px] font-extrabold">
-              KẾT NỐI &amp; ĐÓNG GÓP
+              GET IN TOUCH
             </span>
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-text-main tracking-tight">
-            Liên Hệ Đội Ngũ Phát Triển
+            Contact the VieCultures team
           </h2>
 
           <p className="text-xs sm:text-sm text-text-muted max-w-lg mx-auto font-normal leading-relaxed">
-            Bạn có thắc mắc về lộ trình học tập, đề xuất hợp tác nội dung di sản hoặc đóng góp ý kiến phát triển nền tảng?
+            Have a question about learning, a heritage content partnership idea, or feedback about the platform?
           </p>
         </div>
 
@@ -43,9 +43,9 @@ export const ContactSection: React.FC = () => {
         {isSubmitted ? (
           <div className="p-8 rounded-3xl bg-emerald-50 border-2 border-emerald-200 text-emerald-900 flex flex-col items-center justify-center text-center space-y-3 animate-in fade-in zoom-in-95 duration-200 shadow-sm">
             <CheckCircle2 className="w-12 h-12 text-emerald-600" />
-            <h3 className="font-serif text-xl font-bold">Cảm Ơn Bạn Đã Gửi Tin Nhắn!</h3>
+            <h3 className="font-serif text-xl font-bold">Thanks for reaching out!</h3>
             <p className="text-xs sm:text-sm text-emerald-800 max-w-md leading-relaxed">
-              Đội ngũ VieCultures đã nhận được thông tin từ <strong className="text-emerald-950">{email}</strong> và sẽ phản hồi bạn trong vòng 24 giờ làm việc.
+              The VieCultures team received your message from <strong className="text-emerald-950">{email}</strong>. We’ll get back to you within one business day.
             </p>
             <button
               type="button"
@@ -57,7 +57,7 @@ export const ContactSection: React.FC = () => {
               }}
               className="mt-3 px-5 py-2 rounded-xl bg-emerald-700 text-warm-ivory text-xs font-bold hover:bg-emerald-800 transition-colors cursor-pointer shadow-xs"
             >
-              Gửi tin nhắn khác
+              Send another message
             </button>
           </div>
         ) : (
@@ -69,13 +69,13 @@ export const ContactSection: React.FC = () => {
                   className="text-xs font-bold uppercase tracking-wider text-text-main flex items-center gap-1.5 mb-2"
                 >
                   <User className="w-3.5 h-3.5 text-antique-gold" />
-                  <span>Họ và Tên</span>
+                  <span>Full name</span>
                 </label>
                 <input
                   id="contact-name"
                   type="text"
                   required
-                  placeholder="Ví dụ: Nguyễn Văn An"
+                  placeholder="e.g. Alex Nguyen"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-line bg-surface text-sm text-text-main placeholder-text-muted/60 focus:bg-white focus:outline-none focus-ring shadow-xs transition-colors"
@@ -88,7 +88,7 @@ export const ContactSection: React.FC = () => {
                   className="text-xs font-bold uppercase tracking-wider text-text-main flex items-center gap-1.5 mb-2"
                 >
                   <Mail className="w-3.5 h-3.5 text-antique-gold" />
-                  <span>Địa Chỉ Email</span>
+                  <span>Email address</span>
                 </label>
                 <input
                   id="contact-email"
@@ -106,13 +106,13 @@ export const ContactSection: React.FC = () => {
             <div>
               <label className="text-xs font-bold uppercase tracking-wider text-text-main flex items-center gap-1.5 mb-2">
                 <Building className="w-3.5 h-3.5 text-antique-gold" />
-                <span>Chủ Đề Liên Hệ</span>
+                <span>What are you contacting us about?</span>
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-semibold">
                 {[
-                  { key: 'general', label: 'Học viên cá nhân' },
-                  { key: 'partnership', label: 'Hợp tác nội dung di sản' },
-                  { key: 'enterprise', label: 'Trường học & Doanh nghiệp' },
+                  { key: 'general', label: 'Individual learner' },
+                  { key: 'partnership', label: 'Heritage content partnership' },
+                  { key: 'enterprise', label: 'School or business' },
                 ].map((item) => (
                   <button
                     key={item.key}
@@ -136,13 +136,13 @@ export const ContactSection: React.FC = () => {
                 className="text-xs font-bold uppercase tracking-wider text-text-main flex items-center gap-1.5 mb-2"
               >
                 <MessageSquare className="w-3.5 h-3.5 text-antique-gold" />
-                <span>Nội Dung Tin Nhắn</span>
+                <span>Your message</span>
               </label>
               <textarea
                 id="contact-message"
                 required
                 rows={4}
-                placeholder="Nhập câu hỏi, đề xuất hoặc phản hồi của bạn..."
+                placeholder="Share your question, idea, or feedback..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-line bg-surface text-sm text-text-main placeholder-text-muted/60 focus:bg-white focus:outline-none focus-ring shadow-xs transition-colors resize-y"
@@ -154,7 +154,7 @@ export const ContactSection: React.FC = () => {
               className="w-full py-4 rounded-xl bg-gradient-to-r from-antique-bright via-antique-rich to-antique-gold text-heritage-forest font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg hover:brightness-105 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer focus-ring"
             >
               <Send className="w-4 h-4 text-heritage-forest" />
-              <span>Gửi Tin Nhắn Đến Đội Ngũ</span>
+              <span>Send your message</span>
             </button>
           </form>
         )}

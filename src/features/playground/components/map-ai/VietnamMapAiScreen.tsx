@@ -170,7 +170,7 @@ export const VietnamMapAiScreen: React.FC = () => {
   const { theme } = useSettings();
 
   return (
-    <div className={`map-ai-app ai-chat-ui ${theme === 'light' ? 'light-theme' : ''} w-full h-full relative overflow-hidden`}>
+    <div className={`map-ai-app ai-chat-ui ${theme === 'light' ? 'light-theme' : 'dark'} w-full h-full relative overflow-hidden`}>
       <MapAiContent />
     </div>
   );

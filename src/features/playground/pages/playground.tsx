@@ -93,12 +93,12 @@ export const PlaygroundPage: React.FC = () => {
 
   return (
     <LiveAPIProvider activeView={currentScreenIndex === 1 ? 'chat' : currentScreenIndex === 2 ? 'immersive' : null}>
-    <div className="relative w-full h-screen overflow-hidden bg-[#FBF7EE] dark:bg-[#0b1a17]">
+    <div className="relative w-full h-screen overflow-hidden bg-warm-ivory dark:bg-[#0b1a17]">
       {/* Mobile / Tablet Quick Exit to Home */}
       {currentScreenIndex !== 0 && <div className="xl:hidden fixed top-3 right-3 z-50">
         <button
           onClick={() => navigate(PATHS.home)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E2925]/90 backdrop-blur-md border border-[#D4AF37]/40 text-[#D4AF37] hover:text-white text-xs font-semibold shadow-lg cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E2925]/90 backdrop-blur-md border border-antique-gold/40 text-antique-gold hover:text-white text-xs font-semibold shadow-lg cursor-pointer"
           title="Về Phòng Học"
           aria-label="Về Phòng Học"
         >
@@ -122,7 +122,7 @@ export const PlaygroundPage: React.FC = () => {
         <section
           ref={el => { screenRefs.current[0] = el; }}
           id="screen-dictation-shadowing"
-          className="w-full h-screen snap-start flex flex-col justify-center border-b border-[#1E4B43]/10 overflow-hidden"
+          className="w-full h-screen snap-start flex flex-col justify-center border-b border-heritage-green/10 overflow-hidden"
         >
           <VideoDictationShadowingScreen isActive={currentScreenIndex === 0} />
         </section>
@@ -131,7 +131,7 @@ export const PlaygroundPage: React.FC = () => {
         <section
           ref={el => { screenRefs.current[1] = el; }}
           id="screen-vietnam-map-ai"
-          className="w-full h-screen snap-start flex flex-col justify-center border-b border-[#1E4B43]/10 overflow-hidden"
+          className="w-full h-screen snap-start flex flex-col justify-center border-b border-heritage-green/10 overflow-hidden"
         >
           <VietnamMapAiScreen />
         </section>
@@ -140,7 +140,7 @@ export const PlaygroundPage: React.FC = () => {
         <section
           ref={el => { screenRefs.current[2] = el; }}
           id="screen-vietnam-map-immersive"
-          className="w-full h-screen snap-start flex flex-col justify-center border-b border-[#1E4B43]/10 overflow-hidden"
+          className="w-full h-screen snap-start flex flex-col justify-center border-b border-heritage-green/10 overflow-hidden"
         >
           <VietnamMapImmersiveScreen />
         </section>
@@ -149,16 +149,16 @@ export const PlaygroundPage: React.FC = () => {
         <section
           ref={el => { screenRefs.current[3] = el; }}
           id="screen-regional-dialects"
-          className="w-full h-screen snap-start flex flex-col items-center justify-center border-b border-[#1E4B43]/10 p-6 bg-[#FBF7EE] dark:bg-[#0b1a17]"
+          className="w-full h-screen snap-start flex flex-col items-center justify-center border-b border-heritage-green/10 p-6 bg-warm-ivory dark:bg-[#0b1a17]"
         >
-          <div className="max-w-xl text-center p-8 rounded-3xl bg-white/80 dark:bg-[#12231F]/80 backdrop-blur-md border border-[#1E4B43]/15 shadow-xl space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#1E4B43] text-[#D4AF37] flex items-center justify-center shadow-lg">
+          <div className="max-w-xl text-center p-8 rounded-3xl bg-white/80 dark:bg-[#12231F]/80 backdrop-blur-md border border-heritage-green/15 shadow-xl space-y-4">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-heritage-green text-antique-gold flex items-center justify-center shadow-lg">
               <Radio className="w-7 h-7" />
             </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[#D4AF37]/20 text-[#B8860B] dark:text-[#FCE5B5]">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-antique-gold/20 text-[#B8860B] dark:text-antique-bright">
               <Sparkles className="w-3.5 h-3.5" /> Màn hình #04 · Đang phát triển (Alpha)
             </div>
-            <h2 className="text-2xl font-serif font-bold text-[#1E4B43] dark:text-[#FBF7EE]">
+            <h2 className="text-2xl font-serif font-bold text-heritage-green dark:text-warm-ivory">
               3-Region Dialect &amp; Tone Explorer
             </h2>
             <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">
@@ -171,16 +171,16 @@ export const PlaygroundPage: React.FC = () => {
         <section
           ref={el => { screenRefs.current[4] = el; }}
           id="screen-heritage-speed-duel"
-          className="w-full h-screen snap-start flex flex-col items-center justify-center border-b border-[#1E4B43]/10 p-6 bg-[#FBF7EE] dark:bg-[#0b1a17]"
+          className="w-full h-screen snap-start flex flex-col items-center justify-center border-b border-heritage-green/10 p-6 bg-warm-ivory dark:bg-[#0b1a17]"
         >
-          <div className="max-w-xl text-center p-8 rounded-3xl bg-white/80 dark:bg-[#12231F]/80 backdrop-blur-md border border-[#1E4B43]/15 shadow-xl space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#1E4B43] text-[#D4AF37] flex items-center justify-center shadow-lg">
+          <div className="max-w-xl text-center p-8 rounded-3xl bg-white/80 dark:bg-[#12231F]/80 backdrop-blur-md border border-heritage-green/15 shadow-xl space-y-4">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-heritage-green text-antique-gold flex items-center justify-center shadow-lg">
               <Zap className="w-7 h-7" />
             </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[#D4AF37]/20 text-[#B8860B] dark:text-[#FCE5B5]">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-antique-gold/20 text-[#B8860B] dark:text-antique-bright">
               <Sparkles className="w-3.5 h-3.5" /> Màn hình #05 · Lab Concept
             </div>
-            <h2 className="text-2xl font-serif font-bold text-[#1E4B43] dark:text-[#FBF7EE]">
+            <h2 className="text-2xl font-serif font-bold text-heritage-green dark:text-warm-ivory">
               Heritage Speed-Run Duel Arena
             </h2>
             <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">

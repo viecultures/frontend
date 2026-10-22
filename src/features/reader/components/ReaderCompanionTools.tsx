@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { ArrowRight, BookOpen, Compass, Layers, Search, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Compass, Search, Sparkles } from 'lucide-react';
 import type { VocabItem } from '@/data/readerData';
 
 interface ReaderCompanionToolsProps {
@@ -7,10 +7,9 @@ interface ReaderCompanionToolsProps {
   vocabulary: VocabItem[];
   onDraftPrompt: (text: string) => void;
   onOpenVocabulary?: () => void;
-  onReviewWords: () => void;
 }
 
-export function ReaderCompanionTools({ articleTitle, vocabulary, onDraftPrompt, onOpenVocabulary, onReviewWords }: ReaderCompanionToolsProps) {
+export function ReaderCompanionTools({ articleTitle, vocabulary, onDraftPrompt, onOpenVocabulary }: ReaderCompanionToolsProps) {
   const [activeTool, setActiveTool] = useState<'steps' | 'word' | null>(null);
   const [word, setWord] = useState('');
   const [result, setResult] = useState<VocabItem | null>(null);
@@ -49,7 +48,6 @@ export function ReaderCompanionTools({ articleTitle, vocabulary, onDraftPrompt, 
         <button type="button" aria-expanded={activeTool === 'word'} aria-controls={`${fieldId}-word`} onClick={() => setActiveTool(activeTool === 'word' ? null : 'word')}>
           <span className="reader-companion-tool-icon reader-companion-tool-icon--sage"><Search size={19} /></span><span>Word in context<small>Look up words as you read</small></span><ArrowRight size={16} />
         </button>
-        <button type="button" onClick={onReviewWords}><span className="reader-companion-tool-icon reader-companion-tool-icon--clay"><Layers size={19} /></span><span>Review vocabulary<small>Take your words into practice</small></span><ArrowRight size={16} /></button>
       </div>
       {activeTool === 'steps' && <div ref={detailRef} id={`${fieldId}-steps`} className="reader-companion-tool-detail">
         <h3>Your reading path</h3>

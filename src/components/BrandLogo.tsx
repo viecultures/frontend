@@ -41,7 +41,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   // Theme text styling
   const mainTextColor = theme === 'dark' ? 'text-warm-ivory' : 'text-heritage-green';
-  const highlightTextColor = theme === 'dark' ? 'text-antique-gold' : 'text-antique-rich';
+  const highlightTextColor = theme === 'dark' ? 'text-antique-gold' : 'text-accent-ink';
 
   const content = (
     <div
@@ -55,7 +55,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       {/* Visual Emblem Container */}
       <div
         className={`relative ${iconSizeClasses} border border-antique-gold/50 bg-heritage-green/90 overflow-hidden shrink-0 shadow-md flex items-center justify-center text-antique-gold transition-all duration-300 ${
-          onClick ? 'group-hover:scale-105 group-hover:border-antique-gold group-hover:shadow-[0_0_15px_rgba(217,183,106,0.35)]' : ''
+          onClick ? 'group-hover:scale-105 group-hover:border-antique-gold group-hover:shadow-[0_0_15px_color-mix(in_srgb,_var(--color-antique-gold)_35%,_transparent)]' : ''
         }`}
       >
         {/* Subtle decorative background gradient overlay */}
@@ -79,8 +79,8 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
           {/* Optional Badge / Room indicator */}
           {badge && (
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-white/80 font-medium pl-2.5 border-l border-white/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className={`hidden sm:flex items-center gap-1.5 text-xs font-medium pl-2.5 border-l ${theme === 'dark' ? 'text-warm-ivory/80 border-warm-ivory/20' : 'text-ink-soft border-line'}`}>
+              <span className="w-2 h-2 rounded-full bg-mountain-teal animate-pulse" />
               <span>{badge}</span>
             </div>
           )}

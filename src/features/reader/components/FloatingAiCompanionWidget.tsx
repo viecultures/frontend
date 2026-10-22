@@ -107,8 +107,7 @@ export function FloatingAiCompanionWidget({
           </div>
           <div className="reader-companion-body" ref={scrollRef}>
             {showTools ? <ReaderCompanionTools key={`${articleId}-${level}`} articleTitle={articleTitle} vocabulary={vocabulary}
-              onDraftPrompt={draftPrompt} onOpenVocabulary={onOpenVocabulary ? () => { closePanel(); onOpenVocabulary(); } : undefined}
-              onReviewWords={() => navigate(articleId ? paths.flashcardStudy({ deck: articleId, level }) : PATHS.dictionary)} />
+              onDraftPrompt={draftPrompt} onOpenVocabulary={onOpenVocabulary ? () => { closePanel(); onOpenVocabulary(); } : undefined} />
               : <ReaderCompanionMessages messages={messages} />}
           </div>
           <footer className="reader-companion-footer">

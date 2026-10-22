@@ -5,8 +5,8 @@
   flex-direction:column;
   gap:12px;
   padding:16px 20px 16px 68px;
-  background:#fbf7ee;
-  color:#1e4b43;
+  background:var(--color-warm-ivory);
+  color:var(--color-heritage-green);
   font-size:13px;
   overflow:hidden
 }
@@ -49,7 +49,7 @@
 }
 .sh-input {
   width:100%;
-  border:1px solid #1e4b4330;
+  border:1px solid color-mix(in srgb, var(--color-heritage-green) 18.82%, transparent);
   background:#fff;
   color:#173c34;
   border-radius:8px;
@@ -59,7 +59,7 @@
 }
 .sh-input:focus {
   border-color:#a98435;
-  box-shadow:0 0 0 2px #d4af3725
+  box-shadow:0 0 0 2px color-mix(in srgb, var(--color-antique-gold) 14.51%, transparent)
 }
 .sh-toolbar select {
   width:auto
@@ -69,10 +69,10 @@
   align-items:center;
   justify-content:center;
   gap:6px;
-  border:1px solid #1e4b4333;
+  border:1px solid color-mix(in srgb, var(--color-heritage-green) 20.00%, transparent);
   border-radius:8px;
   padding:7px 10px;
-  color:#1e4b43;
+  color:var(--color-heritage-green);
   background:#fff;
   font-size:12px;
   font-weight:600;
@@ -90,9 +90,9 @@
   cursor:not-allowed
 }
 .sh-primary {
-  background:#1e4b43;
+  background:var(--color-heritage-green);
   color:#f6d888;
-  border-color:#1e4b43
+  border-color:var(--color-heritage-green)
 }
 .sh-primary:hover {
   background:#163b34
@@ -106,7 +106,7 @@
   gap:6px
 }
 .sh-tabs [aria-selected=true] {
-  background:#1e4b43;
+  background:var(--color-heritage-green);
   color:#f6d888
 }
 .sh-workspace {
@@ -138,7 +138,7 @@
 .sh-content {
   min-height:0;
   overflow:auto;
-  border:1px solid #1e4b4325;
+  border:1px solid color-mix(in srgb, var(--color-heritage-green) 14.51%, transparent);
   background:#fffaf3;
   border-radius:14px;
   padding:16px
@@ -155,7 +155,7 @@
   gap:10px
 }
 .sh-editor-row {
-  border:1px solid #1e4b4325;
+  border:1px solid color-mix(in srgb, var(--color-heritage-green) 14.51%, transparent);
   background:#fff;
   border-radius:12px;
   padding:12px;
@@ -185,7 +185,7 @@
   flex-direction:column;
   gap:5px;
   padding:10px;
-  border:1px solid #1e4b4325;
+  border:1px solid color-mix(in srgb, var(--color-heritage-green) 14.51%, transparent);
   border-radius:10px;
   background:white;
   cursor:pointer
@@ -210,7 +210,7 @@
   gap:4px;
   text-align:left;
   padding:10px;
-  border:1px solid #1e4b4325;
+  border:1px solid color-mix(in srgb, var(--color-heritage-green) 14.51%, transparent);
   border-radius:8px;
   background:white;
   cursor:pointer
@@ -244,7 +244,7 @@
   border-radius:8px
 }
 .sh-take,.sh-replay {
-  border-top:1px solid #1e4b4325;
+  border-top:1px solid color-mix(in srgb, var(--color-heritage-green) 14.51%, transparent);
   padding-top:12px;
   display:flex;
   flex-direction:column;
@@ -263,7 +263,7 @@
 }
 .sh-volume-grid input {
   width:100%;
-  accent-color:#1e4b43
+  accent-color:var(--color-heritage-green)
 }
 @media(max-width:1000px) {
   .sh-hub {

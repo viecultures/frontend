@@ -1,10 +1,11 @@
 import '../reader-components.css';
+import '../reader-design.css';
 import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   AudioShadowingBar,
   BilingualReaderView,
-  ExtensiveReaderView,
+  ReaderPracticeView,
   ReaderToolbar,
   ReaderVocabDrawer,
   ReaderRecommendedSection,
@@ -25,6 +26,7 @@ import { getStoredUser, setStoredUser, clearAuthStorage, getIsProUser, type AppU
 import { articleKey, cacheArticle, getCachedArticle } from '@/services/learning/learningStorage';
 import { useSavedVocabulary, SavedVocabularyContext } from '../hooks/useSavedVocabulary';
 import { PATHS } from '@/routes/paths';
+import { practiceModeFrom, type PracticeMode } from '../lib/readerPractice';
 
 export default function ReaderPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -53,12 +55,10 @@ export default function ReaderPage() {
   const [fontSize, setFontSize] = useState<number>(17);
   const [themeMode, setThemeMode] = useState<"paper" | "dark">("paper");
 
-  // Initial mode reads from URL query ?mode=extensive
-  const initialMode =
-    searchParams.get("mode") === "extensive" ? "extensive" : "bilingual";
-  const [readingMode, setReadingMode] = useState<"bilingual" | "extensive">(
-    initialMode
-  );
+  // Keep old extensive-reader links working while exposing Practice as the workspace.
+  const modeParam = searchParams.get('mode');
+  const readingMode: 'bilingual' | 'practice' = modeParam === 'practice' || modeParam === 'extensive' ? 'practice' : 'bilingual';
+  const practiceMode = practiceModeFrom(searchParams.get('practice'));
 
   // Initial level reads from URL query ?level=Level 1/2/3
   const levelParam = searchParams.get("level");
@@ -68,7 +68,7 @@ export default function ReaderPage() {
     initialLevel
   );
 
-  // Dynamic Post Data from Backend API (null = fallback to Tết default)
+  // Resolved article shared by Reading and Practice; null while loading.
   const [articleData, setArticleData] = useState<ReaderArticleData | null>(null);
 
   const targetId = searchParams.get('postId') || searchParams.get('id') || searchParams.get('story') || searchParams.get('article') || 'tet-holiday';
@@ -86,7 +86,7 @@ export default function ReaderPage() {
       if (targetId === 'tet-holiday') {
         const article = readerApiService.getLocalArticle(targetId, selectedLevel);
         if (article) cacheArticle(article, selectedLevel);
-        if (active) setLoadedKey(requestedKey);
+        if (active) { setArticleData(article); setArticleError(!article); setLoadedKey(requestedKey); }
         return;
       }
       const post = await readerApiService.getPostById(targetId);
@@ -110,13 +110,6 @@ export default function ReaderPage() {
 
   // Sync state if URL searchParams change externally
   useEffect(() => {
-    const modeParam = searchParams.get("mode");
-    if (modeParam === "extensive" && readingMode !== "extensive") {
-      setReadingMode("extensive");
-    } else if (modeParam !== "extensive" && readingMode !== "bilingual") {
-      setReadingMode("bilingual");
-    }
-
     const currentLvl = searchParams.get("level");
     if (
       (currentLvl === "Level 1" || currentLvl === "Level 2" || currentLvl === "Level 3") &&
@@ -126,20 +119,30 @@ export default function ReaderPage() {
     }
   }, [searchParams]);
 
-  const handleModeChange = (newMode: "bilingual" | "extensive") => {
-    setReadingMode(newMode);
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        if (newMode === "extensive") {
-          next.set("mode", "extensive");
-        } else {
-          next.delete("mode");
-        }
-        return next;
-      },
-      { replace: true }
-    );
+  const handleModeChange = (newMode: 'bilingual' | 'practice') => {
+    setSearchParams(previous => {
+      const next = new URLSearchParams(previous);
+      if (newMode === 'practice') next.set('mode', 'practice');
+      else { next.delete('mode'); next.delete('practice'); }
+      return next;
+    });
+  };
+
+  const handleStartPractice = (mode: PracticeMode = 'questions') => {
+    setSearchParams(previous => {
+      const next = new URLSearchParams(previous);
+      next.set('mode', 'practice'); next.set('practice', mode);
+      return next;
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const handlePracticeModeChange = (mode: PracticeMode) => {
+    setSearchParams(previous => {
+      const next = new URLSearchParams(previous);
+      next.set('mode', 'practice'); next.set('practice', mode);
+      return next;
+    }, { replace: true });
   };
 
   const handleLevelChange = async (newLevel: 'Level 1' | 'Level 2' | 'Level 3') => {
@@ -147,7 +150,7 @@ export default function ReaderPage() {
     setLevelError('');
     let nextId = targetId;
     if (articleData?.cefrLevel && /^[ABC][12]$/.test(articleData.cefrLevel) && !articleData.topicGroup && newLevel !== selectedLevel) {
-      setLevelError('Bài này chưa có phiên bản ở mức bạn chọn.');
+      setLevelError('This article is not available at the selected level.');
       return;
     }
     if (articleData?.topicGroup) {
@@ -158,7 +161,7 @@ export default function ReaderPage() {
         if (request !== levelRequest.current) return;
         if (post) { nextId = post.id; found = true; break; }
       }
-      if (!found) { setLevelError('Bài này chưa có nội dung ở mức bạn chọn.'); return; }
+      if (!found) { setLevelError('This article has no content at the selected level.'); return; }
     }
     if (request !== levelRequest.current) return;
     setSelectedLevel(newLevel);
@@ -187,7 +190,7 @@ export default function ReaderPage() {
   const [q2Answer, setQ2Answer] = useState<string>("");
   const [quizSubmitted, setQuizSubmitted] = useState<boolean>(false);
 
-  // ── Google Gemini Real Audio Engine (Bỏ hoàn toàn giọng robotic cũ) ──
+  // Playback for article recordings and the bundled Tết voices.
   const [selectedVoiceId, setSelectedVoiceId] = useState<
     "puck" | "charon" | "kore" | "aoede" | "fenrir"
   >("puck");
@@ -202,6 +205,7 @@ export default function ReaderPage() {
   const [duration, setDuration] = useState<number>(0);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => { if (readingMode === 'practice') audioRef.current?.pause(); }, [readingMode]);
 
   const currentSentenceEn =
     articleData && articleData.paragraphs.length > 0 && articleData.paragraphs[0].enText
@@ -211,7 +215,7 @@ export default function ReaderPage() {
   const currentVoice: GeminiVoice =
     GEMINI_VOICES.find((v) => v.id === selectedVoiceId) || GEMINI_VOICES[0];
   const currentAudioUrl =
-    loadedKey !== requestedKey || articleError ? '' : articleData ? (articleData.shadowingAudioUrl || '') :
+    loadedKey !== requestedKey || articleError ? '' : articleData && articleData.id !== 'tet-holiday' ? (articleData.shadowingAudioUrl || '') :
     (audioScope === "full"
       ? currentVoice.fullAudioUrl
       : currentVoice.sentenceAudioUrl);
@@ -345,11 +349,6 @@ export default function ReaderPage() {
   };
 
   // Dynamic style helpers based on themeMode
-  const canvasBgClass =
-    themeMode === "dark"
-      ? "bg-[#141C1A] text-[#E8DFCB]"
-      : "bg-[#F6EEDC] text-[#3F5550]";
-
   const vocabBtnClass =
     themeMode === "dark"
       ? "ink-underline border-b-2 border-dashed border-antique-gold bg-antique-gold/30 font-semibold text-antique-gold hover:bg-antique-gold/45 px-1 rounded transition-colors cursor-pointer shadow-xs focus-ring-dark"
@@ -357,15 +356,15 @@ export default function ReaderPage() {
 
   const bottomCardBgClass =
     themeMode === "dark"
-      ? "bg-[#1E2925] text-[#FBF7EE] border-[#D9B76A]/30 shadow-xl"
-      : "bg-[#FBF7EE] text-[#3F5550] border-[rgba(30,75,67,0.12)] shadow-xl";
+      ? "bg-[#1E2925] text-warm-ivory border-antique-gold/30 shadow-xl"
+      : "bg-warm-ivory text-ink-soft border-heritage-green/12 shadow-xl";
 
-  if (loadedKey !== requestedKey) return <main className="p-12" role="status">Đang tải bài đọc…</main>;
-  if (articleError) return <main className="p-12" role="alert"><h1>Chưa tải được bài đọc này</h1><p>Kiểm tra kết nối hoặc chọn lại bài.</p><button onClick={() => setReloadAttempt(value => value + 1)}>Thử lại</button> <Link to={PATHS.discovery}>Chọn bài đọc</Link></main>;
+  if (loadedKey !== requestedKey) return <main className="p-12" role="status">Loading article…</main>;
+  if (articleError) return <main className="p-12" role="alert"><h1>Could not load this article</h1><p>Check your connection or choose another article.</p><button onClick={() => setReloadAttempt(value => value + 1)}>Try again</button> <Link to={PATHS.discovery}>Browse articles</Link></main>;
 
   return (
     <SavedVocabularyContext.Provider value={savedVocabulary}>
-    <main className="reader-component-theme min-h-screen bg-[#FBF7EE] text-[#3F5550] relative selection:bg-[#BFE3EA] selection:text-[#1E4B43]">
+    <main className="reader-component-theme reader-desk min-h-screen relative selection:bg-sky-mist selection:text-heritage-green" data-desk-theme={themeMode}>
       {/* Top Reader Toolbar Control Bar (sticky at top 0) */}
       <ReaderToolbar
         fontSize={fontSize}
@@ -398,15 +397,20 @@ export default function ReaderPage() {
       />
 
       {levelError && <p role="alert" className="px-8 py-3">{levelError}</p>}
-      {!savedVocabulary.canSave && <p role="alert" className="px-8 py-3">Chưa lưu được từ vựng. Kiểm tra dung lượng hoặc quyền lưu trữ trình duyệt.</p>}
+      {!savedVocabulary.canSave && <p role="alert" className="px-8 py-3">Could not save vocabulary. Check your browser storage space and permissions.</p>}
       {/* Main Canvas Container */}
       <section
-        className={`py-8 px-4 sm:px-8 transition-colors duration-300 ${canvasBgClass}`}
+        className="reader-desk-canvas"
       >
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Audio Shadowing Engine Section with Real Google Gemini Audio */}
-          {articleData && !articleData.shadowingAudioUrl ? <p role="status">Bài này chưa có bản thu âm. Bạn có thể tiếp tục đọc và ôn từ.</p> : <AudioShadowingBar
+        <div className="reader-desk-content">
+          <aside className="reader-margin-note reader-margin-note-left" aria-hidden="true">Rooted<br />in<br />heritage</aside>
+          <aside className="reader-margin-note reader-margin-note-right" aria-hidden="true">Vietnamese<br />culture<br />a brighter<br />tomorrow</aside>
+          {/* Optional article listening controls in Reading. */}
+          {readingMode === 'bilingual' && <details id="reader-audio" className="reader-audio-disclosure">
+          <summary>Listen & practice pronunciation</summary>
+          {articleData && articleData.id !== 'tet-holiday' && !articleData.shadowingAudioUrl ? <p role="status">Audio is not available for this article yet. You can continue reading and reviewing vocabulary.</p> : <AudioShadowingBar
             articleTitle={articleData?.titleEn}
+            onStartShadowing={() => handleStartPractice('shadowing')}
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             playbackSpeed={playbackSpeed}
@@ -428,8 +432,9 @@ export default function ReaderPage() {
             audioScope={audioScope}
             onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
           />}
+          </details>}
 
-          {/* Main Reading Views: Bilingual View vs Extensive Reading View */}
+          {/* Reading and Practice retain the same article and level. */}
           {readingMode === "bilingual" ? (
             <BilingualReaderView
               themeMode={themeMode}
@@ -446,25 +451,27 @@ export default function ReaderPage() {
               selectedLevel={selectedLevel}
               onChangeLevel={handleLevelChange}
               articleData={articleData}
+              onStartPractice={handleStartPractice}
             />
           ) : (
-            <ExtensiveReaderView
+            articleData && <ReaderPracticeView
+              key={requestedKey}
               themeMode={themeMode}
               fontSize={fontSize}
               vocabBtnClass={vocabBtnClass}
-              bottomCardBgClass={bottomCardBgClass}
-              openVocab={openVocab}
-              selectedLevel={selectedLevel}
-              onChangeLevel={handleLevelChange}
               articleData={articleData}
+              mode={practiceMode}
+              onChangeMode={handlePracticeModeChange}
+              onBackToReading={() => handleModeChange('bilingual')}
+              fullAudioUrl={articleData.id === 'tet-holiday' ? currentVoice.fullAudioUrl : articleData.shadowingAudioUrl}
             />
           )}
 
           {/* Recommended Articles Section */}
-          <ReaderRecommendedSection
+          {readingMode === 'bilingual' && <ReaderRecommendedSection
             articles={RECOMMENDED_ARTICLES}
             themeMode={themeMode}
-          />
+          />}
         </div>
       </section>
 
@@ -480,8 +487,6 @@ export default function ReaderPage() {
         vocabList={articleData ? articleData.vocabularies : Object.values(VOCAB_DATABASE)}
         bookmarkedWords={bookmarkedWords}
         onToggleBookmarkWord={toggleBookmarkWord}
-        deckId={articleData?.id || searchParams.get("story") || searchParams.get("article") || 'tet-holiday'}
-        selectedLevel={selectedLevel}
         articleTitle={articleData?.titleEn}
       />
 

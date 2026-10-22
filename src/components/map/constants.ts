@@ -46,33 +46,33 @@ export interface RegionPalette {
 
 export const REGION_PALETTES: Record<RegionKey | 'default', RegionPalette> = {
   all: {
-    fill: '#1E4B43', // heritage-green
-    hover: '#D9B76A', // antique-gold
-    selected: '#F5D280', // antique-rich
-    stroke: '#D9B76A', // antique-gold
+    fill: 'var(--color-heritage-green)', // heritage-green
+    hover: 'var(--color-antique-gold)', // antique-gold
+    selected: 'var(--color-antique-rich)', // antique-rich
+    stroke: 'var(--color-antique-gold)', // antique-gold
   },
   north: {
     fill: '#7A2E33', // Deep Heritage Terracotta / Lotus-tint
     hover: '#9C3D44',
-    selected: '#F5D280', // antique-rich
-    stroke: '#E8B7B2', // lotus-pink
+    selected: 'var(--color-antique-rich)', // antique-rich
+    stroke: 'var(--color-lotus-pink)', // lotus-pink
   },
   central: {
     fill: '#8F681B', // Deep Antique Gold / Ochre
     hover: '#B88726',
-    selected: '#F5D280', // antique-rich
-    stroke: '#FCE5B5', // antique-bright
+    selected: 'var(--color-antique-rich)', // antique-rich
+    stroke: 'var(--color-antique-bright)', // antique-bright
   },
   south: {
     fill: '#184D43', // Deep Heritage Forest Teal
     hover: '#276F61',
-    selected: '#F5D280', // antique-rich
-    stroke: '#BFE3EA', // sky-mist
+    selected: 'var(--color-antique-rich)', // antique-rich
+    stroke: 'var(--color-sky-mist)', // sky-mist
   },
   default: {
-    fill: '#1E4B43',
-    hover: '#D9B76A',
-    selected: '#F5D280',
-    stroke: '#D9B76A',
+    fill: 'var(--color-heritage-green)',
+    hover: 'var(--color-antique-gold)',
+    selected: 'var(--color-antique-rich)',
+    stroke: 'var(--color-antique-gold)',
   },
 };

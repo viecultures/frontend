@@ -53,8 +53,8 @@ export function ProfileDropdown({ isOpen, onClose, user, onLogout, onNavigate }:
     <div ref={menu} role="menu" aria-label="Account" className="absolute right-0 top-full z-50 mt-3 w-64 max-w-[calc(100vw-2.5rem)] rounded-2xl border border-line bg-surface-raised p-3 text-ink shadow-xl">
       <div className="mb-2 border-b border-line px-3 pb-3"><p className="break-words text-base font-semibold">{user?.name || 'Your account'}</p>{user?.email && <p className="mt-1 break-words text-sm text-ink-soft">{user.email}</p>}</div>
       <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.home)}><User size={18} />Study room</button>
-      <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.profile)}><User size={18} />Hồ sơ cá nhân</button>
-      <button type="button" role="menuitem" className={itemClass} onClick={() => go(paths.profile({ tab: 'passport' }))}><Award size={18} />Hộ chiếu Di sản</button>
+      <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.profile)}><User size={18} />Your profile</button>
+      <button type="button" role="menuitem" className={itemClass} onClick={() => go(paths.profile({ tab: 'passport' }))}><Award size={18} />Heritage passport</button>
       <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.discovery)}><BookOpen size={18} />Discover stories</button>
       <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.playground)}><Sparkles size={18} />Practice</button>
       {isAdminUser() && <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.admin)}><ShieldCheck size={18} />Admin CMS</button>}

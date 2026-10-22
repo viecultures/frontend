@@ -1,9 +1,10 @@
 import type { ReadingPostItem } from '@/features/admin/types/adminTypes';
-import { VOCAB_DATABASE, type VocabItem } from '@/data/readerData';
+import type { VocabItem } from '@/data/readerData';
 import { LESSONS_DATA, type Lesson, type LevelDetail } from '@/data/discoveryData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { resolveDeckCards } from '@/data/flashcardsData';
 import { API_BASE_URL } from '@/config/apiConfig';
+import { getDefaultReaderArticle } from '../data/defaultReaderArticle';
 
 export function readerLevelFor(level: string): 'Level 1' | 'Level 2' | 'Level 3' {
   if (level === 'A1' || level === 'A2' || level === 'Level 1') return 'Level 1';
@@ -78,6 +79,7 @@ export interface ReaderArticleData {
   imageUrl?: string;
   summary?: string;
   shadowingAudioUrl?: string;
+  summaryVi?: string;
   paragraphs: Array<{
     id?: string;
     orderIndex: number;
@@ -333,11 +335,7 @@ export const readerApiService = {
     const normalize = (s: string) => s.toLowerCase().trim().replace(/[-_\s]+/g, '');
     const normTarget = normalize(id);
     if (normTarget === 'tetholiday') {
-      const vocabularies = Object.values(VOCAB_DATABASE);
-      return { id: 'tet-holiday', titleEn: 'Tết: Renewal, Remembrance and Regional Flavours',
-        titleVi: 'Tết: Đổi mới, tưởng nhớ và hương vị vùng miền', topic: 'Phong tục & Lễ hội',
-        level: requestedLevel, paragraphs: [], vocabularies,
-        vocabMap: Object.fromEntries(vocabularies.map(word => [word.word.toLowerCase(), word])) };
+      return getDefaultReaderArticle(requestedLevel);
     }
 
     // 1. Check in LESSONS_DATA

@@ -14,19 +14,19 @@ interface LoginPageProps {
   onLoginSuccess?: (userData: AppUser) => void;
 }
 
-// ─── Shared input class — dark glass style ─────────────────────────────────────
+// ─── Shared input class — design system surfaces ─────────────────────────────────────
 const INPUT_CLASS =
-  'w-full bg-black/40 border border-white/20 rounded-xl px-3.5 py-2 text-sm text-white ' +
-  'placeholder-white/40 transition-all ' +
-  'focus:outline-none focus:border-antique-bright focus:ring-1 focus:ring-antique-bright';
+  'w-full bg-surface-raised border border-line rounded-xl px-3.5 py-2 text-sm text-ink ' +
+  'placeholder-ink-faint transition-all ' +
+  'focus:outline-none focus:border-focus focus:ring-1 focus:ring-focus';
 
 const INPUT_WITH_ICON =
-  'w-full bg-black/40 border border-white/20 rounded-xl pl-9 pr-3.5 py-2 text-sm text-white ' +
-  'placeholder-white/40 transition-all ' +
-  'focus:outline-none focus:border-antique-bright focus:ring-1 focus:ring-antique-bright';
+  'w-full bg-surface-raised border border-line rounded-xl pl-9 pr-3.5 py-2 text-sm text-ink ' +
+  'placeholder-ink-faint transition-all ' +
+  'focus:outline-none focus:border-focus focus:ring-1 focus:ring-focus';
 
 const LABEL_CLASS =
-  'block text-[11px] font-semibold text-white/80 uppercase tracking-wider mb-1';
+  'block text-[11px] font-semibold text-ink-soft uppercase tracking-wider mb-1';
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
@@ -104,8 +104,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    // Root: heritage-forest deep dark — cinematic dark mode
-    <div className="h-screen w-full bg-heritage-forest text-white flex flex-col justify-center items-center relative overflow-hidden">
+    // Ivory canvas and sky-blue feature panel from the shared design system.
+    <div className="h-screen w-full bg-surface text-ink flex flex-col justify-center items-center relative overflow-hidden">
 
       {/* Ambient lighting — glass-card radial blurs */}
       <div
@@ -118,24 +118,24 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       />
 
       {/* ── Main Grid (Full Viewport) ──────────────────────────────────── */}
-      <div className="w-full h-full grid grid-cols-1 lg:grid-cols-12 relative z-10 bg-heritage-forest">
+      <div className="w-full h-full grid grid-cols-1 lg:grid-cols-12 relative z-10 bg-surface">
 
         {/* ── Left Column: Form ──────────────────────────────────────────── */}
-        <div className="lg:col-span-7 p-6 sm:p-8 lg:px-12 lg:py-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/10 overflow-y-auto">
+        <div className="lg:col-span-7 p-6 sm:p-8 lg:px-12 lg:py-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-line overflow-y-auto">
           <div className="max-w-md w-full mx-auto my-auto space-y-4">
             {/* Unified Brand Logo */}
             <div className="mb-2">
               <BrandLogo
                 size="md"
-                theme="dark"
+                theme="light"
                 onClick={() => handleNavigate(PATHS.landing)}
-                className="focus-ring-dark rounded-xl"
+                className="focus-ring rounded-xl"
               />
             </div>
 
             {/* Tab Switcher */}
             <div
-              className="flex bg-black/40 p-1 rounded-xl border border-white/10"
+              className="flex bg-surface-muted p-1 rounded-xl border border-line"
               role="tablist"
               aria-label="Chọn hình thức đăng nhập"
             >
@@ -145,10 +145,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 aria-selected={authTab === 'login'}
                 disabled={isLoading}
                 onClick={() => setAuthTab('login')}
-                className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all focus-ring-dark ${
+                className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all focus-ring ${
                   authTab === 'login'
-                    ? 'bg-antique-bright text-heritage-forest shadow-md'
-                    : 'text-white/70 hover:text-white hover:bg-white/5'
+                    ? 'bg-action text-on-action shadow-sm'
+                    : 'text-ink-soft hover:text-ink hover:bg-surface-hover'
                 }`}
               >
                 Đăng Nhập / Sign In
@@ -159,10 +159,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 aria-selected={authTab === 'register'}
                 disabled={isLoading}
                 onClick={() => setAuthTab('register')}
-                className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all focus-ring-dark ${
+                className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all focus-ring ${
                   authTab === 'register'
-                    ? 'bg-antique-bright text-heritage-forest shadow-md'
-                    : 'text-white/70 hover:text-white hover:bg-white/5'
+                    ? 'bg-action text-on-action shadow-sm'
+                    : 'text-ink-soft hover:text-ink hover:bg-surface-hover'
                 }`}
               >
                 Đăng Ký / Sign Up
@@ -171,10 +171,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
             {/* Header */}
             <div>
-              <h1 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-1">
+              <h1 className="font-heading text-2xl sm:text-3xl font-bold text-ink mb-1">
                 {authTab === 'login' ? 'Welcome Back' : isLocalAuthMode ? 'Tạo Hồ Sơ Dùng Thử' : 'Tạo Tài Khoản Mới'}
               </h1>
-              <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-normal">
+              <p className="text-xs sm:text-sm text-ink-soft leading-relaxed font-normal">
                 {authTab === 'login'
                   ? 'Nhập tài khoản của bạn để tiếp tục hành trình học tiếng Anh di sản văn hóa.'
                   : 'Bắt đầu học tiếng Anh qua câu chuyện nghệ thuật & di sản hoàn toàn miễn phí.'}
@@ -206,7 +206,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   Email / Tên Đăng Nhập
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/40" aria-hidden="true">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-ink-faint" aria-hidden="true">
                     <Mail className="w-4 h-4" />
                   </div>
                   <input
@@ -227,7 +227,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   Mật Khẩu / Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/40" aria-hidden="true">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-ink-faint" aria-hidden="true">
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
@@ -246,12 +246,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
               {/* Options row */}
               <div className="flex items-center justify-between pt-0.5">
-                <label className="flex items-center gap-2 cursor-pointer text-xs text-white/80">
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-ink-soft">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-white/30 bg-black/40 text-heritage-green focus:ring-heritage-green w-3.5 h-3.5 cursor-pointer"
+                    className="rounded border-line bg-surface-muted text-heritage-green focus:ring-heritage-green w-3.5 h-3.5 cursor-pointer"
                   />
                   <span>Ghi nhớ đăng nhập</span>
                 </label>
@@ -259,7 +259,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   <button
                     type="button"
                     onClick={() => setIsForgotPasswordOpen(true)}
-                    className="text-xs text-antique-bright hover:underline font-medium focus-ring-dark rounded"
+                    className="text-xs text-accent-ink hover:underline font-medium focus-ring rounded"
                   >
                     Quên mật khẩu?
                   </button>
@@ -270,7 +270,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-antique-bright to-antique-gold text-heritage-forest font-bold rounded-xl text-sm shadow-lg hover:brightness-105 active:scale-[0.99] transition-all mt-1 focus-ring-dark"
+                className="w-full py-2.5 px-4 bg-action text-on-action hover:bg-action-hover font-bold rounded-xl text-sm shadow-lg hover:brightness-105 active:scale-[0.99] transition-all mt-1 focus-ring"
               >
                 {isLoading ? 'Đang đăng nhập...' : authTab === 'login' ? 'Đăng Nhập Ngay' : isLocalAuthMode ? 'Tạo Hồ Sơ Dùng Thử' : 'Đăng Ký Tài Khoản'}
               </button>
@@ -279,9 +279,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             {/* Social divider */}
             <div className="relative my-3 text-center" aria-hidden="true">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/15" />
+                <div className="w-full border-t border-line" />
               </div>
-              <span className="relative px-3 bg-heritage-forest text-[11px] text-white/50 uppercase tracking-wider">
+              <span className="relative px-3 bg-surface text-[11px] text-ink-faint uppercase tracking-wider">
                 Hoặc tiếp tục với
               </span>
             </div>
@@ -294,8 +294,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               >
                 <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-semibold text-red-300">Đăng nhập không thành công</p>
-                  <p className="text-white/80 text-[11px] mt-0.5 leading-relaxed">{errorMessage}</p>
+                  <p className="font-semibold text-danger">Đăng nhập không thành công</p>
+                  <p className="text-ink-soft text-[11px] mt-0.5 leading-relaxed">{errorMessage}</p>
                 </div>
               </div>
             )}
@@ -307,7 +307,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   type="button"
                   disabled={isLoading}
                   onClick={handleDemoLogin}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white text-[#1f1f1f] border border-white/20 rounded-xl text-xs font-semibold hover:bg-white/90 transition-all focus-ring-dark disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white text-[#1f1f1f] border border-line rounded-xl text-xs font-semibold hover:bg-white/90 transition-all focus-ring disabled:opacity-50"
                 >
                   <svg aria-hidden="true" className="w-4 h-4" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.39-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.89-1.74 2.98-4.3 2.98-7.36Z" />
@@ -321,7 +321,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   type="button"
                   disabled={isLoading}
                   onClick={handleDemoLogin}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-[#1877F2] text-white border border-white/15 rounded-xl text-xs font-semibold hover:brightness-110 transition-all focus-ring-dark disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-[#1877F2] text-white border border-line rounded-xl text-xs font-semibold hover:brightness-110 transition-all focus-ring disabled:opacity-50"
                 >
                   <svg aria-hidden="true" className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -333,8 +333,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               {/* Google Sign-In with Official GIS Button */}
               <div className="relative w-full flex justify-center [&>div]:w-full [&>div>iframe]:!w-full [&>div]:flex [&>div]:justify-center">
                 {isLoading ? (
-                  <div className="w-full py-2.5 px-3 bg-black/40 border border-antique-bright/30 rounded-xl text-xs font-semibold text-antique-bright flex items-center justify-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-antique-bright" />
+                  <div className="w-full py-2.5 px-3 bg-surface-muted border border-antique-bright/30 rounded-xl text-xs font-semibold text-accent-ink flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-accent-ink" />
                     <span>Đang xác thực...</span>
                   </div>
                 ) : import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
@@ -349,14 +349,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     onError={() => {
                       setErrorMessage('Đăng nhập bằng Google không thành công hoặc cửa sổ đăng nhập đã bị đóng.');
                     }}
-                    theme="filled_black"
+                    theme="outline"
                     shape="rectangular"
                     size="large"
                     text="continue_with"
                     width="100%"
                   />
                 ) : (
-                  <p className="text-xs text-white/70">Đăng nhập Google chưa được cấu hình.</p>
+                  <p className="text-xs text-ink-soft">Đăng nhập Google chưa được cấu hình.</p>
                 )}
               </div>
 
@@ -365,7 +365,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 type="button"
                 disabled
                 title="Đăng nhập Facebook chưa được hỗ trợ."
-                className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-black/30 border border-white/15 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-all focus-ring-dark cursor-pointer disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-surface-muted border border-line rounded-xl text-xs font-semibold text-ink hover:bg-surface-hover transition-all focus-ring cursor-pointer disabled:opacity-50"
               >
                 <svg className="w-4 h-4 fill-sky-mist" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -376,10 +376,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           </div>
 
           {/* Back link */}
-          <div className="pt-2 text-xs text-white/50 flex items-center justify-between">
+          <div className="pt-2 text-xs text-ink-faint flex items-center justify-between">
             <button
               onClick={() => handleNavigate(PATHS.landing)}
-              className="text-antique-bright hover:underline font-semibold flex items-center gap-1 focus-ring-dark rounded"
+              className="text-accent-ink hover:underline font-semibold flex items-center gap-1 focus-ring rounded"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Quay lại Landing Page</span>
@@ -388,7 +388,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         </div>
 
         {/* ── Right Column: Value Proposition Panel ──────────────────────── */}
-        <div className="lg:col-span-5 bg-[#0A1612] p-6 sm:p-8 lg:px-12 lg:py-6 flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:col-span-5 bg-surface-feature p-6 sm:p-8 lg:px-12 lg:py-6 flex flex-col justify-between relative overflow-hidden">
           <div
             className="absolute top-0 right-0 w-64 h-64 bg-heritage-green/10 rounded-full blur-3xl pointer-events-none"
             aria-hidden="true"
@@ -396,16 +396,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
           <div className="max-w-md w-full mx-auto my-auto space-y-4 relative z-10">
             <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-heritage-green/20 text-sky-mist border border-heritage-green/30 mb-3">
-                <Sparkles className="w-3 h-3 text-antique-bright" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-heritage-green/20 text-action border border-heritage-green/30 mb-3">
+                <Sparkles className="w-3 h-3 text-accent-ink" />
                 EDTECH VĂN HÓA DI SẢN
               </span>
-              <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white leading-tight">
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold text-ink leading-tight">
                 Nâng Tầm Tiếng Anh Qua Di Sản Việt Nam
               </h2>
             </div>
 
-            <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-ink-soft leading-relaxed font-normal">
               Tạo tài khoản để theo dõi tiến độ học từ vựng 3D Flashcards, mở khóa bài đọc song ngữ AI và tham gia thử thách cảm nghĩ cộng đồng.
             </p>
 
@@ -415,21 +415,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 'Tra từ song ngữ thông minh & AI Shadowing',
                 'Nhận huy hiệu Sứ Giả Văn Hóa & Thưởng Xu',
               ].map((feature) => (
-                <li key={feature} className="flex items-start gap-2.5 text-xs sm:text-sm text-white/90">
-                  <CheckCircle2 className="w-4 h-4 text-sky-mist shrink-0 mt-0.5" aria-hidden="true" />
+                <li key={feature} className="flex items-start gap-2.5 text-xs sm:text-sm text-ink">
+                  <CheckCircle2 className="w-4 h-4 text-action shrink-0 mt-0.5" aria-hidden="true" />
                   <span>{feature}</span>
                 </li>
               ))}
             </ul>
 
-            <div className="pt-4 border-t border-white/10 relative z-10">
+            <div className="pt-4 border-t border-line relative z-10">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-antique-bright/20 border border-antique-bright/40 flex items-center justify-center text-base text-antique-bright" aria-hidden="true">
-                  <Crown className="w-5 h-5 text-antique-bright" />
+                <div className="w-9 h-9 rounded-full bg-antique-bright/20 border border-antique-bright/40 flex items-center justify-center text-base text-accent-ink" aria-hidden="true">
+                  <Crown className="w-5 h-5 text-accent-ink" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white">VieCultures Ambassador Program</p>
-                  <p className="text-[11px] text-white/60">Hơn 12,500+ học viên đang tham gia</p>
+                  <p className="text-xs font-bold text-ink">VieCultures Ambassador Program</p>
+                  <p className="text-[11px] text-ink/60">Hơn 12,500+ học viên đang tham gia</p>
                 </div>
               </div>
             </div>

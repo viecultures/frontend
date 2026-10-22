@@ -28,7 +28,7 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
   const navigate = useNavigate();
 
   const getIcon = (iconName: string, active: boolean) => {
-    const props = { className: `w-4 h-4 ${active ? 'text-[#D4AF37]' : 'text-[#5D706A] group-hover:text-white'}` };
+    const props = { className: `w-4 h-4 ${active ? 'text-antique-gold' : 'text-[#5D706A] group-hover:text-white'}` };
     switch (iconName) {
       case 'Headphones': return <Headphones {...props} />;
       case 'Mic': return <Mic {...props} />;
@@ -59,7 +59,7 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
       {/* Home / Exit Button */}
       <button
         onClick={() => navigate(PATHS.home)}
-        className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-[#D4AF37]/30 text-[#D4AF37] hover:text-white hover:bg-[#1E4B43] flex items-center justify-center transition-all cursor-pointer shadow-lg mb-1"
+        className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-antique-gold/30 text-antique-gold hover:text-white hover:bg-heritage-green flex items-center justify-center transition-all cursor-pointer shadow-lg mb-1"
         title="Về Phòng Học"
         aria-label="Về Phòng Học"
       >
@@ -70,14 +70,14 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
       <button
         onClick={handlePrev}
         disabled={currentScreenIndex === 0}
-        className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-[#D4AF37]/30 text-white/70 hover:text-white hover:bg-[#1E4B43] disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all cursor-pointer shadow-lg"
+        className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-antique-gold/30 text-white/70 hover:text-white hover:bg-heritage-green disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all cursor-pointer shadow-lg"
         title="Màn hình trước (Phím ↑)"
       >
         <ChevronUp className="w-4 h-4" />
       </button>
 
       {/* Screen Dots & Tooltip List */}
-      <div className="bg-[#1E2925]/90 backdrop-blur-md p-2 rounded-2xl border border-[#D4AF37]/30 shadow-2xl flex flex-col gap-2">
+      <div className="bg-[#1E2925]/90 backdrop-blur-md p-2 rounded-2xl border border-antique-gold/30 shadow-2xl flex flex-col gap-2">
         {PLAYGROUND_SCREENS.map((screen, idx) => {
           const isActive = currentScreenIndex === idx;
           return (
@@ -86,7 +86,7 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
                 onClick={() => onSelectScreen(idx)}
                 className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#1E4B43] border border-[#D4AF37] scale-110 shadow-md'
+                    ? 'bg-heritage-green border border-antique-gold scale-110 shadow-md'
                     : 'hover:bg-white/10'
                 }`}
               >
@@ -94,14 +94,14 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
               </button>
 
               {/* Tooltip Card on Hover */}
-              <div className="absolute right-12 top-1/2 -translate-y-1/2 hidden group-hover:flex flex-col w-56 p-3 bg-[#1E2925] border border-[#D4AF37]/40 rounded-xl shadow-2xl pointer-events-none z-50 text-left transition-all animate-in fade-in slide-in-from-right-2">
-                <div className="flex items-center justify-between text-[10px] text-[#D4AF37] font-mono mb-1">
+              <div className="absolute right-12 top-1/2 -translate-y-1/2 hidden group-hover:flex flex-col w-56 p-3 bg-[#1E2925] border border-antique-gold/40 rounded-xl shadow-2xl pointer-events-none z-50 text-left transition-all animate-in fade-in slide-in-from-right-2">
+                <div className="flex items-center justify-between text-[10px] text-antique-gold font-mono mb-1">
                   <span>MÀN HÌNH #{screen.number}</span>
                   <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">
                     {screen.status}
                   </span>
                 </div>
-                <div className="font-serif font-bold text-xs text-[#FBF7EE]">
+                <div className="font-serif font-bold text-xs text-warm-ivory">
                   {screen.title}
                 </div>
                 <p className="text-[11px] text-[#9FB1AA] mt-1 leading-snug">
@@ -117,14 +117,14 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
       <button
         onClick={handleNext}
         disabled={currentScreenIndex === PLAYGROUND_SCREENS.length - 1}
-        className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-[#D4AF37]/30 text-white/70 hover:text-white hover:bg-[#1E4B43] disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all cursor-pointer shadow-lg"
+        className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-antique-gold/30 text-white/70 hover:text-white hover:bg-heritage-green disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all cursor-pointer shadow-lg"
         title="Màn hình tiếp theo (Phím ↓)"
       >
         <ChevronDown className="w-4 h-4" />
       </button>
 
       {/* Keyboard Shortcut Indicator */}
-      <div className="text-[9px] font-mono text-[#D4AF37] bg-black/50 px-2 py-0.5 rounded-full border border-white/10 opacity-70">
+      <div className="text-[9px] font-mono text-antique-gold bg-black/50 px-2 py-0.5 rounded-full border border-white/10 opacity-70">
         Phím 1 - 5
       </div>
     </div>

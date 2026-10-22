@@ -125,11 +125,11 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-[#1E4B43] text-gray-200 hover:text-[#D4AF37] border border-white/10 text-xs font-medium transition-all cursor-pointer shadow-sm disabled:opacity-50"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-heritage-green text-gray-200 hover:text-antique-gold border border-white/10 text-xs font-medium transition-all cursor-pointer shadow-sm disabled:opacity-50"
         title="Gợi ý chủ đề khám phá văn hóa"
         aria-expanded={isOpen}
       >
-        <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+        <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
         <span>Gợi ý chủ đề</span>
         <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
@@ -144,11 +144,11 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
           />
 
           {/* Modal Content */}
-          <div className="absolute left-0 top-full mt-2 w-80 sm:w-96 rounded-2xl bg-[#0c1815]/95 border border-[#D4AF37]/30 shadow-2xl z-50 p-4 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200">
+          <div className="absolute left-0 top-full mt-2 w-80 sm:w-96 rounded-2xl bg-[#0c1815]/95 border border-antique-gold/30 shadow-2xl z-50 p-4 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200">
             {/* Header */}
             <div className="flex items-center justify-between pb-2.5 border-b border-white/10 mb-3">
               <div className="flex items-center gap-2">
-                <Compass className="w-4 h-4 text-[#D4AF37]" />
+                <Compass className="w-4 h-4 text-antique-gold" />
                 <h3 className="text-xs font-serif font-bold text-white">
                   Chủ Đề Khám Phá Văn Hóa
                 </h3>
@@ -164,7 +164,7 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
 
             {/* Context Notice if Province Selected */}
             {selectedProvinceName && (
-              <div className="mb-2.5 px-2.5 py-1.5 rounded-lg bg-[#1E4B43]/40 border border-[#D4AF37]/30 text-[11px] text-[#FCE5B5] flex items-center justify-between">
+              <div className="mb-2.5 px-2.5 py-1.5 rounded-lg bg-heritage-green/40 border border-antique-gold/30 text-[11px] text-antique-bright flex items-center justify-between">
                 <span>Đang khám phá: <strong>{selectedProvinceName}</strong></span>
               </div>
             )}
@@ -184,7 +184,7 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
                   onClick={() => setActiveCategory(cat.id)}
                   className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-colors cursor-pointer shrink-0 ${
                     activeCategory === cat.id
-                      ? 'bg-[#D4AF37] text-[#0A1612] font-semibold'
+                      ? 'bg-antique-gold text-[#0A1612] font-semibold'
                       : 'bg-white/5 text-gray-300 hover:bg-white/10'
                   }`}
                 >
@@ -203,13 +203,13 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
                     onSelectTopic(topic);
                     setIsOpen(false);
                   }}
-                  className="w-full text-left p-2.5 rounded-xl bg-white/5 hover:bg-[#1E4B43]/50 border border-white/5 hover:border-[#D4AF37]/40 transition-all cursor-pointer group"
+                  className="w-full text-left p-2.5 rounded-xl bg-white/5 hover:bg-heritage-green/50 border border-white/5 hover:border-antique-gold/40 transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="p-1 rounded-md bg-[#D4AF37]/20 text-[#D4AF37]">
+                    <span className="p-1 rounded-md bg-antique-gold/20 text-antique-gold">
                       {getCategoryIcon(topic.category)}
                     </span>
-                    <span className="text-xs font-semibold text-white group-hover:text-[#FCE5B5] transition-colors">
+                    <span className="text-xs font-semibold text-white group-hover:text-antique-bright transition-colors">
                       {topic.title}
                     </span>
                   </div>

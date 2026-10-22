@@ -4,53 +4,52 @@
  */
 
 .map-ai-app {
-  --text: white;
-  --gray-200: #b4b8bb;
-  --gray-300: #80868b;
-  --gray-400: #9aa0a6;
-  --gray-500: #5f6368;
-  --gray-600: #80868b;
-  --gray-700: #5f6368;
-  --gray-800: #3c4043;
-  --gray-850: #2a2d30;
-  --gray-900: #202124;
-  --gray-1000: #0a0a0a;
-  --border-stroke: #444444;
-  --accent-blue: rgb(161, 228, 242);
-  --accent-blue-active-bg: #001233;
-  --accent-blue-active: #98beff;
-  --accent-blue-headers: #448dff;
-  --accent-green: rgb(168, 218, 181);
-  --midnight-blue: rgb(0, 18, 51);
-  --blue-30: #99beff;
-  --accent-red: #ff4600;
+  /* Legacy map controls inherit the app design system in both themes. */
+  --text: var(--color-ink);
+  --gray-200: var(--color-ink);
+  --gray-300: var(--color-ink-soft);
+  --gray-400: var(--color-ink-faint);
+  --gray-500: var(--color-ink-faint);
+  --gray-600: var(--color-line);
+  --gray-700: var(--color-surface-muted);
+  --gray-800: var(--color-line);
+  --gray-850: var(--color-surface-muted);
+  --gray-900: var(--color-surface);
+  --gray-1000: var(--color-surface-raised);
+  --border-stroke: var(--color-line);
+  --accent-blue: var(--color-surface-feature);
+  --accent-blue-active-bg: var(--color-surface-feature);
+  --accent-blue-active: var(--color-on-feature);
+  --accent-blue-headers: var(--color-on-feature);
+  --accent-green: var(--color-success);
+  --midnight-blue: var(--color-surface-feature);
+  --blue-30: var(--color-surface-feature-strong);
+  --accent-red: var(--color-danger);
+  --Neutral-00: var(--color-surface-raised);
+  --Neutral-2: var(--color-surface);
+  --Neutral-5: var(--color-surface);
+  --Neutral-10: var(--color-surface);
+  --Neutral-15: var(--color-surface-muted);
+  --Neutral-20: var(--color-line);
+  --Neutral-30: var(--color-line);
+  --Neutral-50: var(--color-ink-faint);
+  --Neutral-60: var(--color-ink-faint);
+  --Neutral-80: var(--color-ink-soft);
+  --Neutral-90: var(--color-ink);
+  --Green-400: var(--color-success);
+  --Green-500: var(--color-success);
+  --Green-700: var(--color-success);
+  --Green-800: var(--color-success-soft);
+  --Blue-400: var(--color-info);
+  --Blue-500: var(--color-info);
+  --Blue-800: var(--color-info-soft);
+  --Red-400: var(--color-danger);
+  --Red-500: var(--color-danger);
+  --Red-600: var(--color-danger);
+  --Red-700: var(--color-danger);
+  --Red-800: var(--color-danger-soft);
   --background: var(--gray-900);
   --color: var(--text);
-
-  /* Semantic Neutral Colors */
-  --Neutral-00: #000;
-  --Neutral-2: #0f1112;
-  --Neutral-5: #181a1b;
-  --Neutral-10: #1c1f21;
-  --Neutral-15: #232729;
-  --Neutral-20: #2a2f31;
-  --Neutral-30: #404547;
-  --Neutral-50: #707577;
-  --Neutral-60: #888d8f;
-  --Neutral-80: #c3c6c7;
-  --Neutral-90: #e1e2e3;
-  --Green-400: #57e092;
-  --Green-500: #0d9c53;
-  --Green-700: #025022;
-  --Green-800: #0a3d20;
-  --Blue-400: #80c1ff;
-  --Blue-500: #1f94ff;
-  --Blue-800: #0f3557;
-  --Red-400: #ff9c7a;
-  --Red-500: #ff4600;
-  --Red-600: #e03c00;
-  --Red-700: #bd3000;
-  --Red-800: #5c1300;
 
   width: 100%;
   height: 100%;
@@ -60,32 +59,6 @@
   color: var(--Neutral-90);
 }
 
-.map-ai-app.light-theme {
-  --text: #202124;
-  --gray-200: #3c4043;
-  --gray-300: #5f6368;
-  --gray-400: #70757a;
-  --gray-500: #70757a;
-  --gray-600: #dadce0;
-  --gray-700: #e8eaed;
-  --gray-800: #dadce0;
-  --gray-850: #e8eaed;
-  --gray-900: #f8f9fa;
-  --gray-1000: #ffffff;
-  --border-stroke: #dadce0;
-  
-  --Neutral-00: #ffffff;
-  --Neutral-2: #f8f9fa;
-  --Neutral-5: #f8f9fa;
-  --Neutral-10: #f1f3f4;
-  --Neutral-15: #e8eaed;
-  --Neutral-20: #dadce0;
-  --Neutral-30: #bdc1c6;
-  --Neutral-50: #9aa0a6;
-  --Neutral-60: #7f868c;
-  --Neutral-80: #3c4043;
-  --Neutral-90: #202124;
-}
 
 /* Streaming Layout */
 .map-ai-app .streaming-console.chat-panel-closed .console-panel {
@@ -107,7 +80,7 @@
   flex-shrink: 0;
   padding: 10px 16px;
   background: #12231f;
-  border-bottom: 1px solid #d4af3740;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-antique-gold) 25.10%, transparent);
 }
 
 .map-ai-app .chat-tool-panel-header h2 { font-size: 14px; font-weight: 600; }
@@ -116,19 +89,19 @@
 .map-ai-app .chat-article-detail { flex: 1; min-height: 0; overflow-y: auto; background: #0d1d19; }
 .map-ai-app .chat-article-image { width: 100%; height: 180px; object-fit: cover; }
 .map-ai-app .chat-article-body { padding: 24px; max-width: 760px; margin: auto; }
-.map-ai-app .chat-article-meta { font-size: 12px; color: #d4af37; margin-bottom: 12px; }
-.map-ai-app .chat-article-body h2 { font-family: Georgia, serif; font-size: 24px; line-height: 1.35; color: #fce5b5; }
+.map-ai-app .chat-article-meta { font-size: 12px; color: var(--color-antique-gold); margin-bottom: 12px; }
+.map-ai-app .chat-article-body h2 { font-family: Georgia, serif; font-size: 24px; line-height: 1.35; color: var(--color-antique-bright); }
 .map-ai-app .chat-article-subtitle { margin-top: 8px; font-style: italic; color: #a2b5ad; }
 .map-ai-app .chat-article-body section { margin-top: 24px; font-size: 14px; line-height: 1.8; }
-.map-ai-app .chat-article-body h3 { margin-bottom: 10px; font-weight: 600; color: #fce5b5; }
+.map-ai-app .chat-article-body h3 { margin-bottom: 10px; font-weight: 600; color: var(--color-antique-bright); }
 .map-ai-app .chat-article-translation { margin-top: 8px; color: #a2b5ad; }
 .map-ai-app .chat-article-vocab { display: flex; flex-wrap: wrap; gap: 8px; }
-.map-ai-app .chat-article-vocab span { padding: 3px 10px; background: #1e4b43; border-radius: 8px; color: #fce5b5; }
+.map-ai-app .chat-article-vocab span { padding: 3px 10px; background: var(--color-heritage-green); border-radius: 8px; color: var(--color-antique-bright); }
 .map-ai-app .chat-article-body dl > div { margin-top: 12px; }
 .map-ai-app .chat-article-body dd { color: #a2b5ad; }
 .map-ai-app .chat-article-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.map-ai-app .chat-article-actions :is(button, a) { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border: 1px solid #d4af3760; border-radius: 10px; color: #fce5b5; cursor: pointer; font-size: 12px; }
-.map-ai-app .chat-article-actions :is(button, a):hover { background: #1e4b43; }
+.map-ai-app .chat-article-actions :is(button, a) { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border: 1px solid color-mix(in srgb, var(--color-antique-gold) 37.65%, transparent); border-radius: 10px; color: var(--color-antique-bright); cursor: pointer; font-size: 12px; }
+.map-ai-app .chat-article-actions :is(button, a):hover { background: var(--color-heritage-green); }
 
 @media (min-width: 1280px) {
   .map-ai-app .chat-article-body { padding-right: 84px; }
@@ -309,8 +282,8 @@
 
 .map-ai-app .chat-word:hover,
 .map-ai-app .chat-word:focus-visible {
-  background: rgba(217, 183, 106, 0.22);
-  color: #fce5b5;
+  background: color-mix(in srgb, var(--color-antique-gold) 22%, transparent);
+  color: var(--color-antique-bright);
   outline: none;
 }
 
@@ -318,7 +291,7 @@
   display: flex;
   gap: 4px;
   padding: 3px;
-  border: 1px solid rgba(217, 183, 106, 0.28);
+  border: 1px solid color-mix(in srgb, var(--color-antique-gold) 28%, transparent);
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.18);
   flex-shrink: 0;
@@ -338,8 +311,8 @@
 
 .map-ai-app .level-quick-switch button:hover:not(:disabled),
 .map-ai-app .level-quick-switch button[aria-pressed="true"] {
-  background: #1e4b43;
-  color: #fce5b5;
+  background: var(--color-heritage-green);
+  color: var(--color-antique-bright);
 }
 
 .map-ai-app .level-quick-switch button:disabled {
@@ -397,10 +370,10 @@
   width: 52px;
   height: 52px;
   border-radius: 50% !important;
-  background: #1E4B43;
-  color: #D4AF37;
+  background: var(--color-heritage-green);
+  color: var(--color-antique-gold);
   border: 2px solid rgba(212, 175, 55, 0.4);
-  box-shadow: 0 4px 14px rgba(30, 75, 67, 0.4);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-heritage-green) 40%, transparent);
 }
 
 .map-ai-app .action-button.connect-toggle.connected {
@@ -447,8 +420,8 @@
 .map-ai-app .send-button {
   padding: 8px 14px;
   border-radius: 10px;
-  background: #1E4B43;
-  color: #D4AF37;
+  background: var(--color-heritage-green);
+  color: var(--color-antique-gold);
   border: none;
   cursor: pointer;
   display: flex;

@@ -38,16 +38,16 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({ onNavigate
         </video>
         <div className="landing-hero-scrim" aria-hidden="true" />
         <div className="landing-container landing-hero-content">
-          <div className="landing-hero-copy">
-            <span className="landing-eyebrow"><span className="landing-eyebrow-line" /> TIẾNG ANH QUA VĂN HÓA VIỆT</span>
-            <h1 id="landing-title">Một ngôn ngữ mới.<br />Một Việt Nam<br /><em>gần gũi hơn.</em></h1>
-            <p>Khám phá văn hóa Việt qua bài đọc song ngữ. Đọc để hiểu, nghe để cảm, ôn để nhớ.</p>
+          <div className="landing-hero-copy photo-content-panel">
+            <span className="landing-eyebrow"><span className="landing-eyebrow-line" /> LEARN ENGLISH THROUGH VIETNAMESE CULTURE</span>
+            <h1 id="landing-title">A new language.<br />A closer connection<br /><em>to Vietnam.</em></h1>
+            <p>Explore Vietnamese culture through bilingual reading. Read to understand, listen to connect, and review to remember.</p>
             <div className="landing-hero-actions flex flex-wrap items-center gap-3">
-              <button type="button" className="landing-button landing-button-primary" onClick={startLearning}>Khám phá bài đọc <ArrowUpRight size={18} aria-hidden="true" /></button>
-              <button type="button" className="landing-text-link" onClick={previewFlashcard}>Thử flashcard <ArrowRight size={17} aria-hidden="true" /></button>
+              <button type="button" className="landing-button landing-button-primary" onClick={startLearning}>Explore stories <ArrowUpRight size={18} aria-hidden="true" /></button>
+              <button type="button" className="landing-text-link" onClick={previewFlashcard}>Try a flashcard <ArrowRight size={17} aria-hidden="true" /></button>
             </div>
             <div className="landing-hero-notes">
-              <span><Check size={15} aria-hidden="true" /> Miễn phí · Học theo nhịp của bạn</span>
+              <span><Check size={15} aria-hidden="true" /> Free to start · Learn at your own pace</span>
             </div>
           </div>
         </div>
@@ -56,16 +56,16 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({ onNavigate
           if (!video) return;
           if (video.paused) video.play().catch(() => setIsPlaying(false));
           else video.pause();
-        }} aria-label={isPlaying ? 'Tạm dừng video' : 'Phát video'}>
+        }} aria-label={isPlaying ? 'Pause video' : 'Play video'}>
           {isPlaying ? <Pause size={16} /> : <Play size={16} />}
         </button>
       </div>
-      <div className="landing-container landing-learning-strip" aria-label="Hành trình học">
+      <div className="landing-container landing-learning-strip" aria-label="Your learning journey">
         {[
-          { icon: BookOpen, title: 'Đọc song ngữ' },
-          { icon: Headphones, title: 'Nghe & khám phá' },
-          { icon: Bookmark, title: 'Lưu từ yêu thích' },
-          { icon: RotateCcw, title: 'Ôn tập mỗi ngày' },
+          { icon: BookOpen, title: 'Read bilingually' },
+          { icon: Headphones, title: 'Listen & explore' },
+          { icon: Bookmark, title: 'Save useful words' },
+          { icon: RotateCcw, title: 'Review every day' },
         ].map(({ icon: Icon, title }, index) => (
           <div key={title} className="landing-learning-step"><Icon size={21} strokeWidth={1.5} aria-hidden="true" /><strong>{title}</strong><span className="landing-step-number">0{index + 1}</span></div>
         ))}
