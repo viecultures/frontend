@@ -234,6 +234,7 @@ export default function StreamingConsole() {
                         {articlePayload.map((art, idx) => (
                           <div
                             key={`${art.id}-${idx}`}
+                            data-article-card
                             className="rounded-xl bg-[#14181a] border border-antique-gold/25 hover:border-antique-gold/60 p-3 space-y-2 transition-all shadow-sm group"
                           >
                             <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -283,7 +284,7 @@ export default function StreamingConsole() {
                             )}
 
                             {art.excerptEn && (
-                              <p className="text-[10.5px] text-gray-300/90 leading-relaxed bg-black/30 p-2 rounded-lg border-l-2 border-antique-gold/60 italic">
+                              <p data-article-excerpt className="text-[10.5px] text-gray-300/90 leading-relaxed bg-black/30 p-2 rounded-lg border-l-2 border-antique-gold/60 italic">
                                 "{art.excerptEn.length > 150 ? art.excerptEn.slice(0, 150) + '…' : art.excerptEn}"
                               </p>
                             )}
@@ -371,6 +372,7 @@ export default function StreamingConsole() {
                   </div>
 
                   <div
+                    data-message-role={isUser ? 'user' : 'assistant'}
                     className={`chat-message-bubble max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
                       isUser
                         ? 'bg-[#2563EB] text-white rounded-tr-sm shadow-md'
@@ -399,7 +401,7 @@ export default function StreamingConsole() {
                   key={idx}
                   disabled={busy}
                   onClick={() => handleSendPrompt(action.text)}
-                  className="px-2.5 py-1 rounded-full bg-[#232729] hover:bg-heritage-green border border-white/10 text-xs text-antique-gold transition-all flex items-center gap-1 cursor-pointer"
+                  className="ai-chat-suggestion px-2.5 py-1 rounded-full bg-[#232729] hover:bg-heritage-green border border-white/10 text-xs text-antique-gold transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <Compass className="w-3 h-3" />
                   <span>{action.label}</span>

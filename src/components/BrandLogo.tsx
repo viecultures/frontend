@@ -1,5 +1,4 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
 
 export interface BrandLogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -23,14 +22,8 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   // Sizing definitions
   const iconSizeClasses = {
     sm: 'w-8 h-8 rounded-xl',
-    md: 'w-10 h-10 rounded-full',
-    lg: 'w-12 h-12 rounded-full',
-  }[size];
-
-  const iconInnerClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-5 h-5',
-    lg: 'w-6 h-6',
+    md: 'w-10 h-10 rounded-2xl',
+    lg: 'w-12 h-12 rounded-2xl',
   }[size];
 
   const textSizeClasses = {
@@ -54,15 +47,11 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     >
       {/* Visual Emblem Container */}
       <div
-        className={`relative ${iconSizeClasses} border border-antique-gold/50 bg-heritage-green/90 overflow-hidden shrink-0 shadow-md flex items-center justify-center text-antique-gold transition-all duration-300 ${
+        className={`relative ${iconSizeClasses} border border-antique-gold/50 overflow-hidden shrink-0 shadow-md transition-all duration-300 ${
           onClick ? 'group-hover:scale-105 group-hover:border-antique-gold group-hover:shadow-[0_0_15px_color-mix(in_srgb,_var(--color-antique-gold)_35%,_transparent)]' : ''
         }`}
       >
-        {/* Subtle decorative background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-antique-gold/25 via-transparent to-black/40 pointer-events-none" />
-        
-        {/* Crisp Golden Cultural Sparkle Icon */}
-        <Sparkles className={`${iconInnerClasses} text-antique-gold shrink-0 relative z-10`} />
+        <img src="/brand/viecultures-mascot-logo.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
       </div>
 
       {/* Typography Brand Name */}

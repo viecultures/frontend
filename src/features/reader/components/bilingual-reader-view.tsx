@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
 import Link from "@/components/Link";
 
-import { CheckCircle2, Headphones, PenTool, ChevronRight, RefreshCw, Sparkles } from "lucide-react";
+import { CheckCircle2, Headphones, PenTool, ChevronLeft, ChevronRight, RefreshCw, Sparkles, BookOpen } from "lucide-react";
 import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
+import { paths } from "@/routes/paths";
 
 import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
 import type { ReaderArticleData } from "../services/readerApiService";
@@ -71,10 +72,12 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   // ── Dynamic Reading Quiz State ──────────────────────────────────────────
   const [dynamicAnswers, setDynamicAnswers] = useState<Record<number, string>>({});
   const [dynamicSubmitted, setDynamicSubmitted] = useState<boolean>(false);
+  const [visibleQuestionIndex, setVisibleQuestionIndex] = useState(0);
 
   useEffect(() => {
     setDynamicAnswers({});
     setDynamicSubmitted(false);
+    setVisibleQuestionIndex(0);
   }, [articleData?.id]);
   // ── Shared In-Place Realtime Dictionary Hook ───────────────────────────────
   const { popupState, closeDictionary, handleTextSelection, handleVocabClick } = useReaderDictionary(articleData?.vocabMap);
@@ -217,7 +220,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               </div>
 
               <div className="space-y-6">
-                {articleData.questions.map((q, idx) => {
+                {(() => {
+                  const idx = visibleQuestionIndex;
+                  const q = articleData.questions[idx];
+                  if (!q) return null;
                   const currentVal = dynamicAnswers[idx] || '';
                   const isCorrect = dynamicSubmitted && currentVal === q.correctKey;
                   const isIncorrect = dynamicSubmitted && currentVal !== '' && currentVal !== q.correctKey;
@@ -286,7 +292,17 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                       )}
                     </div>
                   );
-                })}
+                })()}
+              </div>
+
+              <div className="flex items-center justify-between gap-3 pt-2" aria-label="Question navigation">
+                <button type="button" disabled={visibleQuestionIndex === 0} onClick={() => setVisibleQuestionIndex((index) => Math.max(0, index - 1))} className="inline-flex items-center gap-1 rounded-full border px-4 py-2 text-xs font-semibold disabled:opacity-40">
+                  <ChevronLeft className="h-4 w-4" /> Previous
+                </button>
+                <span className="text-xs font-medium opacity-75">Question {visibleQuestionIndex + 1} of {articleData.questions.length}</span>
+                <button type="button" disabled={visibleQuestionIndex >= (articleData.questions?.length ?? 0) - 1} onClick={() => setVisibleQuestionIndex((index) => Math.min((articleData.questions?.length ?? 1) - 1, index + 1))} className="inline-flex items-center gap-1 rounded-full border px-4 py-2 text-xs font-semibold disabled:opacity-40">
+                  Next <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
 
               {/* Submit Quiz Action */}
@@ -314,11 +330,11 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 )}
               </div>
             </>
-          ) : !articleData ? (
+          ) : (
             <>
               <div className="mb-6 pb-4 border-b border-antique-gold/20">
                 <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
-                  Reading check
+                  Reading check ({READER_QUIZ_QUESTIONS.length} questions)
                 </span>
                 <h2
                   className={`font-sans text-2xl font-bold mt-1 ${themeMode === "dark" ? "text-warm-ivory" : "text-heritage-green"
@@ -328,74 +344,41 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 </h2>
               </div>
 
-              {/* Quiz Q1 */}
-              <div className="mb-8">
-                <h3
-                  className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-warm-ivory" : "text-heritage-green"
-                    }`}
-                >
-                  {READER_QUIZ_QUESTIONS[0]?.question}
-                </h3>
-
-                <div className="space-y-2.5">
-                  {READER_QUIZ_QUESTIONS[0]?.options.map((opt) => (
-                    <label
-                      key={opt.value}
-                      className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q1Answer === opt.value
+              {/* Show one question at a time to keep the reader compact. */}
+              {(() => {
+                const question = READER_QUIZ_QUESTIONS[visibleQuestionIndex];
+                const answer = visibleQuestionIndex === 0 ? q1Answer : q2Answer;
+                const setAnswer = visibleQuestionIndex === 0 ? setQ1Answer : setQ2Answer;
+                if (!question) return null;
+                return <div className="mb-6">
+                  <h3 className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-warm-ivory" : "text-heritage-green"}`}>
+                    {question.question}
+                  </h3>
+                  <div className="space-y-2.5">
+                    {question.options.map((opt) => (
+                      <label key={opt.value} className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${answer === opt.value
                         ? "bg-heritage-green/20 border-antique-gold text-warm-ivory font-semibold"
                         : themeMode === "dark"
                           ? "bg-[#18211E] border-antique-gold/20 text-mist-cloud hover:bg-[#1E2925]"
                           : "bg-rice-paper/60 border-heritage-green/12 hover:bg-rice-paper"
-                        }`}
-                    >
-                      <input
-                        type="radio"
-                        name="q1"
-                        value={opt.value}
-                        checked={q1Answer === opt.value}
-                        onChange={() => setQ1Answer(opt.value)}
-                        className="mt-1 accent-antique-gold"
-                      />
-                      <span className="text-xs sm:text-sm">{opt.label}</span>
-                    </label>
-                  ))}
-                </div>
+                      }`}>
+                        <input type="radio" name={question.id} value={opt.value} checked={answer === opt.value} onChange={() => setAnswer(opt.value)} className="mt-1 accent-antique-gold" />
+                        <span className="text-xs sm:text-sm">{opt.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>;
+              })()}
+
+              <div className="flex items-center justify-between gap-3 mb-6" aria-label="Question navigation">
+                <button type="button" disabled={visibleQuestionIndex === 0} onClick={() => setVisibleQuestionIndex((index) => Math.max(0, index - 1))} className="inline-flex items-center gap-1 rounded-full border px-4 py-2 text-xs font-semibold disabled:opacity-40">
+                  <ChevronLeft className="h-4 w-4" /> Previous
+                </button>
+                <span className="text-xs font-medium opacity-75">Question {visibleQuestionIndex + 1} of {READER_QUIZ_QUESTIONS.length}</span>
+                <button type="button" disabled={visibleQuestionIndex >= READER_QUIZ_QUESTIONS.length - 1} onClick={() => setVisibleQuestionIndex((index) => Math.min(READER_QUIZ_QUESTIONS.length - 1, index + 1))} className="inline-flex items-center gap-1 rounded-full border px-4 py-2 text-xs font-semibold disabled:opacity-40">
+                  Next <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
-
-              {/* Quiz Q2 */}
-              <div className="mb-8">
-                <h3
-                  className={`text-sm sm:text-base font-bold mb-3 ${themeMode === "dark" ? "text-warm-ivory" : "text-heritage-green"
-                    }`}
-                >
-                  {READER_QUIZ_QUESTIONS[1]?.question}
-                </h3>
-
-                <div className="space-y-2.5">
-                  {READER_QUIZ_QUESTIONS[1]?.options.map((opt) => (
-                    <label
-                      key={opt.value}
-                      className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${q2Answer === opt.value
-                        ? "bg-heritage-green/20 border-antique-gold text-warm-ivory font-semibold"
-                        : themeMode === "dark"
-                          ? "bg-[#18211E] border-antique-gold/20 text-mist-cloud hover:bg-[#1E2925]"
-                          : "bg-rice-paper/60 border-heritage-green/12 hover:bg-rice-paper"
-                        }`}
-                    >
-                      <input
-                        type="radio"
-                        name="q2"
-                        value={opt.value}
-                        checked={q2Answer === opt.value}
-                        onChange={() => setQ2Answer(opt.value)}
-                        className="mt-1 accent-antique-gold"
-                      />
-                      <span className="text-xs sm:text-sm">{opt.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
               {/* Submit Quiz Action */}
               <div className="flex items-center gap-4">
                 <button
@@ -417,12 +400,6 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 )}
               </div>
             </>
-          ) : (
-            <div className="py-8 px-6 text-center rounded-2xl bg-white/40 dark:bg-white/5 border border-dashed border-antique-gold/30">
-              <p role="status" className="text-xs sm:text-sm text-text-muted">
-                No reading questions are available for this article yet. You can still practice dictation or review vocabulary.
-              </p>
-            </div>
           )}
         </div>
 
@@ -445,8 +422,13 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
             </div>
 
             <div className="space-y-3 mt-6">
-              <button type="button" className="reader-practice-primary w-full px-5 py-3.5 rounded-2xl" onClick={() => onStartPractice()}>Practice this article</button>
-              <button type="button" className="w-full px-5 py-3.5 rounded-2xl border" onClick={() => onStartPractice('shadowing')}>Practise shadowing</button>
+              <Link
+                href={paths.flashcardStudy({ deck: articleData?.id, level: selectedLevel })}
+                className="reader-practice-primary flex w-full items-center justify-between px-5 py-3.5 rounded-2xl"
+              >
+                <span className="flex items-center gap-2"><BookOpen className="w-4 h-4" /> Study vocabulary flashcards</span>
+                <ChevronRight className="w-4 h-4 opacity-80" />
+              </Link>
 
               {/* Open Dictation with this article. */}
               <button

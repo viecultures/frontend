@@ -68,13 +68,9 @@ export function ReaderPracticeView({ articleData, fontSize, vocabBtnClass, theme
     <header className="rp-heading">
       <div><p className="rp-eyebrow">From reading to practice</p><h1>Listening & Speaking</h1><p>One story. Three ways to make it your own.</p></div>
     </header>
-    <div ref={tabs} className="rp-tabs" role="tablist" aria-label="Practice modes" onKeyDown={handleTabKey}>
-      {modes.map(item => <button key={item.id} type="button" role="tab" id={`practice-tab-${item.id}`} aria-controls={`practice-panel-${mode}`} aria-selected={mode === item.id} tabIndex={mode === item.id ? 0 : -1} onClick={() => onChangeMode(item.id)}>{item.label}</button>)}
-    </div>
     <div className="rp-grid" role="tabpanel" id={`practice-panel-${mode}`} aria-labelledby={`practice-tab-${mode}`}>
       <div className="rp-source">
         {mode === 'questions' ? <>
-          {fullAudioUrl && <div className="rp-article-audio"><label htmlFor="practice-article-audio">Listen to the article</label><audio ref={fullPlayer} id="practice-article-audio" aria-label="Article recording" controls src={fullAudioUrl} preload="metadata" /></div>}
           <ReaderArticleContent language="en" themeMode={themeMode} fontSize={fontSize} articleData={articleData} vocabClassName={vocabBtnClass} onVocabClick={handleVocabClick} onMouseUp={handleTextSelection} onDoubleClick={handleTextSelection} />
         </> : <section className="reader-language-sheet rp-transcript" data-reader-theme={themeMode} aria-label={mode === 'dictation' ? 'Listening passage' : 'Shadowing transcript'}>
           <p className="rp-eyebrow">{mode === 'dictation' ? 'Listen closely' : 'Follow the transcript'}</p>
@@ -94,6 +90,10 @@ export function ReaderPracticeView({ articleData, fontSize, vocabBtnClass, theme
         </section>}
       </div>
       <div className="rp-sidebar">
+        <div ref={tabs} className="rp-tabs" role="tablist" aria-label="Practice modes" onKeyDown={handleTabKey}>
+          {modes.map(item => <button key={item.id} type="button" role="tab" id={`practice-tab-${item.id}`} aria-controls={`practice-panel-${mode}`} aria-selected={mode === item.id} tabIndex={mode === item.id ? 0 : -1} onClick={() => onChangeMode(item.id)}>{item.label}</button>)}
+        </div>
+        {fullAudioUrl && <div className="rp-article-audio"><label htmlFor="practice-article-audio">Listen to the article</label><audio ref={fullPlayer} id="practice-article-audio" aria-label="Article recording" controls src={fullAudioUrl} preload="metadata" /></div>}
         {mode === 'questions'
           ? <PracticeQuestions questions={articleData.questions || []} index={questionIndex} onChangeIndex={setQuestionIndex} answers={answers} onAnswer={(id, value) => setAnswers(previous => ({ ...previous, [id]: value }))} onTryDictation={() => onChangeMode('dictation')} />
           : segment ? <>

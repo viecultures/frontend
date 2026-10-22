@@ -15,8 +15,8 @@ export function PracticeShadowing({ segment, recorder, onListen, onStopSample, t
   const take = recorder.takes[segment.id];
   const recorded = Object.keys(recorder.takes).length;
   return <section className="rp-activity" aria-label="Shadowing activity">
-    <p className="rp-eyebrow">Listen · Record · Compare</p><h2>Make the passage your own</h2>
-    <p>Listen for the rhythm, then read the highlighted words aloud. Play your recording and compare it with the sample.</p>
+    <p className="rp-eyebrow">Shadowing</p><h2>Repeat this passage</h2>
+    <p>Listen, then record yourself reading the passage.</p>
     <progress aria-label="Passages recorded" value={recorded} max={total} /><small>{recorded} of {total} passages recorded</small>
     <blockquote className="rp-shadowing-target">{segment.text}</blockquote>
     <button type="button" disabled={recorder.busy} onClick={onListen}><Volume2 size={16} /> Listen to sample</button>
@@ -27,6 +27,6 @@ export function PracticeShadowing({ segment, recorder, onListen, onStopSample, t
     {recorder.busy && <button type="button" className="rp-text-button" onClick={recorder.cancel}>Cancel recording</button>}
     {recorder.error && <p role="alert" className="rp-error">{recorder.error}</p>}
     {take && !recorder.busy && <PracticeRecording take={take} onPlay={onStopSample} onDelete={() => recorder.remove(segment.id)} />}
-    <p className="rp-session-note">Use headphones for the sample. Recordings stay in this page session; each take can last up to 60 seconds.</p>
+    <p className="rp-session-note">Recordings stay on this page for this session.</p>
   </section>;
 }

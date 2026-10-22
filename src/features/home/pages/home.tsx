@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { HomeHeaderNav } from '../components/HomeHeaderNav';
+import { Navbar } from '@/components/Navbar';
 import { HomeGreetingControls } from '../components/HomeGreetingControls';
 import { HomeWidgetsGrid } from '../components/HomeWidgetsGrid';
 import { HomeBottomDock } from '../components/HomeBottomDock';
@@ -57,7 +57,7 @@ function StudyRoomContent({ account, userName }: StudyRoomContentProps) {
 }
 
 export function HomePage({ isLoggedIn = false, user, onLogout }: HomePageProps) {
-  const { activeBackground, backgroundMode } = useSettings();
+  const { activeBackground, backgroundMode, openSettings } = useSettings();
   const navigate = useAppNavigate();
   const hasPhoto = activeBackground.id !== 'minimal-none';
   const account = user?.email || 'guest';
@@ -66,7 +66,7 @@ export function HomePage({ isLoggedIn = false, user, onLogout }: HomePageProps) 
     {hasPhoto && <div className="home-room-background" style={{ backgroundImage: `url(${activeBackground.url})` }} aria-hidden="true" />}
     <div className="home-room-veil" aria-hidden="true" />
     <a className="home-room-skip" href="#study-room-content">Skip to study content</a>
-    <HomeHeaderNav isLoggedIn={isLoggedIn} user={user} onLogout={onLogout} onNavigate={navigate} />
+    <Navbar activeView="home" isLoggedIn={isLoggedIn} user={user} onLogout={onLogout} onNavigateToSection={navigate} onOpenSettings={openSettings} />
     <StudyRoomContent key={account} account={account} userName={user?.name || 'Learner'} />
     <footer className="home-room-footer">
       <span>{hasPhoto ? `${backgroundMode === 'auto' ? 'Room scenery' : 'Background'} · ${activeBackground.nameEn}` : 'Your own little corner of Vietnam.'}</span>

@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
 import Link from '@/components/Link';
-import { ArrowLeft, BookOpen, ChevronDown, Maximize, Minimize, Moon, SlidersHorizontal, Sun, User } from 'lucide-react';
-import { ProfileDropdown } from '@/components/ProfileDropdown';
+import { ArrowLeft, BookOpen, Maximize, Minimize, Moon, SlidersHorizontal, Sun } from 'lucide-react';
+import { Navbar } from '@/components/Navbar';
 import { PATHS, paths } from '@/routes/paths';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import type { AppUser } from '@/utils/auth-storage';
-import { ReaderLotus } from './ReaderLotus';
 
 interface ReaderToolbarProps {
   fontSize: number;
@@ -36,7 +36,7 @@ export function ReaderToolbar({
   isLoggedIn = false, user = null, onLogout, isPro = false,
 }: ReaderToolbarProps) {
   const navigate = useNavigate();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const appNavigate = useAppNavigate();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fullscreenError, setFullscreenError] = useState('');
   const toolbarRef = useRef<HTMLElement>(null);
@@ -65,35 +65,7 @@ export function ReaderToolbar({
   };
 
   return <>
-    <header className="reader-site-header">
-      <div className="reader-site-header-inner">
-        <Link href={PATHS.home} className="reader-wordmark">VN Culture Reader</Link>
-        <nav className="reader-site-links" aria-label="Main navigation">
-          <Link href={PATHS.home}>Home</Link>
-          <Link href={PATHS.discovery}>Discovery</Link>
-          <Popover className="reader-mode-menu">
-            <PopoverButton className="reader-nav-current" aria-label="Reading mode">Reader <ChevronDown size={12} /></PopoverButton>
-            <PopoverPanel className="reader-desk-menu reader-mode-options" focus>
-              {({ close }) => <div role="group" aria-label="Reading mode">
-                <button type="button" aria-pressed={readingMode === 'bilingual'} onClick={() => { onChangeReadingMode('bilingual'); close(); }}>Reading</button>
-                <button type="button" aria-pressed={readingMode === 'practice'} onClick={() => { onChangeReadingMode('practice'); close(); }}>Listening & Speaking</button>
-              </div>}
-            </PopoverPanel>
-          </Popover>
-          <Link href={PATHS.dictionary}>Flashcards</Link>
-          <Link href={PATHS.community}>Community</Link>
-        </nav>
-        <div className="reader-header-end">
-          <span className="reader-culture-signature"><ReaderLotus /><span>Cultures<br />Connect Us</span></span>
-          {isLoggedIn && <div className="reader-navbar-account">
-            <button type="button" className="reader-account-button" aria-label="Account" aria-expanded={isProfileOpen} onClick={() => setIsProfileOpen(open => !open)}>
-              {user?.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? <img src={user.avatar} alt="" /> : <User size={18} />}
-            </button>
-            <ProfileDropdown isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} onLogout={onLogout} onNavigate={to => navigate(to)} />
-          </div>}
-        </div>
-      </div>
-    </header>
+    <Navbar activeView="reader" isLoggedIn={isLoggedIn} user={user} onLogout={onLogout} onNavigateToSection={appNavigate} />
 
     <nav ref={toolbarRef} className="reader-desk-toolbar" aria-label="Reading tools">
       <div className="reader-desk-title">

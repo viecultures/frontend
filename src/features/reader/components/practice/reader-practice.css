@@ -8,13 +8,13 @@
 .rp-workspace button:hover:enabled { border-color: var(--desk-gold); background: color-mix(in srgb, var(--desk-gold) 12%, var(--desk-paper)); }
 .rp-workspace button:disabled { opacity: .45; cursor: default; }
 .rp-workspace button:focus-visible, .rp-workspace textarea:focus-visible, .rp-workspace select:focus-visible, .rp-workspace audio:focus-visible { outline: 2px solid var(--desk-gold); outline-offset: 3px; }
-.rp-tabs { position: sticky; top: var(--reader-toolbar-offset, 74px); z-index: 20; display: flex; gap: 6px; padding: 5px; width: fit-content; max-width: 100%; background: var(--desk-paper); border: 1px solid var(--desk-line); border-radius: 13px; margin-bottom: 24px; }
-.rp-tabs button { border-color: transparent; background: transparent; padding-inline: 24px; }
+.rp-tabs { display: flex; gap: 4px; padding: 4px; width: 100%; max-width: 100%; background: var(--desk-paper); border: 1px solid var(--desk-line); border-radius: 12px; margin: 0; }
+.rp-tabs button { flex: 1; border-color: transparent; background: transparent; padding: 7px 9px; white-space: nowrap; }
 .rp-tabs button[aria-selected='true'] { background: var(--desk-ink); color: var(--desk-paper); border-color: var(--desk-ink); }
 .rp-tabs button[aria-selected='true']:hover { background: var(--desk-ink); }
 .rp-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(310px, 1fr); align-items: start; gap: 28px; }
 .rp-source, .rp-sidebar { min-width: 0; }
-.rp-sidebar { position: sticky; top: calc(var(--reader-toolbar-offset, 74px) + 72px); }
+.rp-sidebar { position: sticky; top: calc(var(--reader-toolbar-offset, 74px) + 16px); display: flex; flex-direction: column; gap: 12px; }
 .rp-activity, .rp-passage-navigation, .rp-article-audio { padding: 24px; border: 1px solid var(--desk-line); border-radius: 12px; background: var(--desk-paper); box-shadow: 0 3px 15px #153d400a; }
 .rp-activity { display: flex; flex-direction: column; gap: 16px; }
 .rp-activity h2 { font-size: 23px; font-weight: 600; line-height: 1.35; letter-spacing: -.5px; }
@@ -27,9 +27,9 @@
 .rp-workspace button.rp-primary { background: var(--desk-ink); color: var(--desk-paper); border-color: var(--desk-ink); }
 .rp-workspace button.rp-primary:hover:enabled { background: color-mix(in srgb, var(--desk-ink) 85%, var(--desk-muted)); }
 .rp-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.rp-article-audio { margin-bottom: 18px; padding: 12px 18px; }
-.rp-article-audio label { font-size: 12px; }
-.rp-article-audio audio, .rp-recording audio { display: block; width: 100%; margin-top: 8px; height: 40px; }
+.rp-article-audio { margin: 0; padding: 9px 12px; }
+.rp-article-audio label { font-size: 11px; }
+.rp-article-audio audio, .rp-recording audio { display: block; width: 100%; margin-top: 4px; height: 36px; }
 .rp-question { min-width: 0; }
 .rp-question legend { font-size: 15px; font-weight: 500; line-height: 1.65; margin-bottom: 15px; }
 .rp-question legend small { display: block; margin-bottom: 8px; font-weight: 400; }
@@ -76,8 +76,7 @@
 @media (max-width: 767px) {
   .rp-heading { flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
   .rp-heading h1 { font-size: 27px; }
-  .rp-tabs { width: 100%; }
-  .rp-tabs button { flex: 1; padding-inline: 8px; font-size: 11px; }
+  .rp-tabs button { padding-inline: 6px; font-size: 11px; }
   .rp-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .rp-sidebar { position: static; order: -1; }
   .rp-activity { padding: 20px; }
