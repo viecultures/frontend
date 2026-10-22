@@ -8,6 +8,7 @@
     "build": "npm run check:palette && tsc -b && vite build",
     "check:palette": "node scripts/check-palette.mjs",
     "preview": "vite preview",
+    "start": "serve -s dist -l tcp://0.0.0.0:$PORT",
     "test:learning": "tsx --tsconfig tsconfig.app.json --test src/features/flashcards/lib/*.test.ts src/features/flashcards/services/*.test.ts src/services/learning/*.test.ts",
     "test:shadowing": "tsx --tsconfig tsconfig.app.json --test src/features/playground/lib/*.test.ts src/features/playground/services/dictationService.test.ts",
     "test:integration": "tsx --tsconfig tsconfig.app.json --test src/utils/auth-storage.test.ts src/services/authService.test.ts src/features/profile/services/*.test.ts src/features/admin/services/*.test.ts",
@@ -32,6 +33,7 @@
     "react-markdown": "9.1.0",
     "react-router-dom": "^7.18.4",
     "remark-gfm": "4.0.1",
+    "serve": "^14.2.6",
     "tailwind-merge": "^3.6.0",
     "zod": "4.1.13",
     "zustand": "5.0.9"
