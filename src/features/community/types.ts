@@ -65,3 +65,21 @@ export interface GamificationShopItem {
   unlocked: boolean;
   category: string;
 }
+
+export interface UserReflectionItem {
+  id: string;
+  postId: string;
+  userId?: string;
+  authorName: string;
+  authorRole?: string;
+  avatarText: string;
+  content: string;
+  usedVocabIds?: string[];
+  usedWords?: string[];
+  reactionsCount: number;
+  userLiked?: boolean;
+  status: 'published' | 'pending_review';
+  createdAt: string;
+  timeAgo?: string;
+  isReported?: boolean;
+}

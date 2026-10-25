@@ -30,6 +30,7 @@ import { useSavedVocabulary, SavedVocabularyContext } from '../hooks/useSavedVoc
 import { PATHS } from '@/routes/paths';
 import { practiceModeFrom, type PracticeMode } from '../lib/readerPractice';
 import { MocSonSealModal } from '@/features/gamification';
+import { ReaderReflectionsSection } from '@/features/community/components/ReaderReflectionsSection';
 
 export default function ReaderPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -502,6 +503,16 @@ export default function ReaderPage() {
               onChangeMode={handlePracticeModeChange}
               onBackToReading={() => handleModeChange('bilingual')}
               fullAudioUrl={articleData.id === 'tet-holiday' ? currentVoice.fullAudioUrl : articleData.shadowingAudioUrl}
+            />
+          )}
+
+          {/* Non-Judgmental Community Reflections Section (FLOW-COMMUNITY / TASK-008) */}
+          {readingMode === 'bilingual' && articleData && (
+            <ReaderReflectionsSection
+              postId={articleData.id}
+              postTitle={articleData.titleEn}
+              vocabularies={articleData.vocabularies || []}
+              themeMode={themeMode}
             />
           )}
 
