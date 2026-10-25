@@ -1,4 +1,6 @@
 export { AudioShadowingBar } from "./audio-shadowing-bar";
+export { StickyAudioPlayer } from "./StickyAudioPlayer";
+export { BilingualParagraphPairList } from "./BilingualParagraphPairList";
 export { BilingualReaderView } from "./bilingual-reader-view";
 export { ExtensiveReaderView } from "./extensive-reader-view";
 export { ReaderPracticeView } from './practice/ReaderPracticeView';
@@ -6,6 +8,7 @@ export { ReaderToolbar } from "./ReaderToolbar";
 export { ReaderVocabDrawer } from "./ReaderVocabDrawer";
 export { ReaderRecommendedSection } from "./ReaderRecommendedSection";
 export { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
+export { WordTooltip } from "./WordTooltip";
 export { VoiceCustomizerModal } from "./VoiceCustomizerModal";
 export { ReaderDictationSection } from "./ReaderDictationSection";
 export { ReaderQuickFlashcards } from "./ReaderQuickFlashcards";

@@ -8,6 +8,7 @@ import FlashcardSidebarLayout from '../components/flashcard-sidebar-layout';
 import { FlashcardStudyHeader, FlashcardProgressBar, FlashcardModeTabs, FlashcardFlipView, FlashcardMultipleChoiceView, FlashcardSpellingView } from '../components';
 import { FlashcardSessionSummary } from '../components/FlashcardSessionSummary';
 import { cardsFromVocabulary, loadStudyDeck, type StudyDeck } from '../services/studyDeck';
+import { persistVocabProgress } from '../services/vocabProgressService';
 import { useReviewSession } from '../hooks/useReviewSession';
 import { PATHS, paths } from '@/routes/paths';
 
@@ -38,6 +39,13 @@ function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerPr
   const rate = (mastered: boolean) => {
     if (!currentCard) return;
     answer(currentCard.id, mastered ? 'mastered' : 'review');
+    void persistVocabProgress({
+      vocabId: currentCard.id,
+      word: currentCard.word,
+      status: mastered ? 'mastered' : 'learning',
+      reviewCount: 1,
+      contextSentence: currentCard.contextEn,
+    });
     clearAnswer();
   };
   const playAudio = (word = currentCard?.word) => {

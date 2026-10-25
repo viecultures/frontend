@@ -165,6 +165,74 @@ export const getIsProUser = (): boolean => {
 };
 
 export const setIsProUser = (isPro: boolean) => {
-  localStorage.setItem(PRO_STATUS_KEY, isPro ? 'true' : 'false');
-  window.dispatchEvent(new CustomEvent('subscription:change', { detail: { isPro } }));
+  try {
+    localStorage.setItem(PRO_STATUS_KEY, isPro ? 'true' : 'false');
+    const user = getStoredUser();
+    if (user) {
+      const updated = { ...user, isPro };
+      const storage = globalThis.sessionStorage?.getItem(AUTH_USER_KEY) ? sessionStorage : localStorage;
+      storage.setItem(AUTH_USER_KEY, JSON.stringify(updated));
+    }
+    if (isPro) {
+      resetAiDailyTurns();
+    }
+  } catch (err) {
+    console.error('[auth-storage] Error setting Pro status:', err);
+  }
+  globalThis.window?.dispatchEvent(new CustomEvent('subscription:change', { detail: { isPro } }));
+  globalThis.window?.dispatchEvent(new CustomEvent('auth:change'));
+};
+
+const AI_TURNS_KEY_PREFIX = 'vie_ai_turns_';
+export const FREE_DAILY_AI_TURNS_LIMIT = 3;
+
+export const getTodayKey = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export const getAiDailyTurnsUsed = (): number => {
+  try {
+    const key = `${AI_TURNS_KEY_PREFIX}${getTodayKey()}`;
+    const raw = localStorage.getItem(key);
+    return raw ? parseInt(raw, 10) || 0 : 0;
+  } catch {
+    return 0;
+  }
+};
+
+export const incrementAiDailyTurns = (): number => {
+  try {
+    const key = `${AI_TURNS_KEY_PREFIX}${getTodayKey()}`;
+    const current = getAiDailyTurnsUsed();
+    const updated = current + 1;
+    localStorage.setItem(key, String(updated));
+    globalThis.window?.dispatchEvent(new CustomEvent('ai:quota:change', { detail: { used: updated } }));
+    return updated;
+  } catch {
+    return 0;
+  }
+};
+
+export const getAiRemainingTurns = (): number => {
+  if (getIsProUser()) return Infinity;
+  return Math.max(0, FREE_DAILY_AI_TURNS_LIMIT - getAiDailyTurnsUsed());
+};
+
+export const canSendAiTurn = (): boolean => {
+  if (getIsProUser()) return true;
+  return getAiDailyTurnsUsed() < FREE_DAILY_AI_TURNS_LIMIT;
+};
+
+export const resetAiDailyTurns = () => {
+  try {
+    const key = `${AI_TURNS_KEY_PREFIX}${getTodayKey()}`;
+    localStorage.removeItem(key);
+    globalThis.window?.dispatchEvent(new CustomEvent('ai:quota:change', { detail: { used: 0 } }));
+  } catch {
+    // no-op
+  }
 };

@@ -25,6 +25,7 @@ const HomePage = React.lazy(() => import('@/features/home/pages/home'));
 const DiscoveryPage = React.lazy(() => import('@/features/discovery/pages/discovery'));
 const ReaderPage = React.lazy(() => import('@/features/reader/pages/reader'));
 const DictionaryPage = React.lazy(() => import('@/features/flashcards/pages/dictionary'));
+const FlashcardsPage = React.lazy(() => import('@/features/flashcards/pages/FlashcardsPage'));
 const FlashcardStudyPage = React.lazy(() => import('@/features/flashcards/pages/flashcard-study'));
 const CommunityPage = React.lazy(() => import('@/features/community/pages/community'));
 const CommunityContestPage = React.lazy(() => import('@/features/community/pages/community-contest'));
@@ -180,9 +181,9 @@ export const App: React.FC = () => {
 
             {/* 3. Study Layout (Navbar + Outlet, no Footer) */}
             <Route element={<StudyLayout isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />}>
-              <Route path={PATHS.flashcardStudy} element={<FlashcardStudyPage />} />
-              <Route path="/flashcards" element={<Navigate to={PATHS.flashcardStudy} replace />} />
-              <Route path="/flashcard-study-page" element={<Navigate to={PATHS.flashcardStudy} replace />} />
+              <Route path={PATHS.flashcardStudy} element={<FlashcardsPage />} />
+              <Route path="/flashcards" element={<FlashcardsPage />} />
+              <Route path="/flashcard-study-page" element={<FlashcardsPage />} />
             </Route>
 
             {/* 4. Focus Full-screen Layout (No Navbar, No Footer) */}

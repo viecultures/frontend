@@ -8,3 +8,4 @@ export { ContestEntryEditor } from "./ContestEntryEditor";
 export { ContestEntryCard } from "./ContestEntryCard";
 export { GamificationShopCard } from "./GamificationShopCard";
 export { GamificationMilestonesCard } from "./GamificationMilestonesCard";
+export { ReaderReflectionsSection } from "./ReaderReflectionsSection";
