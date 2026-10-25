@@ -14,6 +14,20 @@ interface CompanionChatDrawerProps {
   lessonTitle?: string;
 }
 
+const sanitizeCompanionMarkdown = (content: string): string => {
+  if (!content) return '';
+  return content
+    // Remove standalone divider lines made of 3+ asterisks, dashes, or underscores (e.g. ***, ---, ___)
+    .replace(/^(?:\s*[*-_]){3,}\s*$/gm, '')
+    // Remove rogue 3+ asterisks that sit by themselves or at line boundaries
+    .replace(/(?:^|\n)\s*\*{3,}\s*(?:\n|$)/g, '\n')
+    // Remove trailing asterisks, hashes, or dashes at the end of the text
+    .replace(/[\s*#_-]+$/, '')
+    // Collapse excess newlines
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+};
+
 export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
   isOpen,
   onClose,
@@ -161,7 +175,13 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
                   <p className="whitespace-pre-wrap">{msg.content}</p>
                 ) : (
                   <div className="prose prose-sm max-w-none text-stone-800 leading-relaxed font-sans [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4">
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    <ReactMarkdown
+                      components={{
+                        hr: () => null,
+                      }}
+                    >
+                      {sanitizeCompanionMarkdown(msg.content)}
+                    </ReactMarkdown>
                   </div>
                 )}
               </div>
