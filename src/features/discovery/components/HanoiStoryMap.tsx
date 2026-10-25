@@ -9,9 +9,9 @@ const STORY_TILES = STORY_IDS.map(id => JOURNEY_SERIES.find(series => series.id 
 );
 
 const TILES = [
-  { x: 220, y: 178, width: 58, height: 27, cx: 249, cy: 195, number: '01', label: 'Phở Hà Nội' },
-  { x: 220, y: 202, width: 29, height: 37, cx: 237, cy: 219, number: '02', label: 'Chả cá' },
-  { x: 249, y: 202, width: 29, height: 37, cx: 260, cy: 218, number: '03', label: 'Bún chả' },
+  { x: 220, y: 178, width: 58, height: 27, number: '01' },
+  { x: 220, y: 202, width: 29, height: 37, number: '02' },
+  { x: 249, y: 202, width: 29, height: 37, number: '03' },
 ] as const;
 
 interface HanoiStoryMapProps {
@@ -32,7 +32,7 @@ export function HanoiStoryMap({ onSelectSeries }: HanoiStoryMapProps) {
     <div className="hanoi-story-map" aria-label="Hanoi stories map">
       <div className="hanoi-story-map-caption">
         <span>HÀ NỘI · STORY MAP</span>
-        <small>Choose a picture to explore a story</small>
+        <small>Three tastes, three stories to explore</small>
       </div>
       <svg viewBox="225 179 48 57" role="group" aria-label="Hanoi silhouette with three story pictures">
         <defs>
@@ -42,10 +42,6 @@ export function HanoiStoryMap({ onSelectSeries }: HanoiStoryMapProps) {
               <rect x={tile.x} y={tile.y} width={tile.width} height={tile.height} />
             </clipPath>
           ))}
-          <linearGradient id="hanoi-story-shade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#08131b" stopOpacity="0.02" />
-            <stop offset="100%" stopColor="#08131b" stopOpacity="0.78" />
-          </linearGradient>
         </defs>
         <path d={HANOI.d} className="hanoi-story-map-glow" />
         <g clipPath="url(#hanoi-story-outline)">
@@ -62,11 +58,8 @@ export function HanoiStoryMap({ onSelectSeries }: HanoiStoryMapProps) {
                 onKeyDown={event => onTileKeyDown(event, series.id)}
                 clipPath={`url(#hanoi-story-tile-${index})`}
               >
-                <image href={series.imageUrl} x={tile.x} y={tile.y} width={tile.width} height={tile.height} preserveAspectRatio="xMidYMid slice" />
-                <rect x={tile.x} y={tile.y} width={tile.width} height={tile.height} fill="url(#hanoi-story-shade)" />
+                <image href={series.imageUrl} x={tile.x} y={tile.y} width={tile.width} height={tile.height} preserveAspectRatio="xMidYMax slice" />
                 <rect className="hanoi-story-tile-hit" x={tile.x} y={tile.y} width={tile.width} height={tile.height} fill="transparent" />
-                <text x={tile.cx} y={tile.cy - 2} textAnchor="middle" className="hanoi-story-number">{tile.number}</text>
-                <text x={tile.cx} y={tile.cy + 2.2} textAnchor="middle" className="hanoi-story-name">{tile.label}</text>
               </g>
             );
           })}
@@ -74,6 +67,18 @@ export function HanoiStoryMap({ onSelectSeries }: HanoiStoryMapProps) {
         </g>
         <path d={HANOI.d} className="hanoi-story-map-border" />
       </svg>
+      <div className="hanoi-story-list" aria-label="Hanoi stories">
+        {STORY_TILES.map((series, index) => (
+          <button key={series.id} type="button" className="hanoi-story-card" onClick={() => onSelectSeries(series.id)}>
+            <img src={series.imageUrl} alt="" loading="lazy" />
+            <span className="hanoi-story-card-copy">
+              <span className="hanoi-story-card-number">{TILES[index].number} / HÀ NỘI</span>
+              <strong>{series.titleVi}</strong>
+              <small>Explore story →</small>
+            </span>
+          </button>
+        ))}
+      </div>
       <p className="hanoi-story-map-note">The picture sections illustrate stories, not district boundaries.</p>
     </div>
   );
