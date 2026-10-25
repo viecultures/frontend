@@ -40,6 +40,7 @@ const DesignSystemPage = import.meta.env.DEV
   : null;
 import { getStoredUser, setStoredUser, getStoredToken, clearAuthStorage, type AppUser } from '@/utils/auth-storage';
 import { PATHS } from '@/routes/paths';
+import { CompanionChatDrawer, CompanionFloatingButton } from '@/features/companion';
 
 // Redirect legacy /bilingual-reader or /loop routes to canonical /reader while preserving search query
 const RedirectToReader: React.FC<{ defaultParams?: string }> = ({ defaultParams = '' }) => {
@@ -50,6 +51,11 @@ const RedirectToReader: React.FC<{ defaultParams?: string }> = ({ defaultParams 
 
 export const App: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [isCompanionOpen, setIsCompanionOpen] = useState(false);
+  const searchParams = new URLSearchParams(location.search);
+  const currentLessonId = searchParams.get('id') || searchParams.get('lessonId') || undefined;
 
   const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser() || !!getStoredToken());
@@ -220,6 +226,17 @@ export const App: React.FC = () => {
         {/* Global Modals & Banners */}
         <SettingsModal />
         <PwaInstallBanner />
+
+        {/* AI Cultural Companion Floating Drawer & Launcher */}
+        <CompanionFloatingButton
+          isOpen={isCompanionOpen}
+          onClick={() => setIsCompanionOpen(true)}
+        />
+        <CompanionChatDrawer
+          isOpen={isCompanionOpen}
+          onClose={() => setIsCompanionOpen(false)}
+          lessonId={currentLessonId}
+        />
       </div>
   );
 
