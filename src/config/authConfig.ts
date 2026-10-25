@@ -1,2 +1,2 @@
-// Temporary frontend-only sign-in. Set VITE_AUTH_MODE=backend to restore API auth.
-export const isLocalAuthMode = import.meta.env?.VITE_AUTH_MODE !== 'backend';
+// Authentication Mode configuration. Defaults to backend API unless explicitly set to 'local'.
+export const isLocalAuthMode = import.meta.env?.VITE_AUTH_MODE === 'local';

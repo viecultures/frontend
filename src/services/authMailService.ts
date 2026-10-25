@@ -77,7 +77,11 @@ export const authMailService = {
       const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Lỗi khi gửi email xác thực.');
     }
-    return response.json();
+    const data: OtpActionResponse = await response.json();
+    if (data.success === false) {
+      throw new Error(data.message || 'Lỗi khi gửi email xác thực.');
+    }
+    return data;
   },
 
   /**
@@ -94,7 +98,11 @@ export const authMailService = {
       const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Mã xác thực không hợp lệ.');
     }
-    return response.json();
+    const data: OtpActionResponse = await response.json();
+    if (data.success === false || data.verified === false) {
+      throw new Error(data.message || 'Mã xác thực không chính xác hoặc đã hết hạn.');
+    }
+    return data;
   },
 
   /**

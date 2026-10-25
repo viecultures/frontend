@@ -383,10 +383,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     />
                     <span>Ghi nhớ đăng nhập</span>
                   </label>
-                  {!isLocalAuthMode && authTab === 'login' && (
+                  {!isLocalAuthMode && (
                     <button
                       type="button"
                       className="auth-inline-link"
+                      style={{ visibility: authTab === 'login' ? 'visible' : 'hidden' }}
+                      tabIndex={authTab === 'login' ? 0 : -1}
                       onClick={() => setIsForgotPasswordOpen(true)}
                     >
                       Quên mật khẩu?
