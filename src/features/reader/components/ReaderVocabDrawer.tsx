@@ -1,5 +1,7 @@
-import { X, Bookmark, BookmarkCheck } from "lucide-react";
+import { Link } from "react-router-dom";
+import { X, Bookmark, BookmarkCheck, Sparkles, ArrowRight } from "lucide-react";
 import type { VocabItem } from "@/data/readerData";
+import { paths } from "@/routes/paths";
 
 interface ReaderVocabDrawerProps {
   isOpen: boolean;
@@ -10,6 +12,8 @@ interface ReaderVocabDrawerProps {
   bookmarkedWords: Record<string, boolean>;
   onToggleBookmarkWord: (wordId: string) => void;
   articleTitle?: string;
+  articleId?: string;
+  level?: string;
 }
 
 export function ReaderVocabDrawer({
@@ -21,6 +25,8 @@ export function ReaderVocabDrawer({
   bookmarkedWords,
   onToggleBookmarkWord,
   articleTitle = 'Tết: Renewal, Remembrance and Regional Flavours',
+  articleId,
+  level = 'Level 2',
 }: ReaderVocabDrawerProps) {
   if (!isOpen) return null;
 
@@ -36,7 +42,7 @@ export function ReaderVocabDrawer({
       <div className="relative w-full max-w-md bg-warm-ivory h-full shadow-2xl border-l border-antique-gold/40 p-6 flex flex-col justify-between overflow-y-auto z-10 animate-in slide-in-from-right duration-300">
         <div>
           {/* Drawer Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-heritage-green/12 mb-6">
+          <div className="flex items-center justify-between pb-4 border-b border-heritage-green/12 mb-5">
             <div>
               <h3 className="font-sans text-lg font-bold text-heritage-green">
                 Article vocabulary
@@ -53,6 +59,20 @@ export function ReaderVocabDrawer({
               <X className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Flashcard Practice CTA (Neat top button) */}
+          {articleId && (
+            <Link
+              to={paths.flashcardStudy({ deck: articleId, level })}
+              className="mb-5 flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-heritage-green text-warm-ivory text-xs font-semibold hover:bg-heritage-green/90 transition-all shadow-xs group"
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-antique-gold shrink-0" />
+                <span>Practice with Flashcards ({vocabList.length} words)</span>
+              </span>
+              <ArrowRight className="w-4 h-4 text-antique-gold shrink-0 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          )}
 
           {/* Active Inspected Vocab Card */}
           {selectedVocab && (
@@ -72,7 +92,7 @@ export function ReaderVocabDrawer({
                 {selectedVocab.viMeaning}
               </p>
               <div className="p-3 rounded-xl bg-warm-ivory border border-heritage-green/8 text-xs text-ink-soft italic">
-                "{selectedVocab.contextSentence}"
+                &ldquo;{selectedVocab.contextSentence}&rdquo;
               </div>
 
               <div className="mt-4 pt-3 border-t border-heritage-green/10 flex items-center justify-between">

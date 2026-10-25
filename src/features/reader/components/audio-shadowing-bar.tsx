@@ -122,10 +122,10 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
       }`}
     >
       {/* ── Single Compact 1-Line Row Layout ──────────────────────────────────── */}
-      <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-3 sm:gap-4">
+      <div className="reader-audio-layout flex flex-wrap items-center justify-between gap-3 sm:gap-4">
         
         {/* 1. Left: Track / Audio Info + Voice Indicator Button */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
+        <div className="reader-audio-info flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
           <div
             className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 border ${
               isDark
@@ -175,7 +175,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
         </div>
 
         {/* Mobile controls use a full row, with the timeline below them. */}
-        <div className="order-last flex basis-full flex-wrap items-center gap-2 sm:gap-3 flex-1 justify-center min-w-0 md:order-none md:basis-auto md:flex-nowrap">
+        <div className={`reader-audio-controls order-last flex basis-full flex-wrap items-center gap-2 sm:gap-3 flex-1 justify-center min-w-0 ${isAtTop ? 'md:order-none md:basis-auto md:flex-nowrap' : 'md:order-last md:basis-full md:flex-wrap'}`}>
           
           {/* Icons on the LEFT of Play: Replay & Loop */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
@@ -237,7 +237,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
           </Button>
 
           {/* Scrubber / Progress Bar */}
-          <div className="order-last flex basis-full items-center gap-2 flex-1 min-w-[100px] select-none md:order-none md:basis-auto md:max-w-xs">
+          <div className="reader-audio-timeline order-last flex basis-full items-center gap-2 flex-1 min-w-[100px] select-none md:order-none md:basis-auto md:max-w-xs">
             <span
               style={{
                 fontVariantNumeric: "tabular-nums",
@@ -314,7 +314,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
         </div>
 
         {/* 3. Right: Voice Customizer Action Button & Mute */}
-        <div className="flex items-center justify-end gap-2 shrink-0 min-w-0">
+        <div className="reader-audio-actions flex items-center justify-end gap-2 shrink-0 min-w-0">
           {onOpenVoiceCustomizer && (
             <button
               onClick={onOpenVoiceCustomizer}

@@ -71,7 +71,7 @@
 .rp-workspace .reader-article-body { line-height: 1.8; }
 .rp-workspace button.ink-underline { border: 0; border-bottom: 1px dotted var(--desk-gold); }
 .rp-workspace :is(button, input, textarea) { scroll-margin-top: calc(var(--reader-toolbar-offset, 74px) + 78px); }
-.reader-workspace-switch { font-size: 11px; text-decoration: underline; text-underline-offset: 4px; min-height: 44px; white-space: nowrap; color: var(--desk-ink); }
+.reader-workspace-switch { font-size: 15px; text-decoration: underline; text-underline-offset: 4px; min-height: 44px; white-space: nowrap; color: var(--desk-ink); }
 @media (max-width: 1000px) { .rp-grid { grid-template-columns: minmax(0, 1.25fr) minmax(290px, 1fr); gap: 18px; } .rp-activity { padding: 20px; } }
 @media (max-width: 767px) {
   .rp-heading { flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }

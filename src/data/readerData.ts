@@ -4,6 +4,7 @@ export interface VocabItem {
   word: string;
   pos: string;
   ipa: string;
+  audioUrl?: string;
   viMeaning: string;
   enDefinition?: string;
   contextSentence: string;

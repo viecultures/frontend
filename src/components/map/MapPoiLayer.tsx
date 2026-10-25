@@ -4,10 +4,10 @@ import { geoToSvg } from '@/utils/vietnamMapUtils';
 
 const CATEGORY_COLORS: Record<string, { stroke: string; dot: string; ping: string }> = {
   Heritage: { stroke: 'var(--color-antique-gold)', dot: 'var(--color-antique-rich)', ping: 'var(--color-antique-rich)' },
-  Nature: { stroke: '#10B981', dot: '#34D399', ping: '#34D399' },
-  Cuisine: { stroke: '#F59E0B', dot: '#FBBF24', ping: '#FBBF24' },
-  Crafts: { stroke: '#8B5CF6', dot: '#A78BFA', ping: '#A78BFA' },
-  Folklore: { stroke: '#EC4899', dot: '#F472B6', ping: '#F472B6' },
+  Nature: { stroke: 'var(--color-success)', dot: 'var(--color-success)', ping: 'var(--color-success)' },
+  Cuisine: { stroke: 'var(--color-warning)', dot: 'var(--color-antique-rich)', ping: 'var(--color-antique-rich)' },
+  Crafts: { stroke: 'var(--color-info)', dot: 'var(--color-horizon-blue)', ping: 'var(--color-horizon-blue)' },
+  Folklore: { stroke: 'var(--color-danger)', dot: 'var(--color-lotus-pink)', ping: 'var(--color-lotus-pink)' },
 };
 
 export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
@@ -156,8 +156,8 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
                   width={badgeWidth}
                   height="13"
                   rx="6.5"
-                  fill={isPoiHovered ? catColor.stroke : 'var(--color-heritage-forest)'}
-                  stroke={isPoiHovered ? '#FFFFFF' : catColor.stroke}
+                  fill="var(--color-heritage-forest)"
+                  stroke={catColor.stroke}
                   strokeWidth={isPoiHovered ? '1.0' : '0.8'}
                   opacity="0.95"
                   className="drop-shadow-md"
@@ -166,14 +166,14 @@ export const MapPoiLayer: React.FC<MapPoiLayerProps> = ({
                 <path
                   d="M3.2 1.2C2.1 1.2 1.2 2.1 1.2 3.2c0 1.5 2 3.6 2 3.6s2-2.1 2-3.6c0-1.1-.9-2-2-2zm0 2.6c-.35 0-.64-.29-.64-.64s.29-.64.64-.64.64.29.64.64-.29.64-.64.64z"
                   transform={`translate(${-halfWidth + 4}, -4.2)`}
-                  fill={isPoiHovered ? 'var(--color-heritage-forest)' : catColor.dot}
+                  fill={catColor.dot}
                 />
                 <text
                   x={4}
                   y="0.8"
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  fill={isPoiHovered ? 'var(--color-heritage-forest)' : 'var(--color-antique-bright)'}
+                  fill="var(--color-warm-ivory)"
                   fontSize="6.8"
                   fontWeight="800"
                   letterSpacing="0.1px"

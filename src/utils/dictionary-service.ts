@@ -572,12 +572,13 @@ export async function lookupWordInstant(
             id: beData.id || lowerWord.replace(/\s+/g, '-'),
             word: beData.word,
             pos: beData.pos || 'Từ vựng tiếng Anh',
-            ipa: beData.ipa || `/${lowerWord}/`,
-            viMeaning: beData.viMeaning,
-            enDefinition: beData.enDefinition,
-            contextSentence: beData.contextSentence || contextSentence || `"${cleanWord}" in conversation.`,
+            ipa: beData.ipa || '/-/',
+            audioUrl: beData.audioUrl || undefined,
+            viMeaning: beData.viMeaning.startsWith('Từ tiếng Anh:') ? 'Chưa có nghĩa tiếng Việt.' : beData.viMeaning,
+            enDefinition: beData.enDefinition?.startsWith('Vocabulary item:') ? undefined : beData.enDefinition,
+            contextSentence: contextSentence || beData.contextSentence || '',
           };
-          VOCAB_MEMORY_CACHE.set(lowerWord, item);
+          if (item.viMeaning !== 'Chưa có nghĩa tiếng Việt.') VOCAB_MEMORY_CACHE.set(lowerWord, item);
           return item;
         }
       }
@@ -593,10 +594,9 @@ export async function lookupWordInstant(
           id: lowerWord.replace(/\s+/g, '-'),
           word: cleanWord,
           pos: 'Cụm từ (phrase)',
-          ipa: `/${lowerWord}/`,
-          viMeaning: viTranslation || `Cụm từ tiếng Anh: "${cleanWord}".`,
-          enDefinition: `English cultural phrase or collocation: "${cleanWord}".`,
-          contextSentence: contextSentence || `Context: "${cleanWord}" in conversation.`,
+          ipa: '/-/',
+          viMeaning: viTranslation || 'Chưa có nghĩa tiếng Việt.',
+          contextSentence: contextSentence || '',
         };
         if (viTranslation) {
           VOCAB_MEMORY_CACHE.set(lowerWord, item);
@@ -615,19 +615,15 @@ export async function lookupWordInstant(
         fetchVietnameseTranslation(cleanWord),
       ]);
 
-      const ipa = datamuseData?.ipa || `/${lowerWord}/`;
+      const ipa = datamuseData?.ipa || '/-/';
       const pos = datamuseData?.pos || wiktionaryData?.pos || 'Từ vựng tiếng Anh';
-      const enDefinition =
-        datamuseData?.definition ||
-        wiktionaryData?.definition ||
-        `English vocabulary item: ${cleanWord}.`;
+      const enDefinition = datamuseData?.definition || wiktionaryData?.definition;
       const viMeaning =
         viTranslation ||
-        `Từ tiếng Anh: "${cleanWord}".`;
+        'Chưa có nghĩa tiếng Việt.';
       const sentence =
         contextSentence ||
-        wiktionaryData?.example ||
-        `Context: "...${cleanWord}..." in English conversation.`;
+        wiktionaryData?.example || '';
 
       const item: VocabItem = {
         id: lowerWord.replace(/\s+/g, '-'),
@@ -648,10 +644,9 @@ export async function lookupWordInstant(
         id: lowerWord.replace(/\s+/g, '-'),
         word: cleanWord,
         pos: 'Từ vựng tiếng Anh',
-        ipa: `/${lowerWord}/`,
-        viMeaning: `Từ tiếng Anh: "${cleanWord}".`,
-        enDefinition: `Contextual vocabulary: ${cleanWord}.`,
-        contextSentence: contextSentence || `Context: "${cleanWord}" in conversation.`,
+        ipa: '/-/',
+        viMeaning: 'Chưa có nghĩa tiếng Việt.',
+        contextSentence: contextSentence || '',
       };
       return fallbackItem;
     }

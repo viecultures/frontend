@@ -405,34 +405,41 @@ export default function ReaderPage() {
         <div className="reader-desk-content">
           <aside className="reader-margin-note reader-margin-note-left" aria-hidden="true">Rooted<br />in<br />heritage</aside>
           <aside className="reader-margin-note reader-margin-note-right" aria-hidden="true">Vietnamese<br />culture<br />a brighter<br />tomorrow</aside>
-          {/* Optional article listening controls in Reading. */}
-          {readingMode === 'bilingual' && <details id="reader-audio" className="reader-audio-disclosure">
-          <summary>Listen & practice pronunciation</summary>
-          {articleData && articleData.id !== 'tet-holiday' && !articleData.shadowingAudioUrl ? <p role="status">Audio is not available for this article yet. You can continue reading and reviewing vocabulary.</p> : <AudioShadowingBar
-            articleTitle={articleData?.titleEn}
-            onStartShadowing={() => handleStartPractice('shadowing')}
-            isPlaying={isPlaying}
-            onTogglePlay={handleTogglePlay}
-            playbackSpeed={playbackSpeed}
-            onChangeSpeed={(speed: number) => setPlaybackSpeed(speed)}
-            isRepeatLoop={isRepeatLoop}
-            onToggleRepeatLoop={() => setIsRepeatLoop(!isRepeatLoop)}
-            currentSentenceEn={currentSentenceEn}
-            themeMode={themeMode}
-            selectedLevel={selectedLevel}
-            currentTime={currentTime}
-            duration={duration}
-            onSeek={handleSeek}
-            onRestart={handleRestart}
-            isMuted={isMuted}
-            onToggleMute={() => setIsMuted(!isMuted)}
-            selectedVoiceName={currentVoice.name}
-            selectedVoiceFlag={currentVoice.flag}
-            selectedVoiceGender={currentVoice.gender}
-            audioScope={audioScope}
-            onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
-          />}
-          </details>}
+          {/* Article listening controls displayed directly */}
+          {readingMode === 'bilingual' && (
+            articleData && articleData.id !== 'tet-holiday' && !articleData.shadowingAudioUrl ? (
+              <p role="status" className="px-4 py-2 text-sm text-ink-soft">
+                Audio is not available for this article yet. You can continue reading and reviewing vocabulary.
+              </p>
+            ) : (
+              <div id="reader-audio" className="reader-audio-direct">
+                <AudioShadowingBar
+                  articleTitle={articleData?.titleEn}
+                  onStartShadowing={() => handleStartPractice('shadowing')}
+                  isPlaying={isPlaying}
+                  onTogglePlay={handleTogglePlay}
+                  playbackSpeed={playbackSpeed}
+                  onChangeSpeed={(speed: number) => setPlaybackSpeed(speed)}
+                  isRepeatLoop={isRepeatLoop}
+                  onToggleRepeatLoop={() => setIsRepeatLoop(!isRepeatLoop)}
+                  currentSentenceEn={currentSentenceEn}
+                  themeMode={themeMode}
+                  selectedLevel={selectedLevel}
+                  currentTime={currentTime}
+                  duration={duration}
+                  onSeek={handleSeek}
+                  onRestart={handleRestart}
+                  isMuted={isMuted}
+                  onToggleMute={() => setIsMuted(!isMuted)}
+                  selectedVoiceName={currentVoice.name}
+                  selectedVoiceFlag={currentVoice.flag}
+                  selectedVoiceGender={currentVoice.gender}
+                  audioScope={audioScope}
+                  onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
+                />
+              </div>
+            )
+          )}
 
           {/* Reading and Practice retain the same article and level. */}
           {readingMode === "bilingual" ? (
@@ -488,6 +495,8 @@ export default function ReaderPage() {
         bookmarkedWords={bookmarkedWords}
         onToggleBookmarkWord={toggleBookmarkWord}
         articleTitle={articleData?.titleEn}
+        articleId={articleData?.id || targetId}
+        level={selectedLevel}
       />
 
       {/* Voice Customizer Modal (Tùy chỉnh giọng đọc Google Gemini) */}

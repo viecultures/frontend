@@ -7,11 +7,12 @@ import {
   DictionaryQuickActionCards,
   DictionaryCategoryFilter,
   DictionaryLibraryGrid,
+  DictionaryPagination,
   DictionaryInspectorModal,
   CreateDeckModal,
 } from "../components";
 import { paths } from '@/routes/paths';
-import { VOCABULARY_CATEGORY_LABELS } from '../lib/vocabulary-catalog';
+import { VOCABULARY_CATEGORY_LABELS, VOCABULARY_PAGE_SIZE } from '../lib/vocabulary-catalog';
 import '../dictionary-components.css';
 
 const CATEGORY_OPTIONS = [
@@ -27,6 +28,7 @@ export default function DictionaryPage() {
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   // Inspector Modal state
   const [inspectLesson, setInspectLesson] = useState<Lesson | null>(null);
@@ -50,6 +52,22 @@ export default function DictionaryPage() {
     if (sortOrder === "newest") lessons.sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
     return lessons;
   }, [selectedCategory, searchQuery, sortOrder]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredLessons.length / VOCABULARY_PAGE_SIZE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedLessons = useMemo(() => {
+    const startIndex = (safeCurrentPage - 1) * VOCABULARY_PAGE_SIZE;
+    return filteredLessons.slice(startIndex, startIndex + VOCABULARY_PAGE_SIZE);
+  }, [filteredLessons, safeCurrentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    libraryRef.current?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      block: "start",
+    });
+  };
 
   // Audio Pronunciation
   const playAudio = (word: string) => {
@@ -81,13 +99,17 @@ export default function DictionaryPage() {
         <div className="space-y-4">
           <DictionaryDailyHero
             searchQuery={searchQuery}
-            onChangeSearch={setSearchQuery}
+            onChangeSearch={(query) => {
+              setSearchQuery(query);
+              setCurrentPage(1);
+            }}
           />
 
           <DictionaryQuickActionCards
             onGoToRecent={() => handleGoToStudy("imperial-hue")}
             onExploreMore={() => {
               setSelectedCategory("All");
+              setCurrentPage(1);
               libraryRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
             }}
             onOpenCreateDeck={() => setIsCreateDeckOpen(true)}
@@ -98,23 +120,35 @@ export default function DictionaryPage() {
         <section ref={libraryRef} className="vocab-library-section" aria-labelledby="vocab-library-title">
           <div className="vocab-library-heading">
             <div><p className="vocab-eyebrow">LEARN LANGUAGE THROUGH HERITAGE</p><h2 id="vocab-library-title">Vocabulary decks <span>{LESSONS_DATA.length}</span></h2></div>
-            <label className="vocab-sort"><span>Sort by:</span><select aria-label="Sort vocabulary decks" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}><option value="default">Recommended</option><option value="newest">Newest</option><option value="name">Name A–Z</option></select></label>
+            <label className="vocab-sort"><span>Sort by:</span><select aria-label="Sort vocabulary decks" value={sortOrder} onChange={(e) => { setSortOrder(e.target.value); setCurrentPage(1); }}><option value="default">Recommended</option><option value="newest">Newest</option><option value="name">Name A–Z</option></select></label>
           </div>
 
           {/* Category Filter Pills */}
           <DictionaryCategoryFilter
             categories={CATEGORY_OPTIONS}
             selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
+            onSelectCategory={(cat) => {
+              setSelectedCategory(cat);
+              setCurrentPage(1);
+            }}
           />
 
           <p className="vocab-results" role="status">{searchQuery ? `${filteredLessons.length} decks found for “${searchQuery}”` : `${filteredLessons.length} decks to explore`}</p>
 
           {/* Library Cards Grid */}
           <DictionaryLibraryGrid
-            lessons={filteredLessons}
+            lessons={paginatedLessons}
             onGoToStudy={handleGoToStudy}
             onInspectLesson={setInspectLesson}
+          />
+
+          {/* Pagination Controls */}
+          <DictionaryPagination
+            currentPage={safeCurrentPage}
+            totalPages={totalPages}
+            totalDecks={filteredLessons.length}
+            itemsPerPage={VOCABULARY_PAGE_SIZE}
+            onPageChange={handlePageChange}
           />
         </section>
       </div>

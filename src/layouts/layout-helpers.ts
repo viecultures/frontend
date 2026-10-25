@@ -12,6 +12,7 @@ export const getActiveView = (pathname: string): string => {
   if (pathname.startsWith('/community-2') || pathname.startsWith('/community-contest')) return 'community-contest';
   if (pathname.startsWith('/community')) return 'community';
   if (pathname.startsWith('/playground')) return 'playground';
+  if (pathname.startsWith('/ai-workspace')) return 'ai-workspace';
   if (pathname.startsWith('/admin')) return 'admin';
   if (pathname.startsWith('/pricing') || pathname.startsWith('/checkout') || pathname.startsWith('/subscription')) {
     return 'pricing';

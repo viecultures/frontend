@@ -52,9 +52,9 @@ export function ReaderWorkspaceReference({ active }: ReaderWorkspaceReferencePro
   }
   return (
     <section className="reader-workspace-reference" aria-label="Reading context" title={context.title}>
-      <span className="reader-workspace-reference-label">From Reader</span>
+      <span className="reader-workspace-reference-label">Bài đọc: {context.title}</span>
       <div className="reader-workspace-reference-actions">
-        <button type="button" aria-label="Reading reference" title="Reading reference" onClick={() => useChatWorkspace.getState().openReaderReference()}><BookOpen size={16} /><span>Reading reference</span></button>
+        <button type="button" aria-label="Xem ghi chú bài đọc" title="Xem ghi chú bài đọc" onClick={() => useChatWorkspace.getState().openReaderReference()}><BookOpen size={16} /><span>Xem ghi chú</span></button>
         <Link to={context.readerUrl} aria-label="Back to Reader" title="Back to Reader"><ArrowLeft size={16} /><span>Back to Reader</span></Link>
         <button type="button" onClick={dismissReference} aria-label="Dismiss reading reference" title="Dismiss reading reference"><X size={16} /></button>
       </div>

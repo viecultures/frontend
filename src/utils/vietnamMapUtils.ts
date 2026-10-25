@@ -6,6 +6,14 @@ import {
   type ProvinceMapItem,
 } from '@/data/vietnamMapData';
 
+export function toEnglishPlaceName(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/gi, 'd')
+    .replace(/\b\p{L}/gu, character => character.toUpperCase());
+}
+
 export interface ProvinceCulturalSpecialty {
   icon: string;
   heritageType?: string;

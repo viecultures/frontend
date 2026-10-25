@@ -182,7 +182,7 @@ export default function StreamingConsole() {
   };
 
   return (
-    <div className="transcription-container flex flex-col h-full bg-[#121619] text-[#f1f3f4]">
+    <div className="transcription-container flex flex-col h-full">
       <AiMapLessonProgressBar />
       <AiWorkspaceChatHeader title={tutorMode === 'free-conversation' ? readerContext?.title || 'English through Vietnamese culture' : activeLesson.title}
         mode={tutorMode} level={proficiencyLevel} busy={busy} connected={connected}
@@ -220,14 +220,14 @@ export default function StreamingConsole() {
                     <div
                       key={t.id}
                       data-turn-id={t.id}
-                      className="chat-tool-message p-3.5 rounded-xl bg-heritage-green/20 border border-antique-gold/30 text-xs text-[#E8ECE9] shadow-sm space-y-3 animate-fadeIn"
+                      className="chat-tool-message p-3.5 border text-xs shadow-sm space-y-3 animate-fadeIn"
                     >
-                      <div className="flex items-center justify-between text-[11px] font-mono text-antique-gold border-b border-antique-gold/20 pb-2">
+                      <div className="chat-tool-header flex items-center justify-between text-[11px] font-mono border-b pb-2">
                         <span className="font-bold flex items-center gap-1.5">
-                          <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
+                          <BookOpen className="w-3.5 h-3.5" />
                           VieCultures stories ({articlePayload.length})
                         </span>
-                        <span className="text-gray-400 text-[10px]">{formatTimestamp(t.timestamp)}</span>
+                        <span className="chat-tool-timestamp text-[10px]">{formatTimestamp(t.timestamp)}</span>
                       </div>
 
                       <div className="space-y-2.5">
@@ -235,19 +235,19 @@ export default function StreamingConsole() {
                           <div
                             key={`${art.id}-${idx}`}
                             data-article-card
-                            className="rounded-xl bg-[#14181a] border border-antique-gold/25 hover:border-antique-gold/60 p-3 space-y-2 transition-all shadow-sm group"
+                            className="chat-story-card rounded-xl border p-3 space-y-2 transition-all shadow-sm group"
                           >
                             <div className="flex items-center justify-between gap-2 flex-wrap">
-                              <div className="flex items-center gap-1.5 text-[10.5px] text-gray-300">
-                                <MapPin className="w-3.5 h-3.5 text-antique-gold shrink-0" />
-                                <span className="font-medium text-gray-200">{art.location || art.titleVi}</span>
+                              <div className="chat-story-meta flex items-center gap-1.5 text-[10.5px]">
+                                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                                <span className="font-medium">{art.location || art.titleVi}</span>
                               </div>
                               <div className="flex items-center gap-1.5 shrink-0">
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold bg-heritage-green text-antique-gold border border-antique-gold/30">
+                                <span className="chat-story-level px-1.5 py-0.5 rounded text-[9px] font-mono border">
                                   {art.level}
                                 </span>
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono text-gray-400 bg-white/5 border border-white/10 flex items-center gap-1">
-                                  <Clock className="w-2.5 h-2.5 text-antique-gold" />
+                                <span className="chat-story-time px-1.5 py-0.5 rounded text-[9px] font-mono border flex items-center gap-1">
+                                  <Clock className="w-2.5 h-2.5" />
                                   {art.readTime}
                                 </span>
                               </div>
@@ -260,22 +260,22 @@ export default function StreamingConsole() {
                                 className="group/title inline-block text-left cursor-pointer"
                                 title="Open story details"
                               >
-                                <h4 className="text-xs font-serif font-bold text-white group-hover/title:text-antique-bright group-hover/title:underline transition-colors leading-snug">
+                                <h4 className="chat-story-title text-xs group-hover/title:underline transition-colors leading-snug">
                                   {art.titleVi}
                                 </h4>
                               </button>
-                              <p className="text-[11px] text-gray-400 italic">
+                              <p className="chat-story-subtitle text-[11px] italic">
                                 {art.title}
                               </p>
                             </div>
 
                             {art.vocabHighlights && art.vocabHighlights.length > 0 && (
                               <div className="flex items-center gap-1 flex-wrap pt-0.5">
-                                <span className="text-[10px] text-antique-gold font-medium mr-0.5">Vocabulary:</span>
+                                <span className="chat-story-vocab-label text-[10px] mr-0.5">Vocabulary:</span>
                                 {art.vocabHighlights.map((vocab, vIdx) => (
                                   <span
                                     key={vIdx}
-                                    className="px-1.5 py-0.5 rounded text-[9.5px] bg-heritage-green/50 text-[#E8ECE9] border border-antique-gold/20 font-mono"
+                                    className="chat-story-vocab px-1.5 py-0.5 rounded text-[9.5px] border font-mono"
                                   >
                                     {vocab}
                                   </span>
@@ -284,48 +284,48 @@ export default function StreamingConsole() {
                             )}
 
                             {art.excerptEn && (
-                              <p data-article-excerpt className="text-[10.5px] text-gray-300/90 leading-relaxed bg-black/30 p-2 rounded-lg border-l-2 border-antique-gold/60 italic">
+                              <p data-article-excerpt className="chat-story-excerpt text-[10.5px] leading-relaxed p-2 rounded-lg border-l-2 italic">
                                 "{art.excerptEn.length > 150 ? art.excerptEn.slice(0, 150) + '…' : art.excerptEn}"
                               </p>
                             )}
 
-                            <div className="flex items-center justify-end gap-1.5 pt-1 border-t border-white/5 flex-wrap">
+                            <div className="chat-story-actions flex items-center justify-end gap-1.5 pt-1 border-t flex-wrap">
                               <button
                                 type="button"
                                 onClick={() => active && useChatWorkspace.getState().openArticle(art.id)}
-                                className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 flex items-center gap-1 cursor-pointer"
+                                className="chat-story-action px-2.5 py-1 rounded-md text-[10px] border flex items-center gap-1 cursor-pointer"
                               >
-                                <BookOpen className="w-3 h-3 text-antique-gold" /> Story details
+                                <BookOpen className="w-3 h-3" /> Story details
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleFocusLandmarkOnMap(art.id)}
-                                className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-heritage-green/40 hover:bg-heritage-green text-antique-bright border border-antique-gold/30 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
+                                className="chat-story-action px-2.5 py-1 rounded-md text-[10px] border flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
                                 title="Locate this place on the map"
                               >
-                                <Compass className="w-3 h-3 text-antique-gold" />
+                                <Compass className="w-3 h-3" />
                                 <span>Show on map</span>
                               </button>
                               <button
                                 type="button"
                                 disabled={busy}
                                 onClick={() => handleDiscussArticle(art)}
-                                className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 hover:border-white/20 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
+                                className="chat-story-action px-2.5 py-1 rounded-md text-[10px] border flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
                                 title="Discuss this story with AI"
                               >
-                                <MessageSquareText className="w-3 h-3 text-antique-gold" />
+                                <MessageSquareText className="w-3 h-3" />
                                 <span>Discuss this story</span>
                               </button>
                               <a
                                 href={paths.reader({ article: art.id, level: art.level || 'Level 2' })}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-antique-gold/15 hover:bg-antique-gold/25 text-antique-bright border border-antique-gold/35 flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
+                                className="chat-story-action px-2.5 py-1 rounded-md text-[10px] border flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
                                 title="Open the full story in a new tab"
                               >
-                                <BookOpen className="w-3 h-3 text-antique-gold" />
+                                <BookOpen className="w-3 h-3" />
                                 <span>Read story</span>
-                                <ExternalLink className="w-2.5 h-2.5 text-antique-gold/70" />
+                                <ExternalLink className="w-2.5 h-2.5" />
                               </a>
                             </div>
                           </div>
@@ -339,9 +339,9 @@ export default function StreamingConsole() {
                   <div
                     key={t.id}
                   data-turn-id={t.id}
-                    className="chat-tool-message p-3 rounded-xl bg-heritage-green/20 border border-antique-gold/30 text-xs text-[#E8ECE9] shadow-sm space-y-1 animate-fadeIn"
+                    className="chat-tool-message p-3 border text-xs shadow-sm space-y-1 animate-fadeIn"
                   >
-                    <div className="flex items-center justify-between text-[10px] font-mono text-antique-gold">
+                    <div className="chat-tool-header flex items-center justify-between text-[10px] font-mono">
                       <span className="font-bold flex items-center gap-1">
                         <Sparkles className="w-3 h-3" /> Cultural companion
                       </span>
@@ -362,22 +362,14 @@ export default function StreamingConsole() {
                   className={`flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-fadeIn`}
                 >
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs shadow ${
-                      isUser
-                        ? 'bg-[#2563EB] text-white'
-                        : 'bg-heritage-green text-antique-gold border border-antique-gold/30'
-                    }`}
+                    className={`chat-message-avatar ${isUser ? 'chat-message-avatar--user' : 'chat-message-avatar--assistant'} w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs shadow`}
                   >
                     {isUser ? <User className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
                   </div>
 
                   <div
                     data-message-role={isUser ? 'user' : 'assistant'}
-                    className={`chat-message-bubble max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
-                      isUser
-                        ? 'bg-[#2563EB] text-white rounded-tr-sm shadow-md'
-                        : 'bg-[#232729] text-[#f1f3f4] border border-white/10 rounded-tl-sm shadow-md'
-                    }`}
+                    className={`chat-message-bubble max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed border shadow-md ${isUser ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}
                   >
                     <div className="prose prose-invert prose-xs max-w-none select-text cursor-text">
                       <MessageMarkdown text={t.text} />
@@ -388,7 +380,7 @@ export default function StreamingConsole() {
             })}
 
             {active && (isAwaitingFunctionResponse || isAwaitingResponse) && (
-              <div className="flex items-center gap-2 text-xs text-antique-gold p-2 bg-heritage-green/20 rounded-lg border border-antique-gold/20">
+              <div className="chat-tool-status flex items-center gap-2 text-xs p-2 rounded-lg border">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                 <span>Opening your learning tools…</span>
               </div>
@@ -401,7 +393,7 @@ export default function StreamingConsole() {
                   key={idx}
                   disabled={busy}
                   onClick={() => handleSendPrompt(action.text)}
-                  className="ai-chat-suggestion px-2.5 py-1 rounded-full bg-[#232729] hover:bg-heritage-green border border-white/10 text-xs text-antique-gold transition-all flex items-center gap-1 cursor-pointer"
+                  className="ai-chat-suggestion px-2.5 py-1 rounded-full border text-xs transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <Compass className="w-3 h-3" />
                   <span>{action.label}</span>
@@ -411,7 +403,7 @@ export default function StreamingConsole() {
           </>
         )}
       </div>
-      {active && hasNewMessages && <button type="button" onClick={scrollToLatest} className="mx-auto my-2 rounded-full bg-heritage-green px-4 py-2 text-xs text-antique-gold">New messages ↓</button>}
+      {active && hasNewMessages && <button type="button" onClick={scrollToLatest} className="chat-new-messages mx-auto my-2 rounded-full px-4 py-2 text-xs">New messages ↓</button>}
       <InPlaceDictionaryPopup
         isOpen={active && Boolean(selectedWord && wordPosition)}
         vocab={selectedWord}

@@ -11,7 +11,7 @@
 .vocab-library-page .vocab-search { border-radius: var(--radius-xl); }
 .vocab-library-page .vocab-search input { font-size: 14px; font-weight: 400; }
 .vocab-library-page .vocab-search button { min-width: 44px; min-height: 44px; border-radius: var(--radius-xl); }
-.vocab-library-page :is(.vocab-featured, .vocab-action-tile, .vocab-deck, .vocab-empty) { border-radius: var(--radius-2xl); }
+.vocab-library-page :is(.vocab-featured, .vocab-action-tile, .vocab-deck, .vocab-empty, .vocab-pagination) { border-radius: var(--radius-2xl); }
 .vocab-library-page .vocab-featured-label { font-size: 11px; font-weight: 500; letter-spacing: .06em; }
 .vocab-library-page .vocab-featured h2 { font-size: clamp(26px, 2.1vw, 32px); font-weight: 500; line-height: 1.4; }
 .vocab-library-page .vocab-featured p { font-size: 13px; font-weight: 400; line-height: 1.7; }
@@ -36,6 +36,9 @@
 .vocab-library-page .vocab-deck-footer button { min-height: 44px; border-radius: var(--radius-xl); font-size: 12px; font-weight: 400; }
 .vocab-library-page .vocab-empty h3 { font-family: var(--font-sans); font-size: 22px; font-weight: 500; }
 .vocab-library-page .vocab-empty p { font-size: 14px; line-height: 1.7; }
+.vocab-library-page .vocab-pagination-button { min-height: 40px; min-width: 40px; border-radius: var(--radius-xl); font-size: 13px; font-weight: 400; }
+.vocab-library-page .vocab-pagination-button[aria-current="page"] { font-weight: 500; }
+.vocab-library-page .vocab-pagination-info { font-size: 13px; font-weight: 400; }
 
 /* Portalled dialogs opt in explicitly; Flashcard keeps its existing styling. */
 .dictionary-dialog .dictionary-dialog-panel { border-radius: var(--radius-2xl); }

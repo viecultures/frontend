@@ -6,7 +6,8 @@ import { HomeWidgetsGrid } from '../components/HomeWidgetsGrid';
 import { HomeBottomDock } from '../components/HomeBottomDock';
 import { HomeContinueCard } from '../components/HomeContinueCard';
 import { HomeRecommendations } from '../components/HomeRecommendations';
-import { HomeReviewCard } from '../components/HomeReviewCard';
+import { HomeVocabularyCard } from '../components/HomeVocabularyCard';
+import { HomeCalendarCard } from '../components/HomeCalendarCard';
 import { readReadingHistory, readStudyTasks, saveStudyTasks, type StudyTask } from '../lib/studyRoomStorage';
 import { useSettings } from '@/context/SettingsContext';
 import { useAppNavigate } from '@/routes/useAppNavigate';
@@ -46,12 +47,9 @@ function StudyRoomContent({ account, userName }: StudyRoomContentProps) {
     {storageError && <p className="home-room-error" role="alert">{storageError}</p>}
     <div className="home-room-grid">
       <HomeContinueCard bookmark={bookmark} />
-      <HomeReviewCard />
-      <HomeWidgetsGrid tasks={tasks}
-        onToggleTask={id => updateTasks(tasks.map(task => task.id === id ? { ...task, completed: !task.completed } : task))}
-        onAddTask={label => updateTasks([...tasks, { id: crypto.randomUUID(), label, completed: false }])} />
+      <HomeCalendarCard />
       <HomeRecommendations currentId={bookmark?.id} />
-      <HomeBottomDock />
+      <HomeVocabularyCard />
     </div>
   </main>;
 }

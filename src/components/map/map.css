@@ -1,0 +1,64 @@
+.vc-map .vc-map-region-bar,
+.vc-map .vc-map-controls,
+.vc-map .vc-map-tooltip {
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
+  border-color: var(--color-line);
+  box-shadow: var(--shadow-panel);
+}
+
+.vc-map .vc-map-region-tabs {
+  background: var(--color-surface-muted);
+  border-color: var(--color-line);
+}
+
+.vc-map .vc-map-region-tab {
+  color: var(--color-ink-soft);
+}
+
+.vc-map .vc-map-region-tab:hover,
+.vc-map .vc-map-control:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-ink);
+}
+
+.vc-map .vc-map-region-tab[aria-selected='true'] {
+  background: var(--color-action);
+  color: var(--color-on-action);
+}
+
+.vc-map .vc-map-region-tab[aria-selected='true']:hover {
+  background: var(--color-action-hover);
+  color: var(--color-on-action);
+}
+
+.vc-map .vc-map-region-count {
+  background: var(--color-surface-raised);
+  color: var(--color-ink-soft);
+}
+
+.vc-map .vc-map-region-tab[aria-selected='true'] .vc-map-region-count {
+  background: color-mix(in srgb, var(--color-on-action) 16%, transparent);
+  color: var(--color-on-action);
+}
+
+.vc-map .vc-map-control {
+  color: var(--color-ink);
+}
+
+.vc-map .vc-map-control--reset {
+  color: var(--color-accent-ink);
+}
+
+.vc-map .vc-map-tooltip p {
+  color: inherit;
+}
+
+.vc-map .vc-map-svg {
+  filter: drop-shadow(0 8px 20px color-mix(in srgb, var(--color-heritage-forest) 18%, transparent));
+}
+
+.vc-map :is(.vc-map-region-tab, .vc-map-control):focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

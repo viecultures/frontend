@@ -105,7 +105,7 @@ function MapAiContent() {
       <div
         className={`streaming-console ${
           active && isSidebarOpen ? 'sidebar-open' : ''
-        } ${panel ? 'chat-panel-open' : 'chat-panel-closed'} flex flex-row h-full w-full overflow-hidden`}
+        } ${panel ? 'chat-panel-open' : 'chat-panel-closed'} ${panel?.type === 'reader' ? 'reader-panel-open' : ''} flex flex-row h-full w-full overflow-hidden`}
       >
         {/* FAR-LEFT IN-FLOW DEBUG HUB */}
         {active && isDrawerOpen && <MapAiDebugDrawer mode="panel" />}
@@ -116,9 +116,9 @@ function MapAiContent() {
         </div>
 
         {panel && (
-          <aside className="map-panel chat-tool-panel flex flex-col relative overflow-hidden bg-[#090e1a]" aria-label={panel.type === 'map' ? 'Vietnam map' : panel.type === 'reader' ? 'Reading reference' : 'Cultural story'}>
+          <aside className={`map-panel chat-tool-panel flex flex-col relative overflow-hidden bg-[#090e1a] ${panel.type === 'reader' ? 'reader-reference-drawer' : ''}`} aria-label={panel.type === 'map' ? 'Vietnam map' : panel.type === 'reader' ? 'Reading reference' : 'Cultural story'}>
             <div className="chat-tool-panel-header">
-              <h2>{panel.type === 'map' ? 'Vietnam map' : panel.type === 'reader' ? 'Reading reference' : 'Story details'}</h2>
+              <h2>{panel.type === 'map' ? 'Vietnam map' : panel.type === 'reader' ? 'Ghi chú bài đọc' : 'Story details'}</h2>
               <button type="button" onClick={closePanel} aria-label="Close content" title="Close (Esc)"><X size={18} /></button>
             </div>
             {panel.type === 'reader' ? <ReaderWorkspacePanel /> : panel.type === 'article' ? (
@@ -126,7 +126,7 @@ function MapAiContent() {
             ) : (
               <div className="relative flex-1 min-h-0 w-full">
                 {active && selectedLandmark && selectedLandmark.provinceId === selectedProvinceId && (
-                  <button type="button" disabled={busy} className="absolute bottom-4 left-4 z-30 rounded-xl bg-heritage-green px-4 py-2 text-xs text-white" onClick={() => !busy && void sendMessage({ text: `Tell me about ${selectedLandmark.name} in ${selectedProvinceDetail?.name || selectedLandmark.locationNameVi}. Use English suited for ${proficiencyLevel}.`, source: 'map' })}>
+                  <button type="button" disabled={busy} className="ai-workspace-map-ask-button" onClick={() => !busy && void sendMessage({ text: `Tell me about ${selectedLandmark.name} in ${selectedProvinceDetail?.name || selectedLandmark.locationNameVi}. Use English suited for ${proficiencyLevel}.`, source: 'map' })}>
                     Ask AI about {selectedLandmark.name}
                   </button>
                 )}

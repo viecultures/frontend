@@ -16,7 +16,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className={`absolute bottom-4 right-4 z-20 flex flex-col items-center gap-1.5 bg-heritage-forest/90 border border-antique-gold/40 p-1.5 rounded-2xl shadow-xl backdrop-blur-md ${className}`}
+      className={`vc-map-controls absolute bottom-4 right-4 z-20 flex flex-col items-center gap-1.5 border p-1.5 rounded-2xl ${className}`}
     >
       <button
         type="button"
@@ -24,7 +24,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
           e.stopPropagation();
           onZoomIn();
         }}
-        className="p-2 rounded-xl text-warm-ivory hover:bg-white/10 hover:text-antique-rich transition-colors cursor-pointer focus-ring-dark"
+        className="vc-map-control p-2 rounded-xl transition-colors cursor-pointer"
         title="Zoom in (+)"
         aria-label="Zoom in on map"
       >
@@ -37,7 +37,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
           e.stopPropagation();
           onZoomOut();
         }}
-        className="p-2 rounded-xl text-warm-ivory hover:bg-white/10 hover:text-antique-rich transition-colors cursor-pointer focus-ring-dark"
+        className="vc-map-control p-2 rounded-xl transition-colors cursor-pointer"
         title="Zoom out (-)"
         aria-label="Zoom out on map"
       >
@@ -51,7 +51,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
             e.stopPropagation();
             onResetZoom();
           }}
-          className="p-2 rounded-xl text-antique-rich hover:bg-white/10 transition-colors cursor-pointer focus-ring-dark animate-in fade-in zoom-in duration-200"
+          className="vc-map-control vc-map-control--reset p-2 rounded-xl transition-colors cursor-pointer animate-in fade-in zoom-in duration-200"
           title="Reset map to all places"
           aria-label="Reset map"
         >

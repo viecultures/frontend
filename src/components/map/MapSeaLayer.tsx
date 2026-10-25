@@ -4,6 +4,7 @@ import type { MapSeaLayerProps } from './types';
 export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
   islands,
   className = '',
+  labelLanguage = 'vi',
 }) => {
   return (
     <g id="layer-sea" className={`pointer-events-none select-none ${className}`}>
@@ -76,7 +77,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
             fontSize="8.5"
             fontWeight="700"
           >
-            {island.code}
+            {labelLanguage === 'en' ? (island.id === 'hoang-sa' ? 'HOANG SA (VIETNAM)' : 'TRUONG SA (VIETNAM)') : island.code}
           </text>
         </g>
       ))}

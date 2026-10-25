@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Search, SlidersHorizontal, X } from 'lucide-react';
 import { LESSONS_DATA, TOPIC_OPTIONS } from '@/data/discoveryData';
@@ -6,19 +6,19 @@ import { Button } from '@/components/ui/button';
 import { readerApiService, type CatalogLesson } from '@/features/reader/services/readerApiService';
 import { readLearningValue, writeLearningValue } from '@/services/learning/learningStorage';
 import { EditorialStory } from '../components/EditorialStory';
+import { DiscoveryJourney } from '../components/DiscoveryJourney';
 import { DEFAULT_FILTERS, filterCatalog, mergeCatalog, readBookmarkState, selectEditorial, type DiscoveryFilters } from '../lib/catalog';
 import { TOPIC_LABELS } from '../lib/editorial';
 import '../discovery.css';
+import '../journey.css';
 
-const ProvinceBrowser = lazy(() => import('../components/DiscoveryProvinceBrowser'));
 const PAGE_SIZE = 6;
 
 export default function DiscoveryPage() {
   const [params, setParams] = useSearchParams();
-  const places = params.get('view') === 'places';
+  const journey = params.get('view') !== 'stories';
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
   const [advanced, setAdvanced] = useState(false);
-  const [provinceName, setProvinceName] = useState('');
   const [page, setPage] = useState(1);
   const [remote, setRemote] = useState<CatalogLesson[]>([]);
   const [catalogState, setCatalogState] = useState<'loading' | 'ready' | 'offline'>('loading');
@@ -51,11 +51,11 @@ export default function DiscoveryPage() {
   }, [retry]);
 
   const catalog = useMemo(() => mergeCatalog(LESSONS_DATA, remote, readerApiService.mapCatalogLessonToDiscoveryLesson), [remote]);
-  const effectiveFilters = useMemo(() => ({ ...filters, province: places ? filters.province : '' }), [filters, places]);
+  const effectiveFilters = useMemo(() => ({ ...filters, province: '' }), [filters]);
   const filtered = useMemo(() => filterCatalog(catalog, effectiveFilters, bookmarks), [catalog, effectiveFilters, bookmarks]);
   const hasFilters = effectiveFilters.query.trim() !== '' || effectiveFilters.topic !== 'All' || effectiveFilters.level !== 'All'
-    || effectiveFilters.duration !== 'All' || effectiveFilters.saved || !!effectiveFilters.province || effectiveFilters.sort !== 'recommended';
-  const editorial = useMemo(() => !places && !hasFilters ? selectEditorial(filtered) : [], [filtered, places, hasFilters]);
+    || effectiveFilters.duration !== 'All' || effectiveFilters.saved || effectiveFilters.sort !== 'recommended';
+  const editorial = useMemo(() => !hasFilters ? selectEditorial(filtered) : [], [filtered, hasFilters]);
   const remaining = filtered.filter(item => !editorial.some(story => story.id === item.id));
   const pageCount = Math.max(1, Math.ceil(remaining.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
@@ -65,11 +65,11 @@ export default function DiscoveryPage() {
     setFilters(previous => ({ ...previous, [key]: value }));
     setPage(1);
   }
-  function resetFilters() { setFilters(DEFAULT_FILTERS); setProvinceName(''); setPage(1); }
-  function changeMode(nextPlaces: boolean) {
+  function resetFilters() { setFilters(DEFAULT_FILTERS); setPage(1); }
+  function showJourney() {
     setParams(previous => {
       const next = new URLSearchParams(previous);
-      if (nextPlaces) next.set('view', 'places'); else next.delete('view');
+      next.delete('view');
       return next;
     });
     setPage(1);
@@ -89,14 +89,21 @@ export default function DiscoveryPage() {
   const storyProps = { onSave: toggleBookmark };
   const extraCount = Number(filters.duration !== 'All') + Number(filters.saved) + Number(filters.sort !== 'recommended');
 
+  if (journey) return <DiscoveryJourney onBrowseStories={() => setParams(previous => {
+    const next = new URLSearchParams(previous);
+    next.set('view', 'stories');
+    next.delete('place');
+    return next;
+  })} />;
+
   return (
     <div className="discovery-editorial">
       <header className="discovery-header">
         <div><p className="discovery-eyebrow">DISCOVER VIETNAM</p><h1>Stories from Vietnam</h1>
           <p>Choose a story. See Vietnam from a new perspective.</p></div>
         <div className="discovery-modes" role="group" aria-label="Explore by">
-          <button type="button" aria-pressed={!places} onClick={() => changeMode(false)}>Stories</button>
-          <button type="button" aria-pressed={places} onClick={() => changeMode(true)}>By place</button>
+          <button type="button" onClick={showJourney}>Journey</button>
+          <button type="button" aria-pressed="true">Stories</button>
         </div>
       </header>
       <section className="discovery-filters" aria-label="Find and filter stories">
@@ -117,18 +124,16 @@ export default function DiscoveryPage() {
         </div>}
         {hasFilters && <div className="discovery-filter-summary"><span>{filtered.length} matching {filtered.length === 1 ? 'story' : 'stories'}{filters.saved ? ' · Saved' : ''}{filters.duration !== 'All' ? ` · ${filters.duration === 'short' ? 'Up to 5 min' : filters.duration === 'medium' ? '6–10 min' : 'Over 10 min'}` : ''}</span><Button variant="ghost" size="sm" onClick={resetFilters}>Clear filters</Button></div>}
       </section>
-      <div className={`discovery-content ${places ? 'discovery-content--places' : ''}`}>
-        {places && <Suspense fallback={<div className="discovery-map-loading" role="status">Loading map…</div>}><ProvinceBrowser selected={filters.province} catalog={catalog} onSelect={(id, name) => { updateFilter('province', id); setProvinceName(name); }} /></Suspense>}
+      <div className="discovery-content">
         <div className="discovery-stories">
-          {!places && currentPage === 1 && editorial.length > 0 && <section className="discovery-feature" aria-label="Featured stories">
+          {currentPage === 1 && editorial.length > 0 && <section className="discovery-feature" aria-label="Featured stories">
             <h2 className="sr-only">Featured stories</h2>
             <EditorialStory {...storyProps} lesson={editorial[0]} variant="lead" saved={!!bookmarks[editorial[0].id]} />
             <div className="discovery-supporting">{editorial.slice(1).map(lesson => <EditorialStory key={lesson.id} {...storyProps} lesson={lesson} variant="support" saved={!!bookmarks[lesson.id]} />)}</div>
           </section>}
           <section aria-labelledby="discovery-results-heading">
-            <div className="discovery-section-heading"><h2 id="discovery-results-heading" ref={resultsHeading} tabIndex={-1}>{places ? provinceName || 'Stories across Vietnam' : hasFilters ? 'Search results' : 'More stories to explore'}</h2>
+            <div className="discovery-section-heading"><h2 id="discovery-results-heading" ref={resultsHeading} tabIndex={-1}>{hasFilters ? 'Search results' : 'More stories to explore'}</h2>
               <span aria-live="polite">{remaining.length} stories</span></div>
-            {places && filters.province && <p className="discovery-province-note">Stories connected to {provinceName}. <button type="button" onClick={() => { updateFilter('province', ''); setProvinceName(''); }}>View all places</button></p>}
             {visible.length > 0 ? <div className="discovery-story-grid">{visible.map(lesson => <EditorialStory key={lesson.id} {...storyProps} lesson={lesson} saved={!!bookmarks[lesson.id]} />)}</div>
               : <div className="discovery-empty"><h3>{filters.saved ? 'No matching saved stories' : 'No matching stories yet'}</h3><p>{filters.saved ? 'Use the bookmark on a story to keep it for later.' : 'Try another topic, clear a filter or explore a different place.'}</p><Button variant="outline" onClick={resetFilters}>View all stories</Button></div>}
             {pageCount > 1 && <nav className="discovery-pagination" aria-label="Story pages"><Button variant="ghost" size="sm" disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}><ArrowLeft size={18} />Previous</Button><span aria-live="polite">{currentPage} / {pageCount}</span><Button variant="ghost" size="sm" disabled={currentPage === pageCount} onClick={() => changePage(currentPage + 1)}>Next<ArrowRight size={18} /></Button></nav>}

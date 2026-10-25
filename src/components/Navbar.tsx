@@ -16,10 +16,10 @@ interface NavbarProps {
 }
 
 const navigation = [
-  { label: 'Study room', path: PATHS.home, active: ['home'] },
-  { label: 'Discover', path: PATHS.discovery, active: ['discovery'] },
-  { label: 'Read', path: PATHS.reader, active: ['reader'] },
+  { label: 'Home', path: PATHS.home, active: ['home'] },
+  { label: 'Learn', path: PATHS.discovery, active: ['discovery', 'reader'] },
   { label: 'Vocabulary', path: PATHS.dictionary, active: ['dictionary', 'flashcard-study'] },
+  { label: 'Speak', path: PATHS.aiWorkspace, active: ['ai-workspace'] },
   { label: 'Community', path: PATHS.community, active: ['community', 'community-contest'] },
 ];
 

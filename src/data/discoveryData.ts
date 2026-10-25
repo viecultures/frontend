@@ -1,4 +1,5 @@
 import type { Level } from '@/types';
+import { ALL_SERIES } from './series';
 
 // Catalog Lesson Interface
 export type LevelType = 'Level 1' | 'Level 2' | 'Level 3';
@@ -63,8 +64,103 @@ export function getLessonStatsForLevel(lesson: Lesson, level?: string): {
   return { readTime: lesson.readTime, vocabCount: lesson.vocabCount, cefrLevel: 'Level 2' };
 }
 
+
+function getCategoryForTheme(theme: string): "Heritage" | "Cuisine" | "Crafts" | "Nature" | "Folklore" {
+  switch (theme) {
+    case 'cuisine': return 'Cuisine';
+    case 'places':
+    case 'history': return 'Heritage';
+    case 'crafts': return 'Crafts';
+    case 'festivals': return 'Folklore';
+    default: return 'Cuisine';
+  }
+}
+
+const CATEGORY_VI_MAP: Record<string, string> = {
+  Heritage: 'Lịch Sử & Di Sản',
+  Cuisine: 'Ẩm Thực & Cà Phê',
+  Crafts: 'Nghệ Thuật & Làng Nghề',
+  Nature: 'Danh Thắng Thiên Nhiên',
+  Folklore: 'Lễ Hội & Tín Ngưỡng',
+};
+
+export const SERIES_LESSONS: Lesson[] = ALL_SERIES.flatMap((series, sIdx) => {
+  const category = getCategoryForTheme(series.metadata.theme);
+  const categoryVi = CATEGORY_VI_MAP[category];
+
+  return series.articles.map((article, idx) => {
+    const chapterMeta = series.metadata.chapters[idx];
+    const summary = article.summary || chapterMeta?.summary || article.summaryVi || '';
+
+    return {
+      id: article.id,
+      title: article.titleEn,
+      vietnameseTitle: article.titleVi,
+      category,
+      categoryVi,
+      cefrLevel: 'Level 2' as LevelType,
+      availableLevels: ['Level 1', 'Level 2', 'Level 3'] as LevelType[],
+      levelDetails: {
+        'Level 1': {
+          readTime: '3 phút đọc',
+          vocabCount: Math.min(6, article.vocabularies?.length || 6),
+          summary,
+        },
+        'Level 2': {
+          readTime: article.readTime || '3 phút đọc',
+          vocabCount: article.vocabularies?.length || 10,
+          summary,
+        },
+        'Level 3': {
+          readTime: '5 phút đọc',
+          vocabCount: Math.min(14, (article.vocabularies?.length || 10) + 4),
+          summary,
+        },
+      },
+      readTime: article.readTime || '3 phút đọc',
+      vocabCount: article.vocabularies?.length || 10,
+      summary,
+      gradient: category === 'Cuisine'
+        ? 'from-amber-700 via-amber-800 to-amber-950'
+        : 'from-heritage-green via-teal-800 to-emerald-950',
+      iconSymbol: category === 'Cuisine' ? 'UtensilsCrossed' : 'Landmark',
+      imageUrl: article.imageUrl || series.metadata.imageUrl,
+      dateAdded: `2026-04-${String(25 - Math.min(15, sIdx)).padStart(2, '0')}`,
+      provinceId: series.metadata.provinceId,
+      isNational: series.metadata.provinceId === 'ha-noi',
+    };
+  });
+});
+
+export const TET_RENEWAL_LESSON: Lesson = {
+  id: "tet-festivities",
+  title: "Tết: Renewal, Remembrance and Regional Flavours",
+  vietnameseTitle: "Tết: Sự Đổi Mới, Lòng Tưởng Nhớ Và Hương Vị Ba Miền",
+  category: "Folklore",
+  categoryVi: "Lễ Hội & Tín Ngưỡng",
+  cefrLevel: "Level 2",
+  availableLevels: ['Level 1', 'Level 2', 'Level 3'],
+  levelDetails: {
+    'Level 1': { readTime: '4 phút đọc', vocabCount: 6, summary: 'Learn holiday words: red envelopes, sticky rice cake (bánh chưng), and family reunions.' },
+    'Level 2': { readTime: '8 phút đọc', vocabCount: 12, summary: 'A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions.' },
+    'Level 3': { readTime: '11 phút đọc', vocabCount: 16, summary: 'Evaluate East Asian agricultural solar calendars, cosmological renewals, and ritual syncretism.' },
+  },
+  readTime: "8 phút đọc",
+  vocabCount: 12,
+  summary: "A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions.",
+  gradient: "from-rose-800 via-red-900 to-neutral-950",
+  iconSymbol: "Sparkles",
+  imageUrl: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=800&q=80",
+  featured: true,
+  dateAdded: "2026-04-30",
+  provinceId: "ha-noi",
+  isNational: true,
+};
+
 // Mock Dataset of Vietnamese Cultural Stories with Full 3-Level Support
 export const LESSONS_DATA: Lesson[] = [
+  TET_RENEWAL_LESSON,
+  ...SERIES_LESSONS,
   {
     id: "nem-ran-spring-rolls",
     title: "Nem Rán: The Crispy Tradition of Vietnamese Spring Rolls",
@@ -205,29 +301,6 @@ export const LESSONS_DATA: Lesson[] = [
     provinceId: "da-nang",
   },
   {
-    id: "pho-hanoi-history",
-    title: "Hanoi Phở: The Soul of Vietnamese Culinary Heritage",
-    vietnameseTitle: "Phở Hà Nội: Linh Hồn Ẩm Thực Đất Kinh Kỳ",
-    category: "Cuisine",
-    categoryVi: "Ẩm Thực & Cà Phê",
-    cefrLevel: "Level 2",
-    availableLevels: ['Level 1', 'Level 2', 'Level 3'],
-    levelDetails: {
-      'Level 1': { readTime: '3 phút đọc', vocabCount: 5, summary: 'Learn words for clear steaming broth, tender beef slices, fresh noodles, and lime.' },
-      'Level 2': { readTime: '6 phút đọc', vocabCount: 9, summary: 'Trace the century-old origin of beef broth infusion, star anise spices, and artisanal rice noodles in traditional street food stalls.' },
-      'Level 3': { readTime: '9 phút đọc', vocabCount: 14, summary: 'Analyze culinary linguistics (gánh phở), urban food evolution, and national brand diplomacy.' },
-    },
-    readTime: "6 phút đọc",
-    vocabCount: 9,
-    summary:
-      "Trace the century-old origin of beef broth infusion, star anise spices, and artisanal rice noodles in traditional street food stalls.",
-    gradient: "from-[#C59B48] via-[#8C6422] to-[#5C3F11]",
-    iconSymbol: "UtensilsCrossed",
-    imageUrl: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80",
-    dateAdded: "2026-03-22",
-    provinceId: "ha-noi",
-  },
-  {
     id: "ha-long-bay",
     title: "Ha Long Bay: Myths of the Descending Dragon",
     vietnameseTitle: "Vịnh Hạ Long: Truyền Thuyết Rồng Đáp Xuống Biển",
@@ -272,30 +345,6 @@ export const LESSONS_DATA: Lesson[] = [
     imageUrl: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-20",
     provinceId: "bac-ninh",
-  },
-  {
-    id: "tet-festivities",
-    title: "Tết Nguyên Đán: Traditions & Spring Rituals",
-    vietnameseTitle: "Tết Nguyên Đán: Phong Tục & Nghi Lễ Mùa Xuân",
-    category: "Folklore",
-    categoryVi: "Lễ Hội & Tín Ngưỡng",
-    cefrLevel: "Level 2",
-    availableLevels: ['Level 1', 'Level 2', 'Level 3'],
-    levelDetails: {
-      'Level 1': { readTime: '4 phút đọc', vocabCount: 6, summary: 'Learn holiday words: red envelopes, sticky rice cake (bánh chưng), and family reunions.' },
-      'Level 2': { readTime: '8 phút đọc', vocabCount: 12, summary: 'Uncover ancestor veneration, peach blossoms, lucky money envelope customs, and family reunion feasts in traditional lunar new year.' },
-      'Level 3': { readTime: '11 phút đọc', vocabCount: 16, summary: 'Evaluate East Asian agricultural solar calendars, cosmological renewals, and ritual syncretism.' },
-    },
-    readTime: "8 phút đọc",
-    vocabCount: 12,
-    summary:
-      "Uncover ancestor veneration, peach blossoms, lucky money envelope customs, and family reunion feasts in traditional lunar new year.",
-    gradient: "from-[#C93B3B] via-[#9E2B2B] to-[#691818]",
-    iconSymbol: "Sparkles",
-    imageUrl: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=800&q=80",
-    dateAdded: "2026-03-19",
-    provinceId: "ha-noi",
-    isNational: true,
   },
   {
     id: "son-doong-expedition",
@@ -386,7 +435,6 @@ export const LESSONS_DATA: Lesson[] = [
     gradient: "from-heritage-green via-[#2A665B] to-heritage-dark",
     iconSymbol: "Landmark",
     imageUrl: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80",
-    featured: true,
     dateAdded: "2026-03-15",
     provinceId: "hue",
   },

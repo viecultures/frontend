@@ -3,7 +3,7 @@
 .home-room *, .home-room *::before, .home-room *::after { box-sizing: border-box; }
 .home-room-background, .home-room-veil { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
 .home-room-background { background-size: cover; background-position: center; }
-.home-room-veil { z-index: -1; background: var(--background-photo-veil); }
+.home-room-veil { z-index: -1; background: color-mix(in srgb, var(--color-surface) 22%, transparent); }
 .home-room a { text-decoration: none; }
 .home-room button, .home-room a, .home-room input { -webkit-tap-highlight-color: transparent; }
 .home-room button { cursor: pointer; font: inherit; }
@@ -27,17 +27,18 @@
 .home-room-avatar { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--color-surface-feature-strong); border-radius: 50%; background: var(--color-surface-feature); color: var(--color-ink); font-weight: 600; overflow: hidden; }
 .home-room-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .home-room-main { max-width: 1280px; margin: auto; padding: 34px 36px 24px; }
-.home-room-greeting { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
-.home-room .home-room-eyebrow { display: flex; align-items: center; gap: 8px; color: var(--color-ink-faint); font-size: 10px; line-height: 1.5; font-weight: 600; letter-spacing: 1.7px; }
-.home-room-greeting h1 { margin: 7px 0 5px; font-size: clamp(25px, 2.4vw, 32px); line-height: 1.3; font-weight: 600; letter-spacing: -.8px; }
-.home-room .home-room-date { font-size: 12px; color: var(--color-ink-faint); white-space: nowrap; }
-.home-room .home-room-greeting :is(h1, p) { color: var(--color-horizon-blue); }
-.home-room-grid { display: grid; grid-template-columns: minmax(0, 2.05fr) minmax(285px, 1fr); grid-template-areas: "continue review" "stories plan" "focus plan"; gap: 24px; align-items: start; }
+.home-room-greeting { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 26px; padding: 20px 28px; border-radius: 20px; background: color-mix(in srgb, var(--color-surface-raised) 92%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transform: translateZ(0); border: 1px solid color-mix(in srgb, var(--color-line) 80%, transparent); box-shadow: var(--shadow-panel); }
+.home-room .home-room-eyebrow { display: flex; align-items: center; gap: 8px; color: var(--color-ink-soft); font-size: 11px; line-height: 1.5; font-weight: 700; letter-spacing: 1.6px; }
+.home-room-greeting h1 { margin: 6px 0 4px; font-size: clamp(26px, 2.5vw, 34px); line-height: 1.25; font-weight: 700; letter-spacing: -.6px; color: var(--color-ink); }
+.home-room-greeting p { color: var(--color-ink-soft); font-size: 14px; font-weight: 500; line-height: 1.6; }
+.home-room .home-room-date { font-size: 13px; font-weight: 600; color: var(--color-ink); white-space: nowrap; padding: 7px 14px; border-radius: 12px; background: color-mix(in srgb, var(--color-surface-muted) 65%, transparent); border: 1px solid color-mix(in srgb, var(--color-line) 65%, transparent); }
+
+.home-room-grid { display: grid; grid-template-columns: minmax(0, 2.05fr) minmax(285px, 1fr); grid-template-areas: "continue calendar" "stories vocabulary"; gap: 24px; align-items: start; }
 .home-room-grid > * { min-width: 0; }
 .home-room-panel { border: 1px solid var(--color-line); border-radius: 20px; background: var(--color-surface-raised); box-shadow: var(--shadow-panel); }
 .home-room-continue { grid-area: continue; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .9fr); min-height: 345px; overflow: hidden; }
 .home-room-continue-copy { display: flex; flex-direction: column; align-items: flex-start; padding: 30px 28px; }
-.home-room-continue h2 { font-family: var(--font-serif); font-size: clamp(27px, 2.5vw, 36px); line-height: 1.2; font-weight: 500; letter-spacing: -.6px; margin: 15px 0 12px; }
+.home-room-continue h2 { font-family: var(--font-serif); font-size: clamp(27px, 2.5vw, 36px); line-height: 1.2; font-weight: 600; letter-spacing: -.6px; margin: 15px 0 12px; }
 .home-room-continue-copy > p:not(.home-room-eyebrow) { font-size: 13px; }
 .home-room-story-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; font-size: 11px; color: var(--color-ink-soft); margin: 16px 0; }
 .home-room-story-meta span:first-child { padding: 4px 9px; border: 1px solid var(--color-line); border-radius: 6px; background: var(--color-surface-muted); }
@@ -56,15 +57,274 @@
 .home-room-continue-image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .home-room-continue-image > span { position: absolute; bottom: 18px; left: 16px; right: 16px; width: fit-content; max-width: calc(100% - 32px); padding: 7px 11px; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface); color: var(--color-ink); font-size: 10px; line-height: 1.5; }
 .home-room-review { grid-area: review; padding: 26px; background: color-mix(in srgb, var(--color-surface-feature) 58%, var(--color-surface)); }
-.home-room-review h2 { font-size: 24px; font-weight: 500; line-height: 1.35; margin: 18px 0 12px; letter-spacing: -.6px; }
-.home-room-word-count { font-size: 36px; }
+.home-room-review h2 { font-size: 24px; font-weight: 600; line-height: 1.35; margin: 18px 0 12px; letter-spacing: -.6px; }
+.home-room-word-count { font-size: 36px; font-weight: 700; }
 .home-room-review > p:not(.home-room-footnote) { min-height: 66px; font-size: 13px; margin-bottom: 19px; }
 .home-room-review strong { font-weight: 500; }
 .home-room-review .home-room-primary { width: 100%; }
 .home-room .home-room-footnote { margin-top: 12px; font-size: 10px; color: var(--color-ink-faint); }
+
+/* Vocabulary SRS Overview (Inspired by user reference, VieCultures styled) */
+.home-room-vocab {
+  grid-area: vocabulary;
+  padding: 24px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  border-radius: 24px;
+  box-shadow: var(--shadow-panel);
+  display: flex;
+  flex-direction: column;
+}
+
+.home-vocab-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home-vocab-header h2 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--color-ink);
+  margin-top: 4px;
+  letter-spacing: -0.3px;
+}
+
+.home-vocab-summary {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  font-weight: 500;
+}
+
+.home-vocab-summary strong {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.home-vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.home-vocab-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-vocab-card:hover {
+  border-color: var(--color-surface-feature-strong);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-heritage-forest) 8%, transparent);
+  transform: translateY(-1px);
+}
+
+.home-vocab-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.home-vocab-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.home-vocab-badge-success {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  border: 1px solid color-mix(in srgb, var(--color-success) 20%, transparent);
+}
+
+.home-vocab-badge-warning {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 20%, transparent);
+}
+
+.home-vocab-badge-info {
+  background: var(--color-info-soft);
+  color: var(--color-info);
+  border: 1px solid color-mix(in srgb, var(--color-info) 20%, transparent);
+}
+
+.home-vocab-badge-danger {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 20%, transparent);
+}
+
+.home-vocab-count {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-vocab-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-top: 8px;
+}
+
+.home-vocab-progress-track {
+  width: 100%;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--color-line);
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.home-vocab-progress-bar {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.home-vocab-progress-bar.bg-success {
+  background: var(--color-success);
+}
+
+.home-vocab-progress-bar.bg-warning {
+  background: var(--color-warning);
+}
+
+.home-vocab-progress-bar.bg-info {
+  background: var(--color-info);
+}
+
+.home-vocab-progress-bar.bg-danger {
+  background: var(--color-danger);
+}
+
+.home-vocab-due-panel {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--color-surface-feature) 50%, var(--color-surface-muted));
+  border: 1px solid var(--color-line);
+}
+
+.home-vocab-due-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  margin-bottom: 12px;
+}
+
+.home-vocab-due-badge {
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.home-vocab-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.home-vocab-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-ink);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-line) 40%, transparent);
+}
+
+.home-vocab-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-action);
+  flex-shrink: 0;
+}
+
+.home-vocab-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.home-vocab-primary-btn {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 12px;
+  background: var(--color-heritage-dark);
+  color: var(--color-warm-ivory);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-heritage-forest) 25%, transparent);
+}
+
+.home-vocab-primary-btn:hover {
+  background: var(--color-heritage-forest);
+  transform: translateY(-1px);
+}
+
+.home-vocab-secondary-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-action);
+  text-decoration: none;
+  padding: 6px 8px;
+}
+
+.home-vocab-secondary-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .home-room-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.home-room-section-heading h2 { font-size: 20px; font-weight: 500; line-height: 1.4; margin-top: 5px; letter-spacing: -.4px; }
+.home-room-section-heading h2 { font-size: 20px; font-weight: 600; line-height: 1.4; margin-top: 5px; letter-spacing: -.4px; }
 .home-room-recommendations { grid-area: stories; }
+.home-room-recommendations .home-room-section-heading { padding: 14px 22px; border-radius: 16px; background: color-mix(in srgb, var(--color-surface-raised) 92%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transform: translateZ(0); border: 1px solid color-mix(in srgb, var(--color-line) 80%, transparent); box-shadow: var(--shadow-panel); }
+.home-room-recommendations .home-room-section-heading h2 { margin-top: 4px; font-weight: 700; color: var(--color-ink); }
+.home-room-recommendations .home-room-link { font-weight: 600; color: var(--color-action); }
 .home-room-stories { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
 .home-room-story { display: block; overflow: hidden; transition: border-color .18s, box-shadow .18s; }
 .home-room-story:hover { border-color: var(--color-surface-feature-strong); box-shadow: 0 8px 24px color-mix(in srgb, var(--color-ink) 12%, transparent); }
@@ -72,7 +332,7 @@
 .home-room-story-image img { width: 100%; height: 100%; object-fit: cover; }
 .home-room-story-image > span { position: absolute; left: 10px; bottom: 9px; max-width: calc(100% - 20px); padding: 4px 7px; border-radius: 5px; background: var(--color-surface); color: var(--color-ink); font-size: 9px; }
 .home-room-story-copy { padding: 14px; }
-.home-room-story h3 { min-height: 42px; font-size: 13px; font-weight: 500; line-height: 1.6; }
+.home-room-story h3 { min-height: 42px; font-size: 13px; font-weight: 600; line-height: 1.6; }
 .home-room-story-copy > div { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 12px; color: var(--color-ink-faint); font-size: 10px; }
 .home-room-story-copy > div > span { display: inline-flex; align-items: center; gap: 4px; }
 .home-room-plan { grid-area: plan; position: relative; padding: 25px; }
@@ -102,10 +362,481 @@
 .home-room-timer, .home-room-timer-preview { font-variant-numeric: tabular-nums; }
 .home-room-timer { font-size: 23px; letter-spacing: -1px; }
 .home-room-timer-preview { font-size: 12px; color: var(--color-ink-faint); }
-.home-room-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 1280px; margin: auto; padding: 10px 36px 26px; color: var(--color-ink-faint); font-size: 10px; }
-.home-room-footer a { display: flex; align-items: center; min-height: 44px; color: var(--color-ink-soft); }
-.home-room-footer a:hover { text-decoration: underline; }
+.home-room-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 1280px; margin: auto; padding: 12px 36px 26px; color: var(--color-ink-soft); font-size: 11px; font-weight: 500; }
+.home-room-footer span, .home-room-footer a { padding: 6px 14px; border-radius: 9999px; background: color-mix(in srgb, var(--color-surface-raised) 85%, transparent); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); transform: translateZ(0); border: 1px solid color-mix(in srgb, var(--color-line) 60%, transparent); }
+.home-room-footer a { display: inline-flex; align-items: center; min-height: 32px; color: var(--color-action); font-weight: 600; }
+.home-room-footer a:hover { text-decoration: underline; background: var(--color-surface-raised); }
 .home-room-error { border: 1px solid var(--color-line); background: var(--color-surface); padding: 12px; border-radius: 12px; margin-bottom: 16px !important; }
+
+/* Daily Quote & Calendar Card (Image 3 format) */
+.home-room-calendar {
+  grid-area: calendar;
+  position: relative;
+  padding: 24px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  border-radius: 24px;
+  box-shadow: var(--shadow-panel);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Spiral rings pinned to top border */
+.home-calendar-rings {
+  position: absolute;
+  top: -11px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 46px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.home-calendar-ring {
+  width: 13px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--color-heritage-dark);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--color-heritage-forest) 35%, transparent);
+  position: relative;
+}
+
+.home-calendar-ring::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 3px;
+  height: 7px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-surface-raised) 45%, transparent);
+}
+
+.home-calendar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.home-calendar-header-titles h2 {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--color-ink);
+  letter-spacing: -0.3px;
+}
+
+.home-calendar-creator {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--color-ink-soft);
+  font-weight: 500;
+}
+
+.home-calendar-creator-highlight {
+  font-weight: 700;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.home-calendar-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-calendar-nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface-feature);
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.home-calendar-nav-btn:hover:enabled {
+  background: var(--color-surface-feature-strong);
+  transform: scale(1.06);
+}
+
+.home-calendar-nav-btn:active:enabled {
+  transform: scale(0.95);
+}
+
+.home-calendar-artwork-frame {
+  position: relative;
+  border-radius: 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 2px color-mix(in srgb, var(--color-line) 40%, transparent);
+}
+
+.home-calendar-image-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.home-calendar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.home-calendar-image-wrap:hover .home-calendar-image {
+  transform: scale(1.02);
+}
+
+.home-calendar-zoom-hint {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-surface-raised) 90%, transparent);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--color-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ink);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.home-calendar-image-wrap:hover .home-calendar-zoom-hint {
+  opacity: 1;
+}
+
+.home-calendar-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-surface-raised) 88%, transparent);
+  backdrop-filter: blur(4px);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-ink);
+  border: 1px solid color-mix(in srgb, var(--color-line) 80%, transparent);
+}
+
+.home-calendar-mascot {
+  position: absolute;
+  bottom: -12px;
+  left: 6px;
+  width: 60px;
+  height: 60px;
+  z-index: 15;
+  filter: drop-shadow(0 4px 6px color-mix(in srgb, var(--color-heritage-forest) 20%, transparent));
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+
+.home-calendar-mascot:hover {
+  transform: scale(1.15) rotate(-6deg);
+}
+
+.home-calendar-mascot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.home-calendar-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: -8px;
+  width: max-content;
+  max-width: 220px;
+  padding: 7px 11px;
+  border-radius: 12px;
+  background: var(--color-heritage-dark);
+  color: var(--color-warm-ivory);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-heritage-forest) 40%, transparent);
+  z-index: 25;
+  pointer-events: none;
+}
+
+.home-calendar-caption-pill {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-surface-feature) 75%, var(--color-surface-muted));
+  border: 1px solid var(--color-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-calendar-caption-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-calendar-heart-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, color 0.15s ease;
+}
+
+.home-calendar-heart-btn:hover {
+  color: var(--color-danger);
+  transform: scale(1.15);
+}
+
+.home-calendar-heart-btn.is-liked {
+  color: var(--color-danger);
+}
+
+.home-calendar-heart-btn.is-liked svg {
+  fill: var(--color-danger);
+}
+
+.home-calendar-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 12px;
+}
+
+.home-calendar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-line);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease, width 0.15s ease;
+}
+
+.home-calendar-dot.is-active {
+  width: 18px;
+  border-radius: 9999px;
+  background: var(--color-action);
+}
+
+/* Modal lightbox styles */
+.home-calendar-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: color-mix(in srgb, var(--color-heritage-forest) 75%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.home-calendar-modal-content {
+  position: relative;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  border-radius: 24px;
+  box-shadow: 0 20px 48px color-mix(in srgb, var(--color-heritage-forest) 50%, transparent);
+  padding: 24px;
+}
+
+.home-calendar-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.15s ease;
+}
+
+.home-calendar-modal-close:hover {
+  background: var(--color-surface-muted);
+}
+
+.home-calendar-modal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 22px;
+  align-items: center;
+}
+
+.home-calendar-modal-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  object-fit: cover;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-line);
+}
+
+.home-calendar-modal-creator {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+}
+
+.home-calendar-modal-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-top: 4px;
+}
+
+.home-calendar-modal-dates {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-calendar-modal-solar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-calendar-modal-solar .solar-day {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-danger);
+  line-height: 1;
+}
+
+.home-calendar-modal-solar strong {
+  display: block;
+  font-size: 13px;
+  color: var(--color-ink);
+}
+
+.home-calendar-modal-solar p {
+  font-size: 11px;
+  color: var(--color-ink-soft);
+}
+
+.home-calendar-modal-lunar {
+  text-align: right;
+}
+
+.home-calendar-modal-lunar .lunar-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-surface-raised) 70%, transparent);
+  border: 1px solid var(--color-line);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.home-calendar-modal-lunar p {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-top: 4px;
+}
+
+.home-calendar-modal-quote {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-surface-feature) 50%, var(--color-surface-muted));
+  border-left: 3px solid var(--color-action);
+}
+
+.home-calendar-modal-quote .quote-text {
+  font-size: 13px;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+
+.home-calendar-modal-quote .quote-author {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  margin-top: 6px;
+  text-align: right;
+}
+
+.home-calendar-modal-actions {
+  margin-top: 18px;
+}
+
+.home-calendar-modal-actions .home-room-primary {
+  width: 100%;
+}
+
 @media (min-width: 1100px) { .home-room-review { min-height: 345px; display: flex; flex-direction: column; } .home-room-review .home-room-primary { margin-top: auto; } }
 @media (max-width: 1100px) {
   .home-room-header-inner { gap: 15px; padding-inline: 24px; }
@@ -126,9 +857,10 @@
   .home-room-nav { order: 3; width: 100%; justify-content: space-between; border-top: 1px solid var(--color-line); padding-top: 7px; }
   .home-room-nav a { padding: 9px 12px; }
   .home-room-main { padding: 25px 20px 20px; }
-  .home-room-greeting { align-items: flex-start; margin-bottom: 22px; }
+  .home-room-greeting { align-items: flex-start; margin-bottom: 22px; padding: 16px 20px; }
+  .home-room-recommendations .home-room-section-heading { padding: 12px 18px; }
   .home-room .home-room-date { display: none; }
-  .home-room-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "continue" "review" "plan" "stories" "focus"; gap: 22px; }
+  .home-room-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "continue" "calendar" "vocabulary" "stories" "focus"; gap: 22px; }
   .home-room-continue { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); min-height: 320px; }
   .home-room-continue-image { display: block; }
   .home-room-review > p:not(.home-room-footnote) { min-height: 0; }
@@ -137,12 +869,14 @@
   .home-room-stories { gap: 12px; }
   .home-room-story h3 { font-size: 13px; }
   .home-room-task-form input { font-size: 16px; }
-  .home-room-footer { padding-inline: 20px; }
+  .home-room-footer { padding-inline: 20px; flex-direction: column; align-items: flex-start; gap: 10px; }
 }
 @media (max-width: 480px) {
   .home-room-header-inner { padding-inline: 16px; }
   .home-room-nav a { padding-inline: 9px; font-size: 11px; }
   .home-room-main { padding-inline: 16px; }
+  .home-room-greeting { padding: 14px 16px; border-radius: 16px; }
+  .home-room-recommendations .home-room-section-heading { padding: 12px 14px; border-radius: 14px; }
   .home-room-continue { display: flex; flex-direction: column-reverse; min-height: 0; }
   .home-room-continue-image { min-height: 160px; height: 160px; }
   .home-room-continue-copy { padding: 24px; }

@@ -24,8 +24,13 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
   const savedVocabulary = useContext(SavedVocabularyContext);
   const isSaved = savedVocabulary ? savedVocabulary.words.some(word => word.id === vocab?.id || word.word.toLowerCase() === vocab?.word.toLowerCase()) : legacySaved;
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [audioError, setAudioError] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
   const isLight = themeMode === "paper";
+  const hasDictionaryAudio = Boolean(vocab?.audioUrl && /^https?:\/\//i.test(vocab.audioUrl));
+  const hasBrowserVoice = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  const ipa = vocab?.ipa?.trim() || '';
+  const hasIpa = Boolean(ipa && ipa !== '/-/' && ipa !== '/.../' && ipa.toLowerCase() !== `/${vocab?.word.toLowerCase()}/`);
 
   // Check if word is already saved in localStorage
   useEffect(() => {
@@ -61,6 +66,15 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
   const handlePlayAudio = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (vocab.isProfane) return;
+    setAudioError(false);
+    if (hasDictionaryAudio && vocab.audioUrl) {
+      const audio = new Audio(vocab.audioUrl);
+      audio.onended = () => setIsPlayingAudio(false);
+      audio.onerror = () => { setIsPlayingAudio(false); setAudioError(true); };
+      setIsPlayingAudio(true);
+      void audio.play().catch(() => { setIsPlayingAudio(false); setAudioError(true); });
+      return;
+    }
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(vocab.word);
@@ -129,10 +143,11 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
               <h3 className="font-sans font-bold text-base sm:text-lg leading-tight truncate text-current">
                 {vocab.isProfane ? '*****' : vocab.word}
               </h3>
-              {!vocab.isProfane && (
+              {!vocab.isProfane && (hasDictionaryAudio || hasBrowserVoice) && (
                 <button
                   onClick={handlePlayAudio}
-                  title="Play pronunciation"
+                  title={hasDictionaryAudio ? 'Nghe âm thanh từ điển' : 'Nghe giọng đọc máy của trình duyệt'}
+                  aria-label={hasDictionaryAudio ? 'Nghe âm thanh từ điển' : 'Nghe giọng đọc máy của trình duyệt'}
                   className={`p-1 rounded-lg transition-colors cursor-pointer ${
                     isPlayingAudio
                       ? "bg-antique-gold text-heritage-green"
@@ -144,11 +159,13 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
               )}
             </div>
             <div className="flex items-center gap-2 mt-0.5">
-              {!vocab.isProfane && vocab.ipa && vocab.ipa !== '/-/' && (
+              {!vocab.isProfane && hasIpa && (
                 <span className="font-mono text-xs text-antique-gold font-semibold">
                   {vocab.ipa}
                 </span>
               )}
+              {!vocab.isProfane && !hasIpa && <span className="text-xs opacity-70">Chưa có IPA</span>}
+              {!vocab.isProfane && !hasDictionaryAudio && <span className="text-[10px] opacity-70">{hasBrowserVoice ? 'Giọng máy' : 'Chưa có âm thanh'}</span>}
               <span className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
                 vocab.isProfane
                   ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"
@@ -168,6 +185,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
           <X className="w-4 h-4" />
         </button>
       </div>
+      {audioError && <p role="status" className="pt-1 text-xs text-red-600">Không phát được âm thanh từ điển.</p>}
 
       {/* Meanings */}
       <div className="py-2.5 space-y-2 text-xs">

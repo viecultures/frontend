@@ -21,6 +21,16 @@
 .reader-component-audio [title="Open voice settings"], .reader-component-audio [aria-label^="Playback speed"] { background: var(--audio-soft); }
 .reader-component-audio [title="Open voice settings"]:hover, .reader-component-audio [aria-label^="Playback speed"]:hover { background: var(--audio-soft); border-color: currentColor; }
 .reader-component-audio button:focus-visible, .reader-component-audio input:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+@media (min-width: 900px) {
+  .reader-component-audio.fixed .reader-audio-layout { flex-wrap: nowrap; gap: 10px; }
+  .reader-component-audio.fixed .reader-audio-info { flex: 0 0 205px; min-width: 0; }
+  .reader-component-audio.fixed .reader-audio-info > div:last-child { overflow: hidden; }
+  .reader-component-audio.fixed .reader-audio-info h4 { max-width: 150px; }
+  .reader-component-audio.fixed .reader-audio-scope { display: none; }
+  .reader-component-audio.fixed .reader-audio-controls { order: 0; flex: 1 1 auto; flex-wrap: nowrap; min-width: 0; gap: 6px; }
+  .reader-component-audio.fixed .reader-audio-timeline { order: 0; flex: 1 1 150px; min-width: 100px; max-width: none; }
+  .reader-component-audio.fixed .reader-audio-actions { flex-shrink: 0; }
+}
 
 /* Reader navbar: primary reading actions stay visible; preferences live in a popover. */
 .reader-navbar { position: sticky; top: 0; z-index: 50; padding: 10px 24px; color: var(--color-warm-ivory); border-bottom: 1px solid color-mix(in srgb, var(--color-warm-ivory) 12%, transparent); }
@@ -133,3 +143,14 @@
 .reader-quick-remember[aria-pressed="true"] { background: var(--practice-success-soft); color: var(--practice-success); }
 .reader-quick-deck-link { color: var(--practice-ink); }
 .reader-quick-card p[class*="text-stone"], .reader-quick-milestone p, .reader-quick-milestone .text-stone-500 { color: var(--practice-muted); }
+.reader-series-nav { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 28px 0; padding: 20px 24px; border: 1px solid var(--desk-line); border-radius: var(--radius-card); background: var(--desk-paper); color: var(--desk-ink); }
+.reader-series-nav > div:first-child { display: grid; gap: 4px; }
+.reader-series-nav > div:first-child span { color: var(--color-accent-ink); font-size: 14px; font-weight: 700; letter-spacing: .08em; }
+.reader-series-nav > div:first-child strong { font-size: 17px; }
+.reader-series-nav-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.reader-series-nav-links a { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 9px 13px; border: 1px solid var(--desk-line); border-radius: var(--radius-pill); color: var(--desk-ink); font-size: 14px; font-weight: 700; text-decoration: none; }
+.reader-series-nav-links a:hover { background: color-mix(in srgb, var(--desk-ink) 8%, var(--desk-paper)); }
+.reader-series-nav-links .reader-series-next { border-color: var(--color-heritage-green); background: var(--color-heritage-green); color: var(--color-warm-ivory); }
+.reader-series-nav-links .reader-series-next:hover { background: var(--color-heritage-dark); }
+.reader-series-nav a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+@media (max-width: 700px) { .reader-series-nav { align-items: stretch; flex-direction: column; padding: 17px; } .reader-series-nav-links a { flex: 1; } }

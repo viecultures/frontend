@@ -61,7 +61,7 @@ export function filterCatalog(catalog: DiscoveryLesson[], filters: DiscoveryFilt
       return filters.sort === 'time_asc' ? time(a) - time(b) : time(b) - time(a);
     }
     if (filters.sort === 'recommended') {
-      const imagePriority = Number(!!LOCAL_EDITORIAL[b.id]?.image) - Number(!!LOCAL_EDITORIAL[a.id]?.image);
+      const imagePriority = Number(Boolean(LOCAL_EDITORIAL[b.id]?.image || b.imageUrl)) - Number(Boolean(LOCAL_EDITORIAL[a.id]?.image || a.imageUrl));
       if (imagePriority) return imagePriority;
     }
     return b.dateAdded.localeCompare(a.dateAdded);

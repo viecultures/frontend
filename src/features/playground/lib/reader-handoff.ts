@@ -13,7 +13,9 @@ interface ReaderHandoffState {
   context: ReaderWorkspaceContext | null;
   draft: string;
   draftRevision: number;
+  draftMode: 'replace' | 'append';
   enterFromReader: (context: ReaderWorkspaceContext, draft: string) => void;
+  insertTextIntoDraft: (text: string) => void;
   restoreReference: (context: ReaderWorkspaceContext) => void;
   dismissReference: () => void;
   consumeDraft: (revision: number) => void;
@@ -29,10 +31,13 @@ function boundedReference(context: ReaderWorkspaceContext): ReaderWorkspaceConte
 
 /** UI-only handoff. Conversation history and Live session state stay separate. */
 export const useReaderHandoff = create<ReaderHandoffState>(set => ({
-  context: null, draft: '', draftRevision: 0,
+  context: null, draft: '', draftRevision: 0, draftMode: 'replace',
   enterFromReader: (context, draft) => set(state => ({
     context: boundedReference(context),
-    draft: draft.slice(0, 2000), draftRevision: state.draftRevision + 1,
+    draft: draft.slice(0, 2000), draftRevision: state.draftRevision + 1, draftMode: 'replace',
+  })),
+  insertTextIntoDraft: text => set(state => ({
+    draft: text.slice(0, 500), draftRevision: state.draftRevision + 1, draftMode: 'append',
   })),
   restoreReference: context => set({ context: boundedReference(context) }),
   dismissReference: () => set({ context: null }),

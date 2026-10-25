@@ -11,8 +11,8 @@ export interface RegionTabItem {
   key: RegionKey;
   label: string;
   count: string;
-  badgeClass: string;
-  activeClass: string;
+  badgeClass?: string;
+  activeClass?: string;
 }
 
 export interface VietnamMapProps {
@@ -42,6 +42,12 @@ export interface VietnamMapProps {
   showSeaLayer?: boolean;
   /** Show province text labels */
   showLabels?: boolean;
+  /** Show one selectable silhouette per region in the national overview. */
+  overviewByRegion?: boolean;
+  /** Regions that can be opened from the national overview. Defaults to all. */
+  selectableRegions?: readonly Exclude<RegionKey, 'all'>[];
+  /** Render map place labels without Vietnamese diacritics for English interfaces. */
+  labelLanguage?: 'vi' | 'en';
   /** Show floating cultural tooltip on hover (defaults to false) */
   showTooltip?: boolean;
   /** Optional projected AI markers. No runtime store is required. */
@@ -93,11 +99,15 @@ export interface MapProvincesLayerProps {
   activeRegion: RegionKey;
   onSelectProvince: (province: ProvinceMapItem) => void;
   onHoverProvince: (provinceId: string | null) => void;
+  overviewByRegion?: boolean;
+  selectableRegions?: readonly Exclude<RegionKey, 'all'>[];
+  onSelectRegion?: (region: Exclude<RegionKey, 'all'>) => void;
 }
 
 export interface MapSeaLayerProps {
   islands: IslandItem[];
   className?: string;
+  labelLanguage?: 'vi' | 'en';
 }
 
 export interface MapLabelsLayerProps {
@@ -106,6 +116,7 @@ export interface MapLabelsLayerProps {
   hoveredProvinceId: string | null;
   activeRegion: RegionKey;
   zoomScale?: number;
+  labelLanguage?: 'vi' | 'en';
 }
 
 export interface MapPoiLayerProps {

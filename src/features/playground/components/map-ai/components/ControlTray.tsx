@@ -50,8 +50,11 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   const isMobile = useMediaQuery('(max-width: 768px), (orientation: landscape) and (max-height: 768px)');
   const [isTextEntryVisible, setIsTextEntryVisible] = useState(false);
   useEffect(() => {
-    if (useReaderHandoff.getState().draft) {
-      setTextPrompt(useReaderHandoff.getState().draft);
+    const { draft, draftMode } = useReaderHandoff.getState();
+    if (draft) {
+      setTextPrompt(current => draftMode === 'append' && current.trim()
+        ? `${current.trimEnd()} ${draft}`
+        : draft);
       setIsTextEntryVisible(true);
       useReaderHandoff.getState().consumeDraft(handoffRevision);
     }

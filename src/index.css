@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./components/map/map.css";
 
 /* Dark mode driven by a `.dark` class on <html> */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -40,6 +41,11 @@
   --color-mountain-teal: #6E9FA1;
   --color-lotus-pink: #E8B7B2;
   --color-mist-cloud: #E8DFCB;
+
+  /* Shared Vietnam map regions, used by the map and Journey. */
+  --color-map-north: var(--color-heritage-green);
+  --color-map-central: color-mix(in srgb, var(--color-antique-gold) 78%, var(--color-heritage-dark));
+  --color-map-south: var(--color-mountain-teal);
 
   /* ── Semantic Text ──────────────────────────────────── */
   --color-text-body: #3F5550;
@@ -464,13 +470,13 @@
 
 /* One light, semantic navigation system shared by all app pages except landing. */
 .vc-navbar { position: sticky; top: 0; z-index: 50; width: 100%; border-bottom: 1px solid var(--color-line); background: color-mix(in srgb, var(--color-surface) 94%, transparent); backdrop-filter: blur(14px); }
-.vc-navbar-inner { max-width: 1280px; min-height: 80px; margin-inline: auto; padding: 12px 36px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
-.vc-navbar-brand { display: flex; flex-shrink: 0; }
-.vc-navbar-links { display: flex; align-items: center; gap: 8px; }
+.vc-navbar-inner { max-width: 1280px; min-height: 80px; margin-inline: auto; padding: 12px 36px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 28px; }
+.vc-navbar-brand { display: inline-flex; align-items: center; justify-self: start; }
+.vc-navbar-links { display: flex; align-items: center; justify-self: center; gap: 8px; }
 .vc-navbar-links a { display: flex; align-items: center; min-height: 44px; padding: 10px 15px; border-radius: 12px; color: var(--color-ink-soft); font-size: 13px; font-weight: 500; white-space: nowrap; transition: background .18s, color .18s; }
 .vc-navbar-links a[aria-current="page"] { background: var(--color-surface-feature); color: var(--color-action); }
 .vc-navbar-links a:hover { background: var(--color-surface-muted); color: var(--color-action); }
-.vc-navbar-actions { display: flex; align-items: center; gap: 10px; }
+.vc-navbar-actions { display: flex; align-items: center; justify-self: end; gap: 10px; }
 .vc-navbar-icon, .vc-navbar-avatar, .vc-navbar-menu { width: 44px; height: 44px; padding: 10px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--color-line); border-radius: 12px; color: var(--color-action); background: var(--color-surface); cursor: pointer; }
 .vc-navbar-icon:hover, .vc-navbar-menu:hover { background: var(--color-surface-feature); }
 .vc-navbar-profile { position: relative; z-index: 51; }
@@ -486,8 +492,8 @@
   .vc-navbar-links a { padding-inline: 10px; font-size: 12px; }
 }
 @media (max-width: 767px) {
-  .vc-navbar-inner { min-height: 72px; flex-wrap: wrap; gap: 10px 12px; padding: 12px 16px; }
-  .vc-navbar-links { display: none; order: 3; width: 100%; justify-content: space-between; overflow-x: auto; border-top: 1px solid var(--color-line); padding-top: 7px; }
+  .vc-navbar-inner { display: flex; min-height: 72px; flex-wrap: wrap; justify-content: space-between; gap: 10px 12px; padding: 12px 16px; }
+  .vc-navbar-links { display: none; order: 3; width: 100%; justify-content: center; flex-wrap: wrap; border-top: 1px solid var(--color-line); padding-top: 7px; }
   .vc-navbar-links.is-open { display: flex; }
   .vc-navbar-links a { padding: 9px 10px; font-size: 11px; }
   .vc-navbar-menu { display: inline-flex; }

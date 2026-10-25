@@ -33,6 +33,9 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
   showPoiPins = true,
   showSeaLayer = true,
   showLabels = true,
+  overviewByRegion = false,
+  selectableRegions,
+  labelLanguage = 'vi',
   showTooltip = false,
   markers = [],
   onSelectMarker,
@@ -81,7 +84,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
       ref={containerRef}
       {...containerProps}
       onClick={() => handleBackdropClick()}
-      className={`relative flex flex-col items-center justify-between overflow-hidden select-none w-full h-full touch-none ${
+      className={`vc-map relative flex flex-col items-center justify-between overflow-hidden select-none w-full h-full touch-none ${
         zoomScale > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''
       } ${className}`}
     >
@@ -122,7 +125,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
         <svg
           viewBox={currentViewBox}
           preserveAspectRatio="xMidYMid meet"
-          className="w-full h-full max-h-full max-w-full object-contain filter drop-shadow-[0_14px_40px_rgba(0,0,0,0.7)] transition-all duration-500 ease-out"
+          className="vc-map-svg w-full h-full max-h-full max-w-full object-contain transition-all duration-500 ease-out"
         >
           {/* Backdrop Rect to catch clicks outside provinces */}
           <rect
@@ -145,10 +148,13 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
             activeRegion={activeRegion}
             onSelectProvince={selectProvince}
             onHoverProvince={setHoveredId}
+            overviewByRegion={overviewByRegion}
+            selectableRegions={selectableRegions}
+            onSelectRegion={setActiveRegion}
           />
 
           {/* Layer 2: Maritime Sovereignty (Hoàng Sa & Trường Sa, Biển Đông) */}
-          {showSeaLayer && <MapSeaLayer islands={VIETNAM_ISLANDS} />}
+          {showSeaLayer && <MapSeaLayer islands={VIETNAM_ISLANDS} labelLanguage={labelLanguage} />}
 
           {/* Layer 3: Province Name Text Labels with LOD */}
           {showLabels && (
@@ -158,6 +164,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
               hoveredProvinceId={hoveredProvince?.id || null}
               activeRegion={activeRegion}
               zoomScale={zoomScale}
+              labelLanguage={labelLanguage}
             />
           )}
 

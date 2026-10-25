@@ -20,7 +20,7 @@ export function EditorialStory({ lesson, variant = 'card', saved, onSave }: Prop
   const title = english?.title || lesson.title;
   const description = english?.description || lesson.summary;
   // Unverified stock images in the legacy dataset often show unrelated subjects.
-  const image = lesson.isFromDatabase ? lesson.imageUrl : local?.image || (lesson.id === 'pho-hanoi-history' ? lesson.imageUrl : undefined);
+  const image = local?.image || lesson.imageUrl;
   const targetLevel = activeLevel(lesson, 'All');
   const stats = getLessonStatsForLevel(lesson, targetLevel);
   const href = lesson.postIds?.[targetLevel]

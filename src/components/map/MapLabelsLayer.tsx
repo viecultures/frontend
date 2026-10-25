@@ -1,5 +1,6 @@
 import React from 'react';
 import type { MapLabelsLayerProps } from './types';
+import { toEnglishPlaceName } from '@/utils/vietnamMapUtils';
 
 // Major anchor hubs displayed when activeRegion === 'all' at default zoom scale (< 1.45).
 // Smaller delta provinces (Bắc Ninh, Hưng Yên, Hà Nam, Ninh Bình, v.v.) are omitted at national scale
@@ -36,6 +37,7 @@ export const MapLabelsLayer: React.FC<MapLabelsLayerProps> = ({
   hoveredProvinceId,
   activeRegion,
   zoomScale = 1,
+  labelLanguage = 'vi',
 }) => {
   const hasFocus = selectedProvinceId !== null;
   const isNationalOverview = activeRegion === 'all';
@@ -62,7 +64,7 @@ export const MapLabelsLayer: React.FC<MapLabelsLayerProps> = ({
         let strokeWidth = '2.5px';
 
         if (isSelected) {
-          labelClass = 'fill-white font-black text-[11px] sm:text-[12px] opacity-100';
+          labelClass = 'fill-warm-ivory font-black text-[11px] sm:text-[12px] opacity-100';
           strokeWidth = '3.5px';
         } else if (isHovered) {
           labelClass = 'fill-antique-bright font-bold text-[10px] opacity-100';
@@ -88,7 +90,7 @@ export const MapLabelsLayer: React.FC<MapLabelsLayerProps> = ({
               strokeLinejoin: 'round',
             }}
           >
-            {p.name}
+            {labelLanguage === 'en' ? toEnglishPlaceName(p.name) : p.name}
           </text>
         );
       })}

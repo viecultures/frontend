@@ -11,6 +11,7 @@ export { DictionaryQuickActionCards } from "./DictionaryQuickActionCards";
 export { DictionaryCategoryFilter } from "./DictionaryCategoryFilter";
 export { DictionaryLibraryGrid } from "./DictionaryLibraryGrid";
 export { DictionaryInspectorModal } from "./DictionaryInspectorModal";
+export { DictionaryPagination } from "./DictionaryPagination";
 export { CreateDeckModal } from "./CreateDeckModal";
 
 export { VocabularySidebar } from "./VocabularySidebar";

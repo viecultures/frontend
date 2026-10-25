@@ -32,17 +32,9 @@
 .reader-desk-title { display: flex; align-items: center; gap: 16px; }
 .reader-desk-title a { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; color: var(--desk-ink); text-decoration: none; }
 .reader-desk-title a span { font: italic 600 22px/1.2 var(--font-sans); }
-.reader-desk-caption { color: var(--desk-muted); text-transform: uppercase; font-size: 10px; letter-spacing: .8px; }
-.reader-desk-caption::before { content: '•'; padding-right: 7px; }
 .reader-desk-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
-.reader-size-control > span { font-size: 10px; text-transform: uppercase; font-weight: 600; }
-.reader-desk-pill, .reader-size-control { min-height: 36px; border: 1px solid transparent; border-radius: 24px; background: color-mix(in srgb, var(--desk-paper) 90%, transparent); color: var(--desk-ink); font: 13px/1.3 var(--font-sans); }
+.reader-desk-pill, .reader-level-control { min-height: 36px; border: 1px solid transparent; border-radius: 24px; background: color-mix(in srgb, var(--desk-paper) 90%, transparent); color: var(--desk-ink); font: 13px/1.3 var(--font-sans); }
 .reader-desk-pill { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 7px 14px; }
-.reader-size-control { display: inline-flex; align-items: center; padding: 0 8px 0 12px; gap: 3px; }
-.reader-size-control > span { margin-right: 5px; font-family: var(--font-sans); }
-.reader-size-control button { display: grid; place-items: center; width: 24px; min-height: 36px; font-weight: 600; }
-.reader-size-control output { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; }
-.reader-size-control button:disabled { opacity: .35; cursor: default; }
 .reader-desk-settings, .reader-mode-menu { position: relative; }
 .reader-desk-settings > button { padding: 8px; min-width: 36px; }
 .reader-desk-menu { position: absolute; right: 0; top: calc(100% + 10px); width: 260px; max-width: calc(100vw - 24px); padding: 15px; z-index: 45; border: 1px solid var(--desk-line); border-radius: 12px; background: var(--desk-paper); color: var(--desk-ink); box-shadow: 0 12px 35px #102b3c26; font-size: 13px; text-align: left; }
@@ -50,21 +42,24 @@
 .reader-desk-menu button, .reader-desk-menu a { display: flex; align-items: center; width: 100%; min-height: 44px; padding: 8px; border-radius: 6px; text-decoration: none; color: inherit; text-align: left; }
 .reader-desk-menu button[aria-pressed='true'], .reader-desk-menu button:hover, .reader-desk-menu a:hover { background: color-mix(in srgb, var(--desk-gold) 15%, transparent); }
 .reader-mode-options { left: -20px; right: auto; }
-.reader-level-control { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.reader-level-control select { min-height: 44px; border: 1px solid var(--desk-line); border-radius: 6px; padding: 6px; background: var(--desk-paper); }
+.reader-level-control { display: inline-flex; align-items: center; gap: 7px; padding: 0 5px 0 12px; white-space: nowrap; }
+.reader-level-control select { min-height: 34px; border: 0; border-radius: 18px; padding: 4px 6px; background: transparent; color: inherit; }
+.reader-level-control option { color: #123047; background: #faf7ef; }
+.reader-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.reader-setting-size { display: flex; align-items: center; gap: 4px; }
+.reader-desk-menu .reader-setting-size button, .reader-desk-menu .reader-setting-theme { display: inline-flex; align-items: center; justify-content: center; width: auto; min-width: 36px; min-height: 36px; padding: 6px 9px; }
+.reader-setting-size output { min-width: 3ch; text-align: center; font-variant-numeric: tabular-nums; }
+.reader-setting-size button:disabled { opacity: .35; cursor: default; }
+.reader-desk-menu .reader-setting-theme { gap: 6px; }
 .reader-fullscreen-error { flex-basis: 100%; font-size: 12px; }
 .reader-desk button, .reader-desk select, .reader-desk summary { cursor: pointer; }
 .reader-desk :is(button, a, select, summary):focus-visible { outline: 2px solid var(--desk-gold); outline-offset: 3px; }
-.reader-desk-pill:hover, .reader-size-control button:hover:enabled { border-color: var(--desk-gold); }
+.reader-desk-pill:hover, .reader-level-control:hover { border-color: var(--desk-gold); }
 .reader-site-links a:hover { color: var(--desk-muted); }
 .reader-desk-canvas { padding: 0 24px 56px; }
 .reader-desk-content { position: relative; max-width: 1350px; margin: auto; display: flex; flex-direction: column; gap: 28px; }
-.reader-desk-content > :not(.reader-audio-disclosure) { order: 0; }
-.reader-desk-content > .reader-recommended-component { order: 2; }
-.reader-audio-disclosure { order: 1; border: 1px solid var(--desk-line); border-radius: 12px; background: var(--desk-paper); padding: 12px 18px; }
-.reader-audio-disclosure summary { min-height: 32px; align-content: center; color: var(--desk-ink); font-size: 13px; }
-.reader-audio-disclosure[open] summary { margin-bottom: 16px; }
-.reader-desk .reader-audio-disclosure .reader-component-audio.fixed { position: relative; inset: auto; transform: none; opacity: 1; pointer-events: auto; }
+.reader-audio-section { scroll-margin-top: var(--reader-toolbar-offset, 80px); }
+.reader-audio-section > p { border: 1px solid var(--desk-line); border-radius: 12px; background: var(--desk-paper); padding: 16px 20px; }
 .reader-margin-note { position: absolute; top: 110px; color: var(--desk-muted); font: 9px/1.8 var(--font-sans); text-align: center; text-transform: uppercase; letter-spacing: 2px; width: 104px; pointer-events: none; }
 .reader-margin-note-left { right: calc(100% + 10px); }
 .reader-margin-note-right { left: calc(100% + 10px); top: 0; }
@@ -96,7 +91,7 @@
 .reader-desk[data-desk-theme='dark'] .reader-language-sheet { box-shadow: inset 0 0 35px #0000001a, 0 2px 12px #0000001a; }
 @media (min-width: 1600px) { .reader-desk-canvas { padding-inline: 9.5vw; } .reader-desk-content { max-width: 1480px; } .reader-site-header-inner { max-width: 1320px; padding-inline: 16px; } .reader-desk-toolbar { max-width: 78%; } }
 @media (max-width: 1599px) { .reader-margin-note { display: none; } }
-@media (max-width: 1250px) { .reader-site-header-inner { padding: 0 24px; gap: 20px; } .reader-wordmark { font-size: 25px; } .reader-culture-signature { font-size: 12px; gap: 7px; } .reader-desk-toolbar { margin-inline: 24px; } .reader-desk-caption { display: none; } .reader-desk .reader-language-sheet { padding: 24px; } .reader-bilingual-sheets { grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr); } .reader-margin-note { display: none; } }
+@media (max-width: 1250px) { .reader-site-header-inner { padding: 0 24px; gap: 20px; } .reader-wordmark { font-size: 25px; } .reader-culture-signature { font-size: 12px; gap: 7px; } .reader-desk-toolbar { margin-inline: 24px; } .reader-desk .reader-language-sheet { padding: 24px; } .reader-bilingual-sheets { grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr); } .reader-margin-note { display: none; } }
 @media (max-width: 1000px) { .reader-culture-signature { display: none; } .reader-site-header-inner { gap: 12px; } .reader-site-links { gap: 18px; } .reader-desk-toolbar { gap: 4px 10px; } .reader-desk-title a span { font-size: 20px; } .reader-desk-controls { gap: 6px; } .reader-desk-pill { padding-inline: 10px; } .reader-desk .reader-language-sheet { padding: 22px; } }
 @media (max-width: 767px) {
   .reader-desk { background-size: auto 100vh; }
@@ -109,11 +104,8 @@
   .reader-desk-toolbar { margin-inline: 12px; padding: 6px 10px 10px; border-radius: 0 0 12px 12px; gap: 2px; }
   .reader-desk-title { width: 100%; }
   .reader-desk-title a { min-height: 34px; }
-  .reader-desk-controls { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-  .reader-size-control { grid-column: 1 / -1; justify-content: flex-end; }
-  .reader-size-control { gap: 0; padding: 0 12px; min-height: 44px; }
-  .reader-size-control > span { display: inline; margin-right: auto; }
-  .reader-size-control button { width: 28px; min-height: 44px; }
+  .reader-desk-controls { width: 100%; display: flex; flex-wrap: wrap; gap: 6px; }
+  .reader-level-control { min-height: 44px; margin-right: auto; }
   .reader-desk-pill { min-width: 44px; min-height: 44px; padding: 8px; gap: 4px; font-size: 12px; }
   .reader-fullscreen-button span { font-size: 10px; }
   .reader-desk-settings > button { min-width: 44px; }
