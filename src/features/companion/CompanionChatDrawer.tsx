@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { companionService } from '@/services/companionService';
 import type {
   CompanionChatMessage,
@@ -32,8 +33,8 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       const initialGreeting = lessonTitle
-        ? `Hello! I am your Cultural Companion. We are currently exploring "${lessonTitle}". Ask me any questions about the culture, history, or language in this lesson!`
-        : `Hello! I am your Cultural Companion. Ask me about Vietnamese customs, regional cuisine, festivals, or practice conversing in English!`;
+        ? `Hello! I'm your VieCultures Companion. We are currently exploring "${lessonTitle}". Feel free to ask me anything about the culture, history, or language in this lesson!`
+        : `Hello! I'm your VieCultures Companion. What Vietnamese tradition, street food, or cultural custom would you love to chat about today?`;
 
       setMessages([
         {
@@ -46,11 +47,11 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         lessonTitle
           ? [
               `What is the cultural significance of this lesson?`,
-              `Explain the key vocabulary in simple English.`,
+              `Can you explain the key cultural phrases in simple English?`,
             ]
           : [
-              `Tell me about Northern vs Southern Pho.`,
-              `What are the major cultural festivals in Central Vietnam?`,
+              `What makes Northern and Southern Pho different?`,
+              `Tell me about the most vibrant festivals in Vietnam.`,
             ]
       );
     }
@@ -153,10 +154,16 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
                 className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
                   msg.role === 'user'
                     ? 'bg-amber-700 text-white rounded-br-none'
-                    : 'bg-white text-stone-800 border border-stone-200 rounded-bl-none font-serif'
+                    : 'bg-white text-stone-800 border border-amber-100/80 rounded-bl-none font-sans'
                 }`}
               >
-                <p className="whitespace-pre-wrap">{msg.content}</p>
+                {msg.role === 'user' ? (
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                ) : (
+                  <div className="prose prose-sm max-w-none text-stone-800 leading-relaxed font-sans [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4">
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </div>
+                )}
               </div>
             </div>
           ))}
