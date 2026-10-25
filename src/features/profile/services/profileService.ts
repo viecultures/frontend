@@ -372,7 +372,9 @@ export const profileService = {
       // ignore
     }
 
-    window.dispatchEvent(new CustomEvent('seals:change', { detail: updated }));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('seals:change', { detail: updated }));
+    }
     return updated;
   },
 

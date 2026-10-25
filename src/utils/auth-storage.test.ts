@@ -1,6 +1,22 @@
 import { test, type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { clearAuthStorage, getStoredToken, getStoredUser, getUserRole, isAdminUser, setAuthSession, setStoredUser } from './auth-storage';
+import {
+  clearAuthStorage,
+  getStoredToken,
+  getStoredUser,
+  getUserRole,
+  isAdminUser,
+  setAuthSession,
+  setStoredUser,
+  getIsProUser,
+  setIsProUser,
+  getAiDailyTurnsUsed,
+  incrementAiDailyTurns,
+  getAiRemainingTurns,
+  canSendAiTurn,
+  resetAiDailyTurns,
+  FREE_DAILY_AI_TURNS_LIMIT,
+} from './auth-storage';
 
 function storage() {
   const values = new Map<string, string>();
@@ -91,4 +107,63 @@ test('local sign-in replaces legacy backend tokens and remember-me selects the c
   assert.deepEqual(JSON.parse(local.getItem('vie_current_user')!), user);
   clearAuthStorage();
   assert.equal(getStoredUser(), null);
+});
+
+test('setIsProUser unlocks Pro status and synchronizes with stored user profile', t => {
+  const { local, events } = setup(t);
+  const user = { name: 'Learner One', email: 'learner1@example.com', role: 'ROLE_USER', isPro: false };
+  local.setItem('vie_current_user', JSON.stringify(user));
+
+  let subChanges = 0;
+  events.addEventListener('subscription:change', () => { subChanges++; });
+
+  assert.equal(getIsProUser(), false);
+  setIsProUser(true);
+  assert.equal(getIsProUser(), true);
+  assert.equal(subChanges, 1);
+  assert.equal(getStoredUser()?.isPro, true);
+
+  setIsProUser(false);
+  assert.equal(getIsProUser(), false);
+  assert.equal(subChanges, 2);
+  assert.equal(getStoredUser()?.isPro, false);
+});
+
+test('AI daily rate limiting allows 3 turns for free tier and unlimited for Pro tier', t => {
+  const { local } = setup(t);
+  assert.equal(FREE_DAILY_AI_TURNS_LIMIT, 3);
+  assert.equal(getIsProUser(), false);
+
+  // Initial state: 0 used, 3 remaining
+  assert.equal(getAiDailyTurnsUsed(), 0);
+  assert.equal(getAiRemainingTurns(), 3);
+  assert.equal(canSendAiTurn(), true);
+
+  // Turn 1
+  incrementAiDailyTurns();
+  assert.equal(getAiDailyTurnsUsed(), 1);
+  assert.equal(getAiRemainingTurns(), 2);
+  assert.equal(canSendAiTurn(), true);
+
+  // Turn 2
+  incrementAiDailyTurns();
+  assert.equal(getAiDailyTurnsUsed(), 2);
+  assert.equal(getAiRemainingTurns(), 1);
+  assert.equal(canSendAiTurn(), true);
+
+  // Turn 3
+  incrementAiDailyTurns();
+  assert.equal(getAiDailyTurnsUsed(), 3);
+  assert.equal(getAiRemainingTurns(), 0);
+  assert.equal(canSendAiTurn(), false);
+
+  // Upgrading to Pro immediately lifts the rate limit
+  setIsProUser(true);
+  assert.equal(getIsProUser(), true);
+  assert.equal(canSendAiTurn(), true);
+  assert.equal(getAiRemainingTurns(), Infinity);
+
+  // Reset turns
+  resetAiDailyTurns();
+  assert.equal(getAiDailyTurnsUsed(), 0);
 });

@@ -54,7 +54,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
 }) => {
   const [scrollY, setScrollY] = useState(0);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
-  const speeds = [0.75, 1.0, 1.25, 1.5];
+  const speeds = [1.0, 0.8, 0.5];
 
   const isDark = themeMode === "dark";
 

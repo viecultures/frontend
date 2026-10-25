@@ -27,6 +27,13 @@ export const PricingPage: React.FC = () => {
   useEffect(() => {
     setLocalIsPro(getIsProUser());
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    const handleSubChange = () => setLocalIsPro(getIsProUser());
+    window.addEventListener('subscription:change', handleSubChange);
+    window.addEventListener('auth:change', handleSubChange);
+    return () => {
+      window.removeEventListener('subscription:change', handleSubChange);
+      window.removeEventListener('auth:change', handleSubChange);
+    };
   }, []);
 
   const handleSelectPro = () => {
@@ -121,11 +128,15 @@ export const PricingPage: React.FC = () => {
               <ul className="space-y-3.5 text-xs sm:text-sm">
                 <li className="flex items-center gap-3">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>15 bài đọc di sản mẫu cơ bản</span>
+                  <span><strong>3 lượt đàm thoại AI/ngày</strong> (3 AI chat turns/day)</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Lưu tối đa 30 từ vựng vào sổ tay</span>
+                  <span><strong>1-Click Save</strong> lưu từ vựng kèm ngữ cảnh câu (tối đa 30 từ)</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>15 bài đọc di sản văn hóa mẫu cơ bản</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -133,7 +144,7 @@ export const PricingPage: React.FC = () => {
                 </li>
                 <li className="flex items-center gap-3 opacity-60">
                   <X className="w-4 h-4 text-rose-500 shrink-0" />
-                  <span>Không hỗ trợ trợ lý AI Cultural Companion</span>
+                  <span>Không nhận xét cá nhân hóa từ Mascot di sản</span>
                 </li>
                 <li className="flex items-center gap-3 opacity-60">
                   <X className="w-4 h-4 text-rose-500 shrink-0" />
@@ -188,7 +199,11 @@ export const PricingPage: React.FC = () => {
               <ul className="space-y-3.5 text-xs sm:text-sm">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
-                  <span><strong>Đàm đạo sâu cùng AI Cultural Companion:</strong> Trò chuyện không giới hạn bằng tiếng Anh, hỗ trợ gợi ý Quick Prompts đa chiều.</span>
+                  <span><strong>Đàm đạo sâu cùng AI Cultural Companion:</strong> Trò chuyện không giới hạn bằng tiếng Anh, dỡ bỏ hoàn toàn giới hạn 3 lượt/ngày.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
+                  <span><strong>Nhận xét & phản hồi cá nhân hóa từ Mascot di sản:</strong> Đánh giá phát âm, vốn từ và gợi ý phát triển phản xạ theo ngữ cảnh văn hóa.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
@@ -200,7 +215,7 @@ export const PricingPage: React.FC = () => {
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
-                  <span><strong>Không giới hạn sổ tay từ vựng:</strong> Lưu và đồng bộ tiến trình học tập vĩnh viễn trên đám mây.</span>
+                  <span><strong>Không giới hạn 1-Click Save & Sổ tay từ vựng:</strong> Lưu và đồng bộ tiến trình học tập vĩnh viễn trên đám mây.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
@@ -255,14 +270,28 @@ export const PricingPage: React.FC = () => {
               <tbody className="divide-y divide-stone-200 dark:divide-white/10">
                 <tr>
                   <td className="py-3.5 px-6 font-medium">Trò chuyện chuyên sâu với AI Cultural Companion</td>
-                  <td className="py-3.5 px-6 text-center text-stone-400">Không hỗ trợ</td>
+                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">3 lượt / ngày (3 turns/day)</td>
+                  <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
+                    Không giới hạn (Unlimited)
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-6 font-medium">Nhận xét & phản hồi cá nhân hóa từ Mascot di sản</td>
+                  <td className="py-3.5 px-6 text-center text-stone-400">Mẫu cơ bản mặc định</td>
+                  <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
+                    Cá nhân hóa chuyên sâu
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-6 font-medium">1-Click Save lưu từ vựng kèm ngữ cảnh câu</td>
+                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">Tối đa 30 từ</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
                     Không giới hạn
                   </td>
                 </tr>
                 <tr>
                   <td className="py-3.5 px-6 font-medium">Kho bài đọc song ngữ 3 miền</td>
-                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">15 bài mẫu</td>
+                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">15 bài mẫu cơ bản</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
                     Trọn vẹn 63 tỉnh thành
                   </td>
@@ -272,13 +301,6 @@ export const PricingPage: React.FC = () => {
                   <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">Chỉ 1x</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
                     0.5x, 0.8x, 1x (Gemini Voices)
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3.5 px-6 font-medium">Sổ tay lưu từ vựng cá nhân</td>
-                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">Tối đa 30 từ</td>
-                  <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
-                    Không giới hạn
                   </td>
                 </tr>
                 <tr>

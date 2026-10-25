@@ -296,15 +296,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             {isOtpStep
               ? copy.verifyTitle
               : authTab === 'login'
-              ? copy.loginTitle
-              : copy.registerTitle}
+                ? copy.loginTitle
+                : copy.registerTitle}
           </h1>
           <p className="auth-intro">
             {isOtpStep
               ? copy.verifyIntro(email)
               : authTab === 'login'
-              ? copy.loginIntro
-              : copy.registerIntro}
+                ? copy.loginIntro
+                : copy.registerIntro}
           </p>
 
           <div id="auth-panel" role="tabpanel" aria-labelledby={isOtpStep ? 'auth-title' : authTab === 'login' ? 'auth-login-tab' : 'auth-register-tab'}>
@@ -516,7 +516,37 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 </button>
               </form>
             )}
-
+            {!isOtpStep && hasGoogleLogin && (
+              <div className="auth-alternate">
+                <div className="auth-divider">
+                  <span>HOẶC</span>
+                </div>
+                <div className="auth-google relative w-full flex justify-center items-center overflow-hidden [&>div]:!w-full [&>div]:!max-w-full [&>div]:flex [&>div]:justify-center [&>div>iframe]:!mx-auto">
+                  {isLoading ? (
+                    <div className="auth-google-loading">
+                      <Loader2 size={18} className="auth-spinner" aria-hidden="true" />
+                      <span>Đang xác thực...</span>
+                    </div>
+                  ) : (
+                    <GoogleLogin
+                      onSuccess={(response) =>
+                        response.credential
+                          ? handleGoogleSuccess(response.credential)
+                          : setErrorMessage('Không nhận được mã xác thực Google từ trình duyệt.')
+                      }
+                      onError={() =>
+                        setErrorMessage('Đăng nhập bằng Google không thành công hoặc cửa sổ đăng nhập đã bị đóng.')
+                      }
+                      theme="outline"
+                      shape="rectangular"
+                      size="large"
+                      text="continue_with"
+                      width="380"
+                    />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <p className="auth-guest-note">

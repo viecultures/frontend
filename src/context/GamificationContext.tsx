@@ -11,6 +11,7 @@ import type {
 } from '@/types';
 
 import { applyCompletionReward, completionRewardKey } from '@/services/learning/rewardLedger';
+import { calculateStreakUpdate, type StreakUpdateResult } from '@/features/gamification/services/streakService';
 
 // ─── Constants & Configuration ──────────────────────────────────────────────────
 export const LEVEL_CONFIG = {
@@ -209,6 +210,7 @@ interface GamificationContextType {
   equipItem: (itemId: string) => void;
   dismissCelebration: () => void;
   resetGamification: () => void;
+  recordDailyStreak: (customDate?: string) => StreakUpdateResult;
 }
 
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
@@ -622,6 +624,28 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const toggleMissions = () => setIsMissionsOpen((prev) => !prev);
   const dismissCelebration = () => setActiveCelebration(null);
 
+  const recordDailyStreak = useCallback((customDate?: string): StreakUpdateResult => {
+    const result = calculateStreakUpdate(
+      {
+        streakDays: statsRef.current.streakDays,
+        lastActiveDate: statsRef.current.lastActiveDate,
+        streakProtected: statsRef.current.streakProtected,
+        streakFreezeCount: statsRef.current.streakFreezeCount,
+      },
+      customDate
+    );
+
+    setStats((prev) => ({
+      ...prev,
+      streakDays: result.nextStreak.streakDays,
+      lastActiveDate: result.nextStreak.lastActiveDate,
+      streakProtected: result.nextStreak.streakProtected,
+      streakFreezeCount: result.nextStreak.streakFreezeCount,
+    }));
+
+    return result;
+  }, [setStats]);
+
   const resetGamification = () => {
     setStats(DEFAULT_GAMIFICATION_STATS);
     localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -648,6 +672,7 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         equipItem,
         dismissCelebration,
         resetGamification,
+        recordDailyStreak,
       }}
     >
       {children}
