@@ -23,6 +23,7 @@ import type { RegionKey } from '@/utils/useVietnamMap';
 import { paths } from '@/routes/paths';
 import { readLearningValue, writeLearningValue } from '@/services/learning/learningStorage';
 import { JOURNEY_SERIES, type JourneySeries } from '../data/learningJourney';
+import { HanoiStoryMap } from './HanoiStoryMap';
 
 const REGIONS = [
   { id: 'north', name: 'Northern Vietnam', number: '01' },
@@ -57,6 +58,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
   const requestedPlace = VIETNAM_34_PROVINCES.find(province => province.id === params.get('place'));
   const selectedProvince = requestedPlace?.region === 'north' ? requestedPlace : undefined;
   const selectedPlace = selectedProvince?.id || '';
+  const isHanoiStoryMap = selectedPlace === 'ha-noi';
   const selectedRegion: RegionKey = selectedProvince ? 'north' : params.get('region') === 'north' ? 'north' : 'all';
   const region = REGIONS.find(item => item.id === selectedRegion);
 
@@ -258,6 +260,11 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
     setSelectedChapter({ id: chapter.id, title: chapter.title, seriesTitle: series.title });
   }
 
+  function chooseHanoiSeries(seriesId: string) {
+    const series = JOURNEY_SERIES.find(item => item.id === seriesId && item.provinceId === 'ha-noi');
+    if (series?.chapters[0]) chooseChapter(series.chapters[0], series);
+  }
+
   function renderNominatedSeriesCard(series: JourneySeries, isUnlocked: boolean) {
     const province = VIETNAM_34_PROVINCES.find(item => item.id === series.provinceId);
     const placeName = province ? toEnglishPlaceName(province.name) : 'Hanoi';
@@ -375,17 +382,15 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
         <section className="journey-map-panel" aria-label="Journey map">
           <div className="journey-map-heading">
             <div>
-              {region && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => selectRegion('all')}>
-                  <ArrowLeft size={17} /> All regions
-                </Button>
-              )}
+              {region && <Button type="button" variant="ghost" size="sm" onClick={() => isHanoiStoryMap ? selectPlace('') : selectRegion('all')}>
+                <ArrowLeft size={17} /> {isHanoiStoryMap ? 'Northern provinces' : 'All regions'}
+              </Button>}
               <span>{region ? `${region.number} / ${region.name.toUpperCase()}` : 'EXPLORE THREE REGIONS'}</span>
             </div>
-            <strong>{region ? 'Choose a place' : 'Choose a region'}</strong>
+            <strong>{isHanoiStoryMap ? 'Explore Hanoi' : region ? 'Choose a place' : 'Choose a region'}</strong>
           </div>
-          <div className="journey-map" data-map-level={region ? 'provinces' : 'regions'}>
-            <VietnamMap
+          <div className="journey-map" data-map-level={isHanoiStoryMap ? 'stories' : region ? 'provinces' : 'regions'}>
+            {isHanoiStoryMap ? <HanoiStoryMap onSelectSeries={chooseHanoiSeries} /> : <VietnamMap
               activeRegion={selectedRegion}
               overviewByRegion
               selectableRegions={OPEN_REGIONS}
@@ -398,7 +403,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
               showTooltip={false}
               showLabels={!!region}
               showControls={!!region}
-            />
+            />}
           </div>
           {region && selectedProvince && (
             <div className="journey-selected-place">
