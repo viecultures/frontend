@@ -62,6 +62,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
 
   const handleSend = async (messageText?: string) => {
     const textToSend = (messageText || inputMessage).trim();
+    console.log('[CompanionChatDrawer] handleSend triggered:', { textToSend, lessonId });
     if (!textToSend || isLoading) return;
 
     setError(null);
@@ -81,6 +82,8 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         history: messages,
       });
 
+      console.log('[CompanionChatDrawer] Received response:', response);
+
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: response.reply },
@@ -89,6 +92,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       setReferencedLessons(response.referencedLessons || []);
       setRemainingTurns(response.remainingDailyTurns);
     } catch (err) {
+      console.error('[CompanionChatDrawer] Failed to get response:', err);
       const errMessage = err instanceof Error ? err.message : 'Failed to reach AI companion';
       setError(errMessage);
     } finally {

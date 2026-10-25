@@ -87,9 +87,11 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   };
 
   const sendTextPrompt = async () => {
+    console.log('[ControlTray] sendTextPrompt triggered:', { textPrompt, active, busy });
     if (!active || busy || !textPrompt.trim()) return;
     const currentPrompt = textPrompt;
     const result = await sendMessage({ text: currentPrompt, source: 'composer' });
+    console.log('[ControlTray] sendMessage result:', result);
     if (result.status === 'ok') setTextPrompt(value => value === currentPrompt ? '' : value);
   };
 

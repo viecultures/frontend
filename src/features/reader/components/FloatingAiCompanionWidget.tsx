@@ -64,6 +64,7 @@ export function FloatingAiCompanionWidget({
   }
   async function sendMessage() {
     const text = input.trim();
+    console.log('[FloatingAiCompanionWidget] sendMessage triggered:', { text, articleId });
     if (!text) return;
     if (!user) { navigate(paths.login({ redirect: window.location.pathname + window.location.search })); return; }
     if (!isPro) { navigate(PATHS.pricing); return; }
@@ -84,11 +85,14 @@ export function FloatingAiCompanionWidget({
         })),
       });
 
+      console.log('[FloatingAiCompanionWidget] response received:', response);
+
       setMessages(previous => [
         ...previous,
         { sender: 'ai', text: response.reply },
       ]);
     } catch (err) {
+      console.error('[FloatingAiCompanionWidget] Error received:', err);
       const errMessage = err instanceof Error ? err.message : 'Unable to reach Cultural Companion API';
       setMessages(previous => [
         ...previous,

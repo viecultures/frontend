@@ -218,8 +218,15 @@ export class SessionController {
   };
 
   private async run(request: Request): Promise<ActionResult> {
-    if (!this.state.activeView) return { status: 'inactive' };
-    if (this.state.isSending || this.state.connectionStatus === 'ending') return { status: 'busy' };
+    console.log('[SessionController] run() called with request:', request);
+    if (!this.state.activeView) {
+      console.warn('[SessionController] Aborted: activeView is null');
+      return { status: 'inactive' };
+    }
+    if (this.state.isSending || this.state.connectionStatus === 'ending') {
+      console.warn('[SessionController] Aborted: controller is busy or ending');
+      return { status: 'busy' };
+    }
     const generation = this.generation;
     const current = () => generation === this.generation;
     const history = buildResumeHistory(useLogStore.getState().turns);
@@ -233,6 +240,73 @@ export class SessionController {
       const unlocked = this.deps.audio.unlock();
       await unlocked;
       if (!current()) return { status: 'cancelled' };
+
+      // Route text prompts directly through Backend companionService
+      if (request.input === 'text' && request.text) {
+        const text = request.text;
+        console.log('[SessionController] Processing text turn via Backend companionService:', text);
+        this.onInterrupted();
+        this.patch({ isAwaitingResponse: true, connectionStatus: 'connected' });
+        this.responseInFlight = true;
+        if (request.source) useLogStore.getState().addTurn({ role: 'user', text, isFinal: true, source: request.source });
+
+        try {
+          this.deps.client.send({ text });
+        } catch (e) {
+          console.debug('[SessionController] Optional client.send notification error:', e);
+        }
+
+        try {
+          const turns = useLogStore.getState().turns;
+          const historyForCompanion = turns
+            .filter(t => t.role === 'user' || t.role === 'agent')
+            .slice(-6)
+            .map(t => ({
+              role: t.role === 'user' ? ('user' as const) : ('assistant' as const),
+              content: t.text,
+            }));
+
+          console.log('[SessionController] Calling companionService.sendMessage...', {
+            message: text,
+            historyCount: historyForCompanion.length,
+          });
+
+          const companionRes = await companionService.sendMessage({
+            message: text,
+            history: historyForCompanion,
+          });
+
+          console.log('[SessionController] Received backend reply:', companionRes.reply);
+
+          if (!current()) {
+            console.warn('[SessionController] Request was superseded or cancelled');
+            return { status: 'cancelled' };
+          }
+
+          this.responseInFlight = false;
+          useLogStore.getState().addTurn({
+            role: 'agent',
+            text: companionRes.reply,
+            isFinal: true,
+          });
+          this.patch({ isSending: false, isAwaitingResponse: false });
+          this.pendingRequest = null;
+          this.patch({ pendingPrompt: '' });
+          return { status: 'ok' };
+        } catch (beError) {
+          console.error('[SessionController] companionService.sendMessage error:', beError);
+          if (!current()) return { status: 'cancelled' };
+          const message = beError instanceof Error ? beError.message : 'Không thể kết nối đến máy chủ AI.';
+          this.fail(message);
+          useLogStore.getState().addTurn({
+            role: 'agent',
+            text: `Lỗi kết nối máy chủ AI: ${message}`,
+            isFinal: true,
+          });
+          return { status: 'error', message };
+        }
+      }
+
       if (reconnect) {
         try {
           const configuration = this.deps.configuration();
@@ -256,46 +330,9 @@ export class SessionController {
         this.onInterrupted();
         this.patch({ isAwaitingResponse: true });
         this.responseInFlight = true;
+        useLogStore.getState().beginAgentTurn();
+        this.deps.client.send({ text });
         if (request.source) useLogStore.getState().addTurn({ role: 'user', text, isFinal: true, source: request.source });
-
-        // Route text messages through Backend companionService (http://localhost:8080/api/v1/companion/chat)
-        if (request.input === 'text') {
-          try {
-            const turns = useLogStore.getState().turns;
-            const historyForCompanion = turns
-              .filter(t => t.role === 'user' || t.role === 'agent')
-              .slice(-6)
-              .map(t => ({
-                role: t.role === 'user' ? ('user' as const) : ('assistant' as const),
-                content: t.text,
-              }));
-
-            const companionRes = await companionService.sendMessage({
-              message: text,
-              history: historyForCompanion,
-            });
-
-            if (current()) {
-              this.responseInFlight = false;
-              useLogStore.getState().addTurn({
-                role: 'agent',
-                text: companionRes.reply,
-                isFinal: true,
-              });
-              this.patch({ isAwaitingResponse: false });
-            }
-          } catch (beError) {
-            if (this.state.connectionStatus === 'connected') {
-              useLogStore.getState().beginAgentTurn();
-              this.deps.client.send({ text });
-            } else {
-              throw beError;
-            }
-          }
-        } else {
-          useLogStore.getState().beginAgentTurn();
-          this.deps.client.send({ text });
-        }
       }
       this.pendingRequest = null;
       this.patch({ pendingPrompt: '' });
@@ -305,6 +342,7 @@ export class SessionController {
       }
       return { status: 'ok' };
     } catch (error) {
+      console.error('[SessionController] run() encountered top-level error:', error);
       if (!current()) return { status: this.state.connectionStatus === 'error' ? 'error' : 'cancelled', message: this.state.connectionError ?? undefined };
       const message = error instanceof Error ? error.message : 'Không thể gửi yêu cầu.';
       this.fail(message);
