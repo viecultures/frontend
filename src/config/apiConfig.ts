@@ -9,6 +9,6 @@ export const API_BASE_URL: string = (
   import.meta.env?.VITE_API_BASE_URL ||
   (BACKEND_PORT ? `http://localhost:${BACKEND_PORT}` : '') ||
   ''
-);
+).replace(/\/+$/, '');
 
 export const getApiBaseUrl = (): string => API_BASE_URL;
