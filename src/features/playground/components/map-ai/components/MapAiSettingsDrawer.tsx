@@ -234,7 +234,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
               onChange={(e) =>
                 onUpdateSettings((prev) => ({ ...prev, customApiKey: e.target.value }))
               }
-              placeholder="Mặc định sử dụng VITE_GEMINI_API_KEY từ file .env"
+              placeholder="Mặc định sử dụng API từ Backend (/api/v1/companion/chat)"
               className="w-full px-3.5 py-2 rounded-xl bg-gray-50 dark:bg-[#1E2E2A] border border-gray-200 dark:border-white/10 text-xs focus:outline-none focus:ring-2 focus:ring-heritage-green dark:focus:ring-antique-gold"
             />
             <p className="text-[10px] text-gray-500 mt-1">

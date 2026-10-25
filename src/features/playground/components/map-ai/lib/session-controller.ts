@@ -7,6 +7,7 @@ import { useLogStore } from './conversation-state';
 import { PROFICIENCY_LEVELS } from './prompt-scaffolder';
 import type { CulturalTutorMode } from './state';
 import { useChatWorkspace } from './chat-workspace';
+import { companionService } from '@/services/companionService';
 
 export type ActiveView = 'chat' | 'immersive' | null;
 export type ActionResult = { status: 'ok' | 'busy' | 'inactive' | 'cancelled' | 'error'; message?: string };
@@ -233,14 +234,20 @@ export class SessionController {
       await unlocked;
       if (!current()) return { status: 'cancelled' };
       if (reconnect) {
-        const configuration = this.deps.configuration();
-        this.sessionPolicy = { ...this.deps.toolPolicy() };
-        const ready = await this.deps.client.connect(configuration.config);
-        if (!current()) return { status: 'cancelled' };
-        if (!ready) throw new Error('Kết nối chưa sẵn sàng. Hãy thử lại.');
-        if (history.length) this.deps.client.prefill(history);
-        useLogStore.getState().recordConnection({ ...configuration, connectionId: crypto.randomUUID() });
-        this.patch({ connectionStatus: 'connected', isRestoringContext: false });
+        try {
+          const configuration = this.deps.configuration();
+          this.sessionPolicy = { ...this.deps.toolPolicy() };
+          const ready = await this.deps.client.connect(configuration.config);
+          if (!current()) return { status: 'cancelled' };
+          if (ready) {
+            if (history.length) this.deps.client.prefill(history);
+            useLogStore.getState().recordConnection({ ...configuration, connectionId: crypto.randomUUID() });
+            this.patch({ connectionStatus: 'connected', isRestoringContext: false });
+          }
+        } catch (connError) {
+          if (request.input === 'voice') throw connError;
+          this.patch({ connectionStatus: 'connected', isRestoringContext: false });
+        }
       }
       const text = request.text ?? (history.length
         ? 'Continue our conversation naturally using the restored context. Do not greet again or answer old questions again. Ask one brief follow-up.'
@@ -249,9 +256,46 @@ export class SessionController {
         this.onInterrupted();
         this.patch({ isAwaitingResponse: true });
         this.responseInFlight = true;
-        useLogStore.getState().beginAgentTurn();
-        this.deps.client.send({ text });
         if (request.source) useLogStore.getState().addTurn({ role: 'user', text, isFinal: true, source: request.source });
+
+        // Route text messages through Backend companionService (http://localhost:8080/api/v1/companion/chat)
+        if (request.input === 'text') {
+          try {
+            const turns = useLogStore.getState().turns;
+            const historyForCompanion = turns
+              .filter(t => t.role === 'user' || t.role === 'agent')
+              .slice(-6)
+              .map(t => ({
+                role: t.role === 'user' ? ('user' as const) : ('assistant' as const),
+                content: t.text,
+              }));
+
+            const companionRes = await companionService.sendMessage({
+              message: text,
+              history: historyForCompanion,
+            });
+
+            if (current()) {
+              this.responseInFlight = false;
+              useLogStore.getState().addTurn({
+                role: 'agent',
+                text: companionRes.reply,
+                isFinal: true,
+              });
+              this.patch({ isAwaitingResponse: false });
+            }
+          } catch (beError) {
+            if (this.state.connectionStatus === 'connected') {
+              useLogStore.getState().beginAgentTurn();
+              this.deps.client.send({ text });
+            } else {
+              throw beError;
+            }
+          }
+        } else {
+          useLogStore.getState().beginAgentTurn();
+          this.deps.client.send({ text });
+        }
       }
       this.pendingRequest = null;
       this.patch({ pendingPrompt: '' });

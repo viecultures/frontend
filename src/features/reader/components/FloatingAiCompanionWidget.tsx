@@ -8,6 +8,7 @@ import { ReaderCompanionTools } from './ReaderCompanionTools';
 import { ReaderCompanionMessages, type CompanionMessage } from './ReaderCompanionMessages';
 import './reader-companion.css';
 import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
+import { companionService } from '@/services/companionService';
 
 interface FloatingAiCompanionWidgetProps {
   articleTitle?: string;
@@ -61,26 +62,39 @@ export function FloatingAiCompanionWidget({
     }, input);
     navigate(paths.aiWorkspace({ story: articleId, level }));
   }
-  function sendMessage() {
+  async function sendMessage() {
     const text = input.trim();
     if (!text) return;
     if (!user) { navigate(paths.login({ redirect: window.location.pathname + window.location.search })); return; }
     if (!isPro) { navigate(PATHS.pricing); return; }
 
-    // Preserve the existing guided preview without presenting canned text as live AI.
-    const summaryPrompt = `Help me understand “${articleTitle}”.`;
-    const opinionPrompt = `Help me express my opinion about “${articleTitle}” in English.`;
-    const reply = text === summaryPrompt
-      ? articleSummary
-        ? `From the story’s introduction:\n${articleSummary}\n\nTry this: read the opening paragraph, then describe its main idea in one sentence.`
-        : `Start with the opening paragraph of “${articleTitle}”. Identify who or what it describes, then write a one-sentence summary. Use “Word in context” in Learning tools for unfamiliar words.`
-      : text === opinionPrompt
-        ? 'Try this speaking frame: “One detail that stood out to me was ___. I think it matters because ___. It reminds me of ___.” Fill the gaps with details from the story.'
-        : 'Live AI replies are not connected in this preview yet. You can use Learning tools to look up a word from the story, open its vocabulary, or practise with a prepared prompt.';
-    setMessages(previous => [...previous, { sender: 'user', text }, { sender: 'ai', text: reply }]);
+    const newHistory: CompanionMessage[] = [...messages, { sender: 'user', text }];
+    setMessages(newHistory);
     setInput('');
     setShowTools(false);
     inputRef.current?.focus();
+
+    try {
+      const response = await companionService.sendMessage({
+        lessonId: articleId,
+        message: text,
+        history: messages.map(m => ({
+          role: m.sender === 'user' ? 'user' : 'assistant',
+          content: m.text,
+        })),
+      });
+
+      setMessages(previous => [
+        ...previous,
+        { sender: 'ai', text: response.reply },
+      ]);
+    } catch (err) {
+      const errMessage = err instanceof Error ? err.message : 'Unable to reach Cultural Companion API';
+      setMessages(previous => [
+        ...previous,
+        { sender: 'ai', text: errMessage },
+      ]);
+    }
   }
 
   return (
@@ -123,7 +137,7 @@ export function FloatingAiCompanionWidget({
                   onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); sendMessage(); } }} />
                 <button type="submit" className="reader-companion-primary" disabled={!input.trim()} aria-label="Send message"><Send size={18} /></button>
               </form>}
-            <p className="reader-companion-preview">Guided preview · Live AI chat is not connected yet.</p>
+            <p className="reader-companion-preview">Powered by Backend AI Cultural Companion API</p>
           </footer>
         </section>
       )}

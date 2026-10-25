@@ -2,6 +2,8 @@ import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 import type { ProvinceMapItem } from '@/data/vietnamMapData';
 import { getProvinceCultureData } from '../data/vietnamProvincesDetail';
 import type { ChatMessage, MapAiResponse } from '../types';
+import { companionService } from '@/services/companionService';
+import type { CompanionChatMessage } from '@/types/companion';
 
 const SYSTEM_PROMPT = `
 Bạn là "Sứ Giả Văn Hóa AI" (VieCultures AI Map Assistant) — trợ lý đàm thoại thông minh chuyên sâu về 34 tỉnh thành và di sản văn hóa, địa lý, ẩm thực Việt Nam.
@@ -129,60 +131,29 @@ export async function sendMapAiPrompt(
   prompt: string,
   history: ChatMessage[] = [],
   currentSelectedProvinceId?: string,
-  modelOverride?: string,
-  apiKeyOverride?: string
+  _modelOverride?: string,
+  _apiKeyOverride?: string
 ): Promise<MapAiResponse> {
-  const apiKey = (apiKeyOverride || import.meta.env.VITE_GEMINI_API_KEY || '').trim();
-  const modelName = (modelOverride || import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash').trim();
+  const detectedProvince = detectProvinceFromText(prompt);
+  const activeProvinceId = detectedProvince?.id || currentSelectedProvinceId;
+  const activeProvinceData = activeProvinceId ? getProvinceCultureData(activeProvinceId) : null;
 
-  if (!apiKey || apiKey.startsWith('AQ.Ab8RN6JMaHFJUzjpELT3IWoO') === false && apiKey.length < 10) {
-    return generateLocalFallbackResponse(prompt, currentSelectedProvinceId);
-  }
+  const contextAddition = activeProvinceData
+    ? `\n[Ngữ cảnh tỉnh thành đang chọn: ${activeProvinceData.name} (${activeProvinceData.regionName}). Thủ phủ: ${activeProvinceData.capital}. Danh lam: ${activeProvinceData.landmarks.join(', ')}. Đặc sản: ${activeProvinceData.specialties.join(', ')}]`
+    : '';
 
   try {
-    const detectedProvince = detectProvinceFromText(prompt);
-    const activeProvinceId = detectedProvince?.id || currentSelectedProvinceId;
-    const activeProvinceData = activeProvinceId ? getProvinceCultureData(activeProvinceId) : null;
-
-    const contextAddition = activeProvinceData
-      ? `\n[Ngữ cảnh tỉnh thành đang chọn: ${activeProvinceData.name} (${activeProvinceData.regionName}). Thủ phủ: ${activeProvinceData.capital}. Danh lam: ${activeProvinceData.landmarks.join(', ')}. Đặc sản: ${activeProvinceData.specialties.join(', ')}]`
-      : '';
-
-    const contents = history.slice(-6).map((msg) => ({
-      role: msg.sender === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.text }],
+    const companionHistory: CompanionChatMessage[] = history.slice(-6).map((msg) => ({
+      role: msg.sender === 'user' ? 'user' : 'assistant',
+      content: msg.text,
     }));
 
-    contents.push({
-      role: 'user',
-      parts: [{ text: prompt + contextAddition }],
+    const response = await companionService.sendMessage({
+      message: prompt + contextAddition,
+      history: companionHistory,
     });
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: SYSTEM_PROMPT }],
-        },
-        contents,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 800,
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      console.warn(`Gemini API returned status ${response.status}. Switching to local cultural intelligence.`);
-      return generateLocalFallbackResponse(prompt, currentSelectedProvinceId);
-    }
-
-    const data = await response.json();
-    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
+    const candidateText = response.reply;
     if (!candidateText) {
       return generateLocalFallbackResponse(prompt, currentSelectedProvinceId);
     }
@@ -198,7 +169,7 @@ export async function sendMapAiPrompt(
       culturalTags: finalDetail ? [finalDetail.regionName, finalDetail.heritageType || 'Di sản văn hóa'] : [],
     };
   } catch (err) {
-    console.warn('Gemini API call failed, using local engine:', err);
+    console.warn('Backend companion chat failed, using local cultural intelligence fallback:', err);
     return generateLocalFallbackResponse(prompt, currentSelectedProvinceId);
   }
 }
