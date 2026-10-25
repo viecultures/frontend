@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SendHorizontal } from 'lucide-react';
 import { companionService } from '@/services/companionService';
 import type {
@@ -6,6 +7,8 @@ import type {
   CompanionLanguage,
   ReferencedLesson,
 } from '@/types/companion';
+import { getStoredUser, getIsProUser, type AppUser } from '@/utils/auth-storage';
+import { PATHS, paths } from '@/routes/paths';
 import { CompanionQuickPrompts } from './CompanionQuickPrompts';
 import { CompanionChatHeader } from './CompanionChatHeader';
 import { CompanionMessageBubble } from './CompanionMessageBubble';
@@ -43,6 +46,12 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
   lessonId,
   lessonTitle,
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
+  const [isPro, setIsPro] = useState<boolean>(() => getIsProUser());
+
   const [messages, setMessages] = useState<CompanionChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -66,6 +75,25 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
     maxHeightRatio: 0.85,
     bottomOffset: WINDOW_BOTTOM_OFFSET,
   });
+
+  // Track auth & subscription state changes
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const activeUser = getStoredUser();
+      setUser(activeUser);
+      setIsPro(getIsProUser());
+      if (!activeUser) {
+        setMessages([]);
+        setRemainingTurns(null);
+      }
+    };
+    window.addEventListener('auth:change', handleAuthChange);
+    window.addEventListener('subscription:change', handleAuthChange);
+    return () => {
+      window.removeEventListener('auth:change', handleAuthChange);
+      window.removeEventListener('subscription:change', handleAuthChange);
+    };
+  }, []);
 
   const handleLanguageChange = (lang: CompanionLanguage) => {
     setSelectedLanguage(lang);
@@ -102,21 +130,45 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         ];
   }, [lessonTitle]);
 
-  // Load chat history when drawer opens
+  // Load chat history and quota when drawer opens
   useEffect(() => {
     if (!isOpen) return;
 
+    if (!user) {
+      setMessages([
+        {
+          id: 'guest-intro',
+          role: 'assistant',
+          content: 'Xin chào! Hãy đăng nhập vào tài khoản VieCultures để trò chuyện và lưu lại lịch sử với Cultural Companion.',
+          timestamp: Date.now(),
+        },
+      ]);
+      setSuggestedPrompts([]);
+      setRemainingTurns(null);
+      return;
+    }
+
     let isSubscribed = true;
 
-    const loadHistory = async () => {
+    const loadHistoryAndQuota = async () => {
       setIsHistoryLoading(true);
       setError(null);
       try {
-        const history = await companionService.getChatHistory(lessonId);
+        // Fetch history and quota in parallel
+        const [history, quota] = await Promise.allSettled([
+          companionService.getChatHistory(lessonId),
+          companionService.getQuota(),
+        ]);
+
         if (!isSubscribed) return;
 
-        if (history && history.length > 0) {
-          setMessages(history);
+        if (quota.status === 'fulfilled') {
+          setRemainingTurns(quota.value.remainingTurns);
+          setIsPro(quota.value.isPro);
+        }
+
+        if (history.status === 'fulfilled' && history.value && history.value.length > 0) {
+          setMessages(history.value);
         } else {
           const initialMsgs: CompanionChatMessage[] = [
             {
@@ -131,8 +183,8 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         }
         setSuggestedPrompts(getDefaultPrompts());
       } catch (err) {
-        console.error('[CompanionChatDrawer] Failed to load history:', err);
-        setError('Unable to load full chat history. You can still chat normally.');
+        console.error('[CompanionChatDrawer] Failed to load history or quota:', err);
+        setError('Unable to load chat history. You can still chat normally.');
       } finally {
         if (isSubscribed) {
           setIsHistoryLoading(false);
@@ -140,19 +192,32 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       }
     };
 
-    loadHistory();
+    loadHistoryAndQuota();
 
     return () => {
       isSubscribed = false;
     };
-  }, [isOpen, lessonId, getInitialGreeting, getDefaultPrompts]);
+  }, [isOpen, user, lessonId, getInitialGreeting, getDefaultPrompts]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading, isHistoryLoading]);
 
+  const isLimitReached = !isPro && remainingTurns !== null && remainingTurns <= 0;
+
   const handleSend = async (messageText?: string) => {
+    if (!user) {
+      const redirectPath = location.pathname + location.search;
+      navigate(paths.login({ redirect: redirectPath }));
+      return;
+    }
+
+    if (isLimitReached) {
+      navigate(PATHS.pricing);
+      return;
+    }
+
     const textToSend = (messageText || inputMessage).trim();
     console.log('[CompanionChatDrawer] handleSend triggered:', {
       textToSend,
@@ -198,11 +263,24 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       setReferencedLessons(response.referencedLessons || []);
       setRemainingTurns(response.remainingDailyTurns);
 
-      // Persist new history
+      // Persist new history for authenticated user
       await companionService.saveChatHistory(updatedHistory, lessonId);
     } catch (err) {
       console.error('[CompanionChatDrawer] Failed to get response:', err);
       const errMessage = err instanceof Error ? err.message : 'Failed to reach AI companion';
+
+      if (errMessage.includes('AUTH_REQUIRED') || errMessage.includes('401')) {
+        const redirectPath = location.pathname + location.search;
+        navigate(paths.login({ redirect: redirectPath }));
+        return;
+      }
+
+      if (errMessage.includes('LIMIT_EXCEEDED') || errMessage.includes('403')) {
+        setRemainingTurns(0);
+        setError('Bạn đã sử dụng hết 5 lượt chat miễn phí hôm nay.');
+        return;
+      }
+
       setError(errMessage);
     } finally {
       setIsLoading(false);
@@ -251,10 +329,10 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
     }
   };
 
-  const handleClearHistory = async (): Promise<void> => {
+  const handleClearHistory = async () => {
     try {
       await companionService.clearChatHistory(lessonId);
-      const initialMsgs: CompanionChatMessage[] = [
+      const resetGreeting: CompanionChatMessage[] = [
         {
           id: `msg-${Date.now()}`,
           role: 'assistant',
@@ -262,39 +340,52 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
           timestamp: Date.now(),
         },
       ];
-      setMessages(initialMsgs);
+      setMessages(resetGreeting);
+      await companionService.saveChatHistory(resetGreeting, lessonId);
       setSuggestedPrompts(getDefaultPrompts());
       setReferencedLessons([]);
       setError(null);
-      await companionService.saveChatHistory(initialMsgs, lessonId);
     } catch (err) {
       console.error('[CompanionChatDrawer] Failed to clear history:', err);
-      setError('Could not clear history. Please try again.');
+      setError('Failed to clear chat history.');
     }
   };
 
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
-  const windowStyle: React.CSSProperties | undefined = isMobile
-    ? undefined
-    : { width: size.width, height: size.height };
+  const drawerStyle: React.CSSProperties = isMobile
+    ? {
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100%',
+        height: '85vh',
+        maxHeight: '85vh',
+      }
+    : {
+        position: 'fixed',
+        right: '24px',
+        bottom: `${WINDOW_BOTTOM_OFFSET}px`,
+        width: `${size.width}px`,
+        height: `${size.height}px`,
+      };
 
   return (
     <div
       role="dialog"
-      aria-label="Cultural AI Companion chat"
-      style={windowStyle}
-      className={`vc-window-pop fixed z-50 flex flex-col overflow-hidden bg-[#fffaf0] font-sans ${
+      aria-label="Cultural AI Companion"
+      tabIndex={-1}
+      style={drawerStyle}
+      className={`z-50 flex flex-col overflow-hidden border-2 border-[#8a9a6f] bg-[#fffaf0] font-sans text-[#2f3a2a] antialiased select-text ${
         isMobile
-          ? 'inset-0'
-          : 'right-6 bottom-[108px] rounded-[26px] border-2 border-[#8a9a6f] shadow-[0_8px_0_-2px_#c9d6b0,0_28px_60px_-20px_rgba(50,70,40,0.55)]'
+          ? 'vc-drawer-slide rounded-t-[26px] shadow-[0_-8px_30px_rgba(70,90,60,0.35)]'
+          : 'vc-window-pop rounded-[26px] shadow-[0_8px_0_-1px_#c9d6b0,0_20px_45px_-12px_rgba(70,90,60,0.45)]'
       }`}
     >
       <style>{companionKeyframes}</style>
 
-      {/* Resize grip (top-left, since the window is anchored bottom-right) */}
+      {/* Resize Handle (Desktop top-left corner) */}
       {!isMobile && (
         <button
           type="button"
@@ -326,6 +417,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         remainingTurns={remainingTurns}
         onResetSize={isMobile ? undefined : resetSize}
         onClose={onClose}
+        isLoggedIn={!!user}
       />
 
       {/* Messages Body */}
@@ -404,42 +496,84 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Prompts */}
-      {suggestedPrompts.length > 0 && !isLoading && (
-        <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-3 pt-2">
-          <CompanionQuickPrompts
-            prompts={suggestedPrompts}
-            onSelectPrompt={(p) => handleSend(p)}
-            disabled={isLoading}
-          />
-        </div>
-      )}
-
-      {/* Input Bar */}
-      <div className="shrink-0 bg-[#fffaf0] px-3 pt-1 pb-3">
-        <div className="flex items-end gap-2 rounded-[22px] border-2 border-[#d6dcc4] bg-white py-1.5 pr-1.5 pl-3.5 transition-colors focus-within:border-[#8a9a6f]">
-          <textarea
-            ref={inputRef}
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            rows={1}
-            placeholder="Ask about Vietnamese culture..."
-            className="max-h-[120px] flex-1 resize-none bg-transparent py-1.5 text-[13.5px] text-[#2f3a2a] placeholder:text-[#a3ad90] focus:outline-none disabled:opacity-60"
-          />
+      {/* Case 1: Unauthenticated Guest -> Render Login Gate */}
+      {!user ? (
+        <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-4 py-4 text-center">
+          <p className="mb-1 font-serif text-[15px] font-bold text-[#2f4a2c]">
+            Yêu cầu đăng nhập
+          </p>
+          <p className="mb-3 text-xs leading-relaxed text-[#627750]">
+            Đăng nhập vào tài khoản VieCultures để trò chuyện và lưu lại lịch sử với AI Companion.
+          </p>
           <button
             type="button"
-            onClick={() => handleSend()}
-            disabled={isLoading || !inputMessage.trim()}
-            aria-label="Send message"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#5d8a45] text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none disabled:cursor-not-allowed disabled:bg-[#c9d6b0] disabled:shadow-none"
+            onClick={() => {
+              const redirectPath = location.pathname + location.search;
+              navigate(paths.login({ redirect: redirectPath }));
+            }}
+            className="inline-flex items-center justify-center rounded-full bg-[#5d8a45] px-5 py-2 text-xs font-bold text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none"
           >
-            <SendHorizontal className="h-4 w-4" />
+            Đăng nhập để chat
           </button>
         </div>
-        <p className="mt-1 text-center text-[10px] text-[#a3ad90]">Enter to send, Shift + Enter for a new line</p>
-      </div>
+      ) : isLimitReached ? (
+        /* Case 2: Hit Limit -> Render Upgrade Gate */
+        <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-4 py-4 text-center">
+          <p className="mb-1 font-serif text-[15px] font-bold text-[#8f3f2c]">
+            Hết lượt trò chuyện hôm nay
+          </p>
+          <p className="mb-3 text-xs leading-relaxed text-[#7a8a66]">
+            Bạn đã sử dụng hết 5 lượt chat miễn phí hôm nay. Nâng cấp tài khoản Pro để trò chuyện không giới hạn!
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate(PATHS.pricing)}
+            className="inline-flex items-center justify-center rounded-full bg-[#b4533c] px-5 py-2 text-xs font-bold text-white shadow-[0_3px_0_-1px_#7a2a1a] transition-all hover:bg-[#9a4330] active:translate-y-px active:shadow-none"
+          >
+            Nâng cấp tài khoản
+          </button>
+        </div>
+      ) : (
+        /* Case 3: Authenticated with quota remaining -> Show Quick Prompts & Composer */
+        <>
+          {suggestedPrompts.length > 0 && !isLoading && (
+            <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-3 pt-2">
+              <CompanionQuickPrompts
+                prompts={suggestedPrompts}
+                onSelectPrompt={(p) => handleSend(p)}
+                disabled={isLoading}
+              />
+            </div>
+          )}
+
+          <div className="shrink-0 bg-[#fffaf0] px-3 pt-1 pb-3">
+            <div className="flex items-end gap-2 rounded-[22px] border-2 border-[#d6dcc4] bg-white py-1.5 pr-1.5 pl-3.5 transition-colors focus-within:border-[#8a9a6f]">
+              <textarea
+                ref={inputRef}
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isLoading}
+                rows={1}
+                placeholder="Ask about Vietnamese culture..."
+                className="max-h-[120px] flex-1 resize-none bg-transparent py-1.5 text-[13.5px] text-[#2f3a2a] placeholder:text-[#a3ad90] focus:outline-none disabled:opacity-60"
+              />
+              <button
+                type="button"
+                onClick={() => handleSend()}
+                disabled={isLoading || !inputMessage.trim()}
+                aria-label="Send message"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#5d8a45] text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none disabled:cursor-not-allowed disabled:bg-[#c9d6b0] disabled:shadow-none"
+              >
+                <SendHorizontal className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-1 text-center text-[10px] text-[#a3ad90]">
+              Enter to send, Shift + Enter for a new line
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -40,3 +40,9 @@ export interface CompanionTranslateRequest {
 export interface CompanionTranslateResponse {
   translatedText: string;
 }
+
+export interface CompanionQuotaResponse {
+  dailyLimit: number;
+  remainingTurns: number;
+  isPro: boolean;
+}

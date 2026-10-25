@@ -8,6 +8,7 @@ interface CompanionSettingsMenuProps {
   onClearHistory: () => Promise<void>;
   remainingTurns: number | null;
   onResetSize?: () => void;
+  isLoggedIn?: boolean;
 }
 
 interface LanguageOption {
@@ -28,6 +29,7 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
   onClearHistory,
   remainingTurns,
   onResetSize,
+  isLoggedIn = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
@@ -177,14 +179,19 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
             )}
           </div>
 
-          {remainingTurns !== null && (
+          {!isLoggedIn ? (
+            <div className="flex items-center justify-between bg-[#f3efe0] px-4 py-2 text-[11px] text-[#7a8a66]">
+              <span>Daily questions</span>
+              <span className="font-semibold text-[#8f3f2c]">Requires login</span>
+            </div>
+          ) : remainingTurns !== null ? (
             <div className="flex items-center justify-between bg-[#f3efe0] px-4 py-2 text-[11px] text-[#7a8a66]">
               <span>Daily questions</span>
               <span className="font-semibold text-[#3e5a3a]">
-                {remainingTurns === -1 ? 'Unlimited (Pro)' : `${remainingTurns} left`}
+                {remainingTurns === -1 ? 'Unlimited (Pro)' : `${remainingTurns} / 5 left`}
               </span>
             </div>
-          )}
+          ) : null}
         </div>
       )}
     </div>

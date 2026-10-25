@@ -1,11 +1,12 @@
 import { getApiBaseUrl } from '@/config/apiConfig';
-import { getStoredToken } from '@/utils/auth-storage';
+import { getStoredToken, getStoredUser } from '@/utils/auth-storage';
 import type {
   CompanionChatMessage,
   CompanionChatRequest,
   CompanionChatResponse,
   CompanionTranslateRequest,
   CompanionTranslateResponse,
+  CompanionQuotaResponse,
 } from '@/types/companion';
 
 export interface ApiResponse<T> {
@@ -21,11 +22,14 @@ export interface ICompanionService {
   getChatHistory(lessonId?: string): Promise<CompanionChatMessage[]>;
   saveChatHistory(messages: CompanionChatMessage[], lessonId?: string): Promise<void>;
   clearChatHistory(lessonId?: string): Promise<void>;
+  getQuota(): Promise<CompanionQuotaResponse>;
 }
 
 class CompanionService implements ICompanionService {
   private getStorageKey(lessonId?: string): string {
-    return `viecultures_companion_history_${lessonId || 'global'}`;
+    const user = getStoredUser();
+    const userKey = user?.email || 'guest';
+    return `viecultures_companion_history_${userKey}_${lessonId || 'global'}`;
   }
 
   private getAuthHeaders(): Record<string, string> {
@@ -241,6 +245,33 @@ class CompanionService implements ICompanionService {
         console.error('[companionService] Remote history delete failed:', remoteErr);
       }
     }
+  }
+
+  /**
+   * Fetch current authenticated user's daily quota and remaining turns
+   */
+  async getQuota(): Promise<CompanionQuotaResponse> {
+    const baseUrl = getApiBaseUrl();
+    const endpoint = `${baseUrl}/api/v1/companion/quota`;
+
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('AUTH_REQUIRED');
+      }
+      throw new Error(`Failed to fetch companion quota: ${response.status}`);
+    }
+
+    const payload: ApiResponse<CompanionQuotaResponse> = await response.json();
+    if (!payload.success || !payload.data) {
+      throw new Error(payload.message || 'Invalid quota response from server');
+    }
+    return payload.data;
   }
 }
 

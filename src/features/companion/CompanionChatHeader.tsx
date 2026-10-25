@@ -12,6 +12,7 @@ interface CompanionChatHeaderProps {
   remainingTurns: number | null;
   onResetSize?: () => void;
   onClose: () => void;
+  isLoggedIn?: boolean;
 }
 
 const LANGUAGE_BADGE: Record<CompanionLanguage, string> = {
@@ -41,6 +42,7 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
   remainingTurns,
   onResetSize,
   onClose,
+  isLoggedIn = true,
 }) => (
   <div className="relative shrink-0 border-b-2 border-[#8a9a6f]">
     <MeadowBackdrop />
@@ -68,6 +70,7 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
         onClearHistory={onClearHistory}
         remainingTurns={remainingTurns}
         onResetSize={onResetSize}
+        isLoggedIn={isLoggedIn}
       />
       <button
         type="button"
