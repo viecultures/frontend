@@ -23,29 +23,22 @@
 .journey-map-heading span { color: var(--color-accent-ink); font-size: 14px; font-weight: 700; letter-spacing: .08em; }
 .journey-map-heading strong { font-family: var(--font-sans); font-size: 22px; font-weight: 700; text-align: right; }
 .journey-map { height: 560px; overflow: hidden; border-radius: var(--radius-inner); background: var(--color-sky-mist); }
-.journey-map[data-map-level='stories'] { height: auto; min-height: 560px; }
-.hanoi-story-map { display: flex; flex-direction: column; align-items: center; width: 100%; min-height: 560px; padding: 16px 16px 12px; overflow: hidden; background: radial-gradient(circle at 50% 42%, #193748, #071922 74%); color: #fff; }
+.hanoi-story-map { display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; padding: 18px 16px 10px; overflow: hidden; background: radial-gradient(circle at 50% 45%, #193748, #071922 74%); color: #fff; }
 .hanoi-story-map-caption { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
 .hanoi-story-map-caption span { color: #e9c26d; font-size: 12px; font-weight: 800; letter-spacing: .14em; }
 .hanoi-story-map-caption small { color: #d7e2e6; font-size: 13px; }
-.journey-map .hanoi-story-map svg { display: block; width: 100%; height: 320px; flex: none; margin: 4px 0; overflow: visible; filter: none; }
+.journey-map .hanoi-story-map svg { display: block; width: 100%; min-height: 0; flex: 1; margin: 4px 0; overflow: visible; filter: none; }
 .hanoi-story-map-glow { fill: #143b45; stroke: #e7bc5b; stroke-width: 1.7; filter: drop-shadow(0 0 3px #e9b855); }
 .hanoi-story-map-border { fill: none; stroke: #f2cb69; stroke-width: .55; pointer-events: none; }
 .hanoi-story-seams { fill: none; stroke: #f2cb69; stroke-width: .55; pointer-events: none; }
 .hanoi-story-tile { cursor: pointer; }
 .hanoi-story-tile image { pointer-events: none; }
-.hanoi-story-tile rect:not(.hanoi-story-tile-hit) { pointer-events: none; }
+.hanoi-story-tile rect:not(.hanoi-story-tile-hit), .hanoi-story-tile text { pointer-events: none; }
 .hanoi-story-tile:hover image, .hanoi-story-tile:focus-visible image { filter: brightness(1.22) saturate(1.12); }
 .hanoi-story-tile:focus-visible .hanoi-story-tile-hit { stroke: #fff; stroke-width: 1.2; }
-.hanoi-story-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; width: 100%; }
-.hanoi-story-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid #8b7542; border-radius: 10px; background: #102a32; color: #fff; text-align: left; }
-.hanoi-story-card:hover, .hanoi-story-card:focus-visible { border-color: #f2cb69; background: #193c44; }
-.hanoi-story-card img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-.hanoi-story-card-copy { display: grid; gap: 2px; padding: 8px 9px 10px; }
-.hanoi-story-card-number { color: #f2cb69; font-size: 10px; font-weight: 800; letter-spacing: .07em; }
-.hanoi-story-card-copy strong { font-size: 13px; line-height: 1.25; }
-.hanoi-story-card-copy small { color: #d3e4e5; font-size: 11px; }
-.hanoi-story-map-note { margin: 9px 0 0; color: #b7c9cf; font-size: 11px; line-height: 1.35; text-align: center; }
+.hanoi-story-number { fill: #f6d27b; font-size: 2.2px; font-weight: 800; paint-order: stroke; stroke: #071922; stroke-width: .65px; }
+.hanoi-story-name { fill: #fff; font-size: 2.5px; font-weight: 800; paint-order: stroke; stroke: #071922; stroke-width: .95px; }
+.hanoi-story-map-note { max-width: 320px; margin: 0; color: #b7c9cf; font-size: 11px; line-height: 1.35; text-align: center; }
 .journey-map svg { filter: drop-shadow(0 5px 8px color-mix(in srgb, var(--color-heritage-forest) 16%, transparent)); }
 .journey-map #layer-regions path { cursor: pointer; pointer-events: bounding-box; stroke-width: 2.5px; transition: filter .2s ease, opacity .2s ease; }
 .journey-map #layer-regions path:not([data-locked='true']):hover, .journey-map #layer-regions path:not([data-locked='true']):focus-visible { filter: brightness(1.13) drop-shadow(0 0 6px var(--color-antique-gold)); }
@@ -199,5 +192,4 @@
 @media (max-width: 900px) { .journey-hero { align-items: start; flex-direction: column; } .journey-layout { grid-template-columns: 1fr; } }
 @media (max-width: 1100px) { .journey-series-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) { .journey-page { padding: 24px 20px 44px; } .journey-hero h1 { font-size: 28px; } .journey-page .discovery-modes { width: 100%; } .journey-page .discovery-modes button { flex: 1; } .journey-map-panel, .journey-rail { padding: 18px; } .journey-map { height: 420px; } .journey-map-heading strong { font-size: 18px; } .journey-series-grid { grid-template-columns: 1fr; } .journey-series-tile { min-height: 0; } }
-@media (max-width: 760px) { .journey-map .hanoi-story-map svg { height: 300px; } .hanoi-story-list { grid-template-columns: 1fr; } .hanoi-story-card { flex-direction: row; align-items: stretch; } .hanoi-story-card img { width: 38%; aspect-ratio: 16 / 9; } .hanoi-story-card-copy { align-content: center; padding: 8px 12px; } }
 @media (max-width: 760px) { .journey-hover-popover { top: auto !important; right: 12px; bottom: 12px; left: 12px !important; width: auto; max-height: min(70dvh, 500px); overflow-y: auto; } .journey-skill-dialog { width: calc(100vw - 24px); max-height: calc(100dvh - 24px); padding: 22px; border-radius: var(--radius-card); } }
