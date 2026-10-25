@@ -424,7 +424,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 <div className="auth-divider">
                   <span>HOẶC</span>
                 </div>
-                <div className="auth-google">
+                <div className="auth-google relative w-full flex justify-center items-center overflow-hidden [&>div]:!w-full [&>div]:!max-w-full [&>div]:flex [&>div]:justify-center [&>div>iframe]:!mx-auto">
                   {isLoading ? (
                     <div className="auth-google-loading">
                       <Loader2 size={18} className="auth-spinner" aria-hidden="true" />
@@ -444,7 +444,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       shape="rectangular"
                       size="large"
                       text="continue_with"
-                      width="100%"
+                      width="380"
                     />
                   )}
                 </div>
