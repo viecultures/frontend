@@ -125,12 +125,10 @@
 .reader-quick-milestone { background: var(--practice-soft); border-color: var(--practice-line); box-shadow: none; }
 .reader-quick-milestone .uppercase { background: var(--practice-soft); color: var(--practice-muted); border: 1px solid var(--practice-line); }
 .reader-quick-milestone button { border-color: var(--practice-line); box-shadow: none; }
-.reader-recommended-component { border-color: var(--practice-line); }
 .reader-recommended-card { box-shadow: 0 2px 8px rgb(0 0 0 / .04); border-color: var(--practice-line); }
 .reader-recommended-card:hover { border-color: var(--practice-muted); box-shadow: 0 2px 8px rgb(0 0 0 / .04); }
 .reader-recommended-card h4.font-bold { font-weight: 500; color: var(--practice-ink); }
 .reader-recommended-card .uppercase { background: var(--practice-soft); color: var(--practice-muted); border-radius: 6px; }
-.reader-recommended-card > div:last-child { border-color: var(--practice-line); }
 .reader-recommended-card > div:last-child span:last-child { color: var(--practice-muted); }
 @media (max-width: 639px) { .reader-dictation-component input { font-size: 16px; } }
 

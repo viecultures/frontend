@@ -36,8 +36,8 @@
 .home-room-grid { display: grid; grid-template-columns: minmax(0, 2.05fr) minmax(285px, 1fr); grid-template-areas: "continue calendar" "stories vocabulary"; gap: 24px; align-items: start; }
 .home-room-grid > * { min-width: 0; }
 .home-room-panel { border: 1px solid var(--color-line); border-radius: 20px; background: var(--color-surface-raised); box-shadow: var(--shadow-panel); }
-.home-room-continue { grid-area: continue; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .9fr); min-height: 345px; overflow: hidden; }
-.home-room-continue-copy { display: flex; flex-direction: column; align-items: flex-start; padding: 30px 28px; }
+.home-room-continue { grid-area: continue; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .9fr); min-height: 345px; overflow: hidden; align-self: stretch; height: 100%; }
+.home-room-continue-copy { display: flex; flex-direction: column; align-items: flex-start; padding: 30px 28px; height: 100%; box-sizing: border-box; }
 .home-room-continue h2 { font-family: var(--font-serif); font-size: clamp(27px, 2.5vw, 36px); line-height: 1.2; font-weight: 600; letter-spacing: -.6px; margin: 15px 0 12px; }
 .home-room-continue-copy > p:not(.home-room-eyebrow) { font-size: 13px; }
 .home-room-story-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; font-size: 11px; color: var(--color-ink-soft); margin: 16px 0; }
@@ -379,6 +379,9 @@
   box-shadow: var(--shadow-panel);
   display: flex;
   flex-direction: column;
+  align-self: stretch;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 /* Spiral rings pinned to top border */
@@ -419,7 +422,8 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .home-calendar-header-titles h2 {
@@ -485,10 +489,17 @@
   align-items: center;
   justify-content: center;
   box-shadow: inset 0 1px 2px color-mix(in srgb, var(--color-line) 40%, transparent);
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .home-calendar-image-wrap {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
   aspect-ratio: 1 / 1;
   border-radius: 14px;
   overflow: hidden;
@@ -647,7 +658,8 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  margin-top: 12px;
+  margin-top: 10px;
+  flex-shrink: 0;
 }
 
 .home-calendar-dot {
@@ -863,6 +875,9 @@
   .home-room-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "continue" "calendar" "vocabulary" "stories" "focus"; gap: 22px; }
   .home-room-continue { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); min-height: 320px; }
   .home-room-continue-image { display: block; }
+  .home-room-calendar { height: auto; align-self: auto; }
+  .home-calendar-artwork-frame { flex: none; height: auto; }
+  .home-calendar-image-wrap { width: 100%; height: auto; aspect-ratio: 1 / 1; }
   .home-room-review > p:not(.home-room-footnote) { min-height: 0; }
   .home-room-review .home-room-primary { width: auto; }
   .home-room-review h2 { max-width: 340px; }

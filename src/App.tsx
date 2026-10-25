@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { isLocalAuthMode } from '@/config/authConfig';
 
 import { SettingsModal } from './components/SettingsModal';
@@ -58,6 +57,23 @@ export const App: React.FC = () => {
   const searchParams = new URLSearchParams(location.search);
   const currentLessonId = searchParams.get('id') || searchParams.get('lessonId') || undefined;
 
+  const normalizedPath =
+    location.pathname.length > 1 && location.pathname.endsWith('/')
+      ? location.pathname.slice(0, -1)
+      : location.pathname;
+
+  const isLandingOrLogin =
+    normalizedPath === PATHS.landing ||
+    normalizedPath === PATHS.landingConcept ||
+    normalizedPath === '/landing' ||
+    normalizedPath === PATHS.login;
+
+  useEffect(() => {
+    if (isLandingOrLogin && isCompanionOpen) {
+      setIsCompanionOpen(false);
+    }
+  }, [isLandingOrLogin, isCompanionOpen]);
+
   const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser() || !!getStoredToken());
 
@@ -93,9 +109,6 @@ export const App: React.FC = () => {
     setUser(null);
     navigate(PATHS.landing, { replace: true });
   };
-
-  const googleClientId =
-    import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
   const content = (
       <div className="min-h-screen bg-surface text-ink-soft flex flex-col font-sans">
@@ -230,21 +243,23 @@ export const App: React.FC = () => {
         <PwaInstallBanner />
 
         {/* AI Cultural Companion Floating Drawer & Launcher */}
-        <CompanionFloatingButton
-          isOpen={isCompanionOpen}
-          onClick={() => setIsCompanionOpen((prev) => !prev)}
-        />
-        <CompanionChatDrawer
-          isOpen={isCompanionOpen}
-          onClose={() => setIsCompanionOpen(false)}
-          lessonId={currentLessonId}
-        />
+        {!isLandingOrLogin && (
+          <>
+            <CompanionFloatingButton
+              isOpen={isCompanionOpen}
+              onClick={() => setIsCompanionOpen((prev) => !prev)}
+            />
+            <CompanionChatDrawer
+              isOpen={isCompanionOpen}
+              onClose={() => setIsCompanionOpen(false)}
+              lessonId={currentLessonId}
+            />
+          </>
+        )}
       </div>
   );
 
-  return googleClientId ? (
-    <GoogleOAuthProvider clientId={googleClientId} locale="vi">{content}</GoogleOAuthProvider>
-  ) : content;
+  return content;
 };
 
 export default App;

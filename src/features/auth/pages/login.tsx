@@ -1,22 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, ArrowUpRight, CheckCircle2, Loader2, Lock, Mail, RefreshCw } from 'lucide-react';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { BrandLogo } from '@/components/BrandLogo';
 import { PATHS } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import { authService, backendAuthService, type AuthResult } from '@/services/authService';
+import { localAuthService } from '@/services/localAuthService';
 import { authMailService } from '@/services/authMailService';
-import { isLocalAuthMode } from '@/config/authConfig';
+import { isDemoLoginEnabled, isLocalAuthMode } from '@/config/authConfig';
 import { setAuthSession, type AppUser } from '@/utils/auth-storage';
+import { useSettings, type AppLanguage } from '@/context/SettingsContext';
 import { ForgotPasswordModal } from '../components/ForgotPasswordModal';
+import { authCopy } from '../authCopy';
 import '../login.css';
 
 interface LoginPageProps {
   onLoginSuccess?: (userData: AppUser) => void;
 }
 
+const AUTH_LANGUAGE_STORAGE_KEY = 'viecultures_auth_language';
+
+const readAuthLanguage = (): AppLanguage => {
+  try {
+    return window.localStorage.getItem(AUTH_LANGUAGE_STORAGE_KEY) === 'vi' ? 'vi' : 'en';
+  } catch {
+    return 'en';
+  }
+};
+
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
+  const [language, setAuthLanguage] = useState<AppLanguage>(readAuthLanguage);
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
   const [registerStep, setRegisterStep] = useState<'form' | 'otp'>('form');
   const [email, setEmail] = useState('');
@@ -33,8 +47,33 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const languageSynced = useRef(false);
   const navigate = useAppNavigate();
-  const hasGoogleLogin = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const { setLanguage } = useSettings();
+  const copy = authCopy[language];
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+  const hasGoogleLogin = !!googleClientId;
+
+  const readableError = (error: unknown, fallback: string) =>
+    language === 'vi' && error instanceof Error ? error.message : fallback;
+
+  useEffect(() => {
+    if (languageSynced.current) return;
+    languageSynced.current = true;
+    setLanguage(language);
+  }, [language, setLanguage]);
+
+  const changeLanguage = (nextLanguage: AppLanguage) => {
+    setAuthLanguage(nextLanguage);
+    setLanguage(nextLanguage);
+    try {
+      window.localStorage.setItem(AUTH_LANGUAGE_STORAGE_KEY, nextLanguage);
+    } catch {
+      // The current page still switches language when storage is unavailable.
+    }
+    setErrorMessage(null);
+    setSuccessMessage(null);
+  };
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -66,7 +105,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       const result = await backendAuthService.loginWithGoogle(idToken);
       completeLogin(result);
     } catch (error: unknown) {
-      setErrorMessage(error instanceof Error ? error.message : 'Đăng nhập Google thất bại. Vui lòng thử lại.');
+      setErrorMessage(readableError(error, copy.googleLoginFailed));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    try {
+      const demoResult = await localAuthService.loginDemo();
+      const result = isLocalAuthMode
+        ? demoResult
+        : { ...demoResult, user: { ...demoResult.user, role: 'ROLE_USER' } };
+      completeLogin(result);
+    } catch (error: unknown) {
+      setErrorMessage(readableError(error, copy.demoFailed));
     } finally {
       setIsLoading(false);
     }
@@ -89,13 +146,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         setRegisterStep('otp');
         setCooldown(60);
         setOtpDigits(['', '', '', '', '', '']);
-        setSuccessMessage('Mã xác thực gồm 6 chữ số đã được gửi đến email của bạn.');
+        setSuccessMessage(copy.otpSent);
         setTimeout(() => {
           otpInputRefs.current[0]?.focus();
         }, 100);
       }
     } catch (error: unknown) {
-      setErrorMessage(error instanceof Error ? error.message : 'Không thể thực hiện yêu cầu. Vui lòng thử lại.');
+      setErrorMessage(readableError(error, copy.requestFailed));
     } finally {
       setIsLoading(false);
     }
@@ -137,7 +194,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     event.preventDefault();
     const otpCode = otpDigits.join('');
     if (otpCode.length < 6) {
-      setErrorMessage('Vui lòng nhập đủ 6 chữ số mã OTP.');
+      setErrorMessage(copy.otpMissing);
       return;
     }
 
@@ -155,7 +212,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         completeLogin(result);
       }
     } catch (error: unknown) {
-      setErrorMessage(error instanceof Error ? error.message : 'Mã OTP không chính xác hoặc đã hết hạn.');
+      setErrorMessage(readableError(error, copy.otpVerifyFailed));
     } finally {
       setIsLoading(false);
     }
@@ -170,9 +227,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     try {
       const response = await authMailService.sendVerifyEmailOtp(email);
       setCooldown(response.cooldownSeconds || 60);
-      setSuccessMessage('Đã gửi lại mã OTP. Vui lòng kiểm tra hộp thư của bạn.');
+      setSuccessMessage(copy.otpResent);
     } catch (error: unknown) {
-      setErrorMessage(error instanceof Error ? error.message : 'Không thể gửi lại mã OTP lúc này.');
+      setErrorMessage(readableError(error, copy.otpResendFailed));
     } finally {
       setIsLoading(false);
     }
@@ -189,36 +246,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const isOtpStep = authTab === 'register' && registerStep === 'otp';
 
   return (
-    <main className="auth-page">
+    <main className="auth-page" lang={language}>
       <div className="auth-form-panel">
         <header className="auth-topbar">
-          <Link to={PATHS.landing} className="auth-brand" aria-label="VieCultures — về trang chủ">
-            <BrandLogo size="md" theme="light" />
+          <Link to={PATHS.landing} className="auth-brand" aria-label={copy.brandLabel}>
+            <BrandLogo size="sm" theme="dark" />
           </Link>
-          <Link to={PATHS.landing} className="auth-back-link">
-            <ArrowLeft size={17} aria-hidden="true" /> Trang chủ
-          </Link>
-        </header>
-
-        <section className="auth-content" aria-labelledby="auth-title">
-          <p className="auth-eyebrow">VIECULTURES / FOOD STORIES</p>
-          <h1 id="auth-title">
-            {isOtpStep
-              ? 'Xác thực email'
-              : authTab === 'login'
-              ? 'Chào mừng trở lại'
-              : 'Bắt đầu hành trình của bạn'}
-          </h1>
-          <p className="auth-intro">
-            {isOtpStep
-              ? `Nhập mã xác thực gồm 6 chữ số đã được gửi tới ${email} để kích hoạt tài khoản.`
-              : authTab === 'login'
-              ? 'Đăng nhập để tiếp tục đọc và lưu lại những điều bạn đã học.'
-              : 'Tạo tài khoản để tiếp tục khám phá tiếng Anh qua những câu chuyện món ăn Việt.'}
-          </p>
-
+          <div className="auth-topbar-actions">
+            <div className="auth-language-switch" role="group" aria-label="Language / Ngôn ngữ">
+              <button type="button" lang="vi" aria-pressed={language === 'vi'} onClick={() => changeLanguage('vi')}>VI</button>
+              <button type="button" lang="en" aria-pressed={language === 'en'} onClick={() => changeLanguage('en')}>EN</button>
+            </div>
+            <Link to={PATHS.landing} className="auth-back-link">
+              <ArrowLeft size={17} aria-hidden="true" /> {copy.home}
+            </Link>
+          </div>
           {!isOtpStep && (
-            <div className="auth-tabs" role="tablist" aria-label="Hình thức truy cập">
+            <div className="auth-tabs" role="tablist" aria-label={copy.accessLabel}>
               <button
                 id="auth-login-tab"
                 type="button"
@@ -229,7 +273,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 className={authTab === 'login' ? 'is-active' : ''}
                 onClick={() => changeTab('login')}
               >
-                Đăng nhập
+                {copy.login}
               </button>
               <button
                 id="auth-register-tab"
@@ -241,12 +285,66 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 className={authTab === 'register' ? 'is-active' : ''}
                 onClick={() => changeTab('register')}
               >
-                Đăng ký
+                {copy.register}
               </button>
             </div>
           )}
+        </header>
 
-          <div id="auth-panel" role="tabpanel" aria-labelledby={authTab === 'login' ? 'auth-login-tab' : 'auth-register-tab'}>
+        <section className="auth-content" aria-labelledby="auth-title">
+          <h1 id="auth-title" className={authTab === 'register' && !isOtpStep ? 'auth-title-register' : undefined}>
+            {isOtpStep
+              ? copy.verifyTitle
+              : authTab === 'login'
+              ? copy.loginTitle
+              : copy.registerTitle}
+          </h1>
+          <p className="auth-intro">
+            {isOtpStep
+              ? copy.verifyIntro(email)
+              : authTab === 'login'
+              ? copy.loginIntro
+              : copy.registerIntro}
+          </p>
+
+          <div id="auth-panel" role="tabpanel" aria-labelledby={isOtpStep ? 'auth-title' : authTab === 'login' ? 'auth-login-tab' : 'auth-register-tab'}>
+            {!isOtpStep && (isDemoLoginEnabled || hasGoogleLogin) && (
+              <div className="auth-alternate">
+                {hasGoogleLogin && (
+                  <div className="auth-google">
+                    {isLoading ? (
+                      <div className="auth-google-loading">
+                        <Loader2 size={18} className="auth-spinner" aria-hidden="true" />
+                        <span>{copy.googleLoading}</span>
+                      </div>
+                    ) : (
+                      <GoogleOAuthProvider key={language} clientId={googleClientId} locale={language}>
+                        <GoogleLogin
+                          onSuccess={(response) =>
+                            response.credential
+                              ? handleGoogleSuccess(response.credential)
+                              : setErrorMessage(copy.googleMissing)
+                          }
+                          onError={() => setErrorMessage(copy.googleFailed)}
+                          theme="outline"
+                          shape="rectangular"
+                          size="large"
+                          text="continue_with"
+                          width="100%"
+                        />
+                      </GoogleOAuthProvider>
+                    )}
+                  </div>
+                )}
+                {isDemoLoginEnabled && (
+                  <button type="button" className="auth-demo-button" disabled={isLoading} onClick={handleDemoLogin}>
+                    {isLoading && <Loader2 size={18} className="auth-spinner" aria-hidden="true" />}
+                    <span>{isLoading ? copy.demoLoading : copy.demo}</span>
+                  </button>
+                )}
+                <div className="auth-divider"><span>{copy.or}</span></div>
+              </div>
+            )}
             {isOtpStep ? (
               <form onSubmit={handleVerifyOtp} className="auth-otp-container">
                 <div className="auth-otp-inputs">
@@ -263,7 +361,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                       onPaste={idx === 0 ? handleOtpPaste : undefined}
                       className="auth-otp-digit"
-                      aria-label={`Chữ số thứ ${idx + 1}`}
+                      aria-label={copy.otpDigit(idx + 1)}
                       disabled={isLoading}
                       required
                     />
@@ -271,14 +369,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 </div>
 
                 <div className="auth-otp-meta">
-                  <span>Chưa nhận được mã?</span>
+                  <span>{copy.otpNotReceived}</span>
                   <button
                     type="button"
                     className="auth-resend-btn"
                     disabled={cooldown > 0 || isLoading}
                     onClick={handleResendOtp}
                   >
-                    {cooldown > 0 ? `Gửi lại mã (${cooldown}s)` : 'Gửi lại mã OTP'}
+                    {cooldown > 0 ? copy.resendIn(cooldown) : copy.resendOtp}
                   </button>
                 </div>
 
@@ -300,11 +398,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   {isLoading ? (
                     <>
                       <Loader2 size={18} className="auth-spinner" aria-hidden="true" />
-                      <span>Đang xác thực...</span>
+                      <span>{copy.verifying}</span>
                     </>
                   ) : (
                     <>
-                      <span>Xác nhận & Hoàn tất</span>
+                      <span>{copy.verifyComplete}</span>
                       <ArrowUpRight size={18} aria-hidden="true" />
                     </>
                   )}
@@ -321,20 +419,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   }}
                 >
                   <ArrowLeft size={16} aria-hidden="true" />
-                  <span>Quay lại đổi thông tin</span>
+                  <span>{copy.backToForm}</span>
                 </button>
               </form>
             ) : (
               <form onSubmit={handleSubmit} className="auth-form">
                 {authTab === 'register' && (
                   <div className="auth-field">
-                    <label htmlFor="fullName">Họ và tên</label>
+                    <label htmlFor="fullName">{copy.fullName}</label>
                     <input
                       id="fullName"
                       type="text"
                       value={fullName}
                       onChange={(event) => setFullName(event.target.value)}
-                      placeholder="Nguyễn Văn A"
+                      placeholder={copy.fullNamePlaceholder}
                       autoComplete="name"
                       required
                     />
@@ -358,7 +456,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 </div>
 
                 <div className="auth-field">
-                  <label htmlFor="password">Mật khẩu</label>
+                  <label htmlFor="password">{copy.password}</label>
                   <div className="auth-input-wrap">
                     <Lock size={18} aria-hidden="true" />
                     <input
@@ -366,7 +464,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       type="password"
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
-                      placeholder="Nhập mật khẩu"
+                      placeholder={copy.passwordPlaceholder}
                       autoComplete={authTab === 'login' ? 'current-password' : 'new-password'}
                       minLength={6}
                       required
@@ -381,7 +479,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       checked={rememberMe}
                       onChange={(event) => setRememberMe(event.target.checked)}
                     />
-                    <span>Ghi nhớ đăng nhập</span>
+                    <span>{copy.remember}</span>
                   </label>
                   {!isLocalAuthMode && (
                     <button
@@ -391,7 +489,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       tabIndex={authTab === 'login' ? 0 : -1}
                       onClick={() => setIsForgotPasswordOpen(true)}
                     >
-                      Quên mật khẩu?
+                      {copy.forgotPassword}
                     </button>
                   )}
                 </div>
@@ -407,78 +505,31 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   {isLoading ? (
                     <>
                       <Loader2 size={18} className="auth-spinner" aria-hidden="true" />
-                      <span>Đang xử lý...</span>
+                      <span>{copy.processing}</span>
                     </>
                   ) : authTab === 'login' ? (
-                    'Đăng nhập'
+                    copy.login
                   ) : (
-                    'Tạo tài khoản'
+                    copy.createAccount
                   )}
                   {!isLoading && <ArrowUpRight size={18} aria-hidden="true" />}
                 </button>
               </form>
             )}
 
-            {!isOtpStep && hasGoogleLogin && (
-              <div className="auth-alternate">
-                <div className="auth-divider">
-                  <span>HOẶC</span>
-                </div>
-                <div className="auth-google">
-                  {isLoading ? (
-                    <div className="auth-google-loading">
-                      <Loader2 size={18} className="auth-spinner" aria-hidden="true" />
-                      <span>Đang xác thực...</span>
-                    </div>
-                  ) : (
-                    <GoogleLogin
-                      onSuccess={(response) =>
-                        response.credential
-                          ? handleGoogleSuccess(response.credential)
-                          : setErrorMessage('Không nhận được mã xác thực Google từ trình duyệt.')
-                      }
-                      onError={() =>
-                        setErrorMessage('Đăng nhập bằng Google không thành công hoặc cửa sổ đăng nhập đã bị đóng.')
-                      }
-                      theme="outline"
-                      shape="rectangular"
-                      size="large"
-                      text="continue_with"
-                      width="100%"
-                    />
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
           <p className="auth-guest-note">
-            Chỉ muốn xem thử? <Link to={PATHS.discovery}>Khám phá các bài đọc</Link>
+            {copy.guestPrefix} <Link to={PATHS.discovery}>{copy.explore}</Link>
           </p>
         </section>
-        <p className="auth-footer-note">Học từ món ăn, nhớ qua câu chuyện.</p>
+        <p className="auth-footer-note">{copy.footer}</p>
       </div>
-
-      <aside className="auth-story-panel" aria-label="Học tiếng Anh qua món ăn Việt">
-        <div className="auth-story-image">
-          <img src="/images/series/pho-hanoi.jpg" alt="Bát phở Hà Nội bên hồ Hoàn Kiếm" width="1024" height="576" />
-        </div>
-        <div className="auth-story-copy">
-          <span className="auth-story-kicker">TỪ BÀN ĂN ĐẾN TRANG SÁCH</span>
-          <h2>
-            Mỗi món ăn mở ra <span>một câu chuyện.</span>
-          </h2>
-          <p>Đọc, nghe và ghi nhớ tiếng Anh qua những món ăn cùng đời sống quanh chúng.</p>
-          <div className="auth-story-line">
-            <span>01 / PHỞ HÀ NỘI</span>
-            <span>VIECULTURES</span>
-          </div>
-        </div>
-      </aside>
 
       {isForgotPasswordOpen && (
         <ForgotPasswordModal
           isOpen={isForgotPasswordOpen}
+          language={language}
           onClose={() => setIsForgotPasswordOpen(false)}
           initialEmail={email}
           onSuccessLogin={(newEmail) => {

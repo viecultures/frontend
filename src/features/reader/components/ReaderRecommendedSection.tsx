@@ -13,7 +13,7 @@ export function ReaderRecommendedSection({
   themeMode,
 }: ReaderRecommendedSectionProps) {
   return (
-    <div data-practice-theme={themeMode} className="reader-practice-surface reader-recommended-component pt-8 border-t border-antique-gold/20">
+    <div data-practice-theme={themeMode} className="reader-practice-surface reader-recommended-component pt-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
@@ -50,6 +50,12 @@ export function ReaderRecommendedSection({
               }`}
           >
             <div>
+              <img
+                src={article.imageUrl}
+                alt=""
+                loading="lazy"
+                className="mb-4 aspect-[16/10] w-full rounded-xl object-cover"
+              />
               <span className="text-[10px] font-bold uppercase tracking-wider text-heritage-green bg-rice-paper px-2.5 py-1 rounded">
                 {article.category}
               </span>
@@ -63,7 +69,7 @@ export function ReaderRecommendedSection({
                 {article.description}
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-antique-gold/20 flex items-center justify-between text-xs font-semibold opacity-80">
+            <div className="mt-4 flex items-center justify-between text-xs font-semibold opacity-80">
               <span>
                 {article.readTime} • {article.vocabCount} words
               </span>

@@ -58,11 +58,12 @@ VITE_API_BASE_URL=http://localhost:8080
 VITE_BACKEND_PORT=8080
 VITE_AUTH_MODE=local
 VITE_GOOGLE_CLIENT_ID=<cùng GOOGLE_CLIENT_ID trong backend/.env>
+VITE_ENABLE_DEMO_LOGIN=false
 ```
 
 Backend chính là repo `backend` (`D:\GitHub\backend`), có API đăng nhập, hồ sơ, bài viết, từ vựng, voice và transcript. Đặt file `.env` của team tại thư mục backend với `PORT=8080`, rồi chạy `mvn spring-boot:run` tại đó. Cấu hình database, JWT và các khóa bí mật chỉ nằm ở backend; frontend chỉ cần Google Client ID công khai cùng giá trị với backend. Không dùng repo `viecultures_be` làm API chung cho frontend này.
 
-Đăng nhập hiện mặc định chạy dùng thử trên trình duyệt (`VITE_AUTH_MODE=local`): nhập email hợp lệ và mật khẩu bất kỳ từ 6 ký tự; mật khẩu không được lưu hoặc gửi đi. Hai nút Google/Facebook đăng nhập ngay với hồ sơ `Thien Luan` có quyền `ROLE_ADMIN` để vào `/admin`, không mở OAuth và không gọi backend. Đăng ký và đăng nhập email tạo hồ sơ học viên. “Ghi nhớ đăng nhập” lưu phiên qua lần mở trình duyệt; bỏ chọn để chỉ lưu trong tab hiện tại. OTP và đồng bộ hồ sơ xác thực tạm tắt. Đây là phiên dùng thử, không cấp quyền API backend.
+Ở chế độ `VITE_AUTH_MODE=local`, đăng nhập email tạo hồ sơ dùng thử trên trình duyệt: nhập email hợp lệ và mật khẩu bất kỳ từ 6 ký tự; mật khẩu không được lưu hoặc gửi đi. Nút **Tài khoản dùng thử** tạo hồ sơ mẫu không có JWT backend. Nút này cũng hiển thị khi chạy Vite dev; bản closed test dùng chế độ backend có thể bật riêng bằng `VITE_ENABLE_DEMO_LOGIN=true`, khi đó hồ sơ mẫu chỉ có quyền học viên. Google là luồng OAuth thật khi có `VITE_GOOGLE_CLIENT_ID`; chưa có đăng nhập Facebook. “Ghi nhớ đăng nhập” lưu phiên qua lần mở trình duyệt; bỏ chọn để chỉ lưu trong tab hiện tại. Phiên dùng thử không cấp quyền API backend.
 
 Để nối lại xác thực backend, đặt `VITE_AUTH_MODE=backend` rồi khởi động lại Vite và đăng nhập lại. Form email/mật khẩu sẽ gọi `/api/v1/auth/login` hoặc `/api/v1/auth/register`; hồ sơ gọi `/api/v1/auth/me` với JWT. Đăng nhập Google cần cấu hình các JavaScript origin của frontend trong Google Cloud Console. Các API tính năng khác vẫn dùng cấu hình backend hiện tại. Khi đổi `PORT` của backend, cập nhật hai biến API frontend tương ứng và khởi động lại Vite.
 

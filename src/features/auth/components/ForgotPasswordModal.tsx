@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mail, Lock, KeyRound, ArrowRight, CheckCircle2, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { authMailService } from '@/services/authMailService';
+import type { AppLanguage } from '@/context/SettingsContext';
+import { authCopy } from '../authCopy';
 
 interface ForgotPasswordModalProps {
   isOpen: boolean;
+  language: AppLanguage;
   onClose: () => void;
   initialEmail?: string;
   onSuccessLogin?: (email: string) => void;
@@ -13,6 +16,7 @@ type Step = 'EMAIL' | 'OTP' | 'NEW_PASSWORD' | 'SUCCESS';
 
 export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   isOpen,
+  language,
   onClose,
   initialEmail = '',
   onSuccessLogin,
@@ -29,6 +33,9 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const [cooldown, setCooldown] = useState(0);
 
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const copy = authCopy[language].forgot;
+  const serviceMessage = (message: string | undefined, fallback: string) =>
+    language === 'vi' ? message || fallback : fallback;
 
   useEffect(() => {
     if (isOpen) {
@@ -41,6 +48,11 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       setSuccessMessage('');
     }
   }, [isOpen, initialEmail]);
+
+  useEffect(() => {
+    setErrorMessage('');
+    setSuccessMessage('');
+  }, [language]);
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -59,7 +71,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!email.trim()) {
-      setErrorMessage('Vui lòng nhập địa chỉ email của bạn.');
+      setErrorMessage(copy.emailRequired);
       return;
     }
 
@@ -70,17 +82,17 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
     try {
       const res = await authMailService.sendForgotPasswordOtp(email);
       if (res.success) {
-        setSuccessMessage(res.message);
+        setSuccessMessage(serviceMessage(res.message, copy.otpSent));
         setCooldown(res.cooldownSeconds || 60);
         setStep('OTP');
       } else {
-        setErrorMessage(res.message);
+        setErrorMessage(serviceMessage(res.message, copy.sendFailed));
         if (res.cooldownSeconds && res.cooldownSeconds > 0) {
           setCooldown(res.cooldownSeconds);
         }
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Không thể gửi email lúc này. Vui lòng thử lại sau.');
+      setErrorMessage(serviceMessage(err.message, copy.sendFailed));
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +132,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentOtp.length < 6) {
-      setErrorMessage('Vui lòng nhập đủ 6 chữ số mã OTP.');
+      setErrorMessage(copy.otpRequired);
       return;
     }
 
@@ -131,13 +143,13 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
     try {
       const res = await authMailService.verifyForgotPasswordOtp(email, currentOtp);
       if (res.success && res.verified) {
-        setSuccessMessage(res.message);
+        setSuccessMessage(serviceMessage(res.message, copy.otpVerified));
         setStep('NEW_PASSWORD');
       } else {
-        setErrorMessage(res.message || 'Mã OTP không chính xác.');
+        setErrorMessage(serviceMessage(res.message, copy.otpInvalid));
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Xác thực OTP thất bại.');
+      setErrorMessage(serviceMessage(err.message, copy.verifyFailed));
     } finally {
       setIsLoading(false);
     }
@@ -147,11 +159,11 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword.length < 6) {
-      setErrorMessage('Mật khẩu mới phải có tối thiểu 6 ký tự.');
+      setErrorMessage(copy.passwordTooShort);
       return;
     }
     if (newPassword !== confirmPassword) {
-      setErrorMessage('Mật khẩu xác nhận không khớp.');
+      setErrorMessage(copy.passwordMismatch);
       return;
     }
 
@@ -164,17 +176,17 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       if (res.success) {
         setStep('SUCCESS');
       } else {
-        setErrorMessage(res.message);
+        setErrorMessage(serviceMessage(res.message, copy.resetFailed));
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Không thể đổi mật khẩu. Vui lòng thử lại.');
+      setErrorMessage(serviceMessage(err.message, copy.resetFailed));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in" lang={language}>
       {/* Ambient background glow */}
       <div className="absolute w-[500px] h-[500px] bg-heritage-green/20 rounded-full blur-[140px] pointer-events-none" />
 
@@ -183,6 +195,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
         <button
           type="button"
           onClick={onClose}
+          aria-label={copy.close}
           className="absolute top-4 right-4 p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-xl transition-all"
         >
           <X className="w-5 h-5" />
@@ -192,19 +205,19 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
         <div className="mb-6">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-antique-bright/10 border border-antique-bright/30 text-antique-bright text-xs font-semibold uppercase tracking-wider mb-2">
             <KeyRound className="w-3.5 h-3.5" />
-            <span>Khôi Phục Tài Khoản</span>
+            <span>{copy.kicker}</span>
           </div>
           <h2 className="font-heading text-2xl font-bold text-white">
-            {step === 'EMAIL' && 'Quên Mật Khẩu?'}
-            {step === 'OTP' && 'Nhập Mã Xác Thực'}
-            {step === 'NEW_PASSWORD' && 'Thiết Lập Mật Khẩu Mới'}
-            {step === 'SUCCESS' && 'Đổi Mật Khẩu Thành Công!'}
+            {step === 'EMAIL' && copy.emailTitle}
+            {step === 'OTP' && copy.otpTitle}
+            {step === 'NEW_PASSWORD' && copy.passwordTitle}
+            {step === 'SUCCESS' && copy.successTitle}
           </h2>
           <p className="text-xs sm:text-sm text-white/70 mt-1">
-            {step === 'EMAIL' && 'Nhập email đã đăng ký. Hệ thống sẽ gửi mã OTP 6 số bảo mật để xác thực.'}
-            {step === 'OTP' && `Mã xác thực đã được gửi tới ${email}. Vui lòng kiểm tra hộp thư.`}
-            {step === 'NEW_PASSWORD' && 'Tạo mật khẩu mới mạnh mẽ cho tài khoản VieCultures của bạn.'}
-            {step === 'SUCCESS' && 'Bạn đã cập nhật mật khẩu mới thành công và có thể đăng nhập ngay.'}
+            {step === 'EMAIL' && copy.emailIntro}
+            {step === 'OTP' && copy.otpIntro(email)}
+            {step === 'NEW_PASSWORD' && copy.passwordIntro}
+            {step === 'SUCCESS' && copy.successIntro}
           </p>
         </div>
 
@@ -229,7 +242,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
           <form onSubmit={handleSendOtp} className="space-y-4">
             <div>
               <label className="block text-[11px] font-semibold text-white/80 uppercase tracking-wider mb-1.5" htmlFor="reset-email">
-                Email Tài Khoản
+                {copy.accountEmail}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
@@ -256,13 +269,13 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               {isLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Đang gửi mã OTP...</span>
+                  <span>{copy.sending}</span>
                 </>
               ) : cooldown > 0 ? (
-                <span>Gửi lại sau {cooldown}s</span>
+                <span>{copy.resendIn(cooldown)}</span>
               ) : (
                 <>
-                  <span>Gửi Mã Xác Thực OTP</span>
+                  <span>{copy.sendOtp}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -275,7 +288,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
           <form onSubmit={handleVerifyOtp} className="space-y-5">
             <div>
               <label className="block text-center text-xs text-white/70 mb-3">
-                Nhập mã 6 chữ số được gửi tới <strong className="text-antique-bright">{email}</strong>
+                {copy.otpLabel(email)}
               </label>
               <div className="flex justify-between gap-2">
                 {otpDigits.map((digit, idx) => (
@@ -305,11 +318,11 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               {isLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Đang kiểm tra...</span>
+                  <span>{copy.verifying}</span>
                 </>
               ) : (
                 <>
-                  <span>Xác Nhận Mã OTP</span>
+                  <span>{copy.confirmOtp}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -321,7 +334,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 onClick={() => setStep('EMAIL')}
                 className="hover:text-white underline underline-offset-2"
               >
-                Đổi email khác
+                {copy.changeEmail}
               </button>
               <button
                 type="button"
@@ -330,7 +343,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 className="text-antique-bright hover:underline disabled:opacity-50 disabled:no-underline font-medium flex items-center gap-1"
               >
                 <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
-                <span>{cooldown > 0 ? `Gửi lại sau ${cooldown}s` : 'Gửi lại mã'}</span>
+                <span>{cooldown > 0 ? copy.resendIn(cooldown) : copy.resendOtp}</span>
               </button>
             </div>
           </form>
@@ -341,7 +354,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div>
               <label className="block text-[11px] font-semibold text-white/80 uppercase tracking-wider mb-1" htmlFor="new-pass">
-                Mật Khẩu Mới
+                {copy.newPassword}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
@@ -352,7 +365,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Tối thiểu 6 ký tự"
+                  placeholder={copy.passwordPlaceholder}
                   required
                   autoFocus
                   className="w-full bg-black/40 border border-white/20 rounded-xl pl-10 pr-3.5 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-antique-bright focus:ring-1 focus:ring-antique-bright transition-all"
@@ -362,7 +375,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
             <div>
               <label className="block text-[11px] font-semibold text-white/80 uppercase tracking-wider mb-1" htmlFor="confirm-pass">
-                Xác Nhận Mật Khẩu Mới
+                {copy.confirmPassword}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
@@ -373,7 +386,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Nhập lại mật khẩu mới"
+                  placeholder={copy.confirmPlaceholder}
                   required
                   className="w-full bg-black/40 border border-white/20 rounded-xl pl-10 pr-3.5 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-antique-bright focus:ring-1 focus:ring-antique-bright transition-all"
                 />
@@ -388,11 +401,11 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               {isLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Đang lưu mật khẩu mới...</span>
+                  <span>{copy.saving}</span>
                 </>
               ) : (
                 <>
-                  <span>Lưu Mật Khẩu Mới</span>
+                  <span>{copy.savePassword}</span>
                   <CheckCircle2 className="w-4 h-4" />
                 </>
               )}
@@ -407,7 +420,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <p className="text-sm text-white/80">
-              Mật khẩu đã được cập nhật thành công. Email xác nhận an toàn đã được gửi tới hộp thư của bạn.
+              {copy.successMessage}
             </p>
             <button
               type="button"
@@ -417,7 +430,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               }}
               className="w-full py-2.5 px-4 bg-gradient-to-r from-antique-bright to-antique-gold text-heritage-forest font-bold rounded-xl text-sm shadow-lg hover:brightness-105 transition-all"
             >
-              Đăng Nhập Ngay
+              {copy.loginNow}
             </button>
           </div>
         )}
