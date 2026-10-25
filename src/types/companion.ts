@@ -1,6 +1,12 @@
+export type CompanionLanguage = 'vi' | 'en' | 'bilingual';
+
 export interface CompanionChatMessage {
+  id?: string;
   role: 'user' | 'assistant';
   content: string;
+  translatedContent?: string;
+  sourceLanguage?: 'vi' | 'en';
+  timestamp?: number;
 }
 
 export interface ReferencedLesson {
@@ -15,6 +21,7 @@ export interface CompanionChatRequest {
   lessonId?: string;
   message: string;
   history?: CompanionChatMessage[];
+  language?: CompanionLanguage;
 }
 
 export interface CompanionChatResponse {
@@ -22,4 +29,14 @@ export interface CompanionChatResponse {
   suggestedPrompts: string[];
   referencedLessons: ReferencedLesson[];
   remainingDailyTurns: number;
+}
+
+export interface CompanionTranslateRequest {
+  text: string;
+  sourceLang?: 'vi' | 'en';
+  targetLang: 'vi' | 'en';
+}
+
+export interface CompanionTranslateResponse {
+  translatedText: string;
 }
