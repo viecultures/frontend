@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react';
-import { ArrowDown, ArrowRight, ArrowUpRight, BookOpen, Bookmark, Headphones, Menu, Pause, Play, RotateCcw, X } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, BookOpen, Bookmark, Headphones, Menu, Pause, Play, RotateCcw, X } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { getPublishedSeries } from '@/data/series';
 import type { SeriesMetadata } from '@/data/series/types';
-import { PATHS, paths } from '@/routes/paths';
+import { PATHS, paths, withQuery } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import '../food-landing.css';
 
@@ -64,7 +64,8 @@ const FoodLandingPage: React.FC = () => {
   const navItems = [
     { href: '#stories', label: 'Stories' },
     { href: '#how-it-works', label: 'How it works' },
-    { href: '#journey', label: 'The journey' },
+    { href: '#journey', label: 'Inside a dish' },
+    { href: '#contact', label: 'Contact' },
   ];
 
   return (
@@ -139,12 +140,13 @@ const FoodLandingPage: React.FC = () => {
             <div className="food-series-grid">
               {otherSeries.map((series, index) => <Reveal key={series.id} enabled={canAnimate} delay={(index % 3) * 0.12} className="food-series-card"><button type="button" onClick={() => openStory(series)} aria-label={`Read ${series.titleVi}`}><span className="food-series-image"><img src={series.imageUrl} alt="" width="1024" height="576" loading="lazy" /><span className="food-series-arrow"><ArrowUpRight size={20} aria-hidden="true" /></span></span><span className="food-card-kicker">{series.chapters.length} CHAPTERS · {series.region === 'north' ? 'NORTHERN VIETNAM' : 'SOUTHERN VIETNAM'}</span><strong>{series.titleVi}</strong><small>{series.title}</small></button></Reveal>)}
             </div>
+            <Reveal enabled={canAnimate} className="food-more-stories"><p>Curious beyond food? The full collection has stories across Vietnamese culture.</p><Link to={withQuery(PATHS.discovery, { view: 'stories' })} className="food-text-link">Explore all stories <ArrowUpRight size={18} aria-hidden="true" /></Link></Reveal>
           </div>
         </section>
 
         {featuredSeries && <section id="journey" className="food-section food-deep-dive" aria-labelledby="food-deep-title"><div className="food-container food-deep-grid"><Reveal enabled={canAnimate} className="food-deep-visual"><img src={featuredSeries.imageUrl} alt="Phở and the landscape of Hanoi" width="1024" height="576" loading="lazy" /><span>ONE DISH · MANY LAYERS</span></Reveal><div className="food-deep-copy"><Reveal enabled={canAnimate}><span className="food-eyebrow">03 / GO DEEPER</span><h2 id="food-deep-title">One bowl of phở. <em>Three chapters to explore.</em></h2><p>From the kitchen to the morning street, follow one dish through the details that give it meaning.</p></Reveal><ol className="food-chapter-list">{featuredSeries.chapters.map((chapter, index) => <li key={chapter.id}><Reveal enabled={canAnimate} delay={index * 0.14}><button type="button" onClick={() => navigate(paths.reader({ story: chapter.id }))}><span className="food-chapter-number">0{index + 1}</span><span><strong>{chapter.titleEn}</strong><small>{chapter.summary}</small></span><ArrowUpRight size={18} aria-hidden="true" /></button></Reveal></li>)}</ol></div></div></section>}
 
-        <section className="food-section food-regions" aria-labelledby="food-regions-title"><div className="food-container"><Reveal enabled={canAnimate} className="food-section-heading"><span className="food-eyebrow">04 / A JOURNEY STILL GROWING</span><h2 id="food-regions-title">A table as varied <em>as Vietnam.</em></h2><p>Our first published food stories begin in the North. More regional tables can join the journey as their stories are ready.</p></Reveal><div className="food-region-grid"><Reveal enabled={canAnimate} className="food-region-card is-ready"><span>01 / THE NORTH</span><h3>Start here</h3><p>Explore phở, bún chả, chả cá and the everyday traditions behind them.</p><a href="#stories" className="food-text-link">Explore published stories <ArrowRight size={17} aria-hidden="true" /></a></Reveal><Reveal enabled={canAnimate} delay={0.12} className="food-region-card"><span>02 / THE CENTRAL REGION</span><h3>More to discover</h3><p>Food stories from Central Vietnam will appear here when their chapters are ready.</p><small>IN DEVELOPMENT</small></Reveal><Reveal enabled={canAnimate} delay={0.24} className="food-region-card"><span>03 / THE SOUTH</span><h3>More to discover</h3><p>Southern food series will join the published collection when their chapters are ready.</p><small>IN DEVELOPMENT</small></Reveal></div></div></section>
+        <section id="contact" className="food-section food-contact" aria-labelledby="food-contact-title"><div className="food-container food-contact-grid"><Reveal enabled={canAnimate}><span className="food-eyebrow">04 / GET IN TOUCH</span><h2 id="food-contact-title">Have a food story <em>worth sharing?</em></h2></Reveal><Reveal enabled={canAnimate} delay={0.12} className="food-contact-copy"><p>Ideas about a regional dish, a family food tradition, or a collaboration are welcome as VieCultures grows.</p><span>Contact details will be available here soon.</span></Reveal></div></section>
 
         <section className="food-final" aria-labelledby="food-final-title"><div className="food-container food-final-inner"><Reveal enabled={canAnimate}><span className="food-eyebrow">YOUR NEXT STORY IS WAITING</span><h2 id="food-final-title">Begin with a taste.<br /><em>Leave with a story.</em></h2><p>Pick a familiar dish and discover how much language lives around it.</p><button type="button" className="food-button food-button-light" onClick={() => openStory(featuredSeries)}>Read your first chapter <ArrowUpRight size={18} aria-hidden="true" /></button></Reveal><div className="food-final-mark" aria-hidden="true"><BookOpen size={86} strokeWidth={0.8} /><RotateCcw size={40} strokeWidth={1} /></div></div></section>
       </main>
