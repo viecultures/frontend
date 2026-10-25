@@ -242,9 +242,9 @@ export const App: React.FC = () => {
       </div>
   );
 
-  return isLocalAuthMode ? content : (
+  return googleClientId ? (
     <GoogleOAuthProvider clientId={googleClientId} locale="vi">{content}</GoogleOAuthProvider>
-  );
+  ) : content;
 };
 
 export default App;

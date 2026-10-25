@@ -77,3 +77,13 @@
 @media (prefers-reduced-motion: reduce) {
   .auth-page *, .auth-page *::before, .auth-page *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+.auth-otp-container { display: flex; flex-direction: column; gap: 18px; margin-top: 24px; }
+.auth-otp-inputs { display: flex; justify-content: space-between; gap: 8px; }
+.auth-otp-digit { width: 100%; max-width: 52px; height: 56px; border: 1px solid var(--color-line); border-radius: 9px; background: var(--color-surface-raised); color: var(--color-ink); font-size: 24px; font-weight: 700; text-align: center; transition: border-color 180ms ease, box-shadow 180ms ease; }
+.auth-otp-digit:focus { border-color: var(--color-focus); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus) 14%, transparent); }
+.auth-otp-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; font-size: 13px; color: var(--color-ink-soft); }
+.auth-resend-btn { background: none; border: 0; padding: 0; color: var(--color-action); font-family: inherit; font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.auth-resend-btn:disabled { color: var(--color-ink-faint); text-decoration: none; cursor: not-allowed; }
+.auth-back-step-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 44px; padding: 8px 14px; border: 1px solid var(--color-line); border-radius: 9px; background: transparent; color: var(--color-ink-soft); font-family: inherit; font-size: 14px; font-weight: 600; margin-top: 8px; transition: background 180ms ease, color 180ms ease; }
+.auth-back-step-btn:hover { background: var(--color-surface-muted); color: var(--color-ink); }
