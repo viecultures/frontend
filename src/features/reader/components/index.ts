@@ -8,6 +8,7 @@ export { ReaderToolbar } from "./ReaderToolbar";
 export { ReaderVocabDrawer } from "./ReaderVocabDrawer";
 export { ReaderRecommendedSection } from "./ReaderRecommendedSection";
 export { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
+export { WordTooltip } from "./WordTooltip";
 export { VoiceCustomizerModal } from "./VoiceCustomizerModal";
 export { ReaderDictationSection } from "./ReaderDictationSection";
 export { ReaderQuickFlashcards } from "./ReaderQuickFlashcards";
