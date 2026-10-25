@@ -6,6 +6,7 @@
 
 export const PATHS = {
   landing: '/',
+  landingConcept: '/landing-concept',
   login: '/login',
   home: '/home',
   discovery: '/discovery',

@@ -17,6 +17,7 @@ import { RequireAuth, RequireRole, GuestOnly } from '@/routes/guards';
 
 // Primary Entry Pages
 import LandingPage from '@/features/landing/pages/landing';
+const FoodLandingPage = React.lazy(() => import('@/features/landing/pages/FoodLandingPage'));
 import LoginPage from '@/features/auth/pages/login';
 
 // Lazy-loaded Feature Pages (Bundle Optimization)
@@ -111,6 +112,7 @@ export const App: React.FC = () => {
             {/* 1. Public Landing Layout */}
             <Route element={<PublicLayout />}>
               <Route path={PATHS.landing} element={<LandingPage />} />
+              <Route path={PATHS.landingConcept} element={<FoodLandingPage />} />
               <Route path="/landing" element={<Navigate to={PATHS.landing} replace />} />
             </Route>
 
