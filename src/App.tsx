@@ -232,7 +232,7 @@ export const App: React.FC = () => {
         {/* AI Cultural Companion Floating Drawer & Launcher */}
         <CompanionFloatingButton
           isOpen={isCompanionOpen}
-          onClick={() => setIsCompanionOpen(true)}
+          onClick={() => setIsCompanionOpen((prev) => !prev)}
         />
         <CompanionChatDrawer
           isOpen={isCompanionOpen}

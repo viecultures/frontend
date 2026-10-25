@@ -16,14 +16,15 @@ export const CompanionQuickPrompts: React.FC<CompanionQuickPromptsProps> = ({
   }
 
   return (
-    <div className="flex flex-wrap gap-2 py-2">
+    <div className="vc-scroll flex gap-2 overflow-x-auto pb-2">
       {prompts.map((prompt, idx) => (
         <button
           key={idx}
           type="button"
           onClick={() => onSelectPrompt(prompt)}
           disabled={disabled}
-          className="text-xs px-3 py-1.5 rounded-full border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-left font-sans"
+          className="shrink-0 max-w-[260px] truncate text-xs px-3 py-1.5 rounded-full border border-[#c9d6b0] bg-[#f1f5e6] text-[#3e5a3a] hover:bg-[#e4f2df] hover:border-[#8a9a6f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-left font-sans"
+          title={prompt}
         >
           {prompt}
         </button>
