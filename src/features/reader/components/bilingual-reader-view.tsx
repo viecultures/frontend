@@ -9,6 +9,7 @@ import { InPlaceDictionaryPopup } from "./InPlaceDictionaryPopup";
 import type { ReaderArticleData } from "../services/readerApiService";
 import { useReaderDictionary } from "../hooks/useReaderDictionary";
 import { ReaderArticleContent } from './ReaderArticleContent';
+import { BilingualParagraphPairList } from './BilingualParagraphPairList';
 import { ReaderLotus } from './ReaderLotus';
 import type { PracticeMode } from '../lib/readerPractice';
 import { useReadingBookmark } from '../hooks/useReadingBookmark';
@@ -29,6 +30,8 @@ interface BilingualReaderViewProps {
   onChangeLevel?: (lvl: "Level 1" | "Level 2" | "Level 3") => void;
   articleData?: ReaderArticleData | null;
   onStartPractice: (mode?: PracticeMode) => void;
+  activeParagraphIndex?: number;
+  onPlayParagraphAudio?: (index: number, timestamp: number) => void;
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
@@ -46,7 +49,10 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   onChangeLevel,
   articleData,
   onStartPractice,
+  activeParagraphIndex = 0,
+  onPlayParagraphAudio,
 }) => {
+  const [layoutMode, setLayoutMode] = useState<'paired' | 'sheets'>('paired');
   // ── Proportional Scroll Sync Refs & State ─────────────────────────────────
   const leftSheetRef = useRef<HTMLDivElement>(null);
   const rightSheetRef = useRef<HTMLDivElement>(null);
@@ -137,65 +143,152 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   return (
     <div className="reader-bilingual-view space-y-8 animate-in fade-in duration-300">
 
-      {/* ── Scroll Sync Toolbar Indicator ─────────────────────────────────── */}
-      <div className="reader-scroll-tools flex items-center justify-between px-2 text-xs font-semibold" role="group" aria-label="Reading controls and tips">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-pressed={isScrollSyncEnabled}
-            onClick={() => setIsScrollSyncEnabled(!isScrollSyncEnabled)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${isScrollSyncEnabled
-              ? isDark
-                ? "bg-antique-gold/20 border-antique-gold text-antique-gold font-bold shadow-xs"
-                : "bg-heritage-green/10 border-heritage-green/30 text-heritage-green font-bold shadow-xs"
-              : isDark
-                ? "bg-white/5 border-transparent text-sky-mist/60 hover:text-warm-ivory"
-                : "bg-black/5 border-transparent text-heritage-green/60 hover:text-heritage-green"
+      {/* ── Scroll & Layout View Toolbar Indicator ───────────────────────── */}
+      <div className="reader-scroll-tools flex items-center justify-between px-2 text-xs font-semibold gap-3" role="group" aria-label="Reading controls and tips">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Layout Mode Switcher */}
+          <div className="inline-flex items-center p-0.5 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
+            <button
+              type="button"
+              onClick={() => setLayoutMode('paired')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                layoutMode === 'paired'
+                  ? 'bg-antique-gold text-[#123047] font-bold shadow-xs'
+                  : 'text-mist-cloud hover:text-warm-ivory'
               }`}
-            title="Toggle synchronized scrolling between the original and translation"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isScrollSyncEnabled ? "text-antique-gold" : ""}`} />
-            <span>Scroll sync: {isScrollSyncEnabled ? "On" : "Off"}</span>
-          </button>
+              title="Bố cục đối xứng đoạn 1:1 (chuẩn Reader)"
+              aria-pressed={layoutMode === 'paired'}
+            >
+              Đối xứng 1:1
+            </button>
+            <button
+              type="button"
+              onClick={() => setLayoutMode('sheets')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                layoutMode === 'sheets'
+                  ? 'bg-antique-gold text-[#123047] font-bold shadow-xs'
+                  : 'text-mist-cloud hover:text-warm-ivory'
+              }`}
+              title="Bố cục hai trang sách đối soát"
+              aria-pressed={layoutMode === 'sheets'}
+            >
+              Hai trang sách
+            </button>
+          </div>
+
+          {layoutMode === 'sheets' && (
+            <button
+              type="button"
+              aria-pressed={isScrollSyncEnabled}
+              onClick={() => setIsScrollSyncEnabled(!isScrollSyncEnabled)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${isScrollSyncEnabled
+                ? isDark
+                  ? "bg-antique-gold/20 border-antique-gold text-antique-gold font-bold shadow-xs"
+                  : "bg-heritage-green/10 border-heritage-green/30 text-heritage-green font-bold shadow-xs"
+                : isDark
+                  ? "bg-white/5 border-transparent text-sky-mist/60 hover:text-warm-ivory"
+                  : "bg-black/5 border-transparent text-heritage-green/60 hover:text-heritage-green"
+                }`}
+              title="Toggle synchronized scrolling between the original and translation"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isScrollSyncEnabled ? "text-antique-gold" : ""}`} />
+              <span>Scroll sync: {isScrollSyncEnabled ? "On" : "Off"}</span>
+            </button>
+          )}
         </div>
 
         <p role="note" className={`reader-lookup-tip text-[11px] font-medium flex items-center gap-1.5 ${isDark ? "text-sky-mist" : "text-heritage-green/80"
           }`}>
           <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
-          <span>Select a word or phrase to look it up and save its context.</span>
+          <span>Bôi đen từ hoặc chọn từ vựng để tra nghĩa & lưu ngữ cảnh.</span>
         </p>
       </div>
 
-      {/* ── BILINGUAL MODE: Dual Paper Sheets (Side-by-Side Instant Comparison) ── */}
-      <div ref={sheetsRef} className="reader-bilingual-sheets">
+      {/* ── BILINGUAL VIEW DISPLAY ─────────────────────────────────────────── */}
+      {layoutMode === 'paired' && articleData?.paragraphs && articleData.paragraphs.length > 0 ? (
+        <div className="space-y-6">
+          {/* Article Presentation Header Card */}
+          <div
+            className={`p-6 sm:p-8 rounded-2xl border transition-colors ${
+              isDark
+                ? 'bg-[#18211E]/90 text-warm-ivory border-antique-gold/20'
+                : 'bg-[#FAF7EF]/95 text-[#123047] border-[#D6D8CC]'
+            }`}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+              <div className="md:col-span-8 space-y-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-antique-gold">
+                  {articleData.topic || 'Customs & Festivals'} • {articleData.level || selectedLevel}
+                </span>
+                <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
+                  {articleData.titleEn}
+                </h1>
+                <p className="font-sans text-base sm:text-lg italic text-mist-cloud/90">
+                  {articleData.titleVi}
+                </p>
+                {articleData.summary && (
+                  <p className="text-xs sm:text-sm text-mist-cloud pt-1 leading-relaxed border-t border-black/5 dark:border-white/5">
+                    {articleData.summary}
+                  </p>
+                )}
+              </div>
 
-        {/* ── LEFT PAPER SHEET (ENGLISH ORIGINAL) ─────────────────────────── */}
-        <ReaderArticleContent
-          language="en" themeMode={themeMode} fontSize={fontSize} articleData={articleData}
-          wordCount={articleData?.wordCount || (selectedLevel === 'Level 1' ? 220 : selectedLevel === 'Level 2' ? 370 : 520)}
-          vocabClassName={vocabBtnClass} onVocabClick={handleVocabClick}
-          scrollable scrollRef={leftSheetRef}
-          onMouseEnter={() => { activeScrollerRef.current = 'left'; }}
-          onTouchStart={() => { activeScrollerRef.current = 'left'; }}
-          onWheel={() => { activeScrollerRef.current = 'left'; }}
-          onScroll={() => handleScroll('left')}
-          onMouseUp={handleTextSelection} onDoubleClick={handleTextSelection}
-        />
+              {articleData.imageUrl && (
+                <div className="md:col-span-4 rounded-xl overflow-hidden aspect-[16/10] border border-black/10 dark:border-white/10 shadow-sm">
+                  <img
+                    src={articleData.imageUrl}
+                    alt={articleData.titleEn}
+                    className="w-full h-full object-cover"
+                    loading="eager"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
 
-        {/* ── RIGHT PAPER SHEET (TIẾNG VIỆT TRANSLATION) ────────────────────── */}
-        <div className="reader-book-spine" aria-hidden="true"><ReaderLotus /><span className="reader-spine-line" /><span>Same<br />stories<br />brighter<br />tomorrows</span><span className="reader-spine-line" /></div>
-        <ReaderArticleContent
-          language="vi" themeMode={themeMode} fontSize={fontSize} articleData={articleData}
-          vocabClassName={vocabBtnClass} onVocabClick={handleVocabClick}
-          scrollable scrollRef={rightSheetRef}
-          onMouseEnter={() => { activeScrollerRef.current = 'right'; }}
-          onTouchStart={() => { activeScrollerRef.current = 'right'; }}
-          onWheel={() => { activeScrollerRef.current = 'right'; }}
-          onScroll={() => handleScroll('right')}
-          onMouseUp={handleTextSelection} onDoubleClick={handleTextSelection}
-        />
+          {/* 1:1 Bilingual Paragraph Pairs */}
+          <BilingualParagraphPairList
+            articleData={articleData}
+            activeParagraphIndex={activeParagraphIndex}
+            fontSize={fontSize}
+            themeMode={themeMode}
+            vocabBtnClass={vocabBtnClass}
+            onVocabClick={handleVocabClick}
+            onPlayParagraphAudio={onPlayParagraphAudio}
+            onMouseUpText={handleTextSelection}
+            onDoubleClickText={handleTextSelection}
+          />
+        </div>
+      ) : (
+        /* ── BILINGUAL MODE: Dual Paper Sheets (Side-by-Side Instant Comparison) ── */
+        <div ref={sheetsRef} className="reader-bilingual-sheets">
+          {/* ── LEFT PAPER SHEET (ENGLISH ORIGINAL) ─────────────────────────── */}
+          <ReaderArticleContent
+            language="en" themeMode={themeMode} fontSize={fontSize} articleData={articleData}
+            wordCount={articleData?.wordCount || (selectedLevel === 'Level 1' ? 220 : selectedLevel === 'Level 2' ? 370 : 520)}
+            vocabClassName={vocabBtnClass} onVocabClick={handleVocabClick}
+            scrollable scrollRef={leftSheetRef}
+            onMouseEnter={() => { activeScrollerRef.current = 'left'; }}
+            onTouchStart={() => { activeScrollerRef.current = 'left'; }}
+            onWheel={() => { activeScrollerRef.current = 'left'; }}
+            onScroll={() => handleScroll('left')}
+            onMouseUp={handleTextSelection} onDoubleClick={handleTextSelection}
+          />
 
-      </div>
+          {/* ── RIGHT PAPER SHEET (TIẾNG VIỆT TRANSLATION) ────────────────────── */}
+          <div className="reader-book-spine" aria-hidden="true"><ReaderLotus /><span className="reader-spine-line" /><span>Same<br />stories<br />brighter<br />tomorrows</span><span className="reader-spine-line" /></div>
+          <ReaderArticleContent
+            language="vi" themeMode={themeMode} fontSize={fontSize} articleData={articleData}
+            vocabClassName={vocabBtnClass} onVocabClick={handleVocabClick}
+            scrollable scrollRef={rightSheetRef}
+            onMouseEnter={() => { activeScrollerRef.current = 'right'; }}
+            onTouchStart={() => { activeScrollerRef.current = 'right'; }}
+            onWheel={() => { activeScrollerRef.current = 'right'; }}
+            onScroll={() => handleScroll('right')}
+            onMouseUp={handleTextSelection} onDoubleClick={handleTextSelection}
+          />
+        </div>
+      )}
 
       {/* ── Unified Bottom Card: Reading Check Quiz + Practice Next Steps ───── */}
       <div
