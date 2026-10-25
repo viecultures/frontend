@@ -1,7 +1,13 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, Crown, LayoutGrid, Maximize2, Send, X } from 'lucide-react';
-import { getStoredUser, getIsProUser } from '@/utils/auth-storage';
+import { Bot, Crown, LayoutGrid, Maximize2, Send, X, Zap } from 'lucide-react';
+import {
+  getStoredUser,
+  getIsProUser,
+  canSendAiTurn,
+  incrementAiDailyTurns,
+  getAiRemainingTurns,
+} from '@/utils/auth-storage';
 import { PATHS, paths } from '@/routes/paths';
 import type { VocabItem } from '@/data/readerData';
 import { ReaderCompanionTools } from './ReaderCompanionTools';
@@ -29,6 +35,7 @@ export function FloatingAiCompanionWidget({
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [user, setUser] = useState(getStoredUser);
   const [isPro, setIsPro] = useState(getIsProUser);
+  const [remainingTurns, setRemainingTurns] = useState(() => getAiRemainingTurns());
   const [messages, setMessages] = useState<CompanionMessage[]>([]);
   const [showTools, setShowTools] = useState(true);
   const [input, setInput] = useState('');
@@ -38,12 +45,18 @@ export function FloatingAiCompanionWidget({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function updateAccess() { setUser(getStoredUser()); setIsPro(getIsProUser()); }
+    function updateAccess() {
+      setUser(getStoredUser());
+      setIsPro(getIsProUser());
+      setRemainingTurns(getAiRemainingTurns());
+    }
     window.addEventListener('auth:change', updateAccess);
     window.addEventListener('subscription:change', updateAccess);
+    window.addEventListener('ai:quota:change', updateAccess);
     return () => {
       window.removeEventListener('auth:change', updateAccess);
       window.removeEventListener('subscription:change', updateAccess);
+      window.removeEventListener('ai:quota:change', updateAccess);
     };
   }, []);
 
@@ -65,7 +78,15 @@ export function FloatingAiCompanionWidget({
     const text = input.trim();
     if (!text) return;
     if (!user) { navigate(paths.login({ redirect: window.location.pathname + window.location.search })); return; }
-    if (!isPro) { navigate(PATHS.pricing); return; }
+    if (!isPro && !canSendAiTurn()) {
+      navigate(PATHS.pricing);
+      return;
+    }
+
+    if (!isPro) {
+      incrementAiDailyTurns();
+      setRemainingTurns(getAiRemainingTurns());
+    }
 
     // Preserve the existing guided preview without presenting canned text as live AI.
     const summaryPrompt = `Help me understand “${articleTitle}”.`;
@@ -94,7 +115,13 @@ export function FloatingAiCompanionWidget({
               <h2 id={`${panelId}-title`} tabIndex={-1} ref={headingRef}>AI Cultural Companion</h2>
               <p>Read, explore, remember</p>
             </div>
-            {isPro && <span className="reader-companion-pro"><Crown size={12} /> Pro</span>}
+            {isPro ? (
+              <span className="reader-companion-pro"><Crown size={12} /> Pro</span>
+            ) : (
+              <span className="reader-companion-pro" style={{ color: '#e8cb84' }}>
+                {remainingTurns}/3 Free
+              </span>
+            )}
             <button className="reader-companion-icon" type="button" aria-label="Continue in AI workspace" title="Continue in AI workspace" onClick={expandToWorkspace}><Maximize2 size={17} /></button>
             <button className="reader-companion-icon" type="button" aria-label="Close AI companion" onClick={closePanel}><X size={18} /></button>
           </header>
@@ -112,18 +139,75 @@ export function FloatingAiCompanionWidget({
           </div>
           <footer className="reader-companion-footer">
             {input && (!user || !isPro) && <p className="reader-companion-draft">Prepared prompt: {input}</p>}
-            {!user ? <div className="reader-companion-gate"><p>Sign in to use the chat preview.</p><button type="button" className="reader-companion-primary"
-              onClick={() => navigate(paths.login({ redirect: window.location.pathname + window.location.search }))}>Sign in to chat</button></div>
-              : !isPro ? <div className="reader-companion-gate"><p><Crown size={15} /> Chat preview is available to Pro members.</p><button type="button"
-                className="reader-companion-primary" onClick={() => navigate(PATHS.pricing)}>Explore Pro</button></div>
-              : <form onSubmit={event => { event.preventDefault(); sendMessage(); }} className="reader-companion-composer">
-                <label className="sr-only" htmlFor={`${panelId}-input`}>Message the companion</label>
-                <textarea id={`${panelId}-input`} ref={inputRef} rows={2} maxLength={2000} value={input}
-                  onChange={event => setInput(event.target.value)} placeholder="Ask about this story…"
-                  onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); sendMessage(); } }} />
-                <button type="submit" className="reader-companion-primary" disabled={!input.trim()} aria-label="Send message"><Send size={18} /></button>
-              </form>}
-            <p className="reader-companion-preview">Guided preview · Live AI chat is not connected yet.</p>
+            {!user ? (
+              <div className="reader-companion-gate">
+                <p>Sign in to use the chat preview.</p>
+                <button
+                  type="button"
+                  className="reader-companion-primary"
+                  onClick={() => navigate(paths.login({ redirect: window.location.pathname + window.location.search }))}
+                >
+                  Sign in to chat
+                </button>
+              </div>
+            ) : !isPro && remainingTurns <= 0 ? (
+              <div className="reader-companion-gate">
+                <p>
+                  <Crown size={15} /> Bạn đã sử dụng hết 3 lượt chat thử nghiệm hôm nay. Nâng cấp Pro để đàm đạo không giới hạn!
+                </p>
+                <button
+                  type="button"
+                  className="reader-companion-primary"
+                  onClick={() => navigate(PATHS.pricing)}
+                >
+                  Nâng cấp Pro (39.000đ)
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={event => {
+                  event.preventDefault();
+                  sendMessage();
+                }}
+                className="reader-companion-composer"
+              >
+                <label className="sr-only" htmlFor={`${panelId}-input`}>
+                  Message the companion
+                </label>
+                <textarea
+                  id={`${panelId}-input`}
+                  ref={inputRef}
+                  rows={2}
+                  maxLength={2000}
+                  value={input}
+                  onChange={event => setInput(event.target.value)}
+                  placeholder={
+                    isPro
+                      ? 'Đàm đạo cùng AI Cultural Companion (không giới hạn)…'
+                      : `Hỏi về câu chuyện (${remainingTurns}/3 lượt miễn phí hôm nay)…`
+                  }
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+                      event.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                />
+                <button
+                  type="submit"
+                  className="reader-companion-primary"
+                  disabled={!input.trim()}
+                  aria-label="Send message"
+                >
+                  <Send size={18} />
+                </button>
+              </form>
+            )}
+            <p className="reader-companion-preview">
+              {isPro
+                ? 'Hội viên Di Sản Pro · Đàm thoại không giới hạn'
+                : `Gói Miễn Phí: Còn ${remainingTurns}/3 lượt hôm nay · Nhấn Nâng cấp Pro để mở khóa toàn bộ`}
+            </p>
           </footer>
         </section>
       )}
