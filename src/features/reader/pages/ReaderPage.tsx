@@ -29,6 +29,7 @@ import { articleKey, cacheArticle, getCachedArticle } from '@/services/learning/
 import { useSavedVocabulary, SavedVocabularyContext } from '../hooks/useSavedVocabulary';
 import { PATHS } from '@/routes/paths';
 import { practiceModeFrom, type PracticeMode } from '../lib/readerPractice';
+import { MocSonSealModal } from '@/features/gamification';
 
 export default function ReaderPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -56,6 +57,7 @@ export default function ReaderPage() {
   // Reader Control States
   const [fontSize, setFontSize] = useState<number>(17);
   const [themeMode, setThemeMode] = useState<"paper" | "dark">("paper");
+  const [isSealModalOpen, setIsSealModalOpen] = useState<boolean>(false);
 
   // Keep old extensive-reader links working while exposing Practice as the workspace.
   const modeParam = searchParams.get('mode');
@@ -487,6 +489,7 @@ export default function ReaderPage() {
               onStartPractice={handleStartPractice}
               activeParagraphIndex={activeParagraphIndex}
               onPlayParagraphAudio={handlePlayParagraphAudio}
+              onOpenSealModal={() => setIsSealModalOpen(true)}
             />
           ) : (
             articleData && <ReaderPracticeView
@@ -572,6 +575,16 @@ export default function ReaderPage() {
         onOpenVocabulary={() => setIsVocabDrawerOpen(true)}
         themeMode={themeMode}
       />}
+
+      {/* Ceremonial Cultural Red Seal (Mộc Son Đỏ) Modal */}
+      <MocSonSealModal
+        isOpen={isSealModalOpen}
+        onClose={() => setIsSealModalOpen(false)}
+        articleId={articleData?.id || targetId || 'tet-holiday'}
+        articleTitle={articleData?.titleVi || articleData?.titleEn || 'Tết Cổ Truyền: Đổi Mới, Nhớ Về Cội Nguồn'}
+        wordsLearnedCount={articleData?.vocabularies?.length || 4}
+        source="reader"
+      />
     </main>
     </SavedVocabularyContext.Provider>
   );

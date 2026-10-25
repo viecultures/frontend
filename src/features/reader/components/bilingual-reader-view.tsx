@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
 import Link from "@/components/Link";
 
-import { CheckCircle2, Headphones, PenTool, ChevronLeft, ChevronRight, RefreshCw, Sparkles, BookOpen } from "lucide-react";
+import { CheckCircle2, Headphones, PenTool, ChevronLeft, ChevronRight, RefreshCw, Sparkles, BookOpen, Award } from "lucide-react";
 import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
 import { paths } from "@/routes/paths";
 
@@ -32,6 +32,7 @@ interface BilingualReaderViewProps {
   onStartPractice: (mode?: PracticeMode) => void;
   activeParagraphIndex?: number;
   onPlayParagraphAudio?: (index: number, timestamp: number) => void;
+  onOpenSealModal?: () => void;
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
@@ -51,6 +52,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   onStartPractice,
   activeParagraphIndex = 0,
   onPlayParagraphAudio,
+  onOpenSealModal,
 }) => {
   const [layoutMode, setLayoutMode] = useState<'paired' | 'sheets'>('paired');
   // ── Proportional Scroll Sync Refs & State ─────────────────────────────────
@@ -515,6 +517,21 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
             </div>
 
             <div className="space-y-3 mt-6">
+              {/* Ceremonial Mộc Son Đỏ & Daily Streak Activation */}
+              {onOpenSealModal && (
+                <button
+                  type="button"
+                  onClick={onOpenSealModal}
+                  className="w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold bg-[#9E2A2B] hover:bg-[#852223] text-white border border-antique-gold shadow-md transition-all cursor-pointer group"
+                >
+                  <span className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-antique-gold group-hover:rotate-12 transition-transform" />
+                    <span>Đóng Mộc Son Đỏ & Kích hoạt Streak</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 opacity-80 group-hover:translate-x-1 transition-transform" />
+                </button>
+              )}
+
               <Link
                 href={paths.flashcardStudy({ deck: articleData?.id, level: selectedLevel })}
                 className="reader-practice-primary flex w-full items-center justify-between px-5 py-3.5 rounded-2xl"

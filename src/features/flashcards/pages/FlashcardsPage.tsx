@@ -32,6 +32,8 @@ import { FlashcardSessionSummary } from '../components/FlashcardSessionSummary';
 import { cardsFromVocabulary, loadStudyDeck, type StudyDeck } from '../services/studyDeck';
 import { persistVocabProgress } from '../services/vocabProgressService';
 import { paths } from '@/routes/paths';
+import { MocSonSealModal, StreakBadge } from '@/features/gamification';
+import { Award, Flame } from 'lucide-react';
 
 /**
  * FlashcardsPage: Main 2-Sided Leitner Binary Flashcard Study Experience.
@@ -56,6 +58,7 @@ export const FlashcardsPage: React.FC = () => {
   const [ratings, setRatings] = useState<Record<string, 'mastered' | 'review'>>({});
   const [forgotCounts, setForgotCounts] = useState<Record<string, number>>({});
   const [cognitiveFatigueAlert, setCognitiveFatigueAlert] = useState<string | null>(null);
+  const [isSealModalOpen, setIsSealModalOpen] = useState<boolean>(false);
 
   // Card view state
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
@@ -186,6 +189,7 @@ export const FlashcardsPage: React.FC = () => {
   useEffect(() => {
     if (isComplete) {
       void handleSessionComplete();
+      setIsSealModalOpen(true);
     }
   }, [isComplete, handleSessionComplete]);
 
@@ -454,7 +458,20 @@ export const FlashcardsPage: React.FC = () => {
                 </div>
               )}
 
+              {/* Daily Streak & Gamification Habit Loop */}
+              <div className="w-full max-w-md mx-auto">
+                <StreakBadge variant="banner" interactive={true} />
+              </div>
+
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsSealModalOpen(true)}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#9E2A2B] hover:bg-[#852223] text-white font-bold text-xs shadow-md border border-antique-gold transition-transform hover:scale-105 flex items-center justify-center gap-2"
+                >
+                  <Award className="w-4 h-4 text-antique-gold" />
+                  <span>Dập Mộc Son Hoàn Thành</span>
+                </button>
                 <button
                   type="button"
                   onClick={handleRestart}
@@ -487,6 +504,16 @@ export const FlashcardsPage: React.FC = () => {
             )
           )}
         </div>
+
+        {/* Ceremonial Red Seal (Mộc Son Đỏ) Activation Modal */}
+        <MocSonSealModal
+          isOpen={isSealModalOpen}
+          onClose={() => setIsSealModalOpen(false)}
+          articleId={deckId}
+          articleTitle={deck?.lesson.title || 'Ôn tập từ vựng văn hóa'}
+          wordsLearnedCount={masteredCount}
+          source="flashcard"
+        />
       </div>
     </FlashcardSidebarLayout>
   );
