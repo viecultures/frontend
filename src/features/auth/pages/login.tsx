@@ -331,7 +331,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               </div>
             ) : <div className="space-y-2.5">
               {/* Google Sign-In with Official GIS Button */}
-              <div className="relative w-full flex justify-center [&>div]:w-full [&>div>iframe]:!w-full [&>div]:flex [&>div]:justify-center">
+              <div className="relative w-full flex justify-center items-center overflow-hidden [&>div]:!w-full [&>div]:!max-w-full [&>div]:flex [&>div]:justify-center [&>div>iframe]:!mx-auto">
                 {isLoading ? (
                   <div className="w-full py-2.5 px-3 bg-surface-muted border border-antique-bright/30 rounded-xl text-xs font-semibold text-accent-ink flex items-center justify-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin text-accent-ink" />
@@ -353,7 +353,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     shape="rectangular"
                     size="large"
                     text="continue_with"
-                    width="100%"
+                    width="380"
                   />
                 ) : (
                   <p className="text-xs text-ink-soft">Đăng nhập Google chưa được cấu hình.</p>
