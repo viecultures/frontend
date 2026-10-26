@@ -1,0 +1,52 @@
+# Robots.txt for VieCultures (https://viecultures.com)
+# Designed for Search Engine Crawlers & AI Agents
+
+User-agent: *
+Allow: /
+Allow: /landing-concept
+Allow: /discovery
+Allow: /reader
+Allow: /dictionary
+Allow: /flashcards
+Allow: /flashcard-study
+Allow: /community
+Allow: /community-contest
+Allow: /pricing
+
+# Disallow Private & User-specific Pages
+Disallow: /login
+Disallow: /home
+Disallow: /profile
+Disallow: /pricing/checkout
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /ai-workspace
+Disallow: /playground
+
+# AI Agents & LLM Crawlers
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /pricing/checkout
+Disallow: /profile
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /pricing/checkout
+Disallow: /profile
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /pricing/checkout
+Disallow: /profile
+
+User-agent: CCBot
+Allow: /
+Disallow: /admin
+Disallow: /pricing/checkout
+Disallow: /profile
+
+# Sitemap & LLMs specification
+Sitemap: https://viecultures.com/sitemap.xml

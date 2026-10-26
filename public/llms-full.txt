@@ -1,0 +1,34 @@
+# VieCultures - Full Context Specification for AI Agents & Search Crawlers
+Website: https://viecultures.com
+Canonical Domain: https://viecultures.com
+
+## 1. Sứ mệnh và Giá trị cốt lõi
+VieCultures là nền tảng số bảo tồn và truyền bá tinh hoa văn hóa Việt Nam đến bạn đọc trong nước và quốc tế. Chúng tôi kết hợp trải nghiệm đọc song ngữ (Bilingual Dual-Reader) với công nghệ trí tuệ nhân tạo (AI Companion) để tạo ra môi trường học tập và thưởng thức văn hóa sống động.
+
+## 2. Các chuyên mục nội dung chính
+### Lịch sử & Nhân vật
+- Các triều đại phong kiến Việt Nam, sự tích dựng nước và giữ nước.
+- Các anh hùng dân tộc và danh nhân văn hóa.
+
+### Lễ hội & Tín ngưỡng
+- Tết Nguyên Đán, Tết Trung Thu, Lễ hội Đền Hùng.
+- Tục thờ cúng tổ tiên, phong tục đón xuân ba miền.
+
+### Văn hóa Ẩm thực
+- Tinh hoa Phở Hà Nội, Bún Bò Huế, Hủ tiếu Nam Bộ.
+- Nghệ thuật thưởng trà, văn hóa cà phê vợt, cà phê phin vỉa hè.
+
+### Di sản Kiến trúc & Nghệ thuật
+- Ca trù, Nhã nhạc cung đình Huế, Đờn ca tài tử.
+- Làng nghề truyền thống: Gốm Bát Tràng, Lụa Vạn Phúc, Tranh Đông Hồ.
+
+## 3. Kiến trúc Đọc Song Ngữ (Dual Reader Architecture)
+- Chế độ đọc câu - câu / đoạn - đoạn song ngữ đối chiếu Anh - Việt.
+- Giọng đọc bản xứ tự nhiên (TTS miền Bắc, Trung, Nam).
+- Tra cứu thuật ngữ văn hóa chuyên sâu trực tiếp trên từng câu từ.
+- Thẻ ghi nhớ Flashcards lưu trữ từ vựng văn hóa vào bộ sưu tập cá nhân.
+
+## 4. API & Liên kết tri thức
+- Danh mục bài đọc: https://viecultures.com/discovery
+- Bản đồ văn hóa di sản: https://viecultures.com/discovery?view=map
+- Diễn đàn thảo luận: https://viecultures.com/community

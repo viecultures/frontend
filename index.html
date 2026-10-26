@@ -14,7 +14,72 @@
     <meta name="application-name" content="VieCultures" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#163D37" />
-    <title>VieCultures - Vietnamese Cultural Reading & Dual Reader Platform</title>
+    <title>VieCultures - Nền tảng Đọc hiểu Văn hóa Việt Nam Song ngữ & AI Companion</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Khám phá kho tàng lịch sử, ẩm thực, phong tục và di sản Việt Nam qua nền tảng đọc song ngữ Anh - Việt tương tác, âm thanh bản xứ ba miền và trợ lý AI thông minh." />
+    <meta name="keywords" content="văn hóa việt nam, vietnamese culture, bilingual reader, đọc song ngữ anh việt, học tiếng việt, ẩm thực việt nam, lịch sử việt nam, flashcards từ vựng, viecultures" />
+    <meta name="author" content="VieCultures Team" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://viecultures.com/" />
+
+    <!-- Open Graph (Facebook, Zalo, LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="VieCultures" />
+    <meta property="og:title" content="VieCultures - Nền tảng Đọc hiểu Văn hóa Việt Nam Song ngữ" />
+    <meta property="og:description" content="Trải nghiệm đọc hiểu văn hóa Việt Nam với trình đọc song ngữ đối chiếu, phát âm chuẩn bản xứ và trợ lý đồng hành AI." />
+    <meta property="og:url" content="https://viecultures.com/" />
+    <meta property="og:image" content="https://viecultures.com/brand/logo-full.png" />
+    <meta property="og:image:alt" content="VieCultures Logo & Heritage Platform" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="VieCultures - Nền tảng Đọc hiểu Văn hóa Việt Nam Song ngữ" />
+    <meta name="twitter:description" content="Khám phá văn hóa, phong tục và ẩm thực Việt qua phương pháp đọc song ngữ tương tác và âm thanh bản xứ." />
+    <meta name="twitter:image" content="https://viecultures.com/brand/logo-full.png" />
+
+    <!-- AI & Bot Context Links -->
+    <link rel="help" href="/llms.txt" type="text/plain" title="LLMs Context" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
+    <!-- Schema.org Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://viecultures.com/#organization",
+            "name": "VieCultures",
+            "url": "https://viecultures.com",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://viecultures.com/brand/logo-full.png",
+              "width": 512,
+              "height": 512
+            },
+            "description": "Nền tảng đọc hiểu văn hóa Việt Nam song ngữ tích hợp trợ lý AI bản xứ."
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://viecultures.com/#website",
+            "url": "https://viecultures.com",
+            "name": "VieCultures",
+            "publisher": {
+              "@id": "https://viecultures.com/#organization"
+            },
+            "inLanguage": ["vi", "en"],
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://viecultures.com/discovery?search={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    </script>
 
     <!-- Font preconnect — giảm DNS lookup latency -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

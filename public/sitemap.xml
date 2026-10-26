@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Homepage / Landing -->
+  <url>
+    <loc>https://viecultures.com/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://viecultures.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viecultures.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viecultures.com/"/>
+  </url>
+
+  <!-- Culinary & Cultural Experience Concept -->
+  <url>
+    <loc>https://viecultures.com/landing-concept</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://viecultures.com/landing-concept"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viecultures.com/landing-concept?lang=en"/>
+  </url>
+
+  <!-- Cultural Discovery & Catalog -->
+  <url>
+    <loc>https://viecultures.com/discovery</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://viecultures.com/discovery"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viecultures.com/discovery?lang=en"/>
+  </url>
+
+  <!-- Interactive Reader -->
+  <url>
+    <loc>https://viecultures.com/reader</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://viecultures.com/reader"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viecultures.com/reader?lang=en"/>
+  </url>
+
+  <!-- Cultural Dictionary & Vocabulary -->
+  <url>
+    <loc>https://viecultures.com/dictionary</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Cultural Community & Discussion -->
+  <url>
+    <loc>https://viecultures.com/community</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Community Creative Contests -->
+  <url>
+    <loc>https://viecultures.com/community-contest</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Subscription & Pricing Plans -->
+  <url>
+    <loc>https://viecultures.com/pricing</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>
