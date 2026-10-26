@@ -83,7 +83,16 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   const muted = !recording;
   const hasHistory = turns.some(turn => turn.role !== 'system');
   const handleMicClick = () => {
-    if (active && !busy) void setMicrophoneEnabled(!recording);
+    if (!active || busy) return;
+    if (!connected) {
+      if (hasHistory) {
+        void resumeConversation({ input: 'voice' });
+      } else {
+        void startConversation({ input: 'voice' });
+      }
+      return;
+    }
+    void setMicrophoneEnabled(!recording);
   };
 
   const sendTextPrompt = async () => {
@@ -180,7 +189,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             'mic-on': !muted,
             'mic-off': muted,
           })}
-          disabled={busy || !connected}
+          disabled={busy}
           onClick={handleMicClick}
           title={micButtonTitle}
           aria-label={micButtonTitle}

@@ -180,7 +180,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         {
           id: 'guest-intro',
           role: 'assistant',
-          content: 'Xin chào! Hãy đăng nhập vào tài khoản VieCultures để trò chuyện và lưu lại lịch sử với Cultural Companion.',
+          content: 'Hello! Please sign in to your VieCultures account to chat and save your history with Cultural Companion.',
           timestamp: Date.now(),
         },
       ]);
@@ -595,10 +595,10 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
           {!user ? (
             <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-4 py-4 text-center">
               <p className="mb-1 font-serif text-[15px] font-bold text-[#2f4a2c]">
-                Yêu cầu đăng nhập
+                Sign in required
               </p>
               <p className="mb-3 text-xs leading-relaxed text-[#627750]">
-                Đăng nhập vào tài khoản VieCultures để trò chuyện và lưu lại lịch sử với AI Companion.
+                Sign in to your VieCultures account to chat and save your history with AI Companion.
               </p>
               <button
                 type="button"
@@ -608,7 +608,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
                 }}
                 className="inline-flex items-center justify-center rounded-full bg-[#5d8a45] px-5 py-2 text-xs font-bold text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none"
               >
-                Đăng nhập để chat
+                Sign in to chat
               </button>
             </div>
           ) : isLimitReached ? (
