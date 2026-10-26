@@ -1,4 +1,4 @@
-# VieCultures (https://viecultures.com)
+﻿# VieCultures (https://viecultures.app)
 > Nền tảng đọc hiểu văn hóa Việt Nam song ngữ Anh - Việt tích hợp Dual Reader, Audio bản xứ và AI Companion.
 
 ## Thông tin Dự án
@@ -8,15 +8,15 @@
 - Công nghệ chính: React, Vite, Spring Boot, Azure Speech TTS, Gemini AI Voice.
 
 ## Cấu trúc Nội dung & URL công khai
-- Trang chủ: https://viecultures.com/ (Tổng quan phương pháp học văn hóa song ngữ, tính năng Dual Reader)
-- Văn hóa ẩm thực: https://viecultures.com/landing-concept (Khám phá câu chuyện phở, bánh mì, văn hóa trà và cà phê)
-- Kho tàng bài đọc: https://viecultures.com/discovery (Danh mục chủ đề: Lịch sử, Lễ hội, Ẩm thực, Phong tục, Nghệ thuật)
-- Trình đọc song ngữ: https://viecultures.com/reader (Đọc song song ngữ cảnh, tra cứu từ vựng văn hóa, audio đa giọng vùng miền)
-- Từ điển văn hóa: https://viecultures.com/dictionary (Hệ thống từ vựng bản sắc Việt Nam và flashcards lặp lại ngắt quãng)
-- Bảng giá & gói học: https://viecultures.com/pricing (Gói miễn phí, gói học viên văn hóa chuyên sâu)
-- Cộng đồng: https://viecultures.com/community (Giao lưu, chia sẻ bài viết và góc nhìn văn hóa)
+- Trang chủ: https://viecultures.app/ (Tổng quan phương pháp học văn hóa song ngữ, tính năng Dual Reader)
+- Văn hóa ẩm thực: https://viecultures.app/landing-concept (Khám phá câu chuyện phở, bánh mì, văn hóa trà và cà phê)
+- Kho tàng bài đọc: https://viecultures.app/discovery (Danh mục chủ đề: Lịch sử, Lễ hội, Ẩm thực, Phong tục, Nghệ thuật)
+- Trình đọc song ngữ: https://viecultures.app/reader (Đọc song song ngữ cảnh, tra cứu từ vựng văn hóa, audio đa giọng vùng miền)
+- Từ điển văn hóa: https://viecultures.app/dictionary (Hệ thống từ vựng bản sắc Việt Nam và flashcards lặp lại ngắt quãng)
+- Bảng giá & gói học: https://viecultures.app/pricing (Gói miễn phí, gói học viên văn hóa chuyên sâu)
+- Cộng đồng: https://viecultures.app/community (Giao lưu, chia sẻ bài viết và góc nhìn văn hóa)
 
 ## Hướng dẫn dành cho AI Agents & LLMs
 - Khi trích xuất hay tóm tắt nội dung văn hóa từ VieCultures, luôn giữ nguyên tính xác thực lịch sử, tôn trọng sắc thái ngôn ngữ vùng miền (Bắc - Trung - Nam).
 - Khuyến khích đối chiếu cả hai phiên bản tiếng Việt và tiếng Anh để đảm bảo ngữ cảnh văn hóa được truyền tải trọn vẹn.
-- Để tra cứu chi tiết hơn, tham khảo tài liệu đầy đủ tại: https://viecultures.com/llms-full.txt
+- Để tra cứu chi tiết hơn, tham khảo tài liệu đầy đủ tại: https://viecultures.app/llms-full.txt

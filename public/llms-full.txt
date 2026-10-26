@@ -1,6 +1,6 @@
-# VieCultures - Full Context Specification for AI Agents & Search Crawlers
-Website: https://viecultures.com
-Canonical Domain: https://viecultures.com
+﻿# VieCultures - Full Context Specification for AI Agents & Search Crawlers
+Website: https://viecultures.app
+Canonical Domain: https://viecultures.app
 
 ## 1. Sứ mệnh và Giá trị cốt lõi
 VieCultures là nền tảng số bảo tồn và truyền bá tinh hoa văn hóa Việt Nam đến bạn đọc trong nước và quốc tế. Chúng tôi kết hợp trải nghiệm đọc song ngữ (Bilingual Dual-Reader) với công nghệ trí tuệ nhân tạo (AI Companion) để tạo ra môi trường học tập và thưởng thức văn hóa sống động.
@@ -29,6 +29,6 @@ VieCultures là nền tảng số bảo tồn và truyền bá tinh hoa văn hó
 - Thẻ ghi nhớ Flashcards lưu trữ từ vựng văn hóa vào bộ sưu tập cá nhân.
 
 ## 4. API & Liên kết tri thức
-- Danh mục bài đọc: https://viecultures.com/discovery
-- Bản đồ văn hóa di sản: https://viecultures.com/discovery?view=map
-- Diễn đàn thảo luận: https://viecultures.com/community
+- Danh mục bài đọc: https://viecultures.app/discovery
+- Bản đồ văn hóa di sản: https://viecultures.app/discovery?view=map
+- Diễn đàn thảo luận: https://viecultures.app/community
