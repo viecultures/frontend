@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { SendHorizontal } from 'lucide-react';
+import { SendHorizontal, LayoutGrid } from 'lucide-react';
 import { companionService } from '@/services/companionService';
 import type {
   CompanionChatMessage,
@@ -164,6 +164,9 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         inputMessage
       );
       navigate(paths.aiWorkspace({ story: articleContext.articleId, level: articleContext.level }));
+      onClose();
+    } else {
+      navigate(PATHS.aiWorkspace);
       onClose();
     }
   };
@@ -488,16 +491,36 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         onExpandToWorkspace={handleExpandToWorkspace}
       />
 
-      {/* Context indicator banner */}
-      {articleContext && (
-        <div className="flex shrink-0 items-center justify-between border-b border-[#dfe5cf] bg-[#f4f7ee] px-3.5 py-1.5 text-[11px] text-[#4a6a44]">
-          <div className="flex items-center gap-1.5 truncate">
-            <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#5d8a45]" />
+      {/* Reader Pro Mode Toolbar */}
+      <div className="flex shrink-0 items-center justify-between border-b border-[#dfe5cf] bg-[#f4f7ee] px-3.5 py-2 text-xs">
+        {articleContext ? (
+          <div className="flex items-center gap-1.5 truncate text-[#4a6a44]">
+            <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-[#5d8a45]" />
             <span className="font-semibold text-[#2f4a2c]">Reading with you:</span>
             <span className="truncate italic text-[#4a6a44]">{articleContext.articleTitle || 'Your story'}</span>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="flex items-center gap-1.5 text-[#4a6a44]">
+            <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-[#5d8a45]" />
+            <span className="font-semibold text-[#2f4a2c]">
+              {viewMode === 'tools' ? 'Learning tools' : 'Your conversation'}
+            </span>
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setViewMode((prev) => (prev === 'chat' ? 'tools' : 'chat'))}
+          className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-all ${
+            viewMode === 'tools'
+              ? 'border-[#5d8a45] bg-[#5d8a45] text-white shadow-xs'
+              : 'border-[#c9d6b0] bg-white text-[#2f4a2c] hover:bg-[#eaf4e2]'
+          }`}
+        >
+          <LayoutGrid className="h-3.5 w-3.5" />
+          <span>{viewMode === 'tools' ? 'Back to chat' : 'Learning tools'}</span>
+        </button>
+      </div>
 
       {viewMode === 'tools' ? (
         <CompanionLearningTools

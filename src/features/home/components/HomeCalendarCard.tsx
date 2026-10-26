@@ -184,11 +184,7 @@ export function HomeCalendarCard() {
           title="Chào bạn! Bấm vào để nghe lời chúc từ linh vật"
         >
           <img
-            src={
-              currentCard.mascotType === 'tennis'
-                ? '/images/calendar/tennis-mascot-clean.png'
-                : '/brand/viecultures-mascot-logo.png'
-            }
+            src={'/brand/viecultures-mascot-logo.png'}
             alt=""
             aria-hidden="true"
           />
@@ -202,23 +198,6 @@ export function HomeCalendarCard() {
           )}
         </div>
       </div>
-
-      {/* Bottom Rounded Caption Pill with Title & Heart button
-      <div className="home-calendar-caption-pill">
-        <span className="home-calendar-caption-text" title={currentCard.caption}>
-          {currentCard.caption}
-        </span>
-
-        <button
-          type="button"
-          className={`home-calendar-heart-btn ${isLiked ? 'is-liked' : ''}`}
-          onClick={toggleFavorite}
-          aria-label={isLiked ? 'Bỏ thích câu này' : 'Yêu thích câu này'}
-          title={isLiked ? 'Đã yêu thích (Favorited)' : 'Thêm vào yêu thích (Add to favorites)'}
-        >
-          <Heart size={18} aria-hidden="true" />
-        </button>
-      </div> */}
 
       {/* Page indicator dots */}
       <div className="home-calendar-dots" aria-label="Danh sách trang lịch">

@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useState, useRef, useMemo } from 'react';
+import type { CSSProperties } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -17,7 +18,7 @@ import {
 } from 'lucide-react';
 import { VietnamMap } from '@/components/map/VietnamMap';
 import { Button } from '@/components/ui/button';
-import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
+import { VIETNAM_34_PROVINCES, VIETNAM_REGION_VIEWBOXES } from '@/data/vietnamMapData';
 import { toEnglishPlaceName } from '@/utils/vietnamMapUtils';
 import type { RegionKey } from '@/utils/useVietnamMap';
 import { paths } from '@/routes/paths';
@@ -30,6 +31,9 @@ const REGIONS = [
   { id: 'south', name: 'Southern Vietnam', number: '03' },
 ] as const;
 const OPEN_REGIONS = ['north'] as const;
+const REGION_SHAPES = Object.fromEntries(
+  REGIONS.map(region => [region.id, VIETNAM_34_PROVINCES.filter(province => province.region === region.id).map(province => province.d).join(' ')]),
+) as Record<(typeof REGIONS)[number]['id'], string>;
 const UPCOMING_SERIES = [
   { id: 'central-preview', title: 'Central Vietnam', place: 'Hue', imageUrl: '/images/landing/hue-citadel.jpg', description: 'New reading series are being prepared for Central Vietnam.' },
   { id: 'south-preview', title: 'Southern Vietnam', place: 'Ho Chi Minh City', imageUrl: '/images/landing/banh-mi.jpg', description: 'New reading series are being prepared for Southern Vietnam.' },
@@ -53,6 +57,12 @@ interface SelectedChapter {
 }
 
 export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
+  const mapPanelRef = useRef<HTMLElement>(null);
+  const [mapPanelHeight, setMapPanelHeight] = useState<number | null>(null);
+  const [carouselHovered, setCarouselHovered] = useState(false);
+  const [carouselFocused, setCarouselFocused] = useState(false);
+  const [pageVisible, setPageVisible] = useState(() => !document.hidden);
+  const [reduceMotion, setReduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [params, setParams] = useSearchParams();
   const requestedPlace = VIETNAM_34_PROVINCES.find(province => province.id === params.get('place'));
   const selectedProvince = requestedPlace?.region === 'north' ? requestedPlace : undefined;
@@ -73,6 +83,29 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
   const seriesTriggerRef = useRef<HTMLElement | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<SelectedChapter | null>(null);
   const skillDialogRef = useRef<HTMLDialogElement>(null);
+
+  useLayoutEffect(() => {
+    const panel = mapPanelRef.current;
+    if (!panel) return;
+
+    const updateHeight = () => setMapPanelHeight(panel.getBoundingClientRect().height);
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(panel);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateVisibility = () => setPageVisible(!document.hidden);
+    const updateMotionPreference = () => setReduceMotion(motionPreference.matches);
+    document.addEventListener('visibilitychange', updateVisibility);
+    motionPreference.addEventListener('change', updateMotionPreference);
+    return () => {
+      document.removeEventListener('visibilitychange', updateVisibility);
+      motionPreference.removeEventListener('change', updateMotionPreference);
+    };
+  }, []);
 
   useEffect(() => {
     const dialog = skillDialogRef.current;
@@ -121,7 +154,17 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
 
   useEffect(() => {
     setActiveSlideIndex(0);
+    setCarouselFocused(false);
+    setCarouselHovered(false);
   }, [selectedPlace, selectedRegion]);
+
+  useEffect(() => {
+    if (nominatedSlides.length <= 1 || carouselHovered || carouselFocused || !pageVisible || reduceMotion) return;
+    const timeout = window.setTimeout(() => {
+      setActiveSlideIndex(index => (index + 1) % nominatedSlides.length);
+    }, 3000);
+    return () => window.clearTimeout(timeout);
+  }, [activeSlideIndex, nominatedSlides.length, carouselHovered, carouselFocused, pageVisible, reduceMotion]);
 
   const currentSlide = nominatedSlides[activeSlideIndex] || nominatedSlides[0];
 
@@ -371,8 +414,11 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
         </div>
       </header>
 
-      <div className="journey-layout">
-        <section className="journey-map-panel" aria-label="Journey map">
+      <div
+        className="journey-layout"
+        style={{ '--journey-panel-height': mapPanelHeight === null ? 'auto' : `${mapPanelHeight}px` } as CSSProperties}
+      >
+        <section ref={mapPanelRef} className="journey-map-panel" aria-label="Journey map">
           <div className="journey-map-heading">
             <div>
               {region && (
@@ -409,7 +455,13 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
           )}
         </section>
 
-        <aside className="journey-rail" aria-label="Nominated series" aria-live="polite">
+        <aside
+          className={`journey-rail ${region ? 'journey-rail--featured' : 'journey-rail--regions'}`}
+          aria-label="Nominated series"
+          aria-live={region ? 'off' : 'polite'}
+          onFocus={() => setCarouselFocused(true)}
+          onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setCarouselFocused(false); }}
+        >
           {!region ? (
             <>
               <p className="journey-eyebrow">REGIONAL READING JOURNEY</p>
@@ -418,21 +470,28 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
                 The reading journey begins in Northern Vietnam. Central and Southern regions will unlock soon.
               </p>
               <div className="journey-region-list">
-                {REGIONS.map(item =>
-                  item.id === 'north' ? (
-                    <button key={item.id} type="button" onClick={() => selectRegion(item.id)}>
-                      <span className="journey-region-number">{item.number}</span>
-                      <span>{item.name}<small>Open now</small></span>
-                      <ArrowRight size={18} />
-                    </button>
+                {REGIONS.map(item => {
+                  const isOpen = item.id === 'north';
+                  const content = <>
+                    <span className="journey-region-number">{item.number}</span>
+                    <svg className="journey-region-thumbnail" viewBox={VIETNAM_REGION_VIEWBOXES[item.id].viewBox} aria-hidden="true" focusable="false">
+                      <path d={REGION_SHAPES[item.id]} fillRule="evenodd" />
+                    </svg>
+                    <span className="journey-region-copy">
+                      <strong>{item.name}</strong>
+                      <small className="journey-region-status">
+                        {isOpen ? <BookOpen size={14} aria-hidden="true" /> : <LockKeyhole size={14} aria-hidden="true" />}
+                        {isOpen ? 'Open now' : 'Locked'}
+                      </small>
+                    </span>
+                    {isOpen && <ArrowRight className="journey-region-arrow" size={18} aria-hidden="true" />}
+                  </>;
+                  return isOpen ? (
+                    <button key={item.id} type="button" className="journey-region-step journey-region-step--open" onClick={() => selectRegion(item.id)}>{content}</button>
                   ) : (
-                    <div key={item.id} className="journey-region-locked">
-                      <span className="journey-region-number">{item.number}</span>
-                      <span>{item.name}<small>Locked</small></span>
-                      <LockKeyhole size={18} />
-                    </div>
-                  )
-                )}
+                    <div key={item.id} className="journey-region-step journey-region-step--locked" aria-label={`${item.name}, locked`}>{content}</div>
+                  );
+                })}
               </div>
             </>
           ) : (
@@ -476,39 +535,25 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
                 </div>
               )}
 
-              {nominatedSlides.length > 1 && (
-                <div className="journey-slider-pills" role="tablist" aria-label="Featured series list">
-                  {nominatedSlides.map((s, idx) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={idx === activeSlideIndex}
-                      className={`journey-slider-pill ${idx === activeSlideIndex ? 'is-active' : ''}`}
-                      onClick={() => setActiveSlideIndex(idx)}
-                    >
-                      {s.title}
-                    </button>
-                  ))}
-                </div>
-              )}
-
               {currentSlide && (
                 <div
                   tabIndex={0}
                   onKeyDown={handleCardKeyDown}
                   aria-label={`Series: ${currentSlide.title}`}
                   className="journey-spotlight-slider-wrapper"
+                  onMouseEnter={() => setCarouselHovered(true)}
+                  onMouseLeave={() => setCarouselHovered(false)}
                 >
                   {renderNominatedSeriesCard(currentSlide, !!unlockedPlaces[currentSlide.provinceId])}
 
                   {nominatedSlides.length > 1 && (
-                    <div className="journey-slider-dots" role="tablist" aria-label="Series slides">
+                    <div className="journey-slider-dots" role="group" aria-label="Featured series positions">
                       {nominatedSlides.map((s, idx) => (
                         <button
                           key={s.id}
                           type="button"
                           aria-label={`Go to slide ${idx + 1}: ${s.title}`}
+                          aria-current={idx === activeSlideIndex ? 'true' : undefined}
                           className={`journey-slider-dot ${idx === activeSlideIndex ? 'is-active' : ''}`}
                           onClick={() => setActiveSlideIndex(idx)}
                         />

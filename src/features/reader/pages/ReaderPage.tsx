@@ -114,6 +114,28 @@ export default function ReaderPage() {
     return () => { active = false; levelRequest.current++; };
   }, [requestedKey, reloadAttempt]);
 
+  // Synchronize active reader article context to Cultural Companion
+  useEffect(() => {
+    if (articleData) {
+      useCompanionArticleContext.getState().setArticleContext({
+        articleId: articleData.id || targetId || 'tet-holiday',
+        articleTitle: articleData.titleEn || 'Tet: Renewal, Remembrance & Regional Flavours',
+        articleSummary: articleData.summary || articleData.paragraphs?.[0]?.enText,
+        level: selectedLevel,
+        vocabulary: articleData.vocabularies || Object.values(VOCAB_DATABASE),
+        readerUrl: window.location.pathname + window.location.search,
+        onOpenVocabulary: () => setIsVocabDrawerOpen(true),
+      });
+    }
+  }, [articleData, targetId, selectedLevel]);
+
+  // Clear article context when ReaderPage unmounts
+  useEffect(() => {
+    return () => {
+      useCompanionArticleContext.getState().clearArticleContext();
+    };
+  }, []);
+
   // Sync state if URL searchParams change externally
   useEffect(() => {
     const currentLvl = searchParams.get("level");

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { isLocalAuthMode } from '@/config/authConfig';
 
 import { SettingsModal } from './components/SettingsModal';
@@ -57,7 +56,24 @@ export const App: React.FC = () => {
 
   const [isCompanionOpen, setIsCompanionOpen] = useState(false);
   const searchParams = new URLSearchParams(location.search);
-  const currentLessonId = searchParams.get('id') || searchParams.get('lessonId') || undefined;
+  const currentLessonId = searchParams.get('id') || searchParams.get('lessonId') || searchParams.get('story') || searchParams.get('article') || searchParams.get('postId') || undefined;
+
+  const normalizedPath =
+    location.pathname.length > 1 && location.pathname.endsWith('/')
+      ? location.pathname.slice(0, -1)
+      : location.pathname;
+
+  const isLandingOrLogin =
+    normalizedPath === PATHS.landing ||
+    normalizedPath === PATHS.landingConcept ||
+    normalizedPath === '/landing' ||
+    normalizedPath === PATHS.login;
+
+  useEffect(() => {
+    if (isLandingOrLogin && isCompanionOpen) {
+      setIsCompanionOpen(false);
+    }
+  }, [isLandingOrLogin, isCompanionOpen]);
 
   const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser() || !!getStoredToken());
@@ -94,9 +110,6 @@ export const App: React.FC = () => {
     setUser(null);
     navigate(PATHS.landing, { replace: true });
   };
-
-  const googleClientId =
-    import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
   const content = (
       <div className="min-h-screen bg-surface text-ink-soft flex flex-col font-sans">
@@ -230,8 +243,8 @@ export const App: React.FC = () => {
         <SettingsModal />
         <PwaInstallBanner />
 
-        {/* AI Cultural Companion Floating Drawer & Launcher (Hidden in /ai-workspace) */}
-        {!location.pathname.startsWith(PATHS.aiWorkspace) && (
+        {/* AI Cultural Companion Floating Drawer & Launcher */}
+        {!isLandingOrLogin && !location.pathname.startsWith(PATHS.aiWorkspace) && (
           <>
             <CompanionFloatingButton
               isOpen={isCompanionOpen}
@@ -247,9 +260,7 @@ export const App: React.FC = () => {
       </div>
   );
 
-  return googleClientId ? (
-    <GoogleOAuthProvider clientId={googleClientId} locale="vi">{content}</GoogleOAuthProvider>
-  ) : content;
+  return content;
 };
 
 export default App;

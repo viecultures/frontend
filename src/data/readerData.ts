@@ -288,6 +288,7 @@ export const READER_QUIZ_QUESTIONS: ReaderQuizQuestion[] = [
 
 export interface RecommendedArticle {
   id: string;
+  imageUrl: string;
   category: string;
   level: string;
   title: string;
@@ -300,6 +301,7 @@ export interface RecommendedArticle {
 export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   {
     id: "saigon-banh-mi",
+    imageUrl: "/images/landing/banh-mi.jpg",
     category: "Cuisine",
     level: "Level 2",
     title: "The Story of Saigon Bánh Mì",
@@ -310,6 +312,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   },
   {
     id: "hoi-an-lanterns",
+    imageUrl: "/images/landing/hoi-an-lanterns.jpg",
     category: "Heritage",
     level: "Level 2",
     title: "Hội An Lantern Festival Traditions",
@@ -320,6 +323,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   },
   {
     id: "bat-trang-pottery",
+    imageUrl: "/images/landing/bat-trang.jpg",
     category: "Crafts",
     level: "Level 2",
     title: "Bát Tràng Pottery & Ceramic Arts",

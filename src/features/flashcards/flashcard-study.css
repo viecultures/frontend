@@ -9,9 +9,9 @@
   font-family: var(--font-sans);
   font-weight: 400;
 }
-.vocab-study-shell .font-serif:where(:not(.vocab-sidebar *)) { font-family: var(--font-sans); }
-.vocab-study-shell :is(.font-bold, .font-extrabold, .font-semibold, .font-black):where(:not(.vocab-sidebar *)) { font-weight: 400; }
-.vocab-study-shell :is(h1, h2, h3, strong):where(:not(.vocab-sidebar *)) { font-weight: 500; filter: none; }
+.vocab-study-shell .font-serif:where(:not(.vocab-sidebar *):not(.vocab-session-summary *)) { font-family: var(--font-sans); }
+.vocab-study-shell :is(.font-bold, .font-extrabold, .font-semibold, .font-black):where(:not(.vocab-sidebar *):not(.vocab-session-summary *)) { font-weight: 400; }
+.vocab-study-shell :is(h1, h2, h3, strong):where(:not(.vocab-sidebar *):not(.vocab-session-summary *)) { font-weight: 500; filter: none; }
 .vocab-study-shell :is(button, input, select, textarea):where(:not(.vocab-sidebar *)) { font: inherit; }
 .vocab-study-shell :is(button, a, input, select, textarea):where(:not(.vocab-sidebar *)):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
 .vocab-study-shell button { cursor: pointer; }
@@ -62,10 +62,10 @@
 .vocab-study-shell .vocab-flip-hint { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--vocab-muted); }
 .vocab-study-shell kbd { padding: 1px 5px; border: 1px solid var(--vocab-line); border-radius: 4px; background: transparent; color: inherit; font-size: 11px; font-weight: 400; }
 .vocab-study-shell .vocab-review-actions { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0; background: transparent; border: 0; }
-.vocab-study-shell :is(.vocab-study-primary, .vocab-study-secondary, .vocab-review-actions button, .vocab-session-summary button) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px; border: 1px solid var(--vocab-line); border-radius: var(--radius-xl); font-size: 14px; font-weight: 400; line-height: 1.5; background: var(--vocab-card); color: var(--vocab-ink); box-shadow: none; transition: background .2s; }
-.vocab-study-shell :is(.vocab-study-primary, .vocab-review-actions button:last-child, .vocab-session-summary button:first-child) { background: var(--color-action); color: var(--color-on-action); border-color: transparent; }
-.vocab-study-shell :is(.vocab-study-primary, .vocab-review-actions button:last-child, .vocab-session-summary button:first-child):hover:enabled { background: var(--color-action-hover); }
-.vocab-study-shell :is(.vocab-study-secondary, .vocab-review-actions button:first-child, .vocab-session-summary button:not(:first-child)):hover { background: var(--vocab-soft); }
+.vocab-study-shell :is(.vocab-study-primary, .vocab-study-secondary, .vocab-review-actions button, .vocab-session-actions button) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px; border: 1px solid var(--vocab-line); border-radius: var(--radius-xl); font-size: 14px; font-weight: 400; line-height: 1.5; background: var(--vocab-card); color: var(--vocab-ink); box-shadow: none; transition: background .2s; }
+.vocab-study-shell :is(.vocab-study-primary, .vocab-review-actions button:last-child, .vocab-session-actions button:first-child) { background: var(--color-action); color: var(--color-on-action); border-color: transparent; }
+.vocab-study-shell :is(.vocab-study-primary, .vocab-review-actions button:last-child, .vocab-session-actions button:first-child):hover:enabled { background: var(--color-action-hover); }
+.vocab-study-shell :is(.vocab-study-secondary, .vocab-review-actions button:first-child, .vocab-session-actions button:not(:first-child)):hover { background: var(--vocab-soft); }
 .vocab-study-shell .vocab-review-actions button svg { color: inherit; }
 .vocab-study-shell .vocab-review-actions kbd { opacity: .8; border-color: currentColor; }
 .vocab-study-shell .vocab-study-primary:disabled { opacity: .5; cursor: not-allowed; }
@@ -90,13 +90,13 @@
 .vocab-study-shell .vocab-feedback-incorrect { color: var(--color-danger); }
 .vocab-study-shell .vocab-feedback.vocab-feedback-correct { background: var(--color-success-soft); }
 .vocab-study-shell .vocab-feedback.vocab-feedback-incorrect { background: var(--color-danger-soft); }
-.vocab-study-shell .vocab-session-summary { font-size: 14px; line-height: 1.7; }
-.vocab-study-shell .vocab-session-summary h2 { color: var(--vocab-ink); }
-.vocab-study-shell .vocab-session-summary > svg { color: var(--color-accent-ink); width: 32px; height: 32px; }
+.vocab-study-shell .vocab-session-summary { font-size: 14px; line-height: 1.6; }
+.vocab-study-shell .vocab-session-summary h2 { font-family: var(--font-serif); }
+
 .vocab-study-shell .vocab-session-summary .grid > div { border-radius: var(--radius-xl); }
-.vocab-study-shell .vocab-session-summary .grid > div:first-child { color: var(--color-success); background: var(--color-success-soft); }
-.vocab-study-shell .vocab-session-summary .grid > div:last-child { color: var(--color-warning); background: var(--color-warning-soft); }
-.vocab-study-shell .vocab-session-summary svg { color: inherit; }
+
+
+
 /* Keep the original shared sidebar appearance, including its local palette. */
 .vocab-study-shell .vocab-sidebar { --vocab-card: #fffefa; --vocab-ink: var(--color-heritage-green); --vocab-muted: #66766f; --vocab-line: #e2e6dc; --vocab-soft: #edf2e9; }
 .dark .vocab-study-shell .vocab-sidebar { --vocab-card: #122924; --vocab-ink: #f5f2e8; --vocab-muted: #afc1b8; --vocab-line: #30473e; --vocab-soft: #1c382e; }

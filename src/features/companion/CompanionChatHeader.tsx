@@ -47,7 +47,6 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
   onResetSize,
   onClose,
   isLoggedIn = true,
-  hasArticleContext = false,
   viewMode = 'chat',
   onToggleViewMode,
   onExpandToWorkspace,
@@ -73,7 +72,7 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
         </p>
       </div>
 
-      {hasArticleContext && onExpandToWorkspace && (
+      {onExpandToWorkspace && (
         <button
           type="button"
           onClick={onExpandToWorkspace}
@@ -85,7 +84,7 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
         </button>
       )}
 
-      {hasArticleContext && onToggleViewMode && (
+      {onToggleViewMode && (
         <button
           type="button"
           onClick={onToggleViewMode}
