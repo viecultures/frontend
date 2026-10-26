@@ -16,6 +16,9 @@ import { ForestSpirit } from './ForestSpirit';
 import { companionKeyframes } from './companionTheme';
 import { useResizableWindow, type WindowSize } from './useResizableWindow';
 import { useMediaQuery } from './useMediaQuery';
+import { useCompanionArticleContext } from './useCompanionArticleContext';
+import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
+import { CompanionLearningTools } from './CompanionLearningTools';
 
 interface CompanionChatDrawerProps {
   isOpen: boolean;
@@ -48,6 +51,11 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const articleContext = useCompanionArticleContext((s) => s.context);
+  const effectiveLessonId = articleContext?.articleId || lessonId;
+  const effectiveLessonTitle = articleContext?.articleTitle || lessonTitle;
+  const [viewMode, setViewMode] = useState<'chat' | 'tools'>('chat');
 
   const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
   const [isPro, setIsPro] = useState<boolean>(() => getIsProUser());
@@ -113,12 +121,20 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
   }, [inputMessage]);
 
   const getInitialGreeting = useCallback((): string => {
-    return lessonTitle
-      ? `Hello! I am your VieCultures Companion. We are currently exploring "${lessonTitle}". Feel free to ask me anything about the culture, history, or language in this lesson!`
-      : `Hello! I am your VieCultures Companion. What Vietnamese tradition, street food, or cultural custom would you love to chat about today?`;
-  }, [lessonTitle]);
+    if (effectiveLessonTitle) {
+      return `Hello! I am your VieCultures Companion. We are currently exploring "${effectiveLessonTitle}". Feel free to ask me anything about the culture, history, or language in this lesson!`;
+    }
+    return `Hello! I am your VieCultures Companion. What Vietnamese tradition, street food, or cultural custom would you love to chat about today?`;
+  }, [effectiveLessonTitle]);
 
   const getDefaultPrompts = useCallback((): string[] => {
+    if (articleContext?.articleTitle) {
+      return [
+        `Help me understand "${articleContext.articleTitle}"`,
+        `Help me express my opinion about "${articleContext.articleTitle}" in English`,
+        `What key vocabulary should I notice in this story?`,
+      ];
+    }
     return lessonTitle
       ? [
           'What is the cultural significance of this lesson?',
@@ -128,7 +144,29 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
           'What makes Northern and Southern Pho different?',
           'Tell me about the most vibrant festivals in Vietnam.',
         ];
-  }, [lessonTitle]);
+  }, [articleContext?.articleTitle, lessonTitle]);
+
+  const handleExpandToWorkspace = () => {
+    if (articleContext?.articleId) {
+      useReaderHandoff.getState().enterFromReader(
+        {
+          articleId: articleContext.articleId,
+          title: articleContext.articleTitle || 'Your reading story',
+          level: articleContext.level || 'Level 2',
+          summary: articleContext.articleSummary,
+          vocabulary: (articleContext.vocabulary || []).map((v) => ({
+            word: v.word,
+            viMeaning: v.viMeaning,
+            contextSentence: v.contextSentence || '',
+          })),
+          readerUrl: articleContext.readerUrl || (window.location.pathname + window.location.search),
+        },
+        inputMessage
+      );
+      navigate(paths.aiWorkspace({ story: articleContext.articleId, level: articleContext.level }));
+      onClose();
+    }
+  };
 
   // Load chat history and quota when drawer opens
   useEffect(() => {
@@ -154,9 +192,8 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       setIsHistoryLoading(true);
       setError(null);
       try {
-        // Fetch history and quota in parallel
         const [history, quota] = await Promise.allSettled([
-          companionService.getChatHistory(lessonId),
+          companionService.getChatHistory(effectiveLessonId),
           companionService.getQuota(),
         ]);
 
@@ -179,7 +216,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
             },
           ];
           setMessages(initialMsgs);
-          await companionService.saveChatHistory(initialMsgs, lessonId);
+          await companionService.saveChatHistory(initialMsgs, effectiveLessonId);
         }
         setSuggestedPrompts(getDefaultPrompts());
       } catch (err) {
@@ -197,12 +234,38 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
     return () => {
       isSubscribed = false;
     };
-  }, [isOpen, user, lessonId, getInitialGreeting, getDefaultPrompts]);
+  }, [isOpen, user, effectiveLessonId, getInitialGreeting, getDefaultPrompts]);
+
+  // Synchronize history updates from external events (e.g. from AI Workspace)
+  useEffect(() => {
+    const handleHistoryUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent<{ lessonId?: string }>;
+      const updatedLessonId = customEvent.detail?.lessonId;
+      if (!updatedLessonId || updatedLessonId === effectiveLessonId) {
+        companionService
+          .getChatHistory(effectiveLessonId)
+          .then((history) => {
+            if (history && history.length > 0) {
+              setMessages(history);
+            }
+          })
+          .catch((err) => {
+            console.error('[CompanionChatDrawer] Failed to reload synced history:', err);
+          });
+      }
+    };
+    window.addEventListener('companion:history-updated', handleHistoryUpdated);
+    return () => {
+      window.removeEventListener('companion:history-updated', handleHistoryUpdated);
+    };
+  }, [effectiveLessonId]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading, isHistoryLoading]);
+    if (viewMode === 'chat') {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isLoading, isHistoryLoading, viewMode]);
 
   const isLimitReached = !isPro && remainingTurns !== null && remainingTurns <= 0;
 
@@ -219,11 +282,6 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
     }
 
     const textToSend = (messageText || inputMessage).trim();
-    console.log('[CompanionChatDrawer] handleSend triggered:', {
-      textToSend,
-      lessonId,
-      language: selectedLanguage,
-    });
     if (!textToSend || isLoading) return;
 
     setError(null);
@@ -242,13 +300,11 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
 
     try {
       const response = await companionService.sendMessage({
-        lessonId,
+        lessonId: effectiveLessonId,
         message: textToSend,
         history: messages,
         language: selectedLanguage,
       });
-
-      console.log('[CompanionChatDrawer] Received response:', response);
 
       const assistantMessage: CompanionChatMessage = {
         id: `msg-${Date.now()}-reply`,
@@ -263,8 +319,10 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       setReferencedLessons(response.referencedLessons || []);
       setRemainingTurns(response.remainingDailyTurns);
 
-      // Persist new history for authenticated user
-      await companionService.saveChatHistory(updatedHistory, lessonId);
+      await companionService.saveChatHistory(updatedHistory, effectiveLessonId);
+      window.dispatchEvent(
+        new CustomEvent('companion:history-updated', { detail: { lessonId: effectiveLessonId } })
+      );
     } catch (err) {
       console.error('[CompanionChatDrawer] Failed to get response:', err);
       const errMessage = err instanceof Error ? err.message : 'Failed to reach AI companion';
@@ -277,7 +335,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
 
       if (errMessage.includes('LIMIT_EXCEEDED') || errMessage.includes('403')) {
         setRemainingTurns(0);
-        setError('Bạn đã sử dụng hết 5 lượt chat miễn phí hôm nay.');
+        setError('Ban da su dung het 5 luot chat mien phi hom nay.');
         return;
       }
 
@@ -320,7 +378,10 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       });
 
       setMessages(updated);
-      await companionService.saveChatHistory(updated, lessonId);
+      await companionService.saveChatHistory(updated, effectiveLessonId);
+      window.dispatchEvent(
+        new CustomEvent('companion:history-updated', { detail: { lessonId: effectiveLessonId } })
+      );
     } catch (err) {
       console.error('[CompanionChatDrawer] Translation action failed:', err);
       setError('Translation failed. Please try again.');
@@ -331,7 +392,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
 
   const handleClearHistory = async () => {
     try {
-      await companionService.clearChatHistory(lessonId);
+      await companionService.clearChatHistory(effectiveLessonId);
       const resetGreeting: CompanionChatMessage[] = [
         {
           id: `msg-${Date.now()}`,
@@ -341,7 +402,10 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         },
       ];
       setMessages(resetGreeting);
-      await companionService.saveChatHistory(resetGreeting, lessonId);
+      await companionService.saveChatHistory(resetGreeting, effectiveLessonId);
+      window.dispatchEvent(
+        new CustomEvent('companion:history-updated', { detail: { lessonId: effectiveLessonId } })
+      );
       setSuggestedPrompts(getDefaultPrompts());
       setReferencedLessons([]);
       setError(null);
@@ -410,7 +474,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       )}
 
       <CompanionChatHeader
-        lessonTitle={lessonTitle}
+        lessonTitle={effectiveLessonTitle}
         language={selectedLanguage}
         onLanguageChange={handleLanguageChange}
         onClearHistory={handleClearHistory}
@@ -418,160 +482,190 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         onResetSize={isMobile ? undefined : resetSize}
         onClose={onClose}
         isLoggedIn={!!user}
+        hasArticleContext={!!articleContext}
+        viewMode={viewMode}
+        onToggleViewMode={() => setViewMode((prev) => (prev === 'chat' ? 'tools' : 'chat'))}
+        onExpandToWorkspace={handleExpandToWorkspace}
       />
 
-      {/* Messages Body */}
-      <div className="vc-scroll relative flex-1 space-y-3 overflow-y-auto bg-[radial-gradient(circle_at_20%_10%,#fdf6e3_0,transparent_45%),radial-gradient(circle_at_90%_80%,#f1f5e6_0,transparent_40%)] px-3.5 py-4">
-        {isHistoryLoading && (
-          <div className="flex items-center justify-center gap-2 py-2 text-xs italic text-[#7a8a66]">
-            <ForestSpirit className="h-5 w-5 vc-spirit-bob" />
-            Gathering our past conversations...
+      {/* Context indicator banner */}
+      {articleContext && (
+        <div className="flex shrink-0 items-center justify-between border-b border-[#dfe5cf] bg-[#f4f7ee] px-3.5 py-1.5 text-[11px] text-[#4a6a44]">
+          <div className="flex items-center gap-1.5 truncate">
+            <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#5d8a45]" />
+            <span className="font-semibold text-[#2f4a2c]">Reading with you:</span>
+            <span className="truncate italic text-[#4a6a44]">{articleContext.articleTitle || 'Your story'}</span>
           </div>
-        )}
-
-        {messages.map((msg, idx) => (
-          <CompanionMessageBubble
-            key={msg.id || idx}
-            message={msg}
-            isTranslating={translatingIndex === idx}
-            translateDisabled={translatingIndex !== null}
-            onTranslate={(target) => handleTranslate(idx, target)}
-          />
-        ))}
-
-        {isLoading && (
-          <div className="vc-msg-in flex items-end gap-2">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#c9d6b0] bg-gradient-to-b from-[#e4f2df] to-[#cfe3b8]">
-              <ForestSpirit className="h-6 w-6" />
-            </span>
-            <div
-              aria-label="Companion is thinking"
-              className="flex items-center gap-1 rounded-[20px] rounded-bl-md border border-[#dfe5cf] bg-white px-4 py-3"
-            >
-              <span className="vc-dot-hop h-1.5 w-1.5 rounded-full bg-[#8a9a6f]" />
-              <span className="vc-dot-hop h-1.5 w-1.5 rounded-full bg-[#8a9a6f] [animation-delay:.15s]" />
-              <span className="vc-dot-hop h-1.5 w-1.5 rounded-full bg-[#8a9a6f] [animation-delay:.3s]" />
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div
-            role="alert"
-            className="flex items-start gap-2 rounded-2xl border border-[#f0c9bc] bg-[#fdf0eb] px-3 py-2.5 text-xs leading-relaxed text-[#8f3f2c]"
-          >
-            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#b4533c]" />
-            <p className="flex-1">{error}</p>
-            <button
-              type="button"
-              onClick={() => setError(null)}
-              className="shrink-0 rounded-full px-1.5 text-[11px] font-semibold hover:bg-white/70"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-
-        {/* Referenced Lessons */}
-        {referencedLessons.length > 0 && (
-          <div className="pt-1">
-            <p className="mb-1.5 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#7a8a66]">
-              Related lessons
-            </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 vc-scroll">
-              {referencedLessons.map((item) => (
-                <a
-                  key={item.id}
-                  href={`/lessons/${item.id}`}
-                  className="min-w-[160px] max-w-[200px] shrink-0 rounded-2xl border border-[#c9d6b0] bg-gradient-to-br from-white to-[#f1f5e6] px-3 py-2 text-xs transition-transform hover:-translate-y-0.5"
-                >
-                  <p className="truncate font-serif font-bold text-[#2f4a2c]">{item.titleEn}</p>
-                  <p className="truncate text-[#7a8a66]">{item.titleVi}</p>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Case 1: Unauthenticated Guest -> Render Login Gate */}
-      {!user ? (
-        <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-4 py-4 text-center">
-          <p className="mb-1 font-serif text-[15px] font-bold text-[#2f4a2c]">
-            Yêu cầu đăng nhập
-          </p>
-          <p className="mb-3 text-xs leading-relaxed text-[#627750]">
-            Đăng nhập vào tài khoản VieCultures để trò chuyện và lưu lại lịch sử với AI Companion.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              const redirectPath = location.pathname + location.search;
-              navigate(paths.login({ redirect: redirectPath }));
-            }}
-            className="inline-flex items-center justify-center rounded-full bg-[#5d8a45] px-5 py-2 text-xs font-bold text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none"
-          >
-            Đăng nhập để chat
-          </button>
         </div>
-      ) : isLimitReached ? (
-        /* Case 2: Hit Limit -> Render Upgrade Gate */
-        <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-4 py-4 text-center">
-          <p className="mb-1 font-serif text-[15px] font-bold text-[#8f3f2c]">
-            Hết lượt trò chuyện hôm nay
-          </p>
-          <p className="mb-3 text-xs leading-relaxed text-[#7a8a66]">
-            Bạn đã sử dụng hết 5 lượt chat miễn phí hôm nay. Nâng cấp tài khoản Pro để trò chuyện không giới hạn!
-          </p>
-          <button
-            type="button"
-            onClick={() => navigate(PATHS.pricing)}
-            className="inline-flex items-center justify-center rounded-full bg-[#b4533c] px-5 py-2 text-xs font-bold text-white shadow-[0_3px_0_-1px_#7a2a1a] transition-all hover:bg-[#9a4330] active:translate-y-px active:shadow-none"
-          >
-            Nâng cấp tài khoản
-          </button>
-        </div>
+      )}
+
+      {viewMode === 'tools' ? (
+        <CompanionLearningTools
+          articleTitle={effectiveLessonTitle}
+          vocabulary={articleContext?.vocabulary}
+          onDraftPrompt={(prompt) => {
+            setViewMode('chat');
+            setInputMessage(prompt);
+            inputRef.current?.focus();
+          }}
+          onOpenVocabulary={articleContext?.onOpenVocabulary}
+        />
       ) : (
-        /* Case 3: Authenticated with quota remaining -> Show Quick Prompts & Composer */
         <>
-          {suggestedPrompts.length > 0 && !isLoading && (
-            <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-3 pt-2">
-              <CompanionQuickPrompts
-                prompts={suggestedPrompts}
-                onSelectPrompt={(p) => handleSend(p)}
-                disabled={isLoading}
-              />
-            </div>
-          )}
+          {/* Messages Body */}
+          <div className="vc-scroll relative flex-1 space-y-3 overflow-y-auto bg-[radial-gradient(circle_at_20%_10%,#fdf6e3_0,transparent_45%),radial-gradient(circle_at_90%_80%,#f1f5e6_0,transparent_40%)] px-3.5 py-4">
+            {isHistoryLoading && (
+              <div className="flex items-center justify-center gap-2 py-2 text-xs italic text-[#7a8a66]">
+                <ForestSpirit className="h-5 w-5 vc-spirit-bob" />
+                Gathering our past conversations...
+              </div>
+            )}
 
-          <div className="shrink-0 bg-[#fffaf0] px-3 pt-1 pb-3">
-            <div className="flex items-end gap-2 rounded-[22px] border-2 border-[#d6dcc4] bg-white py-1.5 pr-1.5 pl-3.5 transition-colors focus-within:border-[#8a9a6f]">
-              <textarea
-                ref={inputRef}
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={isLoading}
-                rows={1}
-                placeholder="Ask about Vietnamese culture..."
-                className="max-h-[120px] flex-1 resize-none bg-transparent py-1.5 text-[13.5px] text-[#2f3a2a] placeholder:text-[#a3ad90] focus:outline-none disabled:opacity-60"
+            {messages.map((msg, idx) => (
+              <CompanionMessageBubble
+                key={msg.id || idx}
+                message={msg}
+                isTranslating={translatingIndex === idx}
+                translateDisabled={translatingIndex !== null}
+                onTranslate={(target) => handleTranslate(idx, target)}
               />
+            ))}
+
+            {isLoading && (
+              <div className="vc-msg-in flex items-end gap-2">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#c9d6b0] bg-gradient-to-b from-[#e4f2df] to-[#cfe3b8]">
+                  <ForestSpirit className="h-6 w-6" />
+                </span>
+                <div
+                  aria-label="Companion is thinking"
+                  className="flex items-center gap-1 rounded-[20px] rounded-bl-md border border-[#dfe5cf] bg-white px-4 py-3"
+                >
+                  <span className="vc-dot-hop h-1.5 w-1.5 rounded-full bg-[#8a9a6f]" />
+                  <span className="vc-dot-hop h-1.5 w-1.5 rounded-full bg-[#8a9a6f] [animation-delay:.15s]" />
+                  <span className="vc-dot-hop h-1.5 w-1.5 rounded-full bg-[#8a9a6f] [animation-delay:.3s]" />
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 rounded-2xl border border-[#f0c9bc] bg-[#fdf0eb] px-3 py-2.5 text-xs leading-relaxed text-[#8f3f2c]"
+              >
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#b4533c]" />
+                <p className="flex-1">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => setError(null)}
+                  className="shrink-0 rounded-full px-1.5 text-[11px] font-semibold hover:bg-white/70"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
+            {/* Referenced Lessons */}
+            {referencedLessons.length > 0 && (
+              <div className="pt-1">
+                <p className="mb-1.5 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#7a8a66]">
+                  Related lessons
+                </p>
+                <div className="flex gap-2 overflow-x-auto pb-1 vc-scroll">
+                  {referencedLessons.map((item) => (
+                    <a
+                      key={item.id}
+                      href={`/lessons/${item.id}`}
+                      className="min-w-[160px] max-w-[200px] shrink-0 rounded-2xl border border-[#c9d6b0] bg-gradient-to-br from-white to-[#f1f5e6] px-3 py-2 text-xs transition-transform hover:-translate-y-0.5"
+                    >
+                      <p className="truncate font-serif font-bold text-[#2f4a2c]">{item.titleEn}</p>
+                      <p className="truncate text-[#7a8a66]">{item.titleVi}</p>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Case 1: Unauthenticated Guest -> Render Login Gate */}
+          {!user ? (
+            <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-4 py-4 text-center">
+              <p className="mb-1 font-serif text-[15px] font-bold text-[#2f4a2c]">
+                Yêu cầu đăng nhập
+              </p>
+              <p className="mb-3 text-xs leading-relaxed text-[#627750]">
+                Đăng nhập vào tài khoản VieCultures để trò chuyện và lưu lại lịch sử với AI Companion.
+              </p>
               <button
                 type="button"
-                onClick={() => handleSend()}
-                disabled={isLoading || !inputMessage.trim()}
-                aria-label="Send message"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#5d8a45] text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none disabled:cursor-not-allowed disabled:bg-[#c9d6b0] disabled:shadow-none"
+                onClick={() => {
+                  const redirectPath = location.pathname + location.search;
+                  navigate(paths.login({ redirect: redirectPath }));
+                }}
+                className="inline-flex items-center justify-center rounded-full bg-[#5d8a45] px-5 py-2 text-xs font-bold text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none"
               >
-                <SendHorizontal className="h-4 w-4" />
+                Đăng nhập để chat
               </button>
             </div>
-            <p className="mt-1 text-center text-[10px] text-[#a3ad90]">
-              Enter to send, Shift + Enter for a new line
-            </p>
-          </div>
+          ) : isLimitReached ? (
+            /* Case 2: Hit Limit -> Render Upgrade Gate */
+            <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-4 py-4 text-center">
+              <p className="mb-1 font-serif text-[15px] font-bold text-[#8f3f2c]">
+                Hết lượt trò chuyện hôm nay
+              </p>
+              <p className="mb-3 text-xs leading-relaxed text-[#7a8a66]">
+                Bạn đã sử dụng hết 5 lượt chat miễn phí hôm nay. Nâng cấp tài khoản Pro để trò chuyện không giới hạn!
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate(PATHS.pricing)}
+                className="inline-flex items-center justify-center rounded-full bg-[#b4533c] px-5 py-2 text-xs font-bold text-white shadow-[0_3px_0_-1px_#7a2a1a] transition-all hover:bg-[#9a4330] active:translate-y-px active:shadow-none"
+              >
+                Nâng cấp tài khoản
+              </button>
+            </div>
+          ) : (
+            /* Case 3: Authenticated with quota remaining -> Show Quick Prompts & Composer */
+            <>
+              {suggestedPrompts.length > 0 && !isLoading && (
+                <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-3 pt-2">
+                  <CompanionQuickPrompts
+                    prompts={suggestedPrompts}
+                    onSelectPrompt={(p) => handleSend(p)}
+                    disabled={isLoading}
+                  />
+                </div>
+              )}
+
+              <div className="shrink-0 bg-[#fffaf0] px-3 pt-1 pb-3">
+                <div className="flex items-end gap-2 rounded-[22px] border-2 border-[#d6dcc4] bg-white py-1.5 pr-1.5 pl-3.5 transition-colors focus-within:border-[#8a9a6f]">
+                  <textarea
+                    ref={inputRef}
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    disabled={isLoading}
+                    rows={1}
+                    placeholder="Ask about Vietnamese culture..."
+                    className="max-h-[120px] flex-1 resize-none bg-transparent py-1.5 text-[13.5px] text-[#2f3a2a] placeholder:text-[#a3ad90] focus:outline-none disabled:opacity-60"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSend()}
+                    disabled={isLoading || !inputMessage.trim()}
+                    aria-label="Send message"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#5d8a45] text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none disabled:cursor-not-allowed disabled:bg-[#c9d6b0] disabled:shadow-none"
+                  >
+                    <SendHorizontal className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="mt-1 text-center text-[10px] text-[#a3ad90]">
+                  Enter to send, Shift + Enter for a new line
+                </p>
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

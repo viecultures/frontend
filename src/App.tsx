@@ -230,16 +230,20 @@ export const App: React.FC = () => {
         <SettingsModal />
         <PwaInstallBanner />
 
-        {/* AI Cultural Companion Floating Drawer & Launcher */}
-        <CompanionFloatingButton
-          isOpen={isCompanionOpen}
-          onClick={() => setIsCompanionOpen((prev) => !prev)}
-        />
-        <CompanionChatDrawer
-          isOpen={isCompanionOpen}
-          onClose={() => setIsCompanionOpen(false)}
-          lessonId={currentLessonId}
-        />
+        {/* AI Cultural Companion Floating Drawer & Launcher (Hidden in /ai-workspace) */}
+        {!location.pathname.startsWith(PATHS.aiWorkspace) && (
+          <>
+            <CompanionFloatingButton
+              isOpen={isCompanionOpen}
+              onClick={() => setIsCompanionOpen((prev) => !prev)}
+            />
+            <CompanionChatDrawer
+              isOpen={isCompanionOpen}
+              onClose={() => setIsCompanionOpen(false)}
+              lessonId={currentLessonId}
+            />
+          </>
+        )}
       </div>
   );
 

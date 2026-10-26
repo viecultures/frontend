@@ -10,9 +10,9 @@ import {
   ReaderVocabDrawer,
   ReaderRecommendedSection,
   VoiceCustomizerModal,
-  FloatingAiCompanionWidget,
   StickyAudioPlayer,
 } from "../components";
+import { useCompanionArticleContext } from "@/features/companion/useCompanionArticleContext";
 import { Footer } from "@/components/Footer";
 import {
   VOCAB_DATABASE,
@@ -577,19 +577,7 @@ export default function ReaderPage() {
         themeMode={themeMode}
       />
 
-      {/* Floating AI Companion Chatbot at bottom-right corner */}
-      {loadedKey === requestedKey && !articleError && <FloatingAiCompanionWidget
-        key={`${articleData?.id || targetId}-${selectedLevel}`}
-        articleTitle={articleData?.titleEn || "Tết: Renewal, Remembrance & Regional Flavours"}
-        articleId={articleData?.id || targetId || 'tet-holiday'}
-        articleSummary={articleData?.summary || articleData?.paragraphs[0]?.enText}
-        level={selectedLevel}
-        vocabulary={articleData ? articleData.vocabularies : Object.values(VOCAB_DATABASE)}
-        onOpenVocabulary={() => setIsVocabDrawerOpen(true)}
-        themeMode={themeMode}
-      />}
-
-      {/* Ceremonial Cultural Red Seal (Mộc Son Đỏ) Modal */}
+            {/* Ceremonial Cultural Red Seal (Mộc Son Đỏ) Modal */}
       <MocSonSealModal
         isOpen={isSealModalOpen}
         onClose={() => setIsSealModalOpen(false)}

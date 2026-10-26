@@ -1,5 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Maximize2, LayoutGrid } from 'lucide-react';
 import type { CompanionLanguage } from '@/types/companion';
 import { ForestSpirit } from './ForestSpirit';
 import { CompanionSettingsMenu } from './CompanionSettingsMenu';
@@ -13,6 +13,10 @@ interface CompanionChatHeaderProps {
   onResetSize?: () => void;
   onClose: () => void;
   isLoggedIn?: boolean;
+  hasArticleContext?: boolean;
+  viewMode?: 'chat' | 'tools';
+  onToggleViewMode?: () => void;
+  onExpandToWorkspace?: () => void;
 }
 
 const LANGUAGE_BADGE: Record<CompanionLanguage, string> = {
@@ -43,16 +47,20 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
   onResetSize,
   onClose,
   isLoggedIn = true,
+  hasArticleContext = false,
+  viewMode = 'chat',
+  onToggleViewMode,
+  onExpandToWorkspace,
 }) => (
   <div className="relative shrink-0 border-b-2 border-[#8a9a6f]">
     <MeadowBackdrop />
-    <div className="relative flex items-center gap-2.5 px-3.5 pt-3 pb-4">
-      <span className="vc-spirit-bob flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#8a9a6f] bg-[#fffaf0]/90 shadow-[0_3px_0_-1px_#c9d6b0]">
-        <ForestSpirit className="h-9 w-9" />
+    <div className="relative flex items-center gap-2 px-3 pt-3 pb-4">
+      <span className="vc-spirit-bob flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-[#8a9a6f] bg-[#fffaf0]/90 shadow-[0_3px_0_-1px_#c9d6b0]">
+        <ForestSpirit className="h-8 w-8" />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <h2 className="truncate font-serif text-[16px] font-bold italic leading-tight text-[#2f4a2c]">
+          <h2 className="truncate font-serif text-[15px] font-bold italic leading-tight text-[#2f4a2c]">
             Cultural Companion
           </h2>
           <span className="shrink-0 rounded-full bg-white/70 px-1.5 py-px text-[9px] font-bold tracking-wider text-[#5d8a45]">
@@ -64,6 +72,35 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
           <span className="truncate">{lessonTitle ? `Exploring: ${lessonTitle}` : 'Ask me about Vietnamese culture'}</span>
         </p>
       </div>
+
+      {hasArticleContext && onExpandToWorkspace && (
+        <button
+          type="button"
+          onClick={onExpandToWorkspace}
+          aria-label="Maximize to AI Workspace"
+          title="Open in AI Workspace"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/50 text-[#3e5a3a] transition-colors hover:bg-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8a9a6f]"
+        >
+          <Maximize2 className="h-4 w-4" strokeWidth={2.2} />
+        </button>
+      )}
+
+      {hasArticleContext && onToggleViewMode && (
+        <button
+          type="button"
+          onClick={onToggleViewMode}
+          aria-label={viewMode === 'tools' ? 'Switch to Chat' : 'Switch to Learning Tools'}
+          title={viewMode === 'tools' ? 'Switch to Chat' : 'Learning Tools'}
+          className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8a9a6f] ${
+            viewMode === 'tools'
+              ? 'bg-[#5d8a45] text-white shadow-[0_2px_0_-1px_#3e5a3a]'
+              : 'bg-white/50 text-[#3e5a3a] hover:bg-white/80'
+          }`}
+        >
+          <LayoutGrid className="h-4 w-4" strokeWidth={2.2} />
+        </button>
+      )}
+
       <CompanionSettingsMenu
         language={language}
         onLanguageChange={onLanguageChange}

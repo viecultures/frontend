@@ -5,7 +5,8 @@ import type { AudioState, ConversationAudioPort } from './conversation-audio';
 import { buildResumeHistory } from './conversation-history';
 import { useLogStore } from './conversation-state';
 import { PROFICIENCY_LEVELS } from './prompt-scaffolder';
-import type { CulturalTutorMode } from './state';
+import { useSettings, type CulturalTutorMode } from './state';
+import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 import { useChatWorkspace } from './chat-workspace';
 import { companionService } from '@/services/companionService';
 
@@ -271,7 +272,12 @@ export class SessionController {
             historyCount: historyForCompanion.length,
           });
 
+          const targetLessonId =
+            useReaderHandoff.getState().context?.articleId ||
+            useSettings.getState().activeLessonId;
+
           const companionRes = await companionService.sendMessage({
+            lessonId: targetLessonId,
             message: text,
             history: historyForCompanion,
           });

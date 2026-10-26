@@ -27,6 +27,10 @@ import { ReaderWorkspaceReference } from '../ReaderWorkspaceReference';
 import { AiWorkspaceWelcome } from '../AiWorkspaceWelcome';
 import { AiWorkspaceChatHeader } from '../AiWorkspaceChatHeader';
 import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
+import { useSearchParams } from 'react-router-dom';
+import { companionService } from '@/services/companionService';
+import type { CompanionChatMessage } from '@/types/companion';
+
 
 export interface VieCultureArticleItem {
   id: string;
@@ -139,6 +143,79 @@ export default function StreamingConsole() {
     scrollRef, selectedWord, wordPosition, closeSelection, handlePointerDown,
     handleTextSelection, handleScroll, hasNewMessages, scrollToLatest, renderedTurn,
   } = useTimelineSelection(turns, active, sessionId);
+
+  const [searchParams] = useSearchParams();
+  const storyParam = searchParams.get('story');
+  const targetLessonId = storyParam || readerContext?.articleId || activeLessonId;
+
+  // Hydrate chat history from backend companionService on entering AI Workspace
+  const isHydratedRef = React.useRef(false);
+  React.useEffect(() => {
+    let isCancelled = false;
+    const hydrateHistory = async () => {
+      try {
+        const history = await companionService.getChatHistory(targetLessonId);
+        if (isCancelled || !history || history.length === 0) return;
+        const currentTurns = useLogStore.getState().turns;
+        if (currentTurns.length === 0) {
+          history.forEach((msg) => {
+            useLogStore.getState().addTurn({
+              id: msg.id || (msg.timestamp ? `hist-${msg.timestamp}` : `hist-${Date.now()}`),
+              role: msg.role === 'assistant' ? 'agent' : 'user',
+              text: msg.content,
+              isFinal: true,
+              source: 'text',
+              timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+            });
+          });
+        }
+      } catch (err) {
+        console.error('[StreamingConsole] Failed to hydrate companion history:', err);
+      } finally {
+        if (!isCancelled) {
+          isHydratedRef.current = true;
+        }
+      }
+    };
+
+    hydrateHistory();
+    return () => {
+      isCancelled = true;
+    };
+  }, [targetLessonId]);
+
+  // Synchronize new user or agent turns in AI Workspace back to companionService backend
+  const lastSavedTurnCountRef = React.useRef(0);
+  React.useEffect(() => {
+    if (!isHydratedRef.current) return;
+    const completedDialogue = turns.filter(
+      (t) => (t.role === 'user' || t.role === 'agent') && t.text.trim() && t.isFinal
+    );
+
+    if (completedDialogue.length === 0 || completedDialogue.length === lastSavedTurnCountRef.current) {
+      return;
+    }
+    lastSavedTurnCountRef.current = completedDialogue.length;
+
+    const companionHistory: CompanionChatMessage[] = completedDialogue.map((t) => ({
+      id: t.id,
+      role: t.role === 'agent' ? 'assistant' : 'user',
+      content: t.text,
+      timestamp: t.timestamp ? new Date(t.timestamp).getTime() : Date.now(),
+    }));
+
+    companionService
+      .saveChatHistory(companionHistory, targetLessonId)
+      .then(() => {
+        window.dispatchEvent(
+          new CustomEvent('companion:history-updated', { detail: { lessonId: targetLessonId } })
+        );
+      })
+      .catch((err) => {
+        console.error('[StreamingConsole] Failed to sync turn history to backend:', err);
+      });
+  }, [turns, targetLessonId]);
+
   const activeLesson: LessonAgentMetadata =
     findLessonById(activeLessonId) || LESSON_AGENT_CATALOG[0];
   const displayedTurns = showSystemMessages ? turns : turns.filter(turn => turn.role !== 'system');
