@@ -47,37 +47,6 @@
 .owl-mascot[data-state=sleeping] .owl-mascot__body{
   animation:owl-sleep 3.6s ease-in-out infinite
 }
-.owl-mascot__sparkles{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  color:#b9973f
-}
-.owl-mascot__sparkles svg{
-  position:absolute;
-  width:22px;
-  height:22px;
-  animation:owl-sparkle 1.4s ease-in-out infinite
-}
-.owl-mascot__sparkles svg:nth-child(1){
-  left:6%;
-  top:34%
-}
-.owl-mascot__sparkles svg:nth-child(2){
-  right:8%;
-  top:17%;
-  animation-delay:.2s
-}
-.owl-mascot__sparkles svg:nth-child(3){
-  right:0;
-  top:55%;
-  animation-delay:.6s
-}
-.owl-mascot__sparkles svg:nth-child(4){
-  left:15%;
-  top:9%;
-  animation-delay:.9s
-}
 .owl-mascot__voice{
   position:absolute;
   right:4%;
@@ -129,16 +98,6 @@
   }
   80%{
     transform:translateY(2px) rotate(1deg)
-  }
-}
-@keyframes owl-sparkle{
-  0%,100%{
-    transform:scale(.6) rotate(-12deg);
-    opacity:.2
-  }
-  50%{
-    transform:scale(1.1) rotate(12deg);
-    opacity:1
   }
 }
 @keyframes owl-voice{

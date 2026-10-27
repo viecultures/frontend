@@ -25,18 +25,18 @@ export interface IslandItem {
 }
 
 export const VIETNAM_MAP_DIMENSIONS = {
-  width: 520,
+  width: 850,
   height: 1100,
-  viewBox: "0 0 520 1100"
+  viewBox: "0 0 850 1100"
 };
 
 export const VIETNAM_REGION_VIEWBOXES = {
   "all": {
     "minX": 0,
     "minY": 0,
-    "width": 520,
+    "width": 850,
     "height": 1100,
-    "viewBox": "0 0 520 1100"
+    "viewBox": "0 0 850 1100"
   },
   "north": {
     "minX": 24.4,
@@ -48,16 +48,16 @@ export const VIETNAM_REGION_VIEWBOXES = {
   "central": {
     "minX": 126,
     "minY": 208.7,
-    "width": 543.2,
-    "height": 656.8,
-    "viewBox": "126.0 208.7 543.2 656.8"
+    "width": 724.0,
+    "height": 680.0,
+    "viewBox": "126.0 208.7 724.0 680.0"
   },
   "south": {
-    "minX": 101.7,
+    "minX": 80.0,
     "minY": 722.1,
-    "width": 277.7,
-    "height": 267.9,
-    "viewBox": "101.7 722.1 277.7 267.9"
+    "width": 770.0,
+    "height": 360.0,
+    "viewBox": "80.0 722.1 770.0 360.0"
   }
 };
 
@@ -65,25 +65,34 @@ export const VIETNAM_ISLANDS: IslandItem[] = [
   {
     id: "hoang-sa",
     name: "Quần đảo Hoàng Sa",
-    code: "QĐ. HOÀNG SA (ĐN)",
-    x: 621.2,
-    y: 485.1,
+    code: "QĐ. HOÀNG SA (VIỆT NAM)",
+    x: 628,
+    y: 476,
     points: [
-      { cx: 621.2, cy: 477.1, r: 5 },
-      { cx: 633.2, cy: 485.1, r: 3.5 },
-      { cx: 611.2, cy: 491.1, r: 3 }
+      { cx: 622, cy: 468, r: 5.5 },
+      { cx: 642, cy: 474, r: 4.5 },
+      { cx: 614, cy: 482, r: 4 },
+      { cx: 630, cy: 488, r: 3.8 },
+      { cx: 648, cy: 462, r: 3.5 },
+      { cx: 654, cy: 484, r: 3.5 },
+      { cx: 620, cy: 494, r: 3.2 }
     ]
   },
   {
     id: "truong-sa",
     name: "Quần đảo Trường Sa",
-    code: "QĐ. TRƯỜNG SA (KH)",
-    x: 750.4,
-    y: 883.5,
+    code: "QĐ. TRƯỜNG SA (VIỆT NAM)",
+    x: 738,
+    y: 870,
     points: [
-      { cx: 750.4, cy: 875.5, r: 5 },
-      { cx: 764.4, cy: 887.5, r: 3.5 },
-      { cx: 742.4, cy: 893.5, r: 3 }
+      { cx: 728, cy: 864, r: 5.5 },
+      { cx: 752, cy: 856, r: 4.8 },
+      { cx: 714, cy: 878, r: 4.5 },
+      { cx: 742, cy: 888, r: 4.2 },
+      { cx: 764, cy: 874, r: 3.8 },
+      { cx: 726, cy: 902, r: 3.8 },
+      { cx: 748, cy: 914, r: 3.5 },
+      { cx: 768, cy: 896, r: 3.2 }
     ]
   }
 ];
@@ -181,8 +190,8 @@ export const VIETNAM_34_PROVINCES: ProvinceMapItem[] = [
     "id": "lam-dong",
     "name": "Lâm Đồng",
     "slug": "lam-dong",
-    "region": "central",
-    "regionName": "Miền Trung",
+    "region": "south",
+    "regionName": "Miền Nam",
     "mergeInfo": "Sáp nhập: Lâm Đồng + Đắk Nông + Bình Thuận",
     "cx": 385.4,
     "cy": 776.5,

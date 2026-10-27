@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookMarked, Search, Volume2, ArrowRight, Sparkles, BookmarkCheck } from 'lucide-react';
+import { BookMarked, Search, Volume2, ArrowRight, BookmarkCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { VOCAB_DATABASE, type VocabItem } from '@/data/readerData';
@@ -60,7 +60,7 @@ export const SavedVocabQuickView: React.FC = () => {
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                <Sparkles aria-hidden="true" className="w-3 h-3" />
+                <BookMarked aria-hidden="true" className="w-3 h-3" />
                 <span>Sample vocabulary · save words while reading to build your notebook</span>
               </span>
             )}

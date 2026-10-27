@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bot, MessageSquare, Settings, Sparkles } from 'lucide-react';
+import { Search, Bot, MessageSquare, Settings } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
 import { PATHS } from '@/routes/paths';
 
@@ -37,7 +37,7 @@ export const HomeFloatingSidebar: React.FC<HomeFloatingSidebarProps> = ({
         title="AI Playground"
         aria-label="AI Playground"
       >
-        <Sparkles className="w-5 h-5 text-action group-hover:text-action transition-colors" />
+        <MessageSquare className="w-5 h-5 text-action group-hover:text-action transition-colors" />
         <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-heritage-forest/95 text-warm-ivory text-xs font-semibold rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity shadow-lg border border-white/10">
           AI Playground
         </span>

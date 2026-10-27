@@ -143,7 +143,7 @@ export const INITIAL_SHOP_ITEMS: HeritageShopItem[] = [
     cost: 250,
     tag: 'Trang Trí',
     category: 'theme',
-    iconName: 'Sparkles',
+    iconName: 'Lightbulb',
   },
   {
     id: 'streak-freeze',

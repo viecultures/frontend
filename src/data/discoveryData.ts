@@ -149,7 +149,7 @@ export const TET_RENEWAL_LESSON: Lesson = {
   vocabCount: 12,
   summary: "A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions.",
   gradient: "from-rose-800 via-red-900 to-neutral-950",
-  iconSymbol: "Sparkles",
+  iconSymbol: "BookOpen",
   imageUrl: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=800&q=80",
   featured: true,
   dateAdded: "2026-04-30",
@@ -249,7 +249,7 @@ export const LESSONS_DATA: Lesson[] = [
     summary:
       "Discover antiphonal vocal duets, nón quai thao hats, and cultural hospitality of traditional village singing festivals.",
     gradient: "from-[#7A4B7A] via-[#5C325C] to-[#3B1C3B]",
-    iconSymbol: "Sparkles",
+    iconSymbol: "BookOpen",
     imageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-25",
     provinceId: "bac-ninh",
@@ -594,7 +594,7 @@ export const LESSONS_DATA: Lesson[] = [
     summary:
       "Step into the flooded rice paddies of Northern Vietnam to discover a unique thousand-year-old performing art and folk mythology.",
     gradient: "from-horizon-blue via-[#75B2C0] to-[#488E9E]",
-    iconSymbol: "Sparkles",
+    iconSymbol: "BookOpen",
     imageUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-03-01",
     provinceId: "ha-noi",
@@ -617,7 +617,7 @@ export const LESSONS_DATA: Lesson[] = [
     summary:
       "Revisit King Le Loi's mythical sword and the sacred turtle of Hanoi in accessible Level 1 English tailored for foundational learners.",
     gradient: "from-lotus-pink via-[#C88A84] to-[#995852]",
-    iconSymbol: "Sparkles",
+    iconSymbol: "BookOpen",
     imageUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80",
     dateAdded: "2026-02-28",
     provinceId: "ha-noi",

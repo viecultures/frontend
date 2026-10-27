@@ -3,13 +3,12 @@
  *
  * One-click cultural conversation starter drawer for Playground Screen #03.
  * Provides curated discussion topics for Vietnamese cultural heritage, cuisine, geography, and legends.
- * - Strict UI Iconography Rule: 100% Lucide React SVG icons (Compass, Sparkles, BookOpen, Utensils, Globe, Mountain).
+ * - Topic controls use Lucide icons for geography, reading, food, and nature.
  */
 
 import React, { useState } from 'react';
 import {
   Compass,
-  Sparkles,
   BookOpen,
   Utensils,
   Globe,
@@ -129,7 +128,7 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
         title="Gợi ý chủ đề khám phá văn hóa"
         aria-expanded={isOpen}
       >
-        <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
+        <Compass className="w-3.5 h-3.5 text-antique-gold" />
         <span>Gợi ý chủ đề</span>
         <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>

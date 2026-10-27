@@ -198,7 +198,7 @@ export const INITIAL_BADGES: UserBadge[] = [
     title: 'Kho Báu Bách Từ',
     subtitle: 'Nắm vững 100 từ vựng chuyên sâu về văn hóa Việt Nam',
     category: 'vocab',
-    iconName: 'Sparkles',
+    iconName: 'Lightbulb',
     currentProgress: 40,
     maxProgress: 100,
     isUnlocked: false,

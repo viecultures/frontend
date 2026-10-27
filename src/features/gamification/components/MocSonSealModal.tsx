@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Award,
   Flame,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   CheckCircle2,
@@ -232,7 +231,7 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
 
               {/* Sparkle badge */}
               <div className="absolute -top-1 -right-1 bg-amber-400 text-stone-900 rounded-full p-1 shadow-md animate-bounce">
-                <Sparkles className="w-4 h-4" />
+                <Award className="w-4 h-4" />
               </div>
             </div>
           ) : (

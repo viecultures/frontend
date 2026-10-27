@@ -7,7 +7,6 @@ import {
   BookmarkCheck,
   ArrowRight,
   Layers,
-  Sparkles,
 } from 'lucide-react';
 import {
   type Lesson,
@@ -101,7 +100,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-heritage-green text-antique-gold">
-                    <Sparkles className="w-10 h-10" />
+                    <BookOpen className="w-10 h-10" />
                   </div>
                 )}
                 {/* Subtle vignette gradient overlay */}
@@ -115,7 +114,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                     </span>
                     {lesson.isFromDatabase && (
                       <span className="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-emerald-600/90 text-warm-ivory border border-white/25 backdrop-blur-md shadow-xs flex items-center gap-1">
-                        <Sparkles className="w-2.5 h-2.5 text-antique-gold" />
+                        <BookOpen className="w-2.5 h-2.5 text-antique-gold" />
                         <span>Database</span>
                       </span>
                     )}
@@ -238,7 +237,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                     loading="lazy"
                   />
                 ) : (
-                  <Sparkles className="w-6 h-6 text-antique-gold" />
+                  <BookOpen className="w-6 h-6 text-antique-gold" />
                 )}
               </div>
               <div className="space-y-1">
@@ -269,7 +268,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   </span>
                   {lesson.isFromDatabase && (
                     <span className="text-[10px] font-bold text-warm-ivory bg-emerald-600 px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
-                      <Sparkles className="w-2.5 h-2.5 text-antique-gold" />
+                      <BookOpen className="w-2.5 h-2.5 text-antique-gold" />
                       <span>Database</span>
                     </span>
                   )}

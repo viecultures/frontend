@@ -8,7 +8,6 @@ import {
   ArrowRight,
   ArrowLeft,
   RotateCcw,
-  Sparkles,
   Trophy,
   Lightbulb,
 } from 'lucide-react';

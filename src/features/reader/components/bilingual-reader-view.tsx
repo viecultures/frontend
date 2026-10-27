@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
 import Link from "@/components/Link";
 
-import { CheckCircle2, Headphones, PenTool, ChevronLeft, ChevronRight, RefreshCw, Sparkles, BookOpen, Award } from "lucide-react";
+import { CheckCircle2, Headphones, PenTool, ChevronLeft, ChevronRight, RefreshCw, BookOpen, Award } from "lucide-react";
 import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
 import { paths } from "@/routes/paths";
 
@@ -201,7 +201,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
         <p role="note" className={`reader-lookup-tip text-[11px] font-medium flex items-center gap-1.5 ${isDark ? "text-sky-mist" : "text-heritage-green/80"
           }`}>
-          <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
+          <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
           <span>Bôi đen từ hoặc chọn từ vựng để tra nghĩa & lưu ngữ cảnh.</span>
         </p>
       </div>
@@ -302,7 +302,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           {articleData?.questions && articleData.questions.length > 0 ? (
             <>
               <div className="mb-6 pb-4 border-b border-antique-gold/20">
-                <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
+                <span className="text-sm font-semibold text-antique-gold">
                   Reading check ({articleData.questions.length} questions)
                 </span>
                 <h2
@@ -340,11 +340,11 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                         {dynamicSubmitted && (
                           isCorrect ? (
                             <span className="text-xs font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/70 dark:text-emerald-300 px-2.5 py-0.5 rounded-full shrink-0 border border-emerald-500/30">
-                              Correct ✓
+                              Correct
                             </span>
                           ) : (
                             <span className="text-xs font-bold text-rose-700 bg-rose-100 dark:bg-rose-950/70 dark:text-rose-300 px-2.5 py-0.5 rounded-full shrink-0 border border-rose-500/30">
-                              Incorrect ✗
+                              Incorrect
                             </span>
                           )
                         )}
@@ -382,7 +382,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
 
                       {dynamicSubmitted && q.explanation && (
                         <p className="mt-3 text-xs italic text-antique-gold dark:text-mist-cloud/90 bg-heritage-green/10 dark:bg-black/20 p-3 rounded-xl border border-antique-gold/20">
-                          💡 <strong>Cultural context:</strong> {q.explanation}
+                           <strong>Cultural context:</strong> {q.explanation}
                         </p>
                       )}
                     </div>
@@ -428,7 +428,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           ) : (
             <>
               <div className="mb-6 pb-4 border-b border-antique-gold/20">
-                <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
+                <span className="text-sm font-semibold text-antique-gold">
                   Reading check ({READER_QUIZ_QUESTIONS.length} questions)
                 </span>
                 <h2
@@ -502,7 +502,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
         <div className="reader-practice-actions lg:col-span-5 flex flex-col justify-between">
           <div>
             <div className="mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
+              <span className="text-sm font-semibold text-antique-gold">
                 Next steps
               </span>
               <h3

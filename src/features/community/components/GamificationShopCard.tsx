@@ -1,5 +1,5 @@
 import { communityLabel } from "../community-copy";
-import { ShoppingBag, Coins, Headphones, Palette, Medal, Sparkles, Check } from "lucide-react";
+import { ShoppingBag, Coins, Headphones, Palette, Medal, Check } from "lucide-react";
 
 interface GamificationShopCardProps {
   userCoins: number;

@@ -1,7 +1,7 @@
 import '../profile-ui.css';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Award, BookMarked, Crown, Sparkles, Check, ArrowLeft } from 'lucide-react';
+import { Award, BookMarked, Crown, Check, ArrowLeft } from 'lucide-react';
 import {
   ProfileHeaderCard,
   LearningStatsGrid,
@@ -198,7 +198,7 @@ export const ProfilePage: React.FC = () => {
                 : 'text-stone-600 dark:text-stone-300 hover:bg-rice-paper dark:hover:bg-white/5'
             }`}
           >
-            <Sparkles aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+            <Award aria-hidden="true" className="w-4 h-4 text-antique-gold" />
             <span>Badges & milestones ({badges.filter((b) => b.isUnlocked).length}/{badges.length})</span>
           </button>
 

@@ -28,7 +28,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
   onSelectRegion,
   onSelectLandmark,
   className = '',
-  showControls = true,
+  showControls = false,
   showRegionTabs = true,
   showPoiPins = true,
   showSeaLayer = true,
@@ -39,6 +39,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
   showTooltip = false,
   markers = [],
   onSelectMarker,
+  customViewBox,
   children,
 }) => {
   const {
@@ -123,7 +124,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
         className="w-full h-full flex-1 min-h-0 flex items-center justify-center relative p-1 overflow-hidden"
       >
         <svg
-          viewBox={currentViewBox}
+          viewBox={customViewBox || currentViewBox}
           preserveAspectRatio="xMidYMid meet"
           className="vc-map-svg w-full h-full max-h-full max-w-full object-contain transition-all duration-500 ease-out"
         >
@@ -183,11 +184,11 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
             />
           )}
           <MapAiMarkersLayer markers={markers} onSelectMarker={onSelectMarker} />
+
+          {/* 5. Custom Overlay SVG Children (Pill markers, lock nodes, etc.) */}
+          {children}
         </svg>
       </div>
-
-      {/* 5. Custom Overlay Children (if provided) */}
-      {children}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from '@/components/Link';
-import { ArrowRight, Sparkles, BookOpen } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 
 export const DiscoveryHeroQuoteBanner: React.FC = () => {
   return (
@@ -12,7 +12,7 @@ export const DiscoveryHeroQuoteBanner: React.FC = () => {
       <div className="max-w-2xl mx-auto relative z-10 space-y-3">
         {/* Cultural Sparkle Emblem */}
         <div className="w-10 h-10 rounded-2xl bg-heritage-green border border-antique-gold/50 flex items-center justify-center mx-auto shadow-sm">
-          <Sparkles className="w-5 h-5 text-antique-gold" />
+          <BookOpen className="w-5 h-5 text-antique-gold" />
         </div>
 
         <h2 className="font-serif text-2xl sm:text-3xl font-bold text-heritage-green">

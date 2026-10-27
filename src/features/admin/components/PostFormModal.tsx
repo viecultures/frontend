@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
-  Sparkles,
+  Lightbulb,
   BookOpen,
   Plus,
   Trash2,
@@ -608,7 +608,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 : 'text-text-body dark:text-warm-ivory/70 hover:bg-white/40 dark:hover:bg-white/5'
             }`}
           >
-            <Sparkles aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+            <Lightbulb aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
             <span>Vocabulary ({vocabularies.length})</span>
           </button>
           <button
@@ -1123,7 +1123,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
 
               {vocabularies.length === 0 ? (
                 <div className="text-center py-10 border-2 border-dashed border-antique-gold/30 rounded-2xl">
-                  <Sparkles aria-hidden="true" className="w-8 h-8 text-antique-gold/50 mx-auto mb-2" />
+                  <Lightbulb aria-hidden="true" className="w-8 h-8 text-antique-gold/50 mx-auto mb-2" />
                   <p className="text-xs text-text-muted">No vocabulary yet.</p>
                   <p className="text-[11px] text-text-muted mt-1">
                     Paste a vocabulary list or add a word manually.
@@ -1448,7 +1448,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               <div className="space-y-3 pt-2 border-t border-antique-gold/20">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-text-body dark:text-warm-ivory uppercase tracking-wider flex items-center gap-2">
-                    <Sparkles aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                    <Lightbulb aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                     <span>Available voices</span>
                   </h4>
                   {isLoadingModels && (
@@ -1773,7 +1773,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                     onClick={handleTsvImport}
                     className="px-5 py-2.5 rounded-xl bg-heritage-green text-warm-ivory font-bold text-xs flex items-center gap-2 hover:bg-heritage-dark transition-all cursor-pointer shadow-md"
                   >
-                    <Sparkles aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                    <Lightbulb aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                     <span>Import into editor</span>
                   </button>
                 </div>

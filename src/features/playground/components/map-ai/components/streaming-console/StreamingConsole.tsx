@@ -15,7 +15,7 @@ import {
 import { useMapStore } from '../../lib/map-state';
 import { useChatWorkspace } from '../../lib/chat-workspace';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
-import { User, Sparkles, RefreshCw, BookOpen, MessageSquareText, Compass, MapPin, Clock, ExternalLink } from 'lucide-react';
+import { User, MessageSquareText, RefreshCw, BookOpen, Compass, MapPin, Clock, ExternalLink } from 'lucide-react';
 import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '@/data/lessonAgentCatalog';
 import type { ProficiencyLevel } from '../../lib/prompt-scaffolder';
 import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
@@ -420,7 +420,7 @@ export default function StreamingConsole() {
                   >
                     <div className="chat-tool-header flex items-center justify-between text-[10px] font-mono">
                       <span className="font-bold flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" /> Cultural companion
+                        <MessageSquareText className="w-3 h-3" /> Cultural companion
                       </span>
                       <span>{formatTimestamp(t.timestamp)}</span>
                     </div>
@@ -441,7 +441,7 @@ export default function StreamingConsole() {
                   <div
                     className={`chat-message-avatar ${isUser ? 'chat-message-avatar--user' : 'chat-message-avatar--assistant'} w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs shadow`}
                   >
-                    {isUser ? <User className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
+                    {isUser ? <User className="w-4 h-4" /> : <MessageSquareText className="w-4 h-4" />}
                   </div>
 
                   <div

@@ -1,4 +1,4 @@
-import { Target, Headphones, Sparkles, Flame, Trophy } from "lucide-react";
+import { Target, Headphones, Flame, Trophy } from "lucide-react";
 import type { PlayerMode } from "./FlashcardModeTabs";
 
 interface FlashcardPracticeModesGridProps {
@@ -17,7 +17,7 @@ export function FlashcardPracticeModesGrid({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-antique-gold" />
+            <Target className="w-4 h-4 text-antique-gold" />
             <span className="text-xs font-bold uppercase tracking-widest text-heritage-green">
               CHẾ ĐỘ LUYỆN TẬP BỔ TRỢ
             </span>

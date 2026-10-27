@@ -1,5 +1,5 @@
 import React, { useState, type MouseEvent } from 'react';
-import { Eye, EyeOff, Play, Volume2, Sparkles, BookOpen } from 'lucide-react';
+import { Eye, EyeOff, Play, Volume2, BookOpen } from 'lucide-react';
 import type { ReaderArticleData } from '../services/readerApiService';
 
 export interface BilingualParagraphPairListProps {

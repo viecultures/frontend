@@ -9,7 +9,6 @@ import {
   ShoppingBag,
   CheckCircle2,
   CircleDashed,
-  Sparkles,
   ShieldCheck,
   TrendingUp,
   Headphones,
@@ -534,7 +533,7 @@ export const MissionsModal: React.FC = () => {
               <div className="space-y-4 animate-in fade-in duration-200">
                 {shopFeedback && (
                   <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-antique-gold" />
+                    <Award className="w-4 h-4 text-antique-gold" />
                     <span>{shopFeedback}</span>
                   </div>
                 )}

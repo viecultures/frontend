@@ -1,11 +1,37 @@
-import { useState, useMemo } from "react";
-import type { CommunityPost } from "../types";
-import { CommunityHeader } from "../components/CommunityHeader";
-import { CommunityPostEditor } from "../components/CommunityPostEditor";
-import { CommunityPostCard } from "../components/CommunityPostCard";
-import { CommunitySidebar } from "../components/CommunitySidebar";
-import { CommunityDetailModal } from "../components/CommunityDetailModal";
-import { Search, Filter, Sparkles, MessageSquare, Plus, Check } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import type { CommunityPost, HighlightVocabItem } from "../types";
+import {
+  CommunityHeader,
+  CommunityPostEditor,
+  CommunityPostCard,
+  CommunitySidebar,
+  CommunityDetailModal,
+  VocabDefinitionModal,
+  ImageLightboxModal,
+} from "../components";
+import {
+  Search,
+  Plus,
+  Check,
+  X,
+  PenLine,
+  BookOpen,
+  ImageIcon,
+  Compass,
+  TrendingUp,
+  Clock,
+  Users,
+} from "lucide-react";
+
+type FeedFilter = "for-you" | "following" | "latest" | "trending";
+
+const TOPIC_FILTERS = [
+  { id: "all", label: "All reflections" },
+  { id: "Imperial Hue", label: "Imperial Hue" },
+  { id: "Saigon Bánh Mì", label: "Saigon Food" },
+  { id: "Hội An Lanterns", label: "Hoi An" },
+  { id: "Vietnamese Traditions", label: "Vietnamese Traditions" },
+];
 
 const INITIAL_POSTS: CommunityPost[] = [
   {
@@ -13,33 +39,51 @@ const INITIAL_POSTS: CommunityPost[] = [
     authorName: "Minh Anh",
     authorRole: "Cultural Ambassador",
     avatarText: "MA",
-    timeAgo: "2 giờ trước",
+    isAmbassador: true,
+    authorFollowing: true,
+    timeAgo: "2 hours ago",
     lessonTag: "Imperial Hue",
     topicCategory: "architecture",
-    title: "Ngọ Môn Gate & The Royal Geometry of Citadel",
+    topicSlug: "imperial-hue",
+    feedType: "for-you",
+    title: "Ngọ Môn Gate & the royal geometry of the Citadel",
     contentEn:
-      "Visiting the Ngọ Môn Gate last summer made me appreciate the architectural wisdom of our ancestors. Standing in front of the gate, I felt deeply connected to the intangible heritage passed down through generations.",
+      "Visiting the Ngọ Môn Gate last summer made me appreciate the architectural wisdom of royal builders. Standing in front of the five-entrance gate, I noticed how the central passage was reserved exclusively for the emperor. Expressing this in English helped me connect with intangible heritage in a whole new way.",
     highlightWords: [
-      { word: "architectural", ipa: "/ˌɑːkɪˈtek.tʃər.əl/", meaning: "thuộc kiến trúc" },
-      { word: "intangible", ipa: "/ɪnˈtæn.dʒə.bəl/", meaning: "phi vật thể" },
+      {
+        word: "architectural",
+        ipa: "/ˌɑː.kɪˈtek.tʃər.əl/",
+        meaning: "thuộc kiến trúc",
+        partOfSpeech: "Adjective",
+        synonyms: ["structural", "design-related", "constructional"],
+        exampleSentence: "Hue is world-renowned for its harmonious architectural heritage.",
+      },
+      {
+        word: "intangible",
+        ipa: "/ɪnˈtæn.dʒə.bəl/",
+        meaning: "phi vật thể",
+        partOfSpeech: "Adjective",
+        synonyms: ["non-material", "spiritual", "abstract"],
+        exampleSentence: "Court music along Perfume River is a recognized intangible cultural masterpiece.",
+      },
     ],
-    heartsCount: 24,
+    heartsCount: 38,
     commentsCount: 3,
-    imageCaption: "Ngọ Môn Gate Sunrise • Imperial Citadel Hue",
-    imageBgGradient: "from-emerald-900 via-teal-800 to-amber-700",
+    imageUrl: "/images/landing/hue-citadel.jpg",
+    imageCaption: "Ngọ Môn Gate at sunrise, Imperial Hue Citadel",
     comments: [
       {
         id: "c-1",
         authorName: "Kenji Sato",
         avatarText: "KS",
-        timeAgo: "1 giờ trước",
+        timeAgo: "1 hour ago",
         text: "The symmetry of the Hue Citadel architecture is truly breathtaking!",
       },
       {
         id: "c-2",
         authorName: "Lê Thu Hà",
         avatarText: "TH",
-        timeAgo: "30 phút trước",
+        timeAgo: "30 mins ago",
         text: "Your English expression is so vivid and evocative, Minh Anh!",
       },
     ],
@@ -47,28 +91,46 @@ const INITIAL_POSTS: CommunityPost[] = [
   {
     id: "post-2",
     authorName: "Daniel Krauss",
-    authorRole: "International Learner",
+    authorRole: "Global Learner",
     avatarText: "DK",
-    timeAgo: "5 giờ trước",
+    isAmbassador: false,
+    authorFollowing: true,
+    timeAgo: "5 hours ago",
     lessonTag: "Saigon Bánh Mì",
     topicCategory: "cuisine",
-    title: "How French Baguettes Evolved into Saigon Street Identity",
+    topicSlug: "saigon-food",
+    feedType: "for-you",
+    title: "How French baguettes evolved into Saigon street identity",
     contentEn:
-      "I loved learning how the bánh mì baguettes evolved from French culinary influence into a uniquely Vietnamese street food staple. Exploring culinary history through bilingual stories makes vocabulary stick so much faster!",
+      "I loved learning how bánh mì evolved from 19th-century French culinary imports into an unmistakably Vietnamese street food staple. Incorporating pâté, cilantro, and pickled daikon completely transformed the bread. Practicing vocabulary through food history makes words stick so much faster.",
     highlightWords: [
-      { word: "culinary", ipa: "/ˈkʌl.ɪ.nər.i/", meaning: "thuộc ẩm thực" },
-      { word: "evolved", ipa: "/ɪˈvɒlvd/", meaning: "tiến hóa, phát triển" },
+      {
+        word: "culinary",
+        ipa: "/ˈkʌl.ɪ.nər.i/",
+        meaning: "thuộc ẩm thực",
+        partOfSpeech: "Adjective",
+        synonyms: ["gastronomic", "cooking-related", "food-related"],
+        exampleSentence: "Saigon is one of the world's most vibrant culinary capitals.",
+      },
+      {
+        word: "evolved",
+        ipa: "/ɪˈvɒlvd/",
+        meaning: "tiến hóa, phát triển",
+        partOfSpeech: "Verb (Past)",
+        synonyms: ["developed", "transformed", "adapted"],
+        exampleSentence: "Vietnamese street snacks evolved through rich cross-cultural exchanges.",
+      },
     ],
-    heartsCount: 18,
+    heartsCount: 29,
     commentsCount: 2,
-    imageCaption: "Traditional Street Bánh Mì Stall • Saigon",
-    imageBgGradient: "from-amber-900 via-yellow-800 to-amber-700",
+    imageUrl: "/images/landing/banh-mi.jpg",
+    imageCaption: "Crispy freshly baked baguettes at a street cart in Saigon",
     comments: [
       {
         id: "c-3",
         authorName: "Phạm Hải Đăng",
         avatarText: "HĐ",
-        timeAgo: "3 giờ trước",
+        timeAgo: "3 hours ago",
         text: "Next time you must try bánh mì xíu mại in Da Lat too!",
       },
     ],
@@ -78,38 +140,134 @@ const INITIAL_POSTS: CommunityPost[] = [
     authorName: "Lê Thu Hà",
     authorRole: "Cultural Ambassador",
     avatarText: "TH",
-    timeAgo: "1 ngày trước",
+    isAmbassador: true,
+    authorFollowing: false,
+    timeAgo: "Yesterday",
     lessonTag: "Hội An Lanterns",
     topicCategory: "festivals",
-    title: "Silk Lanterns Illuminating the Thu Bồn River",
+    topicSlug: "hoi-an",
+    feedType: "trending",
+    title: "Silk lanterns illuminating the Thu Bồn River at night",
     contentEn:
-      "Attending the full moon lantern festival on the Thu Bồn River was unforgettable. The vibrant silk craftsmanship reflecting on the river waters brought our heritage reading lessons to life.",
+      "Attending the full-moon lantern festival along the Thu Bồn River was unforgettable. The vibrant silk craftsmanship reflecting across the water brought the heritage reading lessons to life. I tried explaining the bamboo frame construction to a foreign friend and it was such rewarding speaking practice.",
     highlightWords: [
-      { word: "vibrant", ipa: "/ˈvaɪ.brənt/", meaning: "rực rỡ, sống động" },
-      { word: "craftsmanship", ipa: "/ˈkrɑːfts.mən.ʃɪp/", meaning: "tay nghề thủ công" },
+      {
+        word: "craftsmanship",
+        ipa: "/ˈkrɑːfts.mən.ʃɪp/",
+        meaning: "tay nghề thủ công",
+        partOfSpeech: "Noun",
+        synonyms: ["artistry", "workmanship", "skill"],
+        exampleSentence: "Generations of Hoi An artisans preserved their delicate silk lantern craftsmanship.",
+      },
+      {
+        word: "vibrant",
+        ipa: "/ˈvaɪ.brənt/",
+        meaning: "rực rỡ, sống động",
+        partOfSpeech: "Adjective",
+        synonyms: ["lively", "vivid", "colorful"],
+        exampleSentence: "The old town was filled with vibrant festive lanterns reflecting on the river.",
+      },
     ],
-    heartsCount: 31,
+    heartsCount: 45,
     commentsCount: 4,
-    imageCaption: "Thu Bồn River Full Moon Lanterns • Hội An",
-    imageBgGradient: "from-rose-900 via-amber-800 to-orange-900",
+    imageUrl: "/images/landing/hoi-an-lanterns.jpg",
+    imageCaption: "Traditional silk lanterns glowing along the riverside in Hoi An",
     comments: [
       {
         id: "c-4",
         authorName: "Minh Anh",
         avatarText: "MA",
-        timeAgo: "18 giờ trước",
+        timeAgo: "18 hours ago",
         text: "Hội An at night feels like stepping right into a fairy tale.",
       },
     ],
   },
-];
-
-const CATEGORIES = [
-  { id: "all", label: "All posts" },
-  { id: "Imperial Hue", label: "Imperial Hue" },
-  { id: "Saigon Bánh Mì", label: "Saigon food" },
-  { id: "Hội An Lanterns", label: "Hoi An lanterns" },
-  { id: "my-posts", label: "My posts" },
+  {
+    id: "post-4",
+    authorName: "Trần Thanh Thảo",
+    authorRole: "Cultural Ambassador",
+    avatarText: "TT",
+    isAmbassador: true,
+    authorFollowing: true,
+    timeAgo: "2 days ago",
+    lessonTag: "Vietnamese Traditions",
+    topicCategory: "crafts",
+    topicSlug: "vietnamese-traditions",
+    feedType: "latest",
+    title: "Đông Hồ woodblock prints: Preserving folk stories on Dó paper",
+    contentEn:
+      "Visiting the Đông Hồ craft village in Bắc Ninh showed me how folk philosophy was promulgated through natural scallop-shell paper and vegetable dyes. Every print tells an enduring story of agrarian resilience, optimism, and family prosperity. Writing about this helped me master cultural collocations.",
+    highlightWords: [
+      {
+        word: "promulgated",
+        ipa: "/ˈprɒm.əl.ɡeɪ.tɪd/",
+        meaning: "truyền bá, lan tỏa",
+        partOfSpeech: "Verb",
+        synonyms: ["disseminated", "broadcast", "spread"],
+        exampleSentence: "Folk sayings and woodblock prints promulgated agrarian virtues across centuries.",
+      },
+      {
+        word: "resilience",
+        ipa: "/rɪˈzɪl.jəns/",
+        meaning: "sự kiên cường, bền bỉ",
+        partOfSpeech: "Noun",
+        synonyms: ["perseverance", "fortitude", "endurance"],
+        exampleSentence: "Traditional Vietnamese folk art portrays the cheerful resilience of village life.",
+      },
+    ],
+    heartsCount: 32,
+    commentsCount: 3,
+    imageUrl: "/images/landing/dong-ho.jpg",
+    imageCaption: "Đông Hồ traditional folk woodblock prints on scallop-shell Dó paper",
+    comments: [
+      {
+        id: "c-5",
+        authorName: "Daniel Krauss",
+        avatarText: "DK",
+        timeAgo: "1 day ago",
+        text: "The natural colors made from tree bark and gardenia are so fascinating!",
+      },
+    ],
+  },
+  {
+    id: "post-5",
+    authorName: "Kenji Sato",
+    authorRole: "Global Learner",
+    avatarText: "KS",
+    isAmbassador: false,
+    authorFollowing: false,
+    timeAgo: "3 days ago",
+    lessonTag: "Vietnamese Traditions",
+    topicCategory: "crafts",
+    topicSlug: "vietnamese-traditions",
+    feedType: "latest",
+    title: "Glazing techniques of 700-year-old river pottery in Bát Tràng",
+    contentEn:
+      "Watching the master potters spin clay along the Red River was mesmerizing. They explained how crackle glaze was perfected during the Lê Dynasty. Practicing architectural and craft vocabulary with locals made my Vietnam travels ten times more meaningful.",
+    highlightWords: [
+      {
+        word: "artisans",
+        ipa: "/ˈɑː.tɪ.zænz/",
+        meaning: "nghệ nhân",
+        partOfSpeech: "Noun (Plural)",
+        synonyms: ["craftsmen", "masters", "sculptors"],
+        exampleSentence: "Skillful artisans in Bát Tràng have passed down ceramic recipes for seven centuries.",
+      },
+    ],
+    heartsCount: 22,
+    commentsCount: 1,
+    imageUrl: "/images/landing/bat-trang.jpg",
+    imageCaption: "Handcrafted ceramics drying in the courtyards of Bát Tràng",
+    comments: [
+      {
+        id: "c-6",
+        authorName: "Lê Thu Hà",
+        avatarText: "TH",
+        timeAgo: "2 days ago",
+        text: "Bát Tràng ceramics have such timeless warmth and tactile beauty.",
+      },
+    ],
+  },
 ];
 
 export default function CommunityPage() {
@@ -118,9 +276,17 @@ export default function CommunityPage() {
   const [postTitle, setPostTitle] = useState<string>("");
   const [reflectionText, setReflectionText] = useState<string>("");
   const [selectedLesson, setSelectedLesson] = useState<string>("Imperial Hue");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [feedFilter, setFeedFilter] = useState<FeedFilter>("for-you");
+  const [selectedTopic, setSelectedTopic] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeModalPost, setActiveModalPost] = useState<CommunityPost | null>(null);
+  const [activeVocab, setActiveVocab] = useState<HighlightVocabItem | null>(null);
+  const [lightboxData, setLightboxData] = useState<{
+    isOpen: boolean;
+    imageUrl?: string;
+    caption?: string;
+    title?: string;
+  }>({ isOpen: false });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -128,7 +294,7 @@ export default function CommunityPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Toggle Heart Like
+  // Toggle Like
   const handleToggleHeart = (id: string) => {
     setPosts((prev) =>
       prev.map((post) => {
@@ -164,8 +330,8 @@ export default function CommunityPage() {
           }
           showToast(
             !isBookmarked
-              ? "Post saved to your favorites."
-              : "Post removed from your saved list."
+              ? "Saved in this preview until you leave the page."
+              : "Removed from this preview's saved list."
           );
           return updated;
         }
@@ -174,20 +340,59 @@ export default function CommunityPage() {
     );
   };
 
-  // Add Comment
-  const handleAddComment = (postId: string, text: string) => {
+  // Toggle Author Follow
+  const handleToggleFollow = (authorName: string) => {
+    setPosts((prev) =>
+      prev.map((post) => {
+        if (post.authorName === authorName) {
+          const newStatus = !post.authorFollowing;
+          showToast(
+            newStatus
+              ? `Following ${authorName} in this preview only.`
+              : `Stopped following ${authorName} in this preview.`
+          );
+          return {
+            ...post,
+            authorFollowing: newStatus,
+          };
+        }
+        return post;
+      })
+    );
+  };
+
+  // Add Comment or Threaded Reply
+  const handleAddComment = (
+    postId: string,
+    text: string,
+    replyToCommentId?: string
+  ) => {
     const newComment = {
       id: `c-${Date.now()}`,
-      authorName: "Bạn (Sứ Giả)",
-      avatarText: "ME",
-      timeAgo: "Vừa xong",
+      authorName: "You",
+      avatarText: "HV",
+      timeAgo: "Just now",
       text,
     };
 
     setPosts((prev) =>
       prev.map((post) => {
         if (post.id === postId) {
-          const updatedComments = [...(post.comments || []), newComment];
+          let updatedComments = [...(post.comments || [])];
+          if (replyToCommentId) {
+            updatedComments = updatedComments.map((cmt) => {
+              if (cmt.id === replyToCommentId) {
+                return {
+                  ...cmt,
+                  replies: [...(cmt.replies || []), newComment],
+                };
+              }
+              return cmt;
+            });
+          } else {
+            updatedComments.push(newComment);
+          }
+
           const updated = {
             ...post,
             comments: updatedComments,
@@ -201,55 +406,78 @@ export default function CommunityPage() {
         return post;
       })
     );
-    showToast("Your comment has been posted.");
+    showToast("Comment added to this preview only.");
   };
 
   // Publish New Reflection
-  const handlePublish = () => {
-    if (!reflectionText.trim()) {
-      alert("Enter your reflection before publishing.");
-      return;
-    }
-
+  const handlePublish = (data: {
+    title: string;
+    content: string;
+    lesson: string;
+    imageUrl?: string;
+    imageCaption?: string;
+    vocabList: HighlightVocabItem[];
+  }) => {
     const newPost: CommunityPost = {
       id: `post-${Date.now()}`,
       authorName: "Học Viên VieCultures",
       authorRole: "Cultural Ambassador",
       avatarText: "HV",
-      timeAgo: "Vừa xong",
-      lessonTag: selectedLesson,
+      isAmbassador: true,
+      authorFollowing: true,
+      timeAgo: "Just now",
+      lessonTag: data.lesson,
       topicCategory: "general",
-      title: postTitle.trim() || `Reflections on ${selectedLesson}`,
-      contentEn: reflectionText.trim(),
-      highlightWords: [],
+      title: data.title || `Reflections on ${data.lesson}`,
+      contentEn: data.content,
+      highlightWords: data.vocabList,
       heartsCount: 1,
       commentsCount: 0,
       userLiked: true,
-      imageCaption: `Ảnh di sản đính kèm • ${selectedLesson}`,
-      imageBgGradient: "from-teal-900 via-emerald-800 to-amber-800",
+      imageUrl: data.imageUrl,
+      imageCaption: data.imageCaption,
       comments: [],
+      feedType: "for-you",
     };
 
     setPosts([newPost, ...posts]);
     setPostTitle("");
     setReflectionText("");
     setIsEditorOpen(false);
-    showToast("Your reflection has been published.");
+    showToast("Reflection added to this preview feed only.");
+  };
+
+  // Report post
+  const handleReportPost = (postId: string) => {
+    showToast("Reporting is not available in this preview.");
   };
 
   // Filtered Posts
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
-      // Category filter
-      if (selectedCategory === "my-posts") {
-        if (post.authorName !== "Học Viên VieCultures" && post.authorName !== "Bạn (Sứ Giả)") {
+      // 1. Topic filter
+      if (selectedTopic !== "all") {
+        if (selectedTopic === "Vietnamese Traditions") {
+          if (
+            post.lessonTag !== "Vietnamese Traditions" &&
+            post.topicCategory !== "crafts"
+          ) {
+            return false;
+          }
+        } else if (post.lessonTag !== selectedTopic) {
           return false;
         }
-      } else if (selectedCategory !== "all" && post.lessonTag !== selectedCategory) {
+      }
+
+      // 2. Feed stream filter
+      if (feedFilter === "following" && !post.authorFollowing) {
+        return false;
+      }
+      if (feedFilter === "trending" && post.heartsCount < 25) {
         return false;
       }
 
-      // Search query filter
+      // 3. Search query filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchTitle = post.title?.toLowerCase().includes(q);
@@ -261,27 +489,34 @@ export default function CommunityPage() {
 
       return true;
     });
-  }, [posts, selectedCategory, searchQuery]);
+  }, [posts, selectedTopic, feedFilter, searchQuery]);
 
   return (
-    <main className="community-ui min-h-screen bg-surface text-text-body relative">
+    <main className="community-ui min-h-screen bg-[#FAF7F0] text-[#314F49] relative">
       {/* Toast Notification */}
       {toastMessage && (
-        <div role="status" className="community-toast fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap">
-          <Check className="w-4 h-4 text-antique-gold shrink-0" />
+        <div
+          role="status"
+          className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-[#1D5046] text-white shadow-lg border border-[#153D35] flex items-center gap-2 text-xs font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap"
+        >
+          <Check className="w-4 h-4 text-[#E8D7AE] shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10">
-        {/* Page Title & View Switcher */}
+      {/* Main Container: 1280px Max Width */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <p className="mb-5 rounded-xl border border-[#E8E2D5] bg-white px-4 py-3 text-sm text-[#314F49]">
+          Community preview: posts and interactions on this page are examples. Changes stay in this page until you leave it.
+        </p>
+        {/* 1. Page Header with Compact Hierarchy */}
         <CommunityHeader
           isEditorOpen={isEditorOpen}
           onToggleEditor={() => setIsEditorOpen((prev) => !prev)}
           activeTab="reflections"
         />
 
-        {/* Reflection Editor (Toggleable) */}
+        {/* 2. Full Reflection Studio / Editor (Toggleable) */}
         <CommunityPostEditor
           isOpen={isEditorOpen}
           onClose={() => setIsEditorOpen(false)}
@@ -294,83 +529,238 @@ export default function CommunityPage() {
           onPublish={handlePublish}
         />
 
-        {/* Filter Toolbar & Search Bar */}
-        <div className="community-filter-toolbar flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          {/* Category Tabs */}
-          <div className="community-category-tabs flex flex-wrap items-center gap-2" role="group" aria-label="Filter reflections">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                aria-pressed={selectedCategory === cat.id}
-                className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer focus-ring ${
-                  selectedCategory === cat.id
-                    ? "bg-heritage-green text-warm-ivory shadow-sm"
-                    : "bg-rice-paper text-heritage-green hover:bg-mist-cloud border border-line"
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
+        {/* 3. Responsive Two-Column Layout (Desktop 68% feed / 32% sidebar, 24px gap) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* ========================================================= */}
+          {/* MAIN SOCIAL LEARNING FEED (~68% on Desktop: 8 cols)       */}
+          {/* ========================================================= */}
+          <div className="lg:col-span-8 space-y-4">
+            {/* 3.1 Quick Social Composer Box */}
+            <div
+              onClick={() => {
+                setIsEditorOpen(true);
+                window.scrollTo({ top: 100, behavior: "smooth" });
+              }}
+              className="p-4 rounded-2xl bg-white border border-[#E8E2D5] shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:border-[#1D5046]/40 transition-all cursor-pointer group space-y-3"
+              role="button"
+              tabIndex={0}
+              aria-label="Open reflection composer"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setIsEditorOpen(true);
+                }
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full bg-[#1D5046]/10 text-[#1D5046] font-bold text-xs flex items-center justify-center border border-[#1D5046]/20 shrink-0"
+                  aria-hidden="true"
+                >
+                  HV
+                </div>
+                <div className="flex-1 bg-[#FAF7F0] group-hover:bg-[#FAF7F0]/80 border border-[#E8E2D5] rounded-xl px-4 py-2.5 text-xs text-[#6E7B75] transition-colors">
+                  <span>Share a cultural story or something you learned today...</span>
+                </div>
+              </div>
 
-          {/* Search Box */}
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-text-secondary absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Search community posts"
-              placeholder="Search topics, keywords or authors…"
-              className="w-full pl-9 pr-4 py-2 rounded-full bg-surface border border-line text-xs text-heritage-green placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-antique-gold/40"
-            />
-          </div>
-        </div>
+              {/* Quick Actions Row */}
+              <div className="flex items-center justify-between pt-1 border-t border-[#E8E2D5]/60 text-xs">
+                <div className="flex items-center gap-3 text-[#6E7B75]">
+                  <span className="flex items-center gap-1.5 hover:text-[#1D5046] transition-colors">
+                    <ImageIcon className="w-3.5 h-3.5 text-[#1D5046]" />
+                    <span className="hidden sm:inline">Add photo</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 hover:text-[#1D5046] transition-colors">
+                    <BookOpen className="w-3.5 h-3.5 text-[#1D5046]" />
+                    <span className="hidden sm:inline">Tag vocabulary</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 hover:text-[#1D5046] transition-colors">
+                    <PenLine className="w-3.5 h-3.5 text-antique-gold" />
+                    <span className="hidden sm:inline">Writing assist</span>
+                  </span>
+                </div>
 
-        {/* Layout: Feed (8/12) + Sidebar (4/12) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Main Feed Column */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="flex items-center justify-between pb-2">
-              <h2 className="font-serif text-xl font-bold text-heritage-green flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-antique-gold" />
-                <span>Community reflections ({filteredPosts.length})</span>
-              </h2>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] transition-colors shadow-2xs"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Publish</span>
+                </button>
+              </div>
             </div>
 
+            {/* 3.2 Feed Stream Filters & Search Bar */}
+            <div className="p-3 rounded-2xl bg-white border border-[#E8E2D5] shadow-[0_2px_8px_rgba(0,0,0,0.03)] space-y-2.5">
+              {/* Row A: Feed Stream View Modes (For You, Following, Latest, Trending) */}
+              <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setFeedFilter("for-you")}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                      feedFilter === "for-you"
+                        ? "bg-[#1D5046] text-white shadow-2xs"
+                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                    }`}
+                  >
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>For You</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFeedFilter("following")}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                      feedFilter === "following"
+                        ? "bg-[#1D5046] text-white shadow-2xs"
+                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                    }`}
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>Following</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFeedFilter("latest")}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                      feedFilter === "latest"
+                        ? "bg-[#1D5046] text-white shadow-2xs"
+                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                    }`}
+                  >
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Latest</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFeedFilter("trending")}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                      feedFilter === "trending"
+                        ? "bg-[#1D5046] text-white shadow-2xs"
+                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                    }`}
+                  >
+                    <TrendingUp className="w-3.5 h-3.5 text-antique-gold" />
+                    <span>Trending</span>
+                  </button>
+                </div>
+
+                {/* Compact Search Bar */}
+                <div className="relative w-40 sm:w-52 shrink-0">
+                  <Search className="w-3.5 h-3.5 text-[#6E7B75] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    aria-label="Search reflections by topic, author, or keyword"
+                    placeholder="Search stories..."
+                    className="w-full pl-8 pr-7 py-1.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] placeholder:text-[#6E7B75]/70 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[#6E7B75] hover:text-[#1D5046] text-xs cursor-pointer"
+                      aria-label="Clear search query"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Row B: Cultural Topic Filter Chips */}
+              <div
+                className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-[#E8E2D5]/60"
+                role="group"
+                aria-label="Filter reflections by cultural topic"
+              >
+                {TOPIC_FILTERS.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setSelectedTopic(cat.id)}
+                    aria-pressed={selectedTopic === cat.id}
+                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                      selectedTopic === cat.id
+                        ? "bg-[#1D5046]/10 text-[#1D5046] font-bold border border-[#1D5046]/30"
+                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0] border border-transparent"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3.3 Main Post Stream */}
             {filteredPosts.length > 0 ? (
-              filteredPosts.map((post) => (
-                <CommunityPostCard
-                  key={post.id}
-                  post={post}
-                  onToggleHeart={handleToggleHeart}
-                  onToggleBookmark={handleToggleBookmark}
-                  onOpenDetail={(p) => setActiveModalPost(p)}
-                  onShare={() => {
-                    navigator.clipboard?.writeText(window.location.href);
-                    showToast("Post link copied.");
-                  }}
-                />
-              ))
+              <div className="space-y-4">
+                {filteredPosts.map((post) => (
+                  <CommunityPostCard
+                    key={post.id}
+                    post={post}
+                    onToggleHeart={handleToggleHeart}
+                    onToggleBookmark={handleToggleBookmark}
+                    onOpenDetail={(p) => setActiveModalPost(p)}
+                    onShare={() => {
+                      if (!navigator.clipboard) {
+                        showToast("Clipboard is unavailable in this browser.");
+                        return;
+                      }
+                      void navigator.clipboard.writeText(window.location.href)
+                        .then(() => showToast("Community preview page link copied."))
+                        .catch(() => showToast("Could not copy the page link."));
+                    }}
+                    onSelectVocab={(v) => setActiveVocab(v)}
+                    onOpenLightbox={(imgUrl, caption, title) =>
+                      setLightboxData({
+                        isOpen: true,
+                        imageUrl: imgUrl,
+                        caption,
+                        title,
+                      })
+                    }
+                    onToggleFollow={handleToggleFollow}
+                    onAddComment={handleAddComment}
+                    onReport={handleReportPost}
+                  />
+                ))}
+              </div>
             ) : (
-              <div className="p-12 text-center rounded-3xl bg-surface border border-line space-y-3">
-                <MessageSquare className="w-8 h-8 text-text-secondary/40 mx-auto" />
-                <h3 className="font-serif text-base font-bold text-heritage-green">
-                  No matching posts
+              <div className="p-8 text-center rounded-2xl bg-white border border-[#E8E2D5] space-y-2.5">
+                <h3 className="font-serif text-base font-bold text-[#1D5046]">
+                  No matching reflections found
                 </h3>
-                <p className="text-xs text-text-secondary max-w-sm mx-auto">
-                  Try another search or choose “Write a reflection” to share your perspective.
+                <p className="text-xs text-[#6E7B75] max-w-sm mx-auto">
+                  Try another keyword, clear the search filter, or select &ldquo;All reflections&rdquo; to browse the community.
                 </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedTopic("all");
+                    setFeedFilter("for-you");
+                    setSearchQuery("");
+                  }}
+                  className="mt-2 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] transition-colors"
+                >
+                  Reset filters
+                </button>
               </div>
             )}
           </div>
 
-          {/* Right Sidebar */}
-          <div className="lg:col-span-4">
+          {/* ========================================================= */}
+          {/* SUPPORTIVE SIDEBAR (~32% on Desktop: 4 cols)              */}
+          {/* ========================================================= */}
+          <div className="lg:col-span-4 mt-2 lg:mt-0">
             <CommunitySidebar
-              onSelectTopicTag={(tag) => setSelectedCategory(tag)}
-              selectedTag={selectedCategory}
+              onSelectTopicTag={(tag) => setSelectedTopic(tag)}
+              selectedTag={selectedTopic}
             />
           </div>
         </div>
@@ -384,20 +774,42 @@ export default function CommunityPage() {
           onToggleHeart={handleToggleHeart}
           onToggleBookmark={handleToggleBookmark}
           onAddComment={handleAddComment}
+          onSelectVocab={(v) => setActiveVocab(v)}
         />
       )}
 
-      {/* Floating Action Button */}
+      {/* Vocabulary Definition Modal */}
+      {activeVocab && (
+        <VocabDefinitionModal
+          vocab={activeVocab}
+          onClose={() => setActiveVocab(null)}
+          onSaveVocab={(v) => {
+            showToast(`"${v.word}" marked in this preview only.`);
+          }}
+        />
+      )}
+
+      {/* Image Lightbox Modal */}
+      <ImageLightboxModal
+        isOpen={lightboxData.isOpen}
+        onClose={() => setLightboxData({ isOpen: false })}
+        imageUrl={lightboxData.imageUrl}
+        caption={lightboxData.caption}
+        title={lightboxData.title}
+      />
+
+      {/* Floating Action Button (Mobile / Quick access) */}
       <button
+        type="button"
         onClick={() => {
           setIsEditorOpen(true);
-          window.scrollTo({ top: 120, behavior: "smooth" });
+          window.scrollTo({ top: 100, behavior: "smooth" });
         }}
-        className="community-fab fixed bottom-8 right-8 w-14 h-14 rounded-full bg-heritage-green text-warm-ivory font-bold shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-antique-gold z-40 focus-ring cursor-pointer"
+        className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[#1D5046] text-white shadow-lg hover:bg-[#153D35] transition-all flex items-center justify-center border border-[#153D35] z-40 focus-ring cursor-pointer"
         title="Write a reflection"
-        aria-label="Open reflection editor"
+        aria-label="Open reflection composer"
       >
-        <Plus className="w-6 h-6 text-antique-gold" />
+        <Plus className="w-5 h-5 text-[#E8D7AE]" />
       </button>
     </main>
   );

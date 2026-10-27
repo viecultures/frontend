@@ -2,7 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { PLAYGROUND_SCREENS } from '../types';
 import { PlaygroundSidebarNav } from '../components/PlaygroundSidebarNav';
-import { Feather, Radio, Zap, Sparkles, Home } from 'lucide-react';
+import { Feather, Radio, Zap, Home } from 'lucide-react';
 
 // Experimental Screen Components
 import { VideoDictationShadowingScreen } from '../components/screens/VideoDictationShadowingScreen';
@@ -156,7 +156,7 @@ export const PlaygroundPage: React.FC = () => {
               <Radio className="w-7 h-7" />
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-antique-gold/20 text-[#B8860B] dark:text-antique-bright">
-              <Sparkles className="w-3.5 h-3.5" /> Màn hình #04 · Đang phát triển (Alpha)
+              <Feather className="w-3.5 h-3.5" /> Màn hình #04 · Đang phát triển (Alpha)
             </div>
             <h2 className="text-2xl font-serif font-bold text-heritage-green dark:text-warm-ivory">
               3-Region Dialect &amp; Tone Explorer
@@ -178,7 +178,7 @@ export const PlaygroundPage: React.FC = () => {
               <Zap className="w-7 h-7" />
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-antique-gold/20 text-[#B8860B] dark:text-antique-bright">
-              <Sparkles className="w-3.5 h-3.5" /> Màn hình #05 · Lab Concept
+              <Feather className="w-3.5 h-3.5" /> Màn hình #05 · Lab Concept
             </div>
             <h2 className="text-2xl font-serif font-bold text-heritage-green dark:text-warm-ivory">
               Heritage Speed-Run Duel Arena

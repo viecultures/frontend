@@ -1,14 +1,30 @@
 @import "tailwindcss";
 @import "./components/map/map.css";
 
+/* Basic ampersand (&) font mapping: overrides ornate serif/Playfair glyph with standard clean ampersand */
+@font-face {
+  font-family: "BasicAmpersand";
+  src: local("Plus Jakarta Sans Bold"), local("Segoe UI Bold"), local("Arial Bold"), local("Helvetica Neue Bold"), local("Roboto Bold");
+  unicode-range: U+0026;
+  font-weight: 600 900;
+  font-style: normal italic;
+}
+
+@font-face {
+  font-family: "BasicAmpersand";
+  src: local("Plus Jakarta Sans"), local("Segoe UI"), local("Arial"), local("Helvetica Neue"), local("Roboto");
+  unicode-range: U+0026;
+  font-weight: 100 500;
+  font-style: normal italic;
+}
 /* Dark mode driven by a `.dark` class on <html> */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   /* ── Typography ─────────────────────────────────────── */
   --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-heading: var(--font-sans);
+  --font-serif: "BasicAmpersand", "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-heading: var(--font-serif);
 
   /* Shared UI scale; long-form learning content uses text-reading. */
   --text-xs: 0.875rem;
@@ -42,10 +58,23 @@
   --color-lotus-pink: #E8B7B2;
   --color-mist-cloud: #E8DFCB;
 
+  /* Landing video palette, centralized for the migrated landing stylesheet. */
+  --color-landing-night: #0E221A;
+  --color-landing-scrim: #0E1E18;
+  --color-landing-overlay: #122A22;
+  --color-landing-gold: #FCD34D;
+  --color-landing-gold-hover: #FDE047;
+  --color-landing-button-ink: #1E293B;
+  --color-landing-secondary: #2E7D32;
+  --color-landing-secondary-hover: #388E3C;
+  --color-landing-light: #FFF7E6;
+  --color-landing-white: #FFFFFF;
+  --color-landing-shadow: #000000;
+
   /* Shared Vietnam map regions, used by the map and Journey. */
-  --color-map-north: var(--color-heritage-green);
-  --color-map-central: color-mix(in srgb, var(--color-antique-gold) 78%, var(--color-heritage-dark));
-  --color-map-south: var(--color-mountain-teal);
+  --color-map-north: #235C4A;
+  --color-map-central: #C98A33;
+  --color-map-south: #518894;
 
   /* ── Semantic Text ──────────────────────────────────── */
   --color-text-body: #3F5550;
@@ -203,13 +232,56 @@
     color: var(--color-ink);
   }
 
-  h1, h2, h3, .font-heading {
+  h1, h2, .font-heading {
     font-family: var(--font-heading);
+    letter-spacing: -0.025em;
+  }
+
+  h3, h4, h5, h6 {
+    font-family: var(--font-sans);
   }
 
   :where(button, a, input, textarea, select, summary, [tabindex]):focus-visible {
     outline: 2px solid var(--color-focus);
     outline-offset: 3px;
+  }
+
+
+  /* ── Vietnamese Cultural Dual Learning Helpers ─────── */
+  .bilingual-en-text {
+    font-family: var(--font-sans);
+    font-size: var(--text-reading);
+    line-height: var(--text-reading--line-height);
+    font-weight: 500;
+    color: var(--color-heritage-forest);
+  }
+  .dark .bilingual-en-text {
+    color: var(--color-warm-ivory);
+  }
+
+  .bilingual-vi-text {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    color: var(--color-text-secondary);
+  }
+  .dark .bilingual-vi-text {
+    color: var(--color-sky-mist);
+    opacity: 0.85;
+  }
+
+  .bilingual-vocab-highlight {
+    font-weight: 600;
+    color: var(--color-heritage-forest);
+    border-bottom: 2px solid color-mix(in srgb, var(--color-antique-gold) 75%, transparent);
+    background-color: color-mix(in srgb, var(--color-antique-gold) 12%, transparent);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  .dark .bilingual-vocab-highlight {
+    color: var(--color-warm-ivory);
+    border-bottom-color: var(--color-antique-gold);
+    background-color: color-mix(in srgb, var(--color-antique-gold) 20%, transparent);
   }
 
   :where(input, textarea)::placeholder {

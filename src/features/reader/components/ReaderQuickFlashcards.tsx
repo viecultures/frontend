@@ -7,10 +7,9 @@ import {
   XCircle,
   ArrowRight,
   ArrowLeft,
-  Sparkles,
+  BookOpen,
   ExternalLink,
   Award,
-  BookOpen,
 } from 'lucide-react';
 import { READER_DEFAULT_FLASHCARDS, type QuickFlashcardItem } from '../data/learningLoopData';
 import { paths } from '@/routes/paths';
@@ -312,7 +311,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           >
             <Award className="w-5 h-5 text-antique-gold" />
             <span>Stamp and finish lesson</span>
-            <Sparkles className="w-4 h-4 text-antique-gold" />
+            <BookOpen className="w-4 h-4 text-antique-gold" />
           </button>
         </div>
       </div>

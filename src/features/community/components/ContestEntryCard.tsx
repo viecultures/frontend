@@ -1,4 +1,4 @@
-import { User, Heart, MessageSquare, Trophy, Coins, Camera, Landmark, Sparkles } from "lucide-react";
+import { User, Heart, MessageSquare, Trophy, Coins, Camera, Landmark } from "lucide-react";
 import { communityLabel } from "../community-copy";
 import type { ContestEntry } from "../types";
 
@@ -65,7 +65,7 @@ export function ContestEntryCard({ entry, onVote, onOpenDetail }: ContestEntryCa
       {entry.usedVocab && entry.usedVocab.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 pt-1">
           <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-antique-gold" />
+            <Trophy className="w-3 h-3 text-antique-gold" />
             <span>Vocabulary in use:</span>
           </span>
           {entry.usedVocab.map((word) => (

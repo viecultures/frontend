@@ -30,7 +30,7 @@ import {
   Mic,
   Volume2,
   Key,
-  Sparkles,
+  Compass,
 } from 'lucide-react';
 import {
   LESSON_AGENT_CATALOG,
@@ -151,7 +151,7 @@ export default function Sidebar() {
       <DialogPanel className="sidebar open">
       <div className="sidebar-header">
         <div className="flex items-center gap-2 text-antique-gold">
-          <Sparkles className="w-5 h-5 text-antique-gold" />
+          <Compass className="w-5 h-5 text-antique-gold" />
           <DialogTitle as="h3" className="font-serif font-bold text-base text-white">Speaking settings</DialogTitle>
         </div>
         <button onClick={toggleSidebar} className="close-button" aria-label="Close settings">
@@ -208,7 +208,7 @@ export default function Sidebar() {
           {/* Proficiency Level Selector (Level 1, Level 2, Level 3) */}
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Compass className="w-3.5 h-3.5" />
               <span>Speaking level</span>
             </label>
             <select

@@ -404,7 +404,7 @@ export function resolveLessonForDeck(deckId: string): Lesson | null {
       vocabCount: 8,
       summary: 'Tết Nguyên Đán là dịp lễ thiêng liêng nhất của dân tộc Việt Nam.',
       gradient: 'from-rose-600 via-amber-700 to-heritage-green',
-      iconSymbol: 'Sparkles',
+      iconSymbol: 'BookOpen',
       imageUrl: 'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80',
       dateAdded: '2026-10-14',
     };

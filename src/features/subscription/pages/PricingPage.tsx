@@ -4,12 +4,11 @@ import {
   Check,
   X,
   Crown,
-  Sparkles,
+  BookOpen,
   ArrowRight,
   ShieldCheck,
   Zap,
   CheckCircle2,
-  BookOpen,
   Volume2,
   Bot,
   Layers,
@@ -168,7 +167,7 @@ export const PricingPage: React.FC = () => {
           <div className="relative bg-heritage-forest text-warm-ivory border-4 border-antique-gold rounded-3xl p-6 sm:p-10 flex flex-col justify-between shadow-2xl transition-all transform hover:scale-[1.01]">
             {/* Best Value Badge */}
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#9E2A2B] text-white border border-antique-gold text-xs font-bold uppercase tracking-wider shadow-md flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
+              <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
               <span>Được Khuyên Dùng Nhất</span>
             </div>
 

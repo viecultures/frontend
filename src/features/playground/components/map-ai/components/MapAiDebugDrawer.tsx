@@ -27,7 +27,6 @@ import {
   MapPin,
   Compass,
   BookOpen,
-  Sparkles,
   Terminal,
 } from 'lucide-react';
 import {
@@ -223,7 +222,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
           title="Mở Bảng Điều Khiển &amp; Debug Hub (Dev Mode)"
           aria-label="Mở Bảng Điều Khiển &amp; Debug Hub"
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <Wrench className="w-3.5 h-3.5 text-amber-400" />
           <span className="font-bold tracking-wider">AI MAP HUB</span>
 
           {/* Connection Dot */}
@@ -249,7 +248,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
           <div className="h-12 px-3.5 border-b border-[#1b2b40] bg-[#0c1320] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-md bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <Sparkles className="w-3.5 h-3.5" />
+                <Wrench className="w-3.5 h-3.5" />
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-bold text-white tracking-wide">
@@ -523,7 +522,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
                 {/* Section 4: Speech Assessment Simulator */}
                 <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
                   <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Wrench className="w-3.5 h-3.5" />
                     <span>Speech Evaluation</span>
                   </h4>
                   <button

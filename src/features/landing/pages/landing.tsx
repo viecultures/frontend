@@ -9,6 +9,7 @@ import { HeritageMethodologySection } from '../components/HeritageMethodologySec
 import { InteractiveFlashcardDemoSection } from '../components/InteractiveFlashcardDemoSection';
 import { LandingFaqSection } from '../components/LandingFaqSection';
 import { ContactSection } from '../components/ContactSection';
+import { LandingConversionSection } from '../components/LandingConversionSection';
 import { LandingPhotoCredits } from '../components/LandingPhotoCredits';
 import '../landing.css';
 import { useAppNavigate } from '@/routes/useAppNavigate';
@@ -72,7 +73,16 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
 
   // IntersectionObserver to auto-sync active navbar item as user scrolls
   React.useEffect(() => {
-    const sectionIds = ['hero', 'featured-articles', 'topics', 'ban-do-di-san', 'methodology', 'flashcard-demo', 'faq', 'contact'];
+    const sectionIds = [
+      'hero',
+      'featured-articles',
+      'topics',
+      'ban-do-di-san',
+      'methodology',
+      'flashcard-demo',
+      'faq',
+      'contact',
+    ];
     const elements = sectionIds
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
@@ -86,7 +96,7 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
             const id = entry.target.id;
             // Map sub-sections to closest navbar item if needed
             let navTarget = id;
-            if (id === 'ban-do-di-san' || id === 'flashcard-demo' || id === 'faq') {
+            if (id === 'flashcard-demo' || id === 'faq') {
               navTarget = 'methodology';
             }
             setActiveSegment(navTarget);
@@ -108,7 +118,7 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
 
   return (
     <ThemeProvider>
-      <div className="landing-page w-full min-h-screen font-sans antialiased selection:bg-sky-mist selection:text-heritage-green">
+      <div className="landing-page w-full min-h-screen font-sans antialiased selection:bg-sky-mist selection:text-heritage-green flex flex-col justify-between">
         {/* Site Header */}
         <LandingHeader
           onNavigate={handleNavigate}
@@ -116,7 +126,8 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
           activeSegment={activeSegment}
         />
 
-        <div className="landing-content w-full overflow-x-hidden">
+        {/* Semantic Main Element */}
+        <main className="landing-content w-full overflow-x-hidden flex-1">
           <div id="hero">
             <LandingHeroBanner
               onNavigate={handleNavigate}
@@ -132,28 +143,40 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
             <FourTopicsSection onNavigate={handleNavigate} />
           </div>
 
-          <div>
+          <div id="ban-do-di-san">
             <VietnamHeritageMapSection />
           </div>
 
           <div id="methodology">
-            <HeritageMethodologySection onNavigate={handleNavigate} onPreviewFlashcards={() => scrollToSegment('flashcard-demo')} />
+            <HeritageMethodologySection
+              onNavigate={handleNavigate}
+              onPreviewFlashcards={() => scrollToSegment('flashcard-demo')}
+            />
           </div>
 
-          <div>
+          <div id="flashcard-demo">
             <InteractiveFlashcardDemoSection onNavigate={handleNavigate} />
           </div>
 
-          <div>
+          <div id="faq">
             <LandingFaqSection />
           </div>
 
-          <div>
+          <div id="contact">
             <ContactSection />
           </div>
 
+          <div>
+            <LandingConversionSection onNavigate={handleNavigate} />
+          </div>
+        </main>
+
+        {/* Photo credits & Site Footer */}
+        <div className="w-full bg-surface-feature/20 border-t border-line">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <LandingPhotoCredits />
+          </div>
         </div>
-        <LandingPhotoCredits />
       </div>
     </ThemeProvider>
   );

@@ -3,7 +3,7 @@
  */
 
 import React, { type FC } from 'react';
-import { PlayCircle, BookOpen, Map, Sparkles } from 'lucide-react';
+import { PlayCircle, BookOpen, Map } from 'lucide-react';
 import './PopUp.css';
 
 interface PopUpProps {
@@ -15,7 +15,7 @@ export const PopUp: React.FC<PopUpProps> = ({ onClose }) => {
     <div className="popup-overlay">
       <div className="popup-content">
         <div className="flex items-center gap-2 mb-2 text-antique-gold">
-          <Sparkles className="w-6 h-6 text-antique-gold" />
+          <Map className="w-6 h-6 text-antique-gold" />
           <h2 className="text-xl font-serif font-bold text-white m-0">
             Sứ Giả Văn Hóa AI — Luyện Nói &amp; Luyện Nghe
           </h2>

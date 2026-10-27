@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Clock, Pause, Play, RotateCcw, Sparkles } from 'lucide-react';
+import { ChevronDown, Clock, Pause, Play, RotateCcw, MessageCircle } from 'lucide-react';
 import { PATHS } from '@/routes/paths';
 
 export function HomeBottomDock() {
@@ -31,7 +31,7 @@ export function HomeBottomDock() {
           <button type="button" className="home-room-icon" onClick={() => { setIsRunning(false); setSeconds(25 * 60); }} aria-label="Reset focus timer"><RotateCcw size={17} /></button>
         </div>
         {seconds === 0 && <p role="status">Your focus session is complete. Time for a short break.</p>}
-        <Link className="home-room-link" to={PATHS.playground}><Sparkles size={15} />Practise with your AI companion</Link>
+        <Link className="home-room-link" to={PATHS.playground}><MessageCircle size={15} />Practise with your AI companion</Link>
       </div>
     </div>
   </section>;

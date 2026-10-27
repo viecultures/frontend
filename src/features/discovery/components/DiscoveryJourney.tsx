@@ -13,7 +13,6 @@ import {
   LockKeyhole,
   MapPin,
   Mic2,
-  Sparkles,
   X,
 } from 'lucide-react';
 import { VietnamMap } from '@/components/map/VietnamMap';
@@ -26,9 +25,9 @@ import { readLearningValue, writeLearningValue } from '@/services/learning/learn
 import { JOURNEY_SERIES, type JourneySeries } from '../data/learningJourney';
 
 const REGIONS = [
-  { id: 'north', name: 'Northern Vietnam', number: '01' },
-  { id: 'central', name: 'Central Vietnam', number: '02' },
-  { id: 'south', name: 'Southern Vietnam', number: '03' },
+  { id: 'north', name: 'Northern Vietnam', number: "1" },
+  { id: 'central', name: 'Central Vietnam', number: "2" },
+  { id: 'south', name: 'Southern Vietnam', number: "3" },
 ] as const;
 const OPEN_REGIONS = ['north'] as const;
 const REGION_SHAPES = Object.fromEntries(
@@ -320,7 +319,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
             <BookOpen size={40} aria-hidden="true" />
           )}
           <span className="journey-spotlight-badge">
-            <Sparkles size={13} aria-hidden="true" />
+            <MapPin size={13} aria-hidden="true" />
             FEATURED SERIES
           </span>
         </div>
@@ -404,7 +403,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
     <div className="journey-page">
       <header className="journey-hero">
         <div>
-          <p className="journey-eyebrow">DISCOVER VIETNAM</p>
+
           <h1>Reading journey</h1>
           <p>Explore Vietnam through story series, region by region.</p>
         </div>
@@ -464,7 +463,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
         >
           {!region ? (
             <>
-              <p className="journey-eyebrow">REGIONAL READING JOURNEY</p>
+
               <h2>Explore Vietnam</h2>
               <p className="journey-rail-intro">
                 The reading journey begins in Northern Vietnam. Central and Southern regions will unlock soon.
