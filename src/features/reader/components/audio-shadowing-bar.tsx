@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Play, Pause, Volume2, VolumeX, Mic, Repeat, Gauge, RotateCcw, Sparkles, SlidersHorizontal } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Mic, Repeat, Gauge, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AudioShadowingBarProps {
@@ -134,7 +134,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             }`}
           >
             {isPlaying ? (
-              <Sparkles className="w-4 h-4 text-antique-gold" />
+              <Mic className="w-4 h-4 text-antique-gold" />
             ) : (
               <Volume2 className="w-4 h-4 text-antique-gold" />
             )}
@@ -239,11 +239,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
           {/* Scrubber / Progress Bar */}
           <div className="reader-audio-timeline order-last flex basis-full items-center gap-2 flex-1 min-w-[100px] select-none md:order-none md:basis-auto md:max-w-xs">
             <span
-              style={{
-                fontVariantNumeric: "tabular-nums",
-                fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-              }}
-              className={`text-[11px] font-semibold text-right w-8 min-w-[32px] block shrink-0 select-none ${
+              className={`text-[11px] tabular-nums font-semibold text-right w-8 min-w-[32px] block shrink-0 select-none ${
                 isDark ? "text-sky-mist" : "text-heritage-green/80"
               }`}
             >
@@ -273,11 +269,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             </div>
 
             <span
-              style={{
-                fontVariantNumeric: "tabular-nums",
-                fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-              }}
-              className={`text-[11px] font-semibold text-left w-8 min-w-[32px] block shrink-0 select-none ${
+              className={`text-[11px] tabular-nums font-semibold text-left w-8 min-w-[32px] block shrink-0 select-none ${
                 isDark ? "text-sky-mist" : "text-heritage-green/80"
               }`}
             >
@@ -307,7 +299,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
               aria-label={`Playback speed ${playbackSpeed}x`}
             >
               <Gauge className="w-3 h-3" />
-              <span className="font-mono tabular-nums text-[10px]">{playbackSpeed}x</span>
+              <span className="tabular-nums font-semibold text-[10px]">{playbackSpeed}x</span>
             </button>
           </div>
 

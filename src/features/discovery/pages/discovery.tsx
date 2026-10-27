@@ -99,8 +99,10 @@ export default function DiscoveryPage() {
   return (
     <div className="discovery-editorial">
       <header className="discovery-header">
-        <div><p className="discovery-eyebrow">DISCOVER VIETNAM</p><h1>Stories from Vietnam</h1>
-          <p>Choose a story. See Vietnam from a new perspective.</p></div>
+        <div>
+          <h1>Stories from Vietnam</h1>
+          <p>Explore available Vietnamese cultural stories with bilingual reading and audio.</p>
+        </div>
         <div className="discovery-modes" role="group" aria-label="Explore by">
           <button type="button" onClick={showJourney}>Journey</button>
           <button type="button" aria-pressed="true">Stories</button>

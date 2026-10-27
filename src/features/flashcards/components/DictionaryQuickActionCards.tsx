@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Compass, Plus, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, Compass, Plus } from "lucide-react";
 import { LESSONS_DATA } from "@/data/discoveryData";
 import { resolveDeckCards } from "@/data/flashcardsData";
 import { DeckCoverIllustration } from "./DeckCoverIllustration";
@@ -15,7 +15,7 @@ export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onOpen
       <article className="vocab-featured">
         <DeckCoverIllustration category="Heritage" className="vocab-featured-image" />
         <div className="vocab-featured-content">
-          <span className="vocab-featured-label"><Sparkles size={14} /> TODAY’S PICK</span>
+          <span className="vocab-featured-label"><BookOpen size={14} /> TODAY’S PICK</span>
           <h2>A little English,<br />a glimpse of <em>imperial Hue.</em></h2>
           <p>Explore Hue’s royal architecture, one flashcard at a time.</p>
           <div className="vocab-featured-footer">

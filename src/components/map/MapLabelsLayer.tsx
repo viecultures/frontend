@@ -3,8 +3,6 @@ import type { MapLabelsLayerProps } from './types';
 import { toEnglishPlaceName } from '@/utils/vietnamMapUtils';
 
 // Major anchor hubs displayed when activeRegion === 'all' at default zoom scale (< 1.45).
-// Smaller delta provinces (Bắc Ninh, Hưng Yên, Hà Nam, Ninh Bình, v.v.) are omitted at national scale
-// to prevent label collisions in dense delta areas, and become visible when zooming in or switching to regional views.
 const MAJOR_ANCHOR_PROVINCES = new Set([
   // North
   'ha-noi',
@@ -39,7 +37,6 @@ export const MapLabelsLayer: React.FC<MapLabelsLayerProps> = ({
   zoomScale = 1,
   labelLanguage = 'vi',
 }) => {
-  const hasFocus = selectedProvinceId !== null;
   const isNationalOverview = activeRegion === 'all';
   const isZoomedIn = zoomScale >= 1.45;
 
@@ -55,24 +52,19 @@ export const MapLabelsLayer: React.FC<MapLabelsLayerProps> = ({
         }
 
         // Level of Detail (LOD) check:
-        // In national overview, filter out non-anchor provinces unless user zoomed in, hovers, or selects
         if (isNationalOverview && !isZoomedIn && !MAJOR_ANCHOR_PROVINCES.has(p.id) && !isHovered && !isSelected) {
           return null;
         }
 
-        let labelClass = 'fill-warm-ivory text-[8.5px] sm:text-[9.5px] font-bold opacity-100';
-        let strokeWidth = '2.5px';
+        let labelClass = 'fill-white text-[10.5px] sm:text-[11.5px] font-extrabold opacity-100';
+        let strokeWidth = '1.4px';
 
         if (isSelected) {
-          labelClass = 'fill-warm-ivory font-black text-[11px] sm:text-[12px] opacity-100';
-          strokeWidth = '3.5px';
+          labelClass = 'fill-antique-bright text-[12.5px] sm:text-[13.5px] font-black opacity-100';
+          strokeWidth = '2.2px';
         } else if (isHovered) {
-          labelClass = 'fill-antique-bright font-bold text-[10px] opacity-100';
-          strokeWidth = '2.8px';
-        } else if (hasFocus) {
-          // Keep other provinces in region softly dimmed so user can easily browse and click next
-          labelClass = 'fill-warm-ivory/75 text-[8px] sm:text-[9px] font-semibold opacity-40';
-          strokeWidth = '2.0px';
+          labelClass = 'fill-antique-bright text-[11.5px] sm:text-[12.5px] font-extrabold opacity-100';
+          strokeWidth = '1.8px';
         }
 
         return (
@@ -82,12 +74,13 @@ export const MapLabelsLayer: React.FC<MapLabelsLayerProps> = ({
             y={p.cy}
             textAnchor="middle"
             dominantBaseline="middle"
-            className={`transition-all duration-300 ${labelClass}`}
+            className={`transition-all duration-200 tracking-wide ${labelClass}`}
             style={{
-              paintOrder: 'stroke',
+              paintOrder: 'stroke fill',
               stroke: 'var(--color-heritage-forest)',
               strokeWidth,
               strokeLinejoin: 'round',
+              filter: 'drop-shadow(0 1px 2px rgba(10, 30, 24, 0.85))',
             }}
           >
             {labelLanguage === 'en' ? toEnglishPlaceName(p.name) : p.name}

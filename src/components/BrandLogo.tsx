@@ -22,8 +22,8 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   // Sizing definitions
   const iconSizeClasses = {
     sm: 'w-8 h-8 rounded-xl',
-    md: 'w-10 h-10 rounded-2xl',
-    lg: 'w-12 h-12 rounded-2xl',
+    md: 'w-10 h-10 rounded-xl',
+    lg: 'w-12 h-12 rounded-xl',
   }[size];
 
   const textSizeClasses = {
@@ -47,8 +47,8 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     >
       {/* Visual Emblem Container */}
       <div
-        className={`relative ${iconSizeClasses} border border-antique-gold/50 overflow-hidden shrink-0 shadow-md transition-all duration-300 ${
-          onClick ? 'group-hover:scale-105 group-hover:border-antique-gold group-hover:shadow-[0_0_15px_color-mix(in_srgb,_var(--color-antique-gold)_35%,_transparent)]' : ''
+        className={`relative ${iconSizeClasses} border border-antique-gold/50 overflow-hidden shrink-0 transition-transform duration-200 ${
+          onClick ? 'group-hover:scale-105 group-hover:border-antique-gold' : ''
         }`}
       >
         <img src="/brand/viecultures-mascot-logo.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
@@ -69,7 +69,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
           {/* Optional Badge / Room indicator */}
           {badge && (
             <div className={`hidden sm:flex items-center gap-1.5 text-xs font-medium pl-2.5 border-l ${theme === 'dark' ? 'text-warm-ivory/80 border-warm-ivory/20' : 'text-ink-soft border-line'}`}>
-              <span className="w-2 h-2 rounded-full bg-mountain-teal animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-mountain-teal" />
               <span>{badge}</span>
             </div>
           )}

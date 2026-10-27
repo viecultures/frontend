@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowUpRight, Check, CirclePause, Hand, MessageCircle, Moon, MousePointer2, Play, Sparkles, Sun, VolumeX } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Check, CirclePause, Hand, MessageCircle, Moon, MousePointer2, Play, Award, Sun, VolumeX } from 'lucide-react';
 import { OwlMascot } from '@/components/mascot/OwlMascot';
 import type { OwlState } from '@/components/mascot/OwlMascot';
 import './mascot-demo.css';
@@ -8,7 +8,7 @@ import './mascot-demo.css';
 const STATES = [
   { id: 'idle', name: 'Chờ', caption: 'Dõi theo con trỏ, chớp mắt nhẹ.', icon: MousePointer2, message: 'Mình ở đây. Hôm nay ta khám phá đâu nhỉ?', duration: 6500 },
   { id: 'talking', name: 'Nói chuyện', caption: 'Mấp máy mỏ, nhún theo nhịp nói.', icon: MessageCircle, message: 'Bạn biết không, mỗi vùng đất đều có một câu chuyện…', duration: 6000 },
-  { id: 'celebrating', name: 'Chúc mừng', caption: 'Cười tươi, nảy vui cùng những tia sáng.', icon: Sparkles, message: 'Làm tốt lắm! Thêm một điều thú vị được khám phá.', duration: 4500 },
+  { id: 'celebrating', name: 'Chúc mừng', caption: 'Cười tươi, nảy vui cùng những tia sáng.', icon: Award, message: 'Làm tốt lắm! Thêm một điều thú vị được khám phá.', duration: 4500 },
   { id: 'sleeping', name: 'Ngủ gật', caption: 'Lim dim, thở chậm và gật gù.', icon: Moon, message: 'Mình nghỉ mắt một chút… Chạm để gọi mình nhé.', duration: 6000 },
 ] as const;
 

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Mascot } from 'page-mascot';
-import { Sparkles, Star } from 'lucide-react';
 import { useReducedMotion } from 'motion/react';
 import './owl-mascot.css';
 
@@ -75,9 +74,6 @@ export function OwlMascot({ state, size = 280, reducedMotion = false, active = t
           </button>
         )}
       </div>
-      {state === 'celebrating' && <div className="owl-mascot__sparkles" aria-hidden="true">
-        <Sparkles /><Star /><Sparkles /><Star />
-      </div>}
       {state === 'talking' && <div className="owl-mascot__voice" aria-hidden="true">
         {[0, 1, 2, 3, 4].map(index => <span key={index} style={{ animationDelay: `${index * 110}ms` }} />)}
       </div>}

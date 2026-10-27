@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flower2, Lock, CheckCircle2, MapPin, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
+import { Flower2, Lock, CheckCircle2, MapPin, BookOpen, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { ProfileSealIcon } from './ProfileSealIcon';
@@ -43,7 +43,7 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-antique-gold/20 text-antique-gold text-xs font-bold uppercase tracking-widest border border-antique-gold/40">
-              <Sparkles aria-hidden="true" className="w-3.5 h-3.5" />
+              <MapPin aria-hidden="true" className="w-3.5 h-3.5" />
               <span>Your cultural passport</span>
             </div>
             <h2 className="font-serif text-2xl sm:text-3xl font-extrabold tracking-tight text-warm-ivory">

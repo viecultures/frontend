@@ -4,12 +4,19 @@ export interface CommunityComment {
   avatarText: string;
   timeAgo: string;
   text: string;
+  likesCount?: number;
+  userLiked?: boolean;
+  replies?: CommunityComment[];
 }
 
 export interface HighlightVocabItem {
   word: string;
-  ipa: string;
+  ipa?: string;
   meaning: string;
+  partOfSpeech?: string;
+  synonyms?: string[];
+  exampleSentence?: string;
+  isSaved?: boolean;
 }
 
 export interface CommunityPost {
@@ -17,9 +24,14 @@ export interface CommunityPost {
   authorName: string;
   authorRole: string;
   avatarText: string;
+  avatarUrl?: string;
+  isAmbassador?: boolean;
+  authorBio?: string;
+  authorFollowing?: boolean;
   timeAgo: string;
   lessonTag: string;
   topicCategory: 'architecture' | 'cuisine' | 'festivals' | 'crafts' | 'general';
+  topicSlug?: 'imperial-hue' | 'saigon-food' | 'hoi-an' | 'vietnamese-traditions';
   title?: string;
   contentEn: string;
   highlightWords: HighlightVocabItem[] | string[];
@@ -32,6 +44,16 @@ export interface CommunityPost {
   imageUrl?: string;
   imageBgGradient?: string;
   comments?: CommunityComment[];
+  feedType?: 'for-you' | 'following' | 'latest' | 'trending';
+}
+
+export interface TopAmbassadorItem {
+  name: string;
+  role: string;
+  points: string;
+  initials: string;
+  rank: number;
+  avatarUrl?: string;
 }
 
 export interface ContestEntry {

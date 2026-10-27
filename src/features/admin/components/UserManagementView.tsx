@@ -18,7 +18,6 @@ import {
   Calendar,
   Lock,
   Unlock,
-  Sparkles,
   Layers,
 } from 'lucide-react';
 import type { AdminUserItem, CefrLevel } from '../types/adminTypes';

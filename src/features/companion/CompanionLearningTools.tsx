@@ -1,5 +1,5 @@
 import React, { useState, useId, useRef } from 'react';
-import { Compass, Search, BookOpen, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
+import { Compass, Search, BookOpen, ArrowRight, Loader2 } from 'lucide-react';
 import type { VocabItem } from '@/data/readerData';
 import { lookupWordInstant } from '@/utils/dictionary-service';
 
@@ -240,7 +240,7 @@ export const CompanionLearningTools: React.FC<CompanionLearningToolsProps> = ({
                     }
                     className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#5d8a45] hover:underline"
                   >
-                    <Sparkles className="h-3 w-3" />
+                    <BookOpen className="h-3 w-3" />
                     Ask companion about "{lookupResult.word}"
                   </button>
                 </div>
@@ -253,7 +253,7 @@ export const CompanionLearningTools: React.FC<CompanionLearningToolsProps> = ({
       {/* Grounded Conversation Starters */}
       <div className="space-y-2 rounded-2xl border border-[#c9d6b0] bg-white p-3.5 shadow-[0_3px_0_-1px_#dfe5cf]">
         <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#7a8a66]">
-          <Sparkles className="h-3.5 w-3.5 text-[#5d8a45]" />
+          <BookOpen className="h-3.5 w-3.5 text-[#5d8a45]" />
           Conversation Starters
         </h4>
         <div className="space-y-1.5">

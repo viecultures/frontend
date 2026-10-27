@@ -9,7 +9,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { Mic, MicOff, Sparkles, RefreshCw } from 'lucide-react';
+import { Mic, MicOff, RefreshCw } from 'lucide-react';
 
 export interface ImmersiveAudioVisualizerProps {
   isPlaying?: boolean;

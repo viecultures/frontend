@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from '@/components/Link';
-import { MapPin, BookOpen, Sparkles, Clock } from 'lucide-react';
+import { MapPin, BookOpen, Clock } from 'lucide-react';
 import VietnamMapCarousel from '@/features/discovery/components/vietnam-map-carousel';
 import { VIETNAM_LANDMARKS, type LandmarkArticle } from '@/data/landmarksData';
 import type { ProvinceMapItem } from '@/data/vietnamMapData';
@@ -94,7 +94,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
                 <span>{activeLandmark.readTime} đọc song ngữ</span>
               </span>
               <span className="bg-antique-gold text-heritage-green px-3 py-0.5 rounded-full font-extrabold text-[11px] shadow-xs flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-heritage-green fill-heritage-green" />
+                <BookOpen className="w-3 h-3 text-heritage-green fill-heritage-green" />
                 <span>Di Sản Tiêu Điểm</span>
               </span>
             </div>
@@ -128,7 +128,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
                 key={i}
                 className="px-2.5 py-0.5 rounded-xl text-xs font-bold bg-heritage-green/10 text-heritage-green border border-heritage-green/12 inline-flex items-center gap-1"
               >
-                <Sparkles className="w-3 h-3 text-antique-gold" />
+                <BookOpen className="w-3 h-3 text-antique-gold" />
                 <span>{vocab}</span>
               </span>
             ))}
@@ -148,7 +148,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
               href="/flashcards"
               className="px-4 py-2.5 text-xs font-bold flex items-center gap-2 rounded-full bg-rice-paper text-heritage-green border border-heritage-green/20 hover:bg-mist-cloud transition-all focus-ring"
             >
-              <Sparkles className="w-4 h-4 text-antique-gold" />
+              <BookOpen className="w-4 h-4 text-antique-gold" />
               <span>Ôn Flashcard Địa Danh</span>
             </Link>
           </div>

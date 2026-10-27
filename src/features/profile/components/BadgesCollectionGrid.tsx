@@ -3,7 +3,7 @@ import {
   Award,
   Compass,
   BookMarked,
-  Sparkles,
+  Lightbulb,
   Flame,
   ShieldCheck,
   PenTool,
@@ -44,8 +44,8 @@ export const BadgesCollectionGrid: React.FC<BadgesCollectionGridProps> = ({ badg
         return <MapPin aria-hidden="true" className="w-6 h-6" />;
       case 'BookMarked':
         return <BookMarked aria-hidden="true" className="w-6 h-6" />;
-      case 'Sparkles':
-        return <Sparkles aria-hidden="true" className="w-6 h-6" />;
+      case 'Lightbulb':
+        return <Lightbulb aria-hidden="true" className="w-6 h-6" />;
       case 'Flame':
         return <Flame aria-hidden="true" className="w-6 h-6" />;
       case 'ShieldCheck':

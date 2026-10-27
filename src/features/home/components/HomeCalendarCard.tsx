@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Heart, ZoomIn, X, Calendar as CalendarIcon, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart, ZoomIn, X, Calendar as CalendarIcon, CalendarDays } from 'lucide-react';
 import { CALENDAR_CARDS, createTodayCalendarCard, type CalendarCardItem } from '../data/calendarData';
 
 const FAVORITES_STORAGE_KEY = 'viecultures_calendar_favorites';
@@ -192,7 +192,7 @@ export function HomeCalendarCard() {
           {/* Speech bubble on click */}
           {mascotBubble && (
             <div className="home-calendar-bubble" role="status">
-              <Sparkles size={12} className="inline mr-1" aria-hidden="true" />
+              <CalendarDays size={12} className="inline mr-1" aria-hidden="true" />
               {mascotBubble}
             </div>
           )}

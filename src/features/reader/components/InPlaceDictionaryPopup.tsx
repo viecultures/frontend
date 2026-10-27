@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { SavedVocabularyContext } from '../hooks/useSavedVocabulary';
 import { createPortal } from "react-dom";
-import { Volume2, Bookmark, Check, X, Sparkles, BookOpen, ShieldAlert } from "lucide-react";
+import { Volume2, Bookmark, Check, X, BookOpen, ShieldAlert } from "lucide-react";
 import type { VocabItem } from "@/data/readerData";
 import { maskProfanity } from "@/utils/dictionary-service";
 

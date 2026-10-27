@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Trophy, Coins, Gift, Medal, Clock, PenTool, ShoppingBag, Sparkles, Landmark, Flame } from "lucide-react";
+import { Trophy, Coins, Gift, Medal, Clock, PenTool, ShoppingBag, Landmark, Flame } from "lucide-react";
 
 interface ContestHeroBannerProps {
   onOpenForm: () => void;
@@ -124,7 +124,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
 
             <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
               <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-antique-gold" />
+                <Trophy className="w-3 h-3 text-antique-gold" />
                 <span>Suggested vocabulary:</span>
               </span>
               {["architectural", "intangible", "geomancy", "fortress"].map((word) => (

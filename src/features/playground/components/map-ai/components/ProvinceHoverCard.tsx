@@ -1,5 +1,5 @@
 import React, { useId, useState } from 'react';
-import { Landmark, Volume2, X, Sparkles, MapPin, Utensils, Bot, ChevronDown, ChevronRight, BookOpen, ExternalLink } from 'lucide-react';
+import { Landmark, Volume2, X, MapPin, Utensils, Bot, ChevronDown, ChevronRight, BookOpen, ExternalLink } from 'lucide-react';
 import type { ProvinceCultureData } from '../types';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { paths } from '@/routes/paths';
@@ -76,7 +76,7 @@ export const ProvinceHoverCard: React.FC<ProvinceHoverCardProps> = ({
         {/* UNESCO / Heritage Title */}
         {provinceDetail.unescoTitle && (
           <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/20 text-[10.5px] flex items-center gap-1.5">
-            <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
+            <MapPin className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
             <span className="line-clamp-1 font-medium">{provinceDetail.unescoTitle}</span>
           </div>
         )}

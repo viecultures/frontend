@@ -66,14 +66,14 @@ export function ReaderPracticeView({ articleData, fontSize, vocabBtnClass, theme
 
   return <div className="rp-workspace" data-practice-theme={themeMode}>
     <header className="rp-heading">
-      <div><p className="rp-eyebrow">From reading to practice</p><h1>Listening & Speaking</h1><p>One story. Three ways to make it your own.</p></div>
+      <div><h1>Listening & Speaking</h1><p>One story. Three ways to make it your own.</p></div>
     </header>
     <div className="rp-grid" role="tabpanel" id={`practice-panel-${mode}`} aria-labelledby={`practice-tab-${mode}`}>
       <div className="rp-source">
         {mode === 'questions' ? <>
           <ReaderArticleContent language="en" themeMode={themeMode} fontSize={fontSize} articleData={articleData} vocabClassName={vocabBtnClass} onVocabClick={handleVocabClick} onMouseUp={handleTextSelection} onDoubleClick={handleTextSelection} />
         </> : <section className="reader-language-sheet rp-transcript" data-reader-theme={themeMode} aria-label={mode === 'dictation' ? 'Listening passage' : 'Shadowing transcript'}>
-          <p className="rp-eyebrow">{mode === 'dictation' ? 'Listen closely' : 'Follow the transcript'}</p>
+
           <h2 className="reader-article-title">{articleData.titleEn}</h2>
           {segment ? <>
             <div className="rp-between rp-passage-heading"><span>Passage {segmentIndex + 1} of {segments.length}</span><span>{articleData.shadowingAudioUrl && segment.audioRange ? 'Article recording' : 'Browser voice'}</span></div>

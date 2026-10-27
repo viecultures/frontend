@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  Sparkles,
+  Trophy,
   Coins,
   TrendingUp,
   Flame,
@@ -90,7 +90,7 @@ export const RewardCelebrationModal: React.FC = () => {
                   ) : unlockedBadge ? (
                     <Award className="w-10 h-10 text-antique-gold" />
                   ) : (
-                    <Sparkles className="w-10 h-10 text-antique-gold" />
+                    <Trophy className="w-10 h-10 text-antique-gold" />
                   )}
                 </div>
               </div>

@@ -9,7 +9,7 @@ import {
 } from "../components";
 import { CommunityHeader } from "../components/CommunityHeader";
 import { communityLabel } from "../community-copy";
-import { Trophy, Coins, Sparkles, TrendingUp, Clock, Plus, Check, Heart } from "lucide-react";
+import { Trophy, Coins, TrendingUp, Clock, Plus, Check, Heart } from "lucide-react";
 
 const INITIAL_CONTEST_ENTRIES: ContestEntry[] = [
   {

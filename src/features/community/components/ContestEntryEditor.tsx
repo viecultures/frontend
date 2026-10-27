@@ -1,4 +1,4 @@
-import { X, Send, Coins, Gift, Sparkles, Landmark, BookOpen, CheckCircle2 } from "lucide-react";
+import { X, Send, Coins, Gift, BookOpen, Landmark, CheckCircle2 } from "lucide-react";
 
 interface ContestEntryEditorProps {
   isOpen: boolean;
@@ -85,7 +85,7 @@ export function ContestEntryEditor({
       <div className="p-4 rounded-2xl bg-surface border border-heritage-green/10 space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
+            <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
             <span>Select the vocabulary used in your entry (use 3+ words to earn coins):</span>
           </span>
           <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">

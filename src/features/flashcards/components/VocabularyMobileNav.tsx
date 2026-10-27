@@ -1,4 +1,4 @@
-import { BookMarked, PlusCircle, Sparkles } from 'lucide-react';
+import { BookMarked, PlusCircle } from 'lucide-react';
 import { PATHS } from '@/routes/paths';
 
 interface VocabularyMobileNavProps {
@@ -12,7 +12,7 @@ export function VocabularyMobileNav({ currentPath, onNavigate, onAddWord }: Voca
     <nav className="vocab-mobile-nav lg:hidden" aria-label="Vocabulary navigation">
       <button onClick={() => onNavigate(PATHS.dictionary)} aria-current={currentPath === PATHS.dictionary ? 'page' : undefined}><BookMarked size={16} />Library</button>
       <button onClick={onAddWord}><PlusCircle size={16} />Add word</button>
-      <button onClick={() => onNavigate(PATHS.flashcardStudy)} aria-current={currentPath === PATHS.flashcardStudy ? 'page' : undefined}><Sparkles size={16} />Review</button>
+      <button onClick={() => onNavigate(PATHS.flashcardStudy)} aria-current={currentPath === PATHS.flashcardStudy ? 'page' : undefined}><BookMarked size={16} />Review</button>
     </nav>
   );
 }

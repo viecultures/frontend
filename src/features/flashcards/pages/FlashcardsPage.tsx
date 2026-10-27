@@ -5,7 +5,6 @@ import {
   Volume2,
   CheckCircle2,
   RotateCw,
-  Sparkles,
   BookOpen,
   ArrowLeft,
   AlertCircle,
@@ -439,7 +438,7 @@ export const FlashcardsPage: React.FC = () => {
           {isComplete ? (
             <div className="w-full max-w-lg p-6 rounded-2xl bg-surface-raised border border-antique-gold/30 shadow-xl text-center space-y-6">
               <div className="w-16 h-16 mx-auto rounded-full bg-[#059669]/15 flex items-center justify-center text-[#059669]">
-                <Sparkles className="w-8 h-8 animate-bounce" />
+                <BookOpen className="w-8 h-8 animate-bounce" />
               </div>
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold text-heritage-green dark:text-warm-ivory">
@@ -453,7 +452,7 @@ export const FlashcardsPage: React.FC = () => {
 
               {reward && (
                 <div className="p-4 rounded-xl bg-antique-gold/15 border border-antique-gold/30 text-antique-gold font-bold flex items-center justify-center gap-2">
-                  <Sparkles className="w-5 h-5" />
+                  <BookOpen className="w-5 h-5" />
                   <span>+{reward.xpEarned || 20} XP Cột mốc Flashcard!</span>
                 </div>
               )}

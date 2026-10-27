@@ -6,7 +6,6 @@ import {
   Volume2,
   VolumeX,
   Repeat,
-  Sparkles,
   ChevronDown,
   ChevronUp,
   SlidersHorizontal,
@@ -171,7 +170,7 @@ export const StickyAudioPlayer: React.FC<StickyAudioPlayerProps> = ({
                     title="Click to jump to active paragraph in view"
                   >
                     <span>Đoạn {activeParagraphIndex + 1}/{totalParagraphs}</span>
-                    <Sparkles className="w-2.5 h-2.5" />
+                    <Volume2 className="w-2.5 h-2.5" />
                   </button>
                 )}
                 {selectedVoiceName && (

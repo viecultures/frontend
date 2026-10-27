@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { X, Sparkles, Volume2, Play, Pause, Check, Headphones, Globe, BookOpen, Layers } from "lucide-react";
+import { X, Headphones, Volume2, Play, Pause, Check, Globe, BookOpen, Layers } from "lucide-react";
 import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
 
 interface VoiceCustomizerModalProps {
@@ -255,7 +255,7 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
         {/* Footer Actions */}
         <div className="mt-8 pt-4 border-t border-antique-gold/20 flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs text-antique-gold">
-            <Sparkles className="w-4 h-4" />
+            <Headphones className="w-4 h-4" />
             <span>Google Gemini TTS 24kHz Studio Audio</span>
           </div>
 

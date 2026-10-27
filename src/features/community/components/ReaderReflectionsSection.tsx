@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   Heart,
   MessageSquare,
-  Sparkles,
+  BookOpen,
   ShieldCheck,
   Flag,
   Send,
@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   Clock,
   Plus,
-  BookOpen,
 } from "lucide-react";
 import type { UserReflectionItem } from "../types";
 import {
@@ -268,7 +267,7 @@ export function ReaderReflectionsSection({
     } else {
       setNotice({
         type: "success",
-        text: "✨ Thank you! Your reflection is published. Celebrate expressing yourself in your own voice!",
+        text: "Thank you! Your reflection is published. Celebrate expressing yourself in your own voice!",
       });
     }
 
@@ -376,7 +375,7 @@ export function ReaderReflectionsSection({
         <div className="quick-vocab-toolbar mb-6">
           <div className="flex items-center justify-between mb-2.5">
             <label className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 text-antique-gold">
-              <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
+              <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
               <span>Quick Vocab Toolbar • Chèn nhanh từ vựng bài học</span>
             </label>
             <span className="text-[11px] opacity-70">
@@ -475,7 +474,7 @@ export function ReaderReflectionsSection({
             <div className="flex items-center gap-2 flex-wrap">
               {detectedVocab.matchedWords.length > 0 ? (
                 <span className="text-antique-gold font-bold inline-flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <BookOpen className="w-3.5 h-3.5" />
                   <span>Heritage words used ({detectedVocab.matchedWords.length}):</span>
                   <span className="font-semibold underline">
                     {detectedVocab.matchedWords.join(", ")}
@@ -633,7 +632,7 @@ export function ReaderReflectionsSection({
                   {ref.usedWords && ref.usedWords.length > 0 && (
                     <div className="flex flex-wrap items-center gap-1.5 mb-3">
                       <span className="text-[10px] font-bold uppercase tracking-wider opacity-65 flex items-center gap-1">
-                        <Sparkles className="w-2.5 h-2.5 text-antique-gold" />
+                        <BookOpen className="w-2.5 h-2.5 text-antique-gold" />
                         <span>Vocab applied:</span>
                       </span>
                       {ref.usedWords.map((word) => (

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Award,
   Flame,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   CheckCircle2,

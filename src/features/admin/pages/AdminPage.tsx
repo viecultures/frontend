@@ -9,7 +9,6 @@ import {
   Edit3,
   Eye,
   RefreshCw,
-  Sparkles,
   MapPin,
   Layers,
   FileSpreadsheet,
@@ -204,7 +203,7 @@ export const AdminPage: React.FC = () => {
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-antique-gold/20 text-antique-bright border border-antique-gold/30 text-xs font-bold">
-                <Sparkles aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                <BookOpen aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
                 <span>VieCultures · Administration</span>
               </div>
               <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
@@ -791,7 +790,7 @@ export const AdminPage: React.FC = () => {
                 {previewPost.vocabularies && previewPost.vocabularies.length > 0 && (
                   <div className="space-y-3">
                     <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-antique-bright border-b border-antique-gold/20 pb-2 flex items-center gap-2">
-                      <Sparkles aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                      <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                       <span>Vocabulary ({previewPost.vocabularies.length} items)</span>
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

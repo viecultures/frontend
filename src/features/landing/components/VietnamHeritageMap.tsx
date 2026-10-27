@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Volume2, VolumeX, Sparkles, MapPin, Award, BookOpen } from 'lucide-react';
+import { X, Volume2, VolumeX, MapPin, Award, BookOpen } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import {
   HERITAGE_SITES,
@@ -406,7 +406,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
             <div className="p-4 rounded-2xl bg-sky-mist/40 dark:bg-[#102B26]/80 border border-horizon-blue/60 dark:border-heritage-green space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-heritage-green dark:text-antique-gold uppercase tracking-wide flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
+                  <MapPin className="w-3.5 h-3.5 text-antique-gold" />
                   <span>Sample presentation</span>
                 </span>
                 <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-antique-gold/20 text-heritage-green dark:text-antique-gold font-semibold">

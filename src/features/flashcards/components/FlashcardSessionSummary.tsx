@@ -4,7 +4,6 @@ import {
   RotateCcw,
   Compass,
   Home,
-  Sparkles,
   Zap,
   Coins,
   Volume2,
@@ -82,7 +81,7 @@ export function FlashcardSessionSummary({
             />
           </div>
           <div className="absolute -bottom-1 -right-1 bg-action text-on-action p-1 rounded-full shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-antique-gold" />
+            <Zap className="w-3.5 h-3.5 text-antique-gold" />
           </div>
         </div>
 

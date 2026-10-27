@@ -1,4 +1,4 @@
-import { ArrowRight, BookMarked, PlusCircle, Sparkles } from 'lucide-react';
+import { ArrowRight, BookMarked, PlusCircle } from 'lucide-react';
 import { PATHS } from '@/routes/paths';
 
 interface VocabularySidebarProps {
@@ -27,12 +27,12 @@ export function VocabularySidebar({ currentPath, search, onNavigate, onAddWord }
             <PlusCircle className="w-5 h-5 text-antique-gold" /><span>Add a word</span>
           </button>
           <button onClick={() => onNavigate(PATHS.flashcardStudy)} aria-current={isStudy ? 'page' : undefined} className={`${itemClass} ${isStudy && !search.includes('mode=match') ? activeClass : inactiveClass}`}>
-            <Sparkles className="w-5 h-5 text-antique-gold" /><span>Spaced review</span>
+            <BookMarked className="w-5 h-5 text-antique-gold" /><span>Spaced review</span>
           </button>
         </nav>
       </div>
       <div className="p-4 rounded-3xl bg-gradient-to-br from-heritage-green to-heritage-dark text-warm-ivory space-y-2 border border-antique-gold/40 shadow-md">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-antique-gold"><Sparkles className="w-4 h-4" /><span>Learning community</span></div>
+        <div className="flex items-center gap-1.5 text-xs font-bold text-antique-gold"><BookMarked className="w-4 h-4" /><span>Learning community</span></div>
         <p className="text-[11px] text-sky-mist leading-relaxed">Share new words and explore Vietnamese culture through stories.</p>
         <button onClick={() => onNavigate(PATHS.community)} className="w-full py-2 rounded-xl bg-antique-gold hover:bg-antique-bright text-heritage-dark font-bold text-xs transition-colors cursor-pointer shadow-xs flex items-center justify-center gap-1 focus-ring">
           <span>Join the community</span><ArrowRight className="w-3.5 h-3.5" />

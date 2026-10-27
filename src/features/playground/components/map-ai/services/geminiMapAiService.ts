@@ -100,7 +100,7 @@ function generateLocalFallbackResponse(query: string, currentProvinceId?: string
   const culturalTags = [detail.regionName, detail.heritageType || 'Di sản văn hóa'];
 
   if (normQuery.includes('an') || normQuery.includes('am thuc') || normQuery.includes('dac san') || normQuery.includes('food')) {
-    text = `✨ **Khám phá Ẩm thực trứ danh tại ${province.name}**\n\n${province.name} mang nét đặc trưng ẩm thực độc đáo của vùng đất ${detail.regionName}:\n\n` +
+    text = `**Khám phá Ẩm thực trứ danh tại ${province.name}**\n\n${province.name} mang nét đặc trưng ẩm thực độc đáo của vùng đất ${detail.regionName}:\n\n` +
       detail.specialties.map((s) => `* **${s}**`).join('\n') +
       `\n\n💡 *Từ vựng di sản tiếng Anh:* **Local Specialty** (\`/ˈləʊ.kəl ˈspeʃ.əl.ti/\` - Đặc sản địa phương) & **Culinary Heritage** (\`/ˈkʌl.ɪ.nər.i ˈher.ɪ.tɪdʒ/\`).`;
   } else if (normQuery.includes('lo trinh') || normQuery.includes('tour') || normQuery.includes('itinerary') || normQuery.includes('ngay')) {

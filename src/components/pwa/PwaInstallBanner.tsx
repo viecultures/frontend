@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Download, 
-  Share, 
-  PlusSquare, 
-  X, 
-  Sparkles, 
-  Smartphone, 
-  CheckCircle2, 
-  Zap, 
-  BookOpen, 
+import {
+  Download,
+  Share,
+  PlusSquare,
+  X,
+  Smartphone,
+  CheckCircle2,
+  Zap,
+  BookOpen,
   ExternalLink,
-  Star
+  Star,
 } from 'lucide-react';
 import { usePWAInstall } from './usePWAInstall';
 
@@ -104,7 +103,7 @@ export const PwaInstallBanner: React.FC = () => {
 
             <div className="flex-1">
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-heritage-dark/10 dark:bg-[#DCA842]/15 text-heritage-dark dark:text-[#DCA842] text-[11px] font-semibold tracking-wide uppercase">
-                <Sparkles size={12} className="text-[#DCA842]" />
+                <Download size={12} className="text-[#DCA842]" />
                 Mobile web app
               </div>
               <h3 className="text-base font-bold font-serif text-heritage-dark dark:text-warm-ivory leading-snug mt-0.5">

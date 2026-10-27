@@ -11,7 +11,7 @@ interface PracticeDictationProps {
 
 export function PracticeDictation({ segment, answer, onAnswer, onListen, completed, total }: PracticeDictationProps) {
   return <section className="rp-activity" aria-label="Dictation activity">
-    <p className="rp-eyebrow">Listen · Type · Check</p><h2>Write what you hear</h2>
+    <h2>Write what you hear</h2>
     <p>Listen to the selected passage, then write it from memory. The transcript stays hidden until you check or reveal it.</p>
     <progress aria-label="Dictation passages matched" value={completed} max={total} />
     <small>{completed} of {total} passages matched</small>

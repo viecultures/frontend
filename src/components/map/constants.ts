@@ -17,12 +17,12 @@ export const DEFAULT_REGION_TABS: RegionTabItem[] = [
   {
     key: 'central',
     label: 'Central',
-    count: '11 places',
+    count: '10 places',
   },
   {
     key: 'south',
     label: 'South',
-    count: '8 places',
+    count: '9 places',
   },
 ];
 

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { X, Bookmark, BookmarkCheck, Sparkles, ArrowRight } from "lucide-react";
+import { X, Bookmark, BookmarkCheck, ArrowRight } from "lucide-react";
 import type { VocabItem } from "@/data/readerData";
 import { paths } from "@/routes/paths";
 
@@ -67,7 +67,7 @@ export function ReaderVocabDrawer({
               className="mb-5 flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-heritage-green text-warm-ivory text-xs font-semibold hover:bg-heritage-green/90 transition-all shadow-xs group"
             >
               <span className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-antique-gold shrink-0" />
+                <Bookmark className="w-4 h-4 text-antique-gold shrink-0" />
                 <span>Practice with Flashcards ({vocabList.length} words)</span>
               </span>
               <ArrowRight className="w-4 h-4 text-antique-gold shrink-0 transition-transform group-hover:translate-x-0.5" />

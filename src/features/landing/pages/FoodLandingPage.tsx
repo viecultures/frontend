@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react';
-import { ArrowDown, ArrowUpRight, BookOpen, Bookmark, Headphones, Menu, Pause, Play, RotateCcw, X } from 'lucide-react';
+import { ArrowDown, BookOpen, Bookmark, Headphones, Menu, Pause, Play, RotateCcw, X, ArrowRight } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { getPublishedSeries } from '@/data/series';
 import type { SeriesMetadata } from '@/data/series/types';
@@ -81,15 +81,15 @@ const FoodLandingPage: React.FC = () => {
             <button type="button" className="food-motion-toggle" onClick={() => setMotionOn((on) => !on)} aria-label={canAnimate ? 'Pause page motion' : 'Enable page motion'} title={canAnimate ? 'Pause page motion' : 'Enable page motion'} disabled={!!reducedMotion}>
               {canAnimate ? <Pause size={17} aria-hidden="true" /> : <Play size={17} aria-hidden="true" />}
             </button>
-            <button type="button" className="food-button food-button-small" onClick={() => openStory(featuredSeries)}>Start reading <ArrowUpRight size={16} aria-hidden="true" /></button>
+            <button type="button" className="food-button food-button-small" onClick={() => openStory(featuredSeries)}>Start reading <ArrowRight size={16} aria-hidden="true" /></button>
             <button type="button" className="food-menu-toggle" onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-controls="food-mobile-nav" aria-expanded={menuOpen}>
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
         {menuOpen && <nav id="food-mobile-nav" className="food-mobile-nav food-container" aria-label="Mobile landing navigation">
-          {navItems.map((item) => <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}<ArrowUpRight size={16} aria-hidden="true" /></a>)}
-          <button type="button" onClick={() => { setMenuOpen(false); openStory(featuredSeries); }}>Start reading <ArrowUpRight size={16} aria-hidden="true" /></button>
+          {navItems.map((item) => <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}<ArrowRight size={16} aria-hidden="true" /></a>)}
+          <button type="button" onClick={() => { setMenuOpen(false); openStory(featuredSeries); }}>Start reading <ArrowRight size={16} aria-hidden="true" /></button>
         </nav>}
       </header>
 
@@ -107,7 +107,7 @@ const FoodLandingPage: React.FC = () => {
                 Come closer to Vietnam through its food. Discover where a dish comes from, how people make it, and the English to share its story.
               </motion.p>
               <motion.div className="food-hero-actions" initial={canAnimate ? { opacity: 0, y: 24 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.72, delay: 0.42 }}>
-                <button type="button" className="food-button" onClick={() => openStory(featuredSeries)}>Start with a bowl of phở <ArrowUpRight size={18} aria-hidden="true" /></button>
+                <button type="button" className="food-button" onClick={() => openStory(featuredSeries)}>Start with a bowl of phở <ArrowRight size={18} aria-hidden="true" /></button>
                 <a href="#stories" className="food-text-link">Explore the stories <ArrowDown size={18} aria-hidden="true" /></a>
               </motion.div>
               <motion.div className="food-hero-footnote" initial={canAnimate ? { opacity: 0 } : false} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.6 }}>
@@ -126,7 +126,7 @@ const FoodLandingPage: React.FC = () => {
 
         <section id="how-it-works" className="food-section food-learning" aria-labelledby="food-learning-title">
           <div className="food-container">
-            <Reveal enabled={canAnimate} className="food-section-heading"><span className="food-eyebrow">01 / A WAY INTO THE LANGUAGE</span><h2 id="food-learning-title">More than a recipe. <em>A way to understand.</em></h2><p>Begin with one dish, then follow the language and the lives around it.</p></Reveal>
+            <Reveal enabled={canAnimate} className="food-section-heading"><span className="food-eyebrow">01 / A WAY INTO THE LANGUAGE</span><h2 id="food-learning-title">More than a recipe. <em>A way to understand</em></h2><p>Begin with one dish, then follow the language and the lives around it.</p></Reveal>
             <div className="food-learning-grid">
               {LEARNING_STEPS.map(({ icon: Icon, number, title, copy }, index) => <Reveal key={title} enabled={canAnimate} delay={index * 0.15} className="food-learning-step"><span className="food-learning-top"><span>{number}</span><Icon size={26} strokeWidth={1.5} aria-hidden="true" /></span><h3>{title}</h3><p>{copy}</p></Reveal>)}
             </div>
@@ -135,20 +135,20 @@ const FoodLandingPage: React.FC = () => {
 
         <section id="stories" className="food-section food-stories" aria-labelledby="food-stories-title">
           <div className="food-container">
-            <Reveal enabled={canAnimate} className="food-section-heading food-heading-row"><div><span className="food-eyebrow">02 / THE STORIES ON OUR TABLE</span><h2 id="food-stories-title">Find a dish, <em>stay for the story.</em></h2></div><p>Each series opens one familiar food through three connected chapters.</p></Reveal>
-            {featuredSeries && <Reveal enabled={canAnimate} className="food-featured-story"><div className="food-featured-image"><img src={featuredSeries.imageUrl} alt="Illustrated bowl of phở in Hanoi" width="1024" height="576" loading="lazy" /></div><div className="food-featured-copy"><span className="food-card-kicker">FEATURED SERIES · {featuredSeries.chapters.length} CHAPTERS</span><h3>{featuredSeries.titleVi}</h3><p>{featuredSeries.description}</p><button type="button" className="food-text-link" onClick={() => openStory(featuredSeries)}>Read the first chapter <ArrowUpRight size={18} aria-hidden="true" /></button></div></Reveal>}
+            <Reveal enabled={canAnimate} className="food-section-heading food-heading-row"><div><span className="food-eyebrow">02 / THE STORIES ON OUR TABLE</span><h2 id="food-stories-title">Find a dish, <em>stay for the story</em></h2></div><p>Each series opens one familiar food through three connected chapters.</p></Reveal>
+            {featuredSeries && <Reveal enabled={canAnimate} className="food-featured-story"><div className="food-featured-image"><img src={featuredSeries.imageUrl} alt="Illustrated bowl of phở in Hanoi" width="1024" height="576" loading="lazy" /></div><div className="food-featured-copy"><span className="food-card-kicker">FEATURED SERIES · {featuredSeries.chapters.length} CHAPTERS</span><h3>{featuredSeries.titleVi}</h3><p>{featuredSeries.description}</p><button type="button" className="food-text-link" onClick={() => openStory(featuredSeries)}>Read the first chapter <ArrowRight size={18} aria-hidden="true" /></button></div></Reveal>}
             <div className="food-series-grid">
-              {otherSeries.map((series, index) => <Reveal key={series.id} enabled={canAnimate} delay={(index % 3) * 0.12} className="food-series-card"><button type="button" onClick={() => openStory(series)} aria-label={`Read ${series.titleVi}`}><span className="food-series-image"><img src={series.imageUrl} alt="" width="1024" height="576" loading="lazy" /><span className="food-series-arrow"><ArrowUpRight size={20} aria-hidden="true" /></span></span><span className="food-card-kicker">{series.chapters.length} CHAPTERS · {series.region === 'north' ? 'NORTHERN VIETNAM' : 'SOUTHERN VIETNAM'}</span><strong>{series.titleVi}</strong><small>{series.title}</small></button></Reveal>)}
+              {otherSeries.map((series, index) => <Reveal key={series.id} enabled={canAnimate} delay={(index % 3) * 0.12} className="food-series-card"><button type="button" onClick={() => openStory(series)} aria-label={`Read ${series.titleVi}`}><span className="food-series-image"><img src={series.imageUrl} alt="" width="1024" height="576" loading="lazy" /><span className="food-series-arrow"><ArrowRight size={20} aria-hidden="true" /></span></span><span className="food-card-kicker">{series.chapters.length} CHAPTERS · {series.region === 'north' ? 'NORTHERN VIETNAM' : 'SOUTHERN VIETNAM'}</span><strong>{series.titleVi}</strong><small>{series.title}</small></button></Reveal>)}
             </div>
-            <Reveal enabled={canAnimate} className="food-more-stories"><p>Curious beyond food? The full collection has stories across Vietnamese culture.</p><Link to={withQuery(PATHS.discovery, { view: 'stories' })} className="food-text-link">Explore all stories <ArrowUpRight size={18} aria-hidden="true" /></Link></Reveal>
+            <Reveal enabled={canAnimate} className="food-more-stories"><p>Curious beyond food? The full collection has stories across Vietnamese culture.</p><Link to={withQuery(PATHS.discovery, { view: 'stories' })} className="food-text-link">Explore all stories <ArrowRight size={18} aria-hidden="true" /></Link></Reveal>
           </div>
         </section>
 
-        {featuredSeries && <section id="journey" className="food-section food-deep-dive" aria-labelledby="food-deep-title"><div className="food-container food-deep-grid"><Reveal enabled={canAnimate} className="food-deep-visual"><img src={featuredSeries.imageUrl} alt="Phở and the landscape of Hanoi" width="1024" height="576" loading="lazy" /><span>ONE DISH · MANY LAYERS</span></Reveal><div className="food-deep-copy"><Reveal enabled={canAnimate}><span className="food-eyebrow">03 / GO DEEPER</span><h2 id="food-deep-title">One bowl of phở. <em>Three chapters to explore.</em></h2><p>From the kitchen to the morning street, follow one dish through the details that give it meaning.</p></Reveal><ol className="food-chapter-list">{featuredSeries.chapters.map((chapter, index) => <li key={chapter.id}><Reveal enabled={canAnimate} delay={index * 0.14}><button type="button" onClick={() => navigate(paths.reader({ story: chapter.id }))}><span className="food-chapter-number">0{index + 1}</span><span><strong>{chapter.titleEn}</strong><small>{chapter.summary}</small></span><ArrowUpRight size={18} aria-hidden="true" /></button></Reveal></li>)}</ol></div></div></section>}
+        {featuredSeries && <section id="journey" className="food-section food-deep-dive" aria-labelledby="food-deep-title"><div className="food-container food-deep-grid"><Reveal enabled={canAnimate} className="food-deep-visual"><img src={featuredSeries.imageUrl} alt="Phở and the landscape of Hanoi" width="1024" height="576" loading="lazy" /><span>ONE DISH · MANY LAYERS</span></Reveal><div className="food-deep-copy"><Reveal enabled={canAnimate}><span className="food-eyebrow">03 / GO DEEPER</span><h2 id="food-deep-title">One bowl of phở. <em>Three chapters to explore</em></h2><p>From the kitchen to the morning street, follow one dish through the details that give it meaning.</p></Reveal><ol className="food-chapter-list">{featuredSeries.chapters.map((chapter, index) => <li key={chapter.id}><Reveal enabled={canAnimate} delay={index * 0.14}><button type="button" onClick={() => navigate(paths.reader({ story: chapter.id }))}><span className="food-chapter-number">0{index + 1}</span><span><strong>{chapter.titleEn}</strong><small>{chapter.summary}</small></span><ArrowRight size={18} aria-hidden="true" /></button></Reveal></li>)}</ol></div></div></section>}
 
         <section id="contact" className="food-section food-contact" aria-labelledby="food-contact-title"><div className="food-container food-contact-grid"><Reveal enabled={canAnimate}><span className="food-eyebrow">04 / GET IN TOUCH</span><h2 id="food-contact-title">Have a food story <em>worth sharing?</em></h2></Reveal><Reveal enabled={canAnimate} delay={0.12} className="food-contact-copy"><p>Ideas about a regional dish, a family food tradition, or a collaboration are welcome as VieCultures grows.</p><span>Contact details will be available here soon.</span></Reveal></div></section>
 
-        <section className="food-final" aria-labelledby="food-final-title"><div className="food-container food-final-inner"><Reveal enabled={canAnimate}><span className="food-eyebrow">YOUR NEXT STORY IS WAITING</span><h2 id="food-final-title">Begin with a taste.<br /><em>Leave with a story.</em></h2><p>Pick a familiar dish and discover how much language lives around it.</p><button type="button" className="food-button food-button-light" onClick={() => openStory(featuredSeries)}>Read your first chapter <ArrowUpRight size={18} aria-hidden="true" /></button></Reveal><div className="food-final-mark" aria-hidden="true"><BookOpen size={86} strokeWidth={0.8} /><RotateCcw size={40} strokeWidth={1} /></div></div></section>
+        <section className="food-final" aria-labelledby="food-final-title"><div className="food-container food-final-inner"><Reveal enabled={canAnimate}><span className="food-eyebrow">YOUR NEXT STORY IS WAITING</span><h2 id="food-final-title">Begin with a taste.<br /><em>Leave with a story</em></h2><p>Pick a familiar dish and discover how much language lives around it.</p><button type="button" className="food-button food-button-light" onClick={() => openStory(featuredSeries)}>Read your first chapter <ArrowRight size={18} aria-hidden="true" /></button></Reveal><div className="food-final-mark" aria-hidden="true"><BookOpen size={86} strokeWidth={0.8} /><RotateCcw size={40} strokeWidth={1} /></div></div></section>
       </main>
     </div>
   );

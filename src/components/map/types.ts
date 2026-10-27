@@ -53,6 +53,7 @@ export interface VietnamMapProps {
   /** Optional projected AI markers. No runtime store is required. */
   markers?: readonly VietnamMapMarker[];
   onSelectMarker?: (marker: VietnamMapMarker) => void;
+  customViewBox?: string;
   /** Optional custom children to overlay on the map */
   children?: React.ReactNode;
 }

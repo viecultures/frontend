@@ -15,7 +15,7 @@ export function PracticeShadowing({ segment, recorder, onListen, onStopSample, t
   const take = recorder.takes[segment.id];
   const recorded = Object.keys(recorder.takes).length;
   return <section className="rp-activity" aria-label="Shadowing activity">
-    <p className="rp-eyebrow">Shadowing</p><h2>Repeat this passage</h2>
+    <h2>Repeat this passage</h2>
     <p>Listen, then record yourself reading the passage.</p>
     <progress aria-label="Passages recorded" value={recorded} max={total} /><small>{recorded} of {total} passages recorded</small>
     <blockquote className="rp-shadowing-target">{segment.text}</blockquote>

@@ -3,6 +3,8 @@ export { CommunityPostEditor } from "./CommunityPostEditor";
 export { CommunityPostCard } from "./CommunityPostCard";
 export { CommunitySidebar } from "./CommunitySidebar";
 export { CommunityDetailModal } from "./CommunityDetailModal";
+export { VocabDefinitionModal } from "./VocabDefinitionModal";
+export { ImageLightboxModal } from "./ImageLightboxModal";
 export { ContestHeroBanner } from "./ContestHeroBanner";
 export { ContestEntryEditor } from "./ContestEntryEditor";
 export { ContestEntryCard } from "./ContestEntryCard";

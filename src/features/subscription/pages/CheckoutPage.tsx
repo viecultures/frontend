@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   QrCode,
   ShieldCheck,
-  Sparkles,
   Zap,
   BookOpen,
   ArrowRight,
@@ -196,7 +195,7 @@ export const CheckoutPage: React.FC = () => {
               </div>
               <div className="p-3.5 rounded-2xl bg-black/25 border border-antique-gold/30 space-y-1">
                 <div className="flex items-center gap-2 text-antique-gold font-bold text-xs">
-                  <Sparkles className="w-4 h-4" />
+                  <BookOpen className="w-4 h-4" />
                   <span>Âm Thanh & Từ Vựng</span>
                 </div>
                 <p className="text-[11px] text-stone-300">Đủ 3 tốc độ (0.5x, 0.8x, 1x) & sổ tay không giới hạn.</p>

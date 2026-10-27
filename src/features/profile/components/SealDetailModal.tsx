@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, BookOpen, Check, Copy, Sparkles } from 'lucide-react';
+import { Award, BookOpen, Check, Copy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Modal } from '@/components/ui/modal';
 import { paths } from '@/routes/paths';
@@ -45,7 +45,7 @@ export const SealDetailModal: React.FC<SealDetailModalProps> = ({ seal, isOpen, 
         </div>
       </div>
       <div className="my-5 p-4 rounded-2xl bg-rice-paper dark:bg-[#1A3D34] border border-antique-gold/40 text-sm space-y-2">
-        <h3 className="flex items-center gap-2 text-heritage-green dark:text-antique-gold"><Sparkles className="size-4" aria-hidden="true" />Culture &amp; context</h3>
+        <h3 className="flex items-center gap-2 text-heritage-green dark:text-antique-gold"><BookOpen className="size-4" aria-hidden="true" />Culture &amp; context</h3>
         <p className="text-ink italic">“{seal.quoteEn}”</p>
         <p className="text-stone-500">{seal.quoteVi}</p>
       </div>

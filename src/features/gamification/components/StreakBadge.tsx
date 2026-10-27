@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, ShieldCheck, Sparkles, Award } from 'lucide-react';
+import { Flame, ShieldCheck, Award } from 'lucide-react';
 import { useGamification } from '@/context/GamificationContext';
 
 export interface StreakBadgeProps {
@@ -101,7 +101,7 @@ export const StreakBadge: React.FC<StreakBadgeProps> = ({
 
         {showMultiplier && effectiveMultiplier > 1 && (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-antique-gold/15 border border-antique-gold/30 text-antique-gold font-bold text-xs shrink-0">
-            <Sparkles className="w-4 h-4 text-antique-gold" />
+            <Award className="w-4 h-4 text-antique-gold" />
             <span>Bonus {effectiveMultiplier}x XP</span>
           </div>
         )}
@@ -135,7 +135,7 @@ export const StreakBadge: React.FC<StreakBadgeProps> = ({
         </div>
         {showMultiplier && effectiveMultiplier > 1 && (
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-200 text-[11px] font-bold">
-            <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+            <Award className="w-3 h-3 text-amber-600 dark:text-amber-400" />
             <span>+{Math.round((effectiveMultiplier - 1) * 100)}% Hệ số kinh nghiệm</span>
           </div>
         )}

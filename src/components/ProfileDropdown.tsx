@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Award, BookOpen, LogOut, ShieldCheck, Sparkles, User } from 'lucide-react';
+import { Award, BookOpen, LogOut, ShieldCheck, User } from 'lucide-react';
 import { PATHS, paths } from '@/routes/paths';
 import { clearAuthStorage, isAdminUser, type AppUser } from '@/utils/auth-storage';
 
@@ -56,7 +56,7 @@ export function ProfileDropdown({ isOpen, onClose, user, onLogout, onNavigate }:
       <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.profile)}><User size={18} />Your profile</button>
       <button type="button" role="menuitem" className={itemClass} onClick={() => go(paths.profile({ tab: 'passport' }))}><Award size={18} />Heritage passport</button>
       <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.discovery)}><BookOpen size={18} />Discover stories</button>
-      <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.playground)}><Sparkles size={18} />Practice</button>
+      <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.playground)}><BookOpen size={18} />Practice</button>
       {isAdminUser() && <button type="button" role="menuitem" className={itemClass} onClick={() => go(PATHS.admin)}><ShieldCheck size={18} />Admin CMS</button>}
       <button type="button" role="menuitem" className={`${itemClass} mt-2 border-t border-line`} onClick={logout}><LogOut size={18} />Sign out</button>
     </div>

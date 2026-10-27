@@ -13,7 +13,7 @@ interface PracticeQuestionsProps {
 export function PracticeQuestions({ questions, index, onChangeIndex, answers, onAnswer, onTryDictation }: PracticeQuestionsProps) {
   const question = questions[index];
   if (!question) return <section className="rp-activity" aria-label="Questions activity">
-    <p className="rp-eyebrow">Questions</p><h2>Keep exploring the story</h2>
+    <h2>Keep exploring the story</h2>
     <p>No questions are available for this article yet. Practise listening with its transcript instead.</p>
     <button type="button" className="rp-primary" onClick={onTryDictation}>Try dictation</button>
   </section>;
@@ -22,7 +22,7 @@ export function PracticeQuestions({ questions, index, onChangeIndex, answers, on
   const correct = answer.value === question.correctKey;
   const completed = questions.filter((q, i) => answers[q.id || String(i)]?.checked).length;
   return <section className="rp-activity" aria-label="Questions activity">
-    <p className="rp-eyebrow">Read · Understand · Respond</p><h2>Check your understanding</h2>
+    <h2>Check your understanding</h2>
     <p>{completed} of {questions.length} checked</p>
     <progress aria-label="Questions checked" value={completed} max={questions.length} />
     <fieldset className="rp-question">
