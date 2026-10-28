@@ -41,6 +41,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
     { name: 'Topics', segment: 'topics' },
     { name: 'Heritage Map', segment: 'ban-do-di-san' },
     { name: 'How It Works', segment: 'methodology' },
+    { name: 'Plans', segment: 'plans' },
     { name: 'Contact', segment: 'contact' },
   ];
 

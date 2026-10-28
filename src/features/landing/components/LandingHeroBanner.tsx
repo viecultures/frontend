@@ -61,7 +61,7 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({ onNavigate
           <div className="landing-hero-copy">
 
             <h1 id="landing-title" className="landing-hero-headline">
-              Learn English, <span className="landing-hero-accent">Live Culture</span>
+              Engrave words, <span className="landing-hero-accent">Preserve cultures.</span>
             </h1>
 
             <p className="landing-hero-subtitle">

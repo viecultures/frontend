@@ -109,16 +109,12 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
       data-audio-theme={themeMode}
       className={`reader-component-audio transition-transform transition-opacity duration-300 ${
         isAtTop
-          ? "relative w-full max-w-7xl mx-auto z-20 p-2.5 sm:px-6 sm:py-3 rounded-2xl sm:rounded-3xl border-2 shadow-md"
-          : `fixed top-14 left-4 right-4 max-w-4xl mx-auto z-40 p-2 sm:px-5 sm:py-2.5 rounded-2xl border-2 backdrop-blur-xl transform ${
+          ? "relative w-full max-w-7xl mx-auto z-20 p-2.5 sm:px-6 sm:py-3 rounded-2xl sm:rounded-3xl border"
+          : `fixed top-14 left-4 right-4 max-w-4xl mx-auto z-40 p-2 sm:px-5 sm:py-2.5 rounded-2xl border transform ${
               isScrollingDown
                 ? "-translate-y-28 opacity-0 pointer-events-none"
-                : "translate-y-0 opacity-100 pointer-events-auto shadow-2xl"
+                : "translate-y-0 opacity-100 pointer-events-auto"
             }`
-      } ${
-        isDark
-          ? "bg-[#1E2925] text-warm-ivory border-antique-gold/80 shadow-[0_12px_45px_rgba(0,0,0,0.6)]"
-          : "bg-warm-ivory text-heritage-green border-antique-gold shadow-[0_12px_40px_color-mix(in_srgb,_var(--color-heritage-green)_12%,_transparent)]"
       }`}
     >
       {/* ── Single Compact 1-Line Row Layout ──────────────────────────────────── */}

@@ -19,7 +19,7 @@ export const LandingConversionSection: React.FC<LandingConversionSectionProps> =
           id="conversion-heading"
           className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-heritage-forest leading-tight tracking-tight"
         >
-          Discover Vietnam. Learn English Naturally
+          Engrave words, Preserve cultures.
         </h2>
 
         <p className="text-sm sm:text-base text-ink-soft max-w-xl mx-auto leading-relaxed">

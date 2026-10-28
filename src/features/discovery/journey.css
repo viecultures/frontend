@@ -47,6 +47,10 @@
 .journey-rail { box-sizing: border-box; height: var(--journey-panel-height, auto); padding: 26px; overflow-y: auto; }
 .journey-rail > h2 { margin: 8px 0 12px; font-family: var(--font-sans); font-size: clamp(25px, 2.5vw, 32px); font-weight: 700; line-height: 1.22; }
 .journey-rail-intro { margin-bottom: 20px; color: var(--color-ink-soft); line-height: 1.55; }
+.journey-change-region { margin: 0 0 16px; min-height: 44px; color: var(--color-action); font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.journey-region-recommended { color: var(--color-accent-ink); font-size: 12px; font-weight: 700; }
+.journey-empty-region { display: grid; gap: 12px; padding: 20px; border: 1px solid var(--color-line); border-radius: var(--radius-inner); background: var(--color-surface-muted); color: var(--color-ink-soft); line-height: 1.5; }
+.journey-empty-region button { display: inline-flex; align-items: center; gap: 8px; justify-self: start; min-height: 44px; color: var(--color-action); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .journey-region-list { position: relative; display: grid; gap: 10px; }
 .journey-region-list::before { position: absolute; top: 30px; bottom: 30px; left: 34px; width: 2px; background: var(--color-line); content: ''; }
 .journey-region-step { position: relative; display: grid; grid-template-columns: 42px 70px minmax(0, 1fr) 18px; align-items: center; gap: 10px; width: 100%; min-height: 108px; padding: 14px; border: 1px solid var(--color-line); border-radius: var(--radius-inner); background: var(--color-surface-raised); text-align: left; }

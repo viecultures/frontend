@@ -10,8 +10,8 @@
 .reader-component-toolbar button:focus-visible, .reader-component-toolbar a:focus-visible { outline: 2px solid var(--color-antique-bright); outline-offset: 3px; }
 
 /* Audio appearance only: keep every control, breakpoint and floating behavior. */
-.reader-component-audio { --audio-line: color-mix(in srgb, var(--color-heritage-green) 12%, transparent); --audio-muted: var(--color-text-secondary); --audio-soft: color-mix(in srgb, var(--color-heritage-green) 4%, transparent); font-family: var(--font-sans); border-width: 1px; border-color: var(--audio-line); box-shadow: 0 6px 20px rgb(0 0 0 / .08); }
-.reader-component-audio[data-audio-theme="dark"] { --audio-line: color-mix(in srgb, var(--color-warm-ivory) 12%, transparent); --audio-muted: #B7C9C2; --audio-soft: color-mix(in srgb, var(--color-warm-ivory) 4%, transparent); box-shadow: 0 6px 20px rgb(0 0 0 / .12); }
+.reader-component-audio { --audio-line: var(--desk-line); --audio-muted: var(--color-text-secondary); --audio-soft: color-mix(in srgb, var(--color-heritage-green) 4%, transparent); font-family: var(--font-sans); color: var(--desk-ink); background: color-mix(in srgb, var(--desk-paper) 95%, transparent); border-width: 1px; border-color: var(--desk-line); box-shadow: 0 6px 20px rgb(0 0 0 / .08); backdrop-filter: blur(16px); }
+.reader-component-audio[data-audio-theme="dark"] { --audio-muted: #B7C9C2; --audio-soft: color-mix(in srgb, var(--color-warm-ivory) 4%, transparent); box-shadow: 0 6px 20px rgb(0 0 0 / .12); }
 .reader-component-audio .font-bold, .reader-component-audio .font-semibold { font-weight: 400; }
 .reader-component-audio h4 { font-size: 12px; font-weight: 500; }
 .reader-component-audio .reader-audio-scope { background: var(--audio-soft); color: var(--audio-muted); font-size: 11px; font-weight: 400; }

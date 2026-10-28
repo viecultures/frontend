@@ -22,6 +22,7 @@ import { toEnglishPlaceName } from '@/utils/vietnamMapUtils';
 import type { RegionKey } from '@/utils/useVietnamMap';
 import { paths } from '@/routes/paths';
 import { readLearningValue, writeLearningValue } from '@/services/learning/learningStorage';
+import { readFirstRegionChoice, saveFirstRegionChoice, type FirstRegion } from '@/services/learning/firstRegionChoice';
 import { JOURNEY_SERIES, type JourneySeries } from '../data/learningJourney';
 
 const REGIONS = [
@@ -29,7 +30,6 @@ const REGIONS = [
   { id: 'central', name: 'Central Vietnam', number: "2" },
   { id: 'south', name: 'Southern Vietnam', number: "3" },
 ] as const;
-const OPEN_REGIONS = ['north'] as const;
 const REGION_SHAPES = Object.fromEntries(
   REGIONS.map(region => [region.id, VIETNAM_34_PROVINCES.filter(province => province.region === region.id).map(province => province.d).join(' ')]),
 ) as Record<(typeof REGIONS)[number]['id'], string>;
@@ -63,11 +63,24 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
   const [pageVisible, setPageVisible] = useState(() => !document.hidden);
   const [reduceMotion, setReduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [params, setParams] = useSearchParams();
+  const [firstRegion, setFirstRegion] = useState<FirstRegion | null>(readFirstRegionChoice);
   const requestedPlace = VIETNAM_34_PROVINCES.find(province => province.id === params.get('place'));
-  const selectedProvince = requestedPlace?.region === 'north' ? requestedPlace : undefined;
+  const selectedProvince = requestedPlace?.region === firstRegion ? requestedPlace : undefined;
   const selectedPlace = selectedProvince?.id || '';
-  const selectedRegion: RegionKey = selectedProvince ? 'north' : params.get('region') === 'north' ? 'north' : 'all';
+  const selectedRegion: RegionKey = selectedProvince ? selectedProvince.region : params.get('region') === firstRegion ? firstRegion || 'all' : 'all';
   const region = REGIONS.find(item => item.id === selectedRegion);
+
+  useEffect(() => {
+    const regionParam = params.get('region');
+    const placeParam = params.get('place');
+    if ((!regionParam || regionParam === firstRegion) && (!placeParam || requestedPlace?.region === firstRegion)) return;
+    setParams(previous => {
+      const next = new URLSearchParams(previous);
+      next.delete('region');
+      next.delete('place');
+      return next;
+    }, { replace: true });
+  }, [firstRegion, params, requestedPlace, setParams]);
 
   const [unlockedPlaces, setUnlockedPlaces] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(JOURNEY_SERIES.map(series => [
@@ -118,7 +131,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
   }, [hoverPopover?.pinned, hoverPopover?.series.id]);
 
   const availableSeries = JOURNEY_SERIES.filter(series =>
-    VIETNAM_34_PROVINCES.some(province => province.id === series.provinceId && province.region === 'north'));
+    VIETNAM_34_PROVINCES.some(province => province.id === series.provinceId && province.region === firstRegion));
 
   // Nominated Series Slider State
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -131,6 +144,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
     if (selectedProvince && hasOwnSeries) {
       return JOURNEY_SERIES.filter(s => s.provinceId === selectedProvince.id);
     }
+    if (firstRegion !== 'north') return JOURNEY_SERIES.filter(s => s.region === firstRegion);
     // Default regional nominated series for Northern Vietnam:
     // Featured selection: Phở Hà Nội, Bánh Cáy Làng Nguyễn, Chả Cá Lã Vọng, Bún Chả, Cơm Cháy Ninh Bình, Cá Kho Làng Vũ Đại
     const northernSeries = JOURNEY_SERIES.filter(s =>
@@ -149,7 +163,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
       const idxB = preferredOrder.indexOf(b.id);
       return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
     });
-  }, [selectedProvince, hasOwnSeries]);
+  }, [selectedProvince, hasOwnSeries, firstRegion]);
 
   useEffect(() => {
     setActiveSlideIndex(0);
@@ -187,7 +201,12 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
   }
 
   function selectRegion(nextRegion: RegionKey) {
-    if (nextRegion !== 'all' && nextRegion !== 'north') return;
+    if (nextRegion !== 'all' && !REGIONS.some(item => item.id === nextRegion)) return;
+    if (nextRegion !== 'all' && firstRegion && nextRegion !== firstRegion) return;
+    if (nextRegion !== 'all' && !firstRegion) {
+      setFirstRegion(nextRegion as FirstRegion);
+      saveFirstRegionChoice(nextRegion as FirstRegion);
+    }
     setParams(previous => {
       const next = new URLSearchParams(previous);
       next.delete('place');
@@ -197,15 +216,26 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
   }
 
   function selectPlace(id: string) {
-    const province = VIETNAM_34_PROVINCES.find(item => item.id === id && item.region === 'north');
+    const province = VIETNAM_34_PROVINCES.find(item => item.id === id && item.region === firstRegion);
     setParams(previous => {
       const next = new URLSearchParams(previous);
       if (province) {
-        next.set('region', 'north');
+        next.set('region', province.region);
         next.set('place', province.id);
       } else {
         next.delete('place');
       }
+      return next;
+    });
+  }
+
+  function changeFirstRegion() {
+    setFirstRegion(null);
+    saveFirstRegionChoice(null);
+    setParams(previous => {
+      const next = new URLSearchParams(previous);
+      next.delete('region');
+      next.delete('place');
       return next;
     });
   }
@@ -433,7 +463,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
             <VietnamMap
               activeRegion={selectedRegion}
               overviewByRegion
-              selectableRegions={OPEN_REGIONS}
+              selectableRegions={firstRegion ? [firstRegion] : ['north', 'central', 'south']}
               labelLanguage="en"
               selectedProvinceId={selectedPlace || null}
               onSelectRegion={selectRegion}
@@ -466,11 +496,12 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
 
               <h2>Explore Vietnam</h2>
               <p className="journey-rail-intro">
-                The reading journey begins in Northern Vietnam. Central and Southern regions will unlock soon.
+                {firstRegion ? `Your first region is ${REGIONS.find(item => item.id === firstRegion)?.name}. Explore it below or choose a different starting point.` : 'Choose your first region. We recommend Northern Vietnam, where published stories are ready to read.'}
               </p>
+              {firstRegion && <button type="button" className="journey-change-region" onClick={changeFirstRegion}>Change first region</button>}
               <div className="journey-region-list">
                 {REGIONS.map(item => {
-                  const isOpen = item.id === 'north';
+                  const isOpen = !firstRegion || item.id === firstRegion;
                   const content = <>
                     <span className="journey-region-number">{item.number}</span>
                     <svg className="journey-region-thumbnail" viewBox={VIETNAM_REGION_VIEWBOXES[item.id].viewBox} aria-hidden="true" focusable="false">
@@ -480,8 +511,9 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
                       <strong>{item.name}</strong>
                       <small className="journey-region-status">
                         {isOpen ? <BookOpen size={14} aria-hidden="true" /> : <LockKeyhole size={14} aria-hidden="true" />}
-                        {isOpen ? 'Open now' : 'Locked'}
+                        {firstRegion === item.id ? 'Your first region' : isOpen ? 'Choose first' : 'Locked'}
                       </small>
+                      {item.id === 'north' && <small className="journey-region-recommended">Recommended</small>}
                     </span>
                     {isOpen && <ArrowRight className="journey-region-arrow" size={18} aria-hidden="true" />}
                   </>;
@@ -530,9 +562,11 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
               {selectedProvince && !hasOwnSeries && (
                 <div className="journey-place-notice" role="status">
                   <Compass size={14} className="journey-place-notice-icon" aria-hidden="true" />
-                  <span>No dedicated series for {toEnglishPlaceName(selectedProvince.name)} yet. Showing featured Northern Vietnam series:</span>
+                  <span>No dedicated series for {toEnglishPlaceName(selectedProvince.name)} yet.{firstRegion === 'north' ? ' Showing featured Northern Vietnam series:' : ''}</span>
                 </div>
               )}
+
+              {!currentSlide && <div className="journey-empty-region" role="status"><p>Published stories for {region.name} are on the way.</p><button type="button" onClick={onBrowseStories}>Browse available stories <ArrowRight size={16} aria-hidden="true" /></button></div>}
 
               {currentSlide && (
                 <div
@@ -575,10 +609,11 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
           <ul className="journey-series-grid">
             {availableSeries.map(renderSeriesCard)}
           </ul>
+          {availableSeries.length === 0 && <div className="journey-empty-region"><p>{firstRegion ? 'No published series in your first region yet.' : 'Choose a first region to see its published series.'}</p><button type="button" onClick={onBrowseStories}>Browse available stories <ArrowRight size={16} aria-hidden="true" /></button></div>}
         </div>
         <div className="journey-library-group">
           <div className="journey-library-section-heading">
-            <h2>Locked series</h2>
+            <h2>Upcoming series</h2>
             <span>{UPCOMING_SERIES.length} series</span>
           </div>
           <ul className="journey-series-grid">
@@ -596,7 +631,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
                     <h4>{series.title}</h4>
                     <p>{series.description}</p>
                     <span className="journey-series-footer">
-                      Locked <LockKeyhole size={17} aria-hidden="true" />
+                      Coming soon <LockKeyhole size={17} aria-hidden="true" />
                     </span>
                   </div>
                 </article>
