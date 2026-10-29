@@ -170,7 +170,8 @@ interface SettingsContextType {
   setAccentColor: (colorHex: string) => void;
   setBoardTitle: (title: string) => void;
   setBackgroundMode: (mode: BackgroundMode) => void;
-  setBackground: (bgId: string, customUrl?: string) => void;
+  setBackground: (bgId: string, customUrl?: string) => boolean;
+  clearCustomBackground: () => void;
   resetSettings: () => void;
 }
 
@@ -249,8 +250,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       : settings.backgroundId;
 
   const activeBackground =
-    BACKGROUND_PRESETS.find((bg) => bg.id === activeBgId) ||
-    BACKGROUND_PRESETS[0];
+    activeBgId === 'custom' && settings.customBackgroundUrl?.startsWith('data:image/jpeg;base64,')
+      ? { id: 'custom', name: 'Ảnh riêng', nameEn: 'Custom background', url: settings.customBackgroundUrl, category: 'minimal' as const }
+      : BACKGROUND_PRESETS.find((bg) => bg.id === activeBgId) || BACKGROUND_PRESETS[0];
 
   // Context Actions
   const openSettings = () => setIsSettingsOpen(true);
@@ -278,11 +280,27 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const setBackground = (backgroundId: string, customBackgroundUrl?: string) => {
+    if (backgroundId === 'custom') {
+      if (!customBackgroundUrl?.startsWith('data:image/jpeg;base64,')) return false;
+      const next = { ...settings, backgroundMode: 'fixed' as const, backgroundId, customBackgroundUrl };
+      try {
+        localStorage.setItem('viecultures_app_settings', JSON.stringify(next));
+      } catch {
+        return false;
+      }
+      setSettings(next);
+      return true;
+    }
+    setSettings((prev) => ({ ...prev, backgroundMode: 'fixed', backgroundId, customBackgroundUrl: '' }));
+    return true;
+  };
+
+  const clearCustomBackground = () => {
     setSettings((prev) => ({
       ...prev,
-      backgroundMode: 'fixed',
-      backgroundId,
-      customBackgroundUrl: customBackgroundUrl ?? prev.customBackgroundUrl,
+      customBackgroundUrl: '',
+      backgroundMode: prev.backgroundMode === 'fixed' && prev.backgroundId === 'custom' ? 'auto' : prev.backgroundMode,
+      backgroundId: prev.backgroundId === 'custom' ? DEFAULT_SETTINGS.backgroundId : prev.backgroundId,
     }));
   };
 
@@ -313,6 +331,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setBoardTitle,
         setBackgroundMode,
         setBackground,
+        clearCustomBackground,
         resetSettings,
       }}
     >

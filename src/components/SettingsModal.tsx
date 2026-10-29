@@ -1,12 +1,62 @@
 import { BACKGROUND_PRESETS, useSettings } from '@/context/SettingsContext';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
-import { Check, RotateCcw } from 'lucide-react';
+import { Check, RotateCcw, Upload, X } from 'lucide-react';
 import { usePWAInstall } from '@/components/pwa';
+import { useRef, useState, type ChangeEvent } from 'react';
+
+const ACCEPTED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const MAX_SAVED_BYTES = 2 * 1024 * 1024;
+
+async function prepareBackground(file: File): Promise<string> {
+  if (!ACCEPTED_IMAGE_TYPES.has(file.type)) throw new Error('Choose a JPG, PNG, or WebP image.');
+  if (file.size > MAX_FILE_BYTES) throw new Error('Choose an image under 10 MB.');
+
+  const bitmap = await createImageBitmap(file);
+  try {
+    const scale = Math.min(1, 1920 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('This browser could not prepare the image.');
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+    if (!dataUrl.startsWith('data:image/jpeg;base64,') || dataUrl.length > MAX_SAVED_BYTES) {
+      throw new Error('This image is too detailed to save. Try a smaller image.');
+    }
+    return dataUrl;
+  } finally {
+    bitmap.close();
+  }
+}
 
 export function SettingsModal() {
-  const { settings, isSettingsOpen, closeSettings, setBackgroundMode, setBackground, activeBackground, resetSettings } = useSettings();
+  const { settings, isSettingsOpen, closeSettings, setBackgroundMode, setBackground, clearCustomBackground, activeBackground, resetSettings } = useSettings();
   const { isMobile, isStandalone, isInstalled, openPrompt } = usePWAInstall();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [imageError, setImageError] = useState('');
+  const [isPreparing, setIsPreparing] = useState(false);
+
+  async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setImageError('');
+    setIsPreparing(true);
+    try {
+      const dataUrl = await prepareBackground(file);
+      if (!setBackground('custom', dataUrl)) {
+        throw new Error('Your browser could not save this image. Try a smaller image or free up browser storage.');
+      }
+    } catch (error) {
+      setImageError(error instanceof Error && error.message ? error.message : 'This image could not be opened. Try another image.');
+    } finally {
+      setIsPreparing(false);
+    }
+  }
+
   return (
     <Modal isOpen={isSettingsOpen} onClose={closeSettings} title="Study room settings" className="max-w-2xl">
       <div className="max-h-[65dvh] overflow-y-auto pr-1">
@@ -16,6 +66,25 @@ export function SettingsModal() {
           Change the room with the time of day
         </label>
         <h3 className="mb-3 text-lg font-semibold text-ink">Background</h3>
+        <div className={`mt-4 grid grid-cols-1 gap-4 rounded-2xl border p-4 ${activeBackground.id === 'custom' ? 'border-action ring-2 ring-action/30' : 'border-line'}`}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h4 className="font-semibold text-ink">Custom background</h4>
+              <p className="text-sm text-ink-soft">Choose an image from your device. It stays in this browser.</p>
+            </div>
+            {activeBackground.id === 'custom' && <Check className="size-5 text-action" aria-label="Selected" />}
+          </div>
+          {settings.customBackgroundUrl && <button type="button" aria-label="Use custom background" aria-pressed={activeBackground.id === 'custom'} onClick={() => { setImageError(''); setBackground('custom', settings.customBackgroundUrl); }} className="focus-ring mt-3 block w-full overflow-hidden rounded-xl border border-line">
+            <img src={settings.customBackgroundUrl} alt="Your custom background preview" className="aspect-[16/9] w-full object-cover" />
+          </button>}
+          <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="sr-only" aria-label="Choose custom background image" />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button type="button" variant="outline" size="sm" disabled={isPreparing} onClick={() => fileInput.current?.click()}><Upload size={16} aria-hidden="true" />{isPreparing ? 'Preparing image…' : settings.customBackgroundUrl ? 'Change image' : 'Choose image'}</Button>
+            {settings.customBackgroundUrl && <Button type="button" variant="ghost" size="sm" onClick={() => { clearCustomBackground(); setImageError(''); }}><X size={16} aria-hidden="true" />Remove custom background</Button>}
+          </div>
+          {imageError && <p role="alert" className="mt-3 text-sm text-danger">{imageError}</p>}
+        </div>
+
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {BACKGROUND_PRESETS.map(background => {
             const selected = activeBackground.id === background.id;
@@ -25,6 +94,7 @@ export function SettingsModal() {
             </button>;
           })}
         </div>
+
         {isMobile && !isStandalone && !isInstalled && <div className="mt-6 border-t border-line pt-4"><Button type="button" variant="outline" size="sm" onClick={() => { closeSettings(); openPrompt(); }}>Add app to home screen</Button></div>}
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
