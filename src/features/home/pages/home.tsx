@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { Navbar } from '@/components/Navbar';
 import { HomeGreetingControls } from '../components/HomeGreetingControls';
@@ -25,6 +26,7 @@ interface HomePageProps {
 interface StudyRoomContentProps { account: string; userName: string; }
 
 function StudyRoomContent({ account, userName }: StudyRoomContentProps) {
+  const { t } = useTranslation('home');
   const [tasks, setTasks] = useState(() => readStudyTasks(account));
   const [history, setHistory] = useState(() => readReadingHistory(account));
   const [storageError, setStorageError] = useState('');
@@ -38,7 +40,7 @@ function StudyRoomContent({ account, userName }: StudyRoomContentProps) {
 
   function updateTasks(next: StudyTask[]) {
     setTasks(next);
-    setStorageError(saveStudyTasks(account, next) ? '' : 'Your plan could not be saved. Check browser storage permissions.');
+    setStorageError(saveStudyTasks(account, next) ? '' : t('storage_error', 'Your plan could not be saved. Check browser storage permissions.'));
   }
 
   const bookmark = history[0];
@@ -55,20 +57,22 @@ function StudyRoomContent({ account, userName }: StudyRoomContentProps) {
 }
 
 export function HomePage({ isLoggedIn = false, user, onLogout }: HomePageProps) {
+  const { t, i18n } = useTranslation(['home', 'common']);
   const { activeBackground, backgroundMode, openSettings } = useSettings();
   const navigate = useAppNavigate();
   const hasPhoto = activeBackground.id !== 'minimal-none';
   const account = user?.email || 'guest';
+  const backgroundName = i18n.language === 'vi' ? activeBackground.name : activeBackground.nameEn;
 
   return <div className="home-classic home-room">
     {hasPhoto && <div className="home-room-background" style={{ backgroundImage: `url(${activeBackground.url})` }} aria-hidden="true" />}
     <div className="home-room-veil" aria-hidden="true" />
-    <a className="home-room-skip" href="#study-room-content">Skip to study content</a>
+    <a className="home-room-skip" href="#study-room-content">{t('skip_content', 'Skip to study content')}</a>
     <Navbar activeView="home" isLoggedIn={isLoggedIn} user={user} onLogout={onLogout} onNavigateToSection={navigate} onOpenSettings={openSettings} />
-    <StudyRoomContent key={account} account={account} userName={user?.name || 'Learner'} />
+    <StudyRoomContent key={account} account={account} userName={user?.name || t('greeting.default_user', 'Learner')} />
     <footer className="home-room-footer">
-      <span>{hasPhoto ? `${backgroundMode === 'auto' ? 'Room scenery' : 'Background'} · ${activeBackground.nameEn}` : 'Your own little corner of Vietnam.'}</span>
-      <Link to={PATHS.landing}>About VieCultures</Link>
+      <span>{hasPhoto ? `${backgroundMode === 'auto' ? t('footer.scenery', 'Room scenery') : t('footer.background', 'Background')} · ${backgroundName}` : t('footer.default_scenery', 'Your own little corner of Vietnam.')}</span>
+      <Link to={PATHS.landing}>{t('footer.about', 'About VieCultures')}</Link>
     </footer>
   </div>;
 }

@@ -6,6 +6,14 @@ import viAuth from '../locales/vi/auth.json';
 import enAuth from '../locales/en/auth.json';
 import viLanding from '../locales/vi/landing.json';
 import enLanding from '../locales/en/landing.json';
+import viHome from '../locales/vi/home.json';
+import enHome from '../locales/en/home.json';
+import viReader from '../locales/vi/reader.json';
+import enReader from '../locales/en/reader.json';
+import viFlashcards from '../locales/vi/flashcards.json';
+import enFlashcards from '../locales/en/flashcards.json';
+import viDiscovery from '../locales/vi/discovery.json';
+import enDiscovery from '../locales/en/discovery.json';
 
 export const SUPPORTED_LANGS = ['vi', 'en'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGS)[number];
@@ -15,11 +23,19 @@ export const resources = {
     common: viCommon,
     auth: viAuth,
     landing: viLanding,
+    home: viHome,
+    reader: viReader,
+    flashcards: viFlashcards,
+    discovery: viDiscovery,
   },
   en: {
     common: enCommon,
     auth: enAuth,
     landing: enLanding,
+    home: enHome,
+    reader: enReader,
+    flashcards: enFlashcards,
+    discovery: enDiscovery,
   },
 } as const;
 
@@ -49,7 +65,7 @@ i18n
     lng: getInitialLanguage(),
     fallbackLng: 'vi',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'landing'],
+    ns: ['common', 'auth', 'landing', 'home', 'reader', 'flashcards', 'discovery'],
     interpolation: {
       escapeValue: false,
     },

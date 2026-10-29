@@ -1,0 +1,35 @@
+{
+  "page": {
+    "title": "Explore Vietnamese Culture",
+    "lead": "Read bilingual stories, look up words in context, and listen to natural audio.",
+    "tab_journey": "Map journey",
+    "tab_stories": "All stories",
+    "search_placeholder": "Search stories, provinces...",
+    "filter_topic": "Topic",
+    "filter_level": "Level",
+    "filter_duration": "Duration",
+    "saved_only": "Saved",
+    "reset_filters": "Reset filters",
+    "no_results": "No matching stories found.",
+    "loading": "Loading stories catalog...",
+    "offline_notice": "Could not connect to server. Showing local stories.",
+    "retry": "Try again"
+  },
+  "journey": {
+    "region_north": "Northern Vietnam",
+    "region_central": "Central Vietnam",
+    "region_south": "Southern Vietnam",
+    "select_region_prompt": "Choose a region to begin your cultural discovery journey.",
+    "browse_all_stories": "Browse all stories",
+    "change_region": "Change region",
+    "stories_in_region": "{{count}} stories",
+    "upcoming_notice": "New reading series are being prepared for this region."
+  },
+  "editorial": {
+    "min_read": "{{count}} min read",
+    "save_story": "Save story",
+    "unsave_story": "Unsave story",
+    "featured": "Featured",
+    "read_now": "Read now"
+  }
+}

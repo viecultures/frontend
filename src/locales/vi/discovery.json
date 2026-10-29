@@ -1,0 +1,35 @@
+{
+  "page": {
+    "title": "Khám phá Văn hóa Việt Nam",
+    "lead": "Đọc các câu chuyện song ngữ, tra từ vựng trực tiếp và lắng nghe giọng đọc bản ngữ.",
+    "tab_journey": "Hành trình bản đồ",
+    "tab_stories": "Tất cả bài viết",
+    "search_placeholder": "Tìm kiếm bài đọc, địa danh...",
+    "filter_topic": "Chủ đề",
+    "filter_level": "Trình độ",
+    "filter_duration": "Thời lượng",
+    "saved_only": "Đã lưu",
+    "reset_filters": "Xóa bộ lọc",
+    "no_results": "Không tìm thấy bài viết phù hợp.",
+    "loading": "Đang tải danh mục bài đọc...",
+    "offline_notice": "Không thể kết nối đến máy chủ. Đang hiển thị các bài viết có sẵn.",
+    "retry": "Thử lại"
+  },
+  "journey": {
+    "region_north": "Miền Bắc",
+    "region_central": "Miền Trung",
+    "region_south": "Miền Nam",
+    "select_region_prompt": "Chọn một vùng đất để bắt đầu hành trình khám phá di sản của bạn.",
+    "browse_all_stories": "Duyệt tất cả bài đọc",
+    "change_region": "Đổi vùng đất",
+    "stories_in_region": "{{count}} câu chuyện",
+    "upcoming_notice": "Các chuỗi bài đọc mới đang được biên soạn cho khu vực này."
+  },
+  "editorial": {
+    "min_read": "{{count}} phút đọc",
+    "save_story": "Lưu bài viết",
+    "unsave_story": "Bỏ lưu bài viết",
+    "featured": "Nổi bật",
+    "read_now": "Đọc ngay"
+  }
+}

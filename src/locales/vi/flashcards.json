@@ -1,0 +1,60 @@
+{
+  "header": {
+    "back_to_vocabulary": "Quay lại từ vựng",
+    "flashcards_badge": "Flashcards",
+    "review_options": "Tùy chọn ôn tập",
+    "shuffle": "Trộn thẻ",
+    "shuffled": "Đã trộn thẻ",
+    "auto_audio": "Tự động phát âm",
+    "voice_label": "Giọng phát âm",
+    "voice_us": "Tiếng Anh (Mỹ)",
+    "voice_uk": "Tiếng Anh (Anh)"
+  },
+  "study": {
+    "loading": "Đang chuẩn bị thẻ ôn tập...",
+    "no_cards_title": "Chưa có từ vựng nào được lưu cho bài viết này.",
+    "no_cards_desc": "Mở bài viết để lưu các từ bạn muốn ghi nhớ, hoặc chọn một chủ đề học có sẵn.",
+    "read_article": "Đọc bài viết",
+    "all_decks": "Tất cả các bộ thẻ",
+    "keyboard_hint": "Nhấn Phím cách để lật thẻ · 1 Chưa nhớ · 2 Nhớ chắc",
+    "keyboard_browse": "Dùng Phím mũi tên để duyệt các thẻ",
+    "storage_warning": "Không thể lưu tiến trình ôn tập vào trình duyệt. Hãy kiểm tra lại dung lượng lưu trữ.",
+    "fatigue_alert": "Bạn đã ôn tập liên tục 15 phút. Hãy để mắt nghỉ ngơi một chút trước khi tiếp tục!",
+    "btn_continue_learning": "Tiếp tục học"
+  },
+  "dictionary": {
+    "all_category": "Tất cả ({{count}})",
+    "search_placeholder": "Tìm kiếm từ vựng, chủ đề...",
+    "sort_default": "Mặc định",
+    "sort_name": "Theo tên",
+    "sort_newest": "Mới nhất",
+    "no_results": "Không tìm thấy kết quả phù hợp.",
+    "total_topics": "{{count}} chủ đề học tập",
+    "hero_title": "Thư viện từ vựng & Flashcards",
+    "hero_desc": "Hệ thống từ vựng ngữ cảnh theo phương pháp lặp lại ngắt quãng SRS.",
+    "btn_custom_deck": "Tạo bộ thẻ cá nhân"
+  },
+  "saved_decks": {
+    "title": "Sổ tay từ vựng của bạn",
+    "subtitle": "Các từ bạn chọn lưu trong bài đọc · Lưu trên trình duyệt này",
+    "words_count": "{{count}} từ đã lưu"
+  },
+  "summary": {
+    "aria_label": "Tổng kết phiên ôn tập",
+    "mascot_alt": "Linh vật VieCultures",
+    "great_job": "Rất xuất sắc!",
+    "session_completed": "Bạn đã hoàn thành phiên ôn tập flashcard.",
+    "accuracy": "Độ chính xác",
+    "words_mastered": "từ nhớ chắc",
+    "words_to_review": "từ cần ôn lại",
+    "xp_earned": "+{{count}} XP",
+    "coins_earned": "+{{count}} Xu",
+    "btn_study_again": "Ôn tập lại bộ thẻ",
+    "btn_back_dictionary": "Về thư viện từ vựng",
+    "btn_back_home": "Về trang chủ",
+    "word_list_title": "Danh sách từ vựng đã ôn ({{count}})",
+    "toggle_word_list": "Chi tiết các từ",
+    "mastered_badge": "Nhớ chắc",
+    "review_badge": "Cần ôn lại"
+  }
+}

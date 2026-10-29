@@ -1,0 +1,60 @@
+{
+  "header": {
+    "back_to_vocabulary": "Back to vocabulary",
+    "flashcards_badge": "Flashcards",
+    "review_options": "Review options",
+    "shuffle": "Shuffle",
+    "shuffled": "Shuffled",
+    "auto_audio": "Auto audio",
+    "voice_label": "Pronunciation voice",
+    "voice_us": "English (US)",
+    "voice_uk": "English (UK)"
+  },
+  "study": {
+    "loading": "Preparing study cards...",
+    "no_cards_title": "No saved words found for this article.",
+    "no_cards_desc": "Open the article to save words you want to remember, or select an existing study deck.",
+    "read_article": "Read article",
+    "all_decks": "All decks",
+    "keyboard_hint": "Press Space to flip · 1 Still learning · 2 Mastered",
+    "keyboard_browse": "Use Arrow keys to browse cards",
+    "storage_warning": "Could not save review progress to browser. Please check storage capacity.",
+    "fatigue_alert": "You've been studying for 15 minutes. Take a short eye break before continuing!",
+    "btn_continue_learning": "Continue learning"
+  },
+  "dictionary": {
+    "all_category": "All ({{count}})",
+    "search_placeholder": "Search vocabulary, topics...",
+    "sort_default": "Default",
+    "sort_name": "By name",
+    "sort_newest": "Newest",
+    "no_results": "No matching topics found.",
+    "total_topics": "{{count}} study topics",
+    "hero_title": "Vocabulary & Flashcards Library",
+    "hero_desc": "Contextual vocabulary system powered by Spaced Repetition SRS.",
+    "btn_custom_deck": "Create custom deck"
+  },
+  "saved_decks": {
+    "title": "Your vocabulary notebook",
+    "subtitle": "Words saved from reading articles · Stored in this browser",
+    "words_count": "{{count}} saved words"
+  },
+  "summary": {
+    "aria_label": "Review summary",
+    "mascot_alt": "VieCultures mascot",
+    "great_job": "Great work!",
+    "session_completed": "You completed this flashcard review session.",
+    "accuracy": "Accuracy",
+    "words_mastered": "words mastered",
+    "words_to_review": "words to review",
+    "xp_earned": "+{{count}} XP",
+    "coins_earned": "+{{count}} Coins",
+    "btn_study_again": "Review deck again",
+    "btn_back_dictionary": "Back to vocabulary",
+    "btn_back_home": "Back to home",
+    "word_list_title": "Reviewed words ({{count}})",
+    "toggle_word_list": "Word details",
+    "mastered_badge": "Mastered",
+    "review_badge": "Needs review"
+  }
+}

@@ -1,5 +1,6 @@
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { X, Bookmark, BookmarkCheck, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { VocabItem } from "@/data/readerData";
 import { paths } from "@/routes/paths";
 
@@ -28,6 +29,7 @@ export function ReaderVocabDrawer({
   articleId,
   level = 'Level 2',
 }: ReaderVocabDrawerProps) {
+  const { t } = useTranslation('reader');
   if (!isOpen) return null;
 
   return (
@@ -45,7 +47,7 @@ export function ReaderVocabDrawer({
           <div className="flex items-center justify-between pb-4 border-b border-heritage-green/12 mb-5">
             <div>
               <h3 className="font-sans text-lg font-bold text-heritage-green">
-                Article vocabulary
+                {t('vocab_drawer.article_vocabulary', 'Article vocabulary')}
               </h3>
               <span className="text-xs text-[#6E7E79]">
                 {articleTitle}
@@ -54,7 +56,7 @@ export function ReaderVocabDrawer({
             <button
               onClick={onClose}
               className="p-1.5 rounded-full hover:bg-rice-paper text-heritage-green transition-colors cursor-pointer"
-              aria-label="Close vocabulary"
+              aria-label={t('vocab_drawer.close_vocab', 'Close vocabulary')}
             >
               <X className="w-5 h-5" />
             </button>
@@ -68,7 +70,7 @@ export function ReaderVocabDrawer({
             >
               <span className="flex items-center gap-2">
                 <Bookmark className="w-4 h-4 text-antique-gold shrink-0" />
-                <span>Practice with Flashcards ({vocabList.length} words)</span>
+                <span>{t('vocab_drawer.practice_flashcards', { count: vocabList.length, defaultValue: `Practice with Flashcards (${vocabList.length} words)` })}</span>
               </span>
               <ArrowRight className="w-4 h-4 text-antique-gold shrink-0 transition-transform group-hover:translate-x-0.5" />
             </Link>
@@ -103,12 +105,12 @@ export function ReaderVocabDrawer({
                   {bookmarkedWords[selectedVocab.id] ? (
                     <>
                       <BookmarkCheck className="w-4 h-4 fill-heritage-green" />
-                      <span>Saved to vocabulary</span>
+                      <span>{t('vocab_drawer.saved_to_vocab', 'Saved to vocabulary')}</span>
                     </>
                   ) : (
                     <>
                       <Bookmark className="w-4 h-4" />
-                      <span>Save word</span>
+                      <span>{t('vocab_drawer.save_word', 'Save word')}</span>
                     </>
                   )}
                 </button>
@@ -119,7 +121,7 @@ export function ReaderVocabDrawer({
           {/* List of All Vocabulary in Article */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#6E7E79] mb-2">
-              All article vocabulary ({vocabList.length})
+              {t('vocab_drawer.all_vocab_count', { count: vocabList.length, defaultValue: `All article vocabulary (${vocabList.length})` })}
             </h4>
             {vocabList.map((item) => (
               <div
