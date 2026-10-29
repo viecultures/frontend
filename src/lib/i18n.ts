@@ -4,6 +4,8 @@ import viCommon from '../locales/vi/common.json';
 import enCommon from '../locales/en/common.json';
 import viAuth from '../locales/vi/auth.json';
 import enAuth from '../locales/en/auth.json';
+import viLanding from '../locales/vi/landing.json';
+import enLanding from '../locales/en/landing.json';
 
 export const SUPPORTED_LANGS = ['vi', 'en'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGS)[number];
@@ -12,10 +14,12 @@ export const resources = {
   vi: {
     common: viCommon,
     auth: viAuth,
+    landing: viLanding,
   },
   en: {
     common: enCommon,
     auth: enAuth,
+    landing: enLanding,
   },
 } as const;
 
@@ -45,7 +49,7 @@ i18n
     lng: getInitialLanguage(),
     fallbackLng: 'vi',
     defaultNS: 'common',
-    ns: ['common', 'auth'],
+    ns: ['common', 'auth', 'landing'],
     interpolation: {
       escapeValue: false,
     },

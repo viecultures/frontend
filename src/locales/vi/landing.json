@@ -1,0 +1,35 @@
+{
+  "navigation": {
+    "discover": "Khám phá",
+    "topics": "Chủ đề",
+    "heritage_map": "Bản đồ di sản",
+    "how_it_works": "Phương pháp",
+    "contact": "Liên hệ",
+    "study_room": "Góc học tập",
+    "sign_in": "Đăng nhập",
+    "start_learning": "Bắt đầu học",
+    "language": "Ngôn ngữ"
+  },
+  "hero": {
+    "tag": "Di sản & Ngôn ngữ Việt",
+    "title": "Học tiếng Anh, Sống cùng di sản",
+    "title_part1": "Học tiếng Anh, ",
+    "title_accent": "Sống cùng di sản",
+    "subtitle": "Khám phá Việt Nam qua các câu chuyện chân thực, trải nghiệm đọc song ngữ và luyện nghe nhập tâm",
+    "cta_start": "Bắt đầu học",
+    "cta_explore": "Khám phá câu chuyện"
+  },
+  "discover": "Khám phá",
+  "topics": "Chủ đề",
+  "heritage_map": "Bản đồ di sản",
+  "how_it_works": "Phương pháp",
+  "contact": "Liên hệ",
+  "study_room": "Góc học tập",
+  "sign_in": "Đăng nhập",
+  "start_learning": "Bắt đầu học",
+  "tag": "Di sản & Ngôn ngữ Việt",
+  "title": "Học tiếng Anh, Sống cùng di sản",
+  "subtitle": "Khám phá Việt Nam qua các câu chuyện chân thực, trải nghiệm đọc song ngữ và luyện nghe nhập tâm",
+  "cta_start": "Bắt đầu học",
+  "cta_explore": "Khám phá câu chuyện"
+}
