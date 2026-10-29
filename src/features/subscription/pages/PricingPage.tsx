@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   Check,
   X,
@@ -18,7 +18,7 @@ import { getIsProUser } from '@/utils/auth-storage';
 import { PATHS } from '@/routes/paths';
 
 export const PricingPage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   const [isPro, setLocalIsPro] = useState<boolean>(getIsProUser());
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');

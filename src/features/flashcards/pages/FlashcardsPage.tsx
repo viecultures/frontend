@@ -1,6 +1,7 @@
 import '../flashcard-study.css';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import {
   Volume2,
   CheckCircle2,

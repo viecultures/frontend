@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import { PLAYGROUND_SCREENS } from '../types';
 import { PlaygroundSidebarNav } from '../components/PlaygroundSidebarNav';
 import { Feather, Radio, Zap, Home } from 'lucide-react';
@@ -12,7 +13,7 @@ import { LiveAPIProvider } from '../components/map-ai/contexts/LiveAPIContext';
 import { PATHS, paths } from '@/routes/paths';
 
 export const PlaygroundPage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const [searchParams] = useSearchParams();
   const enterChat = searchParams.get('view') === 'chat' || !!searchParams.get('story');
   const [currentScreenIndex, setCurrentScreenIndex] = useState(enterChat ? 1 : 0);

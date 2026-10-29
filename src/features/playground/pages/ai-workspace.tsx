@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { ArrowLeft, Bot, FlaskConical } from 'lucide-react';
 import { PATHS } from '@/routes/paths';
 import { VietnamMapAiScreen } from '../components/map-ai/VietnamMapAiScreen';

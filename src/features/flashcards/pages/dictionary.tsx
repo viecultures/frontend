@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
 import FlashcardSidebarLayout from "../components/flashcard-sidebar-layout";
 import {
@@ -21,7 +21,7 @@ const CATEGORY_OPTIONS = [
 ];
 
 export default function DictionaryPage() {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const libraryRef = useRef<HTMLElement>(null);
   const [sortOrder, setSortOrder] = useState("default");
 

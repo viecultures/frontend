@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   ArrowLeft,
   Crown,
@@ -23,7 +23,7 @@ import { setIsProUser, getStoredUser, getIsProUser } from '@/utils/auth-storage'
 import { PATHS } from '@/routes/paths';
 
 export const CheckoutPage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const currentUser = getStoredUser();
 
   const [paymentMethod, setPaymentMethod] = useState<'bank' | 'momo'>('bank');

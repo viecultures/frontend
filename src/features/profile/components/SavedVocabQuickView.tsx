@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BookMarked, Search, Volume2, ArrowRight, BookmarkCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { paths } from '@/routes/paths';
 import { VOCAB_DATABASE, type VocabItem } from '@/data/readerData';
 import { getAllSavedVocabularies } from '@/services/learning/learningStorage';

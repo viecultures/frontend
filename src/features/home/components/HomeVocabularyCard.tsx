@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { CheckCircle2, Lightbulb, Brain, HelpCircle, Layers, ArrowRight } from 'lucide-react';
 import { listSavedArticles, articleKey, readReviewSession, readSavedVocabulary, getAllSavedVocabularies } from '@/services/learning/learningStorage';
 import { cardsFromVocabulary } from '@/features/flashcards/services/studyDeck';

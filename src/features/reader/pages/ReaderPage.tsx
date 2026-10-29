@@ -1,7 +1,8 @@
 import '../reader-components.css';
 import '../reader-design.css';
 import { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import {
   AudioShadowingBar,
   BilingualReaderView,

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { listSavedArticles } from '@/services/learning/learningStorage';
 import { paths } from '@/routes/paths';
 

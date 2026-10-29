@@ -1,6 +1,6 @@
 import React from 'react';
 import { Crown, Check, Zap, ShieldCheck, ArrowRight, QrCode } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { PATHS } from '@/routes/paths';
 import type { UserProfileData } from '../types';
 

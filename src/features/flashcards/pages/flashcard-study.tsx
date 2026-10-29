@@ -1,6 +1,7 @@
 import '../flashcard-study.css';
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { useGamification } from '@/context/GamificationContext';
 import type { RewardCelebrationPayload } from '@/types';
 import { articleKey, readSavedVocabulary } from '@/services/learning/learningStorage';

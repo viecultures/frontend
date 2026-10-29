@@ -11,7 +11,7 @@ import {
   ChevronDown,
   Trophy,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import type { StudyDeck } from '../services/studyDeck';
 import type { ReviewSession } from '../lib/reviewSession';
 import type { RewardCelebrationPayload } from '@/types';
@@ -38,7 +38,7 @@ export function FlashcardSessionSummary({
   totalCoins,
   savedOnly,
 }: FlashcardSessionSummaryProps) {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const [isWordListOpen, setIsWordListOpen] = useState(false);
 
   const mastered = Object.values(session.ratings).filter(rating => rating === 'mastered').length;

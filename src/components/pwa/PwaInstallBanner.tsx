@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import {
   Download,
   Share,
@@ -9,12 +10,12 @@ import {
   CheckCircle2,
   Zap,
   BookOpen,
-  ExternalLink,
   Star,
 } from 'lucide-react';
 import { usePWAInstall } from './usePWAInstall';
 
 export const PwaInstallBanner: React.FC = () => {
+  const { t } = useTranslation('common');
   const {
     isMobile,
     isIOS,
@@ -78,7 +79,7 @@ export const PwaInstallBanner: React.FC = () => {
           {/* Close Button */}
           <button
             onClick={dismissPrompt}
-            aria-label="Dismiss install suggestion"
+            aria-label={t('pwa.dismiss_aria', 'Dismiss install suggestion')}
             className="absolute top-3.5 right-3.5 p-2 rounded-full text-ink-soft dark:text-[#9db6af] hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all"
           >
             <X size={20} />
@@ -104,13 +105,13 @@ export const PwaInstallBanner: React.FC = () => {
             <div className="flex-1">
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-heritage-dark/10 dark:bg-[#DCA842]/15 text-heritage-dark dark:text-[#DCA842] text-[11px] font-semibold tracking-wide uppercase">
                 <Download size={12} className="text-[#DCA842]" />
-                Mobile web app
+                {t('pwa.badge', 'Mobile web app')}
               </div>
               <h3 className="text-base font-bold font-serif text-heritage-dark dark:text-warm-ivory leading-snug mt-0.5">
-                Add VieCultures to your home screen
+                {t('pwa.title', 'Add VieCultures to your home screen')}
               </h3>
               <p className="text-xs text-ink-soft dark:text-[#a5bcb7]">
-                Read, listen and practise wherever you are.
+                {t('pwa.description', 'Read, listen and practise wherever you are.')}
               </p>
             </div>
           </div>
@@ -119,15 +120,21 @@ export const PwaInstallBanner: React.FC = () => {
           <div className="mt-3.5 grid grid-cols-3 gap-2 py-2.5 px-3 rounded-2xl bg-white/70 dark:bg-black/20 border border-heritage-dark/10 dark:border-white/5">
             <div className="flex flex-col items-center text-center">
               <Zap size={16} className="text-[#DCA842] mb-1" />
-              <span className="text-[11px] font-medium leading-tight">One-tap access</span>
+              <span className="text-[11px] font-medium leading-tight">
+                {t('pwa.feature_one_tap', 'One-tap access')}
+              </span>
             </div>
             <div className="flex flex-col items-center text-center border-x border-heritage-dark/10 dark:border-white/10 px-1">
               <BookOpen size={16} className="text-[#2D7A6E] dark:text-[#42a899] mb-1" />
-              <span className="text-[11px] font-medium leading-tight">Full screen</span>
+              <span className="text-[11px] font-medium leading-tight">
+                {t('pwa.feature_full_screen', 'Full screen')}
+              </span>
             </div>
             <div className="flex flex-col items-center text-center">
               <Smartphone size={16} className="text-[#DCA842] mb-1" />
-              <span className="text-[11px] font-medium leading-tight">Browser based</span>
+              <span className="text-[11px] font-medium leading-tight">
+                {t('pwa.feature_browser_based', 'Browser based')}
+              </span>
             </div>
           </div>
 
@@ -140,7 +147,7 @@ export const PwaInstallBanner: React.FC = () => {
             >
               <div className="font-semibold text-sm text-heritage-dark dark:text-[#DCA842] flex items-center gap-1.5">
                 <Smartphone size={16} />
-                Add to your home screen {isIOS ? '(iOS Safari)' : ''}:
+                {isIOS ? t('pwa.ios_title', 'Add to your home screen (iOS Safari):') : t('pwa.manual_title', 'Add to your home screen:')}
               </div>
               <ol className="space-y-2 text-ink-soft dark:text-[#d3e5e0]">
                 {isIOS ? (
@@ -148,19 +155,28 @@ export const PwaInstallBanner: React.FC = () => {
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-heritage-dark text-white flex items-center justify-center text-[10px] font-bold">1</span>
                       <span>
-                        Tap <span className="font-semibold text-[#007AFF] inline-flex items-center gap-1"><Share size={13} /> Share</span> in the Safari toolbar.
+                        {t('pwa.ios_step_1_prefix', 'Tap')}{' '}
+                        <span className="font-semibold text-[#007AFF] inline-flex items-center gap-1">
+                          <Share size={13} /> {t('pwa.ios_step_1_share', 'Share')}
+                        </span>{' '}
+                        {t('pwa.ios_step_1_suffix', 'in the Safari toolbar.')}
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-heritage-dark text-white flex items-center justify-center text-[10px] font-bold">2</span>
                       <span>
-                        Scroll down and select <span className="font-semibold text-heritage-dark dark:text-[#DCA842] inline-flex items-center gap-1"><PlusSquare size={13} /> Add to Home Screen</span>.
+                        {t('pwa.ios_step_2_prefix', 'Scroll down and select')}{' '}
+                        <span className="font-semibold text-heritage-dark dark:text-[#DCA842] inline-flex items-center gap-1">
+                          <PlusSquare size={13} /> {t('pwa.ios_step_2_add', 'Add to Home Screen')}
+                        </span>.
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-heritage-dark text-white flex items-center justify-center text-[10px] font-bold">3</span>
                       <span>
-                        Tap <strong className="text-heritage-dark dark:text-warm-ivory">Add</strong> in the top-right corner to finish.
+                        {t('pwa.ios_step_3_prefix', 'Tap')}{' '}
+                        <strong className="text-heritage-dark dark:text-warm-ivory">{t('pwa.ios_step_3_add', 'Add')}</strong>{' '}
+                        {t('pwa.ios_step_3_suffix', 'in the top-right corner to finish.')}
                       </span>
                     </li>
                   </>
@@ -169,13 +185,18 @@ export const PwaInstallBanner: React.FC = () => {
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-heritage-dark text-white flex items-center justify-center text-[10px] font-bold">1</span>
                       <span>
-                        Open the browser menu <span className="font-semibold">(⋮ or ☰)</span> in the browser toolbar.
+                        {t('pwa.other_step_1_prefix', 'Open the browser menu')}{' '}
+                        <span className="font-semibold">{t('pwa.other_step_1_icons', '(⋮ or ☰)')}</span>{' '}
+                        {t('pwa.other_step_1_suffix', 'in the browser toolbar.')}
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-heritage-dark text-white flex items-center justify-center text-[10px] font-bold">2</span>
                       <span>
-                        Choose <strong className="text-heritage-dark dark:text-[#DCA842]">"Install app"</strong> or <strong className="text-heritage-dark dark:text-[#DCA842]">"Add to Home Screen"</strong>.
+                        {t('pwa.other_step_2_prefix', 'Choose')}{' '}
+                        <strong className="text-heritage-dark dark:text-[#DCA842]">{t('pwa.other_step_2_install', '"Install app"')}</strong>{' '}
+                        {t('pwa.other_step_2_or', 'or')}{' '}
+                        <strong className="text-heritage-dark dark:text-[#DCA842]">{t('pwa.other_step_2_add', '"Add to Home Screen".')}</strong>
                       </span>
                     </li>
                   </>
@@ -190,7 +211,7 @@ export const PwaInstallBanner: React.FC = () => {
               onClick={dismissPrompt}
               className="flex-1 py-2.5 px-4 rounded-xl border border-ink-soft/20 dark:border-white/10 text-xs font-semibold text-ink-soft dark:text-[#a0b8b2] hover:bg-black/5 dark:hover:bg-white/5 active:scale-98 transition-all"
             >
-              Maybe later
+              {t('buttons.maybe_later', 'Maybe later')}
             </button>
 
             {showIOSGuide ? (
@@ -199,7 +220,7 @@ export const PwaInstallBanner: React.FC = () => {
                 className="flex-1 py-2.5 px-4 rounded-xl bg-heritage-dark hover:bg-[#1c4c45] text-white dark:bg-[#DCA842] dark:text-[#0F2924] dark:hover:bg-[#e4b55a] font-semibold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-1.5"
               >
                 <CheckCircle2 size={15} />
-                Got it
+                {t('buttons.got_it', 'Got it')}
               </button>
             ) : (
               <button
@@ -208,7 +229,7 @@ export const PwaInstallBanner: React.FC = () => {
                 className="flex-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-heritage-dark to-[#25574f] hover:from-[#1b4841] hover:to-[#2c635a] text-white dark:from-[#DCA842] dark:to-[#e4b55a] dark:text-[#0F2924] font-bold text-xs shadow-md shadow-heritage-dark/20 active:scale-98 transition-all flex items-center justify-center gap-1.5"
               >
                 <Download size={15} className={isInstalling ? 'animate-bounce' : ''} />
-                {isIOS ? 'Installation guide' : canInstall ? 'Install app' : 'Add to Home Screen'}
+                {isIOS ? t('pwa.install_guide', 'Installation guide') : canInstall ? t('pwa.install_app', 'Install app') : t('pwa.add_to_home', 'Add to Home Screen')}
               </button>
             )}
           </div>

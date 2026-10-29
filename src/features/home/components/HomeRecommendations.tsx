@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { ArrowUpRight, Clock } from 'lucide-react';
 import { LESSONS_DATA } from '@/data/discoveryData';
 import { ENGLISH_EDITORIAL, LOCAL_EDITORIAL, TOPIC_LABELS } from '@/features/discovery/lib/editorial';

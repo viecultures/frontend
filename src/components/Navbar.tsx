@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Menu, Settings, User, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
 import { LanguageSwitcher } from './common/LanguageSwitcher';
@@ -17,12 +18,12 @@ interface NavbarProps {
   onOpenSettings?: () => void;
 }
 
-const navigation = [
-  { label: 'Home', path: PATHS.home, active: ['home'] },
-  { label: 'Learn', path: PATHS.discovery, active: ['discovery', 'reader'] },
-  { label: 'Vocabulary', path: PATHS.dictionary, active: ['dictionary', 'flashcard-study'] },
-  { label: 'Speak', path: PATHS.aiWorkspace, active: ['ai-workspace'] },
-  { label: 'Community', path: PATHS.community, active: ['community', 'community-contest'] },
+const navItems = [
+  { key: 'home', path: PATHS.home, active: ['home'] },
+  { key: 'learn', path: PATHS.discovery, active: ['discovery', 'reader'] },
+  { key: 'vocabulary', path: PATHS.dictionary, active: ['dictionary', 'flashcard-study'] },
+  { key: 'speak', path: PATHS.aiWorkspace, active: ['ai-workspace'] },
+  { key: 'community', path: PATHS.community, active: ['community', 'community-contest'] },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -33,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   onOpenSettings,
 }) => {
+  const { t } = useTranslation('common');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { lang: paramLang } = useParams<{ lang?: string }>();
@@ -57,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="vc-navbar-inner">
         <Link
           to={getLocalizedPath(PATHS.home, currentLang)}
-          aria-label="VieCultures study room"
+          aria-label={t('navbar.study_room_label', 'VieCultures study room')}
           className="vc-navbar-brand"
         >
           <BrandLogo size="md" theme="light" />
@@ -65,16 +67,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         <nav
           id="main-navigation"
           className={`vc-navbar-links${isMenuOpen ? ' is-open' : ''}`}
-          aria-label="Main navigation"
+          aria-label={t('footer.navigation_title', 'Main navigation')}
         >
-          {navigation.map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.path}
               to={getLocalizedPath(item.path, currentLang)}
               onClick={() => setIsMenuOpen(false)}
               aria-current={item.active.includes(activeView) ? 'page' : undefined}
             >
-              {item.label}
+              {t(`navbar.${item.key}`, item.key)}
             </Link>
           ))}
         </nav>
@@ -85,8 +87,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               type="button"
               className="vc-navbar-icon"
               onClick={onOpenSettings}
-              aria-label="Room settings"
-              title="Room settings"
+              aria-label={t('navbar.room_settings', 'Room settings')}
+              title={t('navbar.room_settings', 'Room settings')}
             >
               <Settings size={19} />
             </button>
@@ -97,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 type="button"
                 className="vc-navbar-avatar"
                 onClick={() => setIsProfileOpen((value) => !value)}
-                aria-label="Account menu"
+                aria-label={t('navbar.account_menu', 'Account menu')}
                 aria-expanded={isProfileOpen}
                 aria-haspopup="menu"
               >
@@ -122,13 +124,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="vc-navbar-signin"
               to={getLocalizedPath(PATHS.login, currentLang)}
             >
-              Sign in
+              {t('buttons.login', 'Sign in')}
             </Link>
           )}
           <button
             type="button"
             className="vc-navbar-menu"
-            aria-label={isMenuOpen ? 'Close navigation' : 'Open navigation'}
+            aria-label={isMenuOpen ? t('navbar.close_nav', 'Close navigation') : t('navbar.open_nav', 'Open navigation')}
             aria-expanded={isMenuOpen}
             aria-controls="main-navigation"
             onClick={() => setIsMenuOpen((value) => !value)}

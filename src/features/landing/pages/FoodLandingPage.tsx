@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react';
 import { ArrowDown, BookOpen, Bookmark, Headphones, Menu, Pause, Play, RotateCcw, X, ArrowRight } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';

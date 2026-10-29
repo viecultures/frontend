@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { ArrowLeft, ArrowRight, ListOrdered } from 'lucide-react';
 import { getSeriesNavigation } from '@/data/series';
 import { PATHS, paths, withQuery } from '@/routes/paths';

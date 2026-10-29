@@ -1,6 +1,7 @@
 import '../profile-ui.css';
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import { Award, BookMarked, Crown, Check, ArrowLeft } from 'lucide-react';
 import {
   ProfileHeaderCard,
@@ -20,7 +21,7 @@ type TabKey = 'passport' | 'badges' | 'vocab' | 'subscription';
 
 export const ProfilePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   const tabParam = (searchParams.get('tab') as TabKey) || 'passport';
   const [activeTab, setActiveTab] = useState<TabKey>(

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { X, Bookmark, BookmarkCheck, ArrowRight } from "lucide-react";
 import type { VocabItem } from "@/data/readerData";
 import { paths } from "@/routes/paths";

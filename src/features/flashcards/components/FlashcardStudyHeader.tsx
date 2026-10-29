@@ -1,5 +1,5 @@
 import { Volume2, Shuffle, Mic, ChevronDown, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import type { Lesson } from "@/data/discoveryData";
 import { PATHS } from '@/routes/paths';
 

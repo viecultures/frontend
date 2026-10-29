@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { Bookmark, BookmarkCheck, BookOpen } from 'lucide-react';
 import { getLessonStatsForLevel } from '@/data/discoveryData';
 import { paths } from '@/routes/paths';

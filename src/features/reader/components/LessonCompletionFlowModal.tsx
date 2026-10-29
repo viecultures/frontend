@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   Award,
   Flame,
@@ -39,7 +39,7 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
   onLoginSuccess,
 }) => {
 
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   // Multi-step flow state
   const [currentStep, setCurrentStep] = useState<StepType>('stamp');

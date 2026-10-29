@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import { SendHorizontal, LayoutGrid } from 'lucide-react';
 import { companionService } from '@/services/companionService';
 import type {
@@ -49,7 +50,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
   lessonId,
   lessonTitle,
 }) => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const location = useLocation();
 
   const articleContext = useCompanionArticleContext((s) => s.context);

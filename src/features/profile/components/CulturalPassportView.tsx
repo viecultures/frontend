@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Flower2, Lock, CheckCircle2, MapPin, BookOpen, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { paths } from '@/routes/paths';
 import { ProfileSealIcon } from './ProfileSealIcon';
 import { SealDetailModal } from './SealDetailModal';

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { paths, PATHS } from '@/routes/paths';
 import type { ReadingBookmark } from '../lib/studyRoomStorage';

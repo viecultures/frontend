@@ -1,6 +1,6 @@
 import React from 'react';
 import { Crown, Edit3, Target, Calendar } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { PATHS } from '@/routes/paths';
 import { profileTargetLabel } from '../profile-copy';
 import type { UserProfileData } from '../types';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Award, BookOpen, Check, Copy } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { Modal } from '@/components/ui/modal';
 import { paths } from '@/routes/paths';
 import { ProfileSealIcon } from './ProfileSealIcon';

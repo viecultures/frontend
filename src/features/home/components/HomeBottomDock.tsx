@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { ChevronDown, Clock, Pause, Play, RotateCcw, MessageCircle } from 'lucide-react';
 import { PATHS } from '@/routes/paths';
 

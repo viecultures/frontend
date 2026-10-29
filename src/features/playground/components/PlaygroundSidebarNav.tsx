@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   ChevronUp,
   ChevronDown,
@@ -25,7 +25,7 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
   currentScreenIndex,
   onSelectScreen
 }) => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   const getIcon = (iconName: string, active: boolean) => {
     const props = { className: `w-4 h-4 ${active ? 'text-antique-gold' : 'text-[#5D706A] group-hover:text-white'}` };

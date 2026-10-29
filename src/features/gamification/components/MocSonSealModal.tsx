@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   Award,
   Flame,
@@ -47,7 +47,7 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
   source = 'flashcard',
   onAfterStamp,
 }) => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { stats, recordDailyStreak, earnReward } = useGamification();
 
   const [isStamped, setIsStamped] = useState<boolean>(false);

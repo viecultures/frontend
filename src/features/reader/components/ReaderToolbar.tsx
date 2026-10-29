@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import Link from '@/components/Link';
 import { ArrowLeft, BookOpen, Maximize, Minimize, Moon, SlidersHorizontal, Sun } from 'lucide-react';
 import { Navbar } from '@/components/Navbar';
@@ -35,7 +35,7 @@ export function ReaderToolbar({
   onOpenVoiceCustomizer, selectedVoiceName = 'Puck',
   isLoggedIn = false, user = null, onLogout, isPro = false,
 }: ReaderToolbarProps) {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const appNavigate = useAppNavigate();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fullscreenError, setFullscreenError] = useState('');

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { Navbar } from '@/components/Navbar';
 import { HomeGreetingControls } from '../components/HomeGreetingControls';
 import { HomeWidgetsGrid } from '../components/HomeWidgetsGrid';
