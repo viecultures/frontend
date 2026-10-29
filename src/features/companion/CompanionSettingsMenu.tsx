@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MoreHorizontal } from 'lucide-react';
 import type { CompanionLanguage } from '@/types/companion';
 
@@ -31,10 +32,29 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
   onResetSize,
   isLoggedIn = true,
 }) => {
+  const { t } = useTranslation('playground');
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  const languageOptions: LanguageOption[] = [
+    {
+      value: 'en',
+      label: t('playground.companion.settings.lang_en'),
+      hint: t('playground.companion.settings.lang_en_hint'),
+    },
+    {
+      value: 'vi',
+      label: t('playground.companion.settings.lang_vi'),
+      hint: t('playground.companion.settings.lang_vi_hint'),
+    },
+    {
+      value: 'bilingual',
+      label: t('playground.companion.settings.lang_bilingual'),
+      hint: t('playground.companion.settings.lang_bilingual_hint'),
+    },
+  ];
 
   useEffect(() => {
     if (!isOpen) return;
@@ -78,7 +98,7 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        aria-label="Chat settings"
+        aria-label={t('playground.companion.settings.aria_label')}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((v) => !v)}
@@ -95,10 +115,10 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
           className="vc-menu-in absolute right-0 top-10 z-10 w-60 overflow-hidden rounded-2xl border-2 border-[#8a9a6f] bg-[#fffaf0] text-[#3e5a3a] shadow-[0_5px_0_-1px_#c9d6b0,0_16px_30px_-12px_rgba(70,90,60,0.5)]"
         >
           <p className="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#7a8a66]">
-            Reply language
+            {t('playground.companion.settings.reply_language')}
           </p>
           <div className="px-2 pb-2">
-            {LANGUAGE_OPTIONS.map((opt) => {
+            {languageOptions.map((opt) => {
               const checked = opt.value === language;
               return (
                 <button
@@ -139,7 +159,7 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
                 }}
                 className="w-full rounded-xl px-2 py-2 text-left text-sm font-medium hover:bg-[#f3efe0]"
               >
-                Reset window size
+                {t('playground.companion.settings.reset_size')}
               </button>
             )}
 
@@ -150,12 +170,12 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
                 onClick={() => setIsConfirmingClear(true)}
                 className="w-full rounded-xl px-2 py-2 text-left text-sm font-medium text-[#b4533c] hover:bg-[#fbe9e3]"
               >
-                Clear chat history
+                {t('playground.companion.settings.clear_history')}
               </button>
             ) : (
               <div className="rounded-xl bg-[#fbe9e3] p-2.5">
                 <p className="mb-2 text-xs leading-snug text-[#8f3f2c]">
-                  Delete this whole conversation? This cannot be undone.
+                  {t('playground.companion.settings.clear_confirm')}
                 </p>
                 <div className="flex justify-end gap-2">
                   <button
@@ -164,7 +184,7 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
                     disabled={isClearing}
                     className="rounded-full px-3 py-1 text-xs font-semibold text-[#7a8a66] hover:bg-white/70"
                   >
-                    Cancel
+                    {t('playground.companion.settings.cancel')}
                   </button>
                   <button
                     type="button"
@@ -172,7 +192,9 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
                     disabled={isClearing}
                     className="rounded-full bg-[#b4533c] px-3 py-1 text-xs font-semibold text-white hover:bg-[#9a4330] disabled:opacity-60"
                   >
-                    {isClearing ? 'Clearing...' : 'Clear'}
+                    {isClearing
+                      ? t('playground.companion.settings.clearing')
+                      : t('playground.companion.settings.clear_btn')}
                   </button>
                 </div>
               </div>
@@ -181,14 +203,18 @@ export const CompanionSettingsMenu: React.FC<CompanionSettingsMenuProps> = ({
 
           {!isLoggedIn ? (
             <div className="flex items-center justify-between bg-[#f3efe0] px-4 py-2 text-[11px] text-[#7a8a66]">
-              <span>Daily questions</span>
-              <span className="font-semibold text-[#8f3f2c]">Requires login</span>
+              <span>{t('playground.companion.settings.daily_questions')}</span>
+              <span className="font-semibold text-[#8f3f2c]">
+                {t('playground.companion.settings.requires_login')}
+              </span>
             </div>
           ) : remainingTurns !== null ? (
             <div className="flex items-center justify-between bg-[#f3efe0] px-4 py-2 text-[11px] text-[#7a8a66]">
-              <span>Daily questions</span>
+              <span>{t('playground.companion.settings.daily_questions')}</span>
               <span className="font-semibold text-[#3e5a3a]">
-                {remainingTurns === -1 ? 'Unlimited (Pro)' : `${remainingTurns} / 5 left`}
+                {remainingTurns === -1
+                  ? t('playground.companion.settings.unlimited_pro')
+                  : t('playground.companion.settings.turns_left', { remaining: remainingTurns })}
               </span>
             </div>
           ) : null}

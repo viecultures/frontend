@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import { SendHorizontal, LayoutGrid } from 'lucide-react';
 import { companionService } from '@/services/companionService';
 import type {
@@ -49,7 +51,8 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
   lessonId,
   lessonTitle,
 }) => {
-  const navigate = useNavigate();
+  const { t } = useTranslation('playground');
+  const navigate = useAppNavigate();
   const location = useLocation();
 
   const articleContext = useCompanionArticleContext((s) => s.context);
@@ -122,36 +125,38 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
 
   const getInitialGreeting = useCallback((): string => {
     if (effectiveLessonTitle) {
-      return `Hello! I am your VieCultures Companion. We are currently exploring "${effectiveLessonTitle}". Feel free to ask me anything about the culture, history, or language in this lesson!`;
+      return t('playground.companion.drawer.initial_greeting_lesson', {
+        title: effectiveLessonTitle,
+      });
     }
-    return `Hello! I am your VieCultures Companion. What Vietnamese tradition, street food, or cultural custom would you love to chat about today?`;
-  }, [effectiveLessonTitle]);
+    return t('playground.companion.drawer.initial_greeting_default');
+  }, [effectiveLessonTitle, t]);
 
   const getDefaultPrompts = useCallback((): string[] => {
     if (articleContext?.articleTitle) {
       return [
-        `Help me understand "${articleContext.articleTitle}"`,
-        `Help me express my opinion about "${articleContext.articleTitle}" in English`,
-        `What key vocabulary should I notice in this story?`,
+        t('playground.companion.drawer.prompt_understand', { title: articleContext.articleTitle }),
+        t('playground.companion.drawer.prompt_express', { title: articleContext.articleTitle }),
+        t('playground.companion.drawer.prompt_vocab'),
       ];
     }
     return lessonTitle
       ? [
-          'What is the cultural significance of this lesson?',
-          'Can you explain the key cultural phrases in simple English?',
+          t('playground.companion.drawer.prompt_lesson_significance'),
+          t('playground.companion.drawer.prompt_lesson_phrases'),
         ]
       : [
-          'What makes Northern and Southern Pho different?',
-          'Tell me about the most vibrant festivals in Vietnam.',
+          t('playground.companion.drawer.prompt_pho'),
+          t('playground.companion.drawer.prompt_festivals'),
         ];
-  }, [articleContext?.articleTitle, lessonTitle]);
+  }, [articleContext?.articleTitle, lessonTitle, t]);
 
   const handleExpandToWorkspace = () => {
     if (articleContext?.articleId) {
       useReaderHandoff.getState().enterFromReader(
         {
           articleId: articleContext.articleId,
-          title: articleContext.articleTitle || 'Your reading story',
+          title: articleContext.articleTitle || t('playground.companion.drawer.your_story'),
           level: articleContext.level || 'Level 2',
           summary: articleContext.articleSummary,
           vocabulary: (articleContext.vocabulary || []).map((v) => ({
@@ -180,7 +185,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         {
           id: 'guest-intro',
           role: 'assistant',
-          content: 'Hello! Please sign in to your VieCultures account to chat and save your history with Cultural Companion.',
+          content: t('playground.companion.drawer.guest_intro'),
           timestamp: Date.now(),
         },
       ]);
@@ -224,7 +229,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         setSuggestedPrompts(getDefaultPrompts());
       } catch (err) {
         console.error('[CompanionChatDrawer] Failed to load history or quota:', err);
-        setError('Unable to load chat history. You can still chat normally.');
+        setError(t('playground.companion.drawer.err_load_history'));
       } finally {
         if (isSubscribed) {
           setIsHistoryLoading(false);
@@ -237,7 +242,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
     return () => {
       isSubscribed = false;
     };
-  }, [isOpen, user, effectiveLessonId, getInitialGreeting, getDefaultPrompts]);
+  }, [isOpen, user, effectiveLessonId, getInitialGreeting, getDefaultPrompts, t]);
 
   // Synchronize history updates from external events (e.g. from AI Workspace)
   useEffect(() => {
@@ -338,11 +343,11 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
 
       if (errMessage.includes('LIMIT_EXCEEDED') || errMessage.includes('403')) {
         setRemainingTurns(0);
-        setError('Ban da su dung het 5 luot chat mien phi hom nay.');
+        setError(t('playground.companion.drawer.err_limit_exceeded'));
         return;
       }
 
-      setError(errMessage);
+      setError(errMessage || t('playground.companion.drawer.err_failed_reach'));
     } finally {
       setIsLoading(false);
     }
@@ -387,7 +392,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       );
     } catch (err) {
       console.error('[CompanionChatDrawer] Translation action failed:', err);
-      setError('Translation failed. Please try again.');
+      setError(t('playground.companion.drawer.err_translate_failed'));
     } finally {
       setTranslatingIndex(null);
     }
@@ -414,7 +419,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       setError(null);
     } catch (err) {
       console.error('[CompanionChatDrawer] Failed to clear history:', err);
-      setError('Failed to clear chat history.');
+      setError(t('playground.companion.drawer.err_clear_history'));
     }
   };
 
@@ -441,7 +446,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
   return (
     <div
       role="dialog"
-      aria-label="Cultural AI Companion"
+      aria-label={t('playground.companion.drawer.dialog_aria')}
       tabIndex={-1}
       style={drawerStyle}
       className={`z-50 flex flex-col overflow-hidden border-2 border-[#8a9a6f] bg-[#fffaf0] font-sans text-[#2f3a2a] antialiased select-text ${
@@ -456,8 +461,8 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
       {!isMobile && (
         <button
           type="button"
-          aria-label="Drag to resize chat window"
-          title="Drag to resize. Double-click to reset."
+          aria-label={t('playground.companion.drawer.resize_aria')}
+          title={t('playground.companion.drawer.resize_title')}
           onPointerDown={onResizeHandlePointerDown}
           onDoubleClick={resetSize}
           className={`group/grip absolute top-0 left-0 z-20 h-6 w-6 cursor-nwse-resize touch-none rounded-tl-[24px] ${
@@ -496,8 +501,12 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
         <div className="flex shrink-0 items-center border-b border-[#dfe5cf] bg-[#f4f7ee] px-3.5 py-1.5 text-[11.5px] text-[#4a6a44]">
           <div className="flex items-center gap-1.5 truncate">
             <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#5d8a45]" />
-            <span className="font-semibold text-[#2f4a2c]">Reading with you:</span>
-            <span className="truncate italic text-[#4a6a44]">{articleContext.articleTitle || 'Your story'}</span>
+            <span className="font-semibold text-[#2f4a2c]">
+              {t('playground.companion.drawer.reading_with_you')}
+            </span>
+            <span className="truncate italic text-[#4a6a44]">
+              {articleContext.articleTitle || t('playground.companion.drawer.your_story')}
+            </span>
           </div>
         </div>
       )}
@@ -520,7 +529,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
             {isHistoryLoading && (
               <div className="flex items-center justify-center gap-2 py-2 text-xs italic text-[#7a8a66]">
                 <ForestSpirit className="h-5 w-5 vc-spirit-bob" />
-                Gathering our past conversations...
+                {t('playground.companion.drawer.gathering_history')}
               </div>
             )}
 
@@ -562,7 +571,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
                   onClick={() => setError(null)}
                   className="shrink-0 rounded-full px-1.5 text-[11px] font-semibold hover:bg-white/70"
                 >
-                  Dismiss
+                  {t('playground.companion.drawer.dismiss')}
                 </button>
               </div>
             )}
@@ -571,7 +580,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
             {referencedLessons.length > 0 && (
               <div className="pt-1">
                 <p className="mb-1.5 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#7a8a66]">
-                  Related lessons
+                  {t('playground.companion.drawer.related_lessons')}
                 </p>
                 <div className="flex gap-2 overflow-x-auto pb-1 vc-scroll">
                   {referencedLessons.map((item) => (
@@ -595,10 +604,10 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
           {!user ? (
             <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-4 py-4 text-center">
               <p className="mb-1 font-serif text-[15px] font-bold text-[#2f4a2c]">
-                Sign in required
+                {t('playground.companion.drawer.signin_required_title')}
               </p>
               <p className="mb-3 text-xs leading-relaxed text-[#627750]">
-                Sign in to your VieCultures account to chat and save your history with AI Companion.
+                {t('playground.companion.drawer.signin_required_desc')}
               </p>
               <button
                 type="button"
@@ -608,24 +617,24 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
                 }}
                 className="inline-flex items-center justify-center rounded-full bg-[#5d8a45] px-5 py-2 text-xs font-bold text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none"
               >
-                Sign in to chat
+                {t('playground.companion.drawer.signin_btn')}
               </button>
             </div>
           ) : isLimitReached ? (
             /* Case 2: Hit Limit -> Render Upgrade Gate */
             <div className="shrink-0 border-t border-dashed border-[#d6dcc4] bg-[#fffaf0] px-4 py-4 text-center">
               <p className="mb-1 font-serif text-[15px] font-bold text-[#8f3f2c]">
-                Hết lượt trò chuyện hôm nay
+                {t('playground.companion.drawer.limit_reached_title')}
               </p>
               <p className="mb-3 text-xs leading-relaxed text-[#7a8a66]">
-                Bạn đã sử dụng hết 5 lượt chat miễn phí hôm nay. Nâng cấp tài khoản Pro để trò chuyện không giới hạn!
+                {t('playground.companion.drawer.limit_reached_desc')}
               </p>
               <button
                 type="button"
                 onClick={() => navigate(PATHS.pricing)}
                 className="inline-flex items-center justify-center rounded-full bg-[#b4533c] px-5 py-2 text-xs font-bold text-white shadow-[0_3px_0_-1px_#7a2a1a] transition-all hover:bg-[#9a4330] active:translate-y-px active:shadow-none"
               >
-                Nâng cấp tài khoản
+                {t('playground.companion.drawer.upgrade_btn')}
               </button>
             </div>
           ) : (
@@ -650,21 +659,21 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
                     onKeyDown={handleKeyDown}
                     disabled={isLoading}
                     rows={1}
-                    placeholder="Ask about Vietnamese culture..."
+                    placeholder={t('playground.companion.drawer.input_placeholder')}
                     className="max-h-[120px] flex-1 resize-none bg-transparent py-1.5 text-[13.5px] text-[#2f3a2a] placeholder:text-[#a3ad90] focus:outline-none disabled:opacity-60"
                   />
                   <button
                     type="button"
                     onClick={() => handleSend()}
                     disabled={isLoading || !inputMessage.trim()}
-                    aria-label="Send message"
+                    aria-label={t('playground.companion.drawer.send_aria')}
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#5d8a45] text-white shadow-[0_3px_0_-1px_#3e5a3a] transition-all hover:bg-[#4f7a3a] active:translate-y-px active:shadow-none disabled:cursor-not-allowed disabled:bg-[#c9d6b0] disabled:shadow-none"
                   >
                     <SendHorizontal className="h-4 w-4" />
                   </button>
                 </div>
                 <p className="mt-1 text-center text-[10px] text-[#a3ad90]">
-                  Enter to send, Shift + Enter for a new line
+                  {t('playground.companion.drawer.keyboard_hint')}
                 </p>
               </div>
             </>

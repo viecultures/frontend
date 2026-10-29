@@ -3,6 +3,7 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   useSettings,
   useUI,
@@ -43,6 +44,7 @@ import { useMapAiDebugStore } from '../lib/debug-logger';
 const AVAILABLE_MODELS = ['gemini-3.1-flash-live-preview', 'gemini-2.0-flash-realtime-exp'];
 
 export default function Sidebar() {
+  const { t } = useTranslation('playground');
   const {
     isSidebarOpen,
     toggleSidebar,
@@ -152,9 +154,9 @@ export default function Sidebar() {
       <div className="sidebar-header">
         <div className="flex items-center gap-2 text-antique-gold">
           <Compass className="w-5 h-5 text-antique-gold" />
-          <DialogTitle as="h3" className="font-serif font-bold text-base text-white">Speaking settings</DialogTitle>
+          <DialogTitle as="h3" className="font-serif font-bold text-base text-white">{t('playground.sidebar.title')}</DialogTitle>
         </div>
-        <button onClick={toggleSidebar} className="close-button" aria-label="Close settings">
+        <button onClick={toggleSidebar} className="close-button" aria-label={t('playground.sidebar.close_aria')}>
           <X className="w-5 h-5 text-gray-400 hover:text-white" />
         </button>
       </div>
@@ -177,7 +179,7 @@ export default function Sidebar() {
             }}
           >
             <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>Pause the conversation to change these settings.</span>
+            <span>{t('playground.sidebar.pause_warning')}</span>
           </div>
         )}
 
@@ -186,10 +188,10 @@ export default function Sidebar() {
           {tutorMode !== 'free-conversation' && <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Story to practise</span>
+              <span>{t('playground.sidebar.story_to_practice')}</span>
             </label>
             <select
-              aria-label="Story to practise" value={activeLessonId}
+              aria-label={t('playground.sidebar.story_to_practice')} value={activeLessonId}
               disabled={connected}
               onChange={e => handleLessonChange(e.target.value)}
               className="w-full text-xs font-serif"
@@ -201,7 +203,7 @@ export default function Sidebar() {
               ))}
             </select>
             <p className="text-[11px] text-gray-400">
-              Use this story for guided listening and speaking.
+              {t('playground.sidebar.story_hint')}
             </p>
           </div>}
 
@@ -209,22 +211,22 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <Compass className="w-3.5 h-3.5" />
-              <span>Speaking level</span>
+              <span>{t('playground.sidebar.speaking_level')}</span>
             </label>
             <select
-              aria-label="Speaking level" value={proficiencyLevel}
+              aria-label={t('playground.sidebar.speaking_level')} value={proficiencyLevel}
               disabled={busy}
               onChange={e => void handleLevelChange(e.target.value as ProficiencyLevel)}
               className="w-full text-xs font-semibold"
             >
-              <option value="Level 1">Level 1 (A1) — Slow pace · Short, simple sentences</option>
-              <option value="Level 2">Level 2 (B1–B2) — Intermediate · Natural conversation</option>
-              <option value="Level 3">Level 3 (B2–C1) — Advanced · Detailed discussion</option>
+              <option value="Level 1">{t('playground.sidebar.level_1_option')}</option>
+              <option value="Level 2">{t('playground.sidebar.level_2_option')}</option>
+              <option value="Level 3">{t('playground.sidebar.level_3_option')}</option>
             </select>
             <p className="text-[11px] text-gray-400">
-              {proficiencyLevel === 'Level 1' && 'Short sentences, slower speech and sentence starters.'}
-              {proficiencyLevel === 'Level 2' && 'Natural speech, cultural vocabulary and comparisons.'}
-              {proficiencyLevel === 'Level 3' && 'Fluent speech, richer vocabulary and critical discussion.'}
+              {proficiencyLevel === 'Level 1' && t('playground.sidebar.level_1_desc')}
+              {proficiencyLevel === 'Level 2' && t('playground.sidebar.level_2_desc')}
+              {proficiencyLevel === 'Level 3' && t('playground.sidebar.level_3_desc')}
             </p>
           </div>
 
@@ -232,7 +234,7 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <Mic className="w-3.5 h-3.5" />
-              <span>Practice mode</span>
+              <span>{t('playground.sidebar.practice_mode')}</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -245,7 +247,7 @@ export default function Sidebar() {
                     : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
                 }`}
               >
-                Free talk
+                {t('playground.sidebar.free_talk')}
               </button>
               <button
                 type="button"
@@ -257,33 +259,33 @@ export default function Sidebar() {
                     : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
                 }`}
               >
-                Story practice
+                {t('playground.sidebar.story_practice')}
               </button>
             </div>
             <p className="text-[11px] text-gray-400 mt-1">
               {tutorMode === 'guided-lesson'
-                ? 'Practise listening, speaking and comprehension with a story.'
-                : 'Have a natural conversation about Vietnamese culture.'}
+                ? t('playground.sidebar.guided_lesson_desc')
+                : t('playground.sidebar.free_convo_desc')}
             </p>
           </div>
 
           {tutorMode === 'free-conversation' && (
             <>
               <div className="space-y-1.5 mb-4">
-                <label className="text-xs font-bold text-antique-gold uppercase tracking-wider">Corrections</label>
-                <select aria-label="Corrections" value={correctionMode} disabled={connected} onChange={e => setCorrectionMode(e.target.value as CorrectionMode)} className="w-full text-xs">
-                  <option value="off">Off</option>
-                  <option value="after-turn">After each turn</option>
-                  <option value="end-of-session">At the end</option>
+                <label className="text-xs font-bold text-antique-gold uppercase tracking-wider">{t('playground.sidebar.corrections_label')}</label>
+                <select aria-label={t('playground.sidebar.corrections_label')} value={correctionMode} disabled={connected} onChange={e => setCorrectionMode(e.target.value as CorrectionMode)} className="w-full text-xs">
+                  <option value="off">{t('playground.sidebar.corr_off')}</option>
+                  <option value="after-turn">{t('playground.sidebar.corr_after_turn')}</option>
+                  <option value="end-of-session">{t('playground.sidebar.corr_end')}</option>
                 </select>
               </div>
               <div className="space-y-1.5 mb-4">
-                <label className="text-xs font-bold text-antique-gold uppercase tracking-wider">AI map controls</label>
-                <select aria-label="AI map controls" value={mapContextMode} disabled={connected} onChange={e => setMapContextMode(e.target.value as MapContextMode)} className="w-full text-xs">
-                  <option value="off">Off</option>
-                  <option value="on-demand">When I ask for a place</option>
+                <label className="text-xs font-bold text-antique-gold uppercase tracking-wider">{t('playground.sidebar.map_controls_label')}</label>
+                <select aria-label={t('playground.sidebar.map_controls_label')} value={mapContextMode} disabled={connected} onChange={e => setMapContextMode(e.target.value as MapContextMode)} className="w-full text-xs">
+                  <option value="off">{t('playground.sidebar.map_off')}</option>
+                  <option value="on-demand">{t('playground.sidebar.map_on_demand')}</option>
                 </select>
-                <p className="text-[11px] text-gray-400">Explore the map any time. Choose Ask AI to discuss a place.</p>
+                <p className="text-[11px] text-gray-400">{t('playground.sidebar.map_controls_desc')}</p>
               </div>
             </>
           )}
@@ -292,10 +294,10 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <Volume2 className="w-3.5 h-3.5" />
-              <span>Voice</span>
+              <span>{t('playground.sidebar.voice_label')}</span>
             </label>
             <select
-              aria-label="Voice" value={voice}
+              aria-label={t('playground.sidebar.voice_label')} value={voice}
               disabled={connected}
               onChange={e => setVoice(e.target.value)}
               className="w-full text-xs"
@@ -312,15 +314,15 @@ export default function Sidebar() {
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <Key className="w-3.5 h-3.5" />
-              <span>Gemini API key (optional)</span>
+              <span>{t('playground.sidebar.api_key_label')}</span>
             </label>
             <input
               type="password"
-              aria-label="Gemini API key"
+              aria-label={t('playground.sidebar.api_key_label')}
               value={customGeminiApiKey}
               disabled={connected}
               onChange={e => setCustomGeminiApiKey(e.target.value)}
-              placeholder="Enter your API key…"
+              placeholder={t('playground.sidebar.api_key_placeholder')}
               className="w-full text-xs font-mono"
             />
           </div>
@@ -340,14 +342,14 @@ export default function Sidebar() {
               htmlFor="system-message-toggle"
               className="settings-toggle-label text-xs"
             >
-              Show vocabulary and speaking feedback
+              {t('playground.sidebar.feedback_toggle')}
             </label>
           </div>
 
           {/* Color Theme */}
           <div className="settings-toggle-item" style={{ marginTop: '16px', borderTop: '1px solid var(--gray-850)', paddingTop: '16px' }}>
             <label htmlFor="theme-select" className="settings-toggle-label text-xs" style={{ flex: 1 }}>
-              Appearance
+              {t('playground.sidebar.appearance_label')}
             </label>
             <select
               id="theme-select"
@@ -355,29 +357,29 @@ export default function Sidebar() {
               onChange={e => setTheme(e.target.value as 'dark' | 'light')}
               style={{ width: '110px', padding: '6px', background: 'var(--gray-1000)', border: '1px solid var(--gray-800)', color: 'var(--text)' }}
             >
-              <option value="dark">Dark</option>
-              <option value="light">Light</option>
+              <option value="dark">{t('playground.sidebar.theme_dark')}</option>
+              <option value="light">{t('playground.sidebar.theme_light')}</option>
             </select>
           </div>
         </div>
 
         {/* Footer Actions */}
         <div className="sidebar-actions">
-          <button onClick={handleExportLogs} title="Export conversation history">
+          <button onClick={handleExportLogs} title={t('playground.sidebar.export_history_title')}>
             <Download className="w-4 h-4 mr-1.5" />
-            Export history
+            {t('playground.sidebar.export_history')}
           </button>
           <button
             onClick={() => {
               if (activeView) resetConversation();
             }}
-            title="Start a new conversation"
+            title={t('playground.sidebar.new_conversation_title')}
           >
             <RefreshCw className="w-4 h-4 mr-1.5" />
-            New conversation
+            {t('playground.sidebar.new_conversation')}
           </button>
         </div>
-        <button type="button" className="ai-workspace-developer-link" onClick={() => { useMapAiDebugStore.getState().setDrawerOpen(true); toggleSidebar(); }}>Developer tools</button>
+        <button type="button" className="ai-workspace-developer-link" onClick={() => { useMapAiDebugStore.getState().setDrawerOpen(true); toggleSidebar(); }}>{t('playground.sidebar.developer_tools')}</button>
       </div>
       </DialogPanel>
     </Dialog>

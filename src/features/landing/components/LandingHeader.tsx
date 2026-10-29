@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, X, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { BrandLogo } from '@/components/BrandLogo';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { PATHS } from '@/routes/paths';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import { getStoredUser, getStoredToken } from '@/utils/auth-storage';
 
 interface LandingHeaderProps {
@@ -15,6 +18,9 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   onScrollToSegment,
   activeSegment = 'hero',
 }) => {
+  const { t } = useTranslation(['landing', 'common']);
+  const appNavigate = useAppNavigate();
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser() || !!getStoredToken());
@@ -22,7 +28,11 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
 
   useEffect(() => {
     const handleAuthChange = () => {
-      setIsLoggedIn(!!getStoredUser() || !!getStoredToken());
+      try {
+        setIsLoggedIn(!!getStoredUser() || !!getStoredToken());
+      } catch (error) {
+        console.error('[LandingHeader] Failed to read auth state:', error);
+      }
     };
     window.addEventListener('auth:change', handleAuthChange);
     return () => window.removeEventListener('auth:change', handleAuthChange);
@@ -37,12 +47,12 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   }, []);
 
   const navLinks = [
-    { name: 'Discover', segment: 'featured-articles' },
-    { name: 'Topics', segment: 'topics' },
-    { name: 'Heritage Map', segment: 'ban-do-di-san' },
-    { name: 'How It Works', segment: 'methodology' },
-    { name: 'Plans', segment: 'plans' },
-    { name: 'Contact', segment: 'contact' },
+    { name: t('navigation.discover', { defaultValue: 'Discover' }), segment: 'featured-articles' },
+    { name: t('navigation.topics', { defaultValue: 'Topics' }), segment: 'topics' },
+    { name: t('navigation.heritage_map', { defaultValue: 'Heritage Map' }), segment: 'ban-do-di-san' },
+    { name: t('navigation.how_it_works', { defaultValue: 'How It Works' }), segment: 'methodology' },
+    { name: t('navigation.plans', { defaultValue: 'Plans' }), segment: 'plans' },
+    { name: t('navigation.contact', { defaultValue: 'Contact' }), segment: 'contact' },
   ];
 
   useEffect(() => {
@@ -58,17 +68,33 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   }, [isMobileMenuOpen]);
 
   const navigate = (view: string) => {
-    setIsMobileMenuOpen(false);
-    onNavigate?.(view);
+    try {
+      setIsMobileMenuOpen(false);
+      if (onNavigate) {
+        onNavigate(view);
+      } else {
+        appNavigate(view);
+      }
+    } catch (error) {
+      console.error('[LandingHeader] Navigation error:', error);
+    }
   };
 
   const scroll = (segment: string) => {
-    setIsMobileMenuOpen(false);
-    onScrollToSegment(segment);
+    try {
+      setIsMobileMenuOpen(false);
+      onScrollToSegment(segment);
+    } catch (error) {
+      console.error('[LandingHeader] Scroll error:', error);
+    }
   };
 
   return (
-    <header className={`landing-header transition-all duration-300 ${isScrolled ? 'landing-header-scrolled shadow-sm' : ''}`}>
+    <header
+      className={`landing-header transition-all duration-300 ${
+        isScrolled ? 'landing-header-scrolled shadow-sm' : ''
+      }`}
+    >
       <div className="landing-container landing-header-inner">
         <button
           type="button"
@@ -94,6 +120,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
         </nav>
 
         <div className="landing-header-actions">
+          <LanguageSwitcher />
 
           {isLoggedIn ? (
             <button
@@ -101,7 +128,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               className="landing-login focus-ring"
               onClick={() => navigate(PATHS.home)}
             >
-              Study Room
+              {t('navigation.study_room', { defaultValue: 'Study Room' })}
             </button>
           ) : (
             <button
@@ -109,7 +136,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               className="landing-login focus-ring"
               onClick={() => navigate(PATHS.login)}
             >
-              Sign In
+              {t('navigation.sign_in', { defaultValue: 'Sign In' })}
             </button>
           )}
 
@@ -118,7 +145,8 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
             className="landing-button landing-button-primary landing-header-cta focus-ring"
             onClick={() => navigate(PATHS.discovery)}
           >
-            Start Learning <ArrowRight size={16} aria-hidden="true" />
+            {t('navigation.start_learning', { defaultValue: 'Start Learning' })}{' '}
+            <ArrowRight size={16} aria-hidden="true" />
           </button>
 
           <button
@@ -130,7 +158,11 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
             aria-controls="landing-mobile-menu"
             aria-label={isMobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
           >
-            {isMobileMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
+            {isMobileMenuOpen ? (
+              <X size={24} aria-hidden="true" />
+            ) : (
+              <Menu size={24} aria-hidden="true" />
+            )}
           </button>
         </div>
       </div>
@@ -141,6 +173,12 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
           className="landing-mobile-nav landing-container"
           aria-label="Mobile navigation"
         >
+          <div className="flex items-center justify-between py-2 border-b border-line mb-1">
+            <span className="text-xs font-medium text-ink-soft">
+              {t('navigation.language', { defaultValue: 'Ngôn ngữ' })}
+            </span>
+            <LanguageSwitcher />
+          </div>
           {navLinks.map((link) => (
             <button
               key={link.segment}
@@ -154,12 +192,12 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
           ))}
           {isLoggedIn ? (
             <button type="button" onClick={() => navigate(PATHS.home)}>
-              Study Room
+              {t('navigation.study_room', { defaultValue: 'Study Room' })}
               <ArrowRight size={16} aria-hidden="true" />
             </button>
           ) : (
             <button type="button" onClick={() => navigate(PATHS.login)}>
-              Sign In
+              {t('navigation.sign_in', { defaultValue: 'Sign In' })}
               <ArrowRight size={16} aria-hidden="true" />
             </button>
           )}
@@ -168,7 +206,8 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
             className="landing-button landing-button-primary mt-2"
             onClick={() => navigate(PATHS.discovery)}
           >
-            Start Learning <ArrowRight size={16} aria-hidden="true" />
+            {t('navigation.start_learning', { defaultValue: 'Start Learning' })}{' '}
+            <ArrowRight size={16} aria-hidden="true" />
           </button>
         </nav>
       )}

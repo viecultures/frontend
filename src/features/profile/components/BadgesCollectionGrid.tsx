@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Award,
   Compass,
@@ -18,16 +19,17 @@ interface BadgesCollectionGridProps {
   badges: UserBadge[];
 }
 
-const CATEGORY_TABS: { key: 'all' | BadgeCategory; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'heritage', label: 'Heritage' },
-  { key: 'vocab', label: 'Vocabulary' },
-  { key: 'streak', label: 'Learning habits' },
-  { key: 'community', label: 'Community' },
-];
-
 export const BadgesCollectionGrid: React.FC<BadgesCollectionGridProps> = ({ badges }) => {
+  const { t } = useTranslation('profile');
   const [activeCategory, setActiveCategory] = useState<'all' | BadgeCategory>('all');
+
+  const categoryTabs: { key: 'all' | BadgeCategory; label: string }[] = [
+    { key: 'all', label: t('profile.badges_comp.tab_all') },
+    { key: 'heritage', label: t('profile.badges_comp.tab_heritage') },
+    { key: 'vocab', label: t('profile.badges_comp.tab_vocab') },
+    { key: 'streak', label: t('profile.badges_comp.tab_streak') },
+    { key: 'community', label: t('profile.badges_comp.tab_community') },
+  ];
 
   const filteredBadges = badges.filter((b) => {
     if (activeCategory === 'all') return true;
@@ -64,7 +66,7 @@ export const BadgesCollectionGrid: React.FC<BadgesCollectionGridProps> = ({ badg
       {/* Category Tabs */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-rice-paper dark:bg-heritage-forest border border-antique-gold/40 shadow-xs">
-          {CATEGORY_TABS.map((tab) => (
+          {categoryTabs.map((tab) => (
             <button
               key={tab.key}
               type="button"
@@ -81,9 +83,15 @@ export const BadgesCollectionGrid: React.FC<BadgesCollectionGridProps> = ({ badg
           ))}
         </div>
 
-        <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-          Unlocked <strong>{unlockedCount}</strong> / {badges.length} badges
-        </span>
+        <span
+          className="text-xs font-medium text-stone-500 dark:text-stone-400"
+          dangerouslySetInnerHTML={{
+            __html: t('profile.badges_comp.unlocked_summary', {
+              unlocked: unlockedCount,
+              total: badges.length,
+            }),
+          }}
+        />
       </div>
 
       {/* Badges Grid */}
@@ -136,7 +144,7 @@ export const BadgesCollectionGrid: React.FC<BadgesCollectionGridProps> = ({ badg
                   <div className="flex items-center justify-between text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
                     <span className="flex items-center gap-1">
                       <CheckCircle2 aria-hidden="true" className="w-3.5 h-3.5" />
-                      <span>Unlocked</span>
+                      <span>{t('profile.badges_comp.unlocked_label')}</span>
                     </span>
                     <span className="font-mono text-stone-400 font-normal">
                       {badge.unlockedAt}
@@ -145,7 +153,7 @@ export const BadgesCollectionGrid: React.FC<BadgesCollectionGridProps> = ({ badg
                 ) : (
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-[10px] font-bold text-stone-500">
-                      <span>Progress</span>
+                      <span>{t('profile.badges_comp.progress_label')}</span>
                       <span className="font-mono">
                         {badge.currentProgress} / {badge.maxProgress}
                       </span>

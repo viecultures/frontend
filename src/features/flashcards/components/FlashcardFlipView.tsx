@@ -1,5 +1,6 @@
 import React from 'react';
 import { Volume2, CheckCircle2, RotateCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { Flashcard } from '@/data/flashcardsData';
 
 interface FlashcardFlipViewProps {
@@ -37,6 +38,7 @@ export function FlashcardFlipView({
   onReviewLater,
   onMastered,
 }: FlashcardFlipViewProps) {
+  const { t } = useTranslation('flashcards');
   const maskedContext = maskContextSentence(card.contextEn, card.word);
 
   return (
@@ -49,12 +51,12 @@ export function FlashcardFlipView({
               className="vocab-card-flip-trigger"
               tabIndex={isFlipped ? -1 : 0}
               onClick={onToggleFlip}
-              aria-label={`English: ${card.word}. Flip to see the meaning.`}
+              aria-label={t('flip_view.aria_front', { word: card.word, defaultValue: `English: ${card.word}. Flip to see the meaning.` })}
             />
             <div className="vocab-face-meta">
-              <span>English · Ngữ cảnh</span>
+              <span>{t('flip_view.front_meta', 'English · Ngữ cảnh')}</span>
               <span>
-                Card {currentIndex + 1} / {totalCards}
+                {t('flip_view.card_counter', { current: currentIndex + 1, total: totalCards, defaultValue: `Card ${currentIndex + 1} / ${totalCards}` })}
               </span>
             </div>
             <div className="vocab-face-content">
@@ -68,8 +70,8 @@ export function FlashcardFlipView({
                     onPlayAudio(card.word);
                   }}
                   className="vocab-audio-button"
-                  title="Play pronunciation"
-                  aria-label={`Pronounce ${card.word}`}
+                  title={t('flip_view.play_pronunciation', 'Play pronunciation')}
+                  aria-label={t('flip_view.pronounce_word', { word: card.word, defaultValue: `Pronounce ${card.word}` })}
                 >
                   <Volume2 size={20} />
                 </button>
@@ -80,7 +82,7 @@ export function FlashcardFlipView({
               {maskedContext && (
                 <div className="vocab-context-box mt-3 text-sm italic opacity-90">
                   <p className="text-xs uppercase font-semibold text-antique-gold mb-1 not-italic tracking-wider">
-                    Context Sentence (Điền từ vào chỗ trống):
+                    {t('flip_view.context_label', 'Context Sentence (Điền từ vào chỗ trống):')}
                   </p>
                   <p className="vocab-context font-serif">“{maskedContext}”</p>
                 </div>
@@ -88,8 +90,8 @@ export function FlashcardFlipView({
             </div>
             <p className="vocab-flip-hint">
               <RotateCw size={14} />
-              <span>Tap to reveal definition · Chạm để lật mặt sau</span>
-              <kbd>Space</kbd>
+              <span>{t('flip_view.tap_to_reveal', 'Tap to reveal definition')}</span>
+              <kbd>{t('flip_view.key_space', 'Space')}</kbd>
             </p>
           </div>
 
@@ -99,12 +101,12 @@ export function FlashcardFlipView({
               className="vocab-card-flip-trigger"
               tabIndex={!isFlipped ? -1 : 0}
               onClick={onToggleFlip}
-              aria-label={`Meaning: ${card.viMeaning}. Flip to see the English word.`}
+              aria-label={t('flip_view.aria_back', { meaning: card.viMeaning, defaultValue: `Meaning: ${card.viMeaning}. Flip to see the English word.` })}
             />
             <div className="vocab-face-meta">
-              <span>Giải nghĩa & Ngữ âm</span>
+              <span>{t('flip_view.back_meta', 'Giải nghĩa & Ngữ âm')}</span>
               <span>
-                Card {currentIndex + 1} / {totalCards}
+                {t('flip_view.card_counter', { current: currentIndex + 1, total: totalCards, defaultValue: `Card ${currentIndex + 1} / ${totalCards}` })}
               </span>
             </div>
             <div className="vocab-face-content">
@@ -121,8 +123,8 @@ export function FlashcardFlipView({
                     onPlayAudio(card.word);
                   }}
                   className="p-1 rounded-full text-antique-bright hover:bg-white/10 transition-colors"
-                  title="Play pronunciation"
-                  aria-label={`Pronounce ${card.word}`}
+                  title={t('flip_view.play_pronunciation', 'Play pronunciation')}
+                  aria-label={t('flip_view.pronounce_word', { word: card.word, defaultValue: `Pronounce ${card.word}` })}
                 >
                   <Volume2 size={18} />
                 </button>
@@ -134,7 +136,7 @@ export function FlashcardFlipView({
               {card.contextEn && (
                 <div className="vocab-context-box mt-4 text-xs bg-black/20 p-3 rounded-xl border border-white/10 text-left">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-antique-bright block mb-1">
-                    Ví dụ ngữ cảnh gốc:
+                    {t('flip_view.original_context_label', 'Ví dụ ngữ cảnh gốc:')}
                   </span>
                   <p className="italic font-serif leading-relaxed text-warm-ivory">
                     “{card.contextEn}”
@@ -144,14 +146,14 @@ export function FlashcardFlipView({
             </div>
             <p className="vocab-flip-hint">
               <RotateCw size={14} />
-              <span>Tap to return to front</span>
-              <kbd>Space</kbd>
+              <span>{t('flip_view.tap_to_return', 'Tap to return to front')}</span>
+              <kbd>{t('flip_view.key_space', 'Space')}</kbd>
             </p>
           </div>
         </div>
       </div>
 
-      {/* Binary Self-Evaluation Buttons: Remembered (🟢) and Forgot (🔴) */}
+      {/* Binary Self-Evaluation Buttons */}
       <div className="vocab-review-actions flex items-center justify-center gap-3">
         <button
           type="button"
@@ -160,7 +162,7 @@ export function FlashcardFlipView({
           title="Review again (Key 1)"
         >
           <RotateCw size={18} />
-          <span>🔴 Cần ôn lại (Forgot)</span>
+          <span>{t('flip_view.btn_forgot', '🔴 Cần ôn lại (Forgot)')}</span>
           <kbd className="px-1.5 py-0.5 text-[10px] bg-red-500/20 rounded">1</kbd>
         </button>
         <button
@@ -170,7 +172,7 @@ export function FlashcardFlipView({
           title="Remembered (Key 2)"
         >
           <CheckCircle2 size={18} />
-          <span>🟢 Đã nhớ (Remembered)</span>
+          <span>{t('flip_view.btn_remembered', '🟢 Đã nhớ (Remembered)')}</span>
           <kbd className="px-1.5 py-0.5 text-[10px] bg-black/20 rounded">2</kbd>
         </button>
       </div>

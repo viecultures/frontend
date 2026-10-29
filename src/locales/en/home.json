@@ -1,0 +1,86 @@
+{
+  "greeting": {
+    "eyebrow": "YOUR CULTURE STUDY ROOM",
+    "welcome_back": "Welcome back",
+    "welcome": "Welcome",
+    "tagline": "A little English. A little closer to Vietnam.",
+    "default_user": "Learner"
+  },
+  "footer": {
+    "scenery": "Room scenery",
+    "background": "Background",
+    "default_scenery": "Your own little corner of Vietnam.",
+    "about": "About VieCultures"
+  },
+  "skip_content": "Skip to study content",
+  "storage_error": "Your plan could not be saved. Check browser storage permissions.",
+  "continue_card": {
+    "eyebrow_saved": "PICK UP WHERE YOU LEFT OFF",
+    "eyebrow_new": "YOUR FIRST CHAPTER",
+    "default_title": "Every story opens a new world.",
+    "saved_desc": "Return to your story, with your reading position remembered.",
+    "new_desc": "Start with the traditions of Tet. Read in English, explore the Vietnamese translation and save words along the way.",
+    "bilingual": "English · Vietnamese",
+    "reading_position": "Reading position",
+    "btn_continue": "Continue reading",
+    "btn_start": "Start your first story",
+    "browse_stories": "Browse stories",
+    "default_topic": "Traditions & everyday life"
+  },
+  "review_card": {
+    "eyebrow": "WORDS IN CONTEXT",
+    "saved_words": "saved word",
+    "saved_words_count": "{{count}} saved words",
+    "empty_title": "Make new words your own.",
+    "revisit_desc": "Revisit words from",
+    "empty_desc": "Save a word while reading. Your vocabulary practice starts here.",
+    "btn_review": "Review saved words",
+    "btn_explore": "Explore vocabulary",
+    "saved_in_browser": "Saved in this browser"
+  },
+  "vocabulary_card": {
+    "eyebrow": "YOUR VOCABULARY",
+    "title": "Your vocabulary.",
+    "summary": "Learned <1>{{total}}</1> words · <3>{{due}}</3> words due today",
+    "mastered": "Mastered",
+    "familiar": "Familiar",
+    "reviewing": "Reviewing",
+    "learning": "Learning",
+    "mastered_aria": "Mastered: {{count}} words",
+    "familiar_aria": "Familiar: {{count}} words",
+    "reviewing_aria": "Reviewing: {{count}} words",
+    "learning_aria": "Learning: {{count}} words",
+    "due_today": "DUE TODAY",
+    "due_count": "{{count}} words",
+    "btn_review_now": "Review now",
+    "btn_open_notebook": "Open notebook"
+  },
+  "recommendations": {
+    "eyebrow": "LET CURIOSITY LEAD",
+    "title": "Your next discovery",
+    "all_stories": "All stories",
+    "min_read": "min read"
+  },
+  "bottom_dock": {
+    "aria_label": "Focus tools",
+    "focus_tools": "Focus tools",
+    "pomodoro": "POMODORO",
+    "quote": "A quiet moment for your next chapter.",
+    "timer_aria": "Focus time remaining",
+    "btn_pause": "Pause",
+    "btn_restart": "Start again",
+    "btn_start": "Start",
+    "btn_reset_aria": "Reset focus timer",
+    "completed_status": "Your focus session is complete. Time for a short break.",
+    "practise_companion": "Practise with your AI companion"
+  },
+  "study_plan": {
+    "eyebrow": "ONE SMALL STEP",
+    "title": "Your study plan",
+    "empty_desc": "Keep a little intention for today. Add a story to read or a few words to practise.",
+    "input_placeholder": "Add a small goal…",
+    "input_aria": "New study goal",
+    "btn_add_aria": "Add study goal",
+    "footnote": "Your plan stays saved in this browser."
+  }
+}

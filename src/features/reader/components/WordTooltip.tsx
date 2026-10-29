@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { Volume2, Bookmark, Check, X, BookOpen, ShieldAlert } from 'lucide-react';
 import type { VocabItem } from '@/data/readerData';
@@ -27,6 +28,7 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
   themeMode = 'paper',
   onSave,
 }) => {
+  const { t } = useTranslation('reader');
   const [legacySaved, setIsSaved] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const savedVocabulary = useContext(SavedVocabularyContext);
@@ -165,7 +167,7 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
       style={{ top: `${top}px`, left: `${left}px`, width: `${popupWidth}px` }}
       role="dialog"
       aria-modal="true"
-      aria-label={`Vocabulary tooltip: ${vocab.word}`}
+      aria-label={t('dictionary.tooltip_aria', { word: vocab.word, defaultValue: `Vocabulary tooltip: ${vocab.word}` })}
       className={`word-tooltip in-place-dictionary-popup fixed z-[9999] p-4 rounded-2xl shadow-2xl border backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200 ${
         isLight
           ? 'bg-warm-ivory/98 text-heritage-green border-antique-gold/60 shadow-[0_16px_45px_color-mix(in_srgb,_var(--color-heritage-green)_20%,_transparent)]'
@@ -184,8 +186,8 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
                 <button
                   type="button"
                   onClick={handlePlayAudio}
-                  title="Play pronunciation"
-                  aria-label={`Pronounce ${vocab.word}`}
+                  title={t('dictionary.play_pronunciation', 'Play pronunciation')}
+                  aria-label={t('dictionary.pronounce_aria', { word: vocab.word, defaultValue: `Pronounce ${vocab.word}` })}
                   className={`p-1 rounded-lg transition-colors cursor-pointer ${
                     isPlayingAudio
                       ? 'bg-antique-gold text-heritage-green'
@@ -219,8 +221,8 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
           type="button"
           onClick={onClose}
           className="p-1 rounded-lg text-current/60 hover:text-current hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
-          title="Close definition"
-          aria-label="Close definition"
+          title={t('dictionary.close_definition', 'Close definition')}
+          aria-label={t('dictionary.close_definition', 'Close definition')}
         >
           <X className="w-4 h-4" />
         </button>
@@ -232,7 +234,7 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
           <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-200 space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold">
               <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
-              <span>Sensitive language</span>
+              <span>{t('dictionary.sensitive_language', 'Sensitive language')}</span>
             </div>
             <p className="text-[11px] leading-relaxed opacity-90">{vocab.viMeaning}</p>
             <p className="text-[10px] opacity-75 italic leading-tight">{vocab.enDefinition}</p>
@@ -242,7 +244,7 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
             {/* Vietnamese Translation */}
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#059669] dark:text-[#6EE7B7] block">
-                Vietnamese meaning:
+                {t('dictionary.vietnamese_meaning', 'Vietnamese meaning:')}
               </span>
               <p className="font-medium mt-0.5 leading-relaxed text-current">{vocab.viMeaning}</p>
             </div>
@@ -251,7 +253,7 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
             {vocab.enDefinition && (
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-heritage-green dark:text-antique-gold block">
-                  English Definition:
+                  {t('dictionary.english_definition', 'English Definition:')}
                 </span>
                 <p className="opacity-90 italic mt-0.5 leading-relaxed">{vocab.enDefinition}</p>
               </div>
@@ -262,7 +264,7 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
               <div className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-antique-gold/20">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-antique-gold flex items-center gap-1">
                   <BookOpen className="w-3 h-3" />
-                  Article context:
+                  {t('dictionary.article_context', 'Article context:')}
                 </span>
                 <p className="text-[11px] opacity-90 mt-1 line-clamp-3 leading-normal italic font-serif">
                   "{maskProfanity(vocab.contextSentence)}"
@@ -277,7 +279,7 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
       <div className="pt-2 border-t border-antique-gold/25 flex items-center justify-between gap-2">
         {vocab.isProfane ? (
           <div className="w-full py-1.5 px-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center text-[11px] font-medium opacity-60">
-            Saving sensitive language is unavailable
+            {t('dictionary.sensitive_unavailable', 'Saving sensitive language is unavailable')}
           </div>
         ) : (
           <button
@@ -294,12 +296,12 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
             {isSaved ? (
               <>
                 <Check className="w-3.5 h-3.5" />
-                <span>Saved to vocabulary</span>
+                <span>{t('dictionary.saved_to_vocab', 'Saved to vocabulary')}</span>
               </>
             ) : (
               <>
                 <Bookmark className="w-3.5 h-3.5" />
-                <span>{isPhrase ? 'Save phrase with context' : 'Save word with context'}</span>
+                <span>{isPhrase ? t('dictionary.save_phrase', 'Save phrase with context') : t('dictionary.save_word', 'Save word with context')}</span>
               </>
             )}
           </button>

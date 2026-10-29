@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react';
 import { ArrowDown, BookOpen, Bookmark, Headphones, Menu, Pause, Play, RotateCcw, X, ArrowRight } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { getPublishedSeries } from '@/data/series';
 import type { SeriesMetadata } from '@/data/series/types';
 import { PATHS, paths, withQuery } from '@/routes/paths';
@@ -78,6 +79,7 @@ const FoodLandingPage: React.FC = () => {
             {navItems.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
           </nav>
           <div className="food-header-actions">
+            <LanguageSwitcher />
             <button type="button" className="food-motion-toggle" onClick={() => setMotionOn((on) => !on)} aria-label={canAnimate ? 'Pause page motion' : 'Enable page motion'} title={canAnimate ? 'Pause page motion' : 'Enable page motion'} disabled={!!reducedMotion}>
               {canAnimate ? <Pause size={17} aria-hidden="true" /> : <Play size={17} aria-hidden="true" />}
             </button>

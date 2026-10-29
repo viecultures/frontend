@@ -1,7 +1,9 @@
 import '../reader-components.css';
 import '../reader-design.css';
 import { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import {
   AudioShadowingBar,
   BilingualReaderView,
@@ -31,6 +33,7 @@ import { MocSonSealModal } from '@/features/gamification';
 import { ReaderReflectionsSection } from '@/features/community/components/ReaderReflectionsSection';
 
 export default function ReaderPage() {
+  const { t } = useTranslation('reader');
   const [searchParams, setSearchParams] = useSearchParams();
 
   // User & Pro status
@@ -176,7 +179,7 @@ export default function ReaderPage() {
     setLevelError('');
     let nextId = targetId;
     if (articleData?.cefrLevel && /^[ABC][12]$/.test(articleData.cefrLevel) && !articleData.topicGroup && newLevel !== selectedLevel) {
-      setLevelError('This article is not available at the selected level.');
+      setLevelError(t('level_error_unavailable', 'This article is not available at the selected level.'));
       return;
     }
     if (articleData?.topicGroup) {
@@ -187,7 +190,7 @@ export default function ReaderPage() {
         if (request !== levelRequest.current) return;
         if (post) { nextId = post.id; found = true; break; }
       }
-      if (!found) { setLevelError('This article has no content at the selected level.'); return; }
+      if (!found) { setLevelError(t('level_error_no_content', 'This article has no content at the selected level.')); return; }
     }
     if (request !== levelRequest.current) return;
     setSelectedLevel(newLevel);
@@ -386,8 +389,8 @@ export default function ReaderPage() {
       ? "bg-[#1E2925] text-warm-ivory border-antique-gold/30 shadow-xl"
       : "bg-warm-ivory text-ink-soft border-heritage-green/12 shadow-xl";
 
-  if (loadedKey !== requestedKey) return <main className="p-12" role="status">Loading article…</main>;
-  if (articleError) return <main className="p-12" role="alert"><h1>Could not load this article</h1><p>Check your connection or choose another article.</p><button onClick={() => setReloadAttempt(value => value + 1)}>Try again</button> <Link to={PATHS.discovery}>Browse articles</Link></main>;
+  if (loadedKey !== requestedKey) return <main className="p-12" role="status">{t('loading_article', 'Loading article…')}</main>;
+  if (articleError) return <main className="p-12" role="alert"><h1>{t('error_title', 'Could not load this article')}</h1><p>{t('error_desc', 'Check your connection or choose another article.')}</p><button onClick={() => setReloadAttempt(value => value + 1)}>{t('try_again', 'Try again')}</button> <Link to={PATHS.discovery}>{t('browse_articles', 'Browse articles')}</Link></main>;
 
   return (
     <SavedVocabularyContext.Provider value={savedVocabulary}>
@@ -424,7 +427,7 @@ export default function ReaderPage() {
       />
 
       {levelError && <p role="alert" className="px-8 py-3">{levelError}</p>}
-      {!savedVocabulary.canSave && <p role="alert" className="px-8 py-3">Could not save vocabulary. Check your browser storage space and permissions.</p>}
+      {!savedVocabulary.canSave && <p role="alert" className="px-8 py-3">{t('save_vocab_error', 'Could not save vocabulary. Check your browser storage space and permissions.')}</p>}
 
       {/* Main Reader canvas */}
       <section
@@ -436,8 +439,8 @@ export default function ReaderPage() {
 
           {/* Always-visible listening and pronunciation controls. */}
           {readingMode === 'bilingual' && <section id="reader-audio" className="reader-audio-section" aria-labelledby="reader-audio-title">
-          <h2 id="reader-audio-title" className="mb-3 font-sans text-lg font-semibold text-ink">Listen & practice pronunciation</h2>
-          {articleData && articleData.id !== 'tet-holiday' && !articleData.shadowingAudioUrl ? <p role="status">Audio is not available for this article yet. You can continue reading and reviewing vocabulary.</p> : <AudioShadowingBar
+          <h2 id="reader-audio-title" className="mb-3 font-sans text-lg font-semibold text-ink">{t('listen_section_title', 'Listen & practice pronunciation')}</h2>
+          {articleData && articleData.id !== 'tet-holiday' && !articleData.shadowingAudioUrl ? <p role="status">{t('audio_unavailable', 'Audio is not available for this article yet. You can continue reading and reviewing vocabulary.')}</p> : <AudioShadowingBar
             articleTitle={articleData?.titleEn}
             onStartShadowing={() => handleStartPractice('shadowing')}
             isPlaying={isPlaying}

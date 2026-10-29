@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { Menu, Settings, User, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
-import { PATHS } from '@/routes/paths';
+import { LanguageSwitcher } from './common/LanguageSwitcher';
+import { PATHS, getLocalizedPath, resolveLanguage } from '@/routes/paths';
+import i18n from '@/lib/i18n';
 import type { AppUser } from '@/utils/auth-storage';
 
 interface NavbarProps {
@@ -15,39 +18,129 @@ interface NavbarProps {
   onOpenSettings?: () => void;
 }
 
-const navigation = [
-  { label: 'Home', path: PATHS.home, active: ['home'] },
-  { label: 'Learn', path: PATHS.discovery, active: ['discovery', 'reader'] },
-  { label: 'Vocabulary', path: PATHS.dictionary, active: ['dictionary', 'flashcard-study'] },
-  { label: 'Speak', path: PATHS.aiWorkspace, active: ['ai-workspace'] },
-  { label: 'Community', path: PATHS.community, active: ['community', 'community-contest'] },
+const navItems = [
+  { key: 'home', path: PATHS.home, active: ['home'] },
+  { key: 'learn', path: PATHS.discovery, active: ['discovery', 'reader'] },
+  { key: 'vocabulary', path: PATHS.dictionary, active: ['dictionary', 'flashcard-study'] },
+  { key: 'speak', path: PATHS.aiWorkspace, active: ['ai-workspace'] },
+  { key: 'community', path: PATHS.community, active: ['community', 'community-contest'] },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
-  activeView = 'landing', isLoggedIn = false, user, onNavigateToSection, onLogout, onOpenSettings,
+  activeView = 'landing',
+  isLoggedIn = false,
+  user,
+  onNavigateToSection,
+  onLogout,
+  onOpenSettings,
 }) => {
+  const { t } = useTranslation('common');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const handleNavigate = (path: string) => { setIsMenuOpen(false); onNavigateToSection(path); };
+  const { lang: paramLang } = useParams<{ lang?: string }>();
+  const location = useLocation();
 
-  return <header className="vc-navbar">
-    <div className="vc-navbar-inner">
-      <Link to={PATHS.home} aria-label="VieCultures study room" className="vc-navbar-brand"><BrandLogo size="md" theme="light" /></Link>
-      <nav id="main-navigation" className={`vc-navbar-links${isMenuOpen ? ' is-open' : ''}`} aria-label="Main navigation">
-        {navigation.map(item => <Link key={item.path} to={item.path} onClick={() => setIsMenuOpen(false)} aria-current={item.active.includes(activeView) ? 'page' : undefined}>{item.label}</Link>)}
-      </nav>
-      <div className="vc-navbar-actions">
-        {onOpenSettings && <button type="button" className="vc-navbar-icon" onClick={onOpenSettings} aria-label="Room settings" title="Room settings"><Settings size={19} /></button>}
-        {isLoggedIn ? <div className="vc-navbar-profile">
-          <button type="button" className="vc-navbar-avatar" onClick={() => setIsProfileOpen(value => !value)} aria-label="Account menu" aria-expanded={isProfileOpen} aria-haspopup="menu">
-            {user?.avatar && /^(https?:\/\/|\/)/.test(user.avatar) ? <img src={user.avatar} alt="" /> : <span>{user?.name?.trim().slice(0, 1).toUpperCase() || <User size={18} />}</span>}
+  const match = location.pathname.match(/^\/(vi|en)(\/|$)/);
+  const currentLang = resolveLanguage(
+    paramLang || (match ? match[1] : undefined) || i18n?.language
+  );
+
+  const handleNavigate = (path: string) => {
+    try {
+      setIsMenuOpen(false);
+      onNavigateToSection(path);
+    } catch (error) {
+      console.error('[Navbar] Navigation error:', error);
+    }
+  };
+
+  return (
+    <header className="vc-navbar">
+      <div className="vc-navbar-inner">
+        <Link
+          to={getLocalizedPath(PATHS.home, currentLang)}
+          aria-label={t('navbar.study_room_label', 'VieCultures study room')}
+          className="vc-navbar-brand"
+        >
+          <BrandLogo size="md" theme="light" />
+        </Link>
+        <nav
+          id="main-navigation"
+          className={`vc-navbar-links${isMenuOpen ? ' is-open' : ''}`}
+          aria-label={t('footer.navigation_title', 'Main navigation')}
+        >
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={getLocalizedPath(item.path, currentLang)}
+              onClick={() => setIsMenuOpen(false)}
+              aria-current={item.active.includes(activeView) ? 'page' : undefined}
+            >
+              {t(`navbar.${item.key}`, item.key)}
+            </Link>
+          ))}
+        </nav>
+        <div className="vc-navbar-actions">
+          <LanguageSwitcher variant="compact" />
+          {onOpenSettings && (
+            <button
+              type="button"
+              className="vc-navbar-icon"
+              onClick={onOpenSettings}
+              aria-label={t('navbar.room_settings', 'Room settings')}
+              title={t('navbar.room_settings', 'Room settings')}
+            >
+              <Settings size={19} />
+            </button>
+          )}
+          {isLoggedIn ? (
+            <div className="vc-navbar-profile">
+              <button
+                type="button"
+                className="vc-navbar-avatar"
+                onClick={() => setIsProfileOpen((value) => !value)}
+                aria-label={t('navbar.account_menu', 'Account menu')}
+                aria-expanded={isProfileOpen}
+                aria-haspopup="menu"
+              >
+                {user?.avatar && /^(https?:\/\/|\/)/.test(user.avatar) ? (
+                  <img src={user.avatar} alt="" />
+                ) : (
+                  <span>
+                    {user?.name?.trim().slice(0, 1).toUpperCase() || <User size={18} />}
+                  </span>
+                )}
+              </button>
+              <ProfileDropdown
+                isOpen={isProfileOpen}
+                onClose={() => setIsProfileOpen(false)}
+                user={user}
+                onLogout={onLogout}
+                onNavigate={handleNavigate}
+              />
+            </div>
+          ) : (
+            <Link
+              className="vc-navbar-signin"
+              to={getLocalizedPath(PATHS.login, currentLang)}
+            >
+              {t('buttons.login', 'Sign in')}
+            </Link>
+          )}
+          <button
+            type="button"
+            className="vc-navbar-menu"
+            aria-label={isMenuOpen ? t('navbar.close_nav', 'Close navigation') : t('navbar.open_nav', 'Open navigation')}
+            aria-expanded={isMenuOpen}
+            aria-controls="main-navigation"
+            onClick={() => setIsMenuOpen((value) => !value)}
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <ProfileDropdown isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} onLogout={onLogout} onNavigate={handleNavigate} />
-        </div> : <Link className="vc-navbar-signin" to={PATHS.login}>Sign in</Link>}
-        <button type="button" className="vc-navbar-menu" aria-label={isMenuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={isMenuOpen} aria-controls="main-navigation" onClick={() => setIsMenuOpen(value => !value)}>{isMenuOpen ? <X size={20} /> : <Menu size={20} />}</button>
+        </div>
       </div>
-    </div>
-  </header>;
+    </header>
+  );
 };
 
 export default Navbar;

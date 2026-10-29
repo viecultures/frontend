@@ -1,0 +1,86 @@
+{
+  "greeting": {
+    "eyebrow": "PHÒNG HỌC VĂN HÓA CỦA BẠN",
+    "welcome_back": "Chào mừng trở lại",
+    "welcome": "Chào mừng",
+    "tagline": "Một chút tiếng Anh. Thêm gần gũi với Việt Nam.",
+    "default_user": "Người học"
+  },
+  "footer": {
+    "scenery": "Khung cảnh phòng",
+    "background": "Hình nền",
+    "default_scenery": "Góc nhỏ Việt Nam của riêng bạn.",
+    "about": "Về VieCultures"
+  },
+  "skip_content": "Bỏ qua đến nội dung học",
+  "storage_error": "Không thể lưu kế hoạch học tập. Vui lòng kiểm tra quyền lưu trữ trình duyệt.",
+  "continue_card": {
+    "eyebrow_saved": "TIẾP TỤC NƠI BẠN ĐÃ DỪNG",
+    "eyebrow_new": "CHƯƠNG ĐẦU TIÊN CỦA BẠN",
+    "default_title": "Mỗi câu chuyện mở ra một chân trời mới.",
+    "saved_desc": "Quay lại bài đọc của bạn, vị trí đọc đã được ghi nhớ.",
+    "new_desc": "Bắt đầu với phong tục Tết cổ truyền. Đọc tiếng Anh, khám phá bản dịch tiếng Việt và lưu từ vựng trên hành trình.",
+    "bilingual": "Tiếng Anh · Tiếng Việt",
+    "reading_position": "Vị trí đọc",
+    "btn_continue": "Tiếp tục đọc",
+    "btn_start": "Bắt đầu câu chuyện đầu tiên",
+    "browse_stories": "Duyệt các bài đọc",
+    "default_topic": "Phong tục & đời sống thường ngày"
+  },
+  "review_card": {
+    "eyebrow": "TỪ VỰNG TRONG NGỮ CẢNH",
+    "saved_words": "từ đã lưu",
+    "saved_words_count": "{{count}} từ đã lưu",
+    "empty_title": "Biến từ mới thành vốn sống của bạn.",
+    "revisit_desc": "Ôn tập các từ vựng trong bài",
+    "empty_desc": "Lưu từ vựng khi đang đọc. Phiên ôn tập của bạn bắt đầu tại đây.",
+    "btn_review": "Ôn từ vựng đã lưu",
+    "btn_explore": "Khám phá từ vựng",
+    "saved_in_browser": "Đã lưu trong trình duyệt này"
+  },
+  "vocabulary_card": {
+    "eyebrow": "TỪ VỰNG CỦA BẠN",
+    "title": "Từ vựng của bạn.",
+    "summary": "Đã học <1>{{total}}</1> từ · <3>{{due}}</3> từ cần ôn hôm nay",
+    "mastered": "Nhớ chắc",
+    "familiar": "Hơi nhớ",
+    "reviewing": "Đang ôn",
+    "learning": "Chưa nhớ",
+    "mastered_aria": "Nhớ chắc: {{count}} từ",
+    "familiar_aria": "Hơi nhớ: {{count}} từ",
+    "reviewing_aria": "Đang ôn tập: {{count}} từ",
+    "learning_aria": "Chưa nhớ: {{count}} từ",
+    "due_today": "CẦN ÔN HÔM NAY",
+    "due_count": "{{count}} từ",
+    "btn_review_now": "Ôn ngay",
+    "btn_open_notebook": "Mở sổ từ"
+  },
+  "recommendations": {
+    "eyebrow": "ĐỂ TRÍ TÒ MÒ DẪN LỐI",
+    "title": "Khám phá tiếp theo của bạn",
+    "all_stories": "Tất cả bài đọc",
+    "min_read": "phút đọc"
+  },
+  "bottom_dock": {
+    "aria_label": "Công cụ tập trung",
+    "focus_tools": "Công cụ tập trung",
+    "pomodoro": "POMODORO",
+    "quote": "Một khoảnh khắc tĩnh lặng cho chương sách tiếp theo.",
+    "timer_aria": "Thời gian tập trung còn lại",
+    "btn_pause": "Tạm dừng",
+    "btn_restart": "Bắt đầu lại",
+    "btn_start": "Bắt đầu",
+    "btn_reset_aria": "Đặt lại bộ đếm tập trung",
+    "completed_status": "Phiên tập trung đã hoàn tất. Đã đến lúc nghỉ ngơi ngắn.",
+    "practise_companion": "Luyện tập cùng trợ lý AI"
+  },
+  "study_plan": {
+    "eyebrow": "MỘT BƯỚC NHỎ",
+    "title": "Kế hoạch học tập",
+    "empty_desc": "Giữ một chủ đích nhỏ cho hôm nay. Thêm một bài đọc hoặc vài từ để luyện tập.",
+    "input_placeholder": "Thêm một mục tiêu nhỏ…",
+    "input_aria": "Mục tiêu học mới",
+    "btn_add_aria": "Thêm mục tiêu học",
+    "footnote": "Kế hoạch học của bạn được lưu trong trình duyệt này."
+  }
+}

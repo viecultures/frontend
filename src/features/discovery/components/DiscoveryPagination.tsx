@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface DiscoveryPaginationProps {
@@ -16,6 +17,8 @@ export const DiscoveryPagination: React.FC<DiscoveryPaginationProps> = ({
   itemsPerPage,
   onPageChange,
 }) => {
+  const { t } = useTranslation('discovery');
+
   if (totalLessons === 0 || totalPages <= 1) return null;
 
   const startIdx = (currentPage - 1) * itemsPerPage + 1;
@@ -29,9 +32,11 @@ export const DiscoveryPagination: React.FC<DiscoveryPaginationProps> = ({
   return (
     <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-rice-paper/80 border border-heritage-green/12">
       <div className="text-xs font-semibold text-text-secondary">
-        Hiển thị <strong className="text-heritage-green">{startIdx}</strong> -{' '}
-        <strong className="text-heritage-green">{endIdx}</strong> trên tổng số{' '}
-        <strong className="text-heritage-green">{totalLessons}</strong> bài học
+        {t('pagination.showing_summary', {
+          start: startIdx,
+          end: endIdx,
+          total: totalLessons,
+        })}
       </div>
 
       <div className="flex items-center gap-2">
@@ -40,8 +45,8 @@ export const DiscoveryPagination: React.FC<DiscoveryPaginationProps> = ({
           onClick={() => handlePageSelect(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
           className="p-2 rounded-xl bg-warm-ivory border border-heritage-green/14 text-heritage-green disabled:opacity-40 disabled:cursor-not-allowed hover:bg-mist-cloud transition-all shadow-xs cursor-pointer"
-          title="Trang trước"
-          aria-label="Trang trước"
+          title={t('pagination.prev_page')}
+          aria-label={t('pagination.prev_page')}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -68,8 +73,8 @@ export const DiscoveryPagination: React.FC<DiscoveryPaginationProps> = ({
           onClick={() => handlePageSelect(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
           className="p-2 rounded-xl bg-warm-ivory border border-heritage-green/14 text-heritage-green disabled:opacity-40 disabled:cursor-not-allowed hover:bg-mist-cloud transition-all shadow-xs cursor-pointer"
-          title="Trang sau"
-          aria-label="Trang sau"
+          title={t('pagination.next_page')}
+          aria-label={t('pagination.next_page')}
         >
           <ChevronRight className="w-4 h-4" />
         </button>

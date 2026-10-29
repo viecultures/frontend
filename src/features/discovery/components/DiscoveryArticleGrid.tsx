@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Link from '@/components/Link';
 import {
   BookOpen,
@@ -40,6 +41,8 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
   onResetAllFilters,
   selectedCefr = 'All',
 }) => {
+  const { t } = useTranslation('discovery');
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -57,19 +60,19 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
           <Layers className="w-8 h-8 text-antique-gold" />
         </div>
         <h3 className="font-serif text-xl font-bold text-heritage-green">
-          Không tìm thấy bài học phù hợp
+          {t('article_grid.empty_title')}
         </h3>
         <p className="text-sm text-text-body mt-2 max-w-md mx-auto leading-relaxed">
           {onlyBookmarked
-            ? 'Bạn chưa lưu bài học nào trong danh mục này. Hãy nhấp biểu tượng đánh dấu để lưu bài viết yêu thích.'
-            : 'Không tìm thấy câu chuyện văn hóa nào khớp với các bộ lọc hiện tại. Thử thay đổi từ khóa hoặc bộ lọc.'}
+            ? t('article_grid.empty_saved_desc')
+            : t('article_grid.empty_general_desc')}
         </p>
         <button
           type="button"
           onClick={onResetAllFilters}
           className="mt-6 px-6 py-2.5 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm transition-all focus-ring cursor-pointer hover:scale-102 active:scale-98"
         >
-          Đặt lại tất cả bộ lọc
+          {t('article_grid.reset_filters_btn')}
         </button>
       </div>
     );
@@ -115,7 +118,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                     {lesson.isFromDatabase && (
                       <span className="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-emerald-600/90 text-warm-ivory border border-white/25 backdrop-blur-md shadow-xs flex items-center gap-1">
                         <BookOpen className="w-2.5 h-2.5 text-antique-gold" />
-                        <span>Database</span>
+                        <span>{t('article_grid.database_badge')}</span>
                       </span>
                     )}
                   </div>
@@ -123,8 +126,8 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                     type="button"
                     onClick={() => onToggleBookmark(lesson.id)}
                     className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-warm-ivory backdrop-blur-md transition-all cursor-pointer shadow-xs"
-                    aria-label="Lưu bài học"
-                    title={isBookmarked ? "Đã lưu vào danh sách" : "Lưu bài học"}
+                    aria-label={t('article_grid.save_lesson_aria')}
+                    title={isBookmarked ? t('article_grid.saved_status_title') : t('article_grid.save_lesson_title')}
                   >
                     {isBookmarked ? (
                       <BookmarkCheck className="w-4 h-4 text-antique-gold fill-antique-gold" />
@@ -161,7 +164,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                 <div className="mt-4 pt-1 space-y-3">
                   {/* 3 Level Pills Selector & Reading Time */}
                   <div className="flex items-center justify-between text-[11px] font-bold tracking-wider">
-                    <div className="flex items-center gap-1.5" title="Chọn trình độ đọc">
+                    <div className="flex items-center gap-1.5" title={t('article_grid.choose_reading_level')}>
                       {ALL_LEVELS.map((lvl) => {
                         const isSelected = selectedCefr === lvl;
                         return (
@@ -175,7 +178,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                                 ? getCefrBadgeStyle(lvl) + ' shadow-sm ring-2 ring-antique-gold/70 scale-105'
                                 : 'bg-rice-paper text-text-secondary/70 border-heritage-green/15 opacity-55 hover:opacity-100 hover:text-heritage-green'
                             }`}
-                            title={`Đọc với ${lvl}`}
+                            title={t('article_grid.read_with_level', { level: lvl })}
                           >
                             {lvl}
                           </Link>
@@ -192,13 +195,13 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   <div className="flex items-center justify-between text-xs pt-1">
                     <span className="font-semibold text-text-secondary flex items-center gap-1.5">
                       <BookOpen className="w-3.5 h-3.5 text-heritage-green" />
-                      <span>{currentStats.vocabCount} Từ vựng di sản</span>
+                      <span>{t('article_grid.heritage_vocab_count', { count: currentStats.vocabCount })}</span>
                     </span>
                     <Link
                       href={paths.reader({ story: lesson.id, level: activeLevel })}
                       className="font-bold text-heritage-green group-hover:text-antique-rich inline-flex items-center gap-1 transition-colors focus-ring rounded"
                     >
-                      <span>Đọc bài</span>
+                      <span>{t('article_grid.read_article')}</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform text-antique-gold" />
                     </Link>
                   </div>
@@ -242,7 +245,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <div className="flex items-center gap-1" title="Chọn trình độ đọc">
+                  <div className="flex items-center gap-1" title={t('article_grid.choose_reading_level')}>
                     {ALL_LEVELS.map((lvl) => {
                       const isSelected = selectedCefr === lvl;
                       return (
@@ -256,7 +259,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                               ? getCefrBadgeStyle(lvl) + ' shadow-sm ring-2 ring-antique-gold/70'
                               : 'bg-rice-paper text-text-secondary/70 border-heritage-green/15 opacity-55 hover:opacity-100 hover:text-heritage-green'
                           }`}
-                          title={`Đọc với ${lvl}`}
+                          title={t('article_grid.read_with_level', { level: lvl })}
                         >
                           {lvl}
                         </Link>
@@ -269,7 +272,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   {lesson.isFromDatabase && (
                     <span className="text-[10px] font-bold text-warm-ivory bg-emerald-600 px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
                       <BookOpen className="w-2.5 h-2.5 text-antique-gold" />
-                      <span>Database</span>
+                      <span>{t('article_grid.database_badge')}</span>
                     </span>
                   )}
                 </div>
@@ -295,7 +298,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                 </span>
                 <span className="flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5 text-heritage-green shrink-0" />
-                  <span>{currentStats.vocabCount} từ vựng</span>
+                  <span>{t('article_grid.vocab_count', { count: currentStats.vocabCount })}</span>
                 </span>
               </div>
 
@@ -304,8 +307,8 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   type="button"
                   onClick={() => onToggleBookmark(lesson.id)}
                   className="p-2 rounded-xl bg-rice-paper hover:bg-mist-cloud text-heritage-green transition-colors cursor-pointer"
-                  aria-label="Lưu bài học"
-                  title={isBookmarked ? "Đã lưu vào danh sách" : "Lưu bài học"}
+                  aria-label={t('article_grid.save_lesson_aria')}
+                  title={isBookmarked ? t('article_grid.saved_status_title') : t('article_grid.save_lesson_title')}
                 >
                   {isBookmarked ? (
                     <BookmarkCheck className="w-4 h-4 fill-antique-gold text-antique-gold" />
@@ -317,7 +320,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   href={paths.reader({ story: lesson.id, level: activeLevel })}
                   className="px-4 py-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory font-bold inline-flex items-center gap-1.5 transition-all shadow-xs focus-ring hover:scale-102"
                 >
-                  <span>Đọc bài</span>
+                  <span>{t('article_grid.read_article')}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-antique-gold" />
                 </Link>
               </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapPin } from 'lucide-react';
 import { VietnamMap } from '@/components/map/VietnamMap';
 import { type ProvinceMapItem } from '@/data/vietnamMapData';
@@ -19,6 +20,8 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
   showRegionTabs = false,
   showPoiInfoBox = false,
 }) => {
+  const { i18n } = useTranslation('discovery');
+  const isEn = i18n.language === 'en';
   const safeIndex = Math.max(0, Math.min(activeIndex, VIETNAM_LANDMARKS.length - 1));
   const currentLandmark = VIETNAM_LANDMARKS[safeIndex] || VIETNAM_LANDMARKS[0];
 
@@ -82,6 +85,7 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
         onSelectLandmark={handleSelectLandmarkPoi}
         showRegionTabs={showRegionTabs}
         showTooltip={true}
+        labelLanguage={isEn ? 'en' : 'vi'}
         className="w-full h-full flex-1 min-h-0"
       />
 
@@ -90,10 +94,10 @@ export const VietnamMapCarousel: React.FC<VietnamMapCarouselProps> = ({
         <div className="mt-2 w-full text-center p-2.5 px-4 bg-heritage-forest/90 border border-antique-gold/60 rounded-2xl shadow-xl backdrop-blur-md transition-all shrink-0">
           <div className="text-xs font-bold text-antique-bright tracking-wide uppercase flex items-center justify-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-antique-gold" />
-            <span>{currentLandmark.name}</span>
+            <span>{isEn ? (currentLandmark.title || currentLandmark.name) : currentLandmark.name}</span>
           </div>
           <div className="text-xs text-white/80 mt-0.5 font-medium">
-            {currentLandmark.desc || currentLandmark.subtitle}
+            {isEn ? (currentLandmark.subtitle || currentLandmark.desc) : (currentLandmark.desc || currentLandmark.subtitle)}
           </div>
         </div>
       )}

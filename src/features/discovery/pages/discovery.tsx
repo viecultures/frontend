@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Search, SlidersHorizontal, X } from 'lucide-react';
@@ -15,6 +16,7 @@ import '../journey.css';
 const PAGE_SIZE = 6;
 
 export default function DiscoveryPage() {
+  const { t } = useTranslation('discovery');
   const [params, setParams] = useSearchParams();
   const journey = params.get('view') !== 'stories';
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);
@@ -78,8 +80,10 @@ export default function DiscoveryPage() {
     const next = { ...bookmarks, [id]: !bookmarks[id] };
     if (writeLearningValue('discovery-bookmarks', next)) {
       setBookmarks(next);
-      setSaveMessage(next[id] ? 'Story saved on this device.' : 'Story removed from saved stories.');
-    } else setSaveMessage('Unable to save on this device. Check your browser storage permissions.');
+      setSaveMessage(next[id] ? t('page.story_saved') : t('page.story_unsaved'));
+    } else {
+      setSaveMessage(t('page.storage_error'));
+    }
   }
   function changePage(next: number) {
     setPage(next);
@@ -100,49 +104,173 @@ export default function DiscoveryPage() {
     <div className="discovery-editorial">
       <header className="discovery-header">
         <div>
-          <h1>Stories from Vietnam</h1>
-          <p>Explore available Vietnamese cultural stories with bilingual reading and audio.</p>
+          <h1>{t('page.title')}</h1>
+          <p>{t('page.lead')}</p>
         </div>
-        <div className="discovery-modes" role="group" aria-label="Explore by">
-          <button type="button" onClick={showJourney}>Journey</button>
-          <button type="button" aria-pressed="true">Stories</button>
+        <div className="discovery-modes" role="group" aria-label={t('journey.explore_by')}>
+          <button type="button" onClick={showJourney}>{t('page.tab_journey')}</button>
+          <button type="button" aria-pressed="true">{t('page.tab_stories')}</button>
         </div>
       </header>
-      <section className="discovery-filters" aria-label="Find and filter stories">
+      <section className="discovery-filters" aria-label={t('page.filters_button')}>
         <div className="discovery-filter-row">
-          <div className="discovery-search"><Search size={19} aria-hidden="true" />
-            <input type="search" aria-label="Search stories" placeholder="Search stories or places…" value={filters.query} onChange={event => updateFilter('query', event.target.value)} />
-            {filters.query && <button type="button" aria-label="Clear search" onClick={() => updateFilter('query', '')}><X size={18} /></button>}
+          <div className="discovery-search">
+            <Search size={19} aria-hidden="true" />
+            <input
+              type="search"
+              aria-label={t('page.search_aria')}
+              placeholder={t('page.search_placeholder')}
+              value={filters.query}
+              onChange={event => updateFilter('query', event.target.value)}
+            />
+            {filters.query && (
+              <button
+                type="button"
+                aria-label={t('page.clear_search')}
+                onClick={() => updateFilter('query', '')}
+              >
+                <X size={18} />
+              </button>
+            )}
           </div>
-          <label className="discovery-topic"><span className="sr-only">Topic</span><select aria-label="Topic" value={filters.topic} onChange={event => updateFilter('topic', event.target.value)}>
-            {TOPIC_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.value === 'All' ? 'All topics' : TOPIC_LABELS[option.value]}</option>)}
-          </select></label>
-          <Button variant="ghost" size="sm" aria-expanded={advanced} aria-controls="discovery-advanced" onClick={() => setAdvanced(!advanced)}><SlidersHorizontal size={18} />Filters{extraCount > 0 ? ` (${extraCount})` : ''}</Button>
+          <label className="discovery-topic">
+            <span className="sr-only">{t('page.topic_label')}</span>
+            <select
+              aria-label={t('page.topic_label')}
+              value={filters.topic}
+              onChange={event => updateFilter('topic', event.target.value)}
+            >
+              {TOPIC_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.value === 'All' ? t('page.all_topics') : (t(`editorial.topics.${option.value}`, { defaultValue: TOPIC_LABELS[option.value] }))}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-expanded={advanced}
+            aria-controls="discovery-advanced"
+            onClick={() => setAdvanced(!advanced)}
+          >
+            <SlidersHorizontal size={18} />
+            {t('page.filters_button')}{extraCount > 0 ? ` (${extraCount})` : ''}
+          </Button>
         </div>
-        {advanced && <div id="discovery-advanced" className="discovery-advanced">
-          <label>Reading time<select value={filters.duration} onChange={event => updateFilter('duration', event.target.value)}><option value="All">Any length</option><option value="short">Up to 5 min</option><option value="medium">6–10 min</option><option value="long">Over 10 min</option></select></label>
-          <label>Sort by<select value={filters.sort} onChange={event => updateFilter('sort', event.target.value)}><option value="recommended">Curated</option><option value="recent">Newest</option><option value="time_asc">Shortest first</option><option value="time_desc">Longest first</option></select></label>
-          <label className="discovery-saved-filter"><input type="checkbox" checked={filters.saved} onChange={event => updateFilter('saved', event.target.checked)} />Saved stories only</label>
-        </div>}
-        {hasFilters && <div className="discovery-filter-summary"><span>{filtered.length} matching {filtered.length === 1 ? 'story' : 'stories'}{filters.saved ? ' · Saved' : ''}{filters.duration !== 'All' ? ` · ${filters.duration === 'short' ? 'Up to 5 min' : filters.duration === 'medium' ? '6–10 min' : 'Over 10 min'}` : ''}</span><Button variant="ghost" size="sm" onClick={resetFilters}>Clear filters</Button></div>}
+        {advanced && (
+          <div id="discovery-advanced" className="discovery-advanced">
+            <label>
+              {t('page.reading_time')}
+              <select value={filters.duration} onChange={event => updateFilter('duration', event.target.value)}>
+                <option value="All">{t('page.duration_all')}</option>
+                <option value="short">{t('page.duration_short')}</option>
+                <option value="medium">{t('page.duration_medium')}</option>
+                <option value="long">{t('page.duration_long')}</option>
+              </select>
+            </label>
+            <label>
+              {t('page.sort_by')}
+              <select value={filters.sort} onChange={event => updateFilter('sort', event.target.value)}>
+                <option value="recommended">{t('page.sort_recommended')}</option>
+                <option value="recent">{t('page.sort_recent')}</option>
+                <option value="time_asc">{t('page.sort_time_asc')}</option>
+                <option value="time_desc">{t('page.sort_time_desc')}</option>
+              </select>
+            </label>
+            <label className="discovery-saved-filter">
+              <input type="checkbox" checked={filters.saved} onChange={event => updateFilter('saved', event.target.checked)} />
+              {t('page.saved_only')}
+            </label>
+          </div>
+        )}
+        {hasFilters && (
+          <div className="discovery-filter-summary">
+            <span>
+              {t('page.filter_summary', {
+                count: filtered.length,
+                storyLabel: filtered.length === 1 ? 'story' : 'stories',
+              })}
+              {filters.saved ? t('page.filter_summary_saved') : ''}
+              {filters.duration !== 'All' ? ` · ${
+                filters.duration === 'short'
+                  ? t('page.duration_short')
+                  : filters.duration === 'medium'
+                  ? t('page.duration_medium')
+                  : t('page.duration_long')
+              }` : ''}
+            </span>
+            <Button variant="ghost" size="sm" onClick={resetFilters}>
+              {t('page.clear_filters')}
+            </Button>
+          </div>
+        )}
       </section>
       <div className="discovery-content">
         <div className="discovery-stories">
-          {currentPage === 1 && editorial.length > 0 && <section className="discovery-feature" aria-label="Featured stories">
-            <h2 className="sr-only">Featured stories</h2>
-            <EditorialStory {...storyProps} lesson={editorial[0]} variant="lead" saved={!!bookmarks[editorial[0].id]} />
-            <div className="discovery-supporting">{editorial.slice(1).map(lesson => <EditorialStory key={lesson.id} {...storyProps} lesson={lesson} variant="support" saved={!!bookmarks[lesson.id]} />)}</div>
-          </section>}
+          {currentPage === 1 && editorial.length > 0 && (
+            <section className="discovery-feature" aria-label={t('page.featured_heading')}>
+              <h2 className="sr-only">{t('page.featured_heading')}</h2>
+              <EditorialStory {...storyProps} lesson={editorial[0]} variant="lead" saved={!!bookmarks[editorial[0].id]} />
+              <div className="discovery-supporting">
+                {editorial.slice(1).map(lesson => (
+                  <EditorialStory key={lesson.id} {...storyProps} lesson={lesson} variant="support" saved={!!bookmarks[lesson.id]} />
+                ))}
+              </div>
+            </section>
+          )}
           <section aria-labelledby="discovery-results-heading">
-            <div className="discovery-section-heading"><h2 id="discovery-results-heading" ref={resultsHeading} tabIndex={-1}>{hasFilters ? 'Search results' : 'More stories to explore'}</h2>
-              <span aria-live="polite">{remaining.length} stories</span></div>
-            {visible.length > 0 ? <div className="discovery-story-grid">{visible.map(lesson => <EditorialStory key={lesson.id} {...storyProps} lesson={lesson} saved={!!bookmarks[lesson.id]} />)}</div>
-              : <div className="discovery-empty"><h3>{filters.saved ? 'No matching saved stories' : 'No matching stories yet'}</h3><p>{filters.saved ? 'Use the bookmark on a story to keep it for later.' : 'Try another topic, clear a filter or explore a different place.'}</p><Button variant="outline" onClick={resetFilters}>View all stories</Button></div>}
-            {pageCount > 1 && <nav className="discovery-pagination" aria-label="Story pages"><Button variant="ghost" size="sm" disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}><ArrowLeft size={18} />Previous</Button><span aria-live="polite">{currentPage} / {pageCount}</span><Button variant="ghost" size="sm" disabled={currentPage === pageCount} onClick={() => changePage(currentPage + 1)}>Next<ArrowRight size={18} /></Button></nav>}
+            <div className="discovery-section-heading">
+              <h2 id="discovery-results-heading" ref={resultsHeading} tabIndex={-1}>
+                {hasFilters ? t('page.results_heading') : t('page.explore_heading')}
+              </h2>
+              <span aria-live="polite">
+                {t('page.stories_count', { count: remaining.length })}
+              </span>
+            </div>
+            {visible.length > 0 ? (
+              <div className="discovery-story-grid">
+                {visible.map(lesson => (
+                  <EditorialStory key={lesson.id} {...storyProps} lesson={lesson} saved={!!bookmarks[lesson.id]} />
+                ))}
+              </div>
+            ) : (
+              <div className="discovery-empty">
+                <h3>{filters.saved ? t('page.empty_saved_title') : t('page.empty_title')}</h3>
+                <p>{filters.saved ? t('page.empty_saved_desc') : t('page.empty_desc')}</p>
+                <Button variant="outline" onClick={resetFilters}>
+                  {t('page.view_all_stories')}
+                </Button>
+              </div>
+            )}
+            {pageCount > 1 && (
+              <nav className="discovery-pagination" aria-label={t('page.pagination_aria')}>
+                <Button variant="ghost" size="sm" disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}>
+                  <ArrowLeft size={18} />
+                  {t('page.pagination_prev')}
+                </Button>
+                <span aria-live="polite">{currentPage} / {pageCount}</span>
+                <Button variant="ghost" size="sm" disabled={currentPage === pageCount} onClick={() => changePage(currentPage + 1)}>
+                  {t('page.pagination_next')}
+                  <ArrowRight size={18} />
+                </Button>
+              </nav>
+            )}
           </section>
         </div>
       </div>
-      <div className="discovery-catalog-status" role="status">{catalogState === 'loading' ? 'Updating the story collection…' : catalogState === 'offline' ? <><span>The story service is unavailable. Showing the preview collection.</span><Button variant="ghost" size="sm" onClick={() => setRetry(value => value + 1)}>Try again</Button></> : null}</div>
+      <div className="discovery-catalog-status" role="status">
+        {catalogState === 'loading' ? (
+          t('page.status_updating')
+        ) : catalogState === 'offline' ? (
+          <>
+            <span>{t('page.status_offline')}</span>
+            <Button variant="ghost" size="sm" onClick={() => setRetry(value => value + 1)}>
+              {t('page.retry')}
+            </Button>
+          </>
+        ) : null}
+      </div>
       <p className="sr-only" role="status">{saveMessage}</p>
     </div>
   );

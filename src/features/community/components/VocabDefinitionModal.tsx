@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { BookOpen, Bookmark, Check, Volume2, X } from 'lucide-react';
 import type { HighlightVocabItem } from '../types';
@@ -14,6 +15,7 @@ export const VocabDefinitionModal: React.FC<VocabDefinitionModalProps> = ({
   onClose,
   onSaveVocab,
 }) => {
+  const { t } = useTranslation('community');
   const [isSaved, setIsSaved] = useState<boolean>(vocab?.isSaved || false);
 
   if (!vocab) return null;
@@ -46,7 +48,7 @@ export const VocabDefinitionModal: React.FC<VocabDefinitionModalProps> = ({
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#1D5046]/10 text-[#1D5046] text-[11px] font-semibold">
               <BookOpen className="w-3 h-3 text-[#1D5046]" />
-              <span>Cultural Vocabulary</span>
+              <span>{t('community.vocab_modal.tag')}</span>
             </div>
             <div className="flex items-center gap-2 pt-1">
               <DialogTitle className="font-serif text-2xl font-bold text-[#1D5046]">
@@ -56,8 +58,8 @@ export const VocabDefinitionModal: React.FC<VocabDefinitionModalProps> = ({
                 type="button"
                 onClick={handleSpeak}
                 className="p-1 rounded-full text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0] transition-colors cursor-pointer"
-                aria-label={`Listen to pronunciation of ${vocab.word}`}
-                title="Listen to pronunciation"
+                aria-label={t('community.vocab_modal.listen_aria', { word: vocab.word })}
+                title={t('community.vocab_modal.listen_title')}
               >
                 <Volume2 className="w-4 h-4" />
               </button>
@@ -71,7 +73,7 @@ export const VocabDefinitionModal: React.FC<VocabDefinitionModalProps> = ({
             type="button"
             onClick={onClose}
             className="p-1.5 rounded-full text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0] transition-colors cursor-pointer focus-ring"
-            aria-label="Close vocabulary card"
+            aria-label={t('community.vocab_modal.close_aria')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -83,7 +85,7 @@ export const VocabDefinitionModal: React.FC<VocabDefinitionModalProps> = ({
           <div className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5]/70 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#6E7B75]">
-                Meaning
+                {t('community.vocab_modal.meaning_label')}
               </span>
               {vocab.partOfSpeech && (
                 <span className="px-2 py-0.5 rounded-md bg-white border border-[#E8E2D5] text-[11px] font-semibold text-[#1D5046]">
@@ -100,7 +102,7 @@ export const VocabDefinitionModal: React.FC<VocabDefinitionModalProps> = ({
           {vocab.synonyms && vocab.synonyms.length > 0 && (
             <div className="space-y-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#6E7B75]">
-                English Synonyms:
+                {t('community.vocab_modal.synonyms_label')}
               </span>
               <div className="flex flex-wrap gap-1.5 pt-0.5">
                 {vocab.synonyms.map((syn, idx) => (
@@ -119,7 +121,7 @@ export const VocabDefinitionModal: React.FC<VocabDefinitionModalProps> = ({
           {vocab.exampleSentence && (
             <div className="space-y-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#6E7B75]">
-                Cultural Context:
+                {t('community.vocab_modal.context_label')}
               </span>
               <p className="text-xs italic text-[#314F49] bg-white p-3 rounded-xl border border-[#E8E2D5] leading-relaxed">
                 &ldquo;{vocab.exampleSentence}&rdquo;
@@ -142,12 +144,12 @@ export const VocabDefinitionModal: React.FC<VocabDefinitionModalProps> = ({
             {isSaved ? (
               <>
                 <Check className="w-3.5 h-3.5 text-[#1D5046]" />
-                <span>Marked in this preview</span>
+                <span>{t('community.vocab_modal.marked_btn')}</span>
               </>
             ) : (
               <>
                 <Bookmark className="w-3.5 h-3.5" />
-                <span>Mark word in this preview</span>
+                <span>{t('community.vocab_modal.mark_btn')}</span>
               </>
             )}
           </button>
@@ -156,3 +158,5 @@ export const VocabDefinitionModal: React.FC<VocabDefinitionModalProps> = ({
     </Dialog>
   );
 };
+
+export default VocabDefinitionModal;

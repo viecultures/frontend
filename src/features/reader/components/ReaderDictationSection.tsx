@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Headphones,
   Volume2,
@@ -24,6 +25,7 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
   onDictationSuccess,
   items = READER_DICTATION_ITEMS,
 }) => {
+  const { t } = useTranslation('reader');
   const isDark = themeMode === 'dark';
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [userInputs, setUserInputs] = useState<Record<string, string>>({});
@@ -87,14 +89,14 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
-              Dictation
+              {t('dictation_section.tag', 'Dictation')}
             </span>
           </div>
           <h2 className={`font-sans text-2xl font-bold ${isDark ? 'text-warm-ivory' : 'text-heritage-green'}`}>
-            Listen and fill in the missing word
+            {t('dictation_section.title', 'Listen and fill in the missing word')}
           </h2>
           <p className="text-xs sm:text-sm opacity-80 mt-1 leading-relaxed">
-            Listen to the sentence, then type the missing word. Adjust the speed whenever you need.
+            {t('dictation_section.description', 'Listen to the sentence, then type the missing word. Adjust the speed whenever you need.')}
           </p>
         </div>
 
@@ -102,7 +104,7 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
         <div className={`flex items-center gap-2.5 px-4 py-2 rounded-2xl border ${isDark ? 'bg-[#18211E] border-antique-gold/30' : 'bg-white border-antique-gold/40'} shadow-xs`}>
           <Trophy className="w-4 h-4 text-antique-gold" />
           <span className="text-xs font-bold">
-            Correct: {correctIds.size}/{items.length}
+            {t('dictation_section.correct_progress', { count: correctIds.size, total: items.length, defaultValue: `Correct: ${correctIds.size}/${items.length}` })}
           </span>
         </div>
       </div>
@@ -118,14 +120,14 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-heritage-green hover:bg-heritage-dark text-white text-xs font-bold shadow-md transition-all cursor-pointer border border-antique-gold/50"
             >
               <Volume2 className="w-4 h-4 text-antique-gold" />
-              <span>Play sentence</span>
+              <span>{t('dictation_section.play_sentence', 'Play sentence')}</span>
             </button>
-            <span className="text-xs opacity-60 italic">(Read aloud)</span>
+            <span className="text-xs opacity-60 italic">{t('dictation_section.read_aloud', '(Read aloud)')}</span>
           </div>
 
           {/* Speed Selector Buttons */}
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-bold mr-1 opacity-75">Speed:</span>
+            <span className="text-xs font-bold mr-1 opacity-75">{t('dictation_section.speed', 'Speed:')}</span>
             {[0.5, 0.8, 1.0].map((spd) => (
               <button
                 key={spd}
@@ -165,9 +167,9 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
                   }
                 }}
                 onKeyDown={handleKeyDown}
-                aria-label="Missing word"
+                aria-label={t('dictation_section.missing_word_aria', 'Missing word')}
                 data-feedback={currentFeedback || undefined}
-                placeholder="Missing word…"
+                placeholder={t('dictation_section.missing_word_placeholder', 'Missing word…')}
                 disabled={isInputCorrect}
                 className={`w-36 sm:w-44 px-3 py-1 text-center font-bold text-sm sm:text-base rounded-lg border-2 transition-all outline-none ${
                   isInputCorrect
@@ -185,7 +187,7 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
 
           {/* Vietnamese Translation Guide */}
           <div className="pt-3 border-t border-antique-gold/20 text-xs sm:text-sm italic opacity-85">
-            <strong>Vietnamese translation:</strong> {currentItem?.viTranslation}
+            <strong>{t('dictation_section.vietnamese_translation', 'Vietnamese translation:')}</strong> {currentItem?.viTranslation}
           </div>
         </div>
 
@@ -198,7 +200,7 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
                 onClick={handleCheck}
                 className="px-6 py-2.5 rounded-full text-xs font-bold text-white bg-heritage-green hover:bg-heritage-dark shadow-sm transition-all border border-antique-gold cursor-pointer"
               >
-                Check answer
+                {t('dictation_section.check_answer', 'Check answer')}
               </button>
             )}
 
@@ -210,7 +212,7 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
               }`}
             >
               <HelpCircle className="w-3.5 h-3.5 text-antique-gold" />
-              <span>{showHints[currentItem?.id] ? 'Hide hint' : 'Show hint'}</span>
+              <span>{showHints[currentItem?.id] ? t('dictation_section.hide_hint', 'Hide hint') : t('dictation_section.show_hint', 'Show hint')}</span>
             </button>
           </div>
 
@@ -218,14 +220,14 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
           {currentFeedback === 'correct' && (
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 text-xs font-bold">
               <CheckCircle2 className="w-4 h-4" />
-              <span>Correct! You found the missing word.</span>
+              <span>{t('dictation_section.correct_feedback', 'Correct! You found the missing word.')}</span>
             </div>
           )}
 
           {currentFeedback === 'wrong' && (
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300 text-xs font-bold">
               <XCircle className="w-4 h-4" />
-              <span>Not quite. Try listening again at 0.8x.</span>
+              <span>{t('dictation_section.wrong_feedback', 'Not quite. Try listening again at 0.8x.')}</span>
             </div>
           )}
 
@@ -236,7 +238,7 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
               disabled={currentIndex === 0}
               onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
               className="p-2 rounded-xl border border-antique-gold/30 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-              title="Previous sentence"
+              title={t('dictation_section.prev_sentence', 'Previous sentence')}
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
@@ -248,7 +250,7 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
               disabled={currentIndex + 1 >= items.length}
               onClick={() => setCurrentIndex((prev) => Math.min(items.length - 1, prev + 1))}
               className="p-2 rounded-xl border border-antique-gold/30 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-              title="Next sentence"
+              title={t('dictation_section.next_sentence', 'Next sentence')}
             >
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -259,7 +261,7 @@ export const ReaderDictationSection: React.FC<ReaderDictationSectionProps> = ({
         {showHints[currentItem?.id] && (
           <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
             <Lightbulb className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-            <span><strong>Hint:</strong> {currentItem?.hint}</span>
+            <span><strong>{t('dictation_section.hint_prefix', 'Hint:')}</strong> {currentItem?.hint}</span>
           </div>
         )}
       </div>

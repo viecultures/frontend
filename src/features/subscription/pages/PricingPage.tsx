@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   Check,
   X,
@@ -18,7 +19,8 @@ import { getIsProUser } from '@/utils/auth-storage';
 import { PATHS } from '@/routes/paths';
 
 export const PricingPage: React.FC = () => {
-  const navigate = useNavigate();
+  const { t } = useTranslation('subscription');
+  const navigate = useAppNavigate();
 
   const [isPro, setLocalIsPro] = useState<boolean>(getIsProUser());
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -50,7 +52,7 @@ export const PricingPage: React.FC = () => {
             className="inline-flex items-center gap-2 text-xs font-bold text-heritage-green dark:text-antique-gold hover:underline cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Quay lại trang trước</span>
+            <span>{t('pricing.back_to_previous')}</span>
           </button>
         </div>
 
@@ -58,13 +60,13 @@ export const PricingPage: React.FC = () => {
         <div className="text-center space-y-3 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-heritage-green/10 dark:bg-antique-gold/10 border border-antique-gold/40 text-heritage-green dark:text-antique-gold text-xs font-bold uppercase tracking-wider">
             <Crown className="w-3.5 h-3.5" />
-            <span>Bảng Giá & Đặc Quyền Hội Viên</span>
+            <span>{t('pricing.badge')}</span>
           </div>
           <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-heritage-green dark:text-warm-ivory tracking-tight">
-            Nâng Tầm Tiếng Anh Cùng Di Sản Việt
+            {t('pricing.title')}
           </h1>
           <p className="text-sm sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed">
-            Lựa chọn gói đồng hành phù hợp để mở khóa toàn diện kho bài đọc 63 tỉnh thành và đàm đạo không giới hạn cùng trợ lý văn hóa AI.
+            {t('pricing.subtitle')}
           </p>
 
           {/* Billing Toggle (Tháng / Năm) */}
@@ -79,7 +81,7 @@ export const PricingPage: React.FC = () => {
                     : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green'
                 }`}
               >
-                Gói Hàng Tháng
+                {t('pricing.billing_cycle.monthly')}
               </button>
               <button
                 type="button"
@@ -90,9 +92,9 @@ export const PricingPage: React.FC = () => {
                     : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green'
                 }`}
               >
-                <span>Gói 1 Năm</span>
+                <span>{t('pricing.billing_cycle.yearly')}</span>
                 <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#9E2A2B] text-white font-mono">
-                  -20%
+                  {t('pricing.billing_cycle.discount_badge')}
                 </span>
               </button>
             </div>
@@ -106,48 +108,48 @@ export const PricingPage: React.FC = () => {
             <div className="space-y-6">
               <div className="space-y-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
-                  Gói Khởi Điểm
+                  {t('pricing.free_plan.badge')}
                 </span>
                 <h3 className="font-serif text-2xl sm:text-3xl font-bold text-heritage-green dark:text-white">
-                  Bản Miễn Phí (Free)
+                  {t('pricing.free_plan.name')}
                 </h3>
                 <p className="text-xs text-stone-600 dark:text-stone-400">
-                  Dành cho người mới bắt đầu làm quen với phương pháp đọc song ngữ.
+                  {t('pricing.free_plan.description')}
                 </p>
               </div>
 
               <div className="py-2 border-y border-stone-300/60 dark:border-white/10">
                 <div className="font-serif text-4xl font-extrabold text-heritage-green dark:text-antique-gold">
-                  0 VNĐ
+                  {t('pricing.free_plan.price')}
                 </div>
-                <span className="text-xs text-stone-500">Miễn phí vĩnh viễn</span>
+                <span className="text-xs text-stone-500">{t('pricing.free_plan.period')}</span>
               </div>
 
               {/* Feature Checklist */}
               <ul className="space-y-3.5 text-xs sm:text-sm">
                 <li className="flex items-center gap-3">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span><strong>3 lượt đàm thoại AI/ngày</strong> (3 AI chat turns/day)</span>
+                  <span>{t('pricing.free_plan.features.ai_chat')}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span><strong>1-Click Save</strong> lưu từ vựng kèm ngữ cảnh câu (tối đa 30 từ)</span>
+                  <span>{t('pricing.free_plan.features.vocabulary_save')}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>15 bài đọc di sản văn hóa mẫu cơ bản</span>
+                  <span>{t('pricing.free_plan.features.sample_articles')}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Audio Shadowing tốc độ chuẩn (1x)</span>
+                  <span>{t('pricing.free_plan.features.audio_speed')}</span>
                 </li>
                 <li className="flex items-center gap-3 opacity-60">
                   <X className="w-4 h-4 text-rose-500 shrink-0" />
-                  <span>Không nhận xét cá nhân hóa từ Mascot di sản</span>
+                  <span>{t('pricing.free_plan.features.no_mascot_feedback')}</span>
                 </li>
                 <li className="flex items-center gap-3 opacity-60">
                   <X className="w-4 h-4 text-rose-500 shrink-0" />
-                  <span>Kèm banner quảng cáo chân trang</span>
+                  <span>{t('pricing.free_plan.features.has_ads')}</span>
                 </li>
               </ul>
             </div>
@@ -158,7 +160,7 @@ export const PricingPage: React.FC = () => {
                 disabled
                 className="w-full py-3.5 rounded-2xl bg-stone-200 dark:bg-stone-800 text-stone-500 font-serif font-bold text-xs sm:text-sm cursor-not-allowed text-center"
               >
-                {!isPro ? 'Gói Hiện Tại Của Bạn' : 'Gói Cơ Bản'}
+                {!isPro ? t('pricing.free_plan.current_plan') : t('pricing.free_plan.basic_plan')}
               </button>
             </div>
           </div>
@@ -168,29 +170,29 @@ export const PricingPage: React.FC = () => {
             {/* Best Value Badge */}
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#9E2A2B] text-white border border-antique-gold text-xs font-bold uppercase tracking-wider shadow-md flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-              <span>Được Khuyên Dùng Nhất</span>
+              <span>{t('pricing.pro_plan.best_value')}</span>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
-                  Trải Nghiệm Toàn Diện
+                  {t('pricing.pro_plan.badge')}
                 </span>
                 <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
-                  <span>Hội Viên Di Sản Pro</span>
+                  <span>{t('pricing.pro_plan.name')}</span>
                   <Crown className="w-6 h-6 text-antique-gold fill-current" />
                 </h3>
                 <p className="text-xs text-stone-300">
-                  Mở khóa trọn vẹn sức mạnh học tiếng Anh qua văn hóa và đàm thoại AI chuyên sâu.
+                  {t('pricing.pro_plan.description')}
                 </p>
               </div>
 
               <div className="py-2 border-y border-white/10">
                 <div className="font-serif text-4xl font-extrabold text-antique-gold">
-                  {billingCycle === 'monthly' ? '39.000 VNĐ' : '375.000 VNĐ'}
+                  {billingCycle === 'monthly' ? t('pricing.pro_plan.monthly_price') : t('pricing.pro_plan.yearly_price')}
                 </div>
                 <span className="text-xs text-white/70">
-                  {billingCycle === 'monthly' ? 'Thanh toán mỗi tháng' : 'Tiết kiệm ~2 tháng học'}
+                  {billingCycle === 'monthly' ? t('pricing.pro_plan.monthly_period') : t('pricing.pro_plan.yearly_period')}
                 </span>
               </div>
 
@@ -198,27 +200,27 @@ export const PricingPage: React.FC = () => {
               <ul className="space-y-3.5 text-xs sm:text-sm">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
-                  <span><strong>Đàm đạo sâu cùng AI Cultural Companion:</strong> Trò chuyện không giới hạn bằng tiếng Anh, dỡ bỏ hoàn toàn giới hạn 3 lượt/ngày.</span>
+                  <span>{t('pricing.pro_plan.features.ai_companion')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
-                  <span><strong>Nhận xét & phản hồi cá nhân hóa từ Mascot di sản:</strong> Đánh giá phát âm, vốn từ và gợi ý phát triển phản xạ theo ngữ cảnh văn hóa.</span>
+                  <span>{t('pricing.pro_plan.features.mascot_feedback')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
-                  <span><strong>Mở khóa trọn bộ 63 tỉnh thành:</strong> Tiếp cận toàn bộ kho tàng danh lam, phong tục và di sản phi vật thể UNESCO.</span>
+                  <span>{t('pricing.pro_plan.features.all_provinces')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
-                  <span><strong>Đầy đủ 3 dải tốc độ audio (0.5x, 0.8x, 1x):</strong> Google Gemini Real Audio đọc tự nhiên như người bản xứ.</span>
+                  <span>{t('pricing.pro_plan.features.audio_speeds')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
-                  <span><strong>Không giới hạn 1-Click Save & Sổ tay từ vựng:</strong> Lưu và đồng bộ tiến trình học tập vĩnh viễn trên đám mây.</span>
+                  <span>{t('pricing.pro_plan.features.unlimited_vocab')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-antique-gold shrink-0 mt-0.5" />
-                  <span><strong>100% Không quảng cáo & Nhận Huy Hiệu Pro.</strong></span>
+                  <span>{t('pricing.pro_plan.features.no_ads')}</span>
                 </li>
               </ul>
             </div>
@@ -227,7 +229,7 @@ export const PricingPage: React.FC = () => {
               {isPro ? (
                 <div className="w-full py-4 rounded-2xl bg-heritage-green border border-antique-gold text-antique-gold font-serif font-bold text-center text-sm shadow-md flex items-center justify-center gap-2">
                   <CheckCircle2 className="w-5 h-5" />
-                  <span>Bạn Đang Là Hội Viên Pro</span>
+                  <span>{t('pricing.pro_plan.already_pro')}</span>
                 </div>
               ) : (
                 <button
@@ -236,7 +238,7 @@ export const PricingPage: React.FC = () => {
                   className="w-full py-4 rounded-2xl bg-[#9E2A2B] hover:bg-[#852223] text-white font-serif font-bold text-sm sm:text-base shadow-xl border border-antique-gold transition-all transform hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Zap className="w-5 h-5 text-antique-gold" />
-                  <span>Nâng Cấp Gói Pro Ngay (39.000đ)</span>
+                  <span>{t('pricing.pro_plan.upgrade_cta')}</span>
                   <ArrowRight className="w-4 h-4 text-antique-gold" />
                 </button>
               )}
@@ -248,10 +250,10 @@ export const PricingPage: React.FC = () => {
         <section className="pt-8 space-y-6">
           <div className="text-center space-y-1">
             <h3 className="font-serif text-xl sm:text-2xl font-bold text-heritage-green dark:text-warm-ivory">
-              Bảng So Sánh Quyền Lợi Chi Tiết
+              {t('pricing.comparison_table.title')}
             </h3>
             <p className="text-xs text-stone-500">
-              Đối chiếu minh bạch theo chuẩn kiến trúc hệ thống VieCultures
+              {t('pricing.comparison_table.subtitle')}
             </p>
           </div>
 
@@ -259,61 +261,61 @@ export const PricingPage: React.FC = () => {
             <table className="w-full text-xs sm:text-sm text-left">
               <thead>
                 <tr className="bg-heritage-green text-white border-b border-antique-gold/30">
-                  <th className="py-4 px-6 font-serif">Tính Năng / Đặc Quyền</th>
-                  <th className="py-4 px-6 font-serif text-center">Bản Miễn Phí (Free)</th>
+                  <th className="py-4 px-6 font-serif">{t('pricing.comparison_table.feature_col')}</th>
+                  <th className="py-4 px-6 font-serif text-center">{t('pricing.comparison_table.free_col')}</th>
                   <th className="py-4 px-6 font-serif text-center bg-heritage-dark text-antique-gold">
-                    Hội Viên Pro (39k)
+                    {t('pricing.comparison_table.pro_col')}
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200 dark:divide-white/10">
                 <tr>
-                  <td className="py-3.5 px-6 font-medium">Trò chuyện chuyên sâu với AI Cultural Companion</td>
-                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">3 lượt / ngày (3 turns/day)</td>
+                  <td className="py-3.5 px-6 font-medium">{t('pricing.comparison_table.rows.ai_chat.label')}</td>
+                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">{t('pricing.comparison_table.rows.ai_chat.free')}</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
-                    Không giới hạn (Unlimited)
+                    {t('pricing.comparison_table.rows.ai_chat.pro')}
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-6 font-medium">Nhận xét & phản hồi cá nhân hóa từ Mascot di sản</td>
-                  <td className="py-3.5 px-6 text-center text-stone-400">Mẫu cơ bản mặc định</td>
+                  <td className="py-3.5 px-6 font-medium">{t('pricing.comparison_table.rows.mascot.label')}</td>
+                  <td className="py-3.5 px-6 text-center text-stone-400">{t('pricing.comparison_table.rows.mascot.free')}</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
-                    Cá nhân hóa chuyên sâu
+                    {t('pricing.comparison_table.rows.mascot.pro')}
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-6 font-medium">1-Click Save lưu từ vựng kèm ngữ cảnh câu</td>
-                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">Tối đa 30 từ</td>
+                  <td className="py-3.5 px-6 font-medium">{t('pricing.comparison_table.rows.vocab.label')}</td>
+                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">{t('pricing.comparison_table.rows.vocab.free')}</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
-                    Không giới hạn
+                    {t('pricing.comparison_table.rows.vocab.pro')}
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-6 font-medium">Kho bài đọc song ngữ 3 miền</td>
-                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">15 bài mẫu cơ bản</td>
+                  <td className="py-3.5 px-6 font-medium">{t('pricing.comparison_table.rows.content.label')}</td>
+                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">{t('pricing.comparison_table.rows.content.free')}</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
-                    Trọn vẹn 63 tỉnh thành
+                    {t('pricing.comparison_table.rows.content.pro')}
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-6 font-medium">Tốc độ audio & Giọng đọc Gemini</td>
-                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">Chỉ 1x</td>
+                  <td className="py-3.5 px-6 font-medium">{t('pricing.comparison_table.rows.audio.label')}</td>
+                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">{t('pricing.comparison_table.rows.audio.free')}</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
-                    0.5x, 0.8x, 1x (Gemini Voices)
+                    {t('pricing.comparison_table.rows.audio.pro')}
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-6 font-medium">Lưu trữ Mộc Son & Daily Streak lên đám mây</td>
-                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">Lưu tạm Local</td>
+                  <td className="py-3.5 px-6 font-medium">{t('pricing.comparison_table.rows.cloud_sync.label')}</td>
+                  <td className="py-3.5 px-6 text-center text-stone-600 dark:text-stone-300">{t('pricing.comparison_table.rows.cloud_sync.free')}</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
-                    Đồng bộ vĩnh viễn
+                    {t('pricing.comparison_table.rows.cloud_sync.pro')}
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-6 font-medium">Quảng cáo hiển thị</td>
-                  <td className="py-3.5 px-6 text-center text-rose-500">Có banner</td>
+                  <td className="py-3.5 px-6 font-medium">{t('pricing.comparison_table.rows.ads.label')}</td>
+                  <td className="py-3.5 px-6 text-center text-rose-500">{t('pricing.comparison_table.rows.ads.free')}</td>
                   <td className="py-3.5 px-6 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-amber-500/5">
-                    100% Không quảng cáo
+                    {t('pricing.comparison_table.rows.ads.pro')}
                   </td>
                 </tr>
               </tbody>

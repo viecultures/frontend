@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { X, Headphones, Volume2, Play, Pause, Check, Globe, BookOpen, Layers } from "lucide-react";
 import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
 
@@ -21,6 +22,7 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
   onChangeAudioScope,
   themeMode = "paper",
 }) => {
+  const { t } = useTranslation('reader');
   const isDark = themeMode === "dark";
   const [previewingVoiceId, setPreviewingVoiceId] = useState<string | null>(null);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -76,9 +78,9 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
                 <Headphones className="w-5 h-5" />
               </span>
               <div>
-                <h3 className="text-xl font-bold font-sans">Voice settings</h3>
+                <h3 className="text-xl font-bold font-sans">{t('voice_customizer.title', 'Voice settings')}</h3>
                 <p className={`text-xs ${isDark ? "text-sky-mist" : "text-heritage-green/70"}`}>
-                  Choose a voice for listening and shadowing practice
+                  {t('voice_customizer.subtitle', 'Choose a voice for listening and shadowing practice')}
                 </p>
               </div>
             </div>
@@ -88,7 +90,7 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
             className={`p-2 rounded-full transition-colors cursor-pointer ${
               isDark ? "hover:bg-white/10 text-sky-mist" : "hover:bg-black/5 text-heritage-green"
             }`}
-            title="Close voice settings"
+            title={t('voice_customizer.close_title', 'Close voice settings')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -97,7 +99,7 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
         {/* Chế độ phát: Toàn bài đọc vs Câu Shadowing */}
         <div className="mb-6 p-4 rounded-2xl border border-antique-gold/30 bg-black/5 dark:bg-white/5 space-y-2">
           <label className="text-xs font-bold uppercase tracking-wider block text-antique-gold">
-            Audio scope
+            {t('voice_customizer.audio_scope', 'Audio scope')}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
@@ -114,9 +116,9 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
             >
               <BookOpen className="w-4 h-4 mt-0.5 shrink-0 text-antique-gold" />
               <div>
-                <div className="font-bold text-sm">Full article</div>
+                <div className="font-bold text-sm">{t('voice_customizer.full_article_title', 'Full article')}</div>
                 <div className="text-[11px] opacity-80">
-                  Listen to the full article with natural intonation
+                  {t('voice_customizer.full_article_desc', 'Listen to the full article with natural intonation')}
                 </div>
               </div>
             </button>
@@ -135,9 +137,9 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
             >
               <Layers className="w-4 h-4 mt-0.5 shrink-0 text-antique-gold" />
               <div>
-                <div className="font-bold text-sm">Shadowing sentence</div>
+                <div className="font-bold text-sm">{t('voice_customizer.shadowing_title', 'Shadowing sentence')}</div>
                 <div className="text-[11px] opacity-80">
-                  Listen and repeat one sentence at a time
+                  {t('voice_customizer.shadowing_desc', 'Listen and repeat one sentence at a time')}
                 </div>
               </div>
             </button>
@@ -147,7 +149,7 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
         {/* Danh sách 5 giọng đọc Gemini */}
         <div className="space-y-3">
           <label className="text-xs font-bold uppercase tracking-wider block text-antique-gold">
-            Choose a voice ({GEMINI_VOICES.length} voices available)
+            {t('voice_customizer.choose_voice', { count: GEMINI_VOICES.length, defaultValue: `Choose a voice (${GEMINI_VOICES.length} voices available)` })}
           </label>
 
           <div className="space-y-2.5">
@@ -218,17 +220,17 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
                           ? "bg-white/5 border-white/20 text-warm-ivory hover:bg-white/15"
                           : "bg-white border-black/10 text-heritage-green hover:bg-black/5"
                       }`}
-                      title={isPreviewing ? "Stop preview" : "Preview voice"}
+                      title={isPreviewing ? t('voice_customizer.stop_preview', 'Stop preview') : t('voice_customizer.preview_voice', 'Preview voice')}
                     >
                       {isPreviewing ? (
                         <>
                           <Pause className="w-3.5 h-3.5 fill-current" />
-                          <span>Playing</span>
+                          <span>{t('voice_customizer.playing', 'Playing')}</span>
                         </>
                       ) : (
                         <>
                           <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Preview</span>
+                          <span>{t('voice_customizer.preview', 'Preview')}</span>
                         </>
                       )}
                     </button>
@@ -256,14 +258,14 @@ export const VoiceCustomizerModal: React.FC<VoiceCustomizerModalProps> = ({
         <div className="mt-8 pt-4 border-t border-antique-gold/20 flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs text-antique-gold">
             <Headphones className="w-4 h-4" />
-            <span>Google Gemini TTS 24kHz Studio Audio</span>
+            <span>{t('voice_customizer.quality_badge', 'Google Gemini TTS 24kHz Studio Audio')}</span>
           </div>
 
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-antique-gold hover:bg-[#c9a657] text-heritage-green font-bold text-xs shadow-md transition-colors cursor-pointer"
           >
-            Apply & close
+            {t('voice_customizer.apply_close', 'Apply & close')}
           </button>
         </div>
       </div>

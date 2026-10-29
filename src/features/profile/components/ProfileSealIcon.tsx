@@ -1,4 +1,4 @@
-import { Award, Coffee, Drum, Flower2, Landmark, Lamp, Music, Sailboat, Ship, Utensils, type LucideIcon } from 'lucide-react';
+﻿import { Award, Coffee, Drum, Flower2, Landmark, Lamp, Music, Sailboat, Ship, Utensils, type LucideIcon } from 'lucide-react';
 
 const SEAL_ICONS: Record<string, LucideIcon> = {
   'tet-holiday': Flower2,
