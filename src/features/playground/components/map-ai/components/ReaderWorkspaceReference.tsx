@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, BookOpen, X } from 'lucide-react';
 import { paths } from '@/routes/paths';
 import { readerApiService } from '@/features/reader/services/readerApiService';
@@ -10,6 +11,7 @@ import './reader-workspace.css';
 interface ReaderWorkspaceReferenceProps { active: boolean }
 
 export function ReaderWorkspaceReference({ active }: ReaderWorkspaceReferenceProps) {
+  const { t } = useTranslation('playground');
   const [params] = useSearchParams();
   const story = params.get('story');
   const requestedLevel = params.get('level');
@@ -42,7 +44,7 @@ export function ReaderWorkspaceReference({ active }: ReaderWorkspaceReferencePro
   }, [active, story, level, context?.articleId, dismissedStory]);
 
   if (!active) return null;
-  if (error) return <div className="reader-workspace-reference" role="status">This story could not be loaded. You can still continue your conversation. <Link to={paths.reader({ postId: story || undefined, level })}>Return to Reader</Link></div>;
+  if (error) return <div className="reader-workspace-reference" role="status">{t('playground.reader_panel.load_error')} <Link to={paths.reader({ postId: story || undefined, level })}>{t('playground.reader_panel.return_to_reader')}</Link></div>;
   if (!context || (story && context.articleId !== story)) return null;
 
   function dismissReference() {
@@ -51,12 +53,12 @@ export function ReaderWorkspaceReference({ active }: ReaderWorkspaceReferencePro
     if (useChatWorkspace.getState().panel?.type === 'reader') useChatWorkspace.getState().closePanel();
   }
   return (
-    <section className="reader-workspace-reference" aria-label="Reading context" title={context.title}>
-      <span className="reader-workspace-reference-label">Bài đọc: {context.title}</span>
+    <section className="reader-workspace-reference" aria-label={t('playground.reader_panel.aria_label')} title={context.title}>
+      <span className="reader-workspace-reference-label">{t('playground.reader_panel.reading_badge', { title: context.title })}</span>
       <div className="reader-workspace-reference-actions">
-        <button type="button" aria-label="Xem ghi chú bài đọc" title="Xem ghi chú bài đọc" onClick={() => useChatWorkspace.getState().openReaderReference()}><BookOpen size={16} /><span>Xem ghi chú</span></button>
-        <Link to={context.readerUrl} aria-label="Back to Reader" title="Back to Reader"><ArrowLeft size={16} /><span>Back to Reader</span></Link>
-        <button type="button" onClick={dismissReference} aria-label="Dismiss reading reference" title="Dismiss reading reference"><X size={16} /></button>
+        <button type="button" aria-label={t('playground.reader_panel.view_notes_title')} title={t('playground.reader_panel.view_notes_title')} onClick={() => useChatWorkspace.getState().openReaderReference()}><BookOpen size={16} /><span>{t('playground.reader_panel.view_notes')}</span></button>
+        <Link to={context.readerUrl} aria-label={t('playground.reader_panel.back_reader_title')} title={t('playground.reader_panel.back_reader_title')}><ArrowLeft size={16} /><span>{t('playground.reader_panel.back_to_reader')}</span></Link>
+        <button type="button" onClick={dismissReference} aria-label={t('playground.reader_panel.dismiss_ref_title')} title={t('playground.reader_panel.dismiss_ref_title')}><X size={16} /></button>
       </div>
     </section>
   );

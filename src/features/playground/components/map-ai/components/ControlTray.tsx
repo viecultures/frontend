@@ -131,26 +131,26 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     toggleSidebar();
   };
 
-  const micButtonTitle = muted ? 'Turn microphone on' : 'Turn microphone off';
-  const connectButtonTitle = connected || connecting || ending ? 'Pause conversation' : hasHistory ? 'Resume conversation' : 'Start speaking';
+  const micButtonTitle = muted ? t('playground.tray.mic_on_title') : t('playground.tray.mic_off_title');
+  const connectButtonTitle = connected || connecting || ending ? t('playground.tray.pause_convo_title') : hasHistory ? t('playground.tray.resume_convo_title') : t('playground.tray.start_speaking_title');
 
   if (!active) return null;
 
   return (
     <section className="control-tray" ref={trayRef}>
       <div role="status" className="px-3 py-1 text-xs text-slate-400">
-        {connecting ? 'Connecting…' : ending ? 'Wrapping up… You can stop now.' : isRestoringContext ? 'Restoring context…' : isPlaying ? 'AI is speaking' : isAwaitingResponse || isSending ? 'Waiting for a reply…' : connected ? recording ? 'Listening' : 'Mic off · You can type a message' : hasHistory ? 'Paused · Press Play to resume' : 'Ready when you are · Press Play to speak'}
-        {recording && <meter className="ml-2 w-16" min={0} max={1} value={inputVolume} aria-label="Âm lượng microphone" />}
-        {connectionError && <div role="alert">{connectionError} <button type="button" disabled={busy} onClick={() => void handleRetry()}>Retry</button></div>}
-        {connected && !busy && <button type="button" className="ml-3 underline" onClick={() => void endConversation()}>Finish and recap</button>}
-        {!connected && !busy && hasHistory && <button type="button" className="ml-3 underline" onClick={() => void resumeConversation({ input: 'text' })}>Resume conversation</button>}
+        {connecting ? t('playground.tray.connecting') : ending ? t('playground.tray.wrapping_up') : isRestoringContext ? t('playground.tray.restoring_context') : isPlaying ? t('playground.tray.ai_speaking') : isAwaitingResponse || isSending ? t('playground.tray.waiting_reply') : connected ? recording ? t('playground.tray.listening') : t('playground.tray.mic_off') : hasHistory ? t('playground.tray.paused') : t('playground.tray.ready')}
+        {recording && <meter className="ml-2 w-16" min={0} max={1} value={inputVolume} aria-label={t('playground.tray.mic_meter_aria')} />}
+        {connectionError && <div role="alert">{connectionError} <button type="button" disabled={busy} onClick={() => void handleRetry()}>{t('playground.tray_controls.retry')}</button></div>}
+        {connected && !busy && <button type="button" className="ml-3 underline" onClick={() => void endConversation()}>{t('playground.tray_controls.finish_recap')}</button>}
+        {!connected && !busy && hasHistory && <button type="button" className="ml-3 underline" onClick={() => void resumeConversation({ input: 'text' })}>{t('playground.tray_controls.resume_conversation')}</button>}
       </div>
       <nav className={cn('actions-nav', { 'text-entry-visible-landscape': isLandscape && isTextEntryVisible })}>
         <button
           className={cn('action-button')}
           onClick={handleSettingsClick}
-          title="Speaking settings"
-          aria-label="Settings"
+          title={t('playground.tray_controls.speaking_settings')}
+          aria-label={t('playground.tray_controls.settings_aria')}
         >
           <SlidersHorizontal className="w-5 h-5" />
         </button>
@@ -175,14 +175,14 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
         <button
           type="button"
           aria-label={
-            !speakerMuted ? 'Audio output on' : 'Audio output off'
+            !speakerMuted ? t('playground.tray_controls.audio_output_on') : t('playground.tray_controls.audio_output_off')
           }
           className={cn('action-button', {
             'speaker-on': !speakerMuted,
             'speaker-off': speakerMuted,
           })}
           onClick={() => void setSpeakerMuted(!speakerMuted)}
-          title={!speakerMuted ? 'Mute audio output' : 'Unmute audio output'}
+          title={!speakerMuted ? t('playground.tray_controls.mute_audio') : t('playground.tray_controls.unmute_audio')}
         >
           {!speakerMuted ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
         </button>
@@ -201,8 +201,8 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
         <button
           className={cn('action-button keyboard-toggle-button')}
           onClick={() => setIsTextEntryVisible(!isTextEntryVisible)}
-          title="Toggle text input"
-          aria-label="Toggle text input"
+          title={t('playground.tray_controls.toggle_text_input')}
+          aria-label={t('playground.tray_controls.toggle_text_input')}
           aria-expanded={isTextEntryVisible}
         >
           <Keyboard className="w-5 h-5" />
@@ -215,12 +215,12 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             ref={textareaRef}
             className="prompt-input"
             placeholder={
-              connected ? 'Type a message…' : 'Type a message to begin…'
+              connected ? t('playground.tray_controls.placeholder_connected') : t('playground.tray_controls.placeholder_initial')
             }
             value={textPrompt}
             onChange={e => setTextPrompt(e.target.value)}
             onKeyDown={handleKeyDown}
-            aria-label="Text prompt"
+            aria-label={t('playground.tray_controls.text_prompt_aria')}
             disabled={busy}
             rows={1}
           />
@@ -228,13 +228,13 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             type="submit"
             className="send-button"
             disabled={!textPrompt.trim() || busy}
-            aria-label="Send message"
+            aria-label={t('playground.tray_controls.send_aria')}
             title={
               !connected
-                ? 'Connect and send'
+                ? t('playground.tray_controls.connect_and_send')
                 : !textPrompt.trim()
-                ? 'Type a message to send'
-                : 'Send message'
+                ? t('playground.tray_controls.type_to_send')
+                : t('playground.tray_controls.send')
             }
           >
             <Send className="w-4 h-4" />

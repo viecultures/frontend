@@ -320,7 +320,8 @@
       "step_speak": "Luyện nói",
       "step_quiz": "Trắc nghiệm",
       "badge": "Bài học hướng dẫn · {{completed}}/4",
-      "continue_btn": "Tiếp tục luyện tập"
+      "continue_btn": "Tiếp tục luyện tập",
+      "step_complete": "Hoàn thành"
     },
     "error_screen": {
       "quota_exceeded": "Bạn đã đạt giới hạn dùng thử miễn phí trong ngày hôm nay. Vui lòng quay lại vào ngày mai để tiếp tục.",

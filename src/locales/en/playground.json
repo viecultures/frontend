@@ -320,7 +320,8 @@
       "step_speak": "Speak",
       "step_quiz": "Quiz",
       "badge": "Guided lesson · {{completed}}/4",
-      "continue_btn": "Continue practice"
+      "continue_btn": "Continue practice",
+      "step_complete": "Complete"
     },
     "error_screen": {
       "quota_exceeded": "You have hit the limited free quota for today. Please come back tomorrow to continue.",
