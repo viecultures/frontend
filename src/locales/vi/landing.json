@@ -18,19 +18,319 @@
     "title_accent": "Gìn giữ văn hoá.",
     "subtitle": "Khám phá Việt Nam qua các câu chuyện chân thực, trải nghiệm đọc song ngữ và luyện nghe nhập tâm",
     "cta_start": "Bắt đầu học",
+    "cta_explore": "Khám phá câu chuyện",
+    "video_label": "Thước phim văn hóa sinh động về di sản Việt Nam",
+    "video_pause": "Tạm dừng video",
+    "video_play": "Phát video"
+  },
+  "topics": {
+    "title": "Bốn mạch nguồn di sản, muôn vàn khám phá",
+    "intro": "Từ làng nghề ngàn năm đến những câu chuyện ẩm thực tinh tế. Chọn nơi bắt đầu hành trình song ngữ của bạn.",
+    "explore_aria": "Khám phá chủ đề: {{title}}",
+    "items": {
+      "history": {
+        "title": "Lịch sử & Di sản",
+        "vietnameseTitle": "Lịch sử & Di sản",
+        "kicker": "Cội nguồn & Di sản",
+        "description": "Âm vang thành quách triều đại, đền đài cổ kính và kỳ quan kiến trúc bồi đắp Việt Nam ngày nay."
+      },
+      "food": {
+        "title": "Ẩm thực & Cà phê",
+        "vietnameseTitle": "Ẩm thực & Cà phê",
+        "kicker": "Hương vị & Truyền thống",
+        "description": "Từ Phở góc phố, Bánh Mì giòn rụm đến văn hoá cà phê Phin ba miền đầy bản sắc."
+      },
+      "crafts": {
+        "title": "Làng nghề & Thủ công",
+        "vietnameseTitle": "Làng nghề & Thủ công",
+        "kicker": "Chế tác thủ công",
+        "description": "Hàng thế kỷ nghệ thuật gốm Bát Tràng, tranh mộc bản Đông Hồ và làng lụa trứ danh."
+      },
+      "festivals": {
+        "title": "Lễ hội & Đời sống",
+        "vietnameseTitle": "Lễ hội & Đời sống",
+        "kicker": "Nhịp sống muôn màu",
+        "description": "Đêm trăng phố cổ đèn lồng, lễ hội mùa màng và những ngày sum vầy đậm tính gắn kết."
+      }
+    }
+  },
+  "methodology": {
+    "title": "Từ một câu chuyện đến sự thông thạo tự nhiên",
+    "subtitle": "Phương pháp 4 bước liền mạch giúp ghi nhớ ngữ cảnh sâu sắc mà không cần học vẹt máy móc.",
+    "optional": "Tùy chọn",
+    "steps": {
+      "step1": {
+        "number": "01",
+        "step": "Bước 1",
+        "title": "Chọn câu chuyện",
+        "description": "Lựa chọn câu chuyện văn hóa chân thực — từ nghệ thuật ẩm thực đến lịch sử triều đại.",
+        "action": "Khám phá câu chuyện"
+      },
+      "step2": {
+        "number": "02",
+        "step": "Bước 2",
+        "title": "Đọc & Luyện nghe",
+        "description": "Đọc từng câu song ngữ song hành khớp với giọng đọc bản xứ theo nhịp độ của bạn.",
+        "action": "Đọc chuyện cố đô Huế"
+      },
+      "step3": {
+        "number": "03",
+        "step": "Bước 3",
+        "title": "Ôn tập từ vựng",
+        "description": "Làm chủ từ vựng giàu ngữ cảnh bằng thẻ nhớ lặp lại ngắt quãng thông minh.",
+        "action": "Thử ôn tập tương tác"
+      },
+      "step4": {
+        "number": "04",
+        "step": "Bước 4",
+        "title": "Suy ngẫm & Luyện nói",
+        "description": "Luyện nói cùng trợ lý văn hóa AI hoặc viết nhật ký cảm nhận an tâm, tự tin.",
+        "action": "Trải nghiệm trợ lý AI"
+      }
+    }
+  },
+  "articles": {
+    "title": "Câu chuyện đáng khám phá",
+    "all_stories": "Tất cả câu chuyện",
+    "subtitle": "Kho lưu trữ sống động về di sản Việt Nam. Đọc song ngữ, lắng nghe giọng bản ngữ và tiếp thu tự nhiên.",
+    "aria_region": "Câu chuyện di sản song ngữ",
+    "read_listen": "Đọc & nghe",
+    "vietnamese_prefix": "Tiếng Việt: {{title}}",
+    "read_suffix": "đọc",
+    "bilingual_tag": "Tiếng Anh · Tiếng Việt",
+    "read_aria": "Đọc câu chuyện: {{title}}",
+    "select_aria": "Chọn câu chuyện: {{title}}",
+    "items": {
+      "hoi_an": {
+        "category": "Lễ hội & Đời sống",
+        "title": "Một đêm đèn lồng Hội An",
+        "englishTitle": "Hoi An Full-Moon Lantern Festival",
+        "description": "Dạo bước theo ánh đèn hoa đăng bên dòng sông Hoài, lắng nghe chuyện phố cổ và những con người gìn giữ nếp xưa."
+      },
+      "imperial_hue": {
+        "category": "Lịch sử & Di sản",
+        "title": "Huế, những dấu xưa còn lại",
+        "englishTitle": "Imperial Hue Citadel & Court Architecture",
+        "description": "Khám phá mái ngói lưu ly, cổng thành rêu phong cùng những ký ức văn hóa vàng son của đất cố đô."
+      },
+      "saigon_banh_mi": {
+        "category": "Ẩm thực Việt Nam",
+        "title": "Câu chuyện trong ổ bánh mì",
+        "englishTitle": "The Story of Saigon Banh Mi",
+        "description": "Một món ăn đường phố quen thuộc mở ra câu chuyện giao thoa văn hóa đa sắc màu của phương Nam."
+      },
+      "bat_trang": {
+        "category": "Làng nghề & Thủ công",
+        "title": "Đất, lửa và gốm Bát Tràng",
+        "englishTitle": "Bat Trang Ceramic Heritage",
+        "description": "Gặp gỡ bàn tay tài hoa của nghệ nhân Bát Tràng và cảm nhận hồn làng nghề lắng đọng trong từng lớp men."
+      },
+      "mu_cang_chai": {
+        "category": "Thiên nhiên & Con người",
+        "title": "Mùa vàng trên những triền núi",
+        "englishTitle": "Mu Cang Chai Golden Rice Terraces",
+        "description": "Chiêm ngưỡng những nấc thang lúa chín vàng và nếp sống chan hòa cùng non nước Tây Bắc."
+      },
+      "dong_ho": {
+        "category": "Làng nghề & Thủ công",
+        "title": "Sắc màu trong tranh Đông Hồ",
+        "englishTitle": "Dong Ho Folk Woodcut Paintings",
+        "description": "Từ chất giấy điệp đến màu vẽ thiên nhiên, mỗi bản khắc mộc mang đậm hồn quê Việt Nam."
+      }
+    }
+  },
+  "map_section": {
+    "headline_part1": "Khám phá câu chuyện",
+    "headline_part2": "khắp dải đất Việt",
+    "subtitle": "Bắt đầu với các câu chuyện đã phát hành. Nhiều vùng đất và bài học mới đang được cập nhật.",
+    "paracel_name": "Hoàng Sa",
+    "spratly_name": "Trường Sa",
+    "vietnam_claim": "(Việt Nam)",
+    "central_locked": "Miền Trung sắp ra mắt",
+    "south_locked": "Miền Nam sắp ra mắt",
+    "read_story_from": "Đọc câu chuyện từ {{name}}",
+    "coming_soon": "{{name}}: câu chuyện sắp ra mắt",
+    "default_region_north": "Bắc Bộ",
+    "default_region_central": "Trung Bộ",
+    "default_region_south": "Nam Bộ",
+    "default_unesco_category": "Di sản UNESCO",
+    "default_established": "Di sản truyền thống",
+    "default_unesco_status": "Di sản văn hóa tiêu biểu"
+  },
+  "map_journey": {
+    "badge": "LỘ TRÌNH THEO VÙNG MIỀN",
+    "first_region_open": "Vùng đầu tiên đã mở. Hãy khám phá trong hành trình đọc.",
+    "choose_first_region": "Chọn vùng khởi đầu của bạn. Miền Bắc là gợi ý lý tưởng.",
+    "change_first_region": "Đổi vùng khởi đầu",
+    "open_now": "Đang mở",
+    "choose_first": "Chọn mở",
+    "locked": "Đang khóa",
+    "recommended": "Khuyên dùng",
+    "explore_btn": "Khám phá {{name}}",
+    "regions": {
+      "north": {
+        "name": "Miền Bắc",
+        "englishName": "Northern Vietnam",
+        "featuredPlaces": "Hà Nội • Hà Giang"
+      },
+      "central": {
+        "name": "Miền Trung",
+        "englishName": "Central Vietnam",
+        "featuredPlaces": "Huế • Đà Nẵng"
+      },
+      "south": {
+        "name": "Miền Nam",
+        "englishName": "Southern Vietnam",
+        "featuredPlaces": "Đà Lạt • TP. Hồ Chí Minh"
+      }
+    }
+  },
+  "flashcard_demo": {
+    "title": "Ghi nhớ từ ngữ trong ngữ cảnh",
+    "subtitle": "Từ vựng mới sẽ in sâu khi gắn liền với một câu chuyện chân thực. Thử ngay bộ thẻ mẫu từ bài học Cố đô Huế dưới đây để cảm nhận hiệu quả của phương pháp gợi nhớ chủ động.",
+    "steps": {
+      "step1": "Nhớ lại ý nghĩa từ ngữ trực tiếp trong ngữ cảnh văn hóa",
+      "step2": "Lật thẻ để kiểm tra phiên âm IPA và định nghĩa song ngữ",
+      "step3": "Củng cố trí nhớ dài hạn nhờ lịch ôn lặp lại ngắt quãng"
+    },
+    "open_deck": "Mở bộ thẻ Cố đô Huế",
+    "deck_title": "Hoàng thành Cố đô Huế",
+    "sample_cards": "{{count}} thẻ mẫu",
+    "progress_aria": "Số thẻ đã ôn trong bản xem trước",
+    "complete_title": "Bạn đã hoàn thành {{count}} thẻ!",
+    "complete_summary": "{{remembered}} đã nhớ · {{review}} cần ôn lại",
+    "complete_note": "Một lượt ôn ngắn sẽ giúp từ ngữ quen thuộc khắc sâu vào trí nhớ dài hạn.",
+    "try_again": "Thử lại",
+    "card_counter": "Thẻ {{current}} / {{total}}",
+    "previous_card": "Thẻ trước",
+    "next_card": "Thẻ sau",
+    "stop_audio": "Dừng phát âm",
+    "play_audio": "Nghe phát âm từ {{word}}",
+    "flip_hint_en": "Lật thẻ xem nghĩa tiếng Việt",
+    "flip_hint_vi": "Lật thẻ xem từ tiếng Anh",
+    "vietnamese_meaning": "Nghĩa tiếng Việt",
+    "flip_aria_to_en": "Xem lại từ tiếng Anh",
+    "flip_aria_to_vi": "Lật thẻ xem nghĩa tiếng Việt",
+    "review_again": "Cần ôn lại",
+    "remembered": "Đã ghi nhớ",
+    "feedback_remembered": "Đã đánh dấu ghi nhớ.",
+    "feedback_review": "Đã đánh dấu để ôn lại sau.",
+    "feedback_prompt_flipped": "Bạn nhớ từ này rõ đến mức nào?",
+    "feedback_prompt_front": "Hãy thử gợi nhớ ý nghĩa trước khi lật thẻ.",
+    "disclaimer": "Bản xem trước này không lưu tiến độ. Hãy mở bộ thẻ chính thức để đồng bộ lịch ôn tập ngắt quãng."
+  },
+  "plans_section": {
+    "badge": "Gói học tập",
+    "title": "Lựa chọn phương thức học",
+    "subtitle": "Bắt đầu miễn phí với các câu chuyện. Tìm hiểu chi tiết gói học bất cứ khi nào bạn sẵn sàng.",
+    "badge_featured": "Nhiều tiện ích mở rộng",
+    "comparison_note": "Xem bảng so sánh đầy đủ tại",
+    "pricing_link": "trang gói học",
+    "free": {
+      "name": "Miễn phí",
+      "price": "0 đ",
+      "period": "Miễn phí mãi mãi",
+      "description": "Bắt đầu hành trình qua những câu chuyện văn hóa Việt.",
+      "action": "Trải nghiệm miễn phí",
+      "features": [
+        "Đọc và luyện nghe song ngữ",
+        "Lưu tối đa 30 từ vựng",
+        "3 lượt trò chuyện AI mỗi ngày"
+      ]
+    },
+    "pro": {
+      "name": "Gói Pro",
+      "price": "39.000 đ",
+      "period": "mỗi tháng",
+      "description": "Nâng tầm trải nghiệm với không gian đọc, nghe và luyện tập không giới hạn.",
+      "action": "Xem chi tiết Pro",
+      "features": [
+        "Không giới hạn trò chuyện cùng trợ lý AI",
+        "Lưu từ vựng không giới hạn",
+        "Đa dạng tốc độ nghe và công cụ học chuyên sâu"
+      ]
+    }
+  },
+  "faq_section": {
+    "title": "Giải đáp",
+    "title_accent": "thắc mắc",
+    "subtitle": "Mọi điều bạn cần biết về phương pháp học tiếng Anh qua lăng kính di sản văn hóa Việt Nam.",
+    "items": {
+      "faq1": {
+        "question": "VieCultures khác biệt gì so với các ứng dụng học tiếng Anh truyền thống?",
+        "answer": "Thay vì các bài đọc theo ngữ cảnh phương Tây xa lạ, VieCultures gắn liền bài học với di sản Việt Nam chân thực — ẩm thực, làng nghề, lịch sử và phong tục. Người học xây dựng vốn từ tự nhiên để tự tin chia sẻ bản sắc Việt với bạn bè quốc tế."
+      },
+      "faq2": {
+        "question": "Tính năng đọc song ngữ và tra từ một chạm hoạt động ra sao?",
+        "answer": "Mỗi câu chuyện đều có các câu song ngữ Việt - Anh thẳng hàng. Chạm vào bất kỳ từ nào để xem phiên âm IPA, từ loại, định nghĩa tiếng Việt và câu ví dụ, kèm tính năng điều chỉnh tốc độ nghe (0.75x–1.5x)."
+      },
+      "faq3": {
+        "question": "Thuật toán lặp lại ngắt quãng (SRS) giúp bạn ghi nhớ từ vựng như thế nào?",
+        "answer": "VieCultures ứng dụng thuật toán SM-2 chuẩn mực. Đánh giá mức độ nhớ sau mỗi thẻ để hệ thống tính toán thời điểm ôn tập tối ưu nhất, chuyển đổi trí nhớ ngắn hạn thành phản xạ dài hạn."
+      },
+      "faq4": {
+        "question": "Phương pháp luyện nghe nhại (Shadowing) cải thiện phát âm ra sao?",
+        "answer": "Các bản ghi âm khớp giọng bản ngữ giúp bạn luyện nhại theo từng cụm câu. Tập trung vào trọng âm, ngữ điệu và nối âm tự nhiên để nói tiếng Anh uyển chuyển."
+      },
+      "faq5": {
+        "question": "Góc Suy Ngẫm An Tâm (Safe Reflections) là gì?",
+        "answer": "Safe Reflections là không gian đồng hành nơi bạn viết cảm nhận về các câu chuyện mà không bị áp lực sợ sai ngữ pháp hay gạch đỏ. Tinh thần khích lệ và biểu đạt chân thực luôn được đặt lên hàng đầu."
+      },
+      "faq6": {
+        "question": "Tôi có thể bắt đầu học trên VieCultures hoàn toàn miễn phí không?",
+        "answer": "Hoàn toàn có thể. Các câu chuyện nổi bật, trình đọc song ngữ, tra từ và bộ thẻ ôn tập cơ bản đều mở miễn phí. Đăng ký tài khoản để lưu lại tiến trình học và chuỗi ngày rèn luyện của bạn."
+      }
+    }
+  },
+  "conversion": {
+    "title": "Khắc ghi ngôn từ, Gìn giữ văn hoá.",
+    "subtitle": "Khám phá những câu chuyện Việt chân thực, luyện nghe với âm thanh đồng bộ và làm giàu vốn từ qua dòng chảy văn hoá sống động.",
+    "cta_start": "Bắt đầu học",
     "cta_explore": "Khám phá câu chuyện"
   },
-  "discover": "Khám phá",
-  "topics": "Chủ đề",
-  "heritage_map": "Bản đồ di sản",
-  "how_it_works": "Phương pháp",
-  "contact": "Liên hệ",
-  "study_room": "Góc học tập",
-  "sign_in": "Đăng nhập",
-  "start_learning": "Bắt đầu học",
-  "tag": "Di sản & Ngôn ngữ Việt",
-  "title": "Học tiếng Anh, Sống cùng di sản",
-  "subtitle": "Khám phá Việt Nam qua các câu chuyện chân thực, trải nghiệm đọc song ngữ và luyện nghe nhập tâm",
-  "cta_start": "Bắt đầu học",
-  "cta_explore": "Khám phá câu chuyện"
+  "contact_section": {
+    "title": "Liên hệ với đội ngũ VieCultures",
+    "subtitle": "Bạn có thắc mắc về phương pháp học song ngữ, hợp tác nội dung di sản hay đóng góp ý kiến? Chúng tôi luôn sẵn sàng lắng nghe.",
+    "name_label": "Họ và tên",
+    "name_placeholder": "Ví dụ: Nguyễn Văn An",
+    "email_label": "Địa chỉ Email",
+    "email_placeholder": "ten@example.com",
+    "email_invalid_error": "Vui lòng nhập địa chỉ email hợp lệ (ví dụ: ten@example.com).",
+    "topic_label": "Chủ đề",
+    "topics": {
+      "general": "Hỏi đáp học viên",
+      "partnership": "Đối tác nội dung",
+      "enterprise": "Trường học / Tổ chức"
+    },
+    "message_label": "Tin nhắn",
+    "message_placeholder": "Chia sẻ câu hỏi, suy nghĩ hoặc đề xuất của bạn...",
+    "btn_sending": "Đang gửi tin nhắn...",
+    "btn_send": "Gửi tin nhắn",
+    "success_title": "Cảm ơn bạn đã liên hệ!",
+    "success_desc": "Chúng tôi đã nhận được tin nhắn và sẽ phản hồi qua email trong vòng một ngày làm việc.",
+    "send_another": "Gửi tin nhắn khác"
+  },
+  "photo_credits": {
+    "summary": "Nguồn ảnh & Bản quyền",
+    "description": "Hình ảnh được sử dụng từ Wikimedia Commons và cắt chỉnh để phù hợp với giao diện; ảnh gốc được giữ nguyên bản quyền. Giấy phép của từng tác phẩm được liệt kê bên dưới.",
+    "items": {
+      "hoi_an": "Đèn lồng Hội An",
+      "hue": "Cổng Ngọ Môn Huế",
+      "banh_mi": "Bánh mì Việt Nam",
+      "bat_trang": "Làng gốm Bát Tràng",
+      "mu_cang_chai": "Ruộng bậc thang Mù Cang Chải",
+      "dong_ho": "Tranh Đông Hồ — Chuột rước đèn"
+    }
+  },
+  "vietnam_map": {
+    "vietnamese_label": "Tiếng Việt: {{name}}",
+    "close_panel": "Đóng bảng chi tiết",
+    "sample_presentation": "Bài mẫu thuyết trình",
+    "playing_sample": "Đang phát âm mẫu… (Dừng)",
+    "listen_sample": "Nghe câu phát biểu mẫu",
+    "featured_vocab": "TỪ VỰNG & CỤM TỪ TIÊU BIỂU",
+    "tap_to_listen": "Chạm để nghe",
+    "hear_word_title": "Nghe phát âm từ này",
+    "common_phrase": "• Cụm từ thường gặp: {{phrase}}"
+  }
 }

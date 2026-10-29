@@ -162,9 +162,9 @@ export const PlaygroundPage: React.FC = () => {
               <Feather className="w-3.5 h-3.5" /> {t('playground.screens.screen_04_badge')}
             </div>
             <h2 className="text-2xl font-serif font-bold text-heritage-green dark:text-warm-ivory">
-              3-Region Dialect &amp; Tone Explorer
+              {t('playground.screens.screen_04_title')}
             </h2>
-            <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">{t('playground.screens.screen_05_desc')}</p>
+            <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">{t('playground.screens.screen_04_desc')}</p>
           </div>
         </section>
       </div>

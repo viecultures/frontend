@@ -7,6 +7,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Compass,
   BookOpen,
@@ -97,6 +98,7 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
   selectedProvinceName,
   className = '',
 }) => {
+  const { t } = useTranslation('playground');
   const [isOpen, setIsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
@@ -125,11 +127,11 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-heritage-green text-gray-200 hover:text-antique-gold border border-white/10 text-xs font-medium transition-all cursor-pointer shadow-sm disabled:opacity-50"
-        title="Gợi ý chủ đề khám phá văn hóa"
+        title={t('playground.immersive.topic_tray_button_title')}
         aria-expanded={isOpen}
       >
         <Compass className="w-3.5 h-3.5 text-antique-gold" />
-        <span>Gợi ý chủ đề</span>
+        <span>{t('playground.immersive.topic_tray_button')}</span>
         <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
@@ -149,7 +151,7 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-antique-gold" />
                 <h3 className="text-xs font-serif font-bold text-white">
-                  Chủ Đề Khám Phá Văn Hóa
+                  {t('playground.immersive.topic_modal_title')}
                 </h3>
               </div>
               <button
@@ -164,18 +166,18 @@ export const ImmersiveTopicTray: React.FC<ImmersiveTopicTrayProps> = ({
             {/* Context Notice if Province Selected */}
             {selectedProvinceName && (
               <div className="mb-2.5 px-2.5 py-1.5 rounded-lg bg-heritage-green/40 border border-antique-gold/30 text-[11px] text-antique-bright flex items-center justify-between">
-                <span>Đang khám phá: <strong>{selectedProvinceName}</strong></span>
+                <span>{t('playground.immersive.exploring_province', { name: selectedProvinceName })}</span>
               </div>
             )}
 
             {/* Category Filter Pills */}
             <div className="flex items-center gap-1.5 mb-3 overflow-x-auto pb-1">
               {[
-                { id: 'all', label: 'Tất cả' },
-                { id: 'nature', label: 'Thiên nhiên' },
-                { id: 'heritage', label: 'Di sản' },
-                { id: 'cuisine', label: 'Ẩm thực' },
-                { id: 'history', label: 'Lịch sử' },
+                { id: 'all', label: t('playground.immersive.cat_all') },
+                { id: 'nature', label: t('playground.immersive.cat_nature') },
+                { id: 'heritage', label: t('playground.immersive.cat_heritage') },
+                { id: 'cuisine', label: t('playground.immersive.cat_cuisine') },
+                { id: 'history', label: t('playground.immersive.cat_history') },
               ].map((cat) => (
                 <button
                   key={cat.id}

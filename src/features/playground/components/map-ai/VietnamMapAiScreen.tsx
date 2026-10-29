@@ -118,10 +118,10 @@ function MapAiContent() {
         </div>
 
         {panel && (
-          <aside className={`map-panel chat-tool-panel flex flex-col relative overflow-hidden bg-[#090e1a] ${panel.type === 'reader' ? 'reader-reference-drawer' : ''}`} aria-label={panel.type === 'map' ? 'Vietnam map' : panel.type === 'reader' ? 'Reading reference' : 'Cultural story'}>
+          <aside className={`map-panel chat-tool-panel flex flex-col relative overflow-hidden bg-[#090e1a] ${panel.type === 'reader' ? 'reader-reference-drawer' : ''}`} aria-label={panel.type === 'map' ? t('playground.workspace.map_title') : panel.type === 'reader' ? t('playground.reader_panel.aria_label') : t('playground.chat_article.aria_story_details')}>
             <div className="chat-tool-panel-header">
               <h2>{panel.type === 'map' ? t('playground.workspace.map_title') : panel.type === 'reader' ? t('playground.workspace.reading_notes') : t('playground.workspace.story_details')}</h2>
-              <button type="button" onClick={closePanel} aria-label="Close content" title="Close (Esc)"><X size={18} /></button>
+              <button type="button" onClick={closePanel} aria-label={t('playground.immersive.close_aria')} title={t('playground.immersive.close_aria')}><X size={18} /></button>
             </div>
             {panel.type === 'reader' ? <ReaderWorkspacePanel /> : panel.type === 'article' ? (
               <ChatArticleDetail articleId={panel.articleId} onShowMap={handleShowArticleOnMap} />

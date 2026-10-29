@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Settings,
   X,
@@ -32,6 +33,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
   onPreviewVoice,
   onApplySettings,
 }) => {
+  const { t } = useTranslation('playground');
   if (!isOpen) return null;
 
   return (
@@ -52,10 +54,10 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
             </div>
             <div>
               <h2 className="font-serif font-bold text-base leading-tight text-warm-ivory">
-                Cấu Hình Trợ Lý &amp; Giọng Nói
+                {t('playground.settings_drawer.header_title')}
               </h2>
               <p className="text-[11px] text-antique-gold">
-                Tùy chỉnh mô hình, âm sắc AI và chế độ bản đồ
+                {t('playground.settings_drawer.header_desc')}
               </p>
             </div>
           </div>
@@ -63,7 +65,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-            title="Đóng bảng cấu hình"
+            title={t('playground.settings_drawer.close_title')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -76,9 +78,9 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
             <div className="flex items-center justify-between mb-2.5">
               <label className="font-semibold text-xs text-heritage-green dark:text-antique-gold flex items-center gap-1.5">
                 <Volume2 className="w-4 h-4" />
-                <span>LỰA CHỌN GIỌNG ĐỌC AI</span>
+                <span>{t('playground.settings_drawer.voice_section_title')}</span>
               </label>
-              <span className="text-[11px] text-gray-500">{AVAILABLE_VOICES.length} giọng sẵn sàng</span>
+              <span className="text-[11px] text-gray-500">{t('playground.settings_drawer.voices_available', { count: AVAILABLE_VOICES.length })}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -116,7 +118,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
                       className="w-full py-1 rounded-lg bg-white dark:bg-[#14231F] border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-[11px] font-medium text-heritage-green dark:text-antique-gold flex items-center justify-center gap-1 transition-all"
                     >
                       <Volume1 className="w-3.5 h-3.5" />
-                      <span>Nghe thử giọng</span>
+                      <span>{t('playground.settings_drawer.listen_preview')}</span>
                     </button>
                   </div>
                 );
@@ -128,7 +130,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
           <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1E2E2A]/60 border border-gray-200 dark:border-white/10 space-y-3">
             <div>
               <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                <span>Tốc độ đọc (Speech Rate): {settings.speechRate.toFixed(2)}x</span>
+                <span>{t('playground.settings_drawer.speed_label', { rate: settings.speechRate.toFixed(2) })}</span>
               </div>
               <input
                 type="range"
@@ -148,7 +150,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
 
             <div>
               <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                <span>Cao độ giọng (Pitch): {settings.speechPitch.toFixed(2)}</span>
+                <span>{t('playground.settings_drawer.pitch_label', { pitch: settings.speechPitch.toFixed(2) })}</span>
               </div>
               <input
                 type="range"
@@ -171,7 +173,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
           <div>
             <label className="font-semibold text-xs text-heritage-green dark:text-antique-gold flex items-center gap-1.5 mb-2">
               <Cpu className="w-4 h-4" />
-              <span>MÔ HÌNH GEMINI AI</span>
+              <span>{t('playground.settings_drawer.model_section_title')}</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
               {AVAILABLE_MODELS.map((m) => (
@@ -196,7 +198,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
           <div>
             <label className="font-semibold text-xs text-heritage-green dark:text-antique-gold flex items-center gap-1.5 mb-2">
               <Bot className="w-4 h-4" />
-              <span>PHONG CÁCH TRỢ LÝ (AI PERSONA)</span>
+              <span>{t('playground.settings_drawer.persona_section_title')}</span>
             </label>
             <div className="space-y-1.5">
               {PERSONA_OPTIONS.map((p) => (
@@ -226,7 +228,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
           <div>
             <label className="font-semibold text-xs text-heritage-green dark:text-antique-gold flex items-center gap-1.5 mb-1.5">
               <Key className="w-4 h-4" />
-              <span>API KEY (TÙY CHỌN)</span>
+              <span>{t('playground.settings_drawer.api_key_title')}</span>
             </label>
             <input
               type="password"
@@ -234,19 +236,19 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
               onChange={(e) =>
                 onUpdateSettings((prev) => ({ ...prev, customApiKey: e.target.value }))
               }
-              placeholder="Mặc định sử dụng API từ Backend (/api/v1/companion/chat)"
+              placeholder={t('playground.settings_drawer.api_key_placeholder')}
               className="w-full px-3.5 py-2 rounded-xl bg-gray-50 dark:bg-[#1E2E2A] border border-gray-200 dark:border-white/10 text-xs focus:outline-none focus:ring-2 focus:ring-heritage-green dark:focus:ring-antique-gold"
             />
             <p className="text-[10px] text-gray-500 mt-1">
-              Khóa API được lưu an toàn trong phiên làm việc trình duyệt.
+              {t('playground.settings_drawer.api_key_hint')}
             </p>
           </div>
 
           {/* 6. Auto-sync Map switch */}
           <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-[#1E2E2A]/60 border border-gray-200 dark:border-white/10">
             <div>
-              <div className="font-bold text-xs">Tự Động Đồng Bộ Bản Đồ</div>
-              <p className="text-[11px] text-gray-500">Tự động chọn tỉnh thành khi AI nhắc tên</p>
+              <div className="font-bold text-xs">{t('playground.settings_drawer.auto_sync_map_title')}</div>
+              <p className="text-[11px] text-gray-500">{t('playground.settings_drawer.auto_sync_map_desc')}</p>
             </div>
             <input
               type="checkbox"
@@ -266,7 +268,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
             className="px-3 py-2 rounded-xl text-xs text-gray-600 dark:text-gray-400 hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Khôi phục mặc định</span>
+            <span>{t('playground.settings_drawer.reset_defaults')}</span>
           </button>
 
           <button
@@ -274,7 +276,7 @@ export const MapAiSettingsDrawer: React.FC<MapAiSettingsDrawerProps> = ({
             className="px-4 py-2 rounded-xl bg-heritage-green hover:bg-[#15342F] text-antique-gold text-xs font-bold transition-all cursor-pointer shadow-md flex items-center gap-1.5"
           >
             <Check className="w-4 h-4" />
-            <span>Áp Dụng Cấu Hình</span>
+            <span>{t('playground.settings_drawer.apply_settings')}</span>
           </button>
         </div>
       </div>

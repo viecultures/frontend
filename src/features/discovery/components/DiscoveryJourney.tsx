@@ -28,17 +28,13 @@ import { readFirstRegionChoice, saveFirstRegionChoice, type FirstRegion } from '
 import { JOURNEY_SERIES, type JourneySeries } from '../data/learningJourney';
 
 const REGIONS = [
-  { id: 'north', name: 'Northern Vietnam', number: "1" },
-  { id: 'central', name: 'Central Vietnam', number: "2" },
-  { id: 'south', name: 'Southern Vietnam', number: "3" },
+  { id: 'north', nameKey: 'journey.region_north', fallbackName: 'Northern Vietnam', number: "1" },
+  { id: 'central', nameKey: 'journey.region_central', fallbackName: 'Central Vietnam', number: "2" },
+  { id: 'south', nameKey: 'journey.region_south', fallbackName: 'Southern Vietnam', number: "3" },
 ] as const;
 const REGION_SHAPES = Object.fromEntries(
   REGIONS.map(region => [region.id, VIETNAM_34_PROVINCES.filter(province => province.region === region.id).map(province => province.d).join(' ')]),
 ) as Record<(typeof REGIONS)[number]['id'], string>;
-const UPCOMING_SERIES = [
-  { id: 'central-preview', title: 'Central Vietnam', place: 'Hue', imageUrl: '/images/landing/hue-citadel.jpg', description: 'New reading series are being prepared for Central Vietnam.' },
-  { id: 'south-preview', title: 'Southern Vietnam', place: 'Ho Chi Minh City', imageUrl: '/images/landing/banh-mi.jpg', description: 'New reading series are being prepared for Southern Vietnam.' },
-];
 
 interface DiscoveryJourneyProps {
   onBrowseStories: () => void;
@@ -58,7 +54,8 @@ interface SelectedChapter {
 }
 
 export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
-  const { t } = useTranslation('discovery');
+  const { t, i18n } = useTranslation('discovery');
+  const isEn = i18n.language === 'en';
   const mapPanelRef = useRef<HTMLElement>(null);
   const [mapPanelHeight, setMapPanelHeight] = useState<number | null>(null);
   const [carouselHovered, setCarouselHovered] = useState(false);
@@ -72,6 +69,33 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
   const selectedPlace = selectedProvince?.id || '';
   const selectedRegion: RegionKey = selectedProvince ? selectedProvince.region : params.get('region') === firstRegion ? firstRegion || 'all' : 'all';
   const region = REGIONS.find(item => item.id === selectedRegion);
+
+  const getRegionName = (item: (typeof REGIONS)[number]) => t(item.nameKey, item.fallbackName);
+
+  const upcomingSeries = [
+    {
+      id: 'central-preview',
+      title: t('journey.region_central'),
+      place: isEn ? 'Hue' : 'Huế',
+      imageUrl: '/images/landing/hue-citadel.jpg',
+      description: isEn
+        ? 'New reading series are being prepared for Central Vietnam.'
+        : 'Các chuỗi bài đọc mới đang được biên soạn cho khu vực Miền Trung.',
+    },
+    {
+      id: 'south-preview',
+      title: t('journey.region_south'),
+      place: isEn ? 'Ho Chi Minh City' : 'TP. Hồ Chí Minh',
+      imageUrl: '/images/landing/banh-mi.jpg',
+      description: isEn
+        ? 'New reading series are being prepared for Southern Vietnam.'
+        : 'Các chuỗi bài đọc mới đang được biên soạn cho khu vực Miền Nam.',
+    },
+  ];
+
+  const getLocalizedProvinceName = (pName: string) => {
+    return isEn ? toEnglishPlaceName(pName) : pName;
+  };
 
   useEffect(() => {
     const regionParam = params.get('region');
@@ -149,7 +173,6 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
     }
     if (firstRegion !== 'north') return JOURNEY_SERIES.filter(s => s.region === firstRegion);
     // Default regional nominated series for Northern Vietnam:
-    // Featured selection: Phở Hà Nội, Bánh Cáy Làng Nguyễn, Chả Cá Lã Vọng, Bún Chả, Cơm Cháy Ninh Bình, Cá Kho Làng Vũ Đại
     const northernSeries = JOURNEY_SERIES.filter(s =>
       s.region === 'north' || ['ha-noi', 'hung-yen', 'ninh-binh'].includes(s.provinceId)
     );
@@ -287,7 +310,6 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
     clearHideTimeout();
     setHoverPopover(current => {
       if (current?.pinned || (current && current.series.id === series.id)) {
-        // Keep popover position steady so user can comfortably mouse into it
         return current;
       }
       const { x, y } = calculatePopoverPosition(e.clientX, e.clientY);
@@ -335,7 +357,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
 
   function renderNominatedSeriesCard(series: JourneySeries, isUnlocked: boolean) {
     const province = VIETNAM_34_PROVINCES.find(item => item.id === series.provinceId);
-    const placeName = province ? toEnglishPlaceName(province.name) : 'Hanoi';
+    const placeName = province ? getLocalizedProvinceName(province.name) : (isEn ? 'Hanoi' : 'Hà Nội');
     const firstChapter = series.chapters[0];
 
     return (
@@ -353,12 +375,12 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
           )}
           <span className="journey-spotlight-badge">
             <MapPin size={13} aria-hidden="true" />
-            FEATURED SERIES
+            {t('journey.featured_series').toUpperCase()}
           </span>
         </div>
         <div className="journey-spotlight-content">
           <span className="discovery-category">
-            {placeName} · {series.chapters.length} stories · B1
+            {placeName} · {t('journey.stories_in_region', { count: series.chapters.length, defaultValue: `${series.chapters.length} câu chuyện` })} · B1
           </span>
           <h3>{series.title}</h3>
           <p>{series.description}</p>
@@ -370,7 +392,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
                 className="journey-spotlight-action"
               >
                 <BookOpen size={16} aria-hidden="true" />
-                <span>Start reading (Chapter 1)</span>
+                <span>{t('journey.start_reading_ch1')}</span>
                 <ArrowRight size={16} aria-hidden="true" />
               </button>
             ) : (
@@ -380,7 +402,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
                 onClick={() => unlockPlace(series.provinceId)}
               >
                 <LockKeyhole size={16} aria-hidden="true" />
-                <span>Unlock {placeName}</span>
+                <span>{t('journey.unlock_place', { placeName })}</span>
               </Button>
             )}
           </div>
@@ -391,7 +413,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
 
   function renderSeriesCard(series: JourneySeries) {
     const province = VIETNAM_34_PROVINCES.find(item => item.id === series.provinceId);
-    const placeName = province ? toEnglishPlaceName(province.name) : 'Vietnam';
+    const placeName = province ? getLocalizedProvinceName(province.name) : (isEn ? 'Vietnam' : 'Việt Nam');
 
     return (
       <li
@@ -420,11 +442,13 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
             )}
           </div>
           <div className="journey-series-copy">
-            <span className="discovery-category">{placeName} · {series.chapters.length} stories</span>
+            <span className="discovery-category">
+              {placeName} · {t('journey.stories_in_region', { count: series.chapters.length, defaultValue: `${series.chapters.length} câu chuyện` })}
+            </span>
             <h4>{series.title}</h4>
             <p>{series.description}</p>
             <span className="journey-series-footer">
-              Explore chapters <ArrowRight size={18} aria-hidden="true" />
+              {t('journey.explore_chapters')} <ArrowRight size={18} aria-hidden="true" />
             </span>
           </div>
         </button>
@@ -436,13 +460,12 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
     <div className="journey-page">
       <header className="journey-hero">
         <div>
-
-          <h1>Reading journey</h1>
-          <p>Explore Vietnam through story series, region by region.</p>
+          <h1>{t('journey.title')}</h1>
+          <p>{t('journey.lead')}</p>
         </div>
-        <div className="discovery-modes" role="group" aria-label="Explore by">
-          <button type="button" aria-pressed="true">Journey</button>
-          <button type="button" onClick={onBrowseStories}>Stories</button>
+        <div className="discovery-modes" role="group" aria-label={t('journey.explore_by')}>
+          <button type="button" aria-pressed="true">{t('journey.tab_journey')}</button>
+          <button type="button" onClick={onBrowseStories}>{t('journey.tab_stories')}</button>
         </div>
       </header>
 
@@ -450,24 +473,24 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
         className="journey-layout"
         style={{ '--journey-panel-height': mapPanelHeight === null ? 'auto' : `${mapPanelHeight}px` } as CSSProperties}
       >
-        <section ref={mapPanelRef} className="journey-map-panel" aria-label="Journey map">
+        <section ref={mapPanelRef} className="journey-map-panel" aria-label={t('journey.title')}>
           <div className="journey-map-heading">
             <div>
               {region && (
                 <Button type="button" variant="ghost" size="sm" onClick={() => selectRegion('all')}>
-                  <ArrowLeft size={17} /> All regions
+                  <ArrowLeft size={17} /> {t('journey.all_regions')}
                 </Button>
               )}
-              <span>{region ? `${region.number} / ${region.name.toUpperCase()}` : 'EXPLORE THREE REGIONS'}</span>
+              <span>{region ? `${region.number} / ${getRegionName(region).toUpperCase()}` : t('journey.explore_three_regions')}</span>
             </div>
-            <strong>{region ? 'Choose a place' : 'Choose a region'}</strong>
+            <strong>{region ? t('journey.choose_place') : t('journey.choose_region')}</strong>
           </div>
           <div className="journey-map" data-map-level={region ? 'provinces' : 'regions'}>
             <VietnamMap
               activeRegion={selectedRegion}
               overviewByRegion
               selectableRegions={firstRegion ? [firstRegion] : ['north', 'central', 'south']}
-              labelLanguage="en"
+              labelLanguage={isEn ? 'en' : 'vi'}
               selectedProvinceId={selectedPlace || null}
               onSelectRegion={selectRegion}
               onSelectProvince={province => { if (province) selectPlace(province.id); }}
@@ -481,49 +504,61 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
           {region && selectedProvince && (
             <div className="journey-selected-place">
               <MapPin size={18} />
-              <span>{toEnglishPlaceName(selectedProvince.name)}</span>
-              <button type="button" onClick={() => selectPlace('')}>Clear place</button>
+              <span>{getLocalizedProvinceName(selectedProvince.name)}</span>
+              <button type="button" onClick={() => selectPlace('')}>{t('journey.clear_place')}</button>
             </div>
           )}
         </section>
 
         <aside
           className={`journey-rail ${region ? 'journey-rail--featured' : 'journey-rail--regions'}`}
-          aria-label="Nominated series"
+          aria-label={t('journey.featured_series')}
           aria-live={region ? 'off' : 'polite'}
           onFocus={() => setCarouselFocused(true)}
           onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setCarouselFocused(false); }}
         >
           {!region ? (
             <>
-
-              <h2>Explore Vietnam</h2>
+              <h2>{t('journey.explore_vietnam')}</h2>
               <p className="journey-rail-intro">
-                {firstRegion ? `Your first region is ${REGIONS.find(item => item.id === firstRegion)?.name}. Explore it below or choose a different starting point.` : 'Choose your first region. We recommend Northern Vietnam, where published stories are ready to read.'}
+                {firstRegion
+                  ? t('journey.first_region_intro', {
+                      regionName: REGIONS.find(item => item.id === firstRegion)
+                        ? getRegionName(REGIONS.find(item => item.id === firstRegion)!)
+                        : '',
+                    })
+                  : t('journey.choose_first_intro')}
               </p>
-              {firstRegion && <button type="button" className="journey-change-region" onClick={changeFirstRegion}>Change first region</button>}
+              {firstRegion && (
+                <button type="button" className="journey-change-region" onClick={changeFirstRegion}>
+                  {t('journey.change_first_region')}
+                </button>
+              )}
               <div className="journey-region-list">
                 {REGIONS.map(item => {
                   const isOpen = !firstRegion || item.id === firstRegion;
-                  const content = <>
-                    <span className="journey-region-number">{item.number}</span>
-                    <svg className="journey-region-thumbnail" viewBox={VIETNAM_REGION_VIEWBOXES[item.id].viewBox} aria-hidden="true" focusable="false">
-                      <path d={REGION_SHAPES[item.id]} fillRule="evenodd" />
-                    </svg>
-                    <span className="journey-region-copy">
-                      <strong>{item.name}</strong>
-                      <small className="journey-region-status">
-                        {isOpen ? <BookOpen size={14} aria-hidden="true" /> : <LockKeyhole size={14} aria-hidden="true" />}
-                        {firstRegion === item.id ? 'Your first region' : isOpen ? 'Choose first' : 'Locked'}
-                      </small>
-                      {item.id === 'north' && <small className="journey-region-recommended">Recommended</small>}
-                    </span>
-                    {isOpen && <ArrowRight className="journey-region-arrow" size={18} aria-hidden="true" />}
-                  </>;
+                  const regionName = getRegionName(item);
+                  const content = (
+                    <>
+                      <span className="journey-region-number">{item.number}</span>
+                      <svg className="journey-region-thumbnail" viewBox={VIETNAM_REGION_VIEWBOXES[item.id].viewBox} aria-hidden="true" focusable="false">
+                        <path d={REGION_SHAPES[item.id]} fillRule="evenodd" />
+                      </svg>
+                      <span className="journey-region-copy">
+                        <strong>{regionName}</strong>
+                        <small className="journey-region-status">
+                          {isOpen ? <BookOpen size={14} aria-hidden="true" /> : <LockKeyhole size={14} aria-hidden="true" />}
+                          {firstRegion === item.id ? t('journey.your_first_region') : isOpen ? t('journey.choose_first') : t('journey.locked')}
+                        </small>
+                        {item.id === 'north' && <small className="journey-region-recommended">{t('journey.recommended')}</small>}
+                      </span>
+                      {isOpen && <ArrowRight className="journey-region-arrow" size={18} aria-hidden="true" />}
+                    </>
+                  );
                   return isOpen ? (
                     <button key={item.id} type="button" className="journey-region-step journey-region-step--open" onClick={() => selectRegion(item.id)}>{content}</button>
                   ) : (
-                    <div key={item.id} className="journey-region-step journey-region-step--locked" aria-label={`${item.name}, locked`}>{content}</div>
+                    <div key={item.id} className="journey-region-step journey-region-step--locked" aria-label={`${regionName}, ${t('journey.locked')}`}>{content}</div>
                   );
                 })}
               </div>
@@ -533,28 +568,28 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
               <div className="journey-rail-header">
                 <div className="journey-rail-title-group">
                   <span className="journey-eyebrow">
-                    {selectedProvince ? toEnglishPlaceName(selectedProvince.name).toUpperCase() : region.name.toUpperCase()}
+                    {selectedProvince ? getLocalizedProvinceName(selectedProvince.name).toUpperCase() : getRegionName(region).toUpperCase()}
                   </span>
-                  <h2>Featured Series</h2>
+                  <h2>{t('journey.featured_series')}</h2>
                 </div>
                 {nominatedSlides.length > 1 && (
-                  <div className="journey-slider-controls" aria-label="Series navigation">
+                  <div className="journey-slider-controls" aria-label={t('journey.featured_series')}>
                     <button
                       type="button"
                       className="journey-slider-arrow"
                       onClick={handlePrevSlide}
-                      aria-label="Previous series"
+                      aria-label={t('journey.previous_series')}
                     >
                       <ChevronLeft size={18} aria-hidden="true" />
                     </button>
                     <span className="journey-slider-counter">
-                      {activeSlideIndex + 1}/{nominatedSlides.length}
+                      {t('journey.series_counter', { current: activeSlideIndex + 1, total: nominatedSlides.length })}
                     </span>
                     <button
                       type="button"
                       className="journey-slider-arrow"
                       onClick={handleNextSlide}
-                      aria-label="Next series"
+                      aria-label={t('journey.next_series')}
                     >
                       <ChevronRight size={18} aria-hidden="true" />
                     </button>
@@ -565,17 +600,27 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
               {selectedProvince && !hasOwnSeries && (
                 <div className="journey-place-notice" role="status">
                   <Compass size={14} className="journey-place-notice-icon" aria-hidden="true" />
-                  <span>No dedicated series for {toEnglishPlaceName(selectedProvince.name)} yet.{firstRegion === 'north' ? ' Showing featured Northern Vietnam series:' : ''}</span>
+                  <span>
+                    {t('journey.no_dedicated_series', { placeName: getLocalizedProvinceName(selectedProvince.name) })}
+                    {firstRegion === 'north' ? t('journey.showing_featured_north') : ''}
+                  </span>
                 </div>
               )}
 
-              {!currentSlide && <div className="journey-empty-region" role="status"><p>Published stories for {region.name} are on the way.</p><button type="button" onClick={onBrowseStories}>Browse available stories <ArrowRight size={16} aria-hidden="true" /></button></div>}
+              {!currentSlide && (
+                <div className="journey-empty-region" role="status">
+                  <p>{t('journey.stories_on_the_way', { regionName: getRegionName(region) })}</p>
+                  <button type="button" onClick={onBrowseStories}>
+                    {t('journey.browse_available_stories')} <ArrowRight size={16} aria-hidden="true" />
+                  </button>
+                </div>
+              )}
 
               {currentSlide && (
                 <div
                   tabIndex={0}
                   onKeyDown={handleCardKeyDown}
-                  aria-label={`Series: ${currentSlide.title}`}
+                  aria-label={`${t('journey.featured_series')}: ${currentSlide.title}`}
                   className="journey-spotlight-slider-wrapper"
                   onMouseEnter={() => setCarouselHovered(true)}
                   onMouseLeave={() => setCarouselHovered(false)}
@@ -583,12 +628,12 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
                   {renderNominatedSeriesCard(currentSlide, !!unlockedPlaces[currentSlide.provinceId])}
 
                   {nominatedSlides.length > 1 && (
-                    <div className="journey-slider-dots" role="group" aria-label="Featured series positions">
+                    <div className="journey-slider-dots" role="group" aria-label={t('journey.featured_series')}>
                       {nominatedSlides.map((s, idx) => (
                         <button
                           key={s.id}
                           type="button"
-                          aria-label={`Go to slide ${idx + 1}: ${s.title}`}
+                          aria-label={`${idx + 1}: ${s.title}`}
                           aria-current={idx === activeSlideIndex ? 'true' : undefined}
                           className={`journey-slider-dot ${idx === activeSlideIndex ? 'is-active' : ''}`}
                           onClick={() => setActiveSlideIndex(idx)}
@@ -603,30 +648,37 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
         </aside>
       </div>
 
-      <section className="journey-library" aria-label="Journey series">
+      <section className="journey-library" aria-label={t('journey.available_series')}>
         <div className="journey-library-group">
           <div className="journey-library-section-heading">
-            <h2>Available series</h2>
-            <span>{availableSeries.length} series</span>
+            <h2>{t('journey.available_series')}</h2>
+            <span>{t('journey.series_count', { count: availableSeries.length })}</span>
           </div>
           <ul className="journey-series-grid">
             {availableSeries.map(renderSeriesCard)}
           </ul>
-          {availableSeries.length === 0 && <div className="journey-empty-region"><p>{firstRegion ? 'No published series in your first region yet.' : 'Choose a first region to see its published series.'}</p><button type="button" onClick={onBrowseStories}>Browse available stories <ArrowRight size={16} aria-hidden="true" /></button></div>}
+          {availableSeries.length === 0 && (
+            <div className="journey-empty-region">
+              <p>{firstRegion ? t('journey.no_published_series') : t('journey.choose_first_to_see')}</p>
+              <button type="button" onClick={onBrowseStories}>
+                {t('journey.browse_available_stories')} <ArrowRight size={16} aria-hidden="true" />
+              </button>
+            </div>
+          )}
         </div>
         <div className="journey-library-group">
           <div className="journey-library-section-heading">
-            <h2>Upcoming series</h2>
-            <span>{UPCOMING_SERIES.length} series</span>
+            <h2>{t('journey.upcoming_series')}</h2>
+            <span>{t('journey.series_count', { count: upcomingSeries.length })}</span>
           </div>
           <ul className="journey-series-grid">
-            {UPCOMING_SERIES.map(series => (
+            {upcomingSeries.map(series => (
               <li key={series.id}>
                 <article className="journey-series-tile is-locked is-upcoming">
                   <div className="journey-series-image">
                     <img src={series.imageUrl} alt="" loading="lazy" />
                     <span className="journey-series-lock">
-                      <LockKeyhole size={17} /> Coming soon
+                      <LockKeyhole size={17} /> {t('journey.coming_soon')}
                     </span>
                   </div>
                   <div className="journey-series-copy">
@@ -634,7 +686,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
                     <h4>{series.title}</h4>
                     <p>{series.description}</p>
                     <span className="journey-series-footer">
-                      Coming soon <LockKeyhole size={17} aria-hidden="true" />
+                      {t('journey.coming_soon')} <LockKeyhole size={17} aria-hidden="true" />
                     </span>
                   </div>
                 </article>
@@ -657,18 +709,25 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
           onMouseLeave={handlePopoverMouseLeave}
           onKeyDown={event => { if (event.key === 'Escape') closeSeriesChapters(); }}
           role="region"
-          aria-label={`Chapters in ${hoverPopover.series.title}`}
+          aria-label={`${t('journey.explore_chapters')}: ${hoverPopover.series.title}`}
         >
           <div className="journey-hover-popover-header">
             <div>
               <span className="journey-hover-popover-tag">
-                {toEnglishPlaceName(
-                  VIETNAM_34_PROVINCES.find(p => p.id === hoverPopover.series.provinceId)?.name || 'Hanoi'
-                )} · {hoverPopover.series.chapters.length} CHAPTERS
+                {getLocalizedProvinceName(
+                  VIETNAM_34_PROVINCES.find(p => p.id === hoverPopover.series.provinceId)?.name || (isEn ? 'Hanoi' : 'Hà Nội')
+                )} · {t('journey.chapters_count', { count: hoverPopover.series.chapters.length })}
               </span>
               <h4>{hoverPopover.series.title}</h4>
             </div>
-            <button type="button" className="journey-hover-close" aria-label="Close chapter list" onClick={closeSeriesChapters}><X size={16} /></button>
+            <button
+              type="button"
+              className="journey-hover-close"
+              aria-label={t('journey.close_chapter_list')}
+              onClick={closeSeriesChapters}
+            >
+              <X size={16} />
+            </button>
           </div>
 
           <ul className="journey-hover-chapter-list">
@@ -684,7 +743,13 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
                   </span>
                   <div className="journey-hover-chapter-info">
                     <strong>{chapter.title}</strong>
-                    <small>{chapter.readTime?.replace('phút đọc', 'min read') || '3 min read'}</small>
+                    <small>
+                      {chapter.readTime
+                        ? isEn
+                          ? chapter.readTime.replace('phút đọc', 'min read')
+                          : chapter.readTime
+                        : isEn ? '3 min read' : '3 phút đọc'}
+                    </small>
                   </div>
                   <ArrowRight size={15} aria-hidden="true" />
                 </button>
@@ -694,35 +759,69 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
         </div>
       )}
 
-      <dialog ref={skillDialogRef} className="journey-skill-dialog" aria-labelledby="journey-skill-title" onClose={() => setSelectedChapter(null)}>
-        {selectedChapter && <>
-          <div className="journey-skill-header">
-            <div>
-              <span className="journey-eyebrow">{selectedChapter.seriesTitle}</span>
-              <h2 id="journey-skill-title">{selectedChapter.title}</h2>
-              <p>How would you like to learn this story?</p>
+      <dialog
+        ref={skillDialogRef}
+        className="journey-skill-dialog"
+        aria-labelledby="journey-skill-title"
+        onClose={() => setSelectedChapter(null)}
+      >
+        {selectedChapter && (
+          <>
+            <div className="journey-skill-header">
+              <div>
+                <span className="journey-eyebrow">{selectedChapter.seriesTitle}</span>
+                <h2 id="journey-skill-title">{selectedChapter.title}</h2>
+                <p>{t('journey.dialog_question')}</p>
+              </div>
+              <button
+                type="button"
+                className="journey-skill-close"
+                aria-label={t('journey.dialog_close')}
+                onClick={() => setSelectedChapter(null)}
+              >
+                <X size={20} />
+              </button>
             </div>
-            <button type="button" className="journey-skill-close" aria-label="Close skill choices" onClick={() => setSelectedChapter(null)}><X size={20} /></button>
-          </div>
-          <div className="journey-skill-options">
-            <Link to={paths.reader({ story: selectedChapter.id, level: 'Level 2' })}>
-              <BookOpen size={24} aria-hidden="true" /><span><strong>Reading</strong><small>Read the bilingual story and check your understanding.</small></span><ArrowRight size={18} aria-hidden="true" />
-            </Link>
-            <Link to={paths.reader({ story: selectedChapter.id, level: 'Level 2', mode: 'practice', practice: 'dictation' })}>
-              <Headphones size={24} aria-hidden="true" /><span><strong>Listening</strong><small>Listen and write what you hear.</small></span><ArrowRight size={18} aria-hidden="true" />
-            </Link>
-            <div className="journey-skill-speaking" aria-label="Speaking practice">
-              <h3>Speaking</h3>
-              <p>Choose how you want to practise speaking.</p>
-              <Link to={paths.reader({ story: selectedChapter.id, level: 'Level 2', mode: 'practice', practice: 'shadowing' })}>
-                <Mic2 size={24} aria-hidden="true" /><span><strong>Shadowing</strong><small>Listen, repeat and record your voice.</small></span><ArrowRight size={18} aria-hidden="true" />
+            <div className="journey-skill-options">
+              <Link to={paths.reader({ story: selectedChapter.id, level: 'Level 2' })}>
+                <BookOpen size={24} aria-hidden="true" />
+                <span>
+                  <strong>{t('journey.skill_reading_title')}</strong>
+                  <small>{t('journey.skill_reading_desc')}</small>
+                </span>
+                <ArrowRight size={18} aria-hidden="true" />
               </Link>
-              <Link to={paths.aiWorkspace({ story: selectedChapter.id, level: 'Level 2' })}>
-                <Bot size={24} aria-hidden="true" /><span><strong>AI conversation</strong><small>Talk about this story with an AI agent. Typing is also available.</small></span><ArrowRight size={18} aria-hidden="true" />
+              <Link to={paths.reader({ story: selectedChapter.id, level: 'Level 2', mode: 'practice', practice: 'dictation' })}>
+                <Headphones size={24} aria-hidden="true" />
+                <span>
+                  <strong>{t('journey.skill_listening_title')}</strong>
+                  <small>{t('journey.skill_listening_desc')}</small>
+                </span>
+                <ArrowRight size={18} aria-hidden="true" />
               </Link>
+              <div className="journey-skill-speaking" aria-label={t('journey.skill_speaking_heading')}>
+                <h3>{t('journey.skill_speaking_heading')}</h3>
+                <p>{t('journey.skill_speaking_prompt')}</p>
+                <Link to={paths.reader({ story: selectedChapter.id, level: 'Level 2', mode: 'practice', practice: 'shadowing' })}>
+                  <Mic2 size={24} aria-hidden="true" />
+                  <span>
+                    <strong>{t('journey.skill_shadowing_title')}</strong>
+                    <small>{t('journey.skill_shadowing_desc')}</small>
+                  </span>
+                  <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+                <Link to={paths.aiWorkspace({ story: selectedChapter.id, level: 'Level 2' })}>
+                  <Bot size={24} aria-hidden="true" />
+                  <span>
+                    <strong>{t('journey.skill_ai_title')}</strong>
+                    <small>{t('journey.skill_ai_desc')}</small>
+                  </span>
+                  <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+              </div>
             </div>
-          </div>
-        </>}
+          </>
+        )}
       </dialog>
     </div>
   );

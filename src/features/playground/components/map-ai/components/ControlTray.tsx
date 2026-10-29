@@ -5,6 +5,7 @@
 
 import cn from 'classnames';
 import React, { memo, useEffect, useRef, useState, type FormEvent, type Ref } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   SlidersHorizontal,
   Play,
@@ -43,6 +44,7 @@ export type ControlTrayProps = {
 };
 
 export function ControlTray({ trayRef }: ControlTrayProps) {
+  const { t } = useTranslation('playground');
   const { speakerMuted, toggleSidebar } = useUI();
   const [textPrompt, setTextPrompt] = useState('');
   const handoffRevision = useReaderHandoff(state => state.draftRevision);

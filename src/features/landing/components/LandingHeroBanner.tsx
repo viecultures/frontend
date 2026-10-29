@@ -15,7 +15,7 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
   onNavigate,
   onScrollToDemo: _onScrollToDemo,
 }) => {
-  const { t } = useTranslation(['landing', 'common']);
+  const { t } = useTranslation('landing');
   const appNavigate = useAppNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const reducedMotion = useReducedMotion();
@@ -90,7 +90,7 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
           preload="auto"
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          aria-label="Atmospheric cultural video of Vietnamese heritage"
+          aria-label={t('hero.video_label', { defaultValue: 'Atmospheric cultural video of Vietnamese heritage' })}
           tabIndex={-1}
         >
           <source src={bannerVideo} type="video/mp4" />
@@ -110,9 +110,9 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
             ) : null}
 
             <h1 id="landing-title" className="landing-hero-headline">
-              {t('hero.title_part1', { defaultValue: 'Learn English, ' })}
+              {t('hero.title_part1', { defaultValue: 'Engrave words, ' })}
               <span className="landing-hero-accent">
-                {t('hero.title_accent', { defaultValue: 'Live Culture' })}
+                {t('hero.title_accent', { defaultValue: 'Preserve cultures.' })}
               </span>
             </h1>
 
@@ -149,8 +149,8 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
           type="button"
           className="landing-video-toggle focus-ring"
           onClick={toggleVideoPlayback}
-          aria-label={isPlaying ? 'Pause hero video' : 'Play hero video'}
-          title={isPlaying ? 'Pause video' : 'Play video'}
+          aria-label={isPlaying ? t('hero.video_pause', { defaultValue: 'Pause video' }) : t('hero.video_play', { defaultValue: 'Play video' })}
+          title={isPlaying ? t('hero.video_pause', { defaultValue: 'Pause video' }) : t('hero.video_play', { defaultValue: 'Play video' })}
         >
           {isPlaying ? (
             <Pause size={16} aria-hidden="true" />
