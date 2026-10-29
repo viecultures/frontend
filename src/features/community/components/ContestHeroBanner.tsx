@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Trophy, Coins, Gift, Medal, Clock, PenTool, ShoppingBag, Landmark, Flame } from "lucide-react";
+import { Trophy, Coins, Medal, Clock, PenTool, ShoppingBag, Landmark } from "lucide-react";
 
 interface ContestHeroBannerProps {
   onOpenForm: () => void;
@@ -33,24 +33,23 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
   }, []);
 
   return (
-    <section className="community-contest-hero mb-10 rounded-3xl bg-surface border border-antique-gold/40 shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden transition-all">
+    <section className="community-contest-hero mb-6 rounded-2xl bg-white border border-[#E8E2D5] shadow-[0_2px_8px_rgba(0,0,0,0.03)] overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
         {/* LEFT COLUMN (40% Width): Authentic Hue Imperial Photography */}
-        <div className="lg:col-span-5 relative min-h-[260px] lg:min-h-[360px] bg-heritage-green overflow-hidden group">
+        <div className="lg:col-span-4 relative min-h-[180px] lg:min-h-[260px] bg-[#1D5046] overflow-hidden group">
           <img
-            src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80"
+            src="/images/landing/hue-citadel.jpg"
             alt="Hue Imperial Citadel Gate"
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-[0.88]"
+            className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
           />
 
           {/* Gradient & Frame */}
           <div className="absolute inset-0 bg-gradient-to-t from-heritage-dark/85 via-transparent to-black/30" />
-          <div className="absolute inset-3 border border-antique-gold/35 rounded-2xl pointer-events-none" />
 
           {/* Top Label Tag */}
           <div className="absolute top-5 left-5 z-10">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-heritage-dark/90 text-antique-gold text-xs font-bold uppercase tracking-wider backdrop-blur-md border border-antique-gold/50 shadow-md">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1D5046] text-white text-xs font-semibold">
               <Trophy className="w-3.5 h-3.5 text-antique-rich fill-current" />
               <span>Week 14 challenge</span>
             </span>
@@ -58,7 +57,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
 
           {/* Location Caption on Image */}
           <div className="absolute bottom-5 left-5 z-10">
-            <span className="text-xs font-serif font-bold text-warm-ivory bg-heritage-dark/80 px-3.5 py-1.5 rounded-full backdrop-blur-md border border-antique-gold/30 shadow-sm flex items-center gap-1.5">
+            <span className="text-xs font-semibold text-white bg-[#1D5046]/90 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
               <Landmark className="w-3.5 h-3.5 text-antique-gold" />
               <span>Imperial Hue · Ngọ Môn Gate</span>
             </span>
@@ -66,41 +65,37 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
         </div>
 
         {/* RIGHT COLUMN (60% Width): Editorial Typography, Bold High-Contrast Clock & Actions */}
-        <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-5">
+        <div className="lg:col-span-8 p-5 sm:p-6 flex flex-col justify-between space-y-3.5">
           {/* Top Header Row with PROMINENT Countdown Badge */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-line">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-antique-gold/15 text-heritage-green text-xs font-bold border border-antique-gold/30 w-fit">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8E2D5]">
+            <span className="inline-flex items-center gap-1.5 text-[#1D5046] text-xs font-semibold w-fit">
               <Landmark className="w-3.5 h-3.5 text-antique-rich" />
               <span>Heritage spotlight</span>
             </span>
 
             {/* HIGH-CONTRAST GOLD/DARK COUNTDOWN BADGE (Nổi bật, không chìm) */}
-            <div className="community-countdown inline-flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-heritage-dark text-warm-ivory border-2 border-antique-gold/60 shadow-md w-fit self-start sm:self-auto">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-antique-gold">
-                <Clock className="w-3.5 h-3.5 text-antique-gold" />
-                <span className="uppercase tracking-wider text-[11px]">Closes in:</span>
+            <div className="community-countdown inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF7F0] text-[#314F49] border border-[#E8E2D5] w-fit self-start sm:self-auto">
+              <div className="flex items-center gap-1 text-xs font-semibold text-[#6E7B75]">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Preview timer:</span>
               </div>
 
               {/* Digital Bold Timer Numbers */}
               <div className="flex items-center gap-1 font-mono text-xs font-bold">
-                <div className="bg-black/50 px-2 py-0.5 rounded border border-antique-gold/40 text-warm-ivory flex items-baseline gap-0.5">
-                  <span className="text-sm font-bold text-antique-gold">{String(timeLeft.days).padStart(2, "0")}</span>
-                  <span className="text-[9px] font-sans text-sky-mist">d</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span>{String(timeLeft.days).padStart(2, "0")}</span><span>d</span>
                 </div>
-                <span className="text-antique-gold font-bold">:</span>
-                <div className="bg-black/50 px-2 py-0.5 rounded border border-antique-gold/40 text-warm-ivory flex items-baseline gap-0.5">
-                  <span className="text-sm font-bold text-antique-gold">{String(timeLeft.hours).padStart(2, "0")}</span>
-                  <span className="text-[9px] font-sans text-sky-mist">h</span>
+                <span>:</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span>{String(timeLeft.hours).padStart(2, "0")}</span><span>h</span>
                 </div>
-                <span className="text-antique-gold font-bold">:</span>
-                <div className="bg-black/50 px-2 py-0.5 rounded border border-antique-gold/40 text-warm-ivory flex items-baseline gap-0.5">
-                  <span className="text-sm font-bold text-antique-gold">{String(timeLeft.minutes).padStart(2, "0")}</span>
-                  <span className="text-[9px] font-sans text-sky-mist">m</span>
+                <span>:</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span>{String(timeLeft.minutes).padStart(2, "0")}</span><span>m</span>
                 </div>
-                <span className="text-antique-gold font-bold">:</span>
-                <div className="bg-black/50 px-2 py-0.5 rounded border border-antique-gold/40 text-warm-ivory flex items-baseline gap-0.5">
-                  <span className="text-sm font-bold text-amber-300">{String(timeLeft.seconds).padStart(2, "0")}</span>
-                  <span className="text-[9px] font-sans text-sky-mist">s</span>
+                <span>:</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span>{String(timeLeft.seconds).padStart(2, "0")}</span><span>s</span>
                 </div>
               </div>
             </div>
@@ -108,16 +103,16 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
 
           {/* Heading */}
           <div className="space-y-1">
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-heritage-green leading-snug">
+            <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#1D5046] leading-snug">
               Imperial Hue architecture & heritage
             </h2>
-            <p className="text-xs sm:text-sm text-text-secondary font-sans font-medium">
+            <p className="text-xs sm:text-sm text-[#6E7B75]">
               Imperial Hue Architecture & Heritage Essay Challenge
             </p>
           </div>
 
           {/* Prompt & Required Vocab Box */}
-          <div className="p-4 rounded-2xl bg-rice-paper/70 border border-line space-y-2.5">
+          <div className="p-3.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-2.5">
             <p className="text-xs sm:text-sm text-text-body leading-relaxed">
               Write a short reflection (100–300 words) in English about the architecture or your memories of Imperial Hue. Use at least three heritage vocabulary words:
             </p>
@@ -139,7 +134,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
           </div>
 
           {/* Prize Row & Actions */}
-          <div className="space-y-4 pt-1">
+          <div className="space-y-3 pt-1">
             {/* Prize summary */}
             <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
               <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-800 border border-emerald-500/20 flex items-center gap-1.5">
@@ -160,7 +155,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
                 onClick={onOpenForm}
-                className="px-6 py-3 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm border border-antique-gold/60 inline-flex items-center gap-2 transition-all focus-ring cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] border border-[#1D5046] inline-flex items-center gap-2 transition-colors focus-ring cursor-pointer"
               >
                 <PenTool className="w-4 h-4 text-antique-gold" />
                 <span>Write an entry (+100 coins)</span>
@@ -168,7 +163,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
 
               <a
                 href="#gamification-shop"
-                className="px-5 py-3 rounded-full text-xs font-semibold text-heritage-green bg-rice-paper hover:bg-mist-cloud border border-line inline-flex items-center gap-1.5 transition-all focus-ring"
+                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-[#1D5046] bg-[#FAF7F0] hover:bg-white border border-[#E8E2D5] inline-flex items-center gap-1.5 transition-colors focus-ring"
               >
                 <ShoppingBag className="w-3.5 h-3.5 text-antique-gold" />
                 <span>Reward shop</span>

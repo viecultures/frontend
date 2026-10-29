@@ -10,7 +10,7 @@ export const DiscoveryHeroQuoteBanner: React.FC = () => {
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-heritage-green/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-2xl mx-auto relative z-10 space-y-3">
-        {/* Cultural Sparkle Emblem */}
+        {/* Reading emblem */}
         <div className="w-10 h-10 rounded-2xl bg-heritage-green border border-antique-gold/50 flex items-center justify-center mx-auto shadow-sm">
           <BookOpen className="w-5 h-5 text-antique-gold" />
         </div>

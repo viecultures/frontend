@@ -229,7 +229,7 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
                 </span>
               </div>
 
-              {/* Sparkle badge */}
+              {/* Achievement badge */}
               <div className="absolute -top-1 -right-1 bg-amber-400 text-stone-900 rounded-full p-1 shadow-md animate-bounce">
                 <Award className="w-4 h-4" />
               </div>

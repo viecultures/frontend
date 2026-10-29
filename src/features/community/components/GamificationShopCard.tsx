@@ -40,7 +40,7 @@ export function GamificationShopCard({
   return (
     <div
       id="gamification-shop"
-      className="p-6 rounded-3xl bg-surface border border-line space-y-5 shadow-sm"
+      className="p-5 rounded-2xl bg-white border border-[#E8E2D5] space-y-3.5 shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
     >
       <div className="flex items-center justify-between pb-3 border-b border-line">
         <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
@@ -61,7 +61,7 @@ export function GamificationShopCard({
           return (
             <div
               key={item.id}
-              className="p-3.5 rounded-2xl bg-rice-paper/60 border border-line space-y-2 hover:bg-rice-paper transition-colors"
+              className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-2 hover:bg-white transition-colors"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
@@ -81,7 +81,7 @@ export function GamificationShopCard({
                 <button
                   aria-label={`Redeem ${communityLabel(item.name)} for ${item.cost} coins`}
                   onClick={() => onRedeem(item.name, item.cost)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1 shrink-0 cursor-pointer focus-ring ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1 shrink-0 cursor-pointer focus-ring ${
                     canAfford
                       ? "bg-heritage-green text-warm-ivory hover:bg-heritage-dark shadow-sm"
                       : "bg-surface text-text-secondary border border-line hover:bg-mist-cloud"
