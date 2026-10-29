@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import '../flashcard-study.css';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -41,6 +42,7 @@ import { Award, Flame } from 'lucide-react';
  * Leitner queue re-insertion, EC-04.1 cognitive fatigue prevention, and offline progress sync.
  */
 export const FlashcardsPage: React.FC = () => {
+  const { t } = useTranslation('flashcards');
   const [searchParams] = useSearchParams();
   const deckId = searchParams.get('deck') || 'imperial-hue';
   const level = searchParams.get('level') || 'Level 1';

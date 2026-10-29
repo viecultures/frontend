@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import '../flashcard-study.css';
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -16,6 +17,7 @@ import { PATHS, paths } from '@/routes/paths';
 interface FlashcardStudyPlayerProps { deck: StudyDeck; level: string; savedOnly: boolean; }
 
 function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerProps) {
+  const { t } = useTranslation('flashcards');
   const { earnReward, stats } = useGamification();
   const [reward, setReward] = useState<RewardCelebrationPayload | null>(null);
   const [cards] = useState(() => {

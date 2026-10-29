@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import {
   CheckCircle2,
@@ -29,15 +30,9 @@ interface FlashcardSessionSummaryProps {
 }
 
 export function FlashcardSessionSummary({
-  deck,
-  session,
-  level,
-  onRestart,
-  reward,
-  totalXP,
-  totalCoins,
-  savedOnly,
-}: FlashcardSessionSummaryProps) {
+  deck, session, level, onRestart, reward, totalXP, totalCoins, savedOnly, }: FlashcardSessionSummaryProps) {
+  const { t } = useTranslation('flashcards');
+  
   const navigate = useAppNavigate();
   const [isWordListOpen, setIsWordListOpen] = useState(false);
 
@@ -68,7 +63,7 @@ export function FlashcardSessionSummary({
   return (
     <section
       className="vocab-session-summary max-w-2xl max-h-full overflow-y-auto mx-auto rounded-3xl bg-surface border border-line p-6 sm:p-8 shadow-sm space-y-6 text-center"
-      aria-label="Review summary"
+      aria-label={t('summary.aria_label', 'Review summary')}
     >
       {/* 1. Mascot & Header */}
       <div className="flex flex-col items-center justify-center space-y-3">
@@ -76,7 +71,7 @@ export function FlashcardSessionSummary({
           <div className="relative w-16 h-16 rounded-full border border-antique-gold/60 p-1 bg-surface-raised shadow-xs overflow-hidden">
             <img
               src="/brand/viecultures-mascot-logo.png"
-              alt="VieCultures mascot"
+              alt={t('summary.mascot_alt', 'VieCultures mascot')}
               className="w-full h-full object-cover rounded-full"
             />
           </div>
@@ -88,7 +83,7 @@ export function FlashcardSessionSummary({
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-soft text-accent-ink text-xs font-medium">
             <Trophy className="w-3.5 h-3.5 text-accent-ink" />
-            <span>Review complete</span>
+            <span>{t('summary.session_completed', 'Review complete')}</span>
           </div>
           <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-ink tracking-tight pt-1">
             {deck.lesson.vietnameseTitle}
@@ -265,7 +260,7 @@ export function FlashcardSessionSummary({
           onClick={onRestart}
         >
           <RotateCcw className="w-4 h-4" />
-          <span>Review this deck again</span>
+          <span>{t('summary.btn_study_again', 'Review deck again')}</span>
         </button>
         <button
           type="button"
@@ -273,7 +268,7 @@ export function FlashcardSessionSummary({
           onClick={() => navigate(PATHS.home)}
         >
           <Home className="w-4 h-4" />
-          <span>Back to study room</span>
+          <span>{t('summary.btn_back_home', 'Back to home')}</span>
         </button>
       </div>
     </section>

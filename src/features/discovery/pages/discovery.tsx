@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Search, SlidersHorizontal, X } from 'lucide-react';
@@ -15,6 +16,7 @@ import '../journey.css';
 const PAGE_SIZE = 6;
 
 export default function DiscoveryPage() {
+  const { t } = useTranslation('discovery');
   const [params, setParams] = useSearchParams();
   const journey = params.get('view') !== 'stories';
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_FILTERS);

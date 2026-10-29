@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useLayoutEffect, useState, useRef, useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -57,6 +58,7 @@ interface SelectedChapter {
 }
 
 export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
+  const { t } = useTranslation('discovery');
   const mapPanelRef = useRef<HTMLElement>(null);
   const [mapPanelHeight, setMapPanelHeight] = useState<number | null>(null);
   const [carouselHovered, setCarouselHovered] = useState(false);

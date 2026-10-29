@@ -1,0 +1,175 @@
+{
+  "pricing": {
+    "back_to_previous": "Quay lại trang trước",
+    "badge": "Bảng Giá & Đặc Quyền Hội Viên",
+    "title": "Nâng Tầm Tiếng Anh Cùng Di Sản Việt",
+    "subtitle": "Lựa chọn gói đồng hành phù hợp để mở khóa toàn diện kho bài đọc 63 tỉnh thành và đàm đạo không giới hạn cùng trợ lý văn hóa AI.",
+    "billing_cycle": {
+      "monthly": "Gói Hàng Tháng",
+      "yearly": "Gói 1 Năm",
+      "discount_badge": "-20%"
+    },
+    "free_plan": {
+      "badge": "Gói Khởi Điểm",
+      "name": "Bản Miễn Phí (Free)",
+      "description": "Dành cho người mới bắt đầu làm quen với phương pháp đọc song ngữ.",
+      "price": "0 VNĐ",
+      "period": "Miễn phí vĩnh viễn",
+      "current_plan": "Gói Hiện Tại Của Bạn",
+      "basic_plan": "Gói Cơ Bản",
+      "features": {
+        "ai_chat": "3 lượt đàm thoại AI/ngày (3 AI chat turns/day)",
+        "vocabulary_save": "1-Click Save lưu từ vựng kèm ngữ cảnh câu (tối đa 30 từ)",
+        "sample_articles": "15 bài đọc di sản văn hóa mẫu cơ bản",
+        "audio_speed": "Audio Shadowing tốc độ chuẩn (1x)",
+        "no_mascot_feedback": "Không nhận xét cá nhân hóa từ Mascot di sản",
+        "has_ads": "Kèm banner quảng cáo chân trang"
+      }
+    },
+    "pro_plan": {
+      "best_value": "Được Khuyên Dùng Nhất",
+      "badge": "Trải Nghiệm Toàn Diện",
+      "name": "Hội Viên Di Sản Pro",
+      "description": "Mở khóa trọn vẹn sức mạnh học tiếng Anh qua văn hóa và đàm thoại AI chuyên sâu.",
+      "monthly_price": "39.000 VNĐ",
+      "yearly_price": "375.000 VNĐ",
+      "monthly_period": "Thanh toán mỗi tháng",
+      "yearly_period": "Tiết kiệm ~2 tháng học",
+      "upgrade_cta": "Nâng Cấp Gói Pro Ngay (39.000đ)",
+      "already_pro": "Bạn Đang Là Hội Viên Pro",
+      "features": {
+        "ai_companion": "Đàm đạo sâu cùng AI Cultural Companion: Trò chuyện không giới hạn bằng tiếng Anh, dỡ bỏ hoàn toàn giới hạn 3 lượt/ngày.",
+        "mascot_feedback": "Nhận xét & phản hồi cá nhân hóa từ Mascot di sản: Đánh giá phát âm, vốn từ và gợi ý phát triển phản xạ theo ngữ cảnh văn hóa.",
+        "all_provinces": "Mở khóa trọn bộ 63 tỉnh thành: Tiếp cận toàn bộ kho tàng danh lam, phong tục và di sản phi vật thể UNESCO.",
+        "audio_speeds": "Đầy đủ 3 dải tốc độ audio (0.5x, 0.8x, 1x): Google Gemini Real Audio đọc tự nhiên như người bản xứ.",
+        "unlimited_vocab": "Không giới hạn 1-Click Save & Sổ tay từ vựng: Lưu và đồng bộ tiến trình học tập vĩnh viễn trên đám mây.",
+        "no_ads": "100% Không quảng cáo & Nhận Huy Hiệu Pro."
+      }
+    },
+    "comparison_table": {
+      "title": "Bảng So Sánh Quyền Lợi Chi Tiết",
+      "subtitle": "Đối chiếu minh bạch theo chuẩn kiến trúc hệ thống VieCultures",
+      "feature_col": "Tính Năng / Đặc Quyền",
+      "free_col": "Bản Miễn Phí (Free)",
+      "pro_col": "Hội Viên Pro (39k)",
+      "rows": {
+        "ai_chat": {
+          "label": "Trò chuyện chuyên sâu với AI Cultural Companion",
+          "free": "3 lượt / ngày (3 turns/day)",
+          "pro": "Không giới hạn (Unlimited)"
+        },
+        "mascot": {
+          "label": "Nhận xét & phản hồi cá nhân hóa từ Mascot di sản",
+          "free": "Mẫu cơ bản mặc định",
+          "pro": "Cá nhân hóa chuyên sâu"
+        },
+        "vocab": {
+          "label": "1-Click Save lưu từ vựng kèm ngữ cảnh câu",
+          "free": "Tối đa 30 từ",
+          "pro": "Không giới hạn"
+        },
+        "content": {
+          "label": "Kho bài đọc song ngữ 3 miền",
+          "free": "15 bài mẫu cơ bản",
+          "pro": "Trọn vẹn 63 tỉnh thành"
+        },
+        "audio": {
+          "label": "Tốc độ audio & Giọng đọc Gemini",
+          "free": "Chỉ 1x",
+          "pro": "0.5x, 0.8x, 1x (Gemini Voices)"
+        },
+        "cloud_sync": {
+          "label": "Lưu trữ Mộc Son & Daily Streak lên đám mây",
+          "free": "Lưu tạm Local",
+          "pro": "Đồng bộ vĩnh viễn"
+        },
+        "ads": {
+          "label": "Quảng cáo hiển thị",
+          "free": "Có banner",
+          "pro": "100% Không quảng cáo"
+        }
+      }
+    }
+  },
+  "checkout": {
+    "back_to_pricing": "Quay lại Bảng Giá",
+    "badge": "Thanh Toán Đăng Ký Gói Pro",
+    "title": "Xác Nhận Nâng Cấp Hội Viên Di Sản",
+    "subtitle": "Quét mã VietQR chuyển khoản nhanh 24/7 để mở khóa đàm thoại không giới hạn cùng trợ lý AI và trọn vẹn 63 tỉnh thành.",
+    "success": {
+      "badge": "GIAO DỊCH THÀNH CÔNG • PRO ACTIVATED",
+      "title": "Chào Mừng Bạn Đến Với Gói Pro!",
+      "message": "Tài khoản {{name}} đã được nâng cấp lên Hội Viên Di Sản Pro thành công. Giới hạn 3 lượt/ngày của trợ lý AI đã được dỡ bỏ hoàn toàn.",
+      "default_member": "Hội viên",
+      "perks": {
+        "companion_title": "AI Companion",
+        "companion_desc": "Đàm thoại không giới hạn, không còn rate limit.",
+        "content_title": "Kho Bài Đọc",
+        "content_desc": "Mở khóa trọn bộ 63 tỉnh thành & di sản 3 miền.",
+        "audio_title": "Âm Thanh & Từ Vựng",
+        "audio_desc": "Đủ 3 tốc độ (0.5x, 0.8x, 1x) & sổ tay không giới hạn."
+      },
+      "cta_reader": "Vào Bài Đọc & Đàm Đạo AI Ngay",
+      "cta_discovery": "Khám Phá Bản Đồ 63 Tỉnh",
+      "cta_home": "Về Trang Chủ"
+    },
+    "order_summary": {
+      "title": "ĐƠN HÀNG CỦA BẠN",
+      "plan_name": "Gói Hội Viên Di Sản Pro",
+      "billing_cycle": "Chu kỳ thanh toán: 1 Tháng (Tự động kích hoạt)",
+      "list_price_label": "Giá niêm yết:",
+      "list_price": "69.000 VNĐ",
+      "discount_label": "Ưu đãi Checkpoint 4 (EXE101):",
+      "discount_val": "-30.000 VNĐ",
+      "total_label": "Tổng thanh toán:",
+      "total_val": "39.000 VNĐ",
+      "unlocked_perks_label": "Đặc quyền được mở khóa ngay:",
+      "perks": {
+        "ai_unlimited": "Không giới hạn lượt đàm thoại cùng AI Cultural Companion (Dỡ bỏ hạn mức 3 lượt/ngày)",
+        "mascot_feedback": "Nhận xét cá nhân hóa từ Mascot di sản",
+        "all_provinces": "Mở khóa toàn bộ 63 tỉnh thành bài đọc di sản",
+        "all_speeds": "Đủ 3 tốc độ audio (0.5x, 0.8x, 1x) Google Gemini Real Audio",
+        "no_ads": "100% Không có banner quảng cáo"
+      },
+      "security_note": "Bảo mật giao dịch chuyển khoản VietQR theo tiêu chuẩn Ngân Hàng Nhà Nước."
+    },
+    "gateway": {
+      "badge": "CỔNG THANH TOÁN VIETQR",
+      "title": "Quét Mã Để Kích Hoạt Tức Thì",
+      "validity": "Hiệu lực:",
+      "methods": {
+        "bank": "VietQR / MB Bank",
+        "momo": "Ví Điện Tử MoMo"
+      },
+      "auto_recording": "Cổng Tự Động Ghi Nhận Chuyển Khoản",
+      "bank_title": "VietQR MB Bank 24/7",
+      "momo_title": "Ví MoMo Chuyển Tiền",
+      "qr_alt": "Mã thanh toán VietQR gói Pro",
+      "loading_qr": "Đang tải mã VietQR...",
+      "qr_expired": "Mã QR đã hết hiệu lực",
+      "generate_new_qr": "Tạo mã mới",
+      "scan_hint": "Quét bằng App Ngân Hàng",
+      "account_details": {
+        "bank_name_label": "Ngân hàng thụ hưởng:",
+        "bank_name": "MB Bank (Quân Đội)",
+        "account_num_label": "Số tài khoản:",
+        "account_num": "0388912345",
+        "copy_account": "Sao chép số tài khoản",
+        "recipient_name_label": "Tên người nhận:",
+        "recipient_name": "CONG TY CO PHAN VIECULTURES",
+        "amount_label": "Số tiền:",
+        "amount_val": "39.000 VNĐ",
+        "copy_amount": "Sao chép số tiền",
+        "memo_label": "Nội dung chuyển khoản:",
+        "copy_memo": "Sao chép nội dung chuyển khoản"
+      },
+      "connecting_webhook": "Đang kết nối cổng thanh toán VietQR & lắng nghe Webhook...",
+      "received_balance": "Đã nhận biến động số dư (+39.000 VNĐ)! Đang nâng cấp tài khoản Pro...",
+      "verifying_system": "Đang kiểm tra giao dịch chuyển khoản trên hệ thống...",
+      "simulate_btn": "Mô Phỏng Chuyển Khoản Tức Thì (Simulate Instant Transfer)",
+      "confirm_btn": "Xác Nhận Đã Thanh Toán Xong (Thủ Công)",
+      "test_hint": "Nút Mô Phỏng: Giúp hội đồng & giảng viên kiểm thử luồng thanh toán tức thì mà không cần chuyển tiền thật.",
+      "auto_sync_hint": "Hệ thống tự động đồng bộ quyền hạn Hội Viên Pro ngay khi giao dịch thành công."
+    }
+  }
+}

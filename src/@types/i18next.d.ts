@@ -6,6 +6,8 @@ import type viHome from '../locales/vi/home.json';
 import type viReader from '../locales/vi/reader.json';
 import type viFlashcards from '../locales/vi/flashcards.json';
 import type viDiscovery from '../locales/vi/discovery.json';
+import type viSubscription from '../locales/vi/subscription.json';
+import type viAdmin from '../locales/vi/admin.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -18,6 +20,8 @@ declare module 'i18next' {
       reader: typeof viReader;
       flashcards: typeof viFlashcards;
       discovery: typeof viDiscovery;
+      subscription: typeof viSubscription;
+      admin: typeof viAdmin;
     };
   }
 }

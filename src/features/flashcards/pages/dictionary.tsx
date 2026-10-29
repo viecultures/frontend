@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useRef } from "react";
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
@@ -21,6 +22,7 @@ const CATEGORY_OPTIONS = [
 ];
 
 export default function DictionaryPage() {
+  const { t } = useTranslation('flashcards');
   const navigate = useAppNavigate();
   const libraryRef = useRef<HTMLElement>(null);
   const [sortOrder, setSortOrder] = useState("default");

@@ -1,0 +1,85 @@
+{
+  "header": {
+    "badge": "VieCultures · Administration",
+    "title": "Content & Administration",
+    "subtitle": "Manage cultural articles, account access, and learning content in one place.",
+    "refresh_articles": "Refresh",
+    "new_article": "New article",
+    "admin_access": "Administrator access",
+    "refresh_overview": "Refresh overview"
+  },
+  "tabs": {
+    "posts": "Articles",
+    "users": "Users",
+    "overview": "Overview"
+  },
+  "stats": {
+    "articles_in_view": "Articles in view",
+    "articles_desc": "Articles in the current selection",
+    "article_reads": "Article reads",
+    "reads_desc": "Reads for the current selection",
+    "regions_represented": "Regions represented",
+    "regions_desc": "Locations in this selection",
+    "cefr_coverage": "CEFR coverage",
+    "cefr_desc": "Reading levels represented",
+    "registered_users": "Registered users",
+    "users_desc": "Learner and administrator accounts",
+    "avg_reads": "Average reads per article",
+    "avg_reads_desc": "Reads across the current selection",
+    "by_cefr_level": "Articles by CEFR level",
+    "by_region": "Articles by region",
+    "articles_count": "{{count}} articles ({{pct}}%)",
+    "no_region_data": "No regional data yet."
+  },
+  "filters": {
+    "search_placeholder": "Search titles, story groups or keywords…",
+    "search_button": "Search",
+    "all_levels": "All CEFR levels",
+    "level_option": "Level {{level}}",
+    "all_regions": "All regions",
+    "clear_filters": "Clear filters"
+  },
+  "posts_table": {
+    "loading": "Loading articles…",
+    "unavailable_title": "Articles unavailable",
+    "unavailable_desc": "We could not load the article list. Please try again.",
+    "empty_title": "No articles found",
+    "empty_desc": "Create your first article, import a TSV row or adjust your filters.",
+    "try_again": "Try again",
+    "create_article": "Create an article",
+    "col_title": "Article / story group",
+    "col_region": "Region",
+    "col_level": "Level",
+    "col_category": "Category",
+    "col_content": "Content",
+    "col_reads": "Reads",
+    "col_actions": "Actions",
+    "words_count": "{{count}} words",
+    "paragraph_pairs": "{{count}} paragraph pairs",
+    "no_paragraphs": "No paragraph pairs",
+    "vocab_items": "{{count}} vocabulary items",
+    "preview_action": "Preview article",
+    "edit_action": "Edit article",
+    "delete_action": "Delete article"
+  },
+  "preview_dialog": {
+    "title": "Article preview",
+    "close": "Close preview",
+    "bilingual_content": "Bilingual content ({{count}} paragraph pairs)",
+    "no_content": "No article content yet.",
+    "vocabulary": "Vocabulary ({{count}} items)"
+  },
+  "delete_dialog": {
+    "title": "Delete article",
+    "heading": "Delete this article?",
+    "warning": "This permanently deletes the article, its paragraph pairs and linked vocabulary. This cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete article"
+  },
+  "messages": {
+    "load_error": "Unable to load articles. Please try again.",
+    "delete_error": "Unable to delete the article.",
+    "post_deleted": "Article deleted.",
+    "post_saved": "Article saved."
+  }
+}
