@@ -8,12 +8,6 @@ interface CompanionFloatingButtonProps {
   isOpen: boolean;
 }
 
-const Sparkle: React.FC<{ className: string; fill: string }> = ({ className, fill }) => (
-  <svg viewBox="0 0 10 10" className={className} aria-hidden="true">
-    <path d="M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z" fill={fill} />
-  </svg>
-);
-
 const INTRO_SEEN_KEY = 'vc-companion-intro-seen';
 
 const readIntroSeen = (): boolean => {
@@ -82,12 +76,6 @@ export const CompanionFloatingButton: React.FC<CompanionFloatingButtonProps> = (
         >
           <ForestSpirit className={isOpen ? 'h-[52px] w-[52px]' : 'h-16 w-16'} />
         </span>
-        {!isOpen && (
-          <>
-            <Sparkle className="vc-sparkle absolute -left-1 top-1 h-3 w-3" fill="#f6d77a" />
-            <Sparkle className="vc-sparkle absolute -right-0.5 top-0 h-2 w-2 [animation-delay:1.3s]" fill="#ffffff" />
-          </>
-        )}
       </span>
     </button>
   </>

@@ -1,6 +1,4 @@
 export { AudioShadowingBar } from "./audio-shadowing-bar";
-export { StickyAudioPlayer } from "./StickyAudioPlayer";
-export { BilingualParagraphPairList } from "./BilingualParagraphPairList";
 export { BilingualReaderView } from "./bilingual-reader-view";
 export { ExtensiveReaderView } from "./extensive-reader-view";
 export { ReaderPracticeView } from './practice/ReaderPracticeView';

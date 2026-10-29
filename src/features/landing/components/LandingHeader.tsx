@@ -51,6 +51,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
     { name: t('navigation.topics', { defaultValue: 'Topics' }), segment: 'topics' },
     { name: t('navigation.heritage_map', { defaultValue: 'Heritage Map' }), segment: 'ban-do-di-san' },
     { name: t('navigation.how_it_works', { defaultValue: 'How It Works' }), segment: 'methodology' },
+    { name: t('navigation.plans', { defaultValue: 'Plans' }), segment: 'plans' },
     { name: t('navigation.contact', { defaultValue: 'Contact' }), segment: 'contact' },
   ];
 

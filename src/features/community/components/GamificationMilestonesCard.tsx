@@ -2,7 +2,7 @@ import { Award, Coins, CheckCircle2, CircleDashed, PenTool, Heart, Flame, Medal 
 
 export function GamificationMilestonesCard() {
   return (
-    <div className="p-6 rounded-3xl bg-surface border border-line space-y-4 shadow-sm">
+    <div className="p-5 rounded-2xl bg-white border border-[#E8E2D5] space-y-3.5 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
       <div className="flex items-center justify-between pb-2 border-b border-line">
         <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
           <Award className="w-4 h-4 text-antique-gold" />
@@ -12,7 +12,7 @@ export function GamificationMilestonesCard() {
       </div>
 
       <ul className="text-xs space-y-3.5">
-        <li className="p-3 rounded-2xl bg-rice-paper/50 border border-line space-y-1.5">
+        <li className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="font-bold text-heritage-green flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -28,7 +28,7 @@ export function GamificationMilestonesCard() {
           </div>
         </li>
 
-        <li className="p-3 rounded-2xl bg-rice-paper/50 border border-line space-y-1.5">
+        <li className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="font-bold text-heritage-green flex items-center gap-1.5">
               <CircleDashed className="w-4 h-4 text-antique-gold" />
@@ -44,7 +44,7 @@ export function GamificationMilestonesCard() {
           </div>
         </li>
 
-        <li className="p-3 rounded-2xl bg-rice-paper/50 border border-line space-y-1.5">
+        <li className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="font-bold text-heritage-green flex items-center gap-1.5">
               <CircleDashed className="w-4 h-4 text-antique-gold" />

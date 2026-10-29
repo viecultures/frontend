@@ -4,6 +4,7 @@
     "topics": "Topics",
     "heritage_map": "Heritage Map",
     "how_it_works": "How It Works",
+    "plans": "Plans",
     "contact": "Contact",
     "study_room": "Study Room",
     "sign_in": "Sign In",
@@ -12,9 +13,9 @@
   },
   "hero": {
     "tag": "Vietnamese Heritage & Language",
-    "title": "Learn English, Live Culture",
-    "title_part1": "Learn English, ",
-    "title_accent": "Live Culture",
+    "title": "Engrave words, Preserve cultures.",
+    "title_part1": "Engrave words, ",
+    "title_accent": "Preserve cultures.",
     "subtitle": "Discover Vietnam through authentic stories, bilingual reading, and immersive listening",
     "cta_start": "Start Learning",
     "cta_explore": "Explore Stories"
