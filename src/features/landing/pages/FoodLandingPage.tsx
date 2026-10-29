@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react';
 import { ArrowDown, BookOpen, Bookmark, Headphones, Menu, Pause, Play, RotateCcw, X, ArrowRight } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { getPublishedSeries } from '@/data/series';
 import type { SeriesMetadata } from '@/data/series/types';
 import { PATHS, paths, withQuery } from '@/routes/paths';

@@ -1,0 +1,50 @@
+{
+  "app_name": "VieCultures",
+  "navbar": {
+    "home": "Trang chủ",
+    "courses": "Khóa học",
+    "culture": "Văn hóa",
+    "community": "Cộng đồng",
+    "leaderboard": "Bảng xếp hạng",
+    "library": "Thư viện",
+    "dictionary": "Từ điển",
+    "practice": "Luyện tập",
+    "ai_assistant": "Trợ lý AI",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "admin": "Quản trị"
+  },
+  "buttons": {
+    "back": "Quay lại",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "loading": "Đang tải...",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "confirm": "Xác nhận",
+    "submit": "Gửi",
+    "close": "Đóng",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "search": "Tìm kiếm",
+    "continue": "Tiếp tục",
+    "retry": "Thử lại",
+    "lang_vi": "Tiếng Việt",
+    "lang_en": "English"
+  },
+  "footer": {
+    "about": "Về chúng tôi",
+    "terms": "Điều khoản dịch vụ",
+    "privacy": "Chính sách bảo mật",
+    "contact": "Liên hệ",
+    "rights_reserved": "Mọi quyền được bảo lưu.",
+    "slogan": "Khám phá và tôn vinh văn hóa Việt Nam."
+  },
+  "status": {
+    "loading": "Đang tải dữ liệu...",
+    "success": "Thành công",
+    "error": "Đã xảy ra lỗi",
+    "empty": "Không có dữ liệu"
+  }
+}

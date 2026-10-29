@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { PATHS } from '@/routes/paths';
 import { getStoredUser, getStoredToken } from '@/utils/auth-storage';
 
@@ -93,6 +94,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
         </nav>
 
         <div className="landing-header-actions">
+          <LanguageSwitcher />
 
           {isLoggedIn ? (
             <button
@@ -140,6 +142,10 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
           className="landing-mobile-nav landing-container"
           aria-label="Mobile navigation"
         >
+          <div className="flex items-center justify-between py-2 border-b border-line mb-1">
+            <span className="text-xs font-medium text-ink-soft">Language</span>
+            <LanguageSwitcher />
+          </div>
           {navLinks.map((link) => (
             <button
               key={link.segment}
