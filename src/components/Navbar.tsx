@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Menu, Settings, User, X } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { ProfileDropdown } from './ProfileDropdown';
+import { LanguageSwitcher } from './common/LanguageSwitcher';
 import { PATHS } from '@/routes/paths';
 import type { AppUser } from '@/utils/auth-storage';
 
@@ -37,6 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {navigation.map(item => <Link key={item.path} to={item.path} onClick={() => setIsMenuOpen(false)} aria-current={item.active.includes(activeView) ? 'page' : undefined}>{item.label}</Link>)}
       </nav>
       <div className="vc-navbar-actions">
+        <LanguageSwitcher variant="compact" />
         {onOpenSettings && <button type="button" className="vc-navbar-icon" onClick={onOpenSettings} aria-label="Room settings" title="Room settings"><Settings size={19} /></button>}
         {isLoggedIn ? <div className="vc-navbar-profile">
           <button type="button" className="vc-navbar-avatar" onClick={() => setIsProfileOpen(value => !value)} aria-label="Account menu" aria-expanded={isProfileOpen} aria-haspopup="menu">

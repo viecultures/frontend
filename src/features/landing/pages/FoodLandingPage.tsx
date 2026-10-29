@@ -79,6 +79,7 @@ const FoodLandingPage: React.FC = () => {
             {navItems.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
           </nav>
           <div className="food-header-actions">
+            <LanguageSwitcher />
             <button type="button" className="food-motion-toggle" onClick={() => setMotionOn((on) => !on)} aria-label={canAnimate ? 'Pause page motion' : 'Enable page motion'} title={canAnimate ? 'Pause page motion' : 'Enable page motion'} disabled={!!reducedMotion}>
               {canAnimate ? <Pause size={17} aria-hidden="true" /> : <Play size={17} aria-hidden="true" />}
             </button>
