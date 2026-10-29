@@ -1,4 +1,5 @@
 import { Target, Headphones, Flame, Trophy } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { PlayerMode } from "./FlashcardModeTabs";
 
 interface FlashcardPracticeModesGridProps {
@@ -12,6 +13,8 @@ export function FlashcardPracticeModesGrid({
   onSelectQuiz,
   onSelectListening,
 }: FlashcardPracticeModesGridProps) {
+  const { t } = useTranslation('flashcards');
+
   return (
     <div className="pt-8 space-y-4 border-t border-line">
       <div className="space-y-4">
@@ -19,11 +22,11 @@ export function FlashcardPracticeModesGrid({
           <div className="flex items-center gap-2">
             <Target className="w-4 h-4 text-antique-gold" />
             <span className="text-xs font-bold uppercase tracking-widest text-heritage-green">
-              CHẾ ĐỘ LUYỆN TẬP BỔ TRỢ
+              {t('practice_modes.heading', 'CHẾ ĐỘ LUYỆN TẬP BỔ TRỢ')}
             </span>
           </div>
           <span className="text-[11px] text-text-secondary font-medium">
-            Chọn hình thức để tối ưu khả năng ghi nhớ dài hạn
+            {t('practice_modes.subheading', 'Chọn hình thức để tối ưu khả năng ghi nhớ dài hạn')}
           </span>
         </div>
 
@@ -41,9 +44,9 @@ export function FlashcardPracticeModesGrid({
               <Target className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-extrabold text-sm sm:text-base">Quiz 4 Lựa Chọn</h4>
+              <h4 className="font-extrabold text-sm sm:text-base">{t('practice_modes.quiz_title', 'Quiz 4 Lựa Chọn')}</h4>
               <p className="text-[11px] text-amber-100 font-medium">
-                Phản xạ nghĩa từ tốc độ
+                {t('practice_modes.quiz_desc', 'Phản xạ nghĩa từ tốc độ')}
               </p>
             </div>
           </div>
@@ -61,9 +64,9 @@ export function FlashcardPracticeModesGrid({
               <Headphones className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-extrabold text-sm sm:text-base">Listening & Spelling</h4>
+              <h4 className="font-extrabold text-sm sm:text-base">{t('practice_modes.listening_title', 'Listening & Spelling')}</h4>
               <p className="text-[11px] text-emerald-100 font-medium">
-                Nghe và gõ lại chuẩn xác
+                {t('practice_modes.listening_desc', 'Nghe và gõ lại chuẩn xác')}
               </p>
             </div>
           </div>
@@ -74,9 +77,9 @@ export function FlashcardPracticeModesGrid({
               <Flame className="w-6 h-6 text-amber-600" />
             </div>
             <div>
-              <h4 className="font-extrabold text-sm sm:text-base">Thuật Toán SRS</h4>
+              <h4 className="font-extrabold text-sm sm:text-base">{t('practice_modes.srs_title', 'Thuật Toán SRS')}</h4>
               <p className="text-[11px] text-indigo-100 font-medium">
-                Tự động giãn cách ôn tập
+                {t('practice_modes.srs_desc', 'Tự động giãn cách ôn tập')}
               </p>
             </div>
           </div>
@@ -87,9 +90,9 @@ export function FlashcardPracticeModesGrid({
               <Trophy className="w-6 h-6 text-heritage-dark" />
             </div>
             <div>
-              <h4 className="font-extrabold text-sm sm:text-base">Tích Xu Học Tập</h4>
+              <h4 className="font-extrabold text-sm sm:text-base">{t('practice_modes.rewards_title', 'Tích Xu Học Tập')}</h4>
               <p className="text-[11px] text-sky-mist font-medium">
-                Nhận Xu Văn Hóa khi hoàn thành
+                {t('practice_modes.rewards_desc', 'Nhận Xu Văn Hóa khi hoàn thành')}
               </p>
             </div>
           </div>

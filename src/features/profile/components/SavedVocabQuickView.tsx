@@ -86,7 +86,7 @@ export const SavedVocabQuickView: React.FC = () => {
           <Search aria-hidden="true" className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
           <input
             type="search"
-            aria-label="Search vocabulary"
+            aria-label={t('profile.vocab_view.search_aria')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={t('profile.vocab.search_placeholder')}
@@ -105,7 +105,7 @@ export const SavedVocabQuickView: React.FC = () => {
                 : 'text-stone-600 dark:text-stone-300'
             }`}
           >
-            All ({vocabList.length})
+            {t('profile.vocab.filter_all', { count: vocabList.length })}
           </button>
           <button
             type="button"
@@ -117,7 +117,7 @@ export const SavedVocabQuickView: React.FC = () => {
                 : 'text-stone-600 dark:text-stone-300'
             }`}
           >
-            Words
+            {t('profile.vocab.filter_words')}
           </button>
           <button
             type="button"
@@ -129,12 +129,16 @@ export const SavedVocabQuickView: React.FC = () => {
                 : 'text-stone-600 dark:text-stone-300'
             }`}
           >
-            Phrases
+            {t('profile.vocab.filter_phrases')}
           </button>
         </div>
       </div>
 
-      {filtered.length === 0 && <p role="status" className="rounded-2xl border border-antique-gold/40 p-6 text-sm text-ink-faint">No words match your search. Try another word or filter.</p>}
+      {filtered.length === 0 && (
+        <p role="status" className="rounded-2xl border border-antique-gold/40 p-6 text-sm text-ink-faint">
+          {t('profile.vocab_view.no_match')}
+        </p>
+      )}
 
       {/* Vocabulary Cards List */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -153,8 +157,8 @@ export const SavedVocabQuickView: React.FC = () => {
                     type="button"
                     onClick={() => playWordAudio(item.word)}
                     className="p-1 rounded-full hover:bg-stone-200 dark:hover:bg-white/10 text-stone-500 hover:text-heritage-green dark:hover:text-antique-gold transition-colors cursor-pointer"
-                    title="Listen to pronunciation"
-                    aria-label={`Listen to ${item.word}`}
+                    title={t('profile.vocab_view.listen_title')}
+                    aria-label={t('profile.vocab_view.listen_aria', { word: item.word })}
                   >
                     <Volume2 aria-hidden="true" className="w-3.5 h-3.5" />
                   </button>
@@ -167,7 +171,7 @@ export const SavedVocabQuickView: React.FC = () => {
               </div>
 
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-gold border border-antique-gold/30">
-                Level 2
+                {t('profile.vocab_view.level_label')}
               </span>
             </div>
 

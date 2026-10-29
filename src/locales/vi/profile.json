@@ -81,6 +81,87 @@
       "community_access": "Tham gia góc cảm nhận và thử thách viết tuần",
       "gemini_ai_companion": "Trợ lý đàm thoại AI song ngữ văn hóa chuẩn giọng",
       "unlimited_vocab": "Lưu trữ không giới hạn sổ tay từ vựng chuyên sâu"
+    },
+    "stats": {
+      "streak_title": "Chuỗi ngày học tập",
+      "days_in_a_row": "ngày liên tiếp",
+      "streak_protection": "{{count}} lần bảo vệ chuỗi học còn lại",
+      "passport_title": "Hộ chiếu di sản",
+      "stamps_count": "/ {{total}} mộc son",
+      "vocab_title": "Từ vựng",
+      "words_mastered": "từ đã thành thạo",
+      "dot_mastered": "● {{count}} đã thành thạo",
+      "dot_learning": "● {{count}} đang học",
+      "time_title": "Thời gian học tập",
+      "hours_cultural": "giờ đọc câu chuyện văn hóa",
+      "target_minutes": "Mục tiêu: {{count}} phút / ngày"
+    },
+    "badges_comp": {
+      "tab_all": "Tất cả",
+      "tab_heritage": "Di sản",
+      "tab_vocab": "Từ vựng",
+      "tab_streak": "Thói quen học",
+      "tab_community": "Cộng đồng",
+      "unlocked_summary": "Đã mở khóa <strong>{{unlocked}}</strong> / {{total}} huy hiệu",
+      "unlocked_label": "Đã mở khóa",
+      "progress_label": "Tiến độ"
+    },
+    "edit_modal": {
+      "title": "Chỉnh sửa hồ sơ",
+      "subtitle": "Tùy biến không gian của bạn và thiết lập mục tiêu học tập hàng ngày.",
+      "badge_legend": "Huy hiệu hồ sơ",
+      "badge_aria": "Sử dụng huy hiệu {{label}}",
+      "name_label": "Họ và tên",
+      "name_placeholder": "Tên của bạn",
+      "bio_label": "Giới thiệu về bạn",
+      "bio_placeholder": "Điều gì thôi thúc bạn học tập qua văn hóa Việt Nam?",
+      "daily_goal_label": "Mục tiêu hàng ngày",
+      "min_per_day": "{{count}} phút / ngày",
+      "cefr_label": "Mục tiêu CEFR",
+      "cefr_a2": "A2 · Sơ cấp",
+      "cefr_b1": "B1 · Trung cấp",
+      "cefr_b2": "B2 · Trung cao cấp",
+      "cancel_btn": "Hủy",
+      "save_btn": "Lưu thay đổi"
+    },
+    "settings_card": {
+      "dictation_spaced": "Nghe chép chính tả và flashcard lặp lại ngắt quãng",
+      "companion_unlimited": "Trợ lý đàm thoại AI văn hóa Gemini (Không giới hạn)",
+      "companion_limited": "Trợ lý đàm thoại AI văn hóa Gemini (Tối đa 3 phiên/ngày)",
+      "vocab_unlimited": "Lưu từ vựng (Không giới hạn)",
+      "vocab_limited": "Lưu từ vựng (Tối đa 30 từ)",
+      "vietqr_ref": "Mã tham chiếu VietQR: <strong>{{code}}</strong>",
+      "payment_confirmed": "Thanh toán đã xác nhận",
+      "security_title": "Bảo mật tài khoản",
+      "security_desc": "Tính năng đổi mật khẩu chưa kết nối. Phương thức đăng nhập hiện tại vẫn hoạt động.",
+      "current_password": "Mật khẩu hiện tại",
+      "current_password_placeholder": "Nhập mật khẩu hiện tại...",
+      "new_password": "Mật khẩu mới",
+      "new_password_placeholder": "Tối thiểu 6 ký tự...",
+      "confirm_password": "Xác nhận mật khẩu mới",
+      "confirm_password_placeholder": "Nhập lại mật khẩu mới...",
+      "update_password_btn": "Cập nhật mật khẩu"
+    },
+    "header_card": {
+      "target_label": "Mục tiêu: {{target}}",
+      "joined_label": "Tham gia: {{date}}",
+      "explore_pro_cta": "Nâng cấp Pro · 39k/tháng"
+    },
+    "vocab_view": {
+      "search_aria": "Tìm kiếm từ vựng",
+      "listen_aria": "Nghe phát âm {{word}}",
+      "listen_title": "Nghe phát âm",
+      "level_label": "Cấp độ 2",
+      "no_match": "Không có từ nào khớp với tìm kiếm. Hãy thử từ khóa khác hoặc bỏ lọc."
+    },
+    "passport_view": {
+      "aria_view_stamp": "Xem mộc son: {{title}}",
+      "collected_badge": "Đã thu thập",
+      "locked_badge": "Chưa mở khóa",
+      "view_stamp_btn": "Xem mộc son",
+      "explore_story_btn": "Khám phá bài đọc này",
+      "collected_summary": "Đã thu thập <strong>{{unlocked}}</strong> / {{total}} mộc son di sản",
+      "filter_count": "Tất cả ({{count}})"
     }
   }
 }

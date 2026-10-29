@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Award, BookOpen, Check, Copy } from 'lucide-react';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';

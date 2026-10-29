@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Link from "@/components/Link";
 import { ArrowRight } from "lucide-react";
 import type { RecommendedArticle } from "@/data/readerData";
@@ -12,18 +13,19 @@ export function ReaderRecommendedSection({
   articles,
   themeMode,
 }: ReaderRecommendedSectionProps) {
+  const { t } = useTranslation('reader');
   return (
     <div data-practice-theme={themeMode} className="reader-practice-surface reader-recommended-component pt-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
-            Continue reading
+            {t('recommended.tag', 'Continue reading')}
           </span>
           <h3
             className={`font-sans text-xl font-bold mt-0.5 ${themeMode === "dark" ? "text-warm-ivory" : "text-heritage-green"
               }`}
           >
-            Recommended articles
+            {t('recommended.title', 'Recommended articles')}
           </h3>
         </div>
         <Link
@@ -33,7 +35,7 @@ export function ReaderRecommendedSection({
               : "text-heritage-green hover:text-antique-gold"
             }`}
         >
-          <span>View all</span>
+          <span>{t('recommended.view_all', 'View all')}</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -71,10 +73,10 @@ export function ReaderRecommendedSection({
             </div>
             <div className="mt-4 flex items-center justify-between text-xs font-semibold opacity-80">
               <span>
-                {article.readTime} • {article.vocabCount} words
+                {article.readTime} • {article.vocabCount} {t('recommended.words', 'words')}
               </span>
               <span className="text-antique-gold group-hover:translate-x-1 transition-transform inline-block font-bold">
-                Read →
+                {t('recommended.read_action', 'Read →')}
               </span>
             </div>
           </Link>

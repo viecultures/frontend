@@ -101,13 +101,13 @@ export function FlashcardSessionSummary({
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <span className="text-xs font-medium uppercase tracking-wider text-success">
-            Remembered
+            {t('summary.remembered_stat', 'Remembered')}
           </span>
           <strong className="text-2xl font-bold font-sans my-0.5 text-ink">
             {mastered} <span className="text-sm font-normal text-ink-faint">/ {session.order.length}</span>
           </strong>
           <span className="text-xs text-ink-faint">
-            ({accuracyPercent}% accuracy)
+            {t('summary.accuracy_stat', { percent: accuracyPercent, defaultValue: `(${accuracyPercent}% accuracy)` })}
           </span>
         </div>
 
@@ -116,13 +116,13 @@ export function FlashcardSessionSummary({
             <RotateCcw className="w-5 h-5" />
           </div>
           <span className="text-xs font-medium uppercase tracking-wider text-warning">
-            Review again
+            {t('summary.review_stat', 'Review again')}
           </span>
           <strong className="text-2xl font-bold font-sans my-0.5 text-ink">
-            {review} <span className="text-sm font-normal text-ink-faint">words</span>
+            {review} <span className="text-sm font-normal text-ink-faint">{t('summary.words_to_review', 'words')}</span>
           </strong>
           <span className="text-xs text-ink-faint">
-            {review === 0 ? 'All words remembered' : 'Needs more practice'}
+            {review === 0 ? t('summary.all_remembered', 'All words remembered') : t('summary.needs_practice', 'Needs more practice')}
           </span>
         </div>
       </div>
@@ -130,8 +130,8 @@ export function FlashcardSessionSummary({
       {/* 3. Feedback message */}
       <p className="text-sm text-ink font-normal">
         {review
-          ? `${review} words could use more practice. Review this deck again.`
-          : 'You marked every word as remembered in this review.'}
+          ? t('summary.feedback_review', { count: review, defaultValue: `${review} words could use more practice. Review this deck again.` })
+          : t('summary.feedback_all_mastered', 'You marked every word as remembered in this review.')}
       </p>
 
       {/* 4. Gamification Rewards Box */}
@@ -139,7 +139,7 @@ export function FlashcardSessionSummary({
         <div role="status" className="flex flex-wrap items-center justify-center gap-2.5">
           {savedOnly ? (
             <span className="text-xs text-ink-soft">
-              Saved words reviews do not earn an additional completion reward.
+              {t('summary.saved_words_no_extra_reward', 'Saved words reviews do not earn an additional completion reward.')}
             </span>
           ) : reward ? (
             reward.xpEarned > 0 ? (
@@ -150,7 +150,7 @@ export function FlashcardSessionSummary({
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-raised border border-line text-xs font-semibold text-ink shadow-xs">
                   <Coins className="w-4 h-4 text-antique-gold" />
-                  <span>+{reward.coinsEarned} coins</span>
+                  <span>{t('summary.coins_earned', { count: reward.coinsEarned, defaultValue: `+${reward.coinsEarned} coins` })}</span>
                 </div>
               </>
             ) : (
@@ -159,21 +159,21 @@ export function FlashcardSessionSummary({
               </span>
             )
           ) : (
-            <span className="text-xs text-ink-soft">Saving your reward…</span>
+            <span className="text-xs text-ink-soft">{t('summary.saving_reward', 'Saving your reward…')}</span>
           )}
         </div>
 
         <p className="text-xs text-ink-faint">
-          Results are saved in this browser. Each story earns a deck completion reward once.
+          {t('summary.browser_saved_notice', 'Results are saved in this browser. Each story earns a deck completion reward once.')}
         </p>
 
         <div className="pt-2 border-t border-line/60 flex items-center justify-center gap-4 text-xs font-normal text-ink-soft">
           <span>
-            Total XP: <strong data-testid="total-xp" className="text-ink font-semibold">{totalXP}</strong>
+            {t('summary.total_xp', { count: totalXP, defaultValue: `Total XP: ${totalXP}` })}
           </span>
           <span className="w-1 h-1 rounded-full bg-ink-faint/40" />
           <span>
-            Total coins: <strong data-testid="total-coins" className="text-ink font-semibold">{totalCoins}</strong>
+            {t('summary.total_coins', { count: totalCoins, defaultValue: `Total coins: ${totalCoins}` })}
           </span>
         </div>
       </div>
@@ -189,10 +189,10 @@ export function FlashcardSessionSummary({
           >
             <div className="flex items-center gap-2 text-sm font-medium text-ink">
               <BookOpen className="w-4 h-4 text-accent-ink" />
-              <span>Review words from this deck ({cardsReviewed.length})</span>
+              <span>{t('summary.word_list_title', { count: cardsReviewed.length, defaultValue: `Review words from this deck (${cardsReviewed.length})` })}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-ink-faint">
-              <span>{isWordListOpen ? 'Hide list' : 'Show list'}</span>
+              <span>{isWordListOpen ? t('summary.hide_list', 'Hide list') : t('summary.show_list', 'Show list')}</span>
               <ChevronDown
                 className={`w-4 h-4 transition-transform duration-200 ${
                   isWordListOpen ? 'rotate-180' : ''
@@ -220,7 +220,7 @@ export function FlashcardSessionSummary({
                               : 'bg-warning-soft text-warning'
                           }`}
                         >
-                          {isMastered ? 'Remembered' : 'Review again'}
+                          {isMastered ? t('summary.mastered_badge', 'Remembered') : t('summary.review_badge', 'Review again')}
                         </span>
                       </div>
                       <p className="text-xs text-ink-soft truncate mt-0.5">{card.viMeaning}</p>
@@ -229,8 +229,8 @@ export function FlashcardSessionSummary({
                       type="button"
                       onClick={() => playAudio(card.word)}
                       className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-muted text-ink-soft hover:text-ink transition-colors shrink-0 cursor-pointer"
-                      title={`Pronounce ${card.word}`}
-                      aria-label={`Pronounce ${card.word}`}
+                      title={t('flip_view.pronounce_word', { word: card.word, defaultValue: `Pronounce ${card.word}` })}
+                      aria-label={t('flip_view.pronounce_word', { word: card.word, defaultValue: `Pronounce ${card.word}` })}
                     >
                       <Volume2 className="w-4 h-4" />
                     </button>
@@ -252,7 +252,7 @@ export function FlashcardSessionSummary({
           }
         >
           <Compass className="w-4 h-4" />
-          <span>Practise with AI</span>
+          <span>{t('summary.practice_with_ai', 'Practise with AI')}</span>
         </button>
         <button
           type="button"

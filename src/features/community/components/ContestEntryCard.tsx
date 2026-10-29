@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { User, Heart, MessageSquare, Trophy, Coins, Camera, Landmark } from "lucide-react";
 import { communityLabel } from "../community-copy";
 import type { ContestEntry } from "../types";
@@ -8,6 +9,8 @@ interface ContestEntryCardProps {
 }
 
 export function ContestEntryCard({ entry, onVote }: ContestEntryCardProps) {
+  const { t } = useTranslation("community");
+
   return (
     <article className="community-entry-card relative p-5 sm:p-6 rounded-2xl bg-white border border-[#E8E2D5] shadow-[0_2px_8px_rgba(0,0,0,0.03)] space-y-3.5 hover:border-[#1D5046]/30 transition-all">
       {/* Rank Tag if available */}
@@ -45,14 +48,14 @@ export function ContestEntryCard({ entry, onVote }: ContestEntryCardProps) {
 
         <span className="text-xs font-semibold text-[#1D5046] bg-[#E8D7AE]/30 px-2.5 py-1 rounded-full border border-[#E8D7AE]/50 flex items-center gap-1 shrink-0">
           <Coins className="w-3.5 h-3.5 text-antique-gold" />
-          <span>+{entry.rewardCoins} coins</span>
+          <span>{t("community.contest.reward_coins", { count: entry.rewardCoins })}</span>
         </span>
       </div>
 
       {/* Entry Title & Excerpt */}
       <div className="space-y-2">
         <h3 className="font-serif text-lg font-bold text-[#1D5046] leading-snug">
-          "{entry.title}"
+          &ldquo;{entry.title}&rdquo;
         </h3>
         <p className="community-post-body text-sm text-[#314F49] leading-relaxed">{entry.excerpt}</p>
       </div>
@@ -62,7 +65,7 @@ export function ContestEntryCard({ entry, onVote }: ContestEntryCardProps) {
         <div className="flex flex-wrap items-center gap-1.5 pt-1">
           <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1">
             <Trophy className="w-3 h-3 text-antique-gold" />
-            <span>Vocabulary in use:</span>
+            <span>{t("community.contest.vocab_in_use")}</span>
           </span>
           {entry.usedVocab.map((word) => (
             <span
@@ -82,7 +85,7 @@ export function ContestEntryCard({ entry, onVote }: ContestEntryCardProps) {
       >
         <div className="text-xs font-semibold text-antique-gold uppercase tracking-wider flex items-center gap-1.5">
           <Camera className="w-3.5 h-3.5" />
-          <span>Heritage photo challenge</span>
+          <span>{t("community.contest.photo_challenge")}</span>
         </div>
         <div className="text-center my-auto">
           <Landmark className="w-6 h-6 text-[#E8D7AE] mx-auto mb-2" />
@@ -104,17 +107,19 @@ export function ContestEntryCard({ entry, onVote }: ContestEntryCardProps) {
           }`}
         >
           <Heart className={`w-4 h-4 ${entry.userVoted ? "fill-white" : "text-heritage-green"}`} />
-          <span>{entry.userVoted ? "Voted" : "Vote for entry"}</span>
+          <span>{entry.userVoted ? t("community.contest.voted") : t("community.contest.vote_for_entry")}</span>
           <strong>({entry.votesCount})</strong>
         </button>
 
         <div className="text-xs font-semibold text-text-secondary flex items-center gap-4">
           <span className="flex items-center gap-1">
             <MessageSquare className="w-3.5 h-3.5 text-antique-gold" />
-            <span>{entry.commentsCount} comments</span>
+            <span>{t("community.contest.comments_count", { count: entry.commentsCount })}</span>
           </span>
         </div>
       </div>
     </article>
   );
 }
+
+export default ContestEntryCard;

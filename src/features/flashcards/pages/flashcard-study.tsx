@@ -80,7 +80,13 @@ function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerPr
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [session, currentCard, cards.length]);
 
-  if (!cards.length) return <div role="status" className="p-8 text-center"><h1>No vocabulary to review</h1><p>{savedOnly ? 'Save words in the Reader first.' : 'This story does not have a vocabulary deck yet.'}</p><Link to={paths.reader({ postId: deck.article.id, level })}>Back to the story</Link></div>;
+  if (!cards.length) return (
+    <div role="status" className="p-8 text-center">
+      <h1>{t('study.no_cards_title', 'No saved words found for this article.')}</h1>
+      <p>{savedOnly ? t('study.no_cards_desc', 'Open the article to save words you want to remember, or select an existing study deck.') : t('study.no_cards_desc', 'This story does not have a vocabulary deck yet.')}</p>
+      <Link to={paths.reader({ postId: deck.article.id, level })}>{t('study.read_article', 'Read article')}</Link>
+    </div>
+  );
 
   return <div className="vocab-study-page w-full">
     <div>
@@ -96,8 +102,8 @@ function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerPr
         return { ...value, order, currentIndex: Math.max(0, order.indexOf(currentCard?.id || '')) };
       });
     }} isAutoAudio={isAutoAudio} onToggleAutoAudio={setIsAutoAudio} accentVoice={accentVoice} onChangeVoice={setAccentVoice} />
-    <p className="vocab-study-storage">Progress saved in this browser{savedOnly ? ' · Saved words review does not earn an additional completion reward' : ''}</p>
-    {!canSave && <p role="alert">Progress could not be saved. Check browser storage space or permissions.</p>}
+    <p className="vocab-study-storage">{t('study.storage_saved', 'Progress saved in this browser')}{savedOnly ? ` · ${t('study.storage_saved_note', 'Saved words reviews do not earn an additional completion reward')}` : ''}</p>
+    {!canSave && <p role="alert">{t('study.storage_warning', 'Could not save review progress to browser. Please check storage capacity.')}</p>}
     </div>
     <FlashcardProgressBar currentIndex={session.currentIndex} reviewedCount={Object.keys(session.ratings).length} totalCards={cards.length} isComplete={session.complete} />
     <FlashcardModeTabs playerMode={session.mode} onChangeMode={mode => { clearAnswer(); update(value => ({ ...value, mode })); }} />
@@ -111,11 +117,12 @@ function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerPr
         }} onNext={() => { if (spellingFeedback) rate(spellingFeedback === 'correct'); }} />}
       </>}
     </div>
-    <p className="vocab-study-tip">A little practice each day. Say the word aloud before revealing the meaning.</p>
+    <p className="vocab-study-tip">{t('study.daily_tip', 'A little practice each day. Say the word aloud before revealing the meaning.')}</p>
   </div>;
 }
 
 export default function FlashcardStudyPage() {
+  const { t } = useTranslation('flashcards');
   const [params] = useSearchParams();
   const id = params.get('deck') || params.get('postId') || params.get('story') || params.get('article') || 'imperial-hue';
   const level = params.get('level') || 'Level 2';
@@ -130,8 +137,13 @@ export default function FlashcardStudyPage() {
     return () => { active = false; };
   }, [key, attempt]);
   return <FlashcardSidebarLayout>
-    {!result || result.key !== key ? <p role="status">Loading the story’s vocabulary…</p> : result.deck ?
+    {!result || result.key !== key ? <p role="status">{t('study.loading', 'Preparing study cards...')}</p> : result.deck ?
       <FlashcardStudyPlayer key={key + savedOnly} deck={result.deck} level={result.deck.lesson.cefrLevel} savedOnly={savedOnly} /> :
-      <div role="alert" className="p-8 text-center"><h1>Unable to load this vocabulary deck</h1><p>Check your connection or choose another story.</p><button onClick={() => setAttempt(value => value + 1)}>Try again</button> <Link to={PATHS.discovery}>Choose a story</Link></div>}
+      <div role="alert" className="p-8 text-center">
+        <h1>{t('study.load_error_title', 'Unable to load this vocabulary deck')}</h1>
+        <p>{t('study.load_error_desc', 'Check your connection or choose another story.')}</p>
+        <button onClick={() => setAttempt(value => value + 1)}>{t('study.btn_try_again', 'Try again')}</button>
+        {' '}<Link to={PATHS.discovery}>{t('study.btn_choose_story', 'Choose a story')}</Link>
+      </div>}
   </FlashcardSidebarLayout>;
 }

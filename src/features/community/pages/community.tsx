@@ -693,7 +693,7 @@ export default function CommunityPage() {
                         : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0] border border-transparent"
                     }`}
                   >
-                    {cat.label}
+                    {cat.id === "all" ? t("community.filters.all_topics") : cat.label}
                   </button>
                 ))}
               </div>

@@ -1,5 +1,6 @@
+import { useTranslation } from "react-i18next";
 import { communityLabel } from "../community-copy";
-import { ShoppingBag, Coins, Headphones, Palette, Medal, Check } from "lucide-react";
+import { ShoppingBag, Coins, Headphones, Palette, Medal } from "lucide-react";
 
 interface GamificationShopCardProps {
   userCoins: number;
@@ -37,6 +38,8 @@ export function GamificationShopCard({
   userCoins,
   onRedeem,
 }: GamificationShopCardProps) {
+  const { t } = useTranslation("community");
+
   return (
     <div
       id="gamification-shop"
@@ -45,11 +48,11 @@ export function GamificationShopCard({
       <div className="flex items-center justify-between pb-3 border-b border-line">
         <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
           <ShoppingBag className="w-4 h-4 text-antique-gold" />
-          <span>Coin & reward shop</span>
+          <span>{t("community.gamification.shop_title")}</span>
         </h3>
         <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
           <Coins className="w-3.5 h-3.5 text-antique-gold" />
-          <span>Balance: {userCoins} coins</span>
+          <span>{t("community.gamification.shop_balance", { count: userCoins })}</span>
         </span>
       </div>
 
@@ -79,7 +82,7 @@ export function GamificationShopCard({
                 </div>
 
                 <button
-                  aria-label={`Redeem ${communityLabel(item.name)} for ${item.cost} coins`}
+                  aria-label={t("community.gamification.redeem_aria", { name: communityLabel(item.name), cost: item.cost })}
                   onClick={() => onRedeem(item.name, item.cost)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1 shrink-0 cursor-pointer focus-ring ${
                     canAfford
@@ -88,7 +91,7 @@ export function GamificationShopCard({
                   }`}
                 >
                   <Coins className="w-3 h-3 text-antique-gold" />
-                  <span>{item.cost} coins</span>
+                  <span>{t("community.gamification.cost_coins", { cost: item.cost })}</span>
                 </button>
               </div>
 
@@ -102,3 +105,5 @@ export function GamificationShopCard({
     </div>
   );
 }
+
+export default GamificationShopCard;

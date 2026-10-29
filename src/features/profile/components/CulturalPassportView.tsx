@@ -108,7 +108,7 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
                 : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green dark:hover:text-antique-gold'
             }`}
           >
-            All ({seals.length})
+            {t('profile.passport_view.filter_count', { count: seals.length })}
           </button>
           <button
             type="button"
@@ -120,7 +120,7 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
                 : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green dark:hover:text-antique-gold'
             }`}
           >
-            North
+            {t('profile.passport.filter_north')}
           </button>
           <button
             type="button"
@@ -132,7 +132,7 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
                 : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green dark:hover:text-antique-gold'
             }`}
           >
-            Central
+            {t('profile.passport.filter_central')}
           </button>
           <button
             type="button"
@@ -144,13 +144,19 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
                 : 'text-stone-600 dark:text-stone-300 hover:text-heritage-green dark:hover:text-antique-gold'
             }`}
           >
-            South
+            {t('profile.passport.filter_south')}
           </button>
         </div>
 
-        <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-          Collected <strong>{unlockedCount}</strong> / {seals.length} heritage stamps
-        </span>
+        <span
+          className="text-xs font-medium text-stone-500 dark:text-stone-400"
+          dangerouslySetInnerHTML={{
+            __html: t('profile.passport_view.collected_summary', {
+              unlocked: unlockedCount,
+              total: seals.length,
+            }),
+          }}
+        />
       </div>
 
       {/* 3. Cultural Seals Grid */}
@@ -173,12 +179,12 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
               {seal.isUnlocked ? (
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#9E2A2B] dark:text-[#E07A5F] bg-[#9E2A2B]/10 px-2 py-0.5 rounded-full border border-[#9E2A2B]/30">
                   <CheckCircle2 aria-hidden="true" className="w-3 h-3" />
-                  <span>Collected</span>
+                  <span>{t('profile.passport_view.collected_badge')}</span>
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-stone-500 bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-full">
                   <Lock aria-hidden="true" className="w-3 h-3" />
-                  <span>Locked</span>
+                  <span>{t('profile.passport_view.locked_badge')}</span>
                 </span>
               )}
             </div>
@@ -187,7 +193,7 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
             <button
               type="button"
               disabled={!seal.isUnlocked}
-              aria-label={`View stamp: ${seal.titleEn}`}
+              aria-label={t('profile.passport_view.aria_view_stamp', { title: seal.titleEn })}
               onClick={() => setInspectingSeal(seal)}
               className={`profile-stamp-button my-3 py-4 flex flex-col items-center justify-center text-center cursor-pointer group ${
                 !seal.isUnlocked && 'cursor-default'
@@ -197,7 +203,7 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
                 <div className="relative p-3 rounded-full border-2 border-dashed border-[#9E2A2B] bg-[#9E2A2B]/5 shadow-xs w-32 h-32 flex flex-col items-center justify-center transition-all">
                   <ProfileSealIcon postId={seal.postId} className="size-8 mb-1 text-[#9E2A2B] dark:text-[#E07A5F]" />
                   <span className="font-serif font-black text-[9px] text-[#9E2A2B] dark:text-[#E07A5F]">
-                    Heritage stamp
+                    {t('profile.seal_modal.heritage_stamp')}
                   </span>
                   <span className="text-[8px] font-mono text-[#9E2A2B]/80 dark:text-[#E07A5F] font-bold truncate max-w-[80px]">
                     {seal.province}
@@ -208,7 +214,7 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
                 <div className="p-4 rounded-full border-2 border-dashed border-stone-300 dark:border-stone-700 w-28 h-28 flex flex-col items-center justify-center text-stone-400 dark:text-stone-600">
                   <ProfileSealIcon postId={seal.postId} className="size-8 mb-1 opacity-50" />
                   <span className="text-[9px] uppercase font-bold tracking-wider">
-                    Locked
+                    {t('profile.passport_view.locked_badge')}
                   </span>
                 </div>
               )}
@@ -233,14 +239,14 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
               {seal.isUnlocked ? (
                 <>
                   <span className="text-[11px] text-stone-500 font-mono">
-                    Collected: {seal.stampedAt}
+                    {t('profile.seal_modal.collected_at', { date: seal.stampedAt || '' })}
                   </span>
                   <button
                     type="button"
                     onClick={() => setInspectingSeal(seal)}
                     className="font-bold text-heritage-green dark:text-antique-gold hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    <span>View stamp</span>
+                    <span>{t('profile.passport_view.view_stamp_btn')}</span>
                     <ArrowRight aria-hidden="true" className="w-3 h-3" />
                   </button>
                 </>
@@ -250,7 +256,7 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
                   className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-heritage-green/10 hover:bg-heritage-green text-heritage-green hover:text-warm-ivory dark:text-antique-gold dark:hover:text-warm-ivory font-bold text-xs transition-all cursor-pointer"
                 >
                   <BookOpen aria-hidden="true" className="w-3.5 h-3.5" />
-                  <span>Explore this story</span>
+                  <span>{t('profile.passport_view.explore_story_btn')}</span>
                 </Link>
               )}
             </div>

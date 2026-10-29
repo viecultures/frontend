@@ -43,7 +43,6 @@ const TOP_AMBASSADORS: TopAmbassadorItem[] = [
 ];
 
 export function CommunitySidebar({
-
   onSelectTopicTag,
   selectedTag,
 }: CommunitySidebarProps) {
@@ -70,22 +69,22 @@ export function CommunitySidebar({
           <div className="w-full rounded-xl overflow-hidden aspect-[16/9] border border-[#E8E2D5] relative group">
             <img
               src="/images/landing/hue-citadel.jpg"
-              alt="Imperial Hue Architecture & Heritage"
+              alt={t("community.sidebar.challenge_title")}
               className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-2.5">
               <span className="text-white text-xs font-semibold drop-shadow-xs">
-                Imperial Hue Architecture
+                {t("community.sidebar.challenge_title")}
               </span>
             </div>
           </div>
 
           <h3 className="font-serif text-base font-bold text-[#1D5046] leading-snug">
-            Imperial Hue Architecture &amp; Heritage
+            {t("community.sidebar.challenge_title")}
           </h3>
 
           <p className="text-xs text-[#6E7B75] leading-relaxed">
-            Write a 100–300 word reflection in English exploring royal gate symmetry, courtyards, or Perfume River mausoleums.
+            {t("community.sidebar.challenge_desc")}
           </p>
         </div>
 
@@ -93,11 +92,11 @@ export function CommunitySidebar({
         <div className="flex items-center justify-between text-[11px] text-[#6E7B75] pt-1 border-t border-[#E8E2D5]/70">
           <span className="flex items-center gap-1">
             <Users className="w-3.5 h-3.5 text-[#1D5046]" />
-            <span>128 learners joined</span>
+            <span>{t("community.sidebar.learners_joined", { count: 128 })}</span>
           </span>
           <span className="flex items-center gap-1">
             <Clock className="w-3.5 h-3.5 text-antique-gold" />
-            <span>3 days left</span>
+            <span>{t("community.sidebar.days_left", { count: 3 })}</span>
           </span>
         </div>
 
@@ -110,13 +109,13 @@ export function CommunitySidebar({
                   <Check className="w-3.5 h-3.5 text-[#1D5046]" />
                   <span>{t("community.sidebar.joined_challenge")}</span>
                 </span>
-                <span className="text-[11px] text-[#6E7B75]">1/1 submitted</span>
+                <span className="text-[11px] text-[#6E7B75]">{t("community.sidebar.submitted_count", { count: 1 })}</span>
               </div>
               <Link
                 to={PATHS.communityContest}
                 className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-[#1D5046] bg-[#FAF7F0] hover:bg-white border border-[#E8E2D5] transition-colors w-full focus-ring cursor-pointer"
               >
-                <span>View submissions</span>
+                <span>{t("community.sidebar.view_submissions")}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -135,7 +134,7 @@ export function CommunitySidebar({
                 className="px-3 py-2.5 rounded-xl text-xs font-semibold text-[#1D5046] bg-[#FAF7F0] hover:bg-white border border-[#E8E2D5] transition-colors focus-ring"
                 title="View challenge details"
               >
-                Rules
+                {t("community.sidebar.rules")}
               </Link>
             </div>
           )}
@@ -149,7 +148,7 @@ export function CommunitySidebar({
             <TrendingUp className="w-3.5 h-3.5 text-antique-gold" />
             <span>{t("community.sidebar.trending_topics")}</span>
           </h3>
-          <span className="text-[11px] text-[#6E7B75]">This week</span>
+          <span className="text-[11px] text-[#6E7B75]">{t("community.sidebar.this_week")}</span>
         </div>
 
         <div className="flex flex-wrap gap-1.5 pt-0.5">
@@ -184,7 +183,7 @@ export function CommunitySidebar({
             <Award className="w-3.5 h-3.5 text-antique-gold" />
             <span>{t("community.sidebar.top_ambassadors")}</span>
           </h3>
-          <span className="text-[11px] text-[#6E7B75]">Weekly XP</span>
+          <span className="text-[11px] text-[#6E7B75]">{t("community.sidebar.weekly_xp")}</span>
         </div>
 
         <div className="space-y-2.5 pt-0.5">

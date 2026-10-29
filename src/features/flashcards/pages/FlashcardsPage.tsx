@@ -5,19 +5,17 @@ import { useSearchParams } from 'react-router-dom';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import {
   Volume2,
-  CheckCircle2,
-  RotateCw,
   BookOpen,
   ArrowLeft,
   AlertCircle,
   Shuffle,
   VolumeX,
+  RotateCw,
 } from 'lucide-react';
 import { useGamification } from '@/context/GamificationContext';
 import type { RewardCelebrationPayload } from '@/types';
 import type { Flashcard } from '@/data/flashcardsData';
 import {
-  articleKey,
   readSavedVocabulary,
   getAllSavedVocabularies,
   readReviewSession,
@@ -25,16 +23,14 @@ import {
 } from '@/services/learning/learningStorage';
 import FlashcardSidebarLayout from '../components/flashcard-sidebar-layout';
 import {
-  FlashcardStudyHeader,
   FlashcardProgressBar,
   FlashcardFlipView,
 } from '../components';
-import { FlashcardSessionSummary } from '../components/FlashcardSessionSummary';
 import { cardsFromVocabulary, loadStudyDeck, type StudyDeck } from '../services/studyDeck';
 import { persistVocabProgress } from '../services/vocabProgressService';
 import { paths } from '@/routes/paths';
 import { MocSonSealModal, StreakBadge } from '@/features/gamification';
-import { Award, Flame } from 'lucide-react';
+import { Award } from 'lucide-react';
 
 /**
  * FlashcardsPage: Main 2-Sided Leitner Binary Flashcard Study Experience.
@@ -48,7 +44,7 @@ export const FlashcardsPage: React.FC = () => {
   const level = searchParams.get('level') || 'Level 1';
   const savedOnly = searchParams.get('saved') === 'true';
 
-  const { earnReward, stats } = useGamification();
+  const { earnReward } = useGamification();
   const [deck, setDeck] = useState<StudyDeck | null>(null);
   const [isLoadingDeck, setIsLoadingDeck] = useState<boolean>(true);
   const [reward, setReward] = useState<RewardCelebrationPayload | null>(null);
@@ -65,7 +61,7 @@ export const FlashcardsPage: React.FC = () => {
   // Card view state
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
   const [isAutoAudio, setIsAutoAudio] = useState<boolean>(false);
-  const [accentVoice, setAccentVoice] = useState<'en-US' | 'en-GB'>('en-US');
+  const [accentVoice] = useState<'en-US' | 'en-GB'>('en-US');
   const [isShuffled, setIsShuffled] = useState<boolean>(false);
 
   // Session key for persistent progress (EC-04.2)
@@ -242,7 +238,7 @@ export const FlashcardsPage: React.FC = () => {
     // 3. EC-04.1 Cognitive Fatigue Check: Max 3 repeats in 1 session
     if (nextForgotCount >= 3) {
       setCognitiveFatigueAlert(
-        `Từ "${currentCard.word}" có vẻ khó với bạn, hãy đọc lại câu ngữ cảnh trong bài đọc!`
+        t('study.fatigue_word_hint', { word: currentCard.word, defaultValue: `Từ "${currentCard.word}" có vẻ khó với bạn, hãy đọc lại câu ngữ cảnh trong bài đọc!` })
       );
       // Remove from active queue to prevent infinite fatigue
       setQueue((prevQueue) => prevQueue.filter((_, idx) => idx !== currentQueueIndex));
@@ -314,7 +310,7 @@ export const FlashcardsPage: React.FC = () => {
         <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 text-center space-y-4">
           <div className="w-10 h-10 border-4 border-antique-gold/30 border-t-antique-gold rounded-full animate-spin" />
           <p className="text-sm font-medium text-ink-soft">
-            Đang tải dữ liệu thẻ từ vựng ngữ cảnh...
+            {t('study.loading', 'Đang tải dữ liệu thẻ từ vựng ngữ cảnh...')}
           </p>
         </div>
       </FlashcardSidebarLayout>
@@ -330,12 +326,12 @@ export const FlashcardsPage: React.FC = () => {
             <BookOpen className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-bold text-heritage-green dark:text-warm-ivory">
-            Chưa có từ vựng cần ôn tập
+            {t('study.no_cards_title', 'Chưa có từ vựng cần ôn tập')}
           </h1>
           <p className="text-sm text-ink-soft">
             {savedOnly
-              ? 'Hãy dùng tính năng 1-Click Save khi đọc bài để tự động đính kèm câu ngữ cảnh vào sổ tay cá nhân.'
-              : 'Bài học này hiện chưa có bộ thẻ từ vựng hoặc chưa được đồng bộ.'}
+              ? t('study.no_cards_desc', 'Hãy dùng tính năng 1-Click Save khi đọc bài để tự động đính kèm câu ngữ cảnh vào sổ tay cá nhân.')
+              : t('study.no_cards_desc', 'Bài học này hiện chưa có bộ thẻ từ vựng hoặc chưa được đồng bộ.')}
           </p>
           <div className="pt-2">
             <Link
@@ -343,7 +339,7 @@ export const FlashcardsPage: React.FC = () => {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-heritage-green text-warm-ivory font-medium hover:bg-heritage-dark transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Quay lại bài đọc</span>
+              <span>{t('study.read_article', 'Quay lại bài đọc')}</span>
             </Link>
           </div>
         </div>
@@ -365,7 +361,7 @@ export const FlashcardsPage: React.FC = () => {
               className="inline-flex items-center gap-1.5 text-xs text-ink-soft hover:text-heritage-green transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Quay lại bài đọc</span>
+              <span>{t('study.read_article', 'Quay lại bài đọc')}</span>
             </Link>
             <div className="flex items-center gap-2">
               <button
@@ -376,10 +372,10 @@ export const FlashcardsPage: React.FC = () => {
                     ? 'bg-antique-gold/20 text-antique-gold border-antique-gold'
                     : 'bg-surface-raised border-antique-gold/20 text-ink-soft hover:text-ink'
                 }`}
-                title="Xáo trộn thứ tự thẻ"
+                title={t('header.shuffle', 'Xáo trộn thứ tự thẻ')}
               >
                 <Shuffle className="w-3.5 h-3.5" />
-                <span>Trộn thẻ</span>
+                <span>{t('header.shuffle', 'Trộn thẻ')}</span>
               </button>
               <button
                 type="button"
@@ -389,10 +385,10 @@ export const FlashcardsPage: React.FC = () => {
                     ? 'bg-[#059669]/15 text-[#059669] border-[#059669]/30'
                     : 'bg-surface-raised border-antique-gold/20 text-ink-soft hover:text-ink'
                 }`}
-                title="Tự động phát âm khi lật thẻ"
+                title={t('header.auto_audio', 'Tự động phát âm khi lật thẻ')}
               >
                 {isAutoAudio ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-                <span>Tự phát âm</span>
+                <span>{t('header.auto_audio', 'Tự phát âm')}</span>
               </button>
             </div>
           </div>
@@ -400,18 +396,18 @@ export const FlashcardsPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-antique-gold/20 pb-3">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-antique-gold">
-                {savedOnly ? 'Sổ tay cá nhân' : 'Bộ thẻ theo bài đọc'}
+                {savedOnly ? t('study.progress_saved_personal', 'Sổ tay cá nhân') : t('study.progress_saved_deck', 'Bộ thẻ theo bài đọc')}
               </p>
               <h1 className="text-xl sm:text-2xl font-bold text-heritage-green dark:text-warm-ivory">
-                {deck?.lesson.title || 'Ôn tập từ vựng văn hóa'}
+                {deck?.lesson.title || t('study.progress_title_default', 'Ôn tập từ vựng văn hóa')}
               </h1>
             </div>
             <div className="text-xs text-ink-soft flex items-center gap-3">
               <span>
-                🟢 Đã nhớ: <strong className="text-[#059669]">{masteredCount}</strong>
+                🟢 {t('study.progress_mastered', 'Đã nhớ')}: <strong className="text-[#059669]">{masteredCount}</strong>
               </span>
               <span>
-                Còn lại trong hàng đợi: <strong>{queue.length}</strong>
+                {t('study.progress_remaining', 'Còn lại trong hàng đợi')}: <strong>{queue.length}</strong>
               </span>
             </div>
           </div>
@@ -430,7 +426,7 @@ export const FlashcardsPage: React.FC = () => {
           <div className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-200 flex items-start gap-2.5 text-xs animate-in fade-in">
             <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
             <div className="flex-1">
-              <p className="font-semibold">Nhắc nhở nhận thức (Spaced Repetition):</p>
+              <p className="font-semibold">{t('study.fatigue_title', 'Nhắc nhở nhận thức (Spaced Repetition):')}</p>
               <p className="mt-0.5 opacity-90">{cognitiveFatigueAlert}</p>
             </div>
           </div>
@@ -445,18 +441,17 @@ export const FlashcardsPage: React.FC = () => {
               </div>
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold text-heritage-green dark:text-warm-ivory">
-                  Xuất sắc! Đã hoàn thành phiên ôn tập!
+                  {t('study.complete_title', 'Xuất sắc! Đã hoàn thành phiên ôn tập!')}
                 </h2>
                 <p className="text-sm text-ink-soft">
-                  Bạn đã nắm vững {masteredCount} / {cards.length} từ vựng ngữ cảnh. Dữ liệu đã được
-                  lưu vào hệ thống Spaced Repetition.
+                  {t('study.complete_desc', { mastered: masteredCount, total: cards.length, defaultValue: `Bạn đã nắm vững ${masteredCount} / ${cards.length} từ vựng ngữ cảnh. Dữ liệu đã được lưu vào hệ thống Spaced Repetition.` })}
                 </p>
               </div>
 
               {reward && (
                 <div className="p-4 rounded-xl bg-antique-gold/15 border border-antique-gold/30 text-antique-gold font-bold flex items-center justify-center gap-2">
                   <BookOpen className="w-5 h-5" />
-                  <span>+{reward.xpEarned || 20} XP Cột mốc Flashcard!</span>
+                  <span>{t('study.complete_xp_bonus', { xp: reward.xpEarned || 20, defaultValue: `+${reward.xpEarned || 20} XP Cột mốc Flashcard!` })}</span>
                 </div>
               )}
 
@@ -472,7 +467,7 @@ export const FlashcardsPage: React.FC = () => {
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#9E2A2B] hover:bg-[#852223] text-white font-bold text-xs shadow-md border border-antique-gold transition-transform hover:scale-105 flex items-center justify-center gap-2"
                 >
                   <Award className="w-4 h-4 text-antique-gold" />
-                  <span>Dập Mộc Son Hoàn Thành</span>
+                  <span>{t('study.seal_btn', 'Dập Mộc Son Hoàn Thành')}</span>
                 </button>
                 <button
                   type="button"
@@ -480,14 +475,14 @@ export const FlashcardsPage: React.FC = () => {
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-antique-gold/40 text-antique-gold font-semibold hover:bg-antique-gold/10 transition-colors flex items-center justify-center gap-2"
                 >
                   <RotateCw className="w-4 h-4" />
-                  <span>Ôn lại từ đầu</span>
+                  <span>{t('study.btn_restart', 'Ôn lại từ đầu')}</span>
                 </button>
                 <Link
                   to={paths.reader({ postId: deckId, level })}
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#059669] text-white font-semibold hover:bg-[#047857] transition-colors flex items-center justify-center gap-2 shadow-sm"
                 >
                   <BookOpen className="w-4 h-4" />
-                  <span>Tiếp tục đọc bài</span>
+                  <span>{t('study.btn_continue_reading', 'Tiếp tục đọc bài')}</span>
                 </Link>
               </div>
             </div>
@@ -512,7 +507,7 @@ export const FlashcardsPage: React.FC = () => {
           isOpen={isSealModalOpen}
           onClose={() => setIsSealModalOpen(false)}
           articleId={deckId}
-          articleTitle={deck?.lesson.title || 'Ôn tập từ vựng văn hóa'}
+          articleTitle={deck?.lesson.title || t('study.progress_title_default', 'Ôn tập từ vựng văn hóa')}
           wordsLearnedCount={masteredCount}
           source="flashcard"
         />

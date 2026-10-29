@@ -96,12 +96,16 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-1 text-xs">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/60 dark:bg-black/20 border border-stone-200 dark:border-white/10 text-stone-600 dark:text-stone-300">
               <Target aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
-              <span>Target: {profileTargetLabel(profile.targetCefr)}</span>
+              <span>
+                {t('profile.header_card.target_label', {
+                  target: profileTargetLabel(profile.targetCefr),
+                })}
+              </span>
             </div>
 
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/60 dark:bg-black/20 border border-stone-200 dark:border-white/10 text-stone-600 dark:text-stone-300">
               <Calendar aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
-              <span>Joined: {profile.joinedAt}</span>
+              <span>{t('profile.header_card.joined_label', { date: profile.joinedAt })}</span>
             </div>
 
             {!profile.isPro && (
@@ -110,7 +114,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-antique-gold/20 hover:bg-antique-gold/30 border border-antique-gold text-heritage-green dark:text-antique-gold font-bold transition-all cursor-pointer"
               >
                 <Crown aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
-                <span>Explore Pro · 39k/month</span>
+                <span>{t('profile.header_card.explore_pro_cta')}</span>
               </Link>
             )}
           </div>

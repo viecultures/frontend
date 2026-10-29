@@ -81,6 +81,87 @@
       "community_access": "Community reflections and weekly essay challenge",
       "gemini_ai_companion": "Bilingual AI cultural voice companion",
       "unlimited_vocab": "Unlimited cultural notebook vocabulary saves"
+    },
+    "stats": {
+      "streak_title": "Learning streak",
+      "days_in_a_row": "days in a row",
+      "streak_protection": "{{count}} streak protection available",
+      "passport_title": "Heritage passport",
+      "stamps_count": "/ {{total}} stamps",
+      "vocab_title": "Vocabulary",
+      "words_mastered": "words mastered",
+      "dot_mastered": "● {{count}} mastered",
+      "dot_learning": "● {{count}} learning",
+      "time_title": "Learning time",
+      "hours_cultural": "hours with cultural stories",
+      "target_minutes": "Target: {{count}} min / day"
+    },
+    "badges_comp": {
+      "tab_all": "All",
+      "tab_heritage": "Heritage",
+      "tab_vocab": "Vocabulary",
+      "tab_streak": "Learning habits",
+      "tab_community": "Community",
+      "unlocked_summary": "Unlocked <strong>{{unlocked}}</strong> / {{total}} badges",
+      "unlocked_label": "Unlocked",
+      "progress_label": "Progress"
+    },
+    "edit_modal": {
+      "title": "Edit profile",
+      "subtitle": "Make this space yours and set a daily learning goal.",
+      "badge_legend": "Profile badge",
+      "badge_aria": "Use {{label}} badge",
+      "name_label": "Full name",
+      "name_placeholder": "Your name",
+      "bio_label": "About you",
+      "bio_placeholder": "What inspires you to learn through Vietnamese culture?",
+      "daily_goal_label": "Daily goal",
+      "min_per_day": "{{count}} min / day",
+      "cefr_label": "CEFR target",
+      "cefr_a2": "A2 · Elementary",
+      "cefr_b1": "B1 · Intermediate",
+      "cefr_b2": "B2 · Upper intermediate",
+      "cancel_btn": "Cancel",
+      "save_btn": "Save changes"
+    },
+    "settings_card": {
+      "dictation_spaced": "Dictation and spaced-repetition flashcards",
+      "companion_unlimited": "Gemini AI Cultural Companion (Unlimited)",
+      "companion_limited": "Gemini AI Cultural Companion (Up to 3 sessions/day)",
+      "vocab_unlimited": "Save vocabulary (Unlimited)",
+      "vocab_limited": "Save vocabulary (Up to 30 words)",
+      "vietqr_ref": "VietQR reference: <strong>{{code}}</strong>",
+      "payment_confirmed": "Payment confirmed",
+      "security_title": "Account security",
+      "security_desc": "Password changes are not connected yet. Your current sign-in method stays active.",
+      "current_password": "Current password",
+      "current_password_placeholder": "Enter current password...",
+      "new_password": "New password",
+      "new_password_placeholder": "At least 6 characters...",
+      "confirm_password": "Confirm new password",
+      "confirm_password_placeholder": "Repeat new password...",
+      "update_password_btn": "Update password"
+    },
+    "header_card": {
+      "target_label": "Target: {{target}}",
+      "joined_label": "Joined: {{date}}",
+      "explore_pro_cta": "Explore Pro · 39k/month"
+    },
+    "vocab_view": {
+      "search_aria": "Search vocabulary",
+      "listen_aria": "Listen to {{word}}",
+      "listen_title": "Listen to pronunciation",
+      "level_label": "Level 2",
+      "no_match": "No words match your search. Try another word or filter."
+    },
+    "passport_view": {
+      "aria_view_stamp": "View stamp: {{title}}",
+      "collected_badge": "Collected",
+      "locked_badge": "Locked",
+      "view_stamp_btn": "View stamp",
+      "explore_story_btn": "Explore this story",
+      "collected_summary": "Collected <strong>{{unlocked}}</strong> / {{total}} heritage stamps",
+      "filter_count": "All ({{count}})"
     }
   }
 }

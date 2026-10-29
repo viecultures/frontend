@@ -100,8 +100,8 @@ export default function CommunityContestPage() {
           };
           showToast(
             !voted
-              ? "Vote added in this preview only."
-              : "Vote removed from this preview."
+              ? t("community.toasts.vote_added")
+              : t("community.toasts.vote_removed")
           );
           return updated;
         }
@@ -114,18 +114,18 @@ export default function CommunityContestPage() {
   const handleRedeem = (itemName: string, cost: number) => {
     if (userCoins < cost) {
       showToast(
-        `This preview reward costs ${cost} coins. Your preview balance is ${userCoins} coins.`
+        t("community.toasts.insufficient_coins", { cost, balance: userCoins })
       );
       return;
     }
     setUserCoins((prev) => prev - cost);
-    showToast(`"${communityLabel(itemName)}" redeemed in this preview for ${cost} coins.`);
+    showToast(t("community.toasts.item_redeemed", { item: communityLabel(itemName), cost }));
   };
 
   // Submit Contest Entry
   const handleSubmitEntry = () => {
     if (!entryTitle.trim() || !entryText.trim()) {
-      alert("Enter a title and your challenge entry.");
+      alert(t("community.toasts.alert_fill_entry"));
       return;
     }
 
@@ -152,7 +152,7 @@ export default function CommunityContestPage() {
     setEntryTitle("");
     setEntryText("");
     setIsFormOpen(false);
-    showToast("Entry added to this preview. Your preview balance increased by 100 coins.");
+    showToast(t("community.toasts.entry_submitted"));
   };
 
   // Filtered Entries
@@ -217,10 +217,10 @@ export default function CommunityContestPage() {
           <div className="lg:col-span-8 space-y-4">
             <div className="rounded-2xl bg-white border border-[#E8E2D5] shadow-[0_2px_8px_rgba(0,0,0,0.03)] p-3 space-y-2.5">
               <h2 className="font-serif text-lg font-bold text-[#1D5046]">
-                <span>Weekly challenge entries ({filteredEntries.length})</span>
+                <span>{t("community.contest.entries_count_title", { count: filteredEntries.length })}</span>
               </h2>
 
-              <div className="community-contest-filters flex items-center gap-1 overflow-x-auto no-scrollbar text-xs font-semibold" aria-label="Sort challenge entries">
+              <div className="community-contest-filters flex items-center gap-1 overflow-x-auto no-scrollbar text-xs font-semibold" aria-label={t("community.contest.sort_aria")}>
                 <button
                   onClick={() => setFilterMode("top")}
                   aria-pressed={filterMode === "top"}
@@ -270,10 +270,10 @@ export default function CommunityContestPage() {
             ) : (
               <div className="p-8 text-center rounded-2xl bg-white border border-[#E8E2D5] space-y-2.5">
                 <h3 className="font-serif text-base font-bold text-heritage-green">
-                  You have no entries this week
+                  {t("community.contest.no_entries_title")}
                 </h3>
                 <p className="text-xs text-text-secondary max-w-sm mx-auto">
-                  Choose “Submit an entry” to share your perspective and receive +100 cultural coins.
+                  {t("community.contest.no_entries_desc")}
                 </p>
                 <button
                   type="button"
@@ -283,7 +283,7 @@ export default function CommunityContestPage() {
                   }}
                   className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] transition-colors focus-ring"
                 >
-                  Submit an entry
+                  {t("community.contest.submit_entry_action")}
                 </button>
               </div>
             )}
@@ -307,8 +307,8 @@ export default function CommunityContestPage() {
           window.scrollTo({ top: 100, behavior: "smooth" });
         }}
         className="community-fab fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[#1D5046] text-white shadow-lg hover:bg-[#153D35] transition-colors flex items-center justify-center border border-[#153D35] z-40 focus-ring cursor-pointer"
-        title="Submit an entry"
-        aria-label="Open contest editor"
+        title={t("community.contest.submit_entry_action")}
+        aria-label={t("community.contest.open_editor_aria")}
       >
         <Plus className="w-5 h-5 text-[#E8D7AE]" />
       </button>

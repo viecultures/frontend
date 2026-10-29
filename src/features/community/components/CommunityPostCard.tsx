@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Heart,
   MessageSquare,
@@ -15,7 +16,7 @@ import {
   Copy,
   ExternalLink,
 } from "lucide-react";
-import type { CommunityPost, HighlightVocabItem, CommunityComment } from "../types";
+import type { CommunityPost, HighlightVocabItem } from "../types";
 
 interface CommunityPostCardProps {
   post: CommunityPost;
@@ -42,6 +43,7 @@ export function CommunityPostCard({
   onAddComment,
   onReport,
 }: CommunityPostCardProps) {
+  const { t } = useTranslation("community");
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [showComments, setShowComments] = useState<boolean>(false);
   const [commentInput, setCommentInput] = useState<string>("");
@@ -91,7 +93,7 @@ export function CommunityPostCard({
             {post.isAmbassador && (
               <span
                 className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#E8D7AE] text-[#1D5046] flex items-center justify-center border border-white shadow-2xs"
-                title="Cultural Ambassador"
+                title={t("community.post.ambassador_badge_title")}
               >
                 <Award className="w-2.5 h-2.5 fill-current" />
               </span>
@@ -114,7 +116,7 @@ export function CommunityPostCard({
               <span>{post.timeAgo}</span>
               <span>·</span>
               <span className="text-[#314F49] font-medium hover:underline cursor-pointer">
-                in {post.lessonTag}
+                {t("community.post.in_tag", { topic: post.lessonTag })}
               </span>
             </div>
           </div>
@@ -135,12 +137,12 @@ export function CommunityPostCard({
               {post.authorFollowing ? (
                 <>
                   <UserCheck className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Following</span>
+                  <span className="hidden sm:inline">{t("community.post.following")}</span>
                 </>
               ) : (
                 <>
                   <UserPlus className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Follow</span>
+                  <span className="hidden sm:inline">{t("community.post.follow")}</span>
                 </>
               )}
             </button>
@@ -152,7 +154,7 @@ export function CommunityPostCard({
               type="button"
               onClick={() => setShowOptionsMenu(!showOptionsMenu)}
               className="p-1.5 rounded-lg text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0] transition-colors cursor-pointer focus-ring"
-              aria-label="More options for this post"
+              aria-label={t("community.post.more_options_aria")}
             >
               <MoreHorizontal className="w-4 h-4" />
             </button>
@@ -173,7 +175,7 @@ export function CommunityPostCard({
                     className="w-full px-3 py-2 text-left hover:bg-[#FAF7F0] flex items-center gap-2 cursor-pointer"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-[#6E7B75]" />
-                    <span>Open full reflection</span>
+                    <span>{t("community.post.open_full")}</span>
                   </button>
                   <button
                     type="button"
@@ -184,7 +186,7 @@ export function CommunityPostCard({
                     className="w-full px-3 py-2 text-left hover:bg-[#FAF7F0] flex items-center gap-2 cursor-pointer"
                   >
                     <Copy className="w-3.5 h-3.5 text-[#6E7B75]" />
-                    <span>Copy reflection link</span>
+                    <span>{t("community.post.copy_post_link")}</span>
                   </button>
                   {onToggleBookmark && (
                     <button
@@ -196,7 +198,7 @@ export function CommunityPostCard({
                       className="w-full px-3 py-2 text-left hover:bg-[#FAF7F0] flex items-center gap-2 cursor-pointer"
                     >
                       <Bookmark className="w-3.5 h-3.5 text-[#6E7B75]" />
-                      <span>{post.userBookmarked ? "Remove from saved" : "Save reflection"}</span>
+                      <span>{post.userBookmarked ? t("community.post.remove_saved") : t("community.post.save_reflection")}</span>
                     </button>
                   )}
                   {onReport && (
@@ -209,7 +211,7 @@ export function CommunityPostCard({
                       className="w-full px-3 py-2 text-left hover:bg-red-50 text-red-600 flex items-center gap-2 cursor-pointer border-t border-[#E8E2D5]/60"
                     >
                       <Flag className="w-3.5 h-3.5" />
-                      <span>Report reflection</span>
+                      <span>{t("community.post.report_reflection")}</span>
                     </button>
                   )}
                 </div>
@@ -247,7 +249,7 @@ export function CommunityPostCard({
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-xs font-semibold text-[#1D5046] hover:underline cursor-pointer focus-ring pt-0.5 inline-block"
           >
-            {isExpanded ? "Show less" : "Read more"}
+            {isExpanded ? t("community.post.read_less") : t("community.post.read_more")}
           </button>
         )}
       </div>
@@ -257,7 +259,7 @@ export function CommunityPostCard({
         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
           <span className="text-[11px] font-semibold text-[#6E7B75] flex items-center gap-1 mr-1">
             <BookOpen className="w-3 h-3 text-[#1D5046]" />
-            <span>Vocabulary:</span>
+            <span>{t("community.post.vocab_label")}</span>
           </span>
           {post.highlightWords.map((item, idx) => {
             const wordText = typeof item === "string" ? item : item.word;
@@ -267,7 +269,7 @@ export function CommunityPostCard({
                 type="button"
                 onClick={() => handleVocabClick(item)}
                 className="px-2.5 py-0.5 rounded-lg bg-[#FAF7F0] text-[#1D5046] border border-[#E8E2D5] text-[11px] font-medium hover:border-[#1D5046]/40 hover:bg-white transition-all cursor-pointer focus-ring"
-                title="Click to view definition & pronunciation"
+                title={t("community.post.click_vocab_title")}
               >
                 {wordText}
               </button>
@@ -276,7 +278,7 @@ export function CommunityPostCard({
         </div>
       )}
 
-      {/* 4. High-Quality Authentic Cultural Photograph (16:9, desktop ~260-300px) */}
+      {/* 4. High-Quality Authentic Cultural Photograph */}
       {post.imageUrl && (
         <div className="w-full rounded-xl overflow-hidden border border-[#E8E2D5] bg-white group">
           <div
@@ -290,17 +292,17 @@ export function CommunityPostCard({
                 onOpenLightbox?.(post.imageUrl!, post.imageCaption, post.title);
               }
             }}
-            aria-label={`View photo: ${post.imageCaption || "Cultural reflection photo"}`}
+            aria-label={t("community.post.view_photo_aria", { caption: post.imageCaption || t("community.post.cultural_photo_fallback") })}
           >
             <img
               src={post.imageUrl}
-              alt={post.imageCaption || "Cultural reflection photography"}
+              alt={post.imageCaption || t("community.post.cultural_photo_alt")}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-102"
               loading="lazy"
             />
             <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <span className="px-3 py-1.5 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-xs">
-                Click to expand photo
+                {t("community.post.click_expand_photo")}
               </span>
             </div>
           </div>
@@ -309,7 +311,7 @@ export function CommunityPostCard({
             <div className="px-3.5 py-2 text-xs text-[#6E7B75] bg-white border-t border-[#E8E2D5] flex items-center justify-between">
               <span className="truncate">{post.imageCaption}</span>
               <span className="text-[11px] text-[#1D5046] font-medium shrink-0 ml-2">
-                Cultural Archive
+                {t("community.post.cultural_archive")}
               </span>
             </div>
           )}
@@ -323,7 +325,7 @@ export function CommunityPostCard({
           <button
             type="button"
             onClick={() => onToggleHeart(post.id)}
-            aria-label={`${post.userLiked ? "Unlike" : "Like"} reflection`}
+            aria-label={`${post.userLiked ? t("community.post.unlike_aria") : t("community.post.like_aria")} ${t("community.post.reflection_word")}`}
             aria-pressed={post.userLiked}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-colors focus-ring cursor-pointer ${
               post.userLiked
@@ -348,7 +350,7 @@ export function CommunityPostCard({
                 ? "text-[#1D5046] bg-[#1D5046]/10"
                 : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
             }`}
-            aria-label={`View and post comments`}
+            aria-label={t("community.post.view_comments_aria")}
           >
             <MessageSquare className="w-4 h-4" />
             <span>{post.comments?.length || post.commentsCount || 0}</span>
@@ -366,8 +368,8 @@ export function CommunityPostCard({
                   ? "text-[#1D5046] bg-[#E8D7AE]/30"
                   : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
               }`}
-              title={post.userBookmarked ? "Saved in this preview" : "Save in this preview"}
-              aria-label={post.userBookmarked ? "Saved in this preview" : "Save in this preview"}
+              title={post.userBookmarked ? t("community.post.saved_in_preview") : t("community.post.save_in_preview")}
+              aria-label={post.userBookmarked ? t("community.post.saved_in_preview") : t("community.post.save_in_preview")}
             >
               <Bookmark className={`w-4 h-4 ${post.userBookmarked ? "fill-current" : ""}`} />
             </button>
@@ -378,8 +380,8 @@ export function CommunityPostCard({
               type="button"
               onClick={() => onShare(post)}
               className="p-2 rounded-xl text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0] transition-colors focus-ring cursor-pointer"
-              title="Copy community page link"
-              aria-label="Copy community page link"
+              title={t("community.post.copy_page_link_aria")}
+              aria-label={t("community.post.copy_page_link_aria")}
             >
               <Share2 className="w-4 h-4" />
             </button>
@@ -399,7 +401,7 @@ export function CommunityPostCard({
               type="text"
               value={commentInput}
               onChange={(e) => setCommentInput(e.target.value)}
-              placeholder="Write a comment or share your thought..."
+              placeholder={t("community.post.comment_input_placeholder")}
               className="flex-1 px-3.5 py-2 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] placeholder:text-[#6E7B75]/70 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white"
             />
             <button
@@ -408,7 +410,7 @@ export function CommunityPostCard({
               className="px-3 py-2 rounded-xl bg-[#1D5046] text-white text-xs font-semibold hover:bg-[#153D35] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer"
             >
               <Send className="w-3 h-3 text-[#E8D7AE]" />
-              <span className="hidden sm:inline">Comment</span>
+              <span className="hidden sm:inline">{t("community.post.comment_submit_btn")}</span>
             </button>
           </form>
 
@@ -446,7 +448,7 @@ export function CommunityPostCard({
                         }
                         className="hover:text-[#1D5046] font-medium cursor-pointer"
                       >
-                        Reply
+                        {t("community.post.reply_btn")}
                       </button>
                     </div>
                   </div>
@@ -459,7 +461,7 @@ export function CommunityPostCard({
                         type="text"
                         value={replyInput}
                         onChange={(e) => setReplyInput(e.target.value)}
-                        placeholder={`Reply to ${comment.authorName}...`}
+                        placeholder={t("community.post.reply_input_placeholder", { name: comment.authorName })}
                         className="flex-1 px-3 py-1.5 rounded-lg bg-white border border-[#E8E2D5] text-xs text-[#314F49] focus:outline-none focus:ring-1 focus:ring-[#1D5046]"
                       />
                       <button
@@ -468,7 +470,7 @@ export function CommunityPostCard({
                         disabled={!replyInput.trim()}
                         className="px-2.5 py-1.5 rounded-lg bg-[#1D5046] text-white text-xs font-semibold disabled:opacity-50 cursor-pointer"
                       >
-                        Send
+                        {t("community.post.send_btn")}
                       </button>
                     </div>
                   )}
@@ -501,7 +503,7 @@ export function CommunityPostCard({
             </div>
           ) : (
             <p className="text-xs text-[#6E7B75] italic py-1 text-center">
-              No comments yet. Be the first to share your perspective!
+              {t("community.post.no_comments_yet")}
             </p>
           )}
         </div>
