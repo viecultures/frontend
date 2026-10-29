@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import type { ContestEntry } from "../types";
 import {
   ContestHeroBanner,
@@ -66,6 +67,7 @@ const INITIAL_CONTEST_ENTRIES: ContestEntry[] = [
 ];
 
 export default function CommunityContestPage() {
+  const { t } = useTranslation("community");
   const [userCoins, setUserCoins] = useState<number>(450);
   const [entries, setEntries] = useState<ContestEntry[]>(INITIAL_CONTEST_ENTRIES);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
@@ -177,7 +179,7 @@ export default function CommunityContestPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <p className="mb-5 rounded-xl border border-[#E8E2D5] bg-white px-4 py-3 text-sm text-[#314F49]">
-          Weekly Challenge preview: entries, votes, coins and rewards are examples. Changes stay on this page until you leave it.
+          {t("community.composer.preview_notice")}
         </p>
         {/* Header Switcher */}
         <CommunityHeader
@@ -229,7 +231,7 @@ export default function CommunityContestPage() {
                   }`}
                 >
                   <TrendingUp className="w-3.5 h-3.5" />
-                  <span>Most voted</span>
+                  <span>{t("community.contest.filter_top")}</span>
                 </button>
                 <button
                   onClick={() => setFilterMode("new")}
@@ -241,7 +243,7 @@ export default function CommunityContestPage() {
                   }`}
                 >
                   <Clock className="w-3.5 h-3.5" />
-                  <span>Newest</span>
+                  <span>{t("community.contest.filter_new")}</span>
                 </button>
                 <button
                   onClick={() => setFilterMode("mine")}
@@ -252,7 +254,7 @@ export default function CommunityContestPage() {
                       : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
                   }`}
                 >
-                  <span>My entries</span>
+                  <span>{t("community.contest.filter_mine")}</span>
                 </button>
               </div>
             </div>

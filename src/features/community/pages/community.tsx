@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import type { CommunityPost, HighlightVocabItem } from "../types";
 import {
   CommunityHeader,
@@ -406,7 +407,7 @@ export default function CommunityPage() {
         return post;
       })
     );
-    showToast("Comment added to this preview only.");
+    showToast(t("community.toasts.comment_added"));
   };
 
   // Publish New Reflection
@@ -444,12 +445,12 @@ export default function CommunityPage() {
     setPostTitle("");
     setReflectionText("");
     setIsEditorOpen(false);
-    showToast("Reflection added to this preview feed only.");
+    showToast(t("community.toasts.reflection_published"));
   };
 
   // Report post
   const handleReportPost = (postId: string) => {
-    showToast("Reporting is not available in this preview.");
+    showToast(t("community.toasts.report_unavailable"));
   };
 
   // Filtered Posts
@@ -507,7 +508,7 @@ export default function CommunityPage() {
       {/* Main Container: 1280px Max Width */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <p className="mb-5 rounded-xl border border-[#E8E2D5] bg-white px-4 py-3 text-sm text-[#314F49]">
-          Community preview: posts and interactions on this page are examples. Changes stay in this page until you leave it.
+          {t("community.composer.preview_notice")}
         </p>
         {/* 1. Page Header with Compact Hierarchy */}
         <CommunityHeader
@@ -560,7 +561,7 @@ export default function CommunityPage() {
                   HV
                 </div>
                 <div className="flex-1 bg-[#FAF7F0] group-hover:bg-[#FAF7F0]/80 border border-[#E8E2D5] rounded-xl px-4 py-2.5 text-xs text-[#6E7B75] transition-colors">
-                  <span>Share a cultural story or something you learned today...</span>
+                  <span>{t("community.composer.placeholder")}</span>
                 </div>
               </div>
 
@@ -569,15 +570,15 @@ export default function CommunityPage() {
                 <div className="flex items-center gap-3 text-[#6E7B75]">
                   <span className="flex items-center gap-1.5 hover:text-[#1D5046] transition-colors">
                     <ImageIcon className="w-3.5 h-3.5 text-[#1D5046]" />
-                    <span className="hidden sm:inline">Add photo</span>
+                    <span className="hidden sm:inline">{t("community.composer.add_photo")}</span>
                   </span>
                   <span className="flex items-center gap-1.5 hover:text-[#1D5046] transition-colors">
                     <BookOpen className="w-3.5 h-3.5 text-[#1D5046]" />
-                    <span className="hidden sm:inline">Tag vocabulary</span>
+                    <span className="hidden sm:inline">{t("community.composer.tag_vocab")}</span>
                   </span>
                   <span className="flex items-center gap-1.5 hover:text-[#1D5046] transition-colors">
                     <PenLine className="w-3.5 h-3.5 text-antique-gold" />
-                    <span className="hidden sm:inline">Writing assist</span>
+                    <span className="hidden sm:inline">{t("community.composer.writing_assist")}</span>
                   </span>
                 </div>
 
@@ -586,7 +587,7 @@ export default function CommunityPage() {
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] transition-colors shadow-2xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Publish</span>
+                  <span>{t("community.composer.publish")}</span>
                 </button>
               </div>
             </div>
@@ -606,7 +607,7 @@ export default function CommunityPage() {
                     }`}
                   >
                     <Compass className="w-3.5 h-3.5" />
-                    <span>For You</span>
+                    <span>{t("community.filters.for_you")}</span>
                   </button>
 
                   <button
@@ -619,7 +620,7 @@ export default function CommunityPage() {
                     }`}
                   >
                     <Users className="w-3.5 h-3.5" />
-                    <span>Following</span>
+                    <span>{t("community.filters.following")}</span>
                   </button>
 
                   <button
@@ -632,7 +633,7 @@ export default function CommunityPage() {
                     }`}
                   >
                     <Clock className="w-3.5 h-3.5" />
-                    <span>Latest</span>
+                    <span>{t("community.filters.latest")}</span>
                   </button>
 
                   <button
@@ -645,7 +646,7 @@ export default function CommunityPage() {
                     }`}
                   >
                     <TrendingUp className="w-3.5 h-3.5 text-antique-gold" />
-                    <span>Trending</span>
+                    <span>{t("community.filters.trending")}</span>
                   </button>
                 </div>
 
@@ -656,8 +657,8 @@ export default function CommunityPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    aria-label="Search reflections by topic, author, or keyword"
-                    placeholder="Search stories..."
+                    aria-label={t("community.filters.search_aria")}
+                    placeholder={t("community.filters.search_placeholder")}
                     className="w-full pl-8 pr-7 py-1.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] placeholder:text-[#6E7B75]/70 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white"
                   />
                   {searchQuery && (
@@ -665,7 +666,7 @@ export default function CommunityPage() {
                       type="button"
                       onClick={() => setSearchQuery("")}
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-[#6E7B75] hover:text-[#1D5046] text-xs cursor-pointer"
-                      aria-label="Clear search query"
+                      aria-label={t("community.filters.clear_search")}
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -677,7 +678,7 @@ export default function CommunityPage() {
               <div
                 className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-[#E8E2D5]/60"
                 role="group"
-                aria-label="Filter reflections by cultural topic"
+                aria-label={t("community.filters.filter_topic_aria")}
               >
                 {TOPIC_FILTERS.map((cat) => (
                   <button
@@ -709,12 +710,12 @@ export default function CommunityPage() {
                     onOpenDetail={(p) => setActiveModalPost(p)}
                     onShare={() => {
                       if (!navigator.clipboard) {
-                        showToast("Clipboard is unavailable in this browser.");
+                        showToast(t("community.toasts.clipboard_unavailable"));
                         return;
                       }
                       void navigator.clipboard.writeText(window.location.href)
-                        .then(() => showToast("Community preview page link copied."))
-                        .catch(() => showToast("Could not copy the page link."));
+                        .then(() => showToast(t("community.toasts.link_copied")))
+                        .catch(() => showToast(t("community.toasts.copy_failed")));
                     }}
                     onSelectVocab={(v) => setActiveVocab(v)}
                     onOpenLightbox={(imgUrl, caption, title) =>
@@ -734,10 +735,10 @@ export default function CommunityPage() {
             ) : (
               <div className="p-8 text-center rounded-2xl bg-white border border-[#E8E2D5] space-y-2.5">
                 <h3 className="font-serif text-base font-bold text-[#1D5046]">
-                  No matching reflections found
+                  {t("community.post.no_posts_found")}
                 </h3>
                 <p className="text-xs text-[#6E7B75] max-w-sm mx-auto">
-                  Try another keyword, clear the search filter, or select &ldquo;All reflections&rdquo; to browse the community.
+                  {t("community.post.no_posts_desc")}
                 </p>
                 <button
                   type="button"

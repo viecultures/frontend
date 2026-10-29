@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import { PLAYGROUND_SCREENS } from '../types';
@@ -13,6 +14,7 @@ import { LiveAPIProvider } from '../components/map-ai/contexts/LiveAPIContext';
 import { PATHS, paths } from '@/routes/paths';
 
 export const PlaygroundPage: React.FC = () => {
+  const { t } = useTranslation('playground');
   const navigate = useAppNavigate();
   const [searchParams] = useSearchParams();
   const enterChat = searchParams.get('view') === 'chat' || !!searchParams.get('story');
@@ -100,11 +102,11 @@ export const PlaygroundPage: React.FC = () => {
         <button
           onClick={() => navigate(PATHS.home)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E2925]/90 backdrop-blur-md border border-antique-gold/40 text-antique-gold hover:text-white text-xs font-semibold shadow-lg cursor-pointer"
-          title="Về Phòng Học"
-          aria-label="Về Phòng Học"
+          title={t('playground.nav.back_to_study')}
+          aria-label={t('playground.nav.back_to_study')}
         >
           <Home className="w-3.5 h-3.5" />
-          <span>Về Phòng Học</span>
+          <span>{t('playground.nav.back_to_study')}</span>
         </button>
       </div>}
 
@@ -157,36 +159,12 @@ export const PlaygroundPage: React.FC = () => {
               <Radio className="w-7 h-7" />
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-antique-gold/20 text-[#B8860B] dark:text-antique-bright">
-              <Feather className="w-3.5 h-3.5" /> Màn hình #04 · Đang phát triển (Alpha)
+              <Feather className="w-3.5 h-3.5" /> {t('playground.screens.screen_04_badge')}
             </div>
             <h2 className="text-2xl font-serif font-bold text-heritage-green dark:text-warm-ivory">
               3-Region Dialect &amp; Tone Explorer
             </h2>
-            <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">
-              Khám phá sóng âm và ma trận phương ngữ Bắc - Trung - Nam, so sánh đường biểu diễn thanh điệu và biến thể từ vựng văn hóa dân gian.
-            </p>
-          </div>
-        </section>
-
-        {/* Screen 5: Heritage Speed-Run Duel Arena */}
-        <section
-          ref={el => { screenRefs.current[4] = el; }}
-          id="screen-heritage-speed-duel"
-          className="w-full h-screen snap-start flex flex-col items-center justify-center border-b border-heritage-green/10 p-6 bg-warm-ivory dark:bg-[#0b1a17]"
-        >
-          <div className="max-w-xl text-center p-8 rounded-3xl bg-white/80 dark:bg-[#12231F]/80 backdrop-blur-md border border-heritage-green/15 shadow-xl space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-heritage-green text-antique-gold flex items-center justify-center shadow-lg">
-              <Zap className="w-7 h-7" />
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-antique-gold/20 text-[#B8860B] dark:text-antique-bright">
-              <Feather className="w-3.5 h-3.5" /> Màn hình #05 · Lab Concept
-            </div>
-            <h2 className="text-2xl font-serif font-bold text-heritage-green dark:text-warm-ivory">
-              Heritage Speed-Run Duel Arena
-            </h2>
-            <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">
-              Đấu trường di sản thử thách phản xạ và từ vựng tốc độ 60 giây dồn dập, tích lũy điểm combo và huy hiệu Sứ Giả Văn Hóa.
-            </p>
+            <p className="text-sm text-[#5D706A] dark:text-[#9FB1AA] leading-relaxed">{t('playground.screens.screen_05_desc')}</p>
           </div>
         </section>
       </div>

@@ -1,0 +1,58 @@
+{
+  "playground": {
+    "nav": {
+      "back_to_study": "Back to study room",
+      "prev_screen": "Previous screen (Key ↑)",
+      "next_screen": "Next screen (Key ↓)",
+      "screen_label": "SCREEN #{{number}}",
+      "key_indicator": "Keys 1 - 5"
+    },
+    "workspace": {
+      "title": "AI workspace",
+      "subtitle": "Speaking practice",
+      "reader_link": "Reader",
+      "study_room_link": "Study room",
+      "playground_link": "Playground",
+      "welcome_title_reading": "Put your reading into words.",
+      "welcome_title_default": "Let’s talk about Vietnam.",
+      "welcome_prompt": "Start speaking or choose a prompt.",
+      "welcome_hint": "Maps and stories open here when you ask.",
+      "map_title": "Vietnam map",
+      "story_details": "Story details",
+      "reading_notes": "Reading notes",
+      "ask_ai_about": "Ask AI about {{name}}",
+      "tell_me_about_prompt": "Tell me about the cultural heritage, famous landmarks, and speaking practice points for {{name}} in English suited for {{level}}."
+    },
+    "tray": {
+      "connecting": "Connecting…",
+      "wrapping_up": "Wrapping up… You can stop now.",
+      "restoring_context": "Restoring context…",
+      "ai_speaking": "AI is speaking",
+      "waiting_reply": "Waiting for a reply…",
+      "listening": "Listening",
+      "mic_off": "Mic off · You can type a message",
+      "paused": "Paused · Press Play to resume",
+      "ready": "Ready when you are · Press Play to speak",
+      "mic_meter_aria": "Microphone volume",
+      "retry": "Retry",
+      "finish_recap": "Finish and recap",
+      "resume_conversation": "Resume conversation",
+      "settings_title": "Speaking settings",
+      "mic_on_title": "Turn microphone on",
+      "mic_off_title": "Turn microphone off",
+      "pause_convo_title": "Pause conversation",
+      "resume_convo_title": "Resume conversation",
+      "start_speaking_title": "Start speaking",
+      "type_message_placeholder": "Type a message in English or Vietnamese...",
+      "send_message": "Send message"
+    },
+    "screens": {
+      "screen_04_badge": "Screen #04 · In Development (Alpha)",
+      "screen_04_title": "3-Region Dialect & Tone Explorer",
+      "screen_04_desc": "Explore soundwaves and dialect matrices across North, Central, and South Vietnam, comparing tonal contours and folk cultural vocabulary variants.",
+      "screen_05_badge": "Screen #05 · Lab Concept",
+      "screen_05_title": "Heritage Speed-Run Duel Arena",
+      "screen_05_desc": "Heritage arena testing 60-second rapid reflex and vocabulary, collecting combo streaks and Cultural Ambassador badges."
+    }
+  }
+}

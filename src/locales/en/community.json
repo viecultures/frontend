@@ -1,0 +1,87 @@
+{
+  "community": {
+    "header": {
+      "reflections_title": "Cultural Ambassador Reflections",
+      "reflections_desc": "Share stories. Practice English. Explore Vietnamese culture together.",
+      "contest_title": "Weekly Heritage Essay Challenge",
+      "contest_desc": "Write a short essay (100–300 words) in English using heritage vocabulary. Top entries earn community ambassador badges.",
+      "write_reflection": "Write Reflection",
+      "submit_entry": "Submit entry",
+      "close_editor": "Close editor",
+      "tab_reflections": "Reflections",
+      "tab_contest": "Weekly Challenge"
+    },
+    "composer": {
+      "placeholder": "Share a cultural story or something you learned today...",
+      "add_photo": "Add photo",
+      "tag_vocab": "Tag vocabulary",
+      "writing_assist": "Writing assist",
+      "publish": "Publish",
+      "preview_notice": "Community preview: posts and interactions on this page are examples. Changes stay in this page until you leave it."
+    },
+    "filters": {
+      "for_you": "For You",
+      "following": "Following",
+      "latest": "Latest",
+      "trending": "Trending",
+      "search_placeholder": "Search stories...",
+      "search_aria": "Search reflections by topic, author, or keyword",
+      "clear_search": "Clear search query",
+      "all_topics": "All reflections",
+      "filter_topic_aria": "Filter reflections by cultural topic"
+    },
+    "post": {
+      "follow": "Follow",
+      "following": "Following",
+      "read_more": "Read more",
+      "read_less": "Read less",
+      "like": "Like",
+      "liked": "Liked",
+      "comment": "Comment",
+      "comments": "comments",
+      "bookmark": "Bookmark",
+      "bookmarked": "Bookmarked",
+      "share": "Share",
+      "copy_link": "Copy post link",
+      "report": "Report post",
+      "write_comment_placeholder": "Write a comment or ask a cultural question...",
+      "reply_placeholder": "Write a reply...",
+      "send": "Send",
+      "reply": "Reply",
+      "cancel": "Cancel",
+      "no_posts_found": "No matching reflections found",
+      "no_posts_desc": "Try another keyword, clear the search filter, or select \"All reflections\" to browse the community."
+    },
+    "sidebar": {
+      "weekly_challenge": "Weekly Challenge",
+      "challenge_coins": "+100 coins",
+      "join_challenge": "Join Weekly Challenge",
+      "joined_challenge": "Joined Challenge",
+      "trending_topics": "Trending Topics",
+      "top_ambassadors": "Top Ambassadors",
+      "view_all_entries": "View all challenge entries",
+      "reflections_count": "{{count}} reflections"
+    },
+    "contest": {
+      "tag_top_1": "TOP 1 TOPIC • +500 COINS",
+      "tag_top_2": "TOP 2 TOPIC • +300 COINS",
+      "tag_top_3": "TOP 3 TOPIC • +200 COINS",
+      "filter_top": "Top Voted",
+      "filter_new": "Newest",
+      "filter_mine": "My Submission",
+      "submit_btn": "Submit Entry (+100 coins)",
+      "vote": "Vote",
+      "voted": "Voted",
+      "reward_coins": "+{{count}} coins",
+      "used_vocab": "Used Vocabulary"
+    },
+    "toasts": {
+      "comment_added": "Comment added to this preview only.",
+      "reflection_published": "Reflection added to this preview feed only.",
+      "report_unavailable": "Reporting is not available in this preview.",
+      "link_copied": "Community preview page link copied.",
+      "copy_failed": "Could not copy the page link.",
+      "clipboard_unavailable": "Clipboard is unavailable in this browser."
+    }
+  }
+}

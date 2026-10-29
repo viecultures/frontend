@@ -1,0 +1,87 @@
+{
+  "community": {
+    "header": {
+      "reflections_title": "Góc Cảm Nhận Sứ Giả Văn Hóa",
+      "reflections_desc": "Chia sẻ cảm nghĩ. Thực hành tiếng Anh. Cùng lan tỏa vẻ đẹp văn hóa Việt Nam.",
+      "contest_title": "Thử Thách Viết Tiểu Luận Di Sản Hàng Tuần",
+      "contest_desc": "Viết bài cảm nhận ngắn (100–300 từ) bằng tiếng Anh sử dụng từ vựng di sản. Bài viết xuất sắc nhận huy hiệu Sứ Giả Cộng Đồng.",
+      "write_reflection": "Viết cảm nhận",
+      "submit_entry": "Gửi bài dự thi",
+      "close_editor": "Đóng trình soạn thảo",
+      "tab_reflections": "Góc cảm nhận",
+      "tab_contest": "Thử thách tuần"
+    },
+    "composer": {
+      "placeholder": "Chia sẻ một câu chuyện văn hóa hoặc điều bạn đã học hôm nay...",
+      "add_photo": "Thêm ảnh",
+      "tag_vocab": "Gắn từ vựng",
+      "writing_assist": "Hỗ trợ viết",
+      "publish": "Đăng bài",
+      "preview_notice": "Bản xem trước cộng đồng: các bài viết và tương tác trên trang này là ví dụ thử nghiệm."
+    },
+    "filters": {
+      "for_you": "Dành cho bạn",
+      "following": "Đang theo dõi",
+      "latest": "Mới nhất",
+      "trending": "Thịnh hành",
+      "search_placeholder": "Tìm kiếm câu chuyện...",
+      "search_aria": "Tìm kiếm bài cảm nhận theo chủ đề, tác giả hoặc từ khóa",
+      "clear_search": "Xóa tìm kiếm",
+      "all_topics": "Tất cả cảm nhận",
+      "filter_topic_aria": "Lọc cảm nhận theo chủ đề văn hóa"
+    },
+    "post": {
+      "follow": "Theo dõi",
+      "following": "Đang theo dõi",
+      "read_more": "Đọc thêm",
+      "read_less": "Thu gọn",
+      "like": "Thích",
+      "liked": "Đã thích",
+      "comment": "Bình luận",
+      "comments": "bình luận",
+      "bookmark": "Lưu bài",
+      "bookmarked": "Đã lưu",
+      "share": "Chia sẻ",
+      "copy_link": "Sao chép liên kết bài viết",
+      "report": "Báo cáo bài viết",
+      "write_comment_placeholder": "Viết bình luận hoặc đặt câu hỏi về văn hóa...",
+      "reply_placeholder": "Viết phản hồi...",
+      "send": "Gửi",
+      "reply": "Trả lời",
+      "cancel": "Hủy",
+      "no_posts_found": "Không tìm thấy bài cảm nhận phù hợp",
+      "no_posts_desc": "Hãy thử từ khóa khác, xóa bộ lọc tìm kiếm hoặc chọn \"Tất cả cảm nhận\" để duyệt qua cộng đồng."
+    },
+    "sidebar": {
+      "weekly_challenge": "Thử thách tuần",
+      "challenge_coins": "+100 xu",
+      "join_challenge": "Tham gia thử thách",
+      "joined_challenge": "Đã tham gia thử thách",
+      "trending_topics": "Chủ đề sôi nổi",
+      "top_ambassadors": "Bảng xếp hạng Sứ Giả",
+      "view_all_entries": "Xem tất cả bài dự thi",
+      "reflections_count": "{{count}} bài viết"
+    },
+    "contest": {
+      "tag_top_1": "TOP 1 CHỦ ĐỀ • +500 XU",
+      "tag_top_2": "TOP 2 CHỦ ĐỀ • +300 XU",
+      "tag_top_3": "TOP 3 CHỦ ĐỀ • +200 XU",
+      "filter_top": "Bình chọn cao nhất",
+      "filter_new": "Mới nhất",
+      "filter_mine": "Bài dự thi của tôi",
+      "submit_btn": "Gửi bài dự thi (+100 xu)",
+      "vote": "Bình chọn",
+      "voted": "Đã bình chọn",
+      "reward_coins": "+{{count}} xu",
+      "used_vocab": "Từ vựng đã dùng"
+    },
+    "toasts": {
+      "comment_added": "Đã thêm bình luận vào bản xem trước.",
+      "reflection_published": "Đã đăng bài cảm nhận vào luồng xem trước.",
+      "report_unavailable": "Tính năng báo cáo chưa khả dụng trong bản xem trước.",
+      "link_copied": "Đã sao chép liên kết trang cộng đồng.",
+      "copy_failed": "Không thể sao chép liên kết trang.",
+      "clipboard_unavailable": "Trình duyệt không hỗ trợ truy cập bộ nhớ tạm."
+    }
+  }
+}

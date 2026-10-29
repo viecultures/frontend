@@ -18,6 +18,12 @@ import viSubscription from '../locales/vi/subscription.json';
 import enSubscription from '../locales/en/subscription.json';
 import viAdmin from '../locales/vi/admin.json';
 import enAdmin from '../locales/en/admin.json';
+import viCommunity from '../locales/vi/community.json';
+import enCommunity from '../locales/en/community.json';
+import viPlayground from '../locales/vi/playground.json';
+import enPlayground from '../locales/en/playground.json';
+import viProfile from '../locales/vi/profile.json';
+import enProfile from '../locales/en/profile.json';
 
 export const SUPPORTED_LANGS = ['vi', 'en'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGS)[number];
@@ -33,6 +39,9 @@ export const resources = {
     discovery: viDiscovery,
     subscription: viSubscription,
     admin: viAdmin,
+    community: viCommunity,
+    playground: viPlayground,
+    profile: viProfile,
   },
   en: {
     common: enCommon,
@@ -44,6 +53,9 @@ export const resources = {
     discovery: enDiscovery,
     subscription: enSubscription,
     admin: enAdmin,
+    community: enCommunity,
+    playground: enPlayground,
+    profile: enProfile,
   },
 } as const;
 
@@ -73,7 +85,7 @@ i18n
     lng: getInitialLanguage(),
     fallbackLng: 'vi',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'landing', 'home', 'reader', 'flashcards', 'discovery', 'subscription', 'admin'],
+    ns: ['common', 'auth', 'landing', 'home', 'reader', 'flashcards', 'discovery', 'subscription', 'admin', 'community', 'playground', 'profile'],
     interpolation: {
       escapeValue: false,
     },

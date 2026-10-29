@@ -1,0 +1,86 @@
+{
+  "profile": {
+    "header": {
+      "back_to_study": "Quay lại phòng học",
+      "profile_synced": "Hồ sơ đã đồng bộ",
+      "saved_locally": "Lưu trên trình duyệt này",
+      "breadcrumb_title": "Hồ sơ & thành tích",
+      "profile_saved_toast": "Đã lưu hồ sơ.",
+      "pro_member": "HỘI VIÊN PRO",
+      "free_tier": "GÓI MIỄN PHÍ",
+      "edit_profile": "Chỉnh sửa hồ sơ",
+      "watermark": "Hồ sơ VieCultures"
+    },
+    "tabs": {
+      "passport": "Hộ chiếu văn hóa ({{unlocked}}/{{total}})",
+      "badges": "Huy hiệu & mốc son ({{unlocked}}/{{total}})",
+      "vocab": "Sổ tay từ vựng ({{count}})",
+      "subscription": "Gói hội viên & cài đặt"
+    },
+    "passport": {
+      "tag": "Hộ chiếu văn hóa của bạn",
+      "title": "Hành trình di sản ba miền",
+      "desc": "Khám phá các câu chuyện văn hóa và sưu tập mộc son di sản trên từng chặng đường.",
+      "reference_label": "Mã hộ chiếu",
+      "belongs_to": "Thuộc về:",
+      "north": "Miền Bắc",
+      "central": "Miền Trung",
+      "south": "Miền Nam",
+      "stamps_count": "{{count}} / 3 mộc son",
+      "filter_all": "Tất cả mộc son",
+      "filter_north": "Miền Bắc",
+      "filter_central": "Miền Trung",
+      "filter_south": "Miền Nam"
+    },
+    "seal_modal": {
+      "heritage_stamp": "Mộc son di sản",
+      "region_north": "Di sản Miền Bắc",
+      "region_central": "Di sản Miền Trung",
+      "region_south": "Di sản Miền Nam",
+      "collected_at": "Thu thập: {{date}}",
+      "locked": "Chưa mở khóa",
+      "culture_context": "Văn hóa & ngữ cảnh",
+      "words_in_context": "Từ vựng ngữ cảnh",
+      "words_count": "{{count}} từ",
+      "reading_time": "Thời gian đọc",
+      "reading_minutes": "~{{count}} phút",
+      "read_again": "Đọc lại bài này",
+      "explore_story": "Khám phá bài đọc này",
+      "copy_stamp": "Sao chép mộc son",
+      "copied": "Đã chép",
+      "review_flashcards": "Ôn tập flashcards",
+      "toast_copied": "Đã sao chép thông tin mộc son vào bộ nhớ tạm.",
+      "toast_copy_failed": "Không thể sao chép. Vui lòng thử lại."
+    },
+    "vocab": {
+      "title": "Từ vựng trong ngữ cảnh",
+      "desc": "Các từ và cụm từ đúc kết từ những câu chuyện bạn đã đọc.",
+      "saved_count": "{{count}} từ đã lưu từ bài đọc",
+      "sample_notice": "Từ vựng mẫu · hãy lưu từ mới trong khi đọc để xây dựng sổ tay",
+      "review_flashcards": "Ôn tập flashcard",
+      "search_placeholder": "Tìm kiếm từ vựng hoặc ý nghĩa...",
+      "filter_all": "Tất cả ({{count}})",
+      "filter_words": "Từ đơn",
+      "filter_phrases": "Cụm từ",
+      "empty_title": "Chưa tìm thấy từ vựng phù hợp",
+      "empty_desc": "Hãy thử đổi từ khóa tìm kiếm hoặc chọn lọc tất cả từ vựng."
+    },
+    "subscription": {
+      "plan_pro": "VieCultures Pro",
+      "plan_free": "Gói miễn phí",
+      "badge_active": "HOẠT ĐỘNG",
+      "badge_free": "MIỄN PHÍ",
+      "expires_at": "Hạn hội viên đến: {{date}}",
+      "free_desc": "Đọc truyện song ngữ và luyện tập flashcard cốt lõi.",
+      "manage_membership": "Quản lý gói hội viên",
+      "explore_pro": "Nâng cấp Pro · 39k/tháng",
+      "plan_includes": "Gói của bạn bao gồm",
+      "bilingual_audio": "Đọc song ngữ và nghe giọng đọc 3 tốc độ (0.5x, 0.8x, 1x)",
+      "core_flashcards": "Ôn tập từ vựng flashcard cốt lõi với lặp lại ngắt quãng",
+      "cultural_stamps": "Sưu tập mộc son di sản và theo dõi tiến độ ba miền",
+      "community_access": "Tham gia góc cảm nhận và thử thách viết tuần",
+      "gemini_ai_companion": "Trợ lý đàm thoại AI song ngữ văn hóa chuẩn giọng",
+      "unlimited_vocab": "Lưu trữ không giới hạn sổ tay từ vựng chuyên sâu"
+    }
+  }
+}

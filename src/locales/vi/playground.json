@@ -1,0 +1,58 @@
+{
+  "playground": {
+    "nav": {
+      "back_to_study": "Về Phòng Học",
+      "prev_screen": "Màn hình trước (Phím ↑)",
+      "next_screen": "Màn hình tiếp theo (Phím ↓)",
+      "screen_label": "MÀN HÌNH #{{number}}",
+      "key_indicator": "Phím 1 - 5"
+    },
+    "workspace": {
+      "title": "Không gian AI",
+      "subtitle": "Luyện nói tương tác",
+      "reader_link": "Bài đọc",
+      "study_room_link": "Phòng học",
+      "playground_link": "Sân chơi thực nghiệm",
+      "welcome_title_reading": "Biến bài đọc thành lời nói của bạn.",
+      "welcome_title_default": "Cùng trò chuyện về văn hóa Việt Nam.",
+      "welcome_prompt": "Bắt đầu nói hoặc chọn một gợi ý bên dưới.",
+      "welcome_hint": "Bản đồ và các câu chuyện sẽ tự mở khi bạn hỏi đến.",
+      "map_title": "Bản đồ Việt Nam",
+      "story_details": "Chi tiết câu chuyện",
+      "reading_notes": "Ghi chú bài đọc",
+      "ask_ai_about": "Hỏi AI về {{name}}",
+      "tell_me_about_prompt": "Hãy chia sẻ về di sản văn hóa, địa danh nổi tiếng và điểm luyện nói tiếng Anh cho {{name}} phù hợp trình độ {{level}}."
+    },
+    "tray": {
+      "connecting": "Đang kết nối…",
+      "wrapping_up": "Đang tổng kết… Bạn có thể dừng lại lúc này.",
+      "restoring_context": "Đang khôi phục ngữ cảnh…",
+      "ai_speaking": "AI đang nói",
+      "waiting_reply": "Đang chờ phản hồi…",
+      "listening": "Đang lắng nghe",
+      "mic_off": "Đã tắt mic · Bạn có thể gõ tin nhắn",
+      "paused": "Đang tạm dừng · Nhấn Play để tiếp tục",
+      "ready": "Sẵn sàng bất cứ khi nào bạn muốn · Nhấn Play để nói",
+      "mic_meter_aria": "Âm lượng microphone",
+      "retry": "Thử lại",
+      "finish_recap": "Kết thúc & tổng kết",
+      "resume_conversation": "Tiếp tục trò chuyện",
+      "settings_title": "Cài đặt hội thoại",
+      "mic_on_title": "Bật microphone",
+      "mic_off_title": "Tắt microphone",
+      "pause_convo_title": "Tạm dừng cuộc trò chuyện",
+      "resume_convo_title": "Tiếp tục cuộc trò chuyện",
+      "start_speaking_title": "Bắt đầu nói",
+      "type_message_placeholder": "Nhập tin nhắn bằng tiếng Anh hoặc tiếng Việt...",
+      "send_message": "Gửi tin nhắn"
+    },
+    "screens": {
+      "screen_04_badge": "Màn hình #04 · Đang phát triển (Alpha)",
+      "screen_04_title": "3-Region Dialect & Tone Explorer",
+      "screen_04_desc": "Khám phá sóng âm và ma trận phương ngữ Bắc - Trung - Nam, so sánh đường biểu diễn thanh điệu và biến thể từ vựng văn hóa dân gian.",
+      "screen_05_badge": "Màn hình #05 · Lab Concept",
+      "screen_05_title": "Heritage Speed-Run Duel Arena",
+      "screen_05_desc": "Đấu trường di sản thử thách phản xạ và từ vựng tốc độ 60 giây dồn dập, tích lũy điểm combo và huy hiệu Sứ Giả Văn Hóa."
+    }
+  }
+}

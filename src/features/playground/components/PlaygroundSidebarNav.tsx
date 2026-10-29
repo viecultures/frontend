@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   ChevronUp,
@@ -25,6 +26,7 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
   currentScreenIndex,
   onSelectScreen
 }) => {
+  const { t } = useTranslation('playground');
   const navigate = useAppNavigate();
 
   const getIcon = (iconName: string, active: boolean) => {
@@ -60,8 +62,8 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
       <button
         onClick={() => navigate(PATHS.home)}
         className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-antique-gold/30 text-antique-gold hover:text-white hover:bg-heritage-green flex items-center justify-center transition-all cursor-pointer shadow-lg mb-1"
-        title="Về Phòng Học"
-        aria-label="Về Phòng Học"
+        title={t('playground.nav.back_to_study')}
+        aria-label={t('playground.nav.back_to_study')}
       >
         <Home className="w-4 h-4" />
       </button>
@@ -71,7 +73,7 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
         onClick={handlePrev}
         disabled={currentScreenIndex === 0}
         className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-antique-gold/30 text-white/70 hover:text-white hover:bg-heritage-green disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all cursor-pointer shadow-lg"
-        title="Màn hình trước (Phím ↑)"
+        title={t('playground.nav.prev_screen')}
       >
         <ChevronUp className="w-4 h-4" />
       </button>
@@ -96,7 +98,7 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
               {/* Tooltip Card on Hover */}
               <div className="absolute right-12 top-1/2 -translate-y-1/2 hidden group-hover:flex flex-col w-56 p-3 bg-[#1E2925] border border-antique-gold/40 rounded-xl shadow-2xl pointer-events-none z-50 text-left transition-all animate-in fade-in slide-in-from-right-2">
                 <div className="flex items-center justify-between text-[10px] text-antique-gold font-mono mb-1">
-                  <span>MÀN HÌNH #{screen.number}</span>
+                  <span>{t('playground.nav.screen_label', { number: screen.number })}</span>
                   <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">
                     {screen.status}
                   </span>
@@ -118,14 +120,14 @@ export const PlaygroundSidebarNav: React.FC<PlaygroundSidebarNavProps> = ({
         onClick={handleNext}
         disabled={currentScreenIndex === PLAYGROUND_SCREENS.length - 1}
         className="w-8 h-8 rounded-full bg-[#1E2925]/80 backdrop-blur-md border border-antique-gold/30 text-white/70 hover:text-white hover:bg-heritage-green disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all cursor-pointer shadow-lg"
-        title="Màn hình tiếp theo (Phím ↓)"
+        title={t('playground.nav.next_screen')}
       >
         <ChevronDown className="w-4 h-4" />
       </button>
 
       {/* Keyboard Shortcut Indicator */}
       <div className="text-[9px] font-mono text-antique-gold bg-black/50 px-2 py-0.5 rounded-full border border-white/10 opacity-70">
-        Phím 1 - 5
+        {t('playground.nav.key_indicator')}
       </div>
     </div>
   );

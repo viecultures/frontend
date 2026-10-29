@@ -14,8 +14,13 @@ export const useAppNavigate = () => {
   const { lang: paramLang } = useParams<{ lang?: string }>();
 
   return useCallback(
-    (to: string, options?: NavigateOptions) => {
+    (to: string | number, options?: NavigateOptions) => {
       try {
+        if (typeof to === 'number') {
+          navigate(to);
+          return;
+        }
+
         if (/^https?:\/\//i.test(to)) {
           window.location.href = to;
           return;

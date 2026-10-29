@@ -6,6 +6,7 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import './map-ai.css';
 import './ai-workspace-ui.css';
@@ -28,6 +29,7 @@ import { ReaderWorkspacePanel } from './components/ReaderWorkspacePanel';
 
 
 function MapAiContent() {
+  const { t } = useTranslation('playground');
   const { isSidebarOpen } = useUI();
   const { activeView, sendMessage, connecting, ending, isSending, isRestoringContext } = useLiveAPIContext();
   const active = activeView === 'chat';
@@ -118,7 +120,7 @@ function MapAiContent() {
         {panel && (
           <aside className={`map-panel chat-tool-panel flex flex-col relative overflow-hidden bg-[#090e1a] ${panel.type === 'reader' ? 'reader-reference-drawer' : ''}`} aria-label={panel.type === 'map' ? 'Vietnam map' : panel.type === 'reader' ? 'Reading reference' : 'Cultural story'}>
             <div className="chat-tool-panel-header">
-              <h2>{panel.type === 'map' ? 'Vietnam map' : panel.type === 'reader' ? 'Ghi chú bài đọc' : 'Story details'}</h2>
+              <h2>{panel.type === 'map' ? t('playground.workspace.map_title') : panel.type === 'reader' ? t('playground.workspace.reading_notes') : t('playground.workspace.story_details')}</h2>
               <button type="button" onClick={closePanel} aria-label="Close content" title="Close (Esc)"><X size={18} /></button>
             </div>
             {panel.type === 'reader' ? <ReaderWorkspacePanel /> : panel.type === 'article' ? (
@@ -127,7 +129,7 @@ function MapAiContent() {
               <div className="relative flex-1 min-h-0 w-full">
                 {active && selectedLandmark && selectedLandmark.provinceId === selectedProvinceId && (
                   <button type="button" disabled={busy} className="ai-workspace-map-ask-button" onClick={() => !busy && void sendMessage({ text: `Tell me about ${selectedLandmark.name} in ${selectedProvinceDetail?.name || selectedLandmark.locationNameVi}. Use English suited for ${proficiencyLevel}.`, source: 'map' })}>
-                    Ask AI about {selectedLandmark.name}
+                    {t('playground.workspace.ask_ai_about', { name: selectedLandmark.name })}
                   </button>
                 )}
                 {active && selectedProvinceDetail && (

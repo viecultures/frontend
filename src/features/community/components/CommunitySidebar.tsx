@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Trophy, TrendingUp, Award, ArrowRight, Clock, Users, Check } from "lucide-react";
 import Link from "@/components/Link";
 import { PATHS } from "@/routes/paths";
@@ -42,9 +43,11 @@ const TOP_AMBASSADORS: TopAmbassadorItem[] = [
 ];
 
 export function CommunitySidebar({
+
   onSelectTopicTag,
   selectedTag,
 }: CommunitySidebarProps) {
+  const { t } = useTranslation("community");
   const [hasJoinedChallenge, setHasJoinedChallenge] = useState<boolean>(false);
 
   return (
@@ -55,10 +58,10 @@ export function CommunitySidebar({
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold text-[#1D5046] uppercase tracking-wider flex items-center gap-1.5">
             <Trophy className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Weekly Challenge</span>
+            <span>{t("community.sidebar.weekly_challenge")}</span>
           </span>
           <span className="text-xs font-bold text-[#1D5046] bg-[#E8D7AE]/30 px-2 py-0.5 rounded-full border border-[#E8D7AE]/50">
-            +100 coins
+            {t("community.sidebar.challenge_coins")}
           </span>
         </div>
 
@@ -105,7 +108,7 @@ export function CommunitySidebar({
               <div className="p-2.5 rounded-xl bg-[#FAF7F0] border border-[#1D5046]/20 flex items-center justify-between text-xs">
                 <span className="text-[#1D5046] font-semibold flex items-center gap-1.5">
                   <Check className="w-3.5 h-3.5 text-[#1D5046]" />
-                  <span>Enrolled in Challenge</span>
+                  <span>{t("community.sidebar.joined_challenge")}</span>
                 </span>
                 <span className="text-[11px] text-[#6E7B75]">1/1 submitted</span>
               </div>
@@ -124,7 +127,7 @@ export function CommunitySidebar({
                 onClick={() => setHasJoinedChallenge(true)}
                 className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] transition-colors shadow-xs focus-ring cursor-pointer"
               >
-                <span>Join Challenge</span>
+                <span>{t("community.sidebar.join_challenge")}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <Link
@@ -144,7 +147,7 @@ export function CommunitySidebar({
         <div className="flex items-center justify-between pb-1.5 border-b border-[#E8E2D5]/70">
           <h3 className="text-xs font-bold text-[#1D5046] uppercase tracking-wider flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Trending Topics</span>
+            <span>{t("community.sidebar.trending_topics")}</span>
           </h3>
           <span className="text-[11px] text-[#6E7B75]">This week</span>
         </div>
@@ -179,7 +182,7 @@ export function CommunitySidebar({
         <div className="flex items-center justify-between pb-1.5 border-b border-[#E8E2D5]/70">
           <h3 className="text-xs font-bold text-[#1D5046] uppercase tracking-wider flex items-center gap-1.5">
             <Award className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Top Ambassadors</span>
+            <span>{t("community.sidebar.top_ambassadors")}</span>
           </h3>
           <span className="text-[11px] text-[#6E7B75]">Weekly XP</span>
         </div>

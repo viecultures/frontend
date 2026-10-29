@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, MotionConfig } from 'motion/react';
 import {
   BookOpen,
@@ -39,6 +40,7 @@ import '../admin-ui.css';
 type AdminTab = 'posts' | 'users' | 'system_stats';
 
 export const AdminPage: React.FC = () => {
+  const { t } = useTranslation('admin');
   const [activeTab, setActiveTab] = useState<AdminTab>('posts');
 
   // Posts State
@@ -80,7 +82,7 @@ export const AdminPage: React.FC = () => {
     } catch (err: unknown) {
       setHasLoadedPosts(false);
       console.error('Lỗi tải bài viết:', err);
-      setErrorMsg((err instanceof Error ? err.message : '') || 'Unable to load articles. Please try again.');
+      setErrorMsg((err instanceof Error ? err.message : '') || t('messages.load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -143,10 +145,10 @@ export const AdminPage: React.FC = () => {
     try {
       await postAdminService.deletePost(deletingId);
       setPosts((prev) => prev.filter((p) => p.id !== deletingId));
-      setSuccessToast('Article deleted.');
+      setSuccessToast(t('messages.post_deleted'));
       setTimeout(() => setSuccessToast(null), 3000);
     } catch (err: unknown) {
-      setErrorMsg((err instanceof Error ? err.message : '') || 'Unable to delete the article.');
+      setErrorMsg((err instanceof Error ? err.message : '') || t('messages.delete_error'));
     } finally {
       setDeletingId(null);
     }
@@ -155,7 +157,7 @@ export const AdminPage: React.FC = () => {
   // Callback on post saved
   const handlePostSaved = () => {
     fetchPosts();
-    setSuccessToast('Article saved.');
+    setSuccessToast(t('messages.post_saved'));
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
@@ -204,13 +206,13 @@ export const AdminPage: React.FC = () => {
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-antique-gold/20 text-antique-bright border border-antique-gold/30 text-xs font-bold">
                 <BookOpen aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
-                <span>VieCultures · Administration</span>
+                <span>{t('header.badge')}</span>
               </div>
               <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
-                Content & administration
+                {t('header.title')}
               </h1>
               <p className="text-xs sm:text-sm text-warm-ivory/80 max-w-2xl font-light">
-                Manage cultural articles, account access and learning content in one place.
+                {t('header.subtitle')}
               </p>
             </div>
 
@@ -222,10 +224,10 @@ export const AdminPage: React.FC = () => {
                     onClick={fetchPosts}
                     disabled={isLoading}
                     className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-bold text-warm-ivory flex items-center gap-2 transition-all cursor-pointer"
-                    title="Refresh articles" aria-label="Refresh articles"
+                    title={t('header.refresh_articles')} aria-label={t('header.refresh_articles')}
                   >
                     <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                    <span>Refresh</span>
+                    <span>{t('header.refresh_articles')}</span>
                   </button>
 
                   <button
@@ -233,7 +235,7 @@ export const AdminPage: React.FC = () => {
                     className="px-5 py-2.5 rounded-xl bg-antique-gold text-heritage-dark hover:bg-antique-bright text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer shadow-lg hover:shadow-xl"
                   >
                     <Plus aria-hidden="true" className="w-4 h-4" />
-                    <span>New article</span>
+                    <span>{t('header.new_article')}</span>
                   </button>
                 </>
               )}
@@ -241,7 +243,7 @@ export const AdminPage: React.FC = () => {
               {activeTab === 'users' && (
                 <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-2">
                   <ShieldCheck aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                  <span>Administrator access</span>
+                  <span>{t('header.admin_access')}</span>
                 </div>
               )}
 
@@ -254,7 +256,7 @@ export const AdminPage: React.FC = () => {
                   className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-bold text-warm-ivory flex items-center gap-2 transition-all cursor-pointer"
                 >
                   <RefreshCw aria-hidden="true" className="w-4 h-4" />
-                  <span>Refresh overview</span>
+                  <span>{t('header.refresh_overview')}</span>
                 </button>
               )}
             </div>
@@ -276,7 +278,7 @@ export const AdminPage: React.FC = () => {
             }`}
           >
             <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>Articles</span>
+            <span>{t('tabs.posts')}</span>
             <span
               className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                 activeTab === 'posts'
@@ -298,7 +300,7 @@ export const AdminPage: React.FC = () => {
             }`}
           >
             <Users aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>Users</span>
+            <span>{t('tabs.users')}</span>
             {totalUsersCount !== null && totalUsersCount > 0 && (
               <span
                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
@@ -322,7 +324,7 @@ export const AdminPage: React.FC = () => {
             }`}
           >
             <BarChart3 aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>Overview</span>
+            <span>{t('tabs.overview')}</span>
           </button>
         </div>
 
@@ -333,40 +335,40 @@ export const AdminPage: React.FC = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
                 <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>Articles in view</span>
+                  <span>{t('stats.articles_in_view')}</span>
                   <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                 </div>
                 <div className="text-2xl sm:text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
                   {stats.totalPosts}
                 </div>
-                <p className="text-[11px] text-text-secondary">Articles in the current selection</p>
+                <p className="text-[11px] text-text-secondary">{t('stats.articles_desc')}</p>
               </div>
 
               <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
                 <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>Article reads</span>
+                  <span>{t('stats.article_reads')}</span>
                   <TrendingUp aria-hidden="true" className="w-4 h-4 text-emerald-500" />
                 </div>
                 <div className="text-2xl sm:text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
                   {stats.totalReads.toLocaleString()}
                 </div>
-                <p className="text-[11px] text-text-secondary">Reads for the current selection</p>
+                <p className="text-[11px] text-text-secondary">{t('stats.reads_desc')}</p>
               </div>
 
               <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
                 <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>Regions represented</span>
+                  <span>{t('stats.regions_represented')}</span>
                   <MapPin aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                 </div>
                 <div className="text-2xl sm:text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
                   {Object.keys(stats.regionsCount).length}
                 </div>
-                <p className="text-[11px] text-text-secondary">Locations in this selection</p>
+                <p className="text-[11px] text-text-secondary">{t('stats.regions_desc')}</p>
               </div>
 
               <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
                 <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>CEFR coverage</span>
+                  <span>{t('stats.cefr_coverage')}</span>
                   <Layers aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
@@ -379,7 +381,7 @@ export const AdminPage: React.FC = () => {
                     </span>
                   ))}
                 </div>
-                <p className="text-[11px] text-text-secondary">Reading levels represented</p>
+                <p className="text-[11px] text-text-secondary">{t('stats.cefr_desc')}</p>
               </div>
             </div>
 
@@ -389,39 +391,39 @@ export const AdminPage: React.FC = () => {
                 <Search aria-hidden="true" className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
                   type="text"
-                  aria-label="Search articles"
+                  aria-label={t('filters.search_placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search titles, story groups or keywords…"
+                  placeholder={t('filters.search_placeholder')}
                   className="w-full pl-10 pr-4 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                 />
-                <button type="submit" className="rounded-xl bg-heritage-green px-3 text-warm-ivory">Search</button>
+                <button type="submit" className="rounded-xl bg-heritage-green px-3 text-warm-ivory">{t('filters.search_button')}</button>
               </form>
 
               <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
                 {/* Level Filter */}
                 <select
-                  aria-label="Filter articles by CEFR level"
+                  aria-label={t('filters.all_levels')}
                   value={selectedLevel}
                   onChange={(e) => setSelectedLevel(e.target.value)}
                   className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
-                  <option value="">All CEFR levels</option>
+                  <option value="">{t('filters.all_levels')}</option>
                   {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => (
                     <option key={lvl} value={lvl}>
-                      Level {lvl}
+                      {t('filters.level_option', { level: lvl })}
                     </option>
                   ))}
                 </select>
 
                 {/* Region Filter */}
                 <select
-                  aria-label="Filter articles by region"
+                  aria-label={t('filters.all_regions')}
                   value={selectedRegion}
                   onChange={(e) => setSelectedRegion(e.target.value)}
                   className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
-                  <option value="">All regions</option>
+                  <option value="">{t('filters.all_regions')}</option>
                   {Object.keys(stats.regionsCount).map((r) => (
                     <option key={r} value={r}>
                       {adminRegionLabel(r)} ({stats.regionsCount[r]})
@@ -440,7 +442,7 @@ export const AdminPage: React.FC = () => {
                     }}
                     className="px-3 py-2 rounded-xl bg-white/40 dark:bg-white/10 hover:bg-white/60 text-xs font-bold text-text-muted cursor-pointer transition-colors"
                   >
-                    Clear filters
+                    {t('filters.clear_filters')}
                   </button>
                 )}
               </div>
@@ -470,22 +472,22 @@ export const AdminPage: React.FC = () => {
               {isLoading ? (
                 <div className="py-20 text-center space-y-3">
                   <div className="inline-block animate-spin w-8 h-8 border-3 border-antique-gold border-t-transparent rounded-full" />
-                  <p className="text-xs text-text-muted">Loading articles…</p>
+                  <p className="text-xs text-text-muted">{t('posts_table.loading')}</p>
                 </div>
               ) : posts.length === 0 ? (
                 <div className="py-20 text-center space-y-4">
                   <BookOpen aria-hidden="true" className="w-12 h-12 text-antique-gold/40 mx-auto" />
                   <div className="space-y-1">
-                    <h3 className="font-heading text-lg font-bold">{!hasLoadedPosts ? 'Articles unavailable' : 'No articles found'}</h3>
+                    <h3 className="font-heading text-lg font-bold">{!hasLoadedPosts ? t('posts_table.unavailable_title') : t('posts_table.empty_title')}</h3>
                     <p className="text-xs text-text-muted max-w-md mx-auto">
-                      {!hasLoadedPosts ? 'We could not load the article list. Please try again.' : 'Create your first article, import a TSV row or adjust your filters.'}
+                      {!hasLoadedPosts ? t('posts_table.unavailable_desc') : t('posts_table.empty_desc')}
                     </p>
                   </div>
                   <button
                     onClick={!hasLoadedPosts ? fetchPosts : handleOpenCreate}
                     className="px-5 py-2.5 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold hover:bg-heritage-dark transition-colors cursor-pointer"
                   >
-                    {!hasLoadedPosts ? 'Try again' : 'Create an article'}
+                    {!hasLoadedPosts ? t('posts_table.try_again') : t('posts_table.create_article')}
                   </button>
                 </div>
               ) : (
@@ -493,13 +495,13 @@ export const AdminPage: React.FC = () => {
                   <table className="w-full text-left text-xs">
                     <thead className="bg-warm-ivory/80 dark:bg-heritage-dark/80 border-b border-antique-gold/20 text-text-secondary uppercase text-[10px] font-bold tracking-wider">
                       <tr>
-                        <th className="px-5 py-3.5">Article / story group</th>
-                        <th className="px-4 py-3.5">Region</th>
-                        <th className="px-4 py-3.5">Level</th>
-                        <th className="px-4 py-3.5">Category</th>
-                        <th className="px-4 py-3.5">Content</th>
-                        <th className="px-4 py-3.5 text-center">Reads</th>
-                        <th className="px-5 py-3.5 text-right">Actions</th>
+                        <th className="px-5 py-3.5">{t('posts_table.col_title')}</th>
+                        <th className="px-4 py-3.5">{t('posts_table.col_region')}</th>
+                        <th className="px-4 py-3.5">{t('posts_table.col_level')}</th>
+                        <th className="px-4 py-3.5">{t('posts_table.col_category')}</th>
+                        <th className="px-4 py-3.5">{t('posts_table.col_content')}</th>
+                        <th className="px-4 py-3.5 text-center">{t('posts_table.col_reads')}</th>
+                        <th className="px-5 py-3.5 text-right">{t('posts_table.col_actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-antique-gold/15">
@@ -547,11 +549,11 @@ export const AdminPage: React.FC = () => {
 
                           <td className="px-4 py-4 whitespace-nowrap text-[11px] space-y-0.5">
                             <div className="font-semibold text-text-body dark:text-warm-ivory">
-                              {post.wordCount ? `${post.wordCount} words` : adminReadTimeLabel(post.readTime) || '—'}
+                              {post.wordCount ? t('posts_table.words_count', { count: post.wordCount }) : adminReadTimeLabel(post.readTime) || '—'}
                             </div>
                             <div className="text-text-muted text-[10px]">
-                              {post.paragraphs?.length ? `${post.paragraphs.length} paragraph pairs` : 'No paragraph pairs'}
-                              {post.vocabularies?.length ? ` • ${post.vocabularies.length} vocabulary items` : ''}
+                              {post.paragraphs?.length ? t('posts_table.paragraph_pairs', { count: post.paragraphs.length }) : t('posts_table.no_paragraphs')}
+                              {post.vocabularies?.length ? ` • ${t('posts_table.vocab_items', { count: post.vocabularies.length })}` : ''}
                             </div>
                           </td>
 
@@ -563,21 +565,21 @@ export const AdminPage: React.FC = () => {
                             <button
                               onClick={() => handleOpenPreview(post)}
                               className="p-1.5 rounded-lg text-heritage-green dark:text-antique-bright hover:bg-heritage-green/10 transition-colors cursor-pointer"
-                              title="Preview article" aria-label="Preview article"
+                              title={t('posts_table.preview_action')} aria-label={t('posts_table.preview_action')}
                             >
                               <Eye aria-hidden="true" className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleOpenEdit(post)}
                               className="p-1.5 rounded-lg text-antique-gold hover:bg-antique-gold/15 transition-colors cursor-pointer"
-                              title="Edit article" aria-label="Edit article"
+                              title={t('posts_table.edit_action')} aria-label={t('posts_table.edit_action')}
                             >
                               <Edit3 aria-hidden="true" className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setDeletingId(post.id)}
                               className="p-1.5 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
-                              title="Delete article" aria-label="Delete article"
+                              title={t('posts_table.delete_action')} aria-label={t('posts_table.delete_action')}
                             >
                               <Trash2 aria-hidden="true" className="w-4 h-4" />
                             </button>
@@ -602,46 +604,46 @@ export const AdminPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-2">
                 <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>Registered users</span>
+                  <span>{t('stats.registered_users')}</span>
                   <Users aria-hidden="true" className="w-5 h-5 text-antique-gold" />
                 </div>
                 <div className="text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
                   {totalUsersCount?.toLocaleString('en-US') ?? '—'}
                 </div>
-                <p className="text-[11px] text-text-secondary">Learner and administrator accounts</p>
+                <p className="text-[11px] text-text-secondary">{t('stats.users_desc')}</p>
               </div>
 
               <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-2">
                 <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>Articles in view</span>
+                  <span>{t('stats.articles_in_view')}</span>
                   <BookOpen aria-hidden="true" className="w-5 h-5 text-emerald-500" />
                 </div>
                 <div className="text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
                   {stats.totalPosts}
                 </div>
-                <p className="text-[11px] text-text-secondary">Articles in the current selection</p>
+                <p className="text-[11px] text-text-secondary">{t('stats.articles_desc')}</p>
               </div>
 
               <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-2">
                 <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>Article reads</span>
+                  <span>{t('stats.article_reads')}</span>
                   <TrendingUp aria-hidden="true" className="w-5 h-5 text-amber-500" />
                 </div>
                 <div className="text-3xl font-heading font-bold text-amber-700 dark:text-antique-gold">
                   {stats.totalReads.toLocaleString()}
                 </div>
-                <p className="text-[11px] text-text-secondary">Reads for this article selection</p>
+                <p className="text-[11px] text-text-secondary">{t('stats.reads_desc')}</p>
               </div>
 
               <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-2">
                 <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>Average reads per article</span>
+                  <span>{t('stats.avg_reads')}</span>
                   <Activity aria-hidden="true" className="w-5 h-5 text-rose-500" />
                 </div>
                 <div className="text-3xl font-heading font-bold text-rose-700 dark:text-rose-400">
                   {stats.avgReads}
                 </div>
-                <p className="text-[11px] text-text-secondary">Reads across the current selection</p>
+                <p className="text-[11px] text-text-secondary">{t('stats.avg_reads_desc')}</p>
               </div>
             </div>
 
@@ -651,7 +653,7 @@ export const AdminPage: React.FC = () => {
               <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-4">
                 <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
                   <Layers aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                  <span>Articles by CEFR level</span>
+                  <span>{t('stats.by_cefr_level')}</span>
                 </h3>
                 <div className="space-y-3">
                   {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => {
@@ -661,9 +663,9 @@ export const AdminPage: React.FC = () => {
                     return (
                       <div key={lvl} className="space-y-1">
                         <div className="flex items-center justify-between text-xs font-semibold">
-                          <span className="text-text-body dark:text-warm-ivory">Level {lvl}</span>
+                          <span className="text-text-body dark:text-warm-ivory">{t('filters.level_option', { level: lvl })}</span>
                           <span className="text-text-secondary">
-                            {count} articles ({pct}%)
+                            {t('stats.articles_count', { count, pct })}
                           </span>
                         </div>
                         <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
@@ -682,10 +684,10 @@ export const AdminPage: React.FC = () => {
               <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-4">
                 <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
                   <MapPin aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                  <span>Articles by region</span>
+                  <span>{t('stats.by_region')}</span>
                 </h3>
                 {Object.keys(stats.regionsCount).length === 0 ? (
-                  <p className="text-xs text-text-muted">No regional data yet.</p>
+                  <p className="text-xs text-text-muted">{t('stats.no_region_data')}</p>
                 ) : (
                   <div className="space-y-3">
                     {Object.entries(stats.regionsCount)
@@ -699,7 +701,7 @@ export const AdminPage: React.FC = () => {
                             <div className="flex items-center justify-between text-xs font-semibold">
                               <span className="text-text-body dark:text-warm-ivory">{adminRegionLabel(region)}</span>
                               <span className="text-text-secondary">
-                                {count} articles ({pct}%)
+                                {t('stats.articles_count', { count, pct })}
                               </span>
                             </div>
                             <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
@@ -733,7 +735,7 @@ export const AdminPage: React.FC = () => {
 
         {/* ── Preview Modal ─────────────────────────────────────────────── */}
         {previewPost && (
-          <AdminDialog title="Article preview" onClose={() => setPreviewPost(null)}>
+          <AdminDialog title={t('preview_dialog.title')} onClose={() => setPreviewPost(null)}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -743,14 +745,14 @@ export const AdminPage: React.FC = () => {
               <div className="p-5 bg-heritage-green text-warm-ivory flex items-center justify-between border-b border-antique-gold/30">
                 <div className="space-y-0.5">
                   <span className="text-[10px] font-bold text-antique-gold uppercase tracking-wider">
-                    {adminRegionLabel(previewPost.region)} · Level {previewPost.level}
+                    {adminRegionLabel(previewPost.region)} · {t('filters.level_option', { level: previewPost.level })}
                   </span>
                   <h3 className="font-heading font-bold text-base sm:text-lg">
                     {previewPost.titleEn}
                   </h3>
                   <p className="text-xs text-warm-ivory/80 italic">{previewPost.titleVi}</p>
                 </div>
-                <button aria-label="Close preview"
+                <button aria-label={t('preview_dialog.close')}
                   onClick={() => setPreviewPost(null)}
                   className="p-1.5 rounded-xl hover:bg-white/10 text-warm-ivory cursor-pointer"
                 >
@@ -763,7 +765,7 @@ export const AdminPage: React.FC = () => {
                 <div className="space-y-4">
                   <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-antique-bright border-b border-antique-gold/20 pb-2 flex items-center gap-2">
                     <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                    <span>Bilingual content ({previewPost.paragraphs?.length || 0} paragraph pairs)</span>
+                    <span>{t('preview_dialog.bilingual_content', { count: previewPost.paragraphs?.length || 0 })}</span>
                   </h4>
                   {previewPost.paragraphs && previewPost.paragraphs.length > 0 ? (
                     previewPost.paragraphs.map((p, idx) => (
@@ -781,7 +783,7 @@ export const AdminPage: React.FC = () => {
                     ))
                   ) : (
                     <div className="text-xs text-text-muted">
-                      {previewPost.contentEn || 'No article content yet.'}
+                      {previewPost.contentEn || t('preview_dialog.no_content')}
                     </div>
                   )}
                 </div>
@@ -791,7 +793,7 @@ export const AdminPage: React.FC = () => {
                   <div className="space-y-3">
                     <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-antique-bright border-b border-antique-gold/20 pb-2 flex items-center gap-2">
                       <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                      <span>Vocabulary ({previewPost.vocabularies.length} items)</span>
+                      <span>{t('preview_dialog.vocabulary', { count: previewPost.vocabularies.length })}</span>
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {previewPost.vocabularies.map((v, idx) => (
@@ -825,7 +827,7 @@ export const AdminPage: React.FC = () => {
 
         {/* ── Delete Confirmation Dialog ─────────────────────────────────── */}
         {deletingId && (
-          <AdminDialog title="Delete article" onClose={() => setDeletingId(null)}>
+          <AdminDialog title={t('delete_dialog.title')} onClose={() => setDeletingId(null)}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -837,10 +839,10 @@ export const AdminPage: React.FC = () => {
               </div>
               <div className="text-center space-y-1">
                 <h3 className="font-heading font-bold text-lg text-text-body dark:text-warm-ivory">
-                  Delete this article?
+                  {t('delete_dialog.heading')}
                 </h3>
                 <p className="text-xs text-text-muted">
-                  This permanently deletes the article, its paragraph pairs and linked vocabulary. This cannot be undone.
+                  {t('delete_dialog.warning')}
                 </p>
               </div>
               <div className="flex items-center justify-center gap-3 pt-2">
@@ -848,13 +850,13 @@ export const AdminPage: React.FC = () => {
                   onClick={() => setDeletingId(null)}
                   className="px-4 py-2.5 rounded-xl border border-antique-gold/30 text-xs font-bold hover:bg-white/10 transition-colors cursor-pointer"
                 >
-                  Cancel
+                  {t('delete_dialog.cancel')}
                 </button>
                 <button
                   onClick={handleConfirmDelete}
                   className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-md"
                 >
-                  Delete article
+                  {t('delete_dialog.confirm')}
                 </button>
               </div>
             </motion.div>
