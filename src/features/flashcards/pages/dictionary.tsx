@@ -1,5 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
 import FlashcardSidebarLayout from "../components/flashcard-sidebar-layout";
 import {
@@ -15,15 +16,19 @@ import { paths } from '@/routes/paths';
 import { VOCABULARY_CATEGORY_LABELS, VOCABULARY_PAGE_SIZE } from '../lib/vocabulary-catalog';
 import '../dictionary-components.css';
 
-const CATEGORY_OPTIONS = [
-  { label: `All (${LESSONS_DATA.length})`, value: "All" },
-  ...Object.entries(VOCABULARY_CATEGORY_LABELS).map(([value, label]) => ({ value, label })),
-];
-
 export default function DictionaryPage() {
-  const navigate = useNavigate();
+  const { t } = useTranslation('flashcards');
+  const navigate = useAppNavigate();
   const libraryRef = useRef<HTMLElement>(null);
   const [sortOrder, setSortOrder] = useState("default");
+
+  const categoryOptions = useMemo(() => [
+    { label: `${t('categories.all', 'All')} (${LESSONS_DATA.length})`, value: "All" },
+    ...Object.entries(VOCABULARY_CATEGORY_LABELS).map(([value]) => ({
+      value,
+      label: t(`categories.${value}`, value),
+    })),
+  ], [t]);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -86,7 +91,7 @@ export default function DictionaryPage() {
 
   const handleCreateDeck = () => {
     if (customDeckName.trim()) {
-      alert(`Created "${customDeckName}" in your personal library!`);
+      alert(t('create_deck_modal.success_alert', { name: customDeckName, defaultValue: `Created "${customDeckName}" in your personal library!` }));
       setIsCreateDeckOpen(false);
       setCustomDeckName("");
     }
@@ -119,13 +124,23 @@ export default function DictionaryPage() {
         {/* Cultural vocabulary catalog */}
         <section ref={libraryRef} className="vocab-library-section" aria-labelledby="vocab-library-title">
           <div className="vocab-library-heading">
-            <div><p className="vocab-eyebrow">LEARN LANGUAGE THROUGH HERITAGE</p><h2 id="vocab-library-title">Vocabulary decks <span>{LESSONS_DATA.length}</span></h2></div>
-            <label className="vocab-sort"><span>Sort by:</span><select aria-label="Sort vocabulary decks" value={sortOrder} onChange={(e) => { setSortOrder(e.target.value); setCurrentPage(1); }}><option value="default">Recommended</option><option value="newest">Newest</option><option value="name">Name A–Z</option></select></label>
+            <div>
+              <p className="vocab-eyebrow">{t('dictionary.catalog_eyebrow', 'LEARN LANGUAGE THROUGH HERITAGE')}</p>
+              <h2 id="vocab-library-title">{t('dictionary.catalog_title', 'Vocabulary decks')} <span>{LESSONS_DATA.length}</span></h2>
+            </div>
+            <label className="vocab-sort">
+              <span>{t('dictionary.sort_label', 'Sort by:')}</span>
+              <select aria-label={t('dictionary.sort_label', 'Sort vocabulary decks')} value={sortOrder} onChange={(e) => { setSortOrder(e.target.value); setCurrentPage(1); }}>
+                <option value="default">{t('dictionary.sort_recommended', 'Recommended')}</option>
+                <option value="newest">{t('dictionary.sort_newest', 'Newest')}</option>
+                <option value="name">{t('dictionary.sort_name', 'Name A–Z')}</option>
+              </select>
+            </label>
           </div>
 
           {/* Category Filter Pills */}
           <DictionaryCategoryFilter
-            categories={CATEGORY_OPTIONS}
+            categories={categoryOptions}
             selectedCategory={selectedCategory}
             onSelectCategory={(cat) => {
               setSelectedCategory(cat);
@@ -133,7 +148,11 @@ export default function DictionaryPage() {
             }}
           />
 
-          <p className="vocab-results" role="status">{searchQuery ? `${filteredLessons.length} decks found for “${searchQuery}”` : `${filteredLessons.length} decks to explore`}</p>
+          <p className="vocab-results" role="status">
+            {searchQuery
+              ? t('dictionary.decks_found', { count: filteredLessons.length, query: searchQuery, defaultValue: `${filteredLessons.length} decks found for “${searchQuery}”` })
+              : t('dictionary.decks_to_explore', { count: filteredLessons.length, defaultValue: `${filteredLessons.length} decks to explore` })}
+          </p>
 
           {/* Library Cards Grid */}
           <DictionaryLibraryGrid

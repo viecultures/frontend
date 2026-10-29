@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 
 export const useMediaQuery = (query: string): boolean => {
   const [matches, setMatches] = useState<boolean>(() =>

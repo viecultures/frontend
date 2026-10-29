@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Shared Ghibli-inspired palette and keyframes for the AI Companion feature.
  * Injected once via <CompanionThemeStyles /> to avoid duplicated <style> tags.
  */

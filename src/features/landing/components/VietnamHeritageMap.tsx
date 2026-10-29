@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Volume2, VolumeX, MapPin, Award, BookOpen } from 'lucide-react';
+import { X, Volume2, VolumeX, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/ThemeContext';
 import {
   HERITAGE_SITES,
@@ -23,9 +24,10 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
   selectedSiteId,
   onSelectSite,
   selectedRegion,
-  onSelectRegion,
+  onSelectRegion: _onSelectRegion,
   zoomLevel,
 }) => {
+  const { t } = useTranslation('landing');
   const { isDark } = useTheme();
   const [internalSelectedSite, setInternalSelectedSite] = useState<CulturalHeritageSite | null>(
     selectedSiteId ? HERITAGE_SITES.find((s) => s.id === selectedSiteId) || null : null
@@ -98,17 +100,19 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
             <path
               d={VIETNAM_SVG_PATHS.bacBo}
               fill={
-                selectedRegion === 'Bắc Bộ' || hoveredRegion === 'Bắc Bộ'
-                  ? isDark ? '#1C4B43' : 'var(--color-horizon-blue)'
-                  : isDark ? '#153A33' : 'var(--color-sky-mist)'
+                hoveredRegion === 'bacBo' || selectedRegion === 'Bắc Bộ'
+                  ? isDark
+                    ? '#1f4e43'
+                    : '#e2efe9'
+                  : isDark
+                  ? '#163832'
+                  : '#edf5f1'
               }
-              stroke={isDark ? 'var(--color-antique-gold)' : 'var(--color-heritage-green)'}
-              strokeWidth={selectedRegion === 'Bắc Bộ' ? 2 : 1.2}
+              stroke="var(--color-heritage-green)"
+              strokeWidth="1.2"
               strokeLinejoin="round"
-              className="cursor-pointer transition-colors duration-200"
-              filter="url(#softGlow)"
-              onClick={() => onSelectRegion && onSelectRegion(selectedRegion === 'Bắc Bộ' ? null : 'Bắc Bộ')}
-              onMouseEnter={() => setHoveredRegion('Bắc Bộ')}
+              className="transition-colors duration-300 cursor-pointer"
+              onMouseEnter={() => setHoveredRegion('bacBo')}
               onMouseLeave={() => setHoveredRegion(null)}
             />
 
@@ -116,17 +120,19 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
             <path
               d={VIETNAM_SVG_PATHS.trungBo}
               fill={
-                selectedRegion === 'Trung Bộ' || hoveredRegion === 'Trung Bộ'
-                  ? isDark ? '#1C4B43' : 'var(--color-horizon-blue)'
-                  : isDark ? '#153A33' : 'var(--color-sky-mist)'
+                hoveredRegion === 'trungBo' || selectedRegion === 'Trung Bộ'
+                  ? isDark
+                    ? '#1f4e43'
+                    : '#e2efe9'
+                  : isDark
+                  ? '#163832'
+                  : '#edf5f1'
               }
-              stroke={isDark ? 'var(--color-antique-gold)' : 'var(--color-heritage-green)'}
-              strokeWidth={selectedRegion === 'Trung Bộ' ? 2 : 1.2}
+              stroke="var(--color-heritage-green)"
+              strokeWidth="1.2"
               strokeLinejoin="round"
-              className="cursor-pointer transition-colors duration-200"
-              filter="url(#softGlow)"
-              onClick={() => onSelectRegion && onSelectRegion(selectedRegion === 'Trung Bộ' ? null : 'Trung Bộ')}
-              onMouseEnter={() => setHoveredRegion('Trung Bộ')}
+              className="transition-colors duration-300 cursor-pointer"
+              onMouseEnter={() => setHoveredRegion('trungBo')}
               onMouseLeave={() => setHoveredRegion(null)}
             />
 
@@ -134,134 +140,41 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
             <path
               d={VIETNAM_SVG_PATHS.namBo}
               fill={
-                selectedRegion === 'Nam Bộ' || hoveredRegion === 'Nam Bộ'
-                  ? isDark ? '#1C4B43' : 'var(--color-horizon-blue)'
-                  : isDark ? '#153A33' : 'var(--color-sky-mist)'
+                hoveredRegion === 'namBo' || selectedRegion === 'Nam Bộ'
+                  ? isDark
+                    ? '#1f4e43'
+                    : '#e2efe9'
+                  : isDark
+                  ? '#163832'
+                  : '#edf5f1'
               }
-              stroke={isDark ? 'var(--color-antique-gold)' : 'var(--color-heritage-green)'}
-              strokeWidth={selectedRegion === 'Nam Bộ' ? 2 : 1.2}
+              stroke="var(--color-heritage-green)"
+              strokeWidth="1.2"
               strokeLinejoin="round"
-              className="cursor-pointer transition-colors duration-200"
-              filter="url(#softGlow)"
-              onClick={() => onSelectRegion && onSelectRegion(selectedRegion === 'Nam Bộ' ? null : 'Nam Bộ')}
-              onMouseEnter={() => setHoveredRegion('Nam Bộ')}
+              className="transition-colors duration-300 cursor-pointer"
+              onMouseEnter={() => setHoveredRegion('namBo')}
               onMouseLeave={() => setHoveredRegion(null)}
             />
           </g>
 
-          {/* 2. Red River & Mekong Estuary Ribbons */}
-          <g id="river-systems" className="pointer-events-none select-none">
-            <path
-              d={VIETNAM_SVG_PATHS.songHong}
-              fill="none"
-              stroke={isDark ? 'var(--color-horizon-blue)' : 'var(--color-mountain-teal)'}
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              className="opacity-70"
-            />
-            <path
-              d={VIETNAM_SVG_PATHS.songMeKong}
-              fill="none"
-              stroke={isDark ? 'var(--color-horizon-blue)' : 'var(--color-mountain-teal)'}
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              className="opacity-70"
-            />
-          </g>
-
-          {/* 3. Sacred Island Territories */}
-          <g id="islands" className="select-none">
-            {/* Hoang Sa (Paracels) */}
-            <g className="cursor-pointer group">
-              <path
-                d={VIETNAM_SVG_PATHS.hoangSa}
-                fill="var(--color-antique-gold)"
-                stroke="var(--color-heritage-green)"
-                strokeWidth="0.8"
-              />
-              <text
-                x="355"
-                y="306"
-                textAnchor="middle"
-                className="text-[7.5px] font-semibold fill-heritage-green dark:fill-antique-gold tracking-wider select-none"
-              >
-                PARACEL ISLANDS
-              </text>
-            </g>
-
-            {/* Truong Sa (Spratlys) */}
-            <g className="cursor-pointer group">
-              <path
-                d={VIETNAM_SVG_PATHS.truongSa}
-                fill="var(--color-antique-gold)"
-                stroke="var(--color-heritage-green)"
-                strokeWidth="0.8"
-              />
-              <text
-                x="350"
-                y="570"
-                textAnchor="middle"
-                className="text-[7.5px] font-semibold fill-heritage-green dark:fill-antique-gold tracking-wider select-none"
-              >
-                SPRATLY ISLANDS
-              </text>
-            </g>
-
-            {/* Phu Quoc */}
+          {/* 2. Maritime Islands */}
+          <g id="maritime-islands">
             <path
               d={VIETNAM_SVG_PATHS.phuQuoc}
-              fill="var(--color-antique-gold)"
+              fill={isDark ? '#163832' : '#edf5f1'}
               stroke="var(--color-heritage-green)"
-              strokeWidth="0.8"
+              strokeWidth="1"
             />
-            <text
-              x="138"
-              y="635"
-              textAnchor="middle"
-              className="text-[6.5px] font-medium fill-heritage-green dark:fill-antique-gold"
-            >
-              Phú Quốc
-            </text>
-
-            {/* Con Dao */}
             <path
               d={VIETNAM_SVG_PATHS.conDao}
-              fill="var(--color-antique-gold)"
+              fill={isDark ? '#163832' : '#edf5f1'}
               stroke="var(--color-heritage-green)"
-              strokeWidth="0.8"
+              strokeWidth="1"
             />
           </g>
 
-          {/* 4. Region Watermark Labels (Pointer events none) */}
-          <g id="region-labels" className="pointer-events-none select-none">
-            <text
-              x="195"
-              y="95"
-              textAnchor="middle"
-              className="text-[8px] font-semibold tracking-widest uppercase fill-heritage-green/70 dark:fill-warm-ivory/60"
-            >
-              NORTHERN VIETNAM
-            </text>
-            <text
-              x="235"
-              y="340"
-              textAnchor="middle"
-              className="text-[8px] font-semibold tracking-widest uppercase fill-heritage-green/70 dark:fill-warm-ivory/60"
-            >
-              CENTRAL VIETNAM
-            </text>
-            <text
-              x="235"
-              y="595"
-              textAnchor="middle"
-              className="text-[8px] font-semibold tracking-widest uppercase fill-heritage-green/70 dark:fill-warm-ivory/60"
-            >
-              SOUTHERN VIETNAM
-            </text>
-          </g>
-
-          {/* 5. Cultural Heritage Site Pins */}
-          <g id="heritage-pins">
+          {/* 3. Cultural Heritage Site Interactive Markers */}
+          <g id="heritage-markers">
             {filteredSites.map((site) => {
               const isSelected = activeSite?.id === site.id;
               const isHovered = hoveredSite?.id === site.id;
@@ -270,59 +183,47 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                 <g
                   key={site.id}
                   transform={`translate(${site.x}, ${site.y})`}
-                  className="cursor-pointer group"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSiteClick(site);
-                  }}
+                  className="cursor-pointer transition-transform duration-200"
+                  onClick={() => handleSiteClick(site)}
                   onMouseEnter={() => setHoveredSite(site)}
                   onMouseLeave={() => setHoveredSite(null)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${site.englishTitle} - ${site.province}`}
                 >
-                  {/* Outer Pulsing Selection Ring */}
-                  {isSelected && (
+                  {/* Pulsing ring for active or hovered pin */}
+                  {(isSelected || isHovered) && (
                     <circle
-                      r={11}
+                      r="14"
                       fill="none"
                       stroke="var(--color-antique-gold)"
-                      strokeWidth="1.8"
-                      strokeDasharray="2 2"
-                      className="animate-spin"
-                      style={{ animationDuration: '6s' }}
+                      strokeWidth="1.5"
+                      opacity="0.8"
+                      className="animate-ping"
                     />
                   )}
 
-                  {/* Main Pin Outer Marker */}
+                  {/* Outer base glow pin */}
                   <circle
-                    r={isSelected ? 6.5 : isHovered ? 5.8 : 4.5}
-                    fill={isSelected ? 'var(--color-heritage-green)' : isHovered ? 'var(--color-heritage-green)' : 'var(--color-antique-gold)'}
-                    stroke={isSelected ? 'var(--color-antique-gold)' : 'var(--color-warm-ivory)'}
-                    strokeWidth="1.5"
-                    filter={isSelected ? 'url(#activePinGlow)' : undefined}
+                    r={isSelected ? 9 : isHovered ? 7.5 : 5.5}
+                    fill={
+                      isSelected
+                        ? 'var(--color-antique-gold)'
+                        : isHovered
+                        ? 'var(--color-terracotta)'
+                        : 'var(--color-heritage-green)'
+                    }
+                    stroke="#FFFFFF"
+                    strokeWidth={isSelected ? '2.5' : '1.5'}
+                    filter={isSelected ? 'url(#activePinGlow)' : 'url(#softGlow)'}
                     className="transition-all duration-200"
                   />
 
-                  {/* Center Dot */}
+                  {/* Inner center dot */}
                   <circle
-                    r={isSelected ? 2.2 : 1.6}
-                    fill={isSelected ? 'var(--color-antique-gold)' : 'var(--color-heritage-green)'}
-                    className="pointer-events-none"
+                    r={isSelected ? 3.5 : 2}
+                    fill={isSelected ? '#102B26' : '#FFFFFF'}
                   />
-
-                  {/* Inline Short Label beside pin */}
-                  <text
-                    x={site.x > 240 ? -8 : 8}
-                    y={3}
-                    textAnchor={site.x > 240 ? 'end' : 'start'}
-                    className={`text-[8.5px] font-semibold tracking-tight transition-colors select-none ${
-                      isSelected
-                        ? 'fill-heritage-green dark:fill-antique-gold font-bold'
-                        : isHovered
-                        ? 'fill-heritage-green dark:fill-warm-ivory'
-                        : 'fill-heritage-green/85 dark:fill-warm-ivory/80'
-                    }`}
-                  >
-                    {site.name.split('–')[0].trim()}
-                  </text>
                 </g>
               );
             })}
@@ -330,25 +231,25 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
         </svg>
       </div>
 
-      {/* Hover Tooltip (Percentage positioning) */}
+      {/* Floating Tooltip when hovering over a site pin (Desktop only) */}
       <AnimatePresence>
         {hoveredSite && !activeSite && (
           <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="absolute pointer-events-none z-30 bg-heritage-green text-warm-ivory px-3.5 py-2.5 rounded-2xl text-xs shadow-xl space-y-1 border border-antique-gold/40 max-w-[220px]"
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="hidden sm:block absolute z-20 pointer-events-none bg-heritage-green/95 backdrop-blur-md text-warm-ivory px-4 py-2.5 rounded-2xl shadow-xl border border-antique-gold/40 max-w-[240px] space-y-1"
             style={{
-              left: `${(hoveredSite.x / VIETNAM_MAP_DIMENSIONS.width) * 100}%`,
-              top: `${(hoveredSite.y / VIETNAM_MAP_DIMENSIONS.height) * 100}%`,
-              transform: 'translate(-50%, -125%)',
+              left: Math.min(Math.max(hoveredSite.x + 30, 20), 400),
+              top: Math.min(Math.max(hoveredSite.y - 40, 20), 500),
             }}
           >
-            <div className="font-semibold text-sm text-warm-ivory">
+            <p className="text-xs font-serif font-bold text-warm-ivory line-clamp-1">
               {hoveredSite.englishTitle}
-            </div>
+            </p>
             <p className="text-[11px] text-sky-mist line-clamp-1 italic">
-              Vietnamese: {hoveredSite.name}
+              {t('vietnam_map.vietnamese_label', { name: hoveredSite.name })}
             </p>
             <div className="flex items-center justify-between text-[10px] text-antique-gold pt-0.5">
               <span>{getEnglishHeritageCopy(hoveredSite).category}</span>
@@ -380,7 +281,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                   {activeSite.englishTitle}
                 </h3>
                 <p className="text-xs font-medium text-heritage-green/70 dark:text-horizon-blue italic">
-                  Vietnamese: {activeSite.name}
+                  {t('vietnam_map.vietnamese_label', { name: activeSite.name })}
                 </p>
               </div>
 
@@ -391,7 +292,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                   if (onSelectSite) onSelectSite(null);
                 }}
                 className="p-1.5 rounded-full hover:bg-mist-cloud dark:hover:bg-heritage-green text-heritage-green dark:text-warm-ivory transition-colors cursor-pointer focus-ring"
-                aria-label="Close details panel"
+                aria-label={t('vietnam_map.close_panel')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -407,7 +308,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-heritage-green dark:text-antique-gold uppercase tracking-wide flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-antique-gold" />
-                  <span>Sample presentation</span>
+                  <span>{t('vietnam_map.sample_presentation')}</span>
                 </span>
                 <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-antique-gold/20 text-heritage-green dark:text-antique-gold font-semibold">
                   {activeSite.cefrLevel}
@@ -426,12 +327,12 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                 {playingWord === activeSite.id ? (
                   <>
                     <VolumeX className="w-3.5 h-3.5" />
-                    <span>Playing sample audio… (Stop)</span>
+                    <span>{t('vietnam_map.playing_sample')}</span>
                   </>
                 ) : (
                   <>
                     <Volume2 className="w-3.5 h-3.5" />
-                    <span>Listen to this sample sentence</span>
+                    <span>{t('vietnam_map.listen_sample')}</span>
                   </>
                 )}
               </button>
@@ -440,14 +341,13 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
             {/* Core Cultural Collocations List */}
             <div className="space-y-3">
               <div className="flex items-center justify-between text-xs font-semibold text-heritage-green dark:text-antique-gold">
-                <span>FEATURED VOCABULARY &amp; PHRASES</span>
-                <span className="text-[11px] font-normal text-mountain-teal">Tap to listen</span>
+                <span>{t('vietnam_map.featured_vocab')}</span>
+                <span className="text-[11px] font-normal text-mountain-teal">{t('vietnam_map.tap_to_listen')}</span>
               </div>
 
               <div className="space-y-2">
                 {getEnglishHeritageCopy(activeSite).vocabularyList.map((vocab, vIdx) => {
                   const itemKey = `${activeSite.id}-${vIdx}`;
-                  const isItemPlaying = playingWord === itemKey;
 
                   return (
                     <div
@@ -468,7 +368,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                           type="button"
                           onClick={() => handlePlaySpeech(vocab.word, itemKey)}
                           className="p-1.5 rounded-lg bg-sky-mist/50 dark:bg-heritage-green hover:bg-sky-mist text-heritage-green dark:text-antique-gold transition-colors cursor-pointer focus-ring"
-                          title="Hear this word pronounced"
+                          title={t('vietnam_map.hear_word_title')}
                         >
                           <Volume2 className="w-3.5 h-3.5" />
                         </button>
@@ -479,7 +379,7 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
                       </p>
 
                       <div className="text-[11px] text-mountain-teal dark:text-horizon-blue italic font-serif">
-                        &bull; Common phrase: {vocab.collocation}
+                        {t('vietnam_map.common_phrase', { phrase: vocab.collocation })}
                       </div>
                     </div>
                   );
@@ -492,3 +392,5 @@ export const VietnamHeritageMap: React.FC<VietnamHeritageMapProps> = ({
     </div>
   );
 };
+
+export default VietnamHeritageMap;

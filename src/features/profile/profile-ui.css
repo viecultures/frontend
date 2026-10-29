@@ -1,4 +1,4 @@
-/* Match the Reader and account surfaces without changing shared navigation. */
+﻿/* Match the Reader and account surfaces without changing shared navigation. */
 .profile-ui, .profile-dialog { font-family: var(--font-sans); font-weight: 400; color: var(--color-ink-soft); }
 :is(.profile-ui, .profile-dialog) :is(button, input, select, textarea) { font-family: inherit; }
 :is(.profile-ui, .profile-dialog) .font-serif { font-family: var(--font-sans); }

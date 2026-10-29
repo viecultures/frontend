@@ -1,4 +1,4 @@
-const LABELS: Record<string, string> = {
+﻿const LABELS: Record<string, string> = {
   'Bước Chân Di Sản': 'First heritage steps',
   'Hoàn thành bài đọc song ngữ văn hóa đầu tiên': 'Complete your first bilingual cultural story.',
   'Sứ Giả Ba Miền': 'Three-region explorer',

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { SavedVocabularyContext } from '../hooks/useSavedVocabulary';
 import { createPortal } from "react-dom";
 import { Volume2, Bookmark, Check, X, BookOpen, ShieldAlert } from "lucide-react";
@@ -20,6 +21,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
   onClose,
   themeMode = "paper",
 }) => {
+  const { t } = useTranslation('reader');
   const [legacySaved, setIsSaved] = useState(false);
   const savedVocabulary = useContext(SavedVocabularyContext);
   const isSaved = savedVocabulary ? savedVocabulary.words.some(word => word.id === vocab?.id || word.word.toLowerCase() === vocab?.word.toLowerCase()) : legacySaved;
@@ -146,8 +148,8 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
               {!vocab.isProfane && (hasDictionaryAudio || hasBrowserVoice) && (
                 <button
                   onClick={handlePlayAudio}
-                  title={hasDictionaryAudio ? 'Nghe âm thanh từ điển' : 'Nghe giọng đọc máy của trình duyệt'}
-                  aria-label={hasDictionaryAudio ? 'Nghe âm thanh từ điển' : 'Nghe giọng đọc máy của trình duyệt'}
+                  title={hasDictionaryAudio ? t('dictionary.listen_dictionary_audio', 'Nghe âm thanh từ điển') : t('dictionary.listen_browser_speech', 'Nghe giọng đọc máy của trình duyệt')}
+                  aria-label={hasDictionaryAudio ? t('dictionary.listen_dictionary_audio', 'Nghe âm thanh từ điển') : t('dictionary.listen_browser_speech', 'Nghe giọng đọc máy của trình duyệt')}
                   className={`p-1 rounded-lg transition-colors cursor-pointer ${
                     isPlayingAudio
                       ? "bg-antique-gold text-heritage-green"
@@ -164,8 +166,8 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
                   {vocab.ipa}
                 </span>
               )}
-              {!vocab.isProfane && !hasIpa && <span className="text-xs opacity-70">Chưa có IPA</span>}
-              {!vocab.isProfane && !hasDictionaryAudio && <span className="text-[10px] opacity-70">{hasBrowserVoice ? 'Giọng máy' : 'Chưa có âm thanh'}</span>}
+              {!vocab.isProfane && !hasIpa && <span className="text-xs opacity-70">{t('dictionary.no_ipa', 'Chưa có IPA')}</span>}
+              {!vocab.isProfane && !hasDictionaryAudio && <span className="text-[10px] opacity-70">{hasBrowserVoice ? t('dictionary.machine_voice', 'Giọng máy') : t('dictionary.no_audio', 'Chưa có âm thanh')}</span>}
               <span className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
                 vocab.isProfane
                   ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"
@@ -180,12 +182,12 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
         <button
           onClick={onClose}
           className="p-1 rounded-lg text-current/60 hover:text-current hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
-          title="Close definition"
+          title={t('dictionary.close_definition', 'Close definition')}
         >
           <X className="w-4 h-4" />
         </button>
       </div>
-      {audioError && <p role="status" className="pt-1 text-xs text-red-600">Không phát được âm thanh từ điển.</p>}
+      {audioError && <p role="status" className="pt-1 text-xs text-red-600">{t('dictionary.audio_error', 'Không phát được âm thanh từ điển.')}</p>}
 
       {/* Meanings */}
       <div className="py-2.5 space-y-2 text-xs">
@@ -193,7 +195,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
           <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-200 space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold">
               <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
-              <span>Sensitive language</span>
+              <span>{t('dictionary.sensitive_language', 'Sensitive language')}</span>
             </div>
             <p className="text-[11px] leading-relaxed opacity-90">
               {vocab.viMeaning}
@@ -207,7 +209,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
             {/* Tiếng Việt */}
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#059669] dark:text-[#6EE7B7] block">
-                Vietnamese meaning:
+                {t('dictionary.vietnamese_meaning', 'Vietnamese meaning:')}
               </span>
               <p className="font-medium mt-0.5 leading-relaxed text-current">
                 {vocab.viMeaning}
@@ -218,7 +220,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
             {vocab.enDefinition && (
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-heritage-green dark:text-antique-gold block">
-                  English Definition:
+                  {t('dictionary.english_definition', 'English Definition:')}
                 </span>
                 <p className="opacity-90 italic mt-0.5 leading-relaxed">
                   {vocab.enDefinition}
@@ -231,7 +233,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
               <div className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-antique-gold/15">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-antique-gold flex items-center gap-1">
                   <BookOpen className="w-3 h-3" />
-                  Article context:
+                  {t('dictionary.article_context', 'Article context:')}
                 </span>
                 <p className="text-[11px] opacity-80 mt-1 line-clamp-2 leading-normal">
                   "{maskProfanity(vocab.contextSentence)}"
@@ -246,7 +248,7 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
       <div className="pt-2 border-t border-antique-gold/25 flex items-center justify-between gap-2">
         {vocab.isProfane ? (
           <div className="w-full py-1.5 px-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-center text-[11px] font-medium opacity-60">
-            Saving sensitive language is unavailable
+            {t('dictionary.sensitive_unavailable', 'Saving sensitive language is unavailable')}
           </div>
         ) : (
           <button
@@ -262,12 +264,12 @@ export const InPlaceDictionaryPopup: React.FC<InPlaceDictionaryPopupProps> = ({
             {isSaved ? (
               <>
                 <Check className="w-3.5 h-3.5" />
-                <span>Saved to vocabulary</span>
+                <span>{t('dictionary.saved_to_vocab', 'Saved to vocabulary')}</span>
               </>
             ) : (
               <>
                 <Bookmark className="w-3.5 h-3.5" />
-                <span>{isPhrase ? "Save phrase with context" : "Save word with context"}</span>
+                <span>{isPhrase ? t('dictionary.save_phrase', 'Save phrase with context') : t('dictionary.save_word', 'Save word with context')}</span>
               </>
             )}
           </button>

@@ -1,5 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
+import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
+import { useParams, useLocation } from 'react-router-dom';
+import i18n from '@/lib/i18n';
 
 interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   href?: string;
@@ -8,26 +11,40 @@ interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 
 }
 
 export const Link: React.FC<LinkProps> = ({ href, to, children, onClick, className, ...props }) => {
-  const navigate = useNavigate();
-  const target = to || href || '';
+  const navigate = useAppNavigate();
+  const { lang: paramLang } = useParams<{ lang?: string }>();
+  const location = useLocation();
+
+  const currentLang = resolveLanguage(
+    paramLang ||
+    location.pathname.match(/^\/(vi|en)(\/|$)/)?.[1] ||
+    i18n?.language
+  );
+
+  const rawTarget = to || href || '';
+  const resolvedHref = React.useMemo(() => {
+    if (rawTarget.startsWith('/') && !/^https?:\/\//i.test(rawTarget)) {
+      return getLocalizedPath(rawTarget, currentLang);
+    }
+    return rawTarget;
+  }, [rawTarget, currentLang]);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (onClick) onClick(e);
-    if (target.startsWith('#')) {
-      const el = document.getElementById(target.slice(1));
+    if (rawTarget.startsWith('#')) {
+      const el = document.getElementById(rawTarget.slice(1));
       if (el) {
         e.preventDefault();
         el.scrollIntoView({ behavior: 'smooth' });
       }
-    } else if (target.startsWith('/') || target === '') {
+    } else if (rawTarget.startsWith('/') || rawTarget === '') {
       e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      navigate(target || '/');
+      navigate(rawTarget || '/');
     }
   };
 
   return (
-    <a href={target} onClick={handleClick} className={className} {...props}>
+    <a href={resolvedHref} onClick={handleClick} className={className} {...props}>
       {children}
     </a>
   );

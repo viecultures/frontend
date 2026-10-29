@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Maximize2, LayoutGrid } from 'lucide-react';
 import type { CompanionLanguage } from '@/types/companion';
 import { ForestSpirit } from './ForestSpirit';
@@ -50,7 +51,10 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
   viewMode = 'chat',
   onToggleViewMode,
   onExpandToWorkspace,
-}) => (
+}) => {
+  const { t } = useTranslation('playground');
+
+  return (
   <div className="relative shrink-0 border-b-2 border-[#8a9a6f]">
     <MeadowBackdrop />
     <div className="relative flex items-center gap-2 px-3 pt-3 pb-4">
@@ -60,7 +64,7 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <h2 className="truncate font-serif text-[15px] font-bold italic leading-tight text-[#2f4a2c]">
-            Cultural Companion
+            {t('playground.companion.header.title')}
           </h2>
           <span className="shrink-0 rounded-full bg-white/70 px-1.5 py-px text-[9px] font-bold tracking-wider text-[#5d8a45]">
             {LANGUAGE_BADGE[language]}
@@ -68,7 +72,11 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
         </div>
         <p className="flex items-center gap-1 truncate text-[11px] text-[#4a6a44]">
           <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#5d8a45]" />
-          <span className="truncate">{lessonTitle ? `Exploring: ${lessonTitle}` : 'Ask me about Vietnamese culture'}</span>
+          <span className="truncate">
+            {lessonTitle
+              ? t('playground.companion.header.exploring', { title: lessonTitle })
+              : t('playground.companion.header.default_subtitle')}
+          </span>
         </p>
       </div>
 
@@ -76,8 +84,8 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
         <button
           type="button"
           onClick={onExpandToWorkspace}
-          aria-label="Maximize to AI Workspace"
-          title="Open in AI Workspace"
+          aria-label={t('playground.companion.header.maximize')}
+          title={t('playground.companion.header.maximize')}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-white/50 text-[#3e5a3a] transition-colors hover:bg-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8a9a6f]"
         >
           <Maximize2 className="h-4 w-4" strokeWidth={2.2} />
@@ -88,8 +96,16 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
         <button
           type="button"
           onClick={onToggleViewMode}
-          aria-label={viewMode === 'tools' ? 'Switch to Chat' : 'Switch to Learning Tools'}
-          title={viewMode === 'tools' ? 'Switch to Chat' : 'Learning Tools'}
+          aria-label={
+            viewMode === 'tools'
+              ? t('playground.companion.header.switch_to_chat')
+              : t('playground.companion.header.switch_to_tools')
+          }
+          title={
+            viewMode === 'tools'
+              ? t('playground.companion.header.switch_to_chat')
+              : t('playground.companion.header.switch_to_tools')
+          }
           className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8a9a6f] ${
             viewMode === 'tools'
               ? 'bg-[#5d8a45] text-white shadow-[0_2px_0_-1px_#3e5a3a]'
@@ -111,11 +127,12 @@ export const CompanionChatHeader: React.FC<CompanionChatHeaderProps> = ({
       <button
         type="button"
         onClick={onClose}
-        aria-label="Close chat"
+        aria-label={t('playground.companion.header.close')}
         className="flex h-8 w-8 items-center justify-center rounded-full bg-white/40 text-[#3e5a3a] transition-colors hover:bg-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8a9a6f]"
       >
         <X className="h-4 w-4" strokeWidth={2.4} />
       </button>
     </div>
   </div>
-);
+  );
+};

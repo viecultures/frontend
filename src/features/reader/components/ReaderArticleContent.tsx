@@ -1,4 +1,5 @@
 import './ReaderArticleContent.css';
+import { useTranslation } from 'react-i18next';
 import type { CSSProperties, HTMLAttributes, MouseEvent, ReactNode, Ref } from 'react';
 import type { ReaderArticleData } from '../services/readerApiService';
 
@@ -21,13 +22,14 @@ export function ReaderArticleContent({
   scrollable = false, scrollRef, vocabClassName, onVocabClick,
   children, className = '', ...events
 }: ReaderArticleContentProps) {
+  const { t } = useTranslation('reader');
   const translated = language === 'vi';
   const isDark = themeMode === 'dark';
   const title = translated
     ? articleData?.titleVi || 'Tết: Sự đổi mới, lòng tưởng nhớ và hương vị các vùng miền'
     : articleData?.titleEn || 'Tết: Renewal, Remembrance and Regional Flavours';
   const summary = (translated ? articleData?.summaryVi || articleData?.summary : articleData?.summary) || (translated
-    ? 'Khám phá văn hóa về sự đổi mới, lòng tri ân tổ tiên và phong vị ẩm thực ba miền'
+    ? 'Khám phá văn hóa về sự đổi mới, lòng triân tổ tiên và phong vị ẩm thực ba miền'
     : 'A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions');
   const image = articleData?.imageUrl || '/images/landing/hoi-an-lanterns.jpg';
   const vocabulary = [...(articleData?.vocabularies || [])].sort((a, b) => b.word.length - a.word.length);
@@ -37,7 +39,7 @@ export function ReaderArticleContent({
     if (!vocabularyPattern) return text;
     return text.split(vocabularyPattern).map((part, index) => {
       const match = vocabulary.find(v => v.word.toLowerCase() === part.toLowerCase());
-      return match ? <button key={index} type="button" onClick={event => onVocabClick(match.word, event)} className={vocabClassName} title={`Look up “${part}”`}>{part}</button> : part;
+      return match ? <button key={index} type="button" onClick={event => onVocabClick(match.word, event)} className={vocabClassName} title={t('content.lookup_title', { word: part, defaultValue: `Look up “${part}”` })}>{part}</button> : part;
     });
   };
 
@@ -52,8 +54,8 @@ export function ReaderArticleContent({
     >
       <div>
         <div className="reader-sheet-heading sr-only">
-          <span className="px-3 py-1">{translated ? 'Vietnamese translation' : 'English original'}</span>
-          <span className="px-2.5 py-0.5">{translated ? 'VI' : 'EN'}</span>
+          <span className="px-3 py-1">{translated ? t('content.vietnamese_translation', 'Vietnamese translation') : t('content.english_original', 'English original')}</span>
+          <span className="px-2.5 py-0.5">{translated ? t('content.vi_badge', 'VI') : t('content.en_badge', 'EN')}</span>
         </div>
         <div className="reader-article-intro"><div className="reader-article-intro-content">
         <h1 className="reader-article-title">

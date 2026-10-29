@@ -1,72 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { Clock, ArrowRight, Headphones } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PATHS, paths } from '@/routes/paths';
 
-export interface StoryArticle {
+export interface StoryArticleConfig {
   id: string;
-  category: string;
-  title: string;
-  englishTitle: string;
+  itemKey: 'hoi_an' | 'imperial_hue' | 'saigon_banh_mi' | 'bat_trang' | 'mu_cang_chai' | 'dong_ho';
   image: string;
   readTime: string;
-  description: string;
 }
 
-const ARTICLES: StoryArticle[] = [
+const ARTICLES_CONFIG: StoryArticleConfig[] = [
   {
     id: 'hoi-an-lanterns',
-    category: 'Festivals & Daily Life',
-    title: 'Một đêm đèn lồng Hội An',
-    englishTitle: 'Hoi An Full-Moon Lantern Festival',
+    itemKey: 'hoi_an',
     image: '/images/landing/hoi-an-lanterns.jpg',
     readTime: '6 min',
-    description: 'Follow the lanterns along the Hoài River and discover the old town’s story and the people who keep its traditions alive.',
   },
   {
     id: 'imperial-hue',
-    category: 'History & Heritage',
-    title: 'Huế, những dấu xưa còn lại',
-    englishTitle: 'Imperial Hue Citadel & Court Architecture',
+    itemKey: 'imperial_hue',
     image: '/images/landing/hue-citadel.jpg',
     readTime: '8 min',
-    description: 'Explore tiled roofs, citadel gates, and the cultural stories of Vietnam’s former imperial capital.',
   },
   {
     id: 'saigon-banh-mi',
-    category: 'Vietnamese Cuisine',
-    title: 'Câu chuyện trong ổ bánh mì',
-    englishTitle: 'The Story of Saigon Banh Mi',
+    itemKey: 'saigon_banh_mi',
     image: '/images/landing/banh-mi.jpg',
     readTime: '5 min',
-    description: 'A familiar street food opens onto a story of cultures meeting and shaping something new.',
   },
   {
     id: 'bat-trang-pottery',
-    category: 'Arts & Craft Villages',
-    title: 'Đất, lửa và gốm Bát Tràng',
-    englishTitle: 'Bat Trang Ceramic Heritage',
+    itemKey: 'bat_trang',
     image: '/images/landing/bat-trang.jpg',
     readTime: '7 min',
-    description: 'Meet the hands of Bát Tràng’s potters and discover how a craft village passes its memory through every glaze.',
   },
   {
     id: 'mu-cang-chai',
-    category: 'Nature & People',
-    title: 'Mùa vàng trên những triền núi',
-    englishTitle: 'Mu Cang Chai Golden Rice Terraces',
+    itemKey: 'mu_cang_chai',
     image: '/images/landing/mu-cang-chai.jpg',
     readTime: '6 min',
-    description: 'Read about rice terraces and a way of life shaped by the land and seasons of the Northwest.',
   },
   {
     id: 'dong-ho-paintings',
-    category: 'Arts & Craft Villages',
-    title: 'Sắc màu trong tranh Đông Hồ',
-    englishTitle: 'Dong Ho Folk Woodcut Paintings',
+    itemKey: 'dong_ho',
     image: '/images/landing/dong-ho.jpg',
     readTime: '8 min',
-    description: 'From dó paper to natural pigments, each print offers a glimpse into Vietnamese life.',
   },
 ];
 
@@ -75,6 +55,7 @@ interface CoverflowArticlesSectionProps {
 }
 
 export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> = ({ onNavigate }) => {
+  const { t } = useTranslation('landing');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [hasFocus, setHasFocus] = useState(false);
@@ -82,7 +63,7 @@ export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> =
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
   const reducedMotion = useReducedMotion();
-  const totalCards = ARTICLES.length;
+  const totalCards = ARTICLES_CONFIG.length;
 
   // Continuous auto-sliding rotation (every 3.5 seconds)
   useEffect(() => {
@@ -144,26 +125,26 @@ export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> =
         {/* Section Heading */}
         <div className="landing-section-heading">
           <div>
-            <h2 id="landing-articles-title">Stories worth exploring</h2>
+            <h2 id="landing-articles-title">{t('articles.title')}</h2>
           </div>
           <button
             type="button"
             className="landing-text-link focus-ring"
             onClick={() => navigate(PATHS.discovery)}
           >
-            All stories <ArrowRight size={18} aria-hidden="true" />
+            {t('articles.all_stories')} <ArrowRight size={18} aria-hidden="true" />
           </button>
         </div>
 
         <p className="landing-section-description">
-          A living archive of Vietnamese heritage. Read in two languages, follow native audio, and build fluency naturally.
+          {t('articles.subtitle')}
         </p>
 
         {/* 3D Coverflow Stage with Automatic Slide (Controls completely removed) */}
         <div
           className="landing-coverflow mt-8"
           role="region"
-          aria-label="Bilingual heritage stories"
+          aria-label={t('articles.aria_region')}
           tabIndex={0}
           onKeyDown={handleKeyDown}
           onMouseEnter={() => setIsHovered(true)}
@@ -177,7 +158,12 @@ export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> =
           onTouchEnd={handleTouchEnd}
         >
           <div className="landing-coverflow-stage">
-            {ARTICLES.map((article, index) => {
+            {ARTICLES_CONFIG.map((article, index) => {
+              const category = t(`articles.items.${article.itemKey}.category`);
+              const title = t(`articles.items.${article.itemKey}.title`);
+              const englishTitle = t(`articles.items.${article.itemKey}.englishTitle`);
+              const description = t(`articles.items.${article.itemKey}.description`);
+
               let offset = (index - currentIndex + totalCards) % totalCards;
               if (offset > totalCards / 2) offset -= totalCards;
               const distance = Math.abs(offset);
@@ -214,20 +200,20 @@ export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> =
                         setCurrentIndex(index);
                       }
                     }}
-                    aria-label={isActive ? `Read story: ${article.englishTitle}` : `Select story: ${article.englishTitle}`}
+                    aria-label={isActive ? t('articles.read_aria', { title: englishTitle }) : t('articles.select_aria', { title: englishTitle })}
                   >
                     {/* Story Cover Image */}
                     <div className="landing-article-image">
                       <img
                         src={article.image}
-                        alt={`${article.englishTitle} - Vietnamese culture`}
+                        alt={`${englishTitle} - Vietnamese culture`}
                         loading="lazy"
                         width={800}
                         height={540}
                       />
                       <span className="landing-article-audio">
                         <Headphones size={13} className="text-antique-gold" aria-hidden="true" />
-                        <span>Read &amp; listen</span>
+                        <span>{t('articles.read_listen')}</span>
                       </span>
                       <span className="landing-article-arrow group-hover:scale-110 transition-transform">
                         <ArrowRight size={20} aria-hidden="true" />
@@ -236,16 +222,16 @@ export const CoverflowArticlesSection: React.FC<CoverflowArticlesSectionProps> =
 
                     {/* Story Content Body */}
                     <div className="landing-article-body">
-                      <span className="landing-article-category">{article.category}</span>
-                      <h3 className="line-clamp-2">{article.englishTitle}</h3>
-                      <span className="landing-article-english">Tiếng Việt: {article.title}</span>
-                      <p className="line-clamp-3">{article.description}</p>
+                      <span className="landing-article-category">{category}</span>
+                      <h3 className="line-clamp-2">{englishTitle}</h3>
+                      <span className="landing-article-english">{t('articles.vietnamese_prefix', { title })}</span>
+                      <p className="line-clamp-3">{description}</p>
                       <div className="landing-article-meta">
                         <span>
-                          <Clock size={13} aria-hidden="true" /> {article.readTime} read
+                          <Clock size={13} aria-hidden="true" /> {article.readTime} {t('articles.read_suffix')}
                         </span>
                         <span className="font-semibold text-action group-hover:translate-x-0.5 transition-transform">
-                          English · Vietnamese <ArrowRight size={13} aria-hidden="true" />
+                          {t('articles.bilingual_tag')} <ArrowRight size={13} aria-hidden="true" />
                         </span>
                       </div>
                     </div>

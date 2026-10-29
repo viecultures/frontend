@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Layers,
   Landmark,
@@ -44,8 +45,29 @@ export const DiscoveryTopicTabs: React.FC<DiscoveryTopicTabsProps> = ({
   onSelectTopic,
   topicCounts,
 }) => {
+  const { t } = useTranslation('discovery');
+
+  const getTopicLabel = (topicValue: string, fallbackLabel: string) => {
+    switch (topicValue) {
+      case 'All':
+        return t('topic_tabs.all');
+      case 'Heritage':
+        return t('topic_tabs.heritage');
+      case 'Cuisine':
+        return t('topic_tabs.cuisine');
+      case 'Crafts':
+        return t('topic_tabs.crafts');
+      case 'Nature':
+        return t('topic_tabs.nature');
+      case 'Folklore':
+        return t('topic_tabs.folklore');
+      default:
+        return fallbackLabel;
+    }
+  };
+
   return (
-    <section className="mb-6 overflow-x-auto pb-2 scrollbar-none" aria-label="Bộ lọc chủ đề bài học">
+    <section className="mb-6 overflow-x-auto pb-2 scrollbar-none" aria-label={t('topic_tabs.aria_label')}>
       <div className="flex items-center gap-2.5 min-w-max">
         {TOPIC_OPTIONS.map((topic) => {
           const isActive = selectedTopic === topic.value;
@@ -62,7 +84,7 @@ export const DiscoveryTopicTabs: React.FC<DiscoveryTopicTabsProps> = ({
               }`}
             >
               {getTopicIcon(topic.value, isActive)}
-              <span>{topic.label}</span>
+              <span>{getTopicLabel(topic.value, topic.label)}</span>
               <span
                 className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold transition-colors ${
                   isActive

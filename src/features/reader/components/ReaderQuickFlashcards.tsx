@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Layers,
   RotateCw,
@@ -29,6 +30,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
   deckId = 'tet-holiday',
   selectedLevel = 'Level 2',
 }) => {
+  const { t } = useTranslation('reader');
   const isDark = themeMode === 'dark';
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
@@ -120,14 +122,14 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold uppercase tracking-wider text-antique-gold">
-              Quick flashcards
+              {t('quick_flashcards.tag', 'Quick flashcards')}
             </span>
           </div>
           <h2 className={`font-sans text-2xl font-bold ${isDark ? 'text-warm-ivory' : 'text-heritage-green'}`}>
-            Flip, recall and review
+            {t('quick_flashcards.title', 'Flip, recall and review')}
           </h2>
           <p className="text-xs sm:text-sm opacity-80 mt-1 leading-relaxed">
-            Flip each card to check its meaning, then choose whether to review it again or mark it as remembered.
+            {t('quick_flashcards.description', 'Flip each card to check its meaning, then choose whether to review it again or mark it as remembered.')}
           </p>
         </div>
 
@@ -135,11 +137,11 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
         <div className="reader-quick-stats flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Remembered: {rememberedIds.size}</span>
+            <span>{t('quick_flashcards.remembered', { count: rememberedIds.size, defaultValue: `Remembered: ${rememberedIds.size}` })}</span>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-bold">
             <XCircle className="w-3.5 h-3.5" />
-            <span>Review: {reviewLaterIds.size}</span>
+            <span>{t('quick_flashcards.review', { count: reviewLaterIds.size, defaultValue: `Review: ${reviewLaterIds.size}` })}</span>
           </div>
         </div>
       </div>
@@ -167,11 +169,11 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           <div className="flex items-center justify-between text-xs font-bold opacity-75">
             <span className="flex items-center gap-1 text-antique-gold">
               <Layers className="w-3.5 h-3.5" />
-              Card {currentIndex + 1} / {cards.length}
+              {t('quick_flashcards.card_count', { current: currentIndex + 1, total: cards.length, defaultValue: `Card ${currentIndex + 1} / ${cards.length}` })}
             </span>
             <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-stone-500">
               <RotateCw className="w-3 h-3" />
-              {isFlipped ? 'Back · Meaning' : 'Front · Click to flip'}
+              {isFlipped ? t('quick_flashcards.back_meaning', 'Back · Meaning') : t('quick_flashcards.front_flip', 'Front · Click to flip')}
             </span>
           </div>
 
@@ -189,7 +191,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
                     playAudio(currentCard.word);
                   }}
                   className="p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
-                  title="Play pronunciation"
+                  title={t('quick_flashcards.play_pronunciation', 'Play pronunciation')}
                 >
                   <Volume2 className="w-5 h-5 text-antique-gold" />
                 </button>
@@ -211,14 +213,14 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               </h4>
               <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-md mx-auto bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 flex items-start justify-center gap-1.5 text-left">
                 <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                <span><strong>Cultural context:</strong> {currentCard.culturalFact}</span>
+                <span><strong>{t('quick_flashcards.cultural_context', 'Cultural context:')}</strong> {currentCard.culturalFact}</span>
               </p>
             </div>
           )}
 
           {/* Card Footer Helper */}
           <div className="text-center text-[11px] opacity-60">
-            Space to flip · Arrow keys to change cards
+            {t('quick_flashcards.keyboard_tip', 'Space to flip · Arrow keys to change cards')}
           </div>
         </div>
 
@@ -235,7 +237,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
             }`}
           >
             <XCircle className="w-4 h-4" />
-            <span>Review again</span>
+            <span>{t('quick_flashcards.review_again_btn', 'Review again')}</span>
           </button>
 
           <button
@@ -249,7 +251,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
             }`}
           >
             <CheckCircle2 className="w-4 h-4" />
-            <span>Remembered</span>
+            <span>{t('quick_flashcards.remembered_btn', 'Remembered')}</span>
           </button>
         </div>
 
@@ -260,7 +262,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               type="button"
               onClick={handlePrev}
               className="p-2 rounded-xl border border-antique-gold/30 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
-              title="Previous card"
+              title={t('quick_flashcards.prev_card', 'Previous card')}
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
@@ -268,7 +270,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               type="button"
               onClick={handleNext}
               className="p-2 rounded-xl border border-antique-gold/30 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
-              title="Next card"
+              title={t('quick_flashcards.next_card', 'Next card')}
             >
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -278,7 +280,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
             href={paths.flashcardStudy({ deck: deckId, level: selectedLevel })}
             className="reader-quick-deck-link inline-flex items-center gap-1.5 text-xs font-bold text-heritage-green dark:text-antique-gold hover:underline"
           >
-            <span>Open full flashcard deck</span>
+            <span>{t('quick_flashcards.open_full_deck', 'Open full flashcard deck')}</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
@@ -290,18 +292,16 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           <div className="space-y-1.5 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#9E2A2B] text-white">
-                Lesson milestone
+                {t('quick_flashcards.milestone_tag', 'Lesson milestone')}
               </span>
               <span className="text-xs text-stone-500 font-sans">
-                Keep your study streak going
+                {t('quick_flashcards.streak_sub', 'Keep your study streak going')}
               </span>
             </div>
             <h3 className="font-sans text-xl sm:text-2xl font-bold text-[#9E2A2B] dark:text-warm-ivory">
-              You’ve completed this lesson!
+              {t('quick_flashcards.completed_title', 'You’ve completed this lesson!')}
             </h3>
-            <p className="text-xs sm:text-sm text-stone-700 dark:text-stone-300 max-w-xl">
-              Add your <strong>heritage stamp</strong> to celebrate this lesson and continue your study streak.
-            </p>
+            <p className="text-xs sm:text-sm text-stone-700 dark:text-stone-300 max-w-xl" dangerouslySetInnerHTML={{ __html: t('quick_flashcards.completed_desc', 'Add your <strong>heritage stamp</strong> to celebrate this lesson and continue your study streak.') }} />
           </div>
 
           <button
@@ -310,7 +310,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
             className="w-full md:w-auto px-8 py-4 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-sans font-bold text-sm sm:text-base shadow-[0_4px_25px_rgba(158,42,43,0.45)] border-2 border-antique-gold transition-all transform hover:scale-105 flex items-center justify-center gap-3 cursor-pointer shrink-0"
           >
             <Award className="w-5 h-5 text-antique-gold" />
-            <span>Stamp and finish lesson</span>
+            <span>{t('quick_flashcards.stamp_finish_btn', 'Stamp and finish lesson')}</span>
             <BookOpen className="w-4 h-4 text-antique-gold" />
           </button>
         </div>

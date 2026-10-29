@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, Compass } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PATHS } from '@/routes/paths';
 
 interface LandingConversionSectionProps {
@@ -7,6 +8,8 @@ interface LandingConversionSectionProps {
 }
 
 export const LandingConversionSection: React.FC<LandingConversionSectionProps> = ({ onNavigate }) => {
+  const { t } = useTranslation('landing');
+
   return (
     <section
       id="conversion-cta"
@@ -14,16 +17,15 @@ export const LandingConversionSection: React.FC<LandingConversionSectionProps> =
       aria-labelledby="conversion-heading"
     >
       <div className="landing-container max-w-4xl text-center space-y-6">
-
         <h2
           id="conversion-heading"
           className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-heritage-forest leading-tight tracking-tight"
         >
-          Engrave words, Preserve cultures.
+          {t('conversion.title')}
         </h2>
 
         <p className="text-sm sm:text-base text-ink-soft max-w-xl mx-auto leading-relaxed">
-          Explore authentic Vietnamese stories, practice with synchronized audio, and remember meaningful vocabulary through living culture.
+          {t('conversion.subtitle')}
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
@@ -32,7 +34,7 @@ export const LandingConversionSection: React.FC<LandingConversionSectionProps> =
             className="landing-button landing-button-primary min-h-[48px] px-7 py-3 rounded-xl text-sm font-semibold shadow-md focus-ring cursor-pointer"
             onClick={() => onNavigate?.(PATHS.login)}
           >
-            <span>Start Learning</span>
+            <span>{t('conversion.cta_start')}</span>
             <ArrowRight size={17} aria-hidden="true" />
           </button>
 
@@ -42,7 +44,7 @@ export const LandingConversionSection: React.FC<LandingConversionSectionProps> =
             onClick={() => onNavigate?.(PATHS.discovery)}
           >
             <Compass size={17} className="text-antique-gold" aria-hidden="true" />
-            <span>Explore Stories</span>
+            <span>{t('conversion.cta_explore')}</span>
           </button>
         </div>
       </div>

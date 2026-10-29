@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import {
   X,
@@ -30,6 +31,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
   onAddComment,
   onSelectVocab,
 }) => {
+  const { t } = useTranslation("community");
   const [commentText, setCommentText] = useState("");
   const [copied, setCopied] = useState(false);
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
@@ -95,7 +97,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                 )}
               </div>
               <span className="text-xs text-[#6E7B75]">
-                {post.timeAgo} • in {post.lessonTag}
+                {post.timeAgo} • {t("community.post.in_tag", { topic: post.lessonTag })}
               </span>
             </div>
           </div>
@@ -104,7 +106,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
             type="button"
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-white text-[#6E7B75] hover:text-[#1D5046] transition-colors cursor-pointer focus-ring"
-            aria-label="Close reflection details"
+            aria-label={t("community.detail_modal.close_aria")}
           >
             <X className="w-5 h-5" />
           </button>
@@ -118,7 +120,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
               as="h2"
               className="font-serif text-xl sm:text-2xl font-bold text-[#1D5046] leading-snug"
             >
-              {post.title || `Reflections on ${post.lessonTag}`}
+              {post.title || t("community.detail_modal.default_title", { topic: post.lessonTag })}
             </DialogTitle>
             <p className="text-sm text-[#314F49] leading-relaxed whitespace-pre-line font-sans">
               {post.contentEn}
@@ -130,7 +132,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
             <div className="p-3.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-2">
               <span className="text-xs font-bold text-[#1D5046] uppercase tracking-wider flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-[#1D5046]" />
-                <span>Practiced English Vocabulary</span>
+                <span>{t("community.detail_modal.practiced_vocab_title")}</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {post.highlightWords.map((item, idx) => {
@@ -141,7 +143,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                       type="button"
                       onClick={() => handleVocabClick(item)}
                       className="px-2.5 py-1 rounded-lg bg-white text-[#1D5046] border border-[#E8E2D5] text-xs font-medium hover:border-[#1D5046]/40 transition-all cursor-pointer"
-                      title="Click to view definition"
+                      title={t("community.detail_modal.click_view_definition")}
                     >
                       {wordText}
                     </button>
@@ -156,7 +158,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
             <div className="rounded-xl overflow-hidden border border-[#E8E2D5] bg-white">
               <img
                 src={post.imageUrl}
-                alt={post.imageCaption || "Cultural reflection photo"}
+                alt={post.imageCaption || t("community.post.cultural_photo_fallback")}
                 className="w-full max-h-80 object-cover"
               />
               {post.imageCaption && (
@@ -185,7 +187,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                     post.userLiked ? "fill-red-500 text-red-500" : ""
                   }`}
                 />
-                <span>{post.heartsCount} likes</span>
+                <span>{t("community.detail_modal.likes_count", { count: post.heartsCount })}</span>
               </button>
 
               {onToggleBookmark && (
@@ -204,7 +206,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                       post.userBookmarked ? "fill-current" : ""
                     }`}
                   />
-                  <span>{post.userBookmarked ? "Saved" : "Save post"}</span>
+                  <span>{post.userBookmarked ? t("community.detail_modal.saved") : t("community.detail_modal.save_post")}</span>
                 </button>
               )}
             </div>
@@ -219,7 +221,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
               ) : (
                 <Share2 className="w-3.5 h-3.5" />
               )}
-              <span>{copied ? "Link copied" : "Share"}</span>
+              <span>{copied ? t("community.detail_modal.link_copied") : t("community.detail_modal.share")}</span>
             </button>
           </div>
 
@@ -227,7 +229,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
           <div className="space-y-3.5 pt-3 border-t border-[#E8E2D5]">
             <h4 className="font-serif text-base font-bold text-[#1D5046] flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-antique-gold" />
-              <span>Discussion ({post.comments?.length || post.commentsCount || 0})</span>
+              <span>{t("community.detail_modal.discussion_title", { count: post.comments?.length || post.commentsCount || 0 })}</span>
             </h4>
 
             {/* List of Comments */}
@@ -262,7 +264,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                           }
                           className="text-[11px] font-semibold text-[#1D5046] hover:underline cursor-pointer"
                         >
-                          Reply
+                          {t("community.detail_modal.reply")}
                         </button>
                       </div>
                     </div>
@@ -275,7 +277,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                           type="text"
                           value={replyText}
                           onChange={(e) => setReplyText(e.target.value)}
-                          placeholder={`Reply to ${cmt.authorName}...`}
+                          placeholder={t("community.detail_modal.reply_placeholder", { name: cmt.authorName })}
                           className="flex-1 px-3 py-1.5 rounded-lg bg-white border border-[#E8E2D5] text-xs text-[#314F49] focus:outline-none focus:ring-1 focus:ring-[#1D5046]"
                         />
                         <button
@@ -284,7 +286,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                           disabled={!replyText.trim()}
                           className="px-3 py-1.5 rounded-lg bg-[#1D5046] text-white text-xs font-semibold disabled:opacity-50 cursor-pointer"
                         >
-                          Send
+                          {t("community.detail_modal.send")}
                         </button>
                       </div>
                     )}
@@ -292,7 +294,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                 ))
               ) : (
                 <div className="p-4 rounded-xl bg-[#FAF7F0] text-center text-xs text-[#6E7B75]">
-                  No comments yet. Share your reflection or perspective!
+                  {t("community.detail_modal.no_comments")}
                 </div>
               )}
             </div>
@@ -303,8 +305,8 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                 type="text"
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                aria-label="Write a comment"
-                placeholder="Write a comment or share your perspective..."
+                aria-label={t("community.detail_modal.write_comment_aria")}
+                placeholder={t("community.detail_modal.comment_placeholder")}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] placeholder:text-[#6E7B75]/70 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white"
               />
               <button
@@ -313,7 +315,7 @@ export const CommunityDetailModal: React.FC<CommunityDetailModalProps> = ({
                 className="px-4 py-2.5 rounded-xl bg-[#1D5046] text-white font-semibold text-xs hover:bg-[#153D35] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer focus-ring"
               >
                 <Send className="w-3.5 h-3.5 text-[#E8D7AE]" />
-                <span>Send</span>
+                <span>{t("community.detail_modal.send")}</span>
               </button>
             </form>
           </div>

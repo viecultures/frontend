@@ -1,4 +1,5 @@
-import { X, Send, Coins, Gift, BookOpen, Landmark, CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { X, Send, Coins, BookOpen, Landmark } from "lucide-react";
 
 interface ContestEntryEditorProps {
   isOpen: boolean;
@@ -25,6 +26,8 @@ export function ContestEntryEditor({
   onToggleVocab,
   onSubmit,
 }: ContestEntryEditorProps) {
+  const { t } = useTranslation("community");
+
   if (!isOpen) return null;
 
   const wordCount = entryText.trim() ? entryText.trim().split(/\s+/).length : 0;
@@ -36,16 +39,16 @@ export function ContestEntryEditor({
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
             <Coins className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Complete an entry to receive +100 cultural coins</span>
+            <span>{t("community.contest.editor_banner")}</span>
           </span>
           <h2 className="font-serif text-lg sm:text-xl font-bold text-[#1D5046] mt-0.5">
-            Submit your weekly challenge entry
+            {t("community.contest.editor_title")}
           </h2>
         </div>
         <button
           onClick={onClose}
           className="p-1.5 rounded-full hover:bg-mist-cloud text-heritage-green transition-colors cursor-pointer focus-ring"
-          aria-label="Close contest editor"
+          aria-label={t("community.contest.close_editor_aria")}
         >
           <X className="w-5 h-5" />
         </button>
@@ -56,26 +59,26 @@ export function ContestEntryEditor({
         <div>
           <label className="block text-xs font-bold text-heritage-green uppercase mb-1.5 flex items-center gap-1.5">
             <Landmark className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Writing perspective</span>
+            <span>{t("community.contest.perspective_label")}</span>
           </label>
-          <select aria-label="Writing perspective" className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs font-medium text-[#1D5046] focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white">
-            <option>Architecture & heritage</option>
-            <option>Travel photo story</option>
-            <option>History & customs</option>
+          <select aria-label={t("community.contest.perspective_label")} className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs font-medium text-[#1D5046] focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white">
+            <option>{t("community.contest.perspective_arch")}</option>
+            <option>{t("community.contest.perspective_travel")}</option>
+            <option>{t("community.contest.perspective_history")}</option>
           </select>
         </div>
 
         <div>
           <label className="block text-xs font-bold text-heritage-green uppercase mb-1.5 flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Entry title</span>
+            <span>{t("community.contest.entry_title_label")}</span>
           </label>
           <input
-            aria-label="Entry title"
+            aria-label={t("community.contest.entry_title_label")}
             type="text"
             value={entryTitle}
             onChange={(e) => onChangeTitle(e.target.value)}
-            placeholder="Enter a title for your challenge entry…"
+            placeholder={t("community.contest.entry_title_placeholder")}
             className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white"
           />
         </div>
@@ -86,10 +89,10 @@ export function ContestEntryEditor({
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Select the vocabulary used in your entry (use 3+ words to earn coins):</span>
+            <span>{t("community.contest.vocab_select_label")}</span>
           </span>
-          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-            Selected: {appliedCount}/3 words
+          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
+            {t("community.contest.vocab_selected_count", { count: appliedCount })}
           </span>
         </div>
         <div className="flex flex-wrap gap-4 text-xs font-bold text-heritage-green pt-1">
@@ -112,39 +115,41 @@ export function ContestEntryEditor({
       {/* Textarea */}
       <div className="space-y-1.5">
         <textarea
-          aria-label="Contest entry text"
+          aria-label={t("community.contest.entry_text_aria")}
           value={entryText}
           onChange={(e) => onChangeText(e.target.value)}
-          placeholder="Share your perspective or story in English (100–300 words)…"
+          placeholder={t("community.contest.entry_text_placeholder")}
           className="w-full h-40 p-4 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-sm text-[#314F49] placeholder:text-[#6E7B75]/60 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white leading-relaxed font-sans"
         />
         <div className="flex items-center justify-between text-xs text-text-secondary px-1">
-          <span>Express yourself naturally, inspired by the heritage stories you read.</span>
-          <span className="font-semibold">{wordCount} words</span>
+          <span>{t("community.contest.hint_natural")}</span>
+          <span className="font-semibold">{t("community.editor.words_count", { count: wordCount })}</span>
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex items-center justify-between pt-2 border-t border-heritage-green/10">
         <span className="text-xs text-text-secondary italic hidden sm:inline">
-          No grammar pressure · Share your love of culture
+          {t("community.contest.hint_no_pressure")}
         </span>
         <div className="flex items-center gap-3 ml-auto">
           <button
             onClick={onClose}
             className="px-4 py-2.5 rounded-xl text-xs font-semibold text-[#1D5046] bg-[#FAF7F0] border border-[#E8E2D5] hover:bg-white cursor-pointer focus-ring"
           >
-            Cancel
+            {t("community.contest.cancel_btn")}
           </button>
           <button
             onClick={onSubmit}
             className="px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] border border-[#1D5046] inline-flex items-center gap-2 focus-ring cursor-pointer"
           >
             <Send className="w-3.5 h-3.5 text-antique-gold" />
-            <span>Submit entry (+100 coins)</span>
+            <span>{t("community.contest.submit_entry_btn")}</span>
           </button>
         </div>
       </div>
     </div>
   );
 }
+
+export default ContestEntryEditor;

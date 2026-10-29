@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Play, Pause, Volume2, VolumeX, Mic, Repeat, Gauge, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -52,6 +53,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
   onOpenVoiceCustomizer,
   onStartShadowing,
 }) => {
+  const { t } = useTranslation('reader');
   const [scrollY, setScrollY] = useState(0);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
   const speeds = [1.0, 0.8, 0.5];
@@ -148,7 +150,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                   ? "bg-[#2563EB]/15 text-[#2563EB] dark:text-[#93C5FD]"
                   : "bg-antique-gold/20 text-antique-gold"
               }`}>
-                {audioScope === "full" ? "Full article" : "Shadowing"}
+                {audioScope === "full" ? t('audio_bar.full_article', 'Full article') : t('audio_bar.shadowing', 'Shadowing')}
               </span>
             </div>
 
@@ -160,10 +162,10 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 className={`text-[10px] font-bold flex items-center gap-1 group transition-colors cursor-pointer hover:underline ${
                   isDark ? "text-antique-gold" : "text-heritage-green"
                 }`}
-                title="Choose reading voice"
+                title={t('audio_bar.choose_voice_title', 'Choose reading voice')}
               >
                 <span>{selectedVoiceFlag}</span>
-                <span>Voice: {selectedVoiceName}</span>
+                <span>{t('audio_bar.voice_label', { name: selectedVoiceName, defaultValue: `Voice: ${selectedVoiceName}` })}</span>
                 <SlidersHorizontal className="w-2.5 h-2.5 opacity-70 group-hover:opacity-100" />
               </button>
             )}
@@ -178,13 +180,13 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             {/* Replay */}
             <button
               onClick={onRestart}
-              title="Restart audio"
+              title={t('audio_bar.restart_title', 'Restart audio')}
               className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer shrink-0 ${
                 isDark
                   ? "text-sky-mist hover:text-antique-gold hover:bg-white/10"
                   : "text-heritage-green hover:text-antique-gold hover:bg-heritage-green/10"
               }`}
-              aria-label="Restart audio"
+              aria-label={t('audio_bar.restart_aria', 'Restart audio')}
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -192,7 +194,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             {/* Loop / Repeat */}
             <button
               onClick={onToggleRepeatLoop}
-              title={isRepeatLoop ? "Sentence repeat is on" : "Enable sentence repeat"}
+              title={isRepeatLoop ? t('audio_bar.repeat_on_title', 'Sentence repeat is on') : t('audio_bar.repeat_off_title', 'Enable sentence repeat')}
               className={`p-1.5 sm:p-2 rounded-full border transition-colors relative cursor-pointer shrink-0 ${
                 isRepeatLoop
                   ? isDark
@@ -202,7 +204,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                   ? "text-sky-mist/70 hover:text-antique-gold border-transparent hover:bg-white/10"
                   : "text-heritage-green/70 hover:text-heritage-green border-transparent hover:bg-heritage-green/10"
               }`}
-              aria-label="Repeat sentence"
+              aria-label={t('audio_bar.repeat_aria', 'Repeat sentence')}
               aria-pressed={isRepeatLoop}
             >
               <Repeat className="w-3.5 h-3.5" />
@@ -222,8 +224,8 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 ? "bg-antique-gold hover:bg-[#c9a657] text-heritage-green"
                 : "bg-heritage-green hover:bg-heritage-dark text-warm-ivory"
             }`}
-            title={isPlaying ? "Pause" : "Play audio"}
-            aria-label={isPlaying ? "Pause" : "Play audio"}
+            title={isPlaying ? t('audio_bar.pause_audio', 'Pause') : t('audio_bar.play_audio', 'Play audio')}
+            aria-label={isPlaying ? t('audio_bar.pause_audio', 'Pause') : t('audio_bar.play_audio', 'Play audio')}
           >
             {isPlaying ? (
               <Pause className="w-4 h-4 fill-current" />
@@ -260,7 +262,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                     ? "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-antique-gold [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-antique-gold [&::-moz-range-thumb]:border-none"
                     : "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-heritage-green [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-heritage-green [&::-moz-range-thumb]:border-none"
                 }`}
-                aria-label="Audio progress"
+                aria-label={t('audio_bar.audio_progress_aria', 'Audio progress')}
               />
             </div>
 
@@ -278,21 +280,21 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
             {onStartShadowing && <button
               type="button"
               onClick={onStartShadowing}
-              title="Practise shadowing"
-              aria-label="Practise shadowing"
+              title={t('audio_bar.practise_shadowing', 'Practise shadowing')}
+              aria-label={t('audio_bar.practise_shadowing', 'Practise shadowing')}
               className="p-2 rounded-full border border-transparent hover:border-antique-gold"
             ><Mic className="w-3.5 h-3.5" /></button>}
 
             {/* Speed Selector */}
             <button
               onClick={handleCycleSpeed}
-              title={`Playback speed: ${playbackSpeed}x. Click to change.`}
+              title={t('audio_bar.playback_speed_title', { speed: playbackSpeed, defaultValue: `Playback speed: ${playbackSpeed}x. Click to change.` })}
               className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-bold transition-colors cursor-pointer shrink-0 ${
                 isDark
                   ? "bg-[#141C1A] border-antique-gold/50 text-antique-gold hover:bg-antique-gold/20"
                   : "bg-heritage-green/10 border-heritage-green/30 text-heritage-green hover:bg-heritage-green/20"
               }`}
-              aria-label={`Playback speed ${playbackSpeed}x`}
+              aria-label={t('audio_bar.playback_speed_aria', { speed: playbackSpeed, defaultValue: `Playback speed ${playbackSpeed}x` })}
             >
               <Gauge className="w-3 h-3" />
               <span className="tabular-nums font-semibold text-[10px]">{playbackSpeed}x</span>
@@ -311,16 +313,16 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                   ? "bg-antique-gold/20 border-antique-gold/60 text-antique-gold hover:bg-antique-gold/30"
                   : "bg-heritage-green/10 border-heritage-green/30 text-heritage-green hover:bg-heritage-green/15"
               }`}
-              title="Open voice settings"
+              title={t('audio_bar.voice_settings_title', 'Open voice settings')}
             >
               <SlidersHorizontal className="w-3 h-3" />
-              <span className="hidden sm:inline">Voice settings</span>
+              <span className="hidden sm:inline">{t('audio_bar.voice_settings', 'Voice settings')}</span>
             </button>
           )}
 
           <button
             onClick={onToggleMute}
-            title={isMuted ? "Unmute" : "Mute"}
+            title={isMuted ? t('audio_bar.unmute', 'Unmute') : t('audio_bar.mute', 'Mute')}
             className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
               isMuted
                 ? "bg-red-500/20 text-red-400 border-red-500/40"
@@ -328,7 +330,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 ? "bg-[#141C1A] border-antique-gold/40 text-antique-gold hover:bg-antique-gold/20"
                 : "bg-heritage-green/10 border-heritage-green/20 text-heritage-green hover:bg-heritage-green/20"
             }`}
-            aria-label={isMuted ? "Unmute" : "Mute"}
+            aria-label={isMuted ? t('audio_bar.unmute', 'Unmute') : t('audio_bar.mute', 'Mute')}
             aria-pressed={isMuted}
           >
             {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}

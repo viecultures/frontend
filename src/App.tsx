@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation, useParams, Navigate } from 'react-router-dom';
 import { isLocalAuthMode } from '@/config/authConfig';
 
 import { SettingsModal } from './components/SettingsModal';
@@ -10,6 +10,7 @@ import { AppLayout } from '@/layouts/AppLayout';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { FocusLayout } from '@/layouts/FocusLayout';
 import { StudyLayout } from '@/layouts/StudyLayout';
+import { LanguageRouteLayout } from '@/layouts/LanguageRouteLayout';
 
 // Route Guards
 import { RequireAuth, RequireRole, GuestOnly } from '@/routes/guards';
@@ -40,14 +41,35 @@ const DesignSystemPage = import.meta.env.DEV
   ? React.lazy(() => import('@/pages/DesignSystemPage'))
   : null;
 import { getStoredUser, setStoredUser, getStoredToken, clearAuthStorage, type AppUser } from '@/utils/auth-storage';
-import { PATHS } from '@/routes/paths';
+import { PATHS, getLocalizedPath } from '@/routes/paths';
 import { CompanionChatDrawer, CompanionFloatingButton } from '@/features/companion';
 
-// Redirect legacy /bilingual-reader or /loop routes to canonical /reader while preserving search query
+// Helper to strip leading slash for child routes under /:lang
+const toRel = (path: string): string => path.replace(/^\//, '');
+
+// Redirect legacy /bilingual-reader or /loop routes to canonical /reader while preserving search query and lang
 const RedirectToReader: React.FC<{ defaultParams?: string }> = ({ defaultParams = '' }) => {
   const location = useLocation();
+  const { lang = 'vi' } = useParams<{ lang: string }>();
   const search = location.search || defaultParams;
-  return <Navigate to={`${PATHS.reader}${search}`} replace />;
+  return <Navigate to={`/${lang}${PATHS.reader}${search}`} replace />;
+};
+
+// Redirect alias routes within localized prefix
+const RedirectWithLang: React.FC<{ to: string }> = ({ to }) => {
+  const { lang = 'vi' } = useParams<{ lang: string }>();
+  const cleanTarget = to.startsWith('/') ? to : `/${to}`;
+  return <Navigate to={`/${lang}${cleanTarget}`} replace />;
+};
+
+// Backward-compatibility fallback: un-prefixed URLs (e.g. /login) redirect to /vi/login
+const UnprefixedFallbackRedirect: React.FC = () => {
+  const location = useLocation();
+  if (/^\/(vi|en)(\/|$)/.test(location.pathname)) {
+    return <NotFoundPage />;
+  }
+  const cleanPath = location.pathname.startsWith('/') ? location.pathname : `/${location.pathname}`;
+  return <Navigate to={`/vi${cleanPath}${location.search}${location.hash}`} replace />;
 };
 
 export const App: React.FC = () => {
@@ -63,11 +85,13 @@ export const App: React.FC = () => {
       ? location.pathname.slice(0, -1)
       : location.pathname;
 
+  const pathWithoutLang = normalizedPath.replace(/^\/(vi|en)(\/|$)/, '/');
+
   const isLandingOrLogin =
-    normalizedPath === PATHS.landing ||
-    normalizedPath === PATHS.landingConcept ||
-    normalizedPath === '/landing' ||
-    normalizedPath === PATHS.login;
+    pathWithoutLang === PATHS.landing ||
+    pathWithoutLang === PATHS.landingConcept ||
+    pathWithoutLang === '/landing' ||
+    pathWithoutLang === PATHS.login;
 
   useEffect(() => {
     if (isLandingOrLogin && isCompanionOpen) {
@@ -100,7 +124,7 @@ export const App: React.FC = () => {
     if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
       navigate(redirectUrl, { replace: true });
     } else {
-      navigate(PATHS.home, { replace: true });
+      navigate(getLocalizedPath(PATHS.home), { replace: true });
     }
   };
 
@@ -108,7 +132,7 @@ export const App: React.FC = () => {
     clearAuthStorage();
     setIsLoggedIn(false);
     setUser(null);
-    navigate(PATHS.landing, { replace: true });
+    navigate(getLocalizedPath(PATHS.landing), { replace: true });
   };
 
   const content = (
@@ -122,120 +146,130 @@ export const App: React.FC = () => {
           }
         >
           <Routes>
-            {DesignSystemPage && <Route path="/design-system" element={<DesignSystemPage />} />}
-            {/* 1. Public Landing Layout */}
-            <Route element={<PublicLayout />}>
-              <Route path={PATHS.landing} element={<LandingPage />} />
-              <Route path={PATHS.landingConcept} element={<FoodLandingPage />} />
-              <Route path="/landing" element={<Navigate to={PATHS.landing} replace />} />
+            {/* Root URL redirect to /vi */}
+            <Route path="/" element={<Navigate to="/vi" replace />} />
+
+            {/* Localized routes tree with :lang prefix */}
+            <Route path="/:lang" element={<LanguageRouteLayout />}>
+              {/* 1. Public Landing Layout */}
+              <Route element={<PublicLayout />}>
+                <Route index element={<LandingPage />} />
+                <Route path={toRel(PATHS.landingConcept)} element={<FoodLandingPage />} />
+                <Route path="landing" element={<RedirectWithLang to={PATHS.landing} />} />
+              </Route>
+
+              {/* 2. Standard App Layout (Navbar + Outlet + Footer) */}
+              <Route element={<AppLayout isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />}>
+                <Route path={toRel(PATHS.discovery)} element={<DiscoveryPage />} />
+                <Route path={toRel(PATHS.dictionary)} element={<DictionaryPage />} />
+                <Route path="flashcard-library" element={<RedirectWithLang to={PATHS.dictionary} />} />
+
+                <Route path={toRel(PATHS.community)} element={<CommunityPage />} />
+                <Route path="community-1" element={<RedirectWithLang to={PATHS.community} />} />
+                <Route path={toRel(PATHS.communityContest)} element={<CommunityContestPage />} />
+                <Route path="community-2" element={<RedirectWithLang to={PATHS.communityContest} />} />
+
+                <Route path={toRel(PATHS.pricing)} element={<PricingPage />} />
+                <Route path="subscription" element={<RedirectWithLang to={PATHS.pricing} />} />
+                <Route path="upgrade" element={<RedirectWithLang to={PATHS.pricing} />} />
+
+                {/* Auth Protected: Checkout */}
+                <Route
+                  path={toRel(PATHS.checkout)}
+                  element={
+                    <RequireAuth>
+                      <CheckoutPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route path="checkout" element={<RedirectWithLang to={PATHS.checkout} />} />
+
+                {/* Auth Protected: User Profile & Cultural Passport */}
+                <Route
+                  path={toRel(PATHS.profile)}
+                  element={
+                    <RequireAuth>
+                      <ProfilePage />
+                    </RequireAuth>
+                  }
+                />
+                <Route path="account" element={<RedirectWithLang to={PATHS.profile} />} />
+                <Route path="passport" element={<RedirectWithLang to={`${PATHS.profile}?tab=passport`} />} />
+                <Route path="achievements" element={<RedirectWithLang to={`${PATHS.profile}?tab=badges`} />} />
+
+                {/* Role Protected: Admin CMS */}
+                <Route
+                  path={toRel(PATHS.admin)}
+                  element={
+                    <RequireRole role="ADMIN">
+                      <AdminPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path={`${toRel(PATHS.admin)}/*`}
+                  element={
+                    <RequireRole role="ADMIN">
+                      <AdminPage />
+                    </RequireRole>
+                  }
+                />
+                <Route path="admin/posts" element={<RedirectWithLang to={PATHS.admin} />} />
+
+                {DesignSystemPage && <Route path="design-system" element={<DesignSystemPage />} />}
+
+                {/* 404 Not Found Page within App shell */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
+
+              {/* 3. Study Layout (Navbar + Outlet, no Footer) */}
+              <Route element={<StudyLayout isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />}>
+                <Route path={toRel(PATHS.flashcardStudy)} element={<FlashcardsPage />} />
+                <Route path="flashcards" element={<FlashcardsPage />} />
+                <Route path="flashcard-study-page" element={<FlashcardsPage />} />
+              </Route>
+
+              {/* 4. Focus Full-screen Layout (No Navbar, No Footer) */}
+              <Route element={<FocusLayout />}>
+                {/* Guest Only: Login */}
+                <Route
+                  path={toRel(PATHS.login)}
+                  element={
+                    <GuestOnly>
+                      <LoginPage onLoginSuccess={handleLoginSuccess} />
+                    </GuestOnly>
+                  }
+                />
+
+                {/* Auth Protected: Home Dashboard */}
+                <Route
+                  path={toRel(PATHS.home)}
+                  element={
+                    <RequireAuth>
+                      <HomePage
+                        isLoggedIn={isLoggedIn}
+                        user={user}
+                        onLogout={handleLogout}
+                      />
+                    </RequireAuth>
+                  }
+                />
+
+                {/* Reader & Playground Workspaces */}
+                <Route path={toRel(PATHS.reader)} element={<ReaderPage />} />
+                <Route path="bilingual-reader" element={<RedirectToReader />} />
+                <Route path="extensive-reader" element={<RedirectToReader defaultParams="?mode=practice" />} />
+                <Route path="learning-loop" element={<RedirectToReader />} />
+                <Route path="loop" element={<RedirectToReader />} />
+
+                <Route path={toRel(PATHS.playground)} element={<PlaygroundPage />} />
+                <Route path={toRel(PATHS.aiWorkspace)} element={<AiWorkspacePage />} />
+                <Route path="mascot-demo" element={<MascotDemoPage />} />
+              </Route>
             </Route>
 
-            {/* 2. Standard App Layout (Navbar + Outlet + Footer) */}
-            <Route element={<AppLayout isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />}>
-              <Route path={PATHS.discovery} element={<DiscoveryPage />} />
-              <Route path={PATHS.dictionary} element={<DictionaryPage />} />
-              <Route path="/flashcard-library" element={<Navigate to={PATHS.dictionary} replace />} />
-
-              <Route path={PATHS.community} element={<CommunityPage />} />
-              <Route path="/community-1" element={<Navigate to={PATHS.community} replace />} />
-              <Route path={PATHS.communityContest} element={<CommunityContestPage />} />
-              <Route path="/community-2" element={<Navigate to={PATHS.communityContest} replace />} />
-
-              <Route path={PATHS.pricing} element={<PricingPage />} />
-              <Route path="/subscription" element={<Navigate to={PATHS.pricing} replace />} />
-              <Route path="/upgrade" element={<Navigate to={PATHS.pricing} replace />} />
-
-              {/* Auth Protected: Checkout */}
-              <Route
-                path={PATHS.checkout}
-                element={
-                  <RequireAuth>
-                    <CheckoutPage />
-                  </RequireAuth>
-                }
-              />
-              <Route path="/checkout" element={<Navigate to={PATHS.checkout} replace />} />
-
-              {/* Auth Protected: User Profile & Cultural Passport */}
-              <Route
-                path={PATHS.profile}
-                element={
-                  <RequireAuth>
-                    <ProfilePage />
-                  </RequireAuth>
-                }
-              />
-              <Route path="/account" element={<Navigate to={PATHS.profile} replace />} />
-              <Route path="/passport" element={<Navigate to={`${PATHS.profile}?tab=passport`} replace />} />
-              <Route path="/achievements" element={<Navigate to={`${PATHS.profile}?tab=badges`} replace />} />
-
-              {/* Role Protected: Admin CMS */}
-              <Route
-                path={PATHS.admin}
-                element={
-                  <RequireRole role="ADMIN">
-                    <AdminPage />
-                  </RequireRole>
-                }
-              />
-              <Route
-                path={`${PATHS.admin}/*`}
-                element={
-                  <RequireRole role="ADMIN">
-                    <AdminPage />
-                  </RequireRole>
-                }
-              />
-              <Route path="/admin/posts" element={<Navigate to={PATHS.admin} replace />} />
-
-              {/* 404 Not Found Page within App shell */}
-              <Route path="*" element={<NotFoundPage />} />
-            </Route>
-
-            {/* 3. Study Layout (Navbar + Outlet, no Footer) */}
-            <Route element={<StudyLayout isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />}>
-              <Route path={PATHS.flashcardStudy} element={<FlashcardsPage />} />
-              <Route path="/flashcards" element={<FlashcardsPage />} />
-              <Route path="/flashcard-study-page" element={<FlashcardsPage />} />
-            </Route>
-
-            {/* 4. Focus Full-screen Layout (No Navbar, No Footer) */}
-            <Route element={<FocusLayout />}>
-              {/* Guest Only: Login */}
-              <Route
-                path={PATHS.login}
-                element={
-                  <GuestOnly>
-                    <LoginPage onLoginSuccess={handleLoginSuccess} />
-                  </GuestOnly>
-                }
-              />
-
-              {/* Auth Protected: Home Dashboard */}
-              <Route
-                path={PATHS.home}
-                element={
-                  <RequireAuth>
-                    <HomePage
-                      isLoggedIn={isLoggedIn}
-                      user={user}
-                      onLogout={handleLogout}
-                    />
-                  </RequireAuth>
-                }
-              />
-
-              {/* Reader & Playground Workspaces */}
-              <Route path={PATHS.reader} element={<ReaderPage />} />
-              <Route path="/bilingual-reader" element={<RedirectToReader />} />
-              <Route path="/extensive-reader" element={<RedirectToReader defaultParams="?mode=practice" />} />
-              <Route path="/learning-loop" element={<RedirectToReader />} />
-              <Route path="/loop" element={<RedirectToReader />} />
-
-              <Route path={PATHS.playground} element={<PlaygroundPage />} />
-              <Route path={PATHS.aiWorkspace} element={<AiWorkspacePage />} />
-              <Route path="/mascot-demo" element={<MascotDemoPage />} />
-            </Route>
+            {/* Fallback for un-prefixed routes (e.g. legacy /login -> /vi/login) */}
+            <Route path="*" element={<UnprefixedFallbackRedirect />} />
           </Routes>
         </React.Suspense>
 
@@ -244,7 +278,7 @@ export const App: React.FC = () => {
         <PwaInstallBanner />
 
         {/* AI Cultural Companion Floating Drawer & Launcher */}
-        {!isLandingOrLogin && !location.pathname.startsWith(PATHS.aiWorkspace) && (
+        {!isLandingOrLogin && !pathWithoutLang.startsWith(PATHS.aiWorkspace) && (
           <>
             <CompanionFloatingButton
               isOpen={isCompanionOpen}

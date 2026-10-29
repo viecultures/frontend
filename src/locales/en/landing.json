@@ -1,0 +1,336 @@
+{
+  "navigation": {
+    "discover": "Discover",
+    "topics": "Topics",
+    "heritage_map": "Heritage Map",
+    "how_it_works": "How It Works",
+    "plans": "Plans",
+    "contact": "Contact",
+    "study_room": "Study Room",
+    "sign_in": "Sign In",
+    "start_learning": "Start Learning",
+    "language": "Language"
+  },
+  "hero": {
+    "tag": "Vietnamese Heritage & Language",
+    "title": "Engrave words, Preserve cultures.",
+    "title_part1": "Engrave words, ",
+    "title_accent": "Preserve cultures.",
+    "subtitle": "Discover Vietnam through authentic stories, bilingual reading, and immersive listening",
+    "cta_start": "Start Learning",
+    "cta_explore": "Explore Stories",
+    "video_label": "Atmospheric cultural video of Vietnamese heritage",
+    "video_pause": "Pause video",
+    "video_play": "Play video"
+  },
+  "topics": {
+    "title": "Four cultural traditions, endless discoveries",
+    "intro": "From thousand-year craft dynasties to culinary stories. Choose where your bilingual journey begins.",
+    "explore_aria": "Explore topic: {{title}}",
+    "items": {
+      "history": {
+        "title": "History & Heritage",
+        "vietnameseTitle": "Lịch sử & Di sản",
+        "kicker": "Roots & Legacy",
+        "description": "Echoes of dynastic citadels, ancient temples, and architectural marvels that built modern Vietnam."
+      },
+      "food": {
+        "title": "Food & Coffee",
+        "vietnameseTitle": "Ẩm thực & Cà phê",
+        "kicker": "Flavor & Tradition",
+        "description": "From street-side Phở and crisp Bánh Mì to traditional Phin coffee cultures across three regions."
+      },
+      "crafts": {
+        "title": "Arts & Craft Villages",
+        "vietnameseTitle": "Làng nghề & Thủ công",
+        "kicker": "Crafted by Hand",
+        "description": "Centuries of artistry in Bát Tràng ceramics, Đông Hồ woodcuts, and silk weaving dynasties."
+      },
+      "festivals": {
+        "title": "Festivals & Daily Life",
+        "vietnameseTitle": "Lễ hội & Đời sống",
+        "kicker": "Living Rhythms",
+        "description": "Timeless full-moon lantern gatherings, seasonal harvest rites, and communal celebrations."
+      }
+    }
+  },
+  "methodology": {
+    "title": "From a single story to natural fluency",
+    "subtitle": "A continuous four-stage methodology designed for contextual retention without mindless rote memorization.",
+    "optional": "Optional",
+    "steps": {
+      "step1": {
+        "number": "01",
+        "step": "Step 1",
+        "title": "Choose a Story",
+        "description": "Select an authentic cultural story — from culinary arts to imperial history.",
+        "action": "Explore stories"
+      },
+      "step2": {
+        "number": "02",
+        "step": "Step 2",
+        "title": "Read & Listen",
+        "description": "Read parallel bilingual sentences synchronized with native audio at your own pace.",
+        "action": "Read the Hue story"
+      },
+      "step3": {
+        "number": "03",
+        "step": "Step 3",
+        "title": "Review Lexicon",
+        "description": "Master contextual story vocabulary using smart spaced-repetition flashcards.",
+        "action": "Try interactive review"
+      },
+      "step4": {
+        "number": "04",
+        "step": "Step 4",
+        "title": "Reflect & Speak",
+        "description": "Practice speaking with the AI cultural guide or journal reflections safely.",
+        "action": "Try AI companion"
+      }
+    }
+  },
+  "articles": {
+    "title": "Stories worth exploring",
+    "all_stories": "All stories",
+    "subtitle": "A living archive of Vietnamese heritage. Read in two languages, follow native audio, and build fluency naturally.",
+    "aria_region": "Bilingual heritage stories",
+    "read_listen": "Read & listen",
+    "vietnamese_prefix": "Tiếng Việt: {{title}}",
+    "read_suffix": "read",
+    "bilingual_tag": "English · Vietnamese",
+    "read_aria": "Read story: {{title}}",
+    "select_aria": "Select story: {{title}}",
+    "items": {
+      "hoi_an": {
+        "category": "Festivals & Daily Life",
+        "title": "Một đêm đèn lồng Hội An",
+        "englishTitle": "Hoi An Full-Moon Lantern Festival",
+        "description": "Follow the lanterns along the Hoài River and discover the old town’s story and the people who keep its traditions alive."
+      },
+      "imperial_hue": {
+        "category": "History & Heritage",
+        "title": "Huế, những dấu xưa còn lại",
+        "englishTitle": "Imperial Hue Citadel & Court Architecture",
+        "description": "Explore tiled roofs, citadel gates, and the cultural stories of Vietnam’s former imperial capital."
+      },
+      "saigon_banh_mi": {
+        "category": "Vietnamese Cuisine",
+        "title": "Câu chuyện trong ổ bánh mì",
+        "englishTitle": "The Story of Saigon Banh Mi",
+        "description": "A familiar street food opens onto a story of cultures meeting and shaping something new."
+      },
+      "bat_trang": {
+        "category": "Arts & Craft Villages",
+        "title": "Đất, lửa và gốm Bát Tràng",
+        "englishTitle": "Bat Trang Ceramic Heritage",
+        "description": "Meet the hands of Bát Tràng’s potters and discover how a craft village passes its memory through every glaze."
+      },
+      "mu_cang_chai": {
+        "category": "Nature & People",
+        "title": "Mùa vàng trên những triền núi",
+        "englishTitle": "Mu Cang Chai Golden Rice Terraces",
+        "description": "Read about rice terraces and a way of life shaped by the land and seasons of the Northwest."
+      },
+      "dong_ho": {
+        "category": "Arts & Craft Villages",
+        "title": "Sắc màu trong tranh Đông Hồ",
+        "englishTitle": "Dong Ho Folk Woodcut Paintings",
+        "description": "From dó paper to natural pigments, each print offers a glimpse into Vietnamese life."
+      }
+    }
+  },
+  "map_section": {
+    "headline_part1": "Discover stories",
+    "headline_part2": "across Vietnam",
+    "subtitle": "Start with our published stories. More places and lessons are on the way.",
+    "paracel_name": "Hoàng Sa",
+    "spratly_name": "Trường Sa",
+    "vietnam_claim": "(Việt Nam)",
+    "central_locked": "Central Vietnam coming soon",
+    "south_locked": "Southern Vietnam coming soon",
+    "read_story_from": "Read a story from {{name}}",
+    "coming_soon": "{{name}}: stories coming soon",
+    "default_region_north": "Bắc Bộ",
+    "default_region_central": "Trung Bộ",
+    "default_region_south": "Nam Bộ",
+    "default_unesco_category": "Di sản UNESCO",
+    "default_established": "Di sản truyền thống",
+    "default_unesco_status": "Di sản văn hóa tiêu biểu"
+  },
+  "map_journey": {
+    "badge": "LEARNING JOURNEY BY REGION",
+    "first_region_open": "Your first region is open. Explore it in the reading journey.",
+    "choose_first_region": "Choose your first region. Northern Vietnam is recommended.",
+    "change_first_region": "Change first region",
+    "open_now": "Open now",
+    "choose_first": "Choose first",
+    "locked": "Locked",
+    "recommended": "Recommended",
+    "explore_btn": "Explore {{name}}",
+    "regions": {
+      "north": {
+        "name": "North",
+        "englishName": "Northern Vietnam",
+        "featuredPlaces": "Hà Nội • Hà Giang"
+      },
+      "central": {
+        "name": "Central",
+        "englishName": "Central Vietnam",
+        "featuredPlaces": "Huế • Đà Nẵng"
+      },
+      "south": {
+        "name": "South",
+        "englishName": "Southern Vietnam",
+        "featuredPlaces": "Đà Lạt • TP. Hồ Chí Minh"
+      }
+    }
+  },
+  "flashcard_demo": {
+    "title": "Words remembered in context",
+    "subtitle": "New vocabulary sticks when anchored to an authentic story. Try a preview deck from the Imperial Hue lesson below to see how active recall and spaced intervals work.",
+    "steps": {
+      "step1": "Recall the meaning directly in its cultural context",
+      "step2": "Flip the card to verify IPA pronunciation and bilingual definitions",
+      "step3": "Reinforce retention with spaced interval scheduling"
+    },
+    "open_deck": "Open the Hue deck",
+    "deck_title": "Imperial Hue Citadel",
+    "sample_cards": "{{count}} sample cards",
+    "progress_aria": "Cards reviewed in this preview",
+    "complete_title": "You reviewed all {{count}} cards!",
+    "complete_summary": "{{remembered}} remembered · {{review}} to review again",
+    "complete_note": "A short review gives familiar words another chance to stick into long-term memory.",
+    "try_again": "Try again",
+    "card_counter": "Card {{current}} / {{total}}",
+    "previous_card": "Previous card",
+    "next_card": "Next card",
+    "stop_audio": "Stop pronunciation",
+    "play_audio": "Hear pronunciation of {{word}}",
+    "flip_hint_en": "Flip to see the meaning",
+    "flip_hint_vi": "Flip to see English word",
+    "vietnamese_meaning": "Vietnamese Meaning",
+    "flip_aria_to_en": "See the English word again",
+    "flip_aria_to_vi": "Flip card to see Vietnamese meaning",
+    "review_again": "Review again",
+    "remembered": "Remembered",
+    "feedback_remembered": "Marked as remembered.",
+    "feedback_review": "Marked for upcoming review.",
+    "feedback_prompt_flipped": "How well do you remember this word?",
+    "feedback_prompt_front": "Try to recall the meaning before flipping.",
+    "disclaimer": "This preview does not save your progress. Open the deck to sync with your spaced repetition schedule."
+  },
+  "plans_section": {
+    "badge": "Learning plans",
+    "title": "Choose how you learn",
+    "subtitle": "Start with stories for free. Explore the full plan details whenever you are ready.",
+    "badge_featured": "More ways to learn",
+    "comparison_note": "See the complete comparison on the",
+    "pricing_link": "pricing page",
+    "free": {
+      "name": "Free",
+      "price": "0 VND",
+      "period": "Forever free",
+      "description": "Begin your journey through Vietnamese stories.",
+      "action": "Explore for free",
+      "features": [
+        "Bilingual reading and listening",
+        "Save up to 30 words",
+        "3 AI chat turns per day"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "39,000 VND",
+      "period": "per month",
+      "description": "Go deeper with more room to read, listen, and practice.",
+      "action": "View Pro details",
+      "features": [
+        "Unlimited AI chat turns",
+        "Unlimited saved vocabulary",
+        "More listening speeds and learning tools"
+      ]
+    }
+  },
+  "faq_section": {
+    "title": "Your questions,",
+    "title_accent": "answered",
+    "subtitle": "Everything you need to know about learning English through Vietnamese cultural heritage.",
+    "items": {
+      "faq1": {
+        "question": "How is VieCultures different from traditional English learning apps?",
+        "answer": "Instead of generic Western texts, VieCultures anchors lessons to authentic Vietnamese heritage — food, craft villages, history, and customs. Learners build vocabulary to express Vietnamese identity naturally on global stages."
+      },
+      "faq2": {
+        "question": "How do bilingual reading and one-tap word lookup work?",
+        "answer": "Every story has aligned parallel sentences in Vietnamese and English. Tap any word to view its IPA pronunciation, part of speech, Vietnamese definition, and context sentence, with variable audio speeds (0.75x–1.5x)."
+      },
+      "faq3": {
+        "question": "How does spaced repetition (SRS) help you remember words?",
+        "answer": "VieCultures adapts the proven SM-2 algorithm. Rate your recall after each card to schedule reviews at optimal memory intervals, converting short-term recognition into lasting active recall."
+      },
+      "faq4": {
+        "question": "How does synchronized audio shadowing improve pronunciation?",
+        "answer": "Synchronized native-speaker recordings let you shadow phrase by phrase. Focus on natural sentence stress, intonation, and connected speech to speak English with authentic rhythm."
+      },
+      "faq5": {
+        "question": "What is Safe Reflections?",
+        "answer": "Safe Reflections is a supportive space where learners write reflections about cultural stories without anxiety over constant red marks. Encouragement and genuine expression come first."
+      },
+      "faq6": {
+        "question": "Can I start learning with VieCultures for free?",
+        "answer": "Yes. Featured stories, bilingual reader, vocabulary lookups, and the core review deck are free to explore. Create an account to save your learning history and streaks."
+      }
+    }
+  },
+  "conversion": {
+    "title": "Engrave words, Preserve cultures.",
+    "subtitle": "Explore authentic Vietnamese stories, practice with synchronized audio, and remember meaningful vocabulary through living culture.",
+    "cta_start": "Start Learning",
+    "cta_explore": "Explore Stories"
+  },
+  "contact_section": {
+    "title": "Contact the VieCultures team",
+    "subtitle": "Have a question about bilingual learning, heritage partnerships, or feedback? We’d love to hear from you.",
+    "name_label": "Full name",
+    "name_placeholder": "e.g. Alex Nguyen",
+    "email_label": "Email address",
+    "email_placeholder": "name@example.com",
+    "email_invalid_error": "Please enter a valid email address (e.g. name@example.com).",
+    "topic_label": "Topic",
+    "topics": {
+      "general": "Learner Inquiry",
+      "partnership": "Content Partner",
+      "enterprise": "School / Team"
+    },
+    "message_label": "Message",
+    "message_placeholder": "Share your questions, thoughts, or suggestions...",
+    "btn_sending": "Sending message...",
+    "btn_send": "Send Message",
+    "success_title": "Thanks for reaching out!",
+    "success_desc": "We received your message and will respond to your email within one business day.",
+    "send_another": "Send another message"
+  },
+  "photo_credits": {
+    "summary": "Image credits",
+    "description": "Images sourced from Wikimedia Commons and cropped to fit the design; the originals are unchanged. Each image’s license is listed below.",
+    "items": {
+      "hoi_an": "Hoi An lanterns",
+      "hue": "Hue Citadel gate",
+      "banh_mi": "Vietnamese bánh mì",
+      "bat_trang": "Bát Tràng pottery village",
+      "mu_cang_chai": "Mù Cang Chải rice terraces",
+      "dong_ho": "Đông Hồ painting — Lantern procession"
+    }
+  },
+  "vietnam_map": {
+    "vietnamese_label": "Vietnamese: {{name}}",
+    "close_panel": "Close details panel",
+    "sample_presentation": "Sample presentation",
+    "playing_sample": "Playing sample audio… (Stop)",
+    "listen_sample": "Listen to this sample sentence",
+    "featured_vocab": "FEATURED VOCABULARY & PHRASES",
+    "tap_to_listen": "Tap to listen",
+    "hear_word_title": "Hear this word pronounced",
+    "common_phrase": "• Common phrase: {{phrase}}"
+  }
+}

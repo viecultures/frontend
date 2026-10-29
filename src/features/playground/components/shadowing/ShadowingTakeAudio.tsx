@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ShadowingTake } from '../../types/shadowing';
 
 interface Props { take: ShadowingTake; active: boolean; stopToken: number; onPlay(): void }
 export function ShadowingTakeAudio({ take, active, stopToken, onPlay }: Props) {
+  const { t } = useTranslation('playground');
   const [url, setUrl] = useState('');
   const audioRef = useRef<HTMLAudioElement>(null);
   useEffect(() => { if (!active) audioRef.current?.pause(); }, [active]);
@@ -12,5 +14,5 @@ export function ShadowingTakeAudio({ take, active, stopToken, onPlay }: Props) {
     const audio = audioRef.current;
     return () => { audio?.pause(); audio?.removeAttribute('src'); audio?.load(); URL.revokeObjectURL(url); };
   }, [take.blob]);
-  return <audio ref={audioRef} aria-label="Selected sentence recording" src={url || undefined} onPlay={onPlay} controls className="w-full h-10" />;
+  return <audio ref={audioRef} aria-label={t('playground.shadowing.practice.your_recording')} src={url || undefined} onPlay={onPlay} controls className="w-full h-10" />;
 }

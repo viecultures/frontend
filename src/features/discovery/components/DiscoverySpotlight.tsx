@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Link from '@/components/Link';
 import { MapPin, BookOpen, Clock } from 'lucide-react';
 import VietnamMapCarousel from '@/features/discovery/components/vietnam-map-carousel';
@@ -21,6 +22,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
   onMouseEnter,
   onMouseLeave,
 }) => {
+  const { t } = useTranslation('discovery');
   const safePinIndex = Math.max(0, Math.min(activePinIndex, VIETNAM_LANDMARKS.length - 1));
   const activeLandmark = VIETNAM_LANDMARKS[safePinIndex] || VIETNAM_LANDMARKS[0];
 
@@ -30,10 +32,10 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
       <div className="mb-4 text-left">
         <h2 className="font-serif text-xl sm:text-2xl font-bold text-heritage-green flex items-center gap-2">
           <MapPin className="w-5 h-5 text-antique-gold" />
-          <span>Khám Phá Bản Đồ Di Sản</span>
+          <span>{t('spotlight.heading')}</span>
         </h2>
         <p className="text-xs text-text-secondary mt-1">
-          Nhấp vào các tỉnh thành trên bản đồ để xem bài đọc tiêu điểm và học từ vựng di sản song ngữ.
+          {t('spotlight.desc')}
         </p>
       </div>
 
@@ -91,11 +93,11 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs font-medium text-warm-ivory">
               <span className="bg-heritage-green/90 px-3 py-0.5 rounded-full border border-white/20 backdrop-blur-md text-[11px] flex items-center gap-1.5">
                 <Clock className="w-3 h-3 text-antique-gold" />
-                <span>{activeLandmark.readTime} đọc song ngữ</span>
+                <span>{t('spotlight.bilingual_reading', { time: activeLandmark.readTime })}</span>
               </span>
               <span className="bg-antique-gold text-heritage-green px-3 py-0.5 rounded-full font-extrabold text-[11px] shadow-xs flex items-center gap-1">
                 <BookOpen className="w-3 h-3 text-heritage-green fill-heritage-green" />
-                <span>Di Sản Tiêu Điểm</span>
+                <span>{t('spotlight.spotlight_badge')}</span>
               </span>
             </div>
           </div>
@@ -122,7 +124,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
 
           {/* Vocabulary Pills */}
           <div className="flex flex-wrap items-center gap-1.5 mb-3">
-            <span className="text-xs font-extrabold text-heritage-green/70">Từ vựng di sản:</span>
+            <span className="text-xs font-extrabold text-heritage-green/70">{t('spotlight.heritage_vocab_label')}</span>
             {activeLandmark.vocabHighlights.map((vocab, i) => (
               <span
                 key={i}
@@ -141,7 +143,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
               className="px-5 py-2.5 text-xs font-extrabold flex items-center gap-2 rounded-full bg-heritage-green text-warm-ivory hover:bg-heritage-dark shadow-md hover:scale-102 transition-all focus-ring"
             >
               <BookOpen className="w-4 h-4" />
-              <span>Đọc Song Ngữ &amp; AI Shadowing</span>
+              <span>{t('spotlight.btn_read_bilingual_shadowing')}</span>
             </Link>
 
             <Link
@@ -149,7 +151,7 @@ export const DiscoverySpotlight: React.FC<DiscoverySpotlightProps> = ({
               className="px-4 py-2.5 text-xs font-bold flex items-center gap-2 rounded-full bg-rice-paper text-heritage-green border border-heritage-green/20 hover:bg-mist-cloud transition-all focus-ring"
             >
               <BookOpen className="w-4 h-4 text-antique-gold" />
-              <span>Ôn Flashcard Địa Danh</span>
+              <span>{t('spotlight.btn_review_flashcards')}</span>
             </Link>
           </div>
         </div>

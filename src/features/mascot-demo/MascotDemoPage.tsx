@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { ArrowLeft, ArrowUpRight, Check, CirclePause, Hand, MessageCircle, Moon, MousePointer2, Play, Award, Sun, VolumeX } from 'lucide-react';
 import { OwlMascot } from '@/components/mascot/OwlMascot';
 import type { OwlState } from '@/components/mascot/OwlMascot';

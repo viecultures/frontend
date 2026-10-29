@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookOpen, ChevronLeft, ChevronRight, Headphones, Pause, Play } from 'lucide-react';
 import { ReaderArticleContent } from '../ReaderArticleContent';
 import { InPlaceDictionaryPopup } from '../InPlaceDictionaryPopup';
@@ -23,11 +24,13 @@ interface ReaderPracticeViewProps {
   fullAudioUrl?: string;
 }
 
-const modes: { id: PracticeMode; label: string }[] = [
-  { id: 'questions', label: 'Questions' }, { id: 'dictation', label: 'Dictation' }, { id: 'shadowing', label: 'Shadowing' },
-];
-
 export function ReaderPracticeView({ articleData, fontSize, vocabBtnClass, themeMode, mode, onChangeMode, onBackToReading, fullAudioUrl }: ReaderPracticeViewProps) {
+  const { t } = useTranslation('reader');
+  const modes: { id: PracticeMode; label: string }[] = useMemo(() => [
+    { id: 'questions', label: t('practice_view.modes.questions', 'Questions') },
+    { id: 'dictation', label: t('practice_view.modes.dictation', 'Dictation') },
+    { id: 'shadowing', label: t('practice_view.modes.shadowing', 'Shadowing') },
+  ], [t]);
   const segments = useMemo(() => buildPracticeSegments(articleData), [articleData]);
   const [segmentIndex, setSegmentIndex] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -66,34 +69,52 @@ export function ReaderPracticeView({ articleData, fontSize, vocabBtnClass, theme
 
   return <div className="rp-workspace" data-practice-theme={themeMode}>
     <header className="rp-heading">
-      <div><h1>Listening & Speaking</h1><p>One story. Three ways to make it your own.</p></div>
+      <div>
+        <h1>{t('practice_view.title', 'Listening & Speaking')}</h1>
+        <p>{t('practice_view.subtitle', 'One story. Three ways to make it your own.')}</p>
+      </div>
     </header>
     <div className="rp-grid" role="tabpanel" id={`practice-panel-${mode}`} aria-labelledby={`practice-tab-${mode}`}>
       <div className="rp-source">
         {mode === 'questions' ? <>
           <ReaderArticleContent language="en" themeMode={themeMode} fontSize={fontSize} articleData={articleData} vocabClassName={vocabBtnClass} onVocabClick={handleVocabClick} onMouseUp={handleTextSelection} onDoubleClick={handleTextSelection} />
-        </> : <section className="reader-language-sheet rp-transcript" data-reader-theme={themeMode} aria-label={mode === 'dictation' ? 'Listening passage' : 'Shadowing transcript'}>
+        </> : <section className="reader-language-sheet rp-transcript" data-reader-theme={themeMode} aria-label={mode === 'dictation' ? t('practice_view.listening_passage_aria', 'Listening passage') : t('practice_view.shadowing_transcript_aria', 'Shadowing transcript')}>
 
           <h2 className="reader-article-title">{articleData.titleEn}</h2>
           {segment ? <>
-            <div className="rp-between rp-passage-heading"><span>Passage {segmentIndex + 1} of {segments.length}</span><span>{articleData.shadowingAudioUrl && segment.audioRange ? 'Article recording' : 'Browser voice'}</span></div>
+            <div className="rp-between rp-passage-heading">
+              <span>{t('practice_view.passage_progress', { current: segmentIndex + 1, total: segments.length, defaultValue: `Passage ${segmentIndex + 1} of ${segments.length}` })}</span>
+              <span>{articleData.shadowingAudioUrl && segment.audioRange ? t('practice_view.article_recording', 'Article recording') : t('practice_view.browser_voice', 'Browser voice')}</span>
+            </div>
             <div className="rp-sample-controls">
-              <button type="button" className="rp-primary" disabled={recorder.busy} onClick={() => sample.playing ? sample.stop() : listenToSegment()}>{sample.playing ? <Pause size={17} /> : <Play size={17} />}{sample.playing ? 'Stop sample' : 'Play sample'}</button>
-              <label>Speed<select aria-label="Sample speed" value={sample.speed} disabled={recorder.busy} onChange={event => { sample.stop(); sample.setSpeed(Number(event.target.value)); }}><option value={0.75}>0.75×</option><option value={1}>1×</option><option value={1.25}>1.25×</option></select></label>
-              <button type="button" aria-pressed={sample.repeat} disabled={recorder.busy} onClick={() => sample.setRepeat(!sample.repeat)}>Repeat {sample.repeat ? 'on' : 'off'}</button>
+              <button type="button" className="rp-primary" disabled={recorder.busy} onClick={() => sample.playing ? sample.stop() : listenToSegment()}>
+                {sample.playing ? <Pause size={17} /> : <Play size={17} />}
+                {sample.playing ? t('practice_view.stop_sample', 'Stop sample') : t('practice_view.play_sample', 'Play sample')}
+              </button>
+              <label>
+                {t('practice_view.speed_label', 'Speed')}
+                <select aria-label={t('practice_view.speed_aria', 'Sample speed')} value={sample.speed} disabled={recorder.busy} onChange={event => { sample.stop(); sample.setSpeed(Number(event.target.value)); }}>
+                  <option value={0.75}>0.75×</option>
+                  <option value={1}>1×</option>
+                  <option value={1.25}>1.25×</option>
+                </select>
+              </label>
+              <button type="button" aria-pressed={sample.repeat} disabled={recorder.busy} onClick={() => sample.setRepeat(!sample.repeat)}>
+                {t('practice_view.repeat_btn', { status: sample.repeat ? 'on' : 'off', defaultValue: `Repeat ${sample.repeat ? 'on' : 'off'}` })}
+              </button>
             </div>
             {sample.error && <p role="alert" className="rp-error">{sample.error}</p>}
             {mode === 'dictation'
-              ? revealed ? <blockquote className="rp-revealed" style={{ fontSize }}>{segment.text}</blockquote> : <div className="rp-listening-stage"><Headphones size={42} strokeWidth={1} /><h3>Let your ears lead</h3><p>Play this passage and write what you hear.<br />Its words will appear after you check or reveal the answer.</p></div>
-              : <div className="rp-segments" aria-label="Article passages">{segments.map((item, index) => <button key={item.id} type="button" className="rp-segment" style={{ fontSize }} disabled={recorder.busy} aria-current={segmentIndex === index ? 'step' : undefined} onClick={() => setSegmentIndex(index)}><span>{index + 1}</span><span>{item.text}</span>{recorder.takes[item.id] && <span className="rp-take-mark">Recorded</span>}</button>)}</div>}
-          </> : <p>No English transcript is available for this article yet.</p>}
+              ? revealed ? <blockquote className="rp-revealed" style={{ fontSize }}>{segment.text}</blockquote> : <div className="rp-listening-stage"><Headphones size={42} strokeWidth={1} /><h3>{t('practice_view.let_ears_lead', 'Let your ears lead')}</h3><p dangerouslySetInnerHTML={{ __html: t('practice_view.dictation_prompt', 'Play this passage and write what you hear.<br />Its words will appear after you check or reveal the answer.') }} /></div>
+              : <div className="rp-segments" aria-label={t('practice_view.passages_aria', 'Article passages')}>{segments.map((item, index) => <button key={item.id} type="button" className="rp-segment" style={{ fontSize }} disabled={recorder.busy} aria-current={segmentIndex === index ? 'step' : undefined} onClick={() => setSegmentIndex(index)}><span>{index + 1}</span><span>{item.text}</span>{recorder.takes[item.id] && <span className="rp-take-mark">{t('practice_view.recorded_badge', 'Recorded')}</span>}</button>)}</div>}
+          </> : <p>{t('practice_view.no_transcript', 'No English transcript is available for this article yet.')}</p>}
         </section>}
       </div>
       <div className="rp-sidebar">
-        <div ref={tabs} className="rp-tabs" role="tablist" aria-label="Practice modes" onKeyDown={handleTabKey}>
+        <div ref={tabs} className="rp-tabs" role="tablist" aria-label={t('practice_view.tabs_aria', 'Practice modes')} onKeyDown={handleTabKey}>
           {modes.map(item => <button key={item.id} type="button" role="tab" id={`practice-tab-${item.id}`} aria-controls={`practice-panel-${mode}`} aria-selected={mode === item.id} tabIndex={mode === item.id ? 0 : -1} onClick={() => onChangeMode(item.id)}>{item.label}</button>)}
         </div>
-        {fullAudioUrl && <div className="rp-article-audio"><label htmlFor="practice-article-audio">Listen to the article</label><audio ref={fullPlayer} id="practice-article-audio" aria-label="Article recording" controls src={fullAudioUrl} preload="metadata" /></div>}
+        {fullAudioUrl && <div className="rp-article-audio"><label htmlFor="practice-article-audio">{t('practice_view.listen_article_label', 'Listen to the article')}</label><audio ref={fullPlayer} id="practice-article-audio" aria-label={t('practice_view.article_recording_aria', 'Article recording')} controls src={fullAudioUrl} preload="metadata" /></div>}
         {mode === 'questions'
           ? <PracticeQuestions questions={articleData.questions || []} index={questionIndex} onChangeIndex={setQuestionIndex} answers={answers} onAnswer={(id, value) => setAnswers(previous => ({ ...previous, [id]: value }))} onTryDictation={() => onChangeMode('dictation')} />
           : segment ? <>
@@ -101,10 +122,10 @@ export function ReaderPracticeView({ articleData, fontSize, vocabBtnClass, theme
               ? <PracticeDictation segment={segment} answer={answer} onAnswer={value => setDictations(previous => ({ ...previous, [segment.id]: value }))} onListen={listenToSegment} completed={matched} total={segments.length} />
               : <PracticeShadowing segment={segment} recorder={recorder} onListen={listenToSegment} onStopSample={sample.stop} total={segments.length} />}
             <div className="rp-navigation rp-passage-navigation">
-              <button type="button" disabled={recorder.busy || segmentIndex === 0} onClick={() => setSegmentIndex(index => index - 1)}><ChevronLeft size={15} /> Previous passage</button>
-              <button type="button" disabled={recorder.busy || segmentIndex >= segments.length - 1} onClick={() => setSegmentIndex(index => index + 1)}>Next passage <ChevronRight size={15} /></button>
+              <button type="button" disabled={recorder.busy || segmentIndex === 0} onClick={() => setSegmentIndex(index => index - 1)}><ChevronLeft size={15} /> {t('practice_view.previous_passage', 'Previous passage')}</button>
+              <button type="button" disabled={recorder.busy || segmentIndex >= segments.length - 1} onClick={() => setSegmentIndex(index => index + 1)}>{t('practice_view.next_passage', 'Next passage')} <ChevronRight size={15} /></button>
             </div>
-          </> : <section className="rp-activity"><BookOpen size={28} /><h2>A transcript is needed</h2><p>Choose another article to practise dictation or shadowing.</p><button type="button" onClick={onBackToReading}>Back to reading</button></section>}
+          </> : <section className="rp-activity"><BookOpen size={28} /><h2>{t('practice_view.transcript_needed_title', 'A transcript is needed')}</h2><p>{t('practice_view.transcript_needed_desc', 'Choose another article to practise dictation or shadowing.')}</p><button type="button" onClick={onBackToReading}>{t('practice_view.back_to_reading', 'Back to reading')}</button></section>}
       </div>
     </div>
     <InPlaceDictionaryPopup isOpen={popupState.isOpen} vocab={popupState.vocab} position={popupState.position} onClose={closeDictionary} themeMode={themeMode} />

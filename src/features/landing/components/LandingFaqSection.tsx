@@ -1,66 +1,48 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Book, Translate, ArrowRepeat, Mic, ShieldCheck, CheckCircle } from 'react-bootstrap-icons';
+import { useTranslation } from 'react-i18next';
 
-interface FaqItem {
+interface FaqConfigItem {
   id: string;
-  question: string;
-  answer: string;
-  category: string;
+  itemKey: 'faq1' | 'faq2' | 'faq3' | 'faq4' | 'faq5' | 'faq6';
   icon: React.ReactNode;
 }
 
-const FAQS: FaqItem[] = [
+const FAQS_CONFIG: FaqConfigItem[] = [
   {
     id: 'faq-1',
-    question: 'How is VieCultures different from traditional English learning apps?',
-    answer:
-      'Instead of generic Western texts, VieCultures anchors lessons to authentic Vietnamese heritage — food, craft villages, history, and customs. Learners build vocabulary to express Vietnamese identity naturally on global stages.',
-    category: 'Our approach',
+    itemKey: 'faq1',
     icon: <Book className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
   },
   {
     id: 'faq-2',
-    question: 'How do bilingual reading and one-tap word lookup work?',
-    answer:
-      'Every story has aligned parallel sentences in Vietnamese and English. Tap any word to view its IPA pronunciation, part of speech, Vietnamese definition, and context sentence, with variable audio speeds (0.75x–1.5x).',
-    category: 'Reading',
+    itemKey: 'faq2',
     icon: <Translate className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
   },
   {
     id: 'faq-3',
-    question: 'How does spaced repetition (SRS) help you remember words?',
-    answer:
-      'VieCultures adapts the proven SM-2 algorithm. Rate your recall after each card to schedule reviews at optimal memory intervals, converting short-term recognition into lasting active recall.',
-    category: 'Memory',
+    itemKey: 'faq3',
     icon: <ArrowRepeat className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
   },
   {
     id: 'faq-4',
-    question: 'How does synchronized audio shadowing improve pronunciation?',
-    answer:
-      'Synchronized native-speaker recordings let you shadow phrase by phrase. Focus on natural sentence stress, intonation, and connected speech to speak English with authentic rhythm.',
-    category: 'Pronunciation',
+    itemKey: 'faq4',
     icon: <Mic className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
   },
   {
     id: 'faq-5',
-    question: 'What is Safe Reflections?',
-    answer:
-      'Safe Reflections is a supportive space where learners write reflections about cultural stories without anxiety over constant red marks. Encouragement and genuine expression come first.',
-    category: 'Community',
+    itemKey: 'faq5',
     icon: <ShieldCheck className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
   },
   {
     id: 'faq-6',
-    question: 'Can I start learning with VieCultures for free?',
-    answer:
-      'Yes. Featured stories, bilingual reader, vocabulary lookups, and the core review deck are free to explore. Create an account to save your learning history and streaks.',
-    category: 'Getting started',
+    itemKey: 'faq6',
     icon: <CheckCircle className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
   },
 ];
 
 export const LandingFaqSection: React.FC = () => {
+  const { t } = useTranslation('landing');
   const [openFaqId, setOpenFaqId] = useState<string | null>('faq-1');
 
   const handleToggle = (id: string) => {
@@ -77,20 +59,23 @@ export const LandingFaqSection: React.FC = () => {
         {/* Section Header */}
         <div className="text-center space-y-3">
           <h2 id="faq-title" className="font-serif text-3xl sm:text-4xl font-bold text-ink tracking-tight leading-tight">
-            Your questions, <span className="italic text-accent-ink font-serif">answered</span>
+            {t('faq_section.title')}{' '}
+            <span className="italic text-accent-ink font-serif">{t('faq_section.title_accent')}</span>
           </h2>
 
           <p className="text-xs sm:text-sm text-ink-soft max-w-lg mx-auto font-normal leading-relaxed">
-            Everything you need to know about learning English through Vietnamese cultural heritage.
+            {t('faq_section.subtitle')}
           </p>
         </div>
 
         {/* Accordion List */}
         <div className="space-y-3.5">
-          {FAQS.map((faq) => {
+          {FAQS_CONFIG.map((faq) => {
             const isOpen = openFaqId === faq.id;
             const btnId = `faq-btn-${faq.id}`;
             const panelId = `faq-panel-${faq.id}`;
+            const question = t(`faq_section.items.${faq.itemKey}.question`);
+            const answer = t(`faq_section.items.${faq.itemKey}.answer`);
 
             return (
               <div
@@ -114,7 +99,7 @@ export const LandingFaqSection: React.FC = () => {
                       {faq.icon}
                     </span>
                     <span className="font-serif text-base sm:text-lg font-bold text-ink">
-                      {faq.question}
+                      {question}
                     </span>
                   </div>
 
@@ -135,7 +120,7 @@ export const LandingFaqSection: React.FC = () => {
                     className="px-5 sm:px-6 pb-6 pt-1 text-xs sm:text-sm text-ink-soft leading-relaxed border-t border-line/50"
                   >
                     <p className="pl-11 font-normal text-ink-soft">
-                      {faq.answer}
+                      {answer}
                     </p>
                   </div>
                 )}

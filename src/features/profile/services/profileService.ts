@@ -1,4 +1,4 @@
-import { getStoredUser, setStoredUser, getIsProUser, setIsProUser } from '@/utils/auth-storage';
+﻿import { getStoredUser, setStoredUser, getIsProUser, setIsProUser } from '@/utils/auth-storage';
 import type { CulturalSeal, UserBadge, UserProfileData } from '../types';
 
 const PROFILE_STORAGE_KEY = 'vie_profile_data_v1';
