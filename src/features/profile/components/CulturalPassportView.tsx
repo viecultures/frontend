@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Flower2, Lock, CheckCircle2, MapPin, BookOpen, ArrowRight } from 'lucide-react';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { paths } from '@/routes/paths';
@@ -15,6 +16,7 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
   seals,
   profile,
 }) => {
+  const { t } = useTranslation('profile');
   const [selectedRegion, setSelectedRegion] = useState<'all' | RegionType>('all');
   const [inspectingSeal, setInspectingSeal] = useState<CulturalSeal | null>(null);
 
@@ -44,26 +46,26 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
           <div className="space-y-2 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-antique-gold/20 text-antique-gold text-xs font-bold uppercase tracking-widest border border-antique-gold/40">
               <MapPin aria-hidden="true" className="w-3.5 h-3.5" />
-              <span>Your cultural passport</span>
+              <span>{t('profile.passport.tag')}</span>
             </div>
             <h2 className="font-serif text-2xl sm:text-3xl font-extrabold tracking-tight text-warm-ivory">
-              Stories across three regions
+              {t('profile.passport.title')}
             </h2>
             <p className="text-xs sm:text-sm text-stone-300 max-w-xl font-sans leading-relaxed">
-              Explore cultural stories and collect heritage stamps along the way.
+              {t('profile.passport.desc')}
             </p>
           </div>
 
           {/* Passport Identity Seal Badge */}
           <div className="shrink-0 p-4 rounded-2xl bg-black/30 border border-antique-gold/50 text-center space-y-1 min-w-[200px] backdrop-blur-sm">
             <span className="text-[10px] uppercase tracking-widest text-antique-gold font-bold block">
-              Passport reference
+              {t('profile.passport.reference_label')}
             </span>
             <div className="font-mono text-sm sm:text-base font-bold text-white tracking-widest">
               VC-PASSPORT-2026
             </div>
             <div className="text-[11px] text-stone-300 font-serif pt-1 border-t border-white/10">
-              Belongs to: <strong className="text-antique-gold">{profile.name}</strong>
+              {t('profile.passport.belongs_to')} <strong className="text-antique-gold">{profile.name}</strong>
             </div>
           </div>
         </div>
@@ -71,29 +73,23 @@ export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
         {/* Regional Progress Counter */}
         <div className="mt-6 pt-5 border-t border-white/15 grid grid-cols-3 gap-2 text-center text-xs">
           <div className="bg-white/5 py-2 px-3 rounded-xl border border-white/10">
-            <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">
-              North
-            </span>
+            <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">{t('profile.passport.north')}</span>
             <span className="font-serif font-bold text-sm sm:text-base text-antique-gold">
-              {northCount} / 3 stamps
+              {t('profile.passport.stamps_count', { count: northCount })}
             </span>
           </div>
 
           <div className="bg-white/5 py-2 px-3 rounded-xl border border-white/10">
-            <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">
-              Central
-            </span>
+            <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">{t('profile.passport.central')}</span>
             <span className="font-serif font-bold text-sm sm:text-base text-antique-gold">
-              {centralCount} / 3 stamps
+              {t('profile.passport.stamps_count', { count: centralCount })}
             </span>
           </div>
 
           <div className="bg-white/5 py-2 px-3 rounded-xl border border-white/10">
-            <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">
-              South
-            </span>
+            <span className="block text-[10px] text-stone-300 uppercase tracking-wider font-semibold">{t('profile.passport.south')}</span>
             <span className="font-serif font-bold text-sm sm:text-base text-antique-gold">
-              {southCount} / 3 stamps
+              {t('profile.passport.stamps_count', { count: southCount })}
             </span>
           </div>
         </div>

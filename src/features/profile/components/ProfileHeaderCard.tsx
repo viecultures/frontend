@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Crown, Edit3, Target, Calendar } from 'lucide-react';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { PATHS } from '@/routes/paths';
@@ -14,12 +15,13 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   profile,
   onOpenEdit,
 }) => {
+  const { t } = useTranslation('profile');
   return (
     <div className="relative w-full rounded-3xl bg-rice-paper dark:bg-heritage-forest border-2 border-antique-gold/40 p-6 sm:p-8 shadow-md overflow-hidden transition-all">
       {/* Decorative Traditional Watermark Corner Pattern */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-radial from-antique-gold/10 to-transparent pointer-events-none rounded-bl-full" />
       <div className="absolute top-3 left-4 text-antique-gold/30 text-xs font-serif select-none pointer-events-none">
-        VieCultures profile
+        {t('profile.header.watermark')}
       </div>
 
       <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
@@ -46,13 +48,13 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               title="Active Pro membership"
             >
               <Crown aria-hidden="true" className="w-3 h-3 fill-current" />
-              <span>PRO MEMBER</span>
+              <span>{t('profile.header.pro_member')}</span>
             </span>
           ) : (
             <span
               className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-stone-300 dark:bg-stone-700 text-stone-700 dark:text-stone-300 text-[10px] font-bold uppercase tracking-wider shadow-sm whitespace-nowrap"
             >
-              FREE TIER
+              {t('profile.header.free_tier')}
             </span>
           )}
         </div>
@@ -81,7 +83,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/70 dark:bg-[#1A3D34] hover:bg-white dark:hover:bg-heritage-green border border-antique-gold/60 text-xs font-bold text-heritage-green dark:text-antique-gold shadow-sm hover:shadow transition-all cursor-pointer focus-ring"
             >
               <Edit3 aria-hidden="true" className="w-3.5 h-3.5" />
-              <span>Edit profile</span>
+              <span>{t('profile.header.edit_profile')}</span>
             </button>
           </div>
 

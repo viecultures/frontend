@@ -37,7 +37,7 @@ export const useAppNavigate = () => {
       } catch (error) {
         console.error('[useAppNavigate] Navigation failed:', error);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        navigate(to, options);
+        navigate(to as any, options);
       }
     },
     [navigate, location.pathname, paramLang],

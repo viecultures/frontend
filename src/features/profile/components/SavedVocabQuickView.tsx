@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookMarked, Search, Volume2, ArrowRight, BookmarkCheck } from 'lucide-react';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { paths } from '@/routes/paths';
@@ -6,6 +7,7 @@ import { VOCAB_DATABASE, type VocabItem } from '@/data/readerData';
 import { getAllSavedVocabularies } from '@/services/learning/learningStorage';
 
 export const SavedVocabQuickView: React.FC = () => {
+  const { t } = useTranslation('profile');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'word' | 'phrase'>('all');
 
@@ -47,21 +49,21 @@ export const SavedVocabQuickView: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h3 className="font-serif text-xl sm:text-2xl font-bold text-heritage-green dark:text-warm-ivory">
-            Vocabulary in context
+            {t('profile.vocab.title')}
           </h3>
           <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-            Words and phrases from the stories you read.
+            {t('profile.vocab.desc')}
           </p>
           <div className="flex items-center gap-2 mt-1.5">
             {isActualSaved ? (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                 <BookmarkCheck aria-hidden="true" className="w-3 h-3" />
-                <span>{userSavedWords.length} saved words from your reading</span>
+                <span>{t('profile.vocab.saved_count', { count: userSavedWords.length })}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30">
                 <BookMarked aria-hidden="true" className="w-3 h-3" />
-                <span>Sample vocabulary · save words while reading to build your notebook</span>
+                <span>{t('profile.vocab.sample_notice')}</span>
               </span>
             )}
           </div>
@@ -73,7 +75,7 @@ export const SavedVocabQuickView: React.FC = () => {
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-heritage-green hover:bg-[#163731] text-warm-ivory text-xs font-bold transition-all shadow-md cursor-pointer focus-ring"
         >
           <BookMarked aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-          <span>Review flashcards</span>
+          <span>{t('profile.vocab.review_flashcards')}</span>
           <ArrowRight aria-hidden="true" className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -87,7 +89,7 @@ export const SavedVocabQuickView: React.FC = () => {
             aria-label="Search vocabulary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search words or Vietnamese meanings..."
+            placeholder={t('profile.vocab.search_placeholder')}
             className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-rice-paper dark:bg-heritage-forest border border-antique-gold/40 text-xs sm:text-sm text-heritage-green dark:text-warm-ivory placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-antique-gold"
           />
         </div>

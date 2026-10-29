@@ -272,6 +272,7 @@ const INITIAL_POSTS: CommunityPost[] = [
 ];
 
 export default function CommunityPage() {
+  const { t } = useTranslation('community');
   const [posts, setPosts] = useState<CommunityPost[]>(INITIAL_POSTS);
   const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false);
   const [postTitle, setPostTitle] = useState<string>("");

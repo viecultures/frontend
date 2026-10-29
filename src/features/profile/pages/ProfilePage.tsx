@@ -1,5 +1,6 @@
 import '../profile-ui.css';
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import { Award, BookMarked, Crown, Check, ArrowLeft } from 'lucide-react';
@@ -20,6 +21,7 @@ import { PATHS } from '@/routes/paths';
 type TabKey = 'passport' | 'badges' | 'vocab' | 'subscription';
 
 export const ProfilePage: React.FC = () => {
+  const { t } = useTranslation('profile');
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useAppNavigate();
 
@@ -113,7 +115,7 @@ export const ProfilePage: React.FC = () => {
   const handleSaveProfile = (updates: Partial<UserProfileData>) => {
     const updated = profileService.updateProfileData(updates);
     setProfile(updated);
-    showToast('Profile saved.');
+    showToast(t('profile.header.profile_saved_toast'));
   };
 
   const unlockedSealsCount = seals.filter((s) => s.isUnlocked).length;
@@ -129,24 +131,24 @@ export const ProfilePage: React.FC = () => {
             className="inline-flex items-center gap-2 text-xs font-bold text-heritage-green dark:text-antique-gold hover:underline cursor-pointer"
           >
             <ArrowLeft aria-hidden="true" className="w-4 h-4" />
-            <span>Back to study room</span>
+            <span>{t('profile.header.back_to_study')}</span>
           </button>
 
           <div className="flex items-center gap-3">
             {isServerConnected === true && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Profile synced</span>
+                <span>{t('profile.header.profile_synced')}</span>
               </span>
             )}
             {isServerConnected === false && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-stone-200 dark:bg-white/10 text-stone-600 dark:text-stone-400">
-                <span>Saved on this browser</span>
+                <span>{t('profile.header.saved_locally')}</span>
               </span>
             )}
 
             <span className="text-xs font-serif font-bold text-antique-gold tracking-wider uppercase hidden sm:inline">
-              Profile & achievements
+              {t('profile.header.breadcrumb_title')}
             </span>
           </div>
         </div>
@@ -186,7 +188,7 @@ export const ProfilePage: React.FC = () => {
             }`}
           >
             <Award aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>Heritage passport ({unlockedSealsCount}/{seals.length})</span>
+            <span>{t('profile.tabs.passport', { unlocked: unlockedSealsCount, total: seals.length })}</span>
           </button>
 
           <button
@@ -200,7 +202,7 @@ export const ProfilePage: React.FC = () => {
             }`}
           >
             <Award aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>Badges & milestones ({badges.filter((b) => b.isUnlocked).length}/{badges.length})</span>
+            <span>{t('profile.tabs.badges', { unlocked: badges.filter((b) => b.isUnlocked).length, total: badges.length })}</span>
           </button>
 
           <button
@@ -214,7 +216,7 @@ export const ProfilePage: React.FC = () => {
             }`}
           >
             <BookMarked aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>Vocabulary notebook ({profile.totalVocabMastered + profile.totalVocabLearning})</span>
+            <span>{t('profile.tabs.vocab', { count: profile.totalVocabMastered + profile.totalVocabLearning })}</span>
           </button>
 
           <button
@@ -228,7 +230,7 @@ export const ProfilePage: React.FC = () => {
             }`}
           >
             <Crown aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>Membership & settings</span>
+            <span>{t('profile.tabs.subscription')}</span>
           </button>
         </div>
 
