@@ -1,31 +1,40 @@
 {
   "greeting": {
-    "eyebrow": "YOUR CULTURE STUDY ROOM",
-    "welcome_back": "Welcome back",
-    "welcome": "Welcome",
-    "tagline": "A little English. A little closer to Vietnam.",
-    "default_user": "Learner"
+    "eyebrow": "READY WHEN YOU ARE",
+    "welcome_back": "Good to see you, {{name}}.",
+    "welcome": "Good to see you, {{name}}.",
+    "tagline": "Engrave words, Preserve cultures.",
+    "default_user": "Learner",
+    "streak_days": "{{count}}-day streak",
+    "streak_first_day": "Your first day",
+    "today_goals": "Today · {{done}}/{{total}} goals",
+    "today_goal": "Today · {{done}}/{{total}} goal"
   },
   "footer": {
     "scenery": "Room scenery",
     "background": "Background",
     "default_scenery": "Your own little corner of Vietnam.",
-    "about": "About VieCultures"
+    "about": "About VieCultures",
+    "copyright": "© 2026 VieCultures · Engrave words, Preserve cultures."
   },
   "skip_content": "Skip to study content",
   "storage_error": "Your plan could not be saved. Check browser storage permissions.",
   "continue_card": {
-    "eyebrow_saved": "PICK UP WHERE YOU LEFT OFF",
+    "eyebrow_saved": "CONTINUE YOUR STORY",
     "eyebrow_new": "YOUR FIRST CHAPTER",
-    "default_title": "Every story opens a new world.",
+    "default_title": "The little secrets of Hà Nội’s bún chả.",
+    "default_desc": "Smoky grills, fresh herbs, and a story worth slowing down for.",
     "saved_desc": "Return to your story, with your reading position remembered.",
     "new_desc": "Start with the traditions of Tet. Read in English, explore the Vietnamese translation and save words along the way.",
     "bilingual": "English · Vietnamese",
     "reading_position": "Reading position",
+    "read_time": "{{count}} min read",
+    "read_percent": "· {{count}}% read",
     "btn_continue": "Continue reading",
+    "btn_read_again": "Read the story again",
     "btn_start": "Start your first story",
     "browse_stories": "Browse stories",
-    "default_topic": "Traditions & everyday life"
+    "default_topic": "HÀ NỘI · FOOD & CULTURE"
   },
   "review_card": {
     "eyebrow": "WORDS IN CONTEXT",
@@ -41,6 +50,8 @@
   "vocabulary_card": {
     "eyebrow": "YOUR VOCABULARY",
     "title": "Your vocabulary.",
+    "words_collected": "words collected",
+    "words_collected_count": "{{count}} words collected",
     "summary": "Learned <1>{{total}}</1> words · <3>{{due}}</3> words due today",
     "mastered": "Mastered",
     "familiar": "Familiar",
@@ -51,9 +62,50 @@
     "reviewing_aria": "Reviewing: {{count}} words",
     "learning_aria": "Learning: {{count}} words",
     "due_today": "DUE TODAY",
+    "due_today_count": "{{count}} words due today",
+    "due_today_count_one": "1 word due today",
     "due_count": "{{count}} words",
+    "all_caught_up": "All caught up for today",
+    "empty_words": "0 words collected",
+    "empty_cta": "Read stories and save words",
+    "about_minutes": "About {{count}} minutes",
+    "about_minute": "About 1 minute",
     "btn_review_now": "Review now",
     "btn_open_notebook": "Open notebook"
+  },
+  "daily_quote": {
+    "eyebrow_heritage": "VIECULTURES HERITAGE",
+    "eyebrow_story": "THE STORY BEHIND THE WORDS",
+    "title": "Daily Quote",
+    "created_by": "Created by",
+    "creator_name": "VieCultures Daily",
+    "expand_title": "View larger",
+    "explore_story": "Explore the story behind",
+    "page_index": "{{current}} / {{total}}",
+    "save_quote": "Save this quote",
+    "saved_quote": "Quote saved",
+    "saved_toast": "Quote saved on this device.",
+    "removed_toast": "Quote removed from saved items.",
+    "brief_label": "IN A FEW WORDS · 20-SECOND READ",
+    "read_more": "Read more: context & meaning",
+    "show_less": "Show less",
+    "who_said_it": "Who said it?",
+    "historical_context": "The historical context",
+    "meaning": "What do the words mean?",
+    "words_to_know": "WORDS TO KNOW",
+    "tap_word_hint": "Tap a word to see its Vietnamese meaning.",
+    "draft_note_title": "Editorial draft · source verification pending",
+    "draft_note_desc": "This English context is sample learning content. The original historical source and exact wording still need verification before publication as a lesson.",
+    "brief_draft": "Editorial preview · historical source verification pending.",
+    "art_caption": "Calendar artwork from your reference.\nThe printed date belongs to the sample design."
+  },
+  "weekly_strip": {
+    "eyebrow": "YOUR PROGRESS",
+    "title": "A little, every day.",
+    "summary": "{{minutes}} min · {{stories}} stories this week",
+    "summary_singular": "{{minutes}} min · 1 story this week",
+    "summary_empty": "0 min · Start your learning rhythm today",
+    "view_calendar": "View calendar"
   },
   "study_calendar": {
     "eyebrow": "YOUR LEARNING JOURNEY",
@@ -65,16 +117,17 @@
     "vocabulary": "Vocabulary",
     "no_time": "No study time",
     "under_minute": "<1 min",
-    "minutes_one": "{{count}} min",
-    "minutes_other": "{{count}} min",
-    "empty": "No learning activity recorded for this day.",
+    "minutes_one": "{{count}} min studied",
+    "minutes_other": "{{count}} min studied",
+    "empty": "No activity yet",
     "legend": "Study time intensity",
     "less": "Less",
-    "more": "More"
+    "more": "More",
+    "color_note": "Darker green means more time spent learning."
   },
   "recommendations": {
-    "eyebrow": "LET CURIOSITY LEAD",
-    "title": "Your next discovery",
+    "eyebrow": "FOLLOW YOUR CURIOSITY",
+    "title": "Something new to discover",
     "all_stories": "All stories",
     "min_read": "min read"
   },
