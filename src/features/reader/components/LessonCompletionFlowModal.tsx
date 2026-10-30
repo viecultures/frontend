@@ -416,7 +416,7 @@ export const LessonCompletionFlowModal: React.FC<LessonCompletionFlowModalProps>
                 className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-sans font-bold text-xs sm:text-sm shadow-xl border border-antique-gold transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Crown className="w-4 h-4 text-antique-gold fill-current" />
-                <span>{t('completion_modal.btn_upgrade_pro', 'Upgrade to Pro (VND 39,000)')}</span>
+                <span>{t('completion_modal.btn_upgrade_pro', 'Upgrade to Plus (VND 49,000)')}</span>
               </button>
             </div>
 

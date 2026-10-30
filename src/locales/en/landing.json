@@ -227,27 +227,31 @@
     "comparison_note": "See the complete comparison on the",
     "pricing_link": "pricing page",
     "free": {
-      "name": "Free",
+      "name": "Free (Explore)",
       "price": "0 VND",
       "period": "Forever free",
       "description": "Begin your journey through Vietnamese stories.",
       "action": "Explore for free",
       "features": [
-        "Bilingual reading and listening",
-        "Save up to 30 words",
-        "3 AI chat turns per day"
+        "Unlimited reading (all 3 levels)",
+        "Audio listening limit: 2 stories / day",
+        "Unlimited dictionary lookups & flashcards",
+        "AI Chat & Voice queries: 15 queries / week",
+        "No minigames, tests, or advanced review"
       ]
     },
     "pro": {
-      "name": "Pro",
-      "price": "39,000 VND",
-      "period": "per month",
-      "description": "Go deeper with more room to read, listen, and practice.",
-      "action": "View Pro details",
+      "name": "Plus Plan",
+      "price": "49,000 VND",
+      "period": "per month (from ~41,583 VND/mo with annual plan)",
+      "description": "Elevate your experience with full Level 3 access, complete SRS, expanded AI dialogues, and Shadowing.",
+      "action": "View Plus Details",
       "features": [
-        "Unlimited AI chat turns",
-        "Unlimited saved vocabulary",
-        "More listening speeds and learning tools"
+        "Unlimited readings and full Level 3 unlock",
+        "Unlimited variable-speed Audio Shadowing",
+        "Full SRS system, minigames & review quizzes",
+        "Expanded AI dialogues with unlimited questions & voice",
+        "Detailed progress tracking, Annual 499k & Student 29k/mo"
       ]
     }
   },

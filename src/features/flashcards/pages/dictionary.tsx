@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useRef } from "react";
 import { useAppNavigate } from '@/routes/useAppNavigate';
+import { listSavedArticles } from '@/services/learning/learningStorage';
 import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
 import FlashcardSidebarLayout from "../components/flashcard-sidebar-layout";
 import {
@@ -10,8 +11,8 @@ import {
   DictionaryLibraryGrid,
   DictionaryPagination,
   DictionaryInspectorModal,
-  CreateDeckModal,
 } from "../components";
+import { SavedVocabularyDecks } from '../components/SavedVocabularyDecks';
 import { paths } from '@/routes/paths';
 import { VOCABULARY_CATEGORY_LABELS, VOCABULARY_PAGE_SIZE } from '../lib/vocabulary-catalog';
 import '../dictionary-components.css';
@@ -20,6 +21,7 @@ export default function DictionaryPage() {
   const { t } = useTranslation('flashcards');
   const navigate = useAppNavigate();
   const libraryRef = useRef<HTMLElement>(null);
+  const savedDecksRef = useRef<HTMLDivElement>(null);
   const [sortOrder, setSortOrder] = useState("default");
 
   const categoryOptions = useMemo(() => [
@@ -37,8 +39,7 @@ export default function DictionaryPage() {
 
   // Inspector Modal state
   const [inspectLesson, setInspectLesson] = useState<Lesson | null>(null);
-  const [isCreateDeckOpen, setIsCreateDeckOpen] = useState<boolean>(false);
-  const [customDeckName, setCustomDeckName] = useState<string>("");
+  const savedWordCount = listSavedArticles().reduce((count, entry) => count + entry.count, 0);
 
   // Filtered Lessons
   const filteredLessons = useMemo(() => {
@@ -89,14 +90,6 @@ export default function DictionaryPage() {
     navigate(paths.flashcardStudy({ deck: lessonId }));
   };
 
-  const handleCreateDeck = () => {
-    if (customDeckName.trim()) {
-      alert(t('create_deck_modal.success_alert', { name: customDeckName, defaultValue: `Created "${customDeckName}" in your personal library!` }));
-      setIsCreateDeckOpen(false);
-      setCustomDeckName("");
-    }
-  };
-
   return (
     <FlashcardSidebarLayout>
       <div className="vocab-library-page">
@@ -117,9 +110,12 @@ export default function DictionaryPage() {
               setCurrentPage(1);
               libraryRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
             }}
-            onOpenCreateDeck={() => setIsCreateDeckOpen(true)}
+            onReviewSaved={() => savedDecksRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' })}
+            savedWordCount={savedWordCount}
           />
         </div>
+
+        {savedWordCount > 0 && <div ref={savedDecksRef} className="vocab-saved-decks"><SavedVocabularyDecks /></div>}
 
         {/* Cultural vocabulary catalog */}
         <section ref={libraryRef} className="vocab-library-section" aria-labelledby="vocab-library-title">
@@ -180,14 +176,6 @@ export default function DictionaryPage() {
         onGoToStudy={handleGoToStudy}
       />
 
-      {/* CREATE DECK MODAL */}
-      <CreateDeckModal
-        isOpen={isCreateDeckOpen}
-        onClose={() => setIsCreateDeckOpen(false)}
-        customDeckName={customDeckName}
-        onChangeDeckName={setCustomDeckName}
-        onCreateDeck={handleCreateDeck}
-      />
     </FlashcardSidebarLayout>
   );
 }

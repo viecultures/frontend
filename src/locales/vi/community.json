@@ -272,7 +272,18 @@
       "vocab_applied": "Từ vựng áp dụng:",
       "space_label": "Không gian cộng đồng không phán xét",
       "encourage_aria": "Ủng hộ bài cảm nhận",
-      "support_label": "ủng hộ"
+      "support_label": "ủng hộ",
+      "vocab_suggestions_label": "Gợi ý từ vựng:",
+      "safe_space_tip": "Không gian an toàn · Viết tự do tiếng Anh hoặc song ngữ, không áp lực",
+      "ugc_feed_badge": "Góc người học",
+      "default_author": "Học viên VieCultures",
+      "roles": {
+        "learner": "Học viên VieCultures",
+        "intl": "Học viên quốc tế",
+        "enthusiast": "Người yêu di sản",
+        "community": "Thành viên cộng đồng",
+        "moderator": "Kiểm duyệt viên"
+      }
     },
     "toasts": {
       "comment_added": "Đã thêm bình luận vào bản xem trước.",

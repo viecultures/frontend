@@ -23,6 +23,7 @@ import { getStoredUser } from "@/utils/auth-storage";
 export interface ReaderReflectionsSectionProps {
   postId: string;
   postTitle?: string;
+  postTitleVi?: string;
   vocabularies?: Array<{
     id: string;
     word: string;
@@ -35,6 +36,68 @@ export interface ReaderReflectionsSectionProps {
 const STORAGE_PREFIX = "vie_reader_reflections_";
 const LIKES_KEY = "vie_user_liked_reflections";
 const REPORTS_KEY = "vie_user_reported_reflections";
+
+function localizeAuthorRole(role: string | undefined, currentLang: string): string {
+  if (!role) return "";
+  const isVi = currentLang.startsWith("vi");
+  if (isVi) {
+    switch (role) {
+      case "VieCultures learner":
+        return "Học viên VieCultures";
+      case "International learner":
+        return "Học viên quốc tế";
+      case "Heritage enthusiast":
+        return "Người yêu di sản";
+      case "Community Learner":
+        return "Thành viên cộng đồng";
+      case "Moderator":
+        return "Kiểm duyệt viên";
+      default:
+        return role;
+    }
+  } else {
+    switch (role) {
+      case "Học viên VieCultures":
+        return "VieCultures learner";
+      case "Học viên quốc tế":
+        return "International learner";
+      case "Người yêu di sản":
+        return "Heritage enthusiast";
+      case "Thành viên cộng đồng":
+        return "Community Learner";
+      case "Kiểm duyệt viên":
+        return "Moderator";
+      default:
+        return role;
+    }
+  }
+}
+
+function localizeTimeAgo(timeAgo: string | undefined, currentLang: string): string {
+  if (!timeAgo) return "";
+  const isVi = currentLang.startsWith("vi");
+  if (isVi) {
+    if (timeAgo.toLowerCase() === "just now" || timeAgo.toLowerCase() === "recently") return "Vừa xong";
+    const match = timeAgo.match(/^(\d+)\s*(hour|minute|day)s?\s*ago$/i);
+    if (match) {
+      const count = match[1];
+      const unit = match[2].toLowerCase();
+      const viUnits: Record<string, string> = { hour: "giờ", minute: "phút", day: "ngày" };
+      return `${count} ${viUnits[unit] || unit} trước`;
+    }
+    return timeAgo;
+  } else {
+    if (timeAgo === "Vừa xong" || timeAgo === "Gần đây") return "Just now";
+    const match = timeAgo.match(/^(\d+)\s*(giờ|phút|ngày)\s*trước$/i);
+    if (match) {
+      const count = match[1];
+      const unit = match[2];
+      const enUnits: Record<string, string> = { giờ: "hour", phút: "minute", ngày: "day" };
+      return `${count} ${enUnits[unit]}${Number(count) === 1 ? "" : "s"} ago`;
+    }
+    return timeAgo;
+  }
+}
 
 function getSeedReflections(postId: string, postTitle?: string): UserReflectionItem[] {
   if (postId.includes("tet") || postTitle?.toLowerCase().includes("tet")) {
@@ -109,10 +172,11 @@ function getSeedReflections(postId: string, postTitle?: string): UserReflectionI
 export function ReaderReflectionsSection({
   postId,
   postTitle,
+  postTitleVi,
   vocabularies = [],
   themeMode = "paper",
 }: ReaderReflectionsSectionProps) {
-  const { t } = useTranslation("community");
+  const { t, i18n } = useTranslation("community");
   const isDark = themeMode === "dark";
   const currentUser = getStoredUser();
 
@@ -125,9 +189,12 @@ export function ReaderReflectionsSection({
     type: "success" | "pending" | "info";
     text: string;
   } | null>(null);
-  const [lastInsertedWord, setLastInsertedWord] = useState<string | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const resolvedStoryTitle = i18n.language.startsWith("vi")
+    ? (postTitleVi || postTitle || t("community.reader_reflections.this_story_fallback"))
+    : (postTitle || postTitleVi || t("community.reader_reflections.this_story_fallback"));
 
   // Load reflections from localStorage or seeds
   useEffect(() => {
@@ -178,7 +245,6 @@ export function ReaderReflectionsSection({
     const textarea = textareaRef.current;
     if (!textarea) {
       setReflectionText((prev) => (prev ? `${prev} ${word} ` : `${word} `));
-      setLastInsertedWord(word);
       return;
     }
 
@@ -191,7 +257,6 @@ export function ReaderReflectionsSection({
     const newText = `${before}${spaceBefore}${word}${spaceAfter}${after}`;
 
     setReflectionText(newText);
-    setLastInsertedWord(word);
 
     // Re-focus and position cursor right after inserted word
     setTimeout(() => {
@@ -199,8 +264,6 @@ export function ReaderReflectionsSection({
       const newCursor = start + spaceBefore.length + word.length + spaceAfter.length;
       textarea.setSelectionRange(newCursor, newCursor);
     }, 0);
-
-    setTimeout(() => setLastInsertedWord(null), 2500);
   };
 
   // Submit Reflection
@@ -211,7 +274,8 @@ export function ReaderReflectionsSection({
     // 1. Passive Moderation Check (EC-03.1)
     const moderation = checkPassiveModeration(reflectionText);
 
-    const displayName = authorNameInput.trim() || currentUser?.name || "VieCultures learner";
+    const defaultAuthor = t("community.reader_reflections.default_author", "Học viên VieCultures");
+    const displayName = authorNameInput.trim() || currentUser?.name || defaultAuthor;
     const initials = displayName
       .split(" ")
       .filter(Boolean)
@@ -341,9 +405,8 @@ export function ReaderReflectionsSection({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-line/60">
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h3 className="font-sans text-lg font-bold flex items-center gap-2 text-heritage-green dark:text-warm-ivory">
-                <BookOpen className="w-4 h-4 text-antique-gold" />
-                <span>{t("community.reader_reflections.share_title")}</span>
+              <h3 className="font-sans text-lg font-bold text-heritage-green dark:text-warm-ivory">
+                {t("community.reader_reflections.share_title")}
               </h3>
               <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-antique-gold px-2.5 py-0.5 rounded-full bg-antique-gold/15 border border-antique-gold/30">
                 <ShieldCheck className="w-3.5 h-3.5 text-antique-gold" />
@@ -351,7 +414,7 @@ export function ReaderReflectionsSection({
               </span>
             </div>
             <p className="text-xs opacity-75 mt-1">
-              {t("community.reader_reflections.share_desc", { story: postTitle || t("community.reader_reflections.this_story_fallback") })}
+              {t("community.reader_reflections.share_desc", { story: resolvedStoryTitle })}
             </p>
           </div>
 
@@ -378,8 +441,8 @@ export function ReaderReflectionsSection({
         {/* Quick Vocab Suggestion Chips (Compact & clean) */}
         {vocabularies && vocabularies.length > 0 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-            <span className="text-[11px] font-semibold text-antique-gold uppercase tracking-wider shrink-0 flex items-center gap-1">
-              <Plus className="w-3 h-3 text-antique-gold" /> Gợi ý từ vựng:
+            <span className="text-[11px] font-semibold text-antique-gold uppercase tracking-wider shrink-0">
+              {t("community.reader_reflections.vocab_suggestions_label", "Gợi ý từ vựng:")}
             </span>
             <div className="flex items-center gap-1.5 overflow-x-auto py-1">
               {vocabularies.map((vocab) => {
@@ -435,7 +498,7 @@ export function ReaderReflectionsSection({
               ) : (
                 <span className="text-[11px] opacity-70 italic flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-antique-gold" />
-                  <span>Không gian an toàn · Viết tự do tiếng Anh hoặc song ngữ, không áp lực</span>
+                  <span>{t("community.reader_reflections.safe_space_tip", "Không gian an toàn · Viết tự do tiếng Anh hoặc song ngữ, không áp lực")}</span>
                 </span>
               )}
             </div>
@@ -502,7 +565,7 @@ export function ReaderReflectionsSection({
               {t("community.reader_reflections.community_voices", { count: reflections.length })}
             </h4>
             <span className="text-[11px] px-2 py-0.5 rounded-full bg-antique-gold/15 text-antique-gold font-bold">
-              UGC Feed
+              {t("community.reader_reflections.ugc_feed_badge", "Góc người học")}
             </span>
           </div>
           <span className="text-xs opacity-65 hidden sm:inline">
@@ -545,7 +608,7 @@ export function ReaderReflectionsSection({
                           </span>
                           {ref.authorRole && (
                             <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-antique-gold/15 text-antique-gold border border-antique-gold/30">
-                              {ref.authorRole}
+                              {localizeAuthorRole(ref.authorRole, i18n.language)}
                             </span>
                           )}
                           {isPending && (
@@ -555,7 +618,9 @@ export function ReaderReflectionsSection({
                             </span>
                           )}
                         </div>
-                        <span className="text-[11px] opacity-65">{ref.timeAgo || "Recently"}</span>
+                        <span className="text-[11px] opacity-65">
+                          {localizeTimeAgo(ref.timeAgo, i18n.language) || (i18n.language.startsWith("vi") ? "Gần đây" : "Recently")}
+                        </span>
                       </div>
                     </div>
 

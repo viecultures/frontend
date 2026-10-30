@@ -227,27 +227,31 @@
     "comparison_note": "Xem bảng so sánh đầy đủ tại",
     "pricing_link": "trang gói học",
     "free": {
-      "name": "Miễn phí",
+      "name": "Free (Khám Phá)",
       "price": "0 đ",
       "period": "Miễn phí mãi mãi",
       "description": "Bắt đầu hành trình qua những câu chuyện văn hóa Việt.",
       "action": "Trải nghiệm miễn phí",
       "features": [
-        "Đọc và luyện nghe song ngữ",
-        "Lưu tối đa 30 từ vựng",
-        "3 lượt trò chuyện AI mỗi ngày"
+        "Không giới hạn bài đọc (cả 3 Level)",
+        "Giới hạn audio nghe: 2 bài nghe / ngày",
+        "Tra từ không giới hạn, flashcard thả ga",
+        "Hỏi đáp & voice trong chat: 15 câu / tuần",
+        "Không có trò chơi, kiểm tra, ôn tập"
       ]
     },
     "pro": {
-      "name": "Gói Pro",
-      "price": "39.000 đ",
-      "period": "mỗi tháng",
-      "description": "Nâng tầm trải nghiệm với không gian đọc, nghe và luyện tập không giới hạn.",
-      "action": "Xem chi tiết Pro",
+      "name": "Gói Plus",
+      "price": "49.000 đ",
+      "period": "mỗi tháng (chỉ từ 41.583đ/tháng với gói năm)",
+      "description": "Nâng tầm trải nghiệm với không gian đọc Level 3, Audio Shadowing, SRS đầy đủ và đàm thoại AI mở rộng.",
+      "action": "Xem chi tiết gói Plus",
       "features": [
-        "Không giới hạn trò chuyện cùng trợ lý AI",
-        "Lưu từ vựng không giới hạn",
-        "Đa dạng tốc độ nghe và công cụ học chuyên sâu"
+        "Không giới hạn bài đọc và Level 3",
+        "Audio Shadowing không giới hạn tốc độ",
+        "Hệ thống SRS đầy đủ, mở khóa toàn bộ trò chơi & ôn tập",
+        "Hội thoại AI mở rộng & voice không giới hạn",
+        "Thống kê tiến độ • Gói năm 499k (SV: 29k/tháng)"
       ]
     }
   },

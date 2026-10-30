@@ -505,6 +505,7 @@ export default function ReaderPage() {
             <ReaderReflectionsSection
               postId={articleData.id}
               postTitle={articleData.titleEn}
+              postTitleVi={articleData.titleVi}
               vocabularies={articleData.vocabularies || []}
               themeMode={themeMode}
             />

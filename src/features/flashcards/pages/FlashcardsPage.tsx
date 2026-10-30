@@ -3,7 +3,6 @@ import '../flashcard-study.css';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
-import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   Volume2,
   BookOpen,
@@ -16,27 +15,24 @@ import {
   HelpCircle,
   CheckCircle2,
   Sparkles,
-  Layers,
   Award,
-  ChevronRight,
 } from 'lucide-react';
 import { useGamification } from '@/context/GamificationContext';
 import type { RewardCelebrationPayload } from '@/types';
 import {
   type Flashcard,
-  SAMPLE_STUDY_DECKS,
-  type SampleDeckMeta,
 } from '@/data/flashcardsData';
 import {
   readSavedVocabulary,
+  saveVocabulary,
   getAllSavedVocabularies,
   readReviewSession,
   saveReviewSession,
 } from '@/services/learning/learningStorage';
 import FlashcardSidebarLayout from '../components/flashcard-sidebar-layout';
+import { StudyCard, type StudyMode } from '../components/StudyCard';
 import {
   FlashcardProgressBar,
-  FlashcardFlipView,
 } from '../components';
 import { cardsFromVocabulary, loadStudyDeck, type StudyDeck } from '../services/studyDeck';
 import { persistVocabProgress } from '../services/vocabProgressService';
@@ -47,7 +43,7 @@ import {
   type AnkiRating,
   type CardSRSState,
 } from '../services/srsEngine';
-import { paths } from '@/routes/paths';
+import { PATHS, paths } from '@/routes/paths';
 import { MocSonSealModal, StreakBadge } from '@/features/gamification';
 
 /**
@@ -60,9 +56,7 @@ import { MocSonSealModal, StreakBadge } from '@/features/gamification';
  * - 100% SVG iconography, zero raw emojis
  */
 export const FlashcardsPage: React.FC = () => {
-  const { t, i18n } = useTranslation('flashcards');
-  const isEn = (i18n.language || '').toLowerCase().startsWith('en');
-  const navigate = useAppNavigate();
+  const { t } = useTranslation('flashcards');
   const [searchParams] = useSearchParams();
   const deckId = searchParams.get('deck') || 'imperial-hue';
   const level = searchParams.get('level') || 'Level 1';
@@ -88,7 +82,10 @@ export const FlashcardsPage: React.FC = () => {
   const [isAutoAudio, setIsAutoAudio] = useState<boolean>(false);
   const [accentVoice] = useState<'en-US' | 'en-GB'>('en-US');
   const [isShuffled, setIsShuffled] = useState<boolean>(false);
-  const [showSampleDecks, setShowSampleDecks] = useState<boolean>(false);
+  const [studyMode, setStudyMode] = useState<StudyMode>('flip');
+  const [reverse, setReverse] = useState(false);
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [studyCycle, setStudyCycle] = useState(0);
 
   // Persistent storage key
   const sessionStorageKey = useMemo(() => {
@@ -116,6 +113,7 @@ export const FlashcardsPage: React.FC = () => {
         const loadedDeck = await loadStudyDeck(deckId, level);
         if (active && loadedDeck) {
           setDeck(loadedDeck);
+          setSavedIds(readSavedVocabulary(deckId, level).map(word => word.id));
           if (!savedOnly) {
             setCards(loadedDeck.cards);
             setQueue(loadedDeck.cards.map((c) => c.id));
@@ -226,7 +224,6 @@ export const FlashcardsPage: React.FC = () => {
   useEffect(() => {
     if (isComplete) {
       void handleSessionComplete();
-      setIsSealModalOpen(true);
     }
   }, [isComplete, handleSessionComplete]);
 
@@ -249,6 +246,7 @@ export const FlashcardsPage: React.FC = () => {
     setCardSRSMap((prev) => ({ ...prev, [cardId]: nextState }));
     setRatings((prev) => ({ ...prev, [cardId]: rating }));
     setIsFlipped(false);
+    setStudyCycle(value => value + 1);
 
     // 2. Persist to API & learningStorage
     void persistVocabProgress({
@@ -301,6 +299,27 @@ export const FlashcardsPage: React.FC = () => {
     setReward(null);
     setQueue(cards.map((c) => c.id));
     setCurrentQueueIndex(0);
+    setStudyCycle(value => value + 1);
+  };
+
+  const handleReviewDifficult = () => {
+    const difficult = cards.filter(card => ratings[card.id] === 'again' || ratings[card.id] === 'hard');
+    setQueue(difficult.map(card => card.id));
+    setCurrentQueueIndex(0);
+    setIsFlipped(false);
+    setReward(null);
+    setStudyCycle(value => value + 1);
+  };
+
+  const handleToggleSave = () => {
+    if (!currentCard) return;
+    const existing = readSavedVocabulary(deckId, level);
+    const isSaved = existing.some(word => word.id === currentCard.id);
+    const articleWord = deck?.article.vocabularies.find(word => word.id === currentCard.id);
+    const item = articleWord || { id: currentCard.id, word: currentCard.word, pos: currentCard.pos,
+      ipa: currentCard.ipa, viMeaning: currentCard.viMeaning, contextSentence: currentCard.contextEn };
+    const next = isSaved ? existing.filter(word => word.id !== currentCard.id) : [...existing, item];
+    if (saveVocabulary(deckId, level, next)) setSavedIds(next.map(word => word.id));
   };
 
   const handleToggleShuffle = () => {
@@ -313,10 +332,6 @@ export const FlashcardsPage: React.FC = () => {
       }
       return copy;
     });
-  };
-
-  const handleSelectSampleDeck = (sampleId: string) => {
-    navigate(paths.flashcardStudy({ deck: sampleId }));
   };
 
   // Keyboard navigation: Anki standard
@@ -333,13 +348,9 @@ export const FlashcardsPage: React.FC = () => {
         return;
       }
 
-      if (e.code === 'Space') {
+      if (e.code === 'Space' && studyMode === 'flip') {
         e.preventDefault();
-        if (!isFlipped) {
-          setIsFlipped(true);
-        } else {
-          void handleRate('good');
-        }
+        setIsFlipped(value => !value);
       } else if (isFlipped) {
         if (e.key === '1') {
           e.preventDefault();
@@ -359,7 +370,7 @@ export const FlashcardsPage: React.FC = () => {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isComplete, cards.length, isFlipped, currentCard]);
+  }, [isComplete, cards.length, isFlipped, currentCard, studyMode]);
 
   // Loading state
   if (isLoadingDeck) {
@@ -403,14 +414,13 @@ export const FlashcardsPage: React.FC = () => {
               <ArrowLeft className="w-4 h-4" />
               <span>{t('study.read_article', 'Quay lại bài đọc')}</span>
             </Link>
-            <button
-              type="button"
-              onClick={() => handleSelectSampleDeck('pho-hanoi')}
+            <Link
+              to={PATHS.dictionary}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-antique-gold text-heritage-dark font-bold hover:bg-antique-bright transition-colors"
             >
               <Sparkles className="w-4 h-4" />
-              <span>{t('study.explore_samples', 'Học bộ thẻ Phở Hà Nội')}</span>
-            </button>
+              <span>{t('study.browse_library', 'Browse vocabulary library')}</span>
+            </Link>
           </div>
         </div>
       </FlashcardSidebarLayout>
@@ -426,46 +436,34 @@ export const FlashcardsPage: React.FC = () => {
   const easyCount = Object.values(ratings).filter((r) => r === 'easy').length;
   const masteredCount = goodCount + easyCount;
 
-  // Anki 3-Counter badges: New, Learning, To Review
-  const ankiNewCount = cards.filter(
-    (c) => !ratings[c.id] && (!cardSRSMap[c.id] || cardSRSMap[c.id].reps === 0)
-  ).length;
-  const ankiLearningCount = queue.length;
-  const ankiReviewCount = masteredCount;
-
   return (
     <FlashcardSidebarLayout>
-      <div className="vocab-study-page w-full max-w-4xl mx-auto py-6 px-4 space-y-6">
+      <div className="vocab-study-page vocab-spaced-review-page w-full max-w-4xl mx-auto py-6 px-4">
         {/* Navigation & Header */}
         <div>
-          <div className="flex items-center justify-between gap-4 mb-2">
-            <Link
-              to={paths.reader({ postId: deckId, level })}
-              className="inline-flex items-center gap-1.5 text-xs text-ink-soft hover:text-heritage-green transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>{t('study.read_article', 'Quay lại bài đọc')}</span>
-            </Link>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setShowSampleDecks((v) => !v)}
-                className={`p-2 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition-colors ${
-                  showSampleDecks
-                    ? 'bg-antique-gold/25 text-antique-gold border-antique-gold'
-                    : 'bg-surface-raised border-antique-gold/20 text-ink-soft hover:text-ink'
-                }`}
-                title={t('study.switch_deck', 'Đổi bộ thẻ bài học mẫu')}
+          <div className="vocab-review-navigation">
+            <div className="vocab-review-links">
+              <Link
+                to={paths.reader({ postId: deckId, level })}
+                className="vocab-review-back"
               >
-                <Layers className="w-3.5 h-3.5 text-antique-gold" />
-                <span>{t('study.switch_deck', 'Bộ thẻ mẫu')}</span>
-              </button>
-
+                <ArrowLeft className="w-4 h-4" />
+                <span>{t('study.read_article', 'Read article')}</span>
+              </Link>
+              <Link
+                to={PATHS.dictionary}
+                className="vocab-review-library"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>{t('study.browse_library', 'Vocabulary library')}</span>
+              </Link>
+            </div>
+            <div className="vocab-review-options">
               <button
                 type="button"
                 onClick={handleToggleShuffle}
-                className={`p-2 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-colors ${
+                aria-pressed={isShuffled}
+                className={`vocab-review-option border transition-colors ${
                   isShuffled
                     ? 'bg-antique-gold/20 text-antique-gold border-antique-gold'
                     : 'bg-surface-raised border-antique-gold/20 text-ink-soft hover:text-ink'
@@ -479,7 +477,8 @@ export const FlashcardsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsAutoAudio((v) => !v)}
-                className={`p-2 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-colors ${
+                aria-pressed={isAutoAudio}
+                className={`vocab-review-option border transition-colors ${
                   isAutoAudio
                     ? 'bg-[#059669]/15 text-[#059669] border-[#059669]/30'
                     : 'bg-surface-raised border-antique-gold/20 text-ink-soft hover:text-ink'
@@ -492,45 +491,17 @@ export const FlashcardsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Title and Anki 3-Counter Status Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-antique-gold/20 pb-3">
-            <div>
+          {/* Session title; progress below carries the completion count. */}
+          <div className="vocab-review-heading">
+            <div className="vocab-review-title">
               <p className="text-[11px] font-bold uppercase tracking-wider text-antique-gold">
                 {savedOnly
                   ? t('study.progress_saved_personal', 'Sổ tay cá nhân')
                   : t('study.progress_saved_deck', 'Bộ thẻ văn hóa')}
               </p>
-              <h1 className="text-xl sm:text-2xl font-bold text-heritage-green dark:text-warm-ivory">
+              <h1 className="text-heritage-green dark:text-warm-ivory">
                 {deck?.lesson.title || t('study.progress_title_default', 'Ôn tập từ vựng văn hóa')}
               </h1>
-            </div>
-
-            {/* Anki 3-Counter Pill Badges */}
-            <div className="flex items-center gap-2 text-xs font-mono">
-              {/* New */}
-              <div
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/25 text-sky-600 dark:text-sky-400 font-semibold"
-                title="Thẻ mới chưa học"
-              >
-                <Sparkles className="w-3 h-3" />
-                <span>{t('study.anki_new', 'Mới')}: {ankiNewCount}</span>
-              </div>
-              {/* Learning */}
-              <div
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 font-semibold"
-                title="Thẻ đang học / trong hàng đợi"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>{t('study.anki_learning', 'Đang học')}: {ankiLearningCount}</span>
-              </div>
-              {/* Mastered */}
-              <div
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#059669]/10 border border-[#059669]/25 text-[#059669] font-semibold"
-                title="Thẻ đã thuộc / hoàn thành hôm nay"
-              >
-                <CheckCircle2 className="w-3 h-3" />
-                <span>{t('study.anki_review', 'Đã thuộc')}: {ankiReviewCount}</span>
-              </div>
             </div>
           </div>
         </div>
@@ -542,6 +513,13 @@ export const FlashcardsPage: React.FC = () => {
           totalCards={cards.length}
           isComplete={isComplete}
         />
+
+        {!isComplete && <div className="study-mode-toolbar">
+          <div className="study-mode-tabs" role="group" aria-label={t('modes.study_mode_aria', 'Study mode')}>
+            {([['flip', 'modes.flip', 'Flip cards'], ['choice', 'modes.quiz', 'Choose answer'], ['type', 'modes.spelling', 'Type word']] as const).map(([mode, key, fallback]) => <button type="button" key={mode} aria-pressed={studyMode === mode} onClick={() => { setStudyMode(mode); setIsFlipped(false); }}><span>{t(key, fallback)}</span></button>)}
+          </div>
+          {studyMode === 'flip' && <button className="study-direction" type="button" onClick={() => { setReverse(value => !value); setIsFlipped(false); }}>{reverse ? 'Việt → Anh' : 'Anh → Việt'} <RotateCw size={15}/></button>}
+        </div>}
 
         {/* Cognitive Fatigue Notice (EC-04.1) */}
         {cognitiveFatigueAlert && (
@@ -559,97 +537,55 @@ export const FlashcardsPage: React.FC = () => {
         {/* Study Player or Session Summary */}
         <div className="vocab-study-player flex justify-center py-2">
           {isComplete ? (
-            <div className="w-full max-w-lg p-6 rounded-2xl bg-surface-raised border border-antique-gold/30 shadow-xl text-center space-y-6">
-              <div className="w-16 h-16 mx-auto rounded-full bg-[#059669]/15 flex items-center justify-center text-[#059669]">
-                <BookOpen className="w-8 h-8 animate-bounce" />
-              </div>
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-heritage-green dark:text-warm-ivory">
-                  {t('study.complete_title', 'Xuất sắc! Đã hoàn thành phiên ôn tập!')}
-                </h2>
-                <p className="text-sm text-ink-soft">
-                  {t('study.complete_desc', {
-                    mastered: masteredCount,
-                    total: cards.length,
-                    defaultValue: `Bạn đã nắm vững ${masteredCount} / ${cards.length} từ vựng văn hóa theo thuật toán Anki SM-2.`,
-                  })}
-                </p>
+            <section className="study-complete" aria-labelledby="study-complete-title">
+              <div className="study-complete-icon"><BookOpen size={26} aria-hidden="true" /></div>
+              <p className="study-complete-eyebrow">{t('study.complete_eyebrow', 'Review finished')}</p>
+              <h2 id="study-complete-title">{t('study.complete_title', 'Review session complete')}</h2>
+              <p className="study-complete-description">{t('study.complete_desc', {
+                mastered: masteredCount, total: cards.length, difficult: againCount + hardCount,
+                defaultValue: `${masteredCount} of ${cards.length} words rated Good or Easy; ${againCount + hardCount} need more practice.`,
+              })}</p>
+
+              <div className="study-complete-stats" aria-label={t('study.rating_summary', 'Rating summary')}>
+                {([
+                  ['again', againCount, 'rating_again', 'Again'],
+                  ['hard', hardCount, 'rating_hard', 'Hard'],
+                  ['good', goodCount, 'rating_good', 'Good'],
+                  ['easy', easyCount, 'rating_easy', 'Easy'],
+                ] as const).map(([rating, count, key, fallback]) => <div className={`study-complete-stat study-complete-stat-${rating}`} key={rating}>
+                  <span>{t(`study.${key}`, fallback)}</span><strong>{count}</strong>
+                </div>)}
               </div>
 
-              {/* Anki Ratings Breakdown */}
-              <div className="grid grid-cols-4 gap-2 text-center text-xs">
-                <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400">
-                  <p className="text-[10px] uppercase font-bold opacity-80">Quên</p>
-                  <p className="text-lg font-bold font-mono mt-0.5">{againCount}</p>
-                </div>
-                <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300">
-                  <p className="text-[10px] uppercase font-bold opacity-80">Khó</p>
-                  <p className="text-lg font-bold font-mono mt-0.5">{hardCount}</p>
-                </div>
-                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-                  <p className="text-[10px] uppercase font-bold opacity-80">Tốt</p>
-                  <p className="text-lg font-bold font-mono mt-0.5">{goodCount}</p>
-                </div>
-                <div className="p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400">
-                  <p className="text-[10px] uppercase font-bold opacity-80">Dễ</p>
-                  <p className="text-lg font-bold font-mono mt-0.5">{easyCount}</p>
-                </div>
+              {reward && reward.xpEarned > 0 && <div className="study-complete-reward" role="status">
+                <Award size={19} aria-hidden="true" />
+                <span>{t('study.complete_xp_bonus', { xp: reward.xpEarned, defaultValue: `+${reward.xpEarned} XP` })}</span>
+              </div>}
+
+              <div className="study-complete-actions">
+                {(againCount + hardCount) > 0 && <button type="button" onClick={handleReviewDifficult} className="study-complete-primary"><RotateCcw size={18} aria-hidden="true" />{t('study.review_difficult', 'Review difficult words')} ({againCount + hardCount})</button>}
+                <Link to={paths.reader({ postId: deckId, level })} className="study-complete-primary"><BookOpen size={18} aria-hidden="true" />{t('study.btn_continue_reading', 'Continue reading')}</Link>
+                <button type="button" onClick={handleRestart} className="study-complete-secondary"><RotateCw size={18} aria-hidden="true" />{t('study.btn_restart', 'Restart review')}</button>
+                <button type="button" onClick={() => setIsSealModalOpen(true)} className="study-complete-secondary"><Award size={18} aria-hidden="true" />{t('study.seal_btn', 'Stamp Ceremonial Seal')}</button>
               </div>
 
-              {reward && (
-                <div className="p-4 rounded-xl bg-antique-gold/15 border border-antique-gold/30 text-antique-gold font-bold flex items-center justify-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  <span>
-                    {t('study.complete_xp_bonus', {
-                      xp: reward.xpEarned || 20,
-                      defaultValue: `+${reward.xpEarned || 20} XP Cột mốc Flashcard!`,
-                    })}
-                  </span>
-                </div>
-              )}
-
-              {/* Daily Streak Habit Loop */}
-              <div className="w-full max-w-md mx-auto">
-                <StreakBadge variant="banner" interactive={true} />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsSealModalOpen(true)}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#9E2A2B] hover:bg-[#852223] text-white font-bold text-xs shadow-md border border-antique-gold transition-transform hover:scale-105 flex items-center justify-center gap-2"
-                >
-                  <Award className="w-4 h-4 text-antique-gold" />
-                  <span>{t('study.seal_btn', 'Dập Mộc Son Hoàn Thành')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRestart}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-antique-gold/40 text-antique-gold font-semibold hover:bg-antique-gold/10 transition-colors flex items-center justify-center gap-2"
-                >
-                  <RotateCw className="w-4 h-4" />
-                  <span>{t('study.btn_restart', 'Ôn lại từ đầu')}</span>
-                </button>
-                <Link
-                  to={paths.reader({ postId: deckId, level })}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#059669] text-white font-semibold hover:bg-[#047857] transition-colors flex items-center justify-center gap-2 shadow-sm"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  <span>{t('study.btn_continue_reading', 'Tiếp tục đọc bài')}</span>
-                </Link>
-              </div>
-            </div>
+              <details className="study-complete-streak"><summary>{t('study.view_streak', 'View learning streak')}</summary><StreakBadge variant="banner" interactive={true} /></details>
+            </section>
           ) : (
             currentCard && (
-              <FlashcardFlipView
+              <StudyCard
+                key={`${currentCard.id}:${studyMode}:${reverse}:${studyCycle}`}
                 card={currentCard}
-                isFlipped={isFlipped}
-                onToggleFlip={() => setIsFlipped((f) => !f)}
-                currentIndex={reviewedCount}
-                totalCards={cards.length}
+                cards={cards}
+                mode={studyMode}
+                reverse={reverse}
+                revealed={isFlipped}
+                saved={savedIds.includes(currentCard.id)}
                 cardSRS={cardSRSMap[currentCard.id]}
-                onPlayAudio={playAudio}
+                onReveal={() => setIsFlipped(true)}
+                onHide={() => setIsFlipped(false)}
+                onAudio={() => playAudio(currentCard.word)}
+                onSave={handleToggleSave}
                 onRate={handleRate}
               />
             )
@@ -666,99 +602,6 @@ export const FlashcardsPage: React.FC = () => {
           source="flashcard"
         />
 
-        {/* Sample Lesson Decks Shelf (Chuẩn bị các deck bài học mẫu) */}
-        <section
-          className="mt-8 pt-6 border-t border-antique-gold/20 space-y-4"
-          aria-labelledby="sample-decks-heading"
-        >
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Layers className="w-4 h-4 text-antique-gold" />
-                <h2 id="sample-decks-heading" className="text-base sm:text-lg font-bold text-heritage-green dark:text-warm-ivory">
-                  {t('study.sample_decks_title', 'Bộ Thẻ Bài Học Mẫu')}
-                </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-antique-gold/15 text-antique-gold">
-                  {SAMPLE_STUDY_DECKS.length} chủ đề
-                </span>
-              </div>
-              <p className="text-xs text-ink-soft">
-                {t('study.sample_decks_subtitle', 'Khám phá các chủ đề di sản và nét đẹp văn hóa Việt Nam qua hệ thống Spaced Repetition')}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowSampleDecks((v) => !v)}
-              className="text-xs text-antique-gold font-semibold hover:underline flex items-center gap-1"
-            >
-              <span>{showSampleDecks ? 'Thu gọn' : 'Xem tất cả'}</span>
-              <ChevronRight className={`w-3.5 h-3.5 transition-transform ${showSampleDecks ? 'rotate-90' : ''}`} />
-            </button>
-          </div>
-
-          <div
-            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-300 ${
-              showSampleDecks ? 'max-h-[2000px] opacity-100' : 'max-h-72 overflow-hidden'
-            }`}
-          >
-            {SAMPLE_STUDY_DECKS.map((sample: SampleDeckMeta) => {
-              const isCurrent = sample.id === deckId;
-              return (
-                <div
-                  key={sample.id}
-                  onClick={() => handleSelectSampleDeck(sample.id)}
-                  className={`group relative p-3 rounded-2xl border transition-all cursor-pointer flex gap-3 items-center ${
-                    isCurrent
-                      ? 'bg-antique-gold/15 border-antique-gold shadow-sm ring-1 ring-antique-gold/40'
-                      : 'bg-surface-raised border-antique-gold/20 hover:border-antique-gold/60 hover:shadow-md'
-                  }`}
-                >
-                  {/* Thumbnail */}
-                  <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-antique-gold/30">
-                    <img
-                      src={sample.imageUrl}
-                      alt={sample.titleVi}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1 mb-0.5">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-antique-gold truncate">
-                        {sample.categoryVi}
-                      </span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/5 dark:bg-white/10 text-ink-soft">
-                        {sample.level}
-                      </span>
-                    </div>
-
-                    <h3 className="font-bold text-sm text-ink dark:text-warm-ivory truncate group-hover:text-heritage-green transition-colors">
-                      {isEn ? sample.titleEn : sample.titleVi}
-                    </h3>
-
-                    <div className="flex items-center justify-between text-[11px] text-ink-soft mt-1">
-                      <span>{sample.cardCount} thẻ từ vựng</span>
-                      {isCurrent ? (
-                        <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
-                          Đang học
-                        </span>
-                      ) : (
-                        <span className="group-hover:translate-x-0.5 transition-transform text-antique-gold font-semibold flex items-center">
-                          Học ngay <ChevronRight className="w-3 h-3" />
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
       </div>
     </FlashcardSidebarLayout>
   );

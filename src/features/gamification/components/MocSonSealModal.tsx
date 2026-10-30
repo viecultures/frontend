@@ -341,7 +341,7 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
               className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#9E2A2B] hover:bg-[#852223] text-white font-sans font-bold text-xs shadow-md transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Crown className="w-3.5 h-3.5 text-yellow-300" />
-              <span>Gói Pro (39k)</span>
+              <span>Gói Plus (49k)</span>
             </button>
           </div>
         </div>

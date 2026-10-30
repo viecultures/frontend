@@ -167,7 +167,7 @@ export const Footer: React.FC = () => {
         {/* Bottom copyright row */}
         <div className="pt-8 border-t border-antique-gold/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-warm-ivory/60 font-medium">
           <p>{t('footer.copyright', '© 2026 VieCultures • VN Culture Reader. All rights reserved.')}</p>
-          <p>{t('footer.slogan', 'Small words. Wonderful worlds.')}</p>
+          <p>{t('footer.slogan', 'Engrave words, Preserve cultures.')}</p>
         </div>
       </div>
     </footer>

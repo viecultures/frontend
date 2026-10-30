@@ -42,6 +42,7 @@ const DesignSystemPage = import.meta.env.DEV
   : null;
 import { getStoredUser, setStoredUser, getStoredToken, clearAuthStorage, type AppUser } from '@/utils/auth-storage';
 import { PATHS, getLocalizedPath } from '@/routes/paths';
+import { useStudyActivityTracking } from '@/features/home/hooks/useStudyActivityTracking';
 const CompanionFloatingButton = React.lazy(() =>
   import('@/features/companion/CompanionFloatingButton').then((module) => ({ default: module.CompanionFloatingButton }))
 );
@@ -106,6 +107,7 @@ export const App: React.FC = () => {
 
   const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser() || !!getStoredToken());
+  useStudyActivityTracking(pathWithoutLang, user?.email || 'guest');
 
   useEffect(() => {
     const handleAuthChange = () => {
