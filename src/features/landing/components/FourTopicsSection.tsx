@@ -12,22 +12,22 @@ interface TopicItemConfig {
 const TOPICS_CONFIG: TopicItemConfig[] = [
   {
     key: 'history',
-    image: '/images/landing/hue-citadel.jpg',
+    image: '/images/landing/hue-citadel.webp',
     alt: 'Imperial Citadel of Hue reflecting ancient Vietnamese architectural heritage',
   },
   {
     key: 'food',
-    image: '/images/landing/banh-mi.jpg',
+    image: '/images/landing/banh-mi.webp',
     alt: 'Traditional Vietnamese culinary specialty representing rich gastronomic culture',
   },
   {
     key: 'crafts',
-    image: '/images/landing/bat-trang.jpg',
+    image: '/images/landing/bat-trang.webp',
     alt: 'Artisan hand-crafting pottery in the historic Bat Trang ceramic village',
   },
   {
     key: 'festivals',
-    image: '/images/landing/hoi-an-lanterns.jpg',
+    image: '/images/landing/hoi-an-lanterns.webp',
     alt: 'Lantern festival illuminating the historic riverside in Hoi An ancient town',
   },
 ];

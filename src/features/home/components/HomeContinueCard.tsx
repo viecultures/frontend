@@ -46,7 +46,7 @@ export function HomeContinueCard({ bookmark }: HomeContinueCardProps) {
       </div>
     </div>
     <div className="home-room-continue-image">
-      <img src={bookmark?.image || '/images/landing/hoi-an-lanterns.jpg'} alt="" />
+      <img src={bookmark?.image || '/images/landing/hoi-an-lanterns.webp'} alt="" />
       <span>{bookmark?.topic || t('continue_card.default_topic', 'Traditions & everyday life')}</span>
     </div>
   </section>;

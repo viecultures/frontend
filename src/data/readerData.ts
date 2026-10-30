@@ -301,7 +301,7 @@ export interface RecommendedArticle {
 export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   {
     id: "saigon-banh-mi",
-    imageUrl: "/images/landing/banh-mi.jpg",
+    imageUrl: "/images/landing/banh-mi.webp",
     category: "Cuisine",
     level: "Level 2",
     title: "The Story of Saigon Bánh Mì",
@@ -312,7 +312,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   },
   {
     id: "hoi-an-lanterns",
-    imageUrl: "/images/landing/hoi-an-lanterns.jpg",
+    imageUrl: "/images/landing/hoi-an-lanterns.webp",
     category: "Heritage",
     level: "Level 2",
     title: "Hội An Lantern Festival Traditions",
@@ -323,7 +323,7 @@ export const RECOMMENDED_ARTICLES: RecommendedArticle[] = [
   },
   {
     id: "bat-trang-pottery",
-    imageUrl: "/images/landing/bat-trang.jpg",
+    imageUrl: "/images/landing/bat-trang.webp",
     category: "Crafts",
     level: "Level 2",
     title: "Bát Tràng Pottery & Ceramic Arts",

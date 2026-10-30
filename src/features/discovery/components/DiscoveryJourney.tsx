@@ -77,7 +77,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
       id: 'central-preview',
       title: t('journey.region_central'),
       place: isEn ? 'Hue' : 'Huế',
-      imageUrl: '/images/landing/hue-citadel.jpg',
+      imageUrl: '/images/landing/hue-citadel.webp',
       description: isEn
         ? 'New reading series are being prepared for Central Vietnam.'
         : 'Các chuỗi bài đọc mới đang được biên soạn cho khu vực Miền Trung.',
@@ -86,7 +86,7 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
       id: 'south-preview',
       title: t('journey.region_south'),
       place: isEn ? 'Ho Chi Minh City' : 'TP. Hồ Chí Minh',
-      imageUrl: '/images/landing/banh-mi.jpg',
+      imageUrl: '/images/landing/banh-mi.webp',
       description: isEn
         ? 'New reading series are being prepared for Southern Vietnam.'
         : 'Các chuỗi bài đọc mới đang được biên soạn cho khu vực Miền Nam.',

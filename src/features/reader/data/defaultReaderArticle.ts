@@ -8,7 +8,7 @@ export function getDefaultReaderArticle(level: string): ReaderArticleData {
     id: 'tet-holiday', level,
     titleEn: 'Tết: Renewal, Remembrance and Regional Flavours',
     titleVi: 'Tết: Sự đổi mới, lòng tưởng nhớ và hương vị các vùng miền',
-    topic: 'Customs & Festivals', imageUrl: '/images/landing/hoi-an-lanterns.jpg',
+    topic: 'Customs & Festivals', imageUrl: '/images/landing/hoi-an-lanterns.webp',
     summary: 'A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions',
     summaryVi: 'Khám phá văn hóa về sự đổi mới, lòng tri ân tổ tiên và phong vị ẩm thực ba miền',
     paragraphs: [

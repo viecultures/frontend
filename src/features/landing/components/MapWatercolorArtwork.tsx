@@ -14,7 +14,7 @@ export const MapWatercolorArtwork: React.FC = () => {
       aria-hidden="true"
     >
       <img
-        src="/images/landing/vietnam-map-bg.png"
+        src="/images/landing/vietnam-map-bg.webp"
         alt=""
         className="w-full h-full object-cover object-bottom pointer-events-none select-none"
         loading="lazy"

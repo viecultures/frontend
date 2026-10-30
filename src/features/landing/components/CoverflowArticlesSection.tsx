@@ -15,37 +15,37 @@ const ARTICLES_CONFIG: StoryArticleConfig[] = [
   {
     id: 'hoi-an-lanterns',
     itemKey: 'hoi_an',
-    image: '/images/landing/hoi-an-lanterns.jpg',
+    image: '/images/landing/hoi-an-lanterns.webp',
     readTime: '6 min',
   },
   {
     id: 'imperial-hue',
     itemKey: 'imperial_hue',
-    image: '/images/landing/hue-citadel.jpg',
+    image: '/images/landing/hue-citadel.webp',
     readTime: '8 min',
   },
   {
     id: 'saigon-banh-mi',
     itemKey: 'saigon_banh_mi',
-    image: '/images/landing/banh-mi.jpg',
+    image: '/images/landing/banh-mi.webp',
     readTime: '5 min',
   },
   {
     id: 'bat-trang-pottery',
     itemKey: 'bat_trang',
-    image: '/images/landing/bat-trang.jpg',
+    image: '/images/landing/bat-trang.webp',
     readTime: '7 min',
   },
   {
     id: 'mu-cang-chai',
     itemKey: 'mu_cang_chai',
-    image: '/images/landing/mu-cang-chai.jpg',
+    image: '/images/landing/mu-cang-chai.webp',
     readTime: '6 min',
   },
   {
     id: 'dong-ho-paintings',
     itemKey: 'dong_ho',
-    image: '/images/landing/dong-ho.jpg',
+    image: '/images/landing/dong-ho.webp',
     readTime: '8 min',
   },
 ];

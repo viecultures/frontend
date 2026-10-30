@@ -41,7 +41,7 @@ export function ContestHeroBanner({ onOpenForm }: ContestHeroBannerProps) {
         {/* LEFT COLUMN (40% Width): Authentic Hue Imperial Photography */}
         <div className="lg:col-span-4 relative min-h-[180px] lg:min-h-[260px] bg-[#1D5046] overflow-hidden group">
           <img
-            src="/images/landing/hue-citadel.jpg"
+            src="/images/landing/hue-citadel.webp"
             alt="Hue Imperial Citadel Gate"
             className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"

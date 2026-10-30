@@ -1,7 +1,7 @@
 import type { ReaderArticleData } from '@/features/reader/services/readerApiService';
 import type { ArticleSeries, SeriesMetadata } from '../types';
 
-const imageUrl = '/images/series/ca-kho-vu-dai.jpg';
+const imageUrl = '/images/series/ca-kho-vu-dai.webp';
 
 export const CA_KHO_VU_DAI_SERIES_METADATA: SeriesMetadata = {
   id: 'ca-kho-vu-dai',

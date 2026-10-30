@@ -31,7 +31,7 @@ export function ReaderArticleContent({
   const summary = (translated ? articleData?.summaryVi || articleData?.summary : articleData?.summary) || (translated
     ? 'Khám phá văn hóa về sự đổi mới, lòng triân tổ tiên và phong vị ẩm thực ba miền'
     : 'A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions');
-  const image = articleData?.imageUrl || '/images/landing/hoi-an-lanterns.jpg';
+  const image = articleData?.imageUrl || '/images/landing/hoi-an-lanterns.webp';
   const vocabulary = [...(articleData?.vocabularies || [])].sort((a, b) => b.word.length - a.word.length);
   const escapedWords = vocabulary.map(v => v.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).filter(Boolean);
   const vocabularyPattern = escapedWords.length ? new RegExp(`\\b(${escapedWords.join('|')})\\b`, 'gi') : null;

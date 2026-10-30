@@ -1,7 +1,7 @@
 import type { ReaderArticleData } from '@/features/reader/services/readerApiService';
 import type { ArticleSeries, SeriesMetadata } from '../types';
 
-const imageUrl = '/images/series/banh-cay-thai-binh.jpg';
+const imageUrl = '/images/series/banh-cay-thai-binh.webp';
 
 export const BANH_CAY_SERIES_METADATA: SeriesMetadata = {
   id: 'banh-cay-thai-binh',
