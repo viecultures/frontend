@@ -22,7 +22,7 @@
 .journey-map-heading > div > button { justify-self: start; padding-left: 0; color: var(--color-action); }
 .journey-map-heading span { color: var(--color-accent-ink); font-size: 14px; font-weight: 700; letter-spacing: .08em; }
 .journey-map-heading strong { font-family: var(--font-sans); font-size: 22px; font-weight: 700; text-align: right; }
-.journey-map { height: 560px; overflow: hidden; border-radius: var(--radius-inner); background: linear-gradient(rgba(24, 54, 51, .18), rgba(24, 54, 51, .18)), url('/images/discovery/journey-map-background.png') center / cover no-repeat var(--color-sky-mist); }
+.journey-map { height: 560px; overflow: hidden; border-radius: var(--radius-inner); background: linear-gradient(rgba(24, 54, 51, .18), rgba(24, 54, 51, .18)), url('/images/discovery/journey-map-background.webp') center / cover no-repeat var(--color-sky-mist); }
 .journey-map svg { filter: drop-shadow(0 5px 8px color-mix(in srgb, var(--color-heritage-forest) 16%, transparent)); }
 .journey-map #layer-regions path { cursor: pointer; pointer-events: bounding-box; stroke-width: 2.5px; transition: filter .2s ease, opacity .2s ease; }
 .journey-map #layer-regions path:not([data-locked='true']):hover, .journey-map #layer-regions path:not([data-locked='true']):focus-visible { filter: brightness(1.13) drop-shadow(0 0 6px var(--color-antique-gold)); }

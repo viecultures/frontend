@@ -42,7 +42,12 @@ const DesignSystemPage = import.meta.env.DEV
   : null;
 import { getStoredUser, setStoredUser, getStoredToken, clearAuthStorage, type AppUser } from '@/utils/auth-storage';
 import { PATHS, getLocalizedPath } from '@/routes/paths';
-import { CompanionChatDrawer, CompanionFloatingButton } from '@/features/companion';
+const CompanionFloatingButton = React.lazy(() =>
+  import('@/features/companion/CompanionFloatingButton').then((module) => ({ default: module.CompanionFloatingButton }))
+);
+const CompanionChatDrawer = React.lazy(() =>
+  import('@/features/companion/CompanionChatDrawer').then((module) => ({ default: module.CompanionChatDrawer }))
+);
 
 // Helper to strip leading slash for child routes under /:lang
 const toRel = (path: string): string => path.replace(/^\//, '');
@@ -279,7 +284,7 @@ export const App: React.FC = () => {
 
         {/* AI Cultural Companion Floating Drawer & Launcher */}
         {!isLandingOrLogin && !pathWithoutLang.startsWith(PATHS.aiWorkspace) && (
-          <>
+          <React.Suspense fallback={null}>
             <CompanionFloatingButton
               isOpen={isCompanionOpen}
               onClick={() => setIsCompanionOpen((prev) => !prev)}
@@ -289,7 +294,7 @@ export const App: React.FC = () => {
               onClose={() => setIsCompanionOpen(false)}
               lessonId={currentLessonId}
             />
-          </>
+          </React.Suspense>
         )}
       </div>
   );

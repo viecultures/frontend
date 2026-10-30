@@ -47,32 +47,32 @@ const TOPIC_OPTIONS = [
 
 const PRESET_PHOTOS = [
   {
-    url: "/images/landing/hue-citadel.jpg",
+    url: "/images/landing/hue-citadel.webp",
     label: "Imperial Hue Citadel",
     topic: "Imperial Hue",
   },
   {
-    url: "/images/landing/banh-mi.jpg",
+    url: "/images/landing/banh-mi.webp",
     label: "Saigon Bánh Mì",
     topic: "Saigon Bánh Mì",
   },
   {
-    url: "/images/landing/hoi-an-lanterns.jpg",
+    url: "/images/landing/hoi-an-lanterns.webp",
     label: "Hội An Silk Lanterns",
     topic: "Hội An Lanterns",
   },
   {
-    url: "/images/landing/bat-trang.jpg",
+    url: "/images/landing/bat-trang.webp",
     label: "Bát Tràng Ceramics",
     topic: "Bát Tràng Pottery",
   },
   {
-    url: "/images/landing/dong-ho.jpg",
+    url: "/images/landing/dong-ho.webp",
     label: "Đông Hồ Folk Art",
     topic: "Vietnamese Traditions",
   },
   {
-    url: "/images/landing/pho-hanoi.jpg",
+    url: "/images/landing/pho-hanoi.webp",
     label: "Traditional Hanoi Phở",
     topic: "Saigon Bánh Mì",
   },

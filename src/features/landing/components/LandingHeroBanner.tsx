@@ -1,9 +1,12 @@
-import React, { useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Pause, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useReducedMotion } from 'motion/react';
 import { PATHS } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
+
+const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || 'https://pub-b59d6caa40b24474b79648789b6c72c9.r2.dev';
+const HERO_BANNER_VIDEO_URL = String(R2_PUBLIC_URL) + '/video/banner/hero-banner-v3.mp4';
 
 interface LandingHeroBannerProps {
   onNavigate?: (view: string) => void;
@@ -16,9 +19,9 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
 }) => {
   const { t } = useTranslation('landing');
   const appNavigate = useAppNavigate();
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const reducedMotion = useReducedMotion();
-  const [isPlaying, setIsPlaying] = useState(!reducedMotion);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const handleNavigate = (path: string) => {
     try {
@@ -31,6 +34,19 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
       console.error('[LandingHeroBanner] Navigation error:', error);
     }
   };
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (reducedMotion) {
+      video.pause();
+    } else {
+      video.play().catch((error: unknown) => {
+        console.error('[LandingHeroBanner] Autoplay prevented or failed:', error);
+        setIsPlaying(false);
+      });
+    }
+  }, [reducedMotion]);
 
   const scrollToStories = () => {
     try {
@@ -47,14 +63,16 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
 
   const toggleVideoPlayback = () => {
     try {
-      const iframe = iframeRef.current;
-      if (!iframe || !iframe.contentWindow) return;
-      const command = isPlaying ? 'pauseVideo' : 'playVideo';
-      iframe.contentWindow.postMessage(
-        JSON.stringify({ event: 'command', func: command, args: [] }),
-        '*'
-      );
-      setIsPlaying(!isPlaying);
+      const video = videoRef.current;
+      if (!video) return;
+      if (video.paused) {
+        video.play().catch((error: unknown) => {
+          console.error('[LandingHeroBanner] Play action failed:', error);
+          setIsPlaying(false);
+        });
+      } else {
+        video.pause();
+      }
     } catch (error) {
       console.error('[LandingHeroBanner] Video toggle error:', error);
     }
@@ -63,20 +81,22 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
   return (
     <section className="landing-hero" aria-labelledby="landing-title">
       <div className="landing-hero-stage landing-hero-stage-fullscreen">
-        {/* Fullscreen Cinematic YouTube Background Video */}
-        <div className="landing-hero-bg-video-wrapper">
-          <iframe
-            ref={iframeRef}
-            className="landing-hero-bg-video landing-hero-youtube-iframe"
-            src={`https://www.youtube-nocookie.com/embed/IlYJvv8ixM4?autoplay=1&mute=1&controls=0&loop=1&playlist=IlYJvv8ixM4&playsinline=1&rel=0&modestbranding=1&enablejsapi=1`}
-            title={t('hero.video_label', { defaultValue: 'Atmospheric cultural video of Vietnamese heritage' })}
-            allow="autoplay; encrypted-media"
-            tabIndex={-1}
-          />
-        </div>
-
-        {/* Interaction shield: Chặn toàn bộ hover, click, controls từ YouTube */}
-        <div className="landing-hero-interaction-shield" aria-hidden="true" />
+        {/* Fullscreen Cinematic Video (Streamed from Cloudflare R2 CDN) */}
+        <video
+          className="landing-hero-bg-video"
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          aria-label={t('hero.video_label', { defaultValue: 'Atmospheric cultural video of Vietnamese heritage' })}
+          tabIndex={-1}
+        >
+          <source src={HERO_BANNER_VIDEO_URL} type="video/mp4" />
+        </video>
 
         {/* Transparent & Asymmetric Cinematic Scrim: Kept clear on the right side */}
         <div className="landing-hero-cinematic-scrim" aria-hidden="true" />

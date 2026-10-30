@@ -21,7 +21,7 @@ export function useReadingBookmark(
     let interacted = false;
     const persist = () => saveReadingBookmark(account, {
       id: article.id, level, title: article.titleEn,
-      image: article.imageUrl || '/images/landing/hoi-an-lanterns.jpg',
+      image: article.imageUrl || '/images/landing/hoi-an-lanterns.webp',
       topic: article.topic, position, updatedAt: Date.now(),
     });
     const restore = () => {

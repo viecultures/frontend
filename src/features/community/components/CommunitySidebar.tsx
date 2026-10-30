@@ -68,7 +68,7 @@ export function CommunitySidebar({
         <div className="space-y-2">
           <div className="w-full rounded-xl overflow-hidden aspect-[16/9] border border-[#E8E2D5] relative group">
             <img
-              src="/images/landing/hue-citadel.jpg"
+              src="/images/landing/hue-citadel.webp"
               alt={t("community.sidebar.challenge_title")}
               className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
             />

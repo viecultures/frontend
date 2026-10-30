@@ -70,7 +70,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 38,
     commentsCount: 3,
-    imageUrl: "/images/landing/hue-citadel.jpg",
+    imageUrl: "/images/landing/hue-citadel.webp",
     imageCaption: "Ngọ Môn Gate at sunrise, Imperial Hue Citadel",
     comments: [
       {
@@ -124,7 +124,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 29,
     commentsCount: 2,
-    imageUrl: "/images/landing/banh-mi.jpg",
+    imageUrl: "/images/landing/banh-mi.webp",
     imageCaption: "Crispy freshly baked baguettes at a street cart in Saigon",
     comments: [
       {
@@ -171,7 +171,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 45,
     commentsCount: 4,
-    imageUrl: "/images/landing/hoi-an-lanterns.jpg",
+    imageUrl: "/images/landing/hoi-an-lanterns.webp",
     imageCaption: "Traditional silk lanterns glowing along the riverside in Hoi An",
     comments: [
       {
@@ -218,7 +218,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 32,
     commentsCount: 3,
-    imageUrl: "/images/landing/dong-ho.jpg",
+    imageUrl: "/images/landing/dong-ho.webp",
     imageCaption: "Đông Hồ traditional folk woodblock prints on scallop-shell Dó paper",
     comments: [
       {
@@ -257,7 +257,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 22,
     commentsCount: 1,
-    imageUrl: "/images/landing/bat-trang.jpg",
+    imageUrl: "/images/landing/bat-trang.webp",
     imageCaption: "Handcrafted ceramics drying in the courtyards of Bát Tràng",
     comments: [
       {
