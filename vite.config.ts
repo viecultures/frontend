@@ -36,6 +36,18 @@ export default defineConfig(({ mode }) => {
               if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) {
                 return "vendor-react";
               }
+              if (id.includes("react-router-dom") || id.includes("react-router") || id.includes("@remix-run")) {
+                return "vendor-router";
+              }
+              if (id.includes("motion") || id.includes("framer-motion")) {
+                return "vendor-motion";
+              }
+              if (id.includes("i18next") || id.includes("react-i18next")) {
+                return "vendor-i18n";
+              }
+              if (id.includes("@vis.gl/react-google-maps")) {
+                return "vendor-maps";
+              }
             }
           },
         },

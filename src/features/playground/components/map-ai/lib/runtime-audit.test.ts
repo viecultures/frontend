@@ -35,7 +35,7 @@ function controllerFixture(t: TestContext) {
     connect: async () => true,
     disconnect: () => { disconnects++; return true; },
     prefill: () => {}, send: parts => { sent.push(parts); },
-    sendToolResponse: () => {}, endAudioInput: () => {}, sendRealtimeInput: () => {},
+    sendToolResponse: () => {}, endAudioInput: () => {}, startActivity: () => {}, endActivity: () => {}, sendRealtimeInput: () => {},
   };
   const audio: ConversationAudioPort = {
     unlock: async () => {}, startMicrophone: async () => {}, stopMicrophone: () => {},

@@ -30,12 +30,12 @@ export const ENGLISH_EDITORIAL: Record<string, { title: string; description: str
 
 // Local copy describes existing lessons; backend stories retain their own editorial copy.
 export const LOCAL_EDITORIAL: Record<string, { title: string; description: string; image?: string }> = {
-  'imperial-hue': { title: 'Bên trong cung đình Huế', description: 'Khám phá kiến trúc cung đình và dấu ấn triều Nguyễn qua những công trình ở Huế.', image: '/images/landing/hue-citadel.jpg' },
-  'hoi-an-lanterns': { title: 'Hội An dưới ánh đèn lồng', description: 'Theo những chiếc đèn lồng tìm hiểu đời sống và nghề thủ công ở phố Hội.', image: '/images/landing/hoi-an-lanterns.jpg' },
-  'dong-ho-paintings': { title: 'Chuyện kể trong tranh Đông Hồ', description: 'Tìm hiểu chất liệu, màu sắc và những câu chuyện dân gian trong tranh Đông Hồ.', image: '/images/landing/dong-ho.jpg' },
-  'saigon-banh-mi': { title: 'Bánh mì và nhịp sống Sài Gòn', description: 'Khám phá những hương vị làm nên chiếc bánh mì quen thuộc giữa phố thị.', image: '/images/landing/banh-mi.jpg' },
-  'bat-trang-pottery': { title: 'Đất và lửa ở Bát Tràng', description: 'Ghé làng gốm Bát Tràng để tìm hiểu bàn tay người thợ và nghề gốm truyền thống.', image: '/images/landing/bat-trang.jpg' },
-  'mu-cang-chai': { title: 'Những mùa vàng Mù Cang Chải', description: 'Tìm hiểu ruộng bậc thang và cuộc sống gắn với núi rừng Tây Bắc.', image: '/images/landing/mu-cang-chai.jpg' },
+  'imperial-hue': { title: 'Bên trong cung đình Huế', description: 'Khám phá kiến trúc cung đình và dấu ấn triều Nguyễn qua những công trình ở Huế.', image: '/images/landing/hue-citadel.webp' },
+  'hoi-an-lanterns': { title: 'Hội An dưới ánh đèn lồng', description: 'Theo những chiếc đèn lồng tìm hiểu đời sống và nghề thủ công ở phố Hội.', image: '/images/landing/hoi-an-lanterns.webp' },
+  'dong-ho-paintings': { title: 'Chuyện kể trong tranh Đông Hồ', description: 'Tìm hiểu chất liệu, màu sắc và những câu chuyện dân gian trong tranh Đông Hồ.', image: '/images/landing/dong-ho.webp' },
+  'saigon-banh-mi': { title: 'Bánh mì và nhịp sống Sài Gòn', description: 'Khám phá những hương vị làm nên chiếc bánh mì quen thuộc giữa phố thị.', image: '/images/landing/banh-mi.webp' },
+  'bat-trang-pottery': { title: 'Đất và lửa ở Bát Tràng', description: 'Ghé làng gốm Bát Tràng để tìm hiểu bàn tay người thợ và nghề gốm truyền thống.', image: '/images/landing/bat-trang.webp' },
+  'mu-cang-chai': { title: 'Những mùa vàng Mù Cang Chải', description: 'Tìm hiểu ruộng bậc thang và cuộc sống gắn với núi rừng Tây Bắc.', image: '/images/landing/mu-cang-chai.webp' },
   'nem-ran-spring-rolls': { title: 'Nem rán trong mâm cơm ngày Tết', description: 'Từ nguyên liệu đến cách cuốn, khám phá món nem rán trong bếp Việt.' },
   'gong-culture-tay-nguyen': { title: 'Âm vang cồng chiêng Tây Nguyên', description: 'Tìm hiểu tiếng cồng chiêng trong sinh hoạt cộng đồng và đời sống tinh thần Tây Nguyên.' },
   'non-la-culture': { title: 'Dưới vành nón lá', description: 'Khám phá chiếc nón lá và nét văn hóa gắn với đời sống người Việt.' },

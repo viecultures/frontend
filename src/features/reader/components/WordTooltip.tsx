@@ -31,9 +31,14 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
   const { t } = useTranslation('reader');
   const [legacySaved, setIsSaved] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [showVietnamese, setShowVietnamese] = useState(false);
   const savedVocabulary = useContext(SavedVocabularyContext);
   const popupRef = useRef<HTMLDivElement>(null);
   const isLight = themeMode === 'paper';
+
+  useEffect(() => {
+    setShowVietnamese(false);
+  }, [isOpen, vocab?.id, vocab?.word]);
 
   const isSaved = savedVocabulary
     ? savedVocabulary.words.some(
@@ -145,10 +150,10 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
   };
 
   // Clamped viewport position calculation
-  const popupWidth = 340;
-  const popupHeight = 280;
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
+  const popupWidth = Math.min(340, viewportWidth - 32);
+  const popupHeight = showVietnamese ? 360 : 300;
 
   let left = position.x - popupWidth / 2;
   if (left < 16) left = 16;
@@ -158,17 +163,18 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
   if (top + popupHeight > viewportHeight - 16) {
     top = Math.max(16, position.y - popupHeight - 16);
   }
+  top = Math.min(top, Math.max(16, viewportHeight - Math.min(popupHeight, viewportHeight - 32) - 16));
 
   const isPhrase = vocab.word.trim().split(/\s+/).length > 1;
 
   return createPortal(
     <div
       ref={popupRef}
-      style={{ top: `${top}px`, left: `${left}px`, width: `${popupWidth}px` }}
+      style={{ top: `${top}px`, left: `${left}px`, width: `${popupWidth}px`, maxHeight: 'calc(100dvh - 32px)' }}
       role="dialog"
       aria-modal="true"
       aria-label={t('dictionary.tooltip_aria', { word: vocab.word, defaultValue: `Vocabulary tooltip: ${vocab.word}` })}
-      className={`word-tooltip in-place-dictionary-popup fixed z-[9999] p-4 rounded-2xl shadow-2xl border backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200 ${
+      className={`word-tooltip in-place-dictionary-popup fixed z-[9999] overflow-y-auto p-4 rounded-2xl shadow-2xl border backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200 ${
         isLight
           ? 'bg-warm-ivory/98 text-heritage-green border-antique-gold/60 shadow-[0_16px_45px_color-mix(in_srgb,_var(--color-heritage-green)_20%,_transparent)]'
           : 'bg-[#141C1A]/98 text-warm-ivory border-antique-gold/80 shadow-[0_16px_50px_rgba(0,0,0,0.8)]'
@@ -241,23 +247,30 @@ export const WordTooltip: React.FC<WordTooltipProps> = ({
           </div>
         ) : (
           <>
-            {/* Vietnamese Translation */}
+            {/* English Definition */}
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#059669] dark:text-[#6EE7B7] block">
-                {t('dictionary.vietnamese_meaning', 'Vietnamese meaning:')}
+              <span className="text-[10px] font-bold uppercase tracking-wider text-heritage-green dark:text-antique-gold block">
+                {t('dictionary.english_definition', 'English definition:')}
               </span>
-              <p className="font-medium mt-0.5 leading-relaxed text-current">{vocab.viMeaning}</p>
+              <p className="opacity-90 mt-0.5 leading-relaxed" lang="en">
+                {vocab.enDefinition || t('dictionary.no_english_definition', 'English definition is not available yet.')}
+              </p>
             </div>
 
-            {/* English Definition */}
-            {vocab.enDefinition && (
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-heritage-green dark:text-antique-gold block">
-                  {t('dictionary.english_definition', 'English Definition:')}
-                </span>
-                <p className="opacity-90 italic mt-0.5 leading-relaxed">{vocab.enDefinition}</p>
-              </div>
-            )}
+            <div>
+              <button type="button" onClick={() => setShowVietnamese(value => !value)} aria-expanded={showVietnamese}
+                className="text-[11px] font-semibold text-[#059669] dark:text-[#6EE7B7] hover:underline cursor-pointer">
+                {showVietnamese ? t('dictionary.hide_vietnamese', 'Hide Vietnamese') : t('dictionary.show_vietnamese', 'Show Vietnamese')}
+              </button>
+              {showVietnamese && (
+                <div className="mt-1" lang="vi">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#059669] dark:text-[#6EE7B7] block">
+                    {t('dictionary.vietnamese_meaning', 'Vietnamese meaning:')}
+                  </span>
+                  <p className="font-medium mt-0.5 leading-relaxed text-current">{vocab.viMeaning}</p>
+                </div>
+              )}
+            </div>
 
             {/* Context Sentence (Context-First Rule) */}
             {vocab.contextSentence && (

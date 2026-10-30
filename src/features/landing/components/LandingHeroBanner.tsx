@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Pause, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useReducedMotion } from 'motion/react';
-import bannerVideo from '@/assets/hero-banner-v3.mp4';
 import { PATHS } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
+
+const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || 'https://pub-b59d6caa40b24474b79648789b6c72c9.r2.dev';
+const HERO_BANNER_VIDEO_URL = String(R2_PUBLIC_URL) + '/video/banner/hero-banner-v3.mp4';
 
 interface LandingHeroBannerProps {
   onNavigate?: (view: string) => void;
@@ -79,7 +81,7 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
   return (
     <section className="landing-hero" aria-labelledby="landing-title">
       <div className="landing-hero-stage landing-hero-stage-fullscreen">
-        {/* Fullscreen Cinematic Background Video */}
+        {/* Fullscreen Cinematic Video (Streamed from Cloudflare R2 CDN) */}
         <video
           className="landing-hero-bg-video"
           ref={videoRef}
@@ -93,7 +95,7 @@ export const LandingHeroBanner: React.FC<LandingHeroBannerProps> = ({
           aria-label={t('hero.video_label', { defaultValue: 'Atmospheric cultural video of Vietnamese heritage' })}
           tabIndex={-1}
         >
-          <source src={bannerVideo} type="video/mp4" />
+          <source src={HERO_BANNER_VIDEO_URL} type="video/mp4" />
         </video>
 
         {/* Transparent & Asymmetric Cinematic Scrim: Kept clear on the right side */}

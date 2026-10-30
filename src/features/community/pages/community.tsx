@@ -70,7 +70,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 38,
     commentsCount: 3,
-    imageUrl: "/images/landing/hue-citadel.jpg",
+    imageUrl: "/images/landing/hue-citadel.webp",
     imageCaption: "Ngọ Môn Gate at sunrise, Imperial Hue Citadel",
     comments: [
       {
@@ -124,7 +124,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 29,
     commentsCount: 2,
-    imageUrl: "/images/landing/banh-mi.jpg",
+    imageUrl: "/images/landing/banh-mi.webp",
     imageCaption: "Crispy freshly baked baguettes at a street cart in Saigon",
     comments: [
       {
@@ -171,7 +171,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 45,
     commentsCount: 4,
-    imageUrl: "/images/landing/hoi-an-lanterns.jpg",
+    imageUrl: "/images/landing/hoi-an-lanterns.webp",
     imageCaption: "Traditional silk lanterns glowing along the riverside in Hoi An",
     comments: [
       {
@@ -218,7 +218,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 32,
     commentsCount: 3,
-    imageUrl: "/images/landing/dong-ho.jpg",
+    imageUrl: "/images/landing/dong-ho.webp",
     imageCaption: "Đông Hồ traditional folk woodblock prints on scallop-shell Dó paper",
     comments: [
       {
@@ -257,7 +257,7 @@ const INITIAL_POSTS: CommunityPost[] = [
     ],
     heartsCount: 22,
     commentsCount: 1,
-    imageUrl: "/images/landing/bat-trang.jpg",
+    imageUrl: "/images/landing/bat-trang.webp",
     imageCaption: "Handcrafted ceramics drying in the courtyards of Bát Tràng",
     comments: [
       {
@@ -494,21 +494,21 @@ export default function CommunityPage() {
   }, [posts, selectedTopic, feedFilter, searchQuery]);
 
   return (
-    <main className="community-ui min-h-screen bg-[#FAF7F0] text-[#314F49] relative">
+    <main className="community-ui min-h-screen bg-surface-muted text-text-body relative">
       {/* Toast Notification */}
       {toastMessage && (
         <div
           role="status"
-          className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-[#1D5046] text-white shadow-lg border border-[#153D35] flex items-center gap-2 text-xs font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap"
+          className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-heritage-green text-white shadow-lg border border-[#153D35] flex items-center gap-2 text-xs font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap"
         >
-          <Check className="w-4 h-4 text-[#E8D7AE] shrink-0" />
+          <Check className="w-4 h-4 text-antique-gold shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* Main Container: 1280px Max Width */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <p className="mb-5 rounded-xl border border-[#E8E2D5] bg-white px-4 py-3 text-sm text-[#314F49]">
+        <p className="mb-5 rounded-xl border border-line bg-white px-4 py-3 text-sm text-text-body">
           {t("community.composer.preview_notice")}
         </p>
         {/* 1. Page Header with Compact Hierarchy */}
@@ -543,7 +543,7 @@ export default function CommunityPage() {
                 setIsEditorOpen(true);
                 window.scrollTo({ top: 100, behavior: "smooth" });
               }}
-              className="p-4 rounded-2xl bg-white border border-[#E8E2D5] shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:border-[#1D5046]/40 transition-all cursor-pointer group space-y-3"
+              className="p-4 rounded-2xl bg-white border border-line shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:border-heritage-green/40 transition-all cursor-pointer group space-y-3"
               role="button"
               tabIndex={0}
               aria-label="Open reflection composer"
@@ -556,28 +556,28 @@ export default function CommunityPage() {
             >
               <div className="flex items-center gap-3">
                 <div
-                  className="w-10 h-10 rounded-full bg-[#1D5046]/10 text-[#1D5046] font-bold text-xs flex items-center justify-center border border-[#1D5046]/20 shrink-0"
+                  className="w-10 h-10 rounded-full bg-heritage-green/10 text-heritage-green font-bold text-xs flex items-center justify-center border border-heritage-green/20 shrink-0"
                   aria-hidden="true"
                 >
                   HV
                 </div>
-                <div className="flex-1 bg-[#FAF7F0] group-hover:bg-[#FAF7F0]/80 border border-[#E8E2D5] rounded-xl px-4 py-2.5 text-xs text-[#6E7B75] transition-colors">
+                <div className="flex-1 bg-surface-muted group-hover:bg-surface-muted/80 border border-line rounded-xl px-4 py-2.5 text-xs text-text-muted transition-colors">
                   <span>{t("community.composer.placeholder")}</span>
                 </div>
               </div>
 
               {/* Quick Actions Row */}
-              <div className="flex items-center justify-between pt-1 border-t border-[#E8E2D5]/60 text-xs">
-                <div className="flex items-center gap-3 text-[#6E7B75]">
-                  <span className="flex items-center gap-1.5 hover:text-[#1D5046] transition-colors">
-                    <ImageIcon className="w-3.5 h-3.5 text-[#1D5046]" />
+              <div className="flex items-center justify-between pt-1 border-t border-line/60 text-xs">
+                <div className="flex items-center gap-3 text-text-muted">
+                  <span className="flex items-center gap-1.5 hover:text-heritage-green transition-colors">
+                    <ImageIcon className="w-3.5 h-3.5 text-heritage-green" />
                     <span className="hidden sm:inline">{t("community.composer.add_photo")}</span>
                   </span>
-                  <span className="flex items-center gap-1.5 hover:text-[#1D5046] transition-colors">
-                    <BookOpen className="w-3.5 h-3.5 text-[#1D5046]" />
+                  <span className="flex items-center gap-1.5 hover:text-heritage-green transition-colors">
+                    <BookOpen className="w-3.5 h-3.5 text-heritage-green" />
                     <span className="hidden sm:inline">{t("community.composer.tag_vocab")}</span>
                   </span>
-                  <span className="flex items-center gap-1.5 hover:text-[#1D5046] transition-colors">
+                  <span className="flex items-center gap-1.5 hover:text-heritage-green transition-colors">
                     <PenLine className="w-3.5 h-3.5 text-antique-gold" />
                     <span className="hidden sm:inline">{t("community.composer.writing_assist")}</span>
                   </span>
@@ -585,7 +585,7 @@ export default function CommunityPage() {
 
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] transition-colors shadow-2xs"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-heritage-green hover:bg-heritage-dark transition-colors shadow-2xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>{t("community.composer.publish")}</span>
@@ -594,7 +594,7 @@ export default function CommunityPage() {
             </div>
 
             {/* 3.2 Feed Stream Filters & Search Bar */}
-            <div className="p-3 rounded-2xl bg-white border border-[#E8E2D5] shadow-[0_2px_8px_rgba(0,0,0,0.03)] space-y-2.5">
+            <div className="p-3 rounded-2xl bg-white border border-line shadow-[0_2px_8px_rgba(0,0,0,0.03)] space-y-2.5">
               {/* Row A: Feed Stream View Modes (For You, Following, Latest, Trending) */}
               <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
                 <div className="flex items-center gap-1">
@@ -603,8 +603,8 @@ export default function CommunityPage() {
                     onClick={() => setFeedFilter("for-you")}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
                       feedFilter === "for-you"
-                        ? "bg-[#1D5046] text-white shadow-2xs"
-                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                        ? "bg-heritage-green text-white shadow-2xs"
+                        : "text-text-muted hover:text-heritage-green hover:bg-surface-muted"
                     }`}
                   >
                     <Compass className="w-3.5 h-3.5" />
@@ -616,8 +616,8 @@ export default function CommunityPage() {
                     onClick={() => setFeedFilter("following")}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
                       feedFilter === "following"
-                        ? "bg-[#1D5046] text-white shadow-2xs"
-                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                        ? "bg-heritage-green text-white shadow-2xs"
+                        : "text-text-muted hover:text-heritage-green hover:bg-surface-muted"
                     }`}
                   >
                     <Users className="w-3.5 h-3.5" />
@@ -629,8 +629,8 @@ export default function CommunityPage() {
                     onClick={() => setFeedFilter("latest")}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
                       feedFilter === "latest"
-                        ? "bg-[#1D5046] text-white shadow-2xs"
-                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                        ? "bg-heritage-green text-white shadow-2xs"
+                        : "text-text-muted hover:text-heritage-green hover:bg-surface-muted"
                     }`}
                   >
                     <Clock className="w-3.5 h-3.5" />
@@ -642,8 +642,8 @@ export default function CommunityPage() {
                     onClick={() => setFeedFilter("trending")}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
                       feedFilter === "trending"
-                        ? "bg-[#1D5046] text-white shadow-2xs"
-                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                        ? "bg-heritage-green text-white shadow-2xs"
+                        : "text-text-muted hover:text-heritage-green hover:bg-surface-muted"
                     }`}
                   >
                     <TrendingUp className="w-3.5 h-3.5 text-antique-gold" />
@@ -653,20 +653,20 @@ export default function CommunityPage() {
 
                 {/* Compact Search Bar */}
                 <div className="relative w-40 sm:w-52 shrink-0">
-                  <Search className="w-3.5 h-3.5 text-[#6E7B75] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-text-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     aria-label={t("community.filters.search_aria")}
                     placeholder={t("community.filters.search_placeholder")}
-                    className="w-full pl-8 pr-7 py-1.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] placeholder:text-[#6E7B75]/70 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white"
+                    className="w-full pl-8 pr-7 py-1.5 rounded-xl bg-surface-muted border border-line text-xs text-text-body placeholder:text-text-muted/70 focus:outline-none focus:ring-1 focus:ring-heritage-green focus:bg-white"
                   />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery("")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[#6E7B75] hover:text-[#1D5046] text-xs cursor-pointer"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-heritage-green text-xs cursor-pointer"
                       aria-label={t("community.filters.clear_search")}
                     >
                       <X className="w-3.5 h-3.5" />
@@ -677,7 +677,7 @@ export default function CommunityPage() {
 
               {/* Row B: Cultural Topic Filter Chips */}
               <div
-                className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-[#E8E2D5]/60"
+                className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-line/60"
                 role="group"
                 aria-label={t("community.filters.filter_topic_aria")}
               >
@@ -689,8 +689,8 @@ export default function CommunityPage() {
                     aria-pressed={selectedTopic === cat.id}
                     className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0 ${
                       selectedTopic === cat.id
-                        ? "bg-[#1D5046]/10 text-[#1D5046] font-bold border border-[#1D5046]/30"
-                        : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0] border border-transparent"
+                        ? "bg-heritage-green/10 text-heritage-green font-bold border border-heritage-green/30"
+                        : "text-text-muted hover:text-heritage-green hover:bg-surface-muted border border-transparent"
                     }`}
                   >
                     {cat.id === "all" ? t("community.filters.all_topics") : cat.label}
@@ -734,11 +734,11 @@ export default function CommunityPage() {
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center rounded-2xl bg-white border border-[#E8E2D5] space-y-2.5">
-                <h3 className="font-serif text-base font-bold text-[#1D5046]">
+              <div className="p-8 text-center rounded-2xl bg-white border border-line space-y-2.5">
+                <h3 className="font-serif text-base font-bold text-heritage-green">
                   {t("community.post.no_posts_found")}
                 </h3>
-                <p className="text-xs text-[#6E7B75] max-w-sm mx-auto">
+                <p className="text-xs text-text-muted max-w-sm mx-auto">
                   {t("community.post.no_posts_desc")}
                 </p>
                 <button
@@ -748,7 +748,7 @@ export default function CommunityPage() {
                     setFeedFilter("for-you");
                     setSearchQuery("");
                   }}
-                  className="mt-2 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] transition-colors"
+                  className="mt-2 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-heritage-green hover:bg-heritage-dark transition-colors"
                 >
                   Reset filters
                 </button>
@@ -807,11 +807,11 @@ export default function CommunityPage() {
           setIsEditorOpen(true);
           window.scrollTo({ top: 100, behavior: "smooth" });
         }}
-        className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[#1D5046] text-white shadow-lg hover:bg-[#153D35] transition-all flex items-center justify-center border border-[#153D35] z-40 focus-ring cursor-pointer"
+        className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-heritage-green text-white shadow-lg hover:bg-heritage-dark transition-all flex items-center justify-center border border-[#153D35] z-40 focus-ring cursor-pointer"
         title="Write a reflection"
         aria-label="Open reflection composer"
       >
-        <Plus className="w-5 h-5 text-[#E8D7AE]" />
+        <Plus className="w-5 h-5 text-antique-gold" />
       </button>
     </main>
   );

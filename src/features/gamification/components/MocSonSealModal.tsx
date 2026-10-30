@@ -1,3 +1,4 @@
+import { Modal } from '@/components/ui/modal';
 import React, { useState, useEffect } from 'react';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
@@ -168,8 +169,8 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-black/80 backdrop-blur-md">
-      <div className="relative w-full max-w-xl bg-warm-ivory text-ink-soft border-4 border-antique-gold rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden my-8">
+    <Modal isOpen={isOpen} onClose={onClose} title="Đóng Mộc Son Hoàn Thành" hideHeader className="max-w-xl bg-warm-ivory text-ink-soft border-4 border-antique-gold rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden my-8" backdropClassName="bg-black/80 backdrop-blur-md">
+
         {/* Close Button */}
         <button
           type="button"
@@ -256,7 +257,7 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
           {isStamped && (
             <div className="mt-4 p-3 rounded-xl bg-antique-gold/15 border border-antique-gold/30 text-left max-w-md w-full flex items-start gap-2.5 animate-in fade-in duration-300">
               <div className="w-7 h-7 rounded-full bg-antique-gold text-heritage-forest flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                🪷
+                <Award size={14} className="text-heritage-forest" />
               </div>
               <div className="text-xs text-stone-700">
                 <p className="font-bold text-heritage-green">Mascot Đồng Hành:</p>
@@ -264,8 +265,8 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
                   "Chúc mừng bạn đã mở khóa thành công Mộc Son <strong>{articleTitle.split(':')[0]}</strong> và nắm vững {wordsLearnedCount} từ vựng mới hôm nay!"
                 </p>
                 {streakResultMsg && (
-                  <p className="mt-1 font-semibold text-[#9E2A2B]">
-                    🔥 {streakResultMsg}
+                  <p className="mt-1 font-semibold text-[#9E2A2B] inline-flex items-center gap-1">
+                    <Flame size={13} className="text-[#9E2A2B]" /> {streakResultMsg}
                   </p>
                 )}
               </div>
@@ -344,8 +345,7 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };
 

@@ -219,20 +219,43 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return () => clearInterval(timer);
   }, []);
 
-  // Fixed light theme (theme trắng)
-  const resolvedTheme: 'light' | 'dark' = 'light';
-  const isDark = false;
+  // Resolve active theme: support 'light' | 'dark' | 'system'
+  const [systemIsDark, setSystemIsDark] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false;
+  });
 
-  // Apply Light Theme & Accent Color to DOM
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const updateSystemDark = (e: MediaQueryListEvent) => setSystemIsDark(e.matches);
+    media.addEventListener('change', updateSystemDark);
+    return () => media.removeEventListener('change', updateSystemDark);
+  }, []);
+
+  const resolvedTheme: 'light' | 'dark' =
+    settings.theme === 'dark'
+      ? 'dark'
+      : settings.theme === 'system'
+        ? (systemIsDark ? 'dark' : 'light')
+        : 'light';
+  const isDark = resolvedTheme === 'dark';
+
+  // Apply Theme & Accent Color to DOM
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('dark');
-    root.style.colorScheme = 'light';
+    if (isDark) {
+      root.classList.add('dark');
+      root.style.colorScheme = 'dark';
+    } else {
+      root.classList.remove('dark');
+      root.style.colorScheme = 'light';
+    }
 
     // Apply accent color as dynamic CSS variable
     root.style.setProperty('--app-accent', settings.accentColor);
     root.style.setProperty('--app-accent-rgb', hexToRgb(settings.accentColor));
-  }, [settings.accentColor]);
+  }, [isDark, settings.accentColor]);
 
   // Persist to localStorage whenever settings change
   useEffect(() => {

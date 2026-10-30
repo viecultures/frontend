@@ -6,6 +6,7 @@
  */
 
 import { create } from 'zustand';
+import type { LiveUsageSample } from './live-cost';
 
 export type LogLevel = 'info' | 'warn' | 'error' | 'success';
 export type LogCategory = 'ws' | 'audio' | 'asr' | 'tool' | 'map' | 'system';
@@ -34,6 +35,7 @@ export const isMapAiDebugEnabled = (): boolean => {
 
 interface MapAiDebugState {
   logs: DebugLogEntry[];
+  usageSamples: LiveUsageSample[];
   maxLogs: number;
   isDrawerOpen: boolean;
   activeTab: 'health' | 'logs' | 'simulator';
@@ -44,6 +46,8 @@ interface MapAiDebugState {
 
   // Actions
   addLog: (entry: Omit<DebugLogEntry, 'id' | 'timestamp'>) => void;
+  recordUsage: (sample: LiveUsageSample) => void;
+  clearUsage: () => void;
   clearLogs: () => void;
   toggleDrawer: () => void;
   setDrawerOpen: (open: boolean) => void;
@@ -57,6 +61,7 @@ let logCounter = 0;
 
 export const useMapAiDebugStore = create<MapAiDebugState>((set, get) => ({
   logs: [],
+  usageSamples: [],
   maxLogs: 300,
   isDrawerOpen: false,
   activeTab: 'health',
@@ -85,6 +90,12 @@ export const useMapAiDebugStore = create<MapAiDebugState>((set, get) => ({
       };
     });
   },
+
+  recordUsage: sample => {
+    if (!isMapAiDebugEnabled()) return;
+    set(state => ({ usageSamples: [sample, ...state.usageSamples].slice(0, 200) }));
+  },
+  clearUsage: () => set({ usageSamples: [] }),
 
   clearLogs: () => set({ logs: [], errorCount: 0 }),
   toggleDrawer: () => set(state => ({ isDrawerOpen: !state.isDrawerOpen })),

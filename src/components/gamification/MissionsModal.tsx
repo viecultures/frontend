@@ -1,3 +1,4 @@
+import { Modal } from '@/components/ui/modal';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -63,26 +64,14 @@ export const MissionsModal: React.FC = () => {
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closeMissions}
-          className="fixed inset-0 bg-black/80 backdrop-blur-md"
-          aria-hidden="true"
-        />
-
-        {/* Modal Window */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          transition={{ type: 'spring', damping: 26, stiffness: 300 }}
-          className="relative w-full max-w-3xl max-h-[90vh] bg-surface dark:bg-heritage-dark border-2 border-antique-gold/40 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.6)] text-text-body dark:text-warm-ivory z-10 flex flex-col overflow-hidden"
-        >
+    <Modal
+      isOpen={isMissionsOpen}
+      onClose={closeMissions}
+      title="Trung Tâm Nhiệm Vụ & Danh Hiệu"
+      hideHeader
+      className="max-w-3xl w-full max-h-[90vh] bg-surface dark:bg-heritage-dark border-2 border-antique-gold/40 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.6)] text-text-body dark:text-warm-ivory flex flex-col p-0 overflow-hidden"
+      backdropClassName="bg-black/80 backdrop-blur-md"
+    >
           {/* ── HEADER ──────────────────────────────────────────────────────── */}
           <div className="p-5 sm:p-6 pb-4 border-b border-line dark:border-white/10 flex items-center justify-between bg-rice-paper/50 dark:bg-black/30">
             <div className="flex items-center gap-3">
@@ -602,9 +591,7 @@ export const MissionsModal: React.FC = () => {
               </div>
             )}
           </div>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+    </Modal>
   );
 };
 

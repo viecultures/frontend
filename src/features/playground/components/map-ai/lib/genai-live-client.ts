@@ -20,6 +20,8 @@ import EventEmitter from 'eventemitter3';
 import { DEFAULT_LIVE_API_MODEL } from './constants';
 import { base64ToArrayBuffer } from './utils';
 import { debugLog } from './debug-logger';
+import { useMapAiDebugStore } from './debug-logger';
+import { makeLiveUsageSample } from './live-cost';
 
 /**
  * Represents a single log entry in the system.
@@ -67,6 +69,12 @@ export class GenAILiveClient {
   protected session?: Session;
   private cancelSetup?: () => void;
   private generation = 0;
+  private usageConnectionId = '';
+  private usageContext: { view: 'chat' | 'immersive' | null; tutorMode: string; voiceInteractionMode: string } = {
+    view: null, tutorMode: '', voiceInteractionMode: '',
+  };
+
+  public setUsageContext(context: typeof this.usageContext) { this.usageContext = context; }
 
   private _status: 'connected' | 'disconnected' | 'connecting' = 'disconnected';
   public get status() {
@@ -87,6 +95,7 @@ export class GenAILiveClient {
     }
 
     this._status = 'connecting';
+    this.usageConnectionId = globalThis.crypto?.randomUUID?.() ?? String(Date.now());
     const generation = ++this.generation;
     const current = () => generation === this.generation;
     let setupTimer: ReturnType<typeof setTimeout>;
@@ -174,6 +183,15 @@ export class GenAILiveClient {
     if (this._status === 'connected' && this.session) this.session.sendRealtimeInput({ audioStreamEnd: true });
   }
 
+  public startActivity() {
+    if (this._status !== 'connected' || !this.session) throw new Error('Phiên chưa sẵn sàng.');
+    this.session.sendRealtimeInput({ activityStart: {} });
+  }
+
+  public endActivity() {
+    if (this._status === 'connected' && this.session) this.session.sendRealtimeInput({ activityEnd: {} });
+  }
+
   public send(parts: Part | Part[], turnComplete: boolean = true) {
     if (this._status !== 'connected' || !this.session) {
       throw new Error('Phiên chưa sẵn sàng. Câu hỏi chưa được gửi.');
@@ -183,7 +201,9 @@ export class GenAILiveClient {
       turns: [{ role: 'user', parts: partsArray }],
       turnComplete,
     });
-    this.log(`client.send`, parts);
+    this.log(`client.send`, partsArray.map(part => part.inlineData
+      ? { mimeType: part.inlineData.mimeType, encodedLength: part.inlineData.data?.length ?? 0 }
+      : part));
   }
 
   public sendRealtimeText(text: string) {
@@ -243,6 +263,20 @@ export class GenAILiveClient {
   }
 
   protected onMessage(message: LiveServerMessage) {
+    if (message.usageMetadata) {
+      const usage = message.usageMetadata;
+      const sample = makeLiveUsageSample(usage, {
+        connectionId: this.usageConnectionId,
+        model: this.model,
+        ...this.usageContext,
+      });
+      useMapAiDebugStore.getState().recordUsage(sample);
+      debugLog.info('Gemini Live token usage', {
+        connectionId: sample.connectionId,
+        estimatedUsd: sample.estimatedUsd,
+        totalTokenCount: sample.totalTokenCount,
+      });
+    }
     if (message.setupComplete) {
       this.emitter.emit('setupcomplete');
       return;

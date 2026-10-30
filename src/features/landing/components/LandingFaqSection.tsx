@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Book, Translate, ArrowRepeat, Mic, ShieldCheck, CheckCircle } from 'react-bootstrap-icons';
+import { ChevronDown, ChevronUp, Book, Languages, RotateCcw, Mic, ShieldCheck, CheckCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface FaqConfigItem {
@@ -17,12 +17,12 @@ const FAQS_CONFIG: FaqConfigItem[] = [
   {
     id: 'faq-2',
     itemKey: 'faq2',
-    icon: <Translate className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
+    icon: <Languages className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
   },
   {
     id: 'faq-3',
     itemKey: 'faq3',
-    icon: <ArrowRepeat className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
+    icon: <RotateCcw className="w-4 h-4 text-antique-gold" aria-hidden="true" />,
   },
   {
     id: 'faq-4',

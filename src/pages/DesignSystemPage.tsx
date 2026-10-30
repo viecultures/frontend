@@ -75,7 +75,7 @@ export default function DesignSystemPage() {
               </div>
               <div className="space-y-4">
                 <p className="text-sm font-medium text-accent-ink">Ẩm thực và đời sống</p>
-                <h2 id="lesson-example" className="font-serif text-3xl leading-snug text-ink">Một buổi sáng ở Hà Nội</h2>
+                <h2 id="lesson-example" className="font-bold text-3xl leading-snug text-ink">Một buổi sáng ở Hà Nội</h2>
                 <p className="max-w-prose text-reading">Trong một con ngõ nhỏ, hương phở nóng hòa cùng tiếng trò chuyện đầu ngày. Khám phá câu chuyện phía sau một món ăn quen thuộc và học cách kể lại bằng tiếng Anh.</p>
               </div>
               <div className="flex flex-wrap items-center gap-3 border-t border-line pt-6">
@@ -100,8 +100,8 @@ export default function DesignSystemPage() {
                 <p className="text-sm text-ink-faint">Tiếng Việt rõ dấu: ă, â, ê, ô, ơ, ư, đ · Trường học, di sản, ký ức.</p>
               </Card>
               <Card className="space-y-4">
-                <p className="text-sm text-ink-faint">Playfair Display · Tiêu đề biên tập</p>
-                <h3 className="font-serif text-3xl text-ink">Chuyện nhỏ, hiểu biết lớn</h3>
+                <p className="text-sm text-ink-faint">Be Vietnam Pro · Tiêu đề nổi bật</p>
+                <h3 className="font-bold text-3xl text-ink">Chuyện nhỏ, hiểu biết lớn</h3>
                 <p className="text-reading">Nội dung học dài dùng cỡ 18px, giãn dòng thoáng và dòng đọc vừa phải.</p>
               </Card>
             </div>

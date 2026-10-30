@@ -336,103 +336,28 @@ export function ReaderReflectionsSection({
           : "bg-surface border-antique-gold/30 text-heritage-green shadow-sm"
       }`}
     >
-      {/* 1. Non-Judgmental English Policy Banner */}
-      <div
-        className={`policy-banner mb-8 p-5 rounded-2xl border flex flex-col md:flex-row items-start md:items-center gap-4 transition-all ${
-          isDark
-            ? "bg-[#1E2E27] border-antique-gold/40 text-warm-ivory"
-            : "bg-rice-paper border-antique-gold/40 text-heritage-green"
-        }`}
-      >
-        <div className="w-12 h-12 rounded-2xl bg-antique-gold/20 flex items-center justify-center shrink-0 border border-antique-gold/40 text-[#1D5046]">
-          <ShieldCheck className="w-6 h-6 text-antique-gold" />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-antique-gold/20 text-antique-gold border border-antique-gold/30">
-              {t("community.reader_reflections.policy_title")}
-            </span>
-            <span className="text-xs font-semibold opacity-75">
-              {t("community.reader_reflections.policy_subtitle")}
-            </span>
-          </div>
-          <p className="text-xs sm:text-sm leading-relaxed opacity-90">
-            {t("community.reader_reflections.policy_desc")}
-          </p>
-        </div>
-        <div className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-antique-gold px-3 py-1.5 rounded-xl bg-antique-gold/10 border border-antique-gold/20">
-          <ShieldCheck className="w-4 h-4 text-antique-gold" />
-          <span>{t("community.reader_reflections.policy_badge")}</span>
-        </div>
-      </div>
-
-      {/* 2. Quick Vocab Toolbar */}
-      {vocabularies && vocabularies.length > 0 && (
-        <div className="quick-vocab-toolbar mb-6">
-          <div className="flex items-center justify-between mb-2.5">
-            <label className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 text-antique-gold">
-              <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-              <span>{t("community.reader_reflections.quick_vocab_title")}</span>
-            </label>
-            <span className="text-[11px] opacity-70">
-              {t("community.reader_reflections.quick_vocab_desc")}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
-            {vocabularies.map((vocab) => {
-              const isUsed = detectedVocab.matchedWords.includes(vocab.word);
-              return (
-                <button
-                  key={vocab.id || vocab.word}
-                  type="button"
-                  onClick={() => handleInsertWord(vocab.word)}
-                  title={vocab.vietnameseMeaning ? `${vocab.word}: ${vocab.vietnameseMeaning}` : vocab.word}
-                  className={`group shrink-0 text-xs px-3 py-1.5 rounded-full border transition-all inline-flex items-center gap-1.5 cursor-pointer ${
-                    isUsed
-                      ? "bg-antique-gold/25 border-antique-gold text-antique-gold font-bold shadow-sm"
-                      : isDark
-                      ? "bg-[#1E2E27] border-line/50 text-warm-ivory hover:border-antique-gold"
-                      : "bg-surface border-line hover:border-antique-gold text-heritage-green hover:bg-rice-paper"
-                  }`}
-                >
-                  <Plus className="w-3 h-3 text-antique-gold group-hover:rotate-90 transition-transform" />
-                  <span className="font-semibold">{vocab.word}</span>
-                  {vocab.vietnameseMeaning && (
-                    <span className="text-[10px] opacity-65 font-normal max-w-[120px] truncate">
-                      ({vocab.vietnameseMeaning})
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {lastInsertedWord && (
-            <div className="text-[11px] text-antique-gold flex items-center gap-1 mt-1 animate-in fade-in">
-              <CheckCircle2 className="w-3 h-3" />
-              <span>{t("community.reader_reflections.inserted_word", { word: lastInsertedWord })}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 3. Reflection Composer */}
-      <form onSubmit={handleSubmitReflection} className="reflection-composer mb-10 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Reflection Composer with Integrated Safe Space Badge & Quick Vocab */}
+      <form onSubmit={handleSubmitReflection} className="reflection-composer mb-8 space-y-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-line/60">
           <div>
-            <h3 className="font-serif text-lg sm:text-xl font-bold flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-antique-gold" />
-              <span>{t("community.reader_reflections.share_title")}</span>
-            </h3>
-            <p className="text-xs opacity-75 mt-0.5">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h3 className="font-sans text-lg font-bold flex items-center gap-2 text-heritage-green dark:text-warm-ivory">
+                <BookOpen className="w-4 h-4 text-antique-gold" />
+                <span>{t("community.reader_reflections.share_title")}</span>
+              </h3>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-antique-gold px-2.5 py-0.5 rounded-full bg-antique-gold/15 border border-antique-gold/30">
+                <ShieldCheck className="w-3.5 h-3.5 text-antique-gold" />
+                <span>{t("community.reader_reflections.policy_badge")}</span>
+              </span>
+            </div>
+            <p className="text-xs opacity-75 mt-1">
               {t("community.reader_reflections.share_desc", { story: postTitle || t("community.reader_reflections.this_story_fallback") })}
             </p>
           </div>
 
           {/* Author Name Input */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="reflection-author" className="text-xs font-semibold opacity-70 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
+            <label htmlFor="reflection-author" className="text-xs font-semibold opacity-70">
               {t("community.reader_reflections.your_name_label")}
             </label>
             <input
@@ -450,22 +375,53 @@ export function ReaderReflectionsSection({
           </div>
         </div>
 
+        {/* Quick Vocab Suggestion Chips (Compact & clean) */}
+        {vocabularies && vocabularies.length > 0 && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+            <span className="text-[11px] font-semibold text-antique-gold uppercase tracking-wider shrink-0 flex items-center gap-1">
+              <Plus className="w-3 h-3 text-antique-gold" /> Gợi ý từ vựng:
+            </span>
+            <div className="flex items-center gap-1.5 overflow-x-auto py-1">
+              {vocabularies.map((vocab) => {
+                const isUsed = detectedVocab.matchedWords.includes(vocab.word);
+                return (
+                  <button
+                    key={vocab.id || vocab.word}
+                    type="button"
+                    onClick={() => handleInsertWord(vocab.word)}
+                    title={vocab.vietnameseMeaning ? `${vocab.word}: ${vocab.vietnameseMeaning}` : vocab.word}
+                    className={`shrink-0 text-[11px] px-2.5 py-1 rounded-full border transition-all inline-flex items-center gap-1 cursor-pointer ${
+                      isUsed
+                        ? "bg-antique-gold/25 border-antique-gold text-antique-gold font-bold shadow-xs"
+                        : isDark
+                        ? "bg-[#1E2E27] border-line/50 text-warm-ivory hover:border-antique-gold"
+                        : "bg-surface border-line hover:border-antique-gold text-heritage-green hover:bg-rice-paper"
+                    }`}
+                  >
+                    <span>+{vocab.word}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Textarea */}
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <textarea
             ref={textareaRef}
             value={reflectionText}
             onChange={(e) => setReflectionText(e.target.value)}
             placeholder={t("community.reader_reflections.textarea_placeholder")}
-            rows={4}
-            className={`w-full p-4 rounded-2xl border text-sm leading-relaxed transition-all focus:outline-none focus:ring-2 focus:ring-antique-gold/50 ${
+            rows={3}
+            className={`w-full p-3.5 rounded-2xl border text-sm leading-relaxed transition-all focus:outline-none focus:ring-2 focus:ring-antique-gold/50 ${
               isDark
                 ? "bg-[#141C18] border-line/60 text-warm-ivory placeholder:text-warm-ivory/40 focus:border-antique-gold"
                 : "bg-surface border-heritage-green/20 text-heritage-green placeholder:text-text-secondary/50 focus:border-antique-gold"
             }`}
           />
 
-          {/* Character Counter & Lemmatized Vocab Indicators */}
+          {/* Composer Footer: Vocab Indicators + Counter + Submit */}
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs px-1">
             <div className="flex items-center gap-2 flex-wrap">
               {detectedVocab.matchedWords.length > 0 ? (
@@ -477,8 +433,9 @@ export function ReaderReflectionsSection({
                   </span>
                 </span>
               ) : (
-                <span className="text-[11px] opacity-65 italic">
-                  {t("community.reader_reflections.vocab_tip")}
+                <span className="text-[11px] opacity-70 italic flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-antique-gold" />
+                  <span>Không gian an toàn · Viết tự do tiếng Anh hoặc song ngữ, không áp lực</span>
                 </span>
               )}
             </div>
@@ -541,7 +498,7 @@ export function ReaderReflectionsSection({
       <div className="reflections-feed space-y-4">
         <div className="flex items-center justify-between border-b border-line pb-3">
           <div className="flex items-center gap-2">
-            <h4 className="font-serif text-base sm:text-lg font-bold">
+            <h4 className="font-sans text-base sm:text-lg font-bold">
               {t("community.reader_reflections.community_voices", { count: reflections.length })}
             </h4>
             <span className="text-[11px] px-2 py-0.5 rounded-full bg-antique-gold/15 text-antique-gold font-bold">

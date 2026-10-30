@@ -117,8 +117,8 @@ const FoodLandingPage: React.FC = () => {
               </motion.div>
             </div>
             <motion.div className="food-hero-art" initial={canAnimate ? { opacity: 0, y: 62, scale: 0.96 } : false} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1.15, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}>
-              <div className="food-hero-arch"><img src="/images/series/pho-hanoi.jpg" alt="A bowl of phở beside Hanoi's Hoàn Kiếm Lake" width="1024" height="576" fetchPriority="high" /></div>
-              <div className="food-hero-inset"><img src="/images/series/bun-cha.jpg" alt="Bún chả with herbs and noodles" width="1024" height="576" /></div>
+              <div className="food-hero-arch"><img src="/images/series/pho-hanoi.webp" alt="A bowl of phở beside Hanoi's Hoàn Kiếm Lake" width="1024" height="576" fetchPriority="high" /></div>
+              <div className="food-hero-inset"><img src="/images/series/bun-cha.webp" alt="Bún chả with herbs and noodles" width="1024" height="576" /></div>
               <div className="food-hero-stamp" aria-hidden="true"><span>01</span><small>Begin with<br />a story</small></div>
               <p className="food-hero-art-caption">A familiar taste. A deeper way to learn.</p>
             </motion.div>

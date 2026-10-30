@@ -17,7 +17,7 @@ function withStorage(check: () => void) {
 }
 
 const bookmark: ReadingBookmark = {
-  id: 'imperial-hue', title: 'Inside Hue', image: '/images/landing/hue-citadel.jpg',
+  id: 'imperial-hue', title: 'Inside Hue', image: '/images/landing/hue-citadel.webp',
   topic: 'Heritage', level: 'Level 1', position: 0.42, updatedAt: 100,
 };
 

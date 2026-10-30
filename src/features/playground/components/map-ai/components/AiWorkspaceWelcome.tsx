@@ -3,18 +3,19 @@ import { useTranslation } from 'react-i18next';
 
 interface AiWorkspaceWelcomeProps {
   hasReading: boolean;
+  openTopic?: boolean;
   actions: { text: string; label: string }[];
   busy: boolean;
   onChoose: (text: string) => void;
 }
 
-export function AiWorkspaceWelcome({ hasReading, actions, busy, onChoose }: AiWorkspaceWelcomeProps) {
+export function AiWorkspaceWelcome({ hasReading, openTopic, actions, busy, onChoose }: AiWorkspaceWelcomeProps) {
   const { t } = useTranslation('playground');
   return (
     <section className="empty-state ai-workspace-welcome" aria-label="Start a conversation">
       <div className="ai-workspace-welcome-title">
         <span><MessageSquareText size={20} /></span>
-        <h2>{hasReading ? t('playground.workspace.welcome_title_reading') : t('playground.workspace.welcome_title_default')}</h2>
+        <h2>{openTopic ? t('playground.workspace.welcome_title_free_talk') : hasReading ? t('playground.workspace.welcome_title_reading') : t('playground.workspace.welcome_title_default')}</h2>
       </div>
       <p>{t('playground.workspace.welcome_prompt')}</p>
       <div className="ai-workspace-starters">
@@ -25,7 +26,7 @@ export function AiWorkspaceWelcome({ hasReading, actions, busy, onChoose }: AiWo
           </button>
         ))}
       </div>
-      <small>{t('playground.workspace.welcome_hint')}</small>
+      <small>{t(openTopic ? 'playground.workspace.welcome_hint_free_talk' : 'playground.workspace.welcome_hint')}</small>
     </section>
   );
 }

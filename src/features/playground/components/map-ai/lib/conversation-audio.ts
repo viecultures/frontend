@@ -29,6 +29,7 @@ export class ConversationAudio implements ConversationAudioPort {
   private recorder: AudioRecorder | null = null;
   private microphoneAttempt = 0;
   private muted = false;
+  private playbackRate = 1;
   private detachRecorder: (() => void) | null = null;
 
   constructor(private readonly update: (state: Partial<AudioState>) => void) {}
@@ -38,6 +39,7 @@ export class ConversationAudio implements ConversationAudioPort {
       const streamer = new AudioStreamer(createAudioContext());
       this.streamer = streamer;
       streamer.setGain(this.muted ? 0 : 1);
+      streamer.setPlaybackRate(this.playbackRate);
       streamer.onComplete = () => {
         if (this.streamer === streamer && !streamer.playing) this.update({ isPlaying: false, volume: 0 });
       };
@@ -97,6 +99,7 @@ export class ConversationAudio implements ConversationAudioPort {
   completePlayback() { this.streamer?.complete(); }
   get playing() { return this.streamer?.playing ?? false; }
   setMuted(muted: boolean) { this.muted = muted; this.streamer?.setGain(muted ? 0 : 1); }
+  setPlaybackRate(rate: number) { this.playbackRate = rate; this.streamer?.setPlaybackRate(rate); }
 
   dispose() {
     this.stopMicrophone();
