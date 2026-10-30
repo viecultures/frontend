@@ -203,7 +203,7 @@ export function FlashcardFlipView({
                   <span className="text-[10px] font-bold uppercase tracking-wider text-antique-bright block mb-1">
                     {t('flip_view.original_context_label', 'Ngữ cảnh văn hóa gốc:')}
                   </span>
-                  <p className="italic font-serif leading-relaxed text-warm-ivory">
+                  <p className="italic font-sans leading-relaxed text-warm-ivory">
                     “{card.contextEn}”
                   </p>
                 </div>

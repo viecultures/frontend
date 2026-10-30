@@ -190,12 +190,17 @@ export function HomeVocabularyCard() {
 
         {/* Word Pills */}
         <div className="home-vocab-pills">
-          {dueWords.map((word) => (
+          {dueWords.slice(0, 4).map((word) => (
             <span key={word} className="home-vocab-pill">
               <span className="home-vocab-pill-dot" aria-hidden="true" />
               {word}
             </span>
           ))}
+          {dueWords.length > 4 && (
+            <span className="home-vocab-pill opacity-75 font-mono text-[11px]">
+              +{dueWords.length - 4} {t('vocabulary_card.more_words', 'khác')}
+            </span>
+          )}
         </div>
 
         {/* Actions */}

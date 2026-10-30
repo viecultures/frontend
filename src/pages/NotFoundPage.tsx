@@ -14,7 +14,7 @@ export const NotFoundPage: React.FC = () => {
         Lỗi 404 • Lạc Bước Hành Trình
       </span>
 
-      <h1 className="font-serif text-3xl sm:text-5xl font-bold text-heritage-green dark:text-warm-ivory tracking-tight max-w-xl">
+      <h1 className="font-sans text-3xl sm:text-5xl font-extrabold text-heritage-green dark:text-warm-ivory tracking-tight max-w-xl">
         Trang Không Tồn Tại
       </h1>
 
