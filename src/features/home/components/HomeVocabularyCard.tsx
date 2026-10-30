@@ -45,9 +45,11 @@ export function HomeVocabularyCard() {
     decks.forEach(deck => {
       deck.cards.forEach(card => {
         const rating = deck.session.ratings[card.id];
-        if (rating === 'mastered') {
+        if (rating === 'mastered' || rating === 'easy') {
           masteredCount++;
-        } else if (rating === 'review') {
+        } else if (rating === 'familiar' || rating === 'good') {
+          familiarCount++;
+        } else if (rating === 'review' || rating === 'hard') {
           reviewingCount++;
         } else {
           learningCount++;
