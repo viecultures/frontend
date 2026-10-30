@@ -455,45 +455,44 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 </button>
               )}
 
-              {/* Practice Options Grid (Streamlined 3-card layout) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-                {/* 1. Study Flashcards */}
-                <Link
-                  href={paths.flashcardStudy({ deck: articleData?.id, level: selectedLevel })}
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all group ${themeMode === "dark"
-                    ? "bg-[#18211E] text-warm-ivory border-antique-gold/20 hover:bg-[#232F2B]"
-                    : "bg-rice-paper text-heritage-green border-heritage-green/12 hover:bg-mist-cloud"
-                    }`}
-                >
-                  <BookOpen className="w-4 h-4 mb-1 text-antique-gold" />
-                  <span className="text-xs font-semibold leading-tight">{t('bilingual.study_flashcards', 'Flashcards')}</span>
-                </Link>
+              <Link
+                href={paths.flashcardStudy({ deck: articleData?.id, level: selectedLevel })}
+                className="reader-practice-primary flex w-full items-center justify-between px-5 py-3.5 rounded-2xl"
+              >
+                <span className="flex items-center gap-2"><BookOpen className="w-4 h-4" /> {t('bilingual.study_flashcards', 'Study vocabulary flashcards')}</span>
+                <ChevronRight className="w-4 h-4 opacity-80" />
+              </Link>
 
-                {/* 2. Practice Dictation */}
-                <button
-                  type="button"
-                  onClick={() => onStartPractice('dictation')}
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer group ${themeMode === "dark"
-                    ? "bg-[#18211E] text-warm-ivory border-antique-gold/20 hover:bg-[#232F2B]"
-                    : "bg-rice-paper text-heritage-green border-heritage-green/12 hover:bg-mist-cloud"
-                    }`}
-                >
-                  <Headphones className="w-4 h-4 mb-1 text-antique-gold" />
-                  <span className="text-xs font-semibold leading-tight">{t('bilingual.practice_dictation', 'Dictation')}</span>
-                </button>
+              {/* Open Dictation with this article. */}
+              <button
+                type="button"
+                onClick={() => onStartPractice('dictation')}
+                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer group ${themeMode === "dark"
+                  ? "bg-[#18211E] text-warm-ivory border-antique-gold/20 hover:bg-[#232F2B]"
+                  : "bg-rice-paper text-heritage-green border-heritage-green/12 hover:bg-mist-cloud"
+                  }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Headphones className="w-4 h-4 text-antique-gold" />
+                  <span>{t('bilingual.practice_dictation', 'Practice dictation')}</span>
+                </span>
+                <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-1 transition-transform" />
+              </button>
 
-                {/* 3. Community Reflection */}
-                <Link
-                  href="/community"
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all group ${themeMode === "dark"
-                    ? "bg-[#18211E] text-warm-ivory border-antique-gold/20 hover:bg-[#232F2B]"
-                    : "bg-rice-paper text-heritage-green border-heritage-green/12 hover:bg-mist-cloud"
-                    }`}
-                >
-                  <PenTool className="w-4 h-4 mb-1 text-antique-gold" />
-                  <span className="text-xs font-semibold leading-tight">{t('bilingual.write_reflection', 'Reflection')}</span>
-                </Link>
-              </div>
+              {/* Community Reflection Link */}
+              <Link
+                href="/community"
+                className={`flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all group ${themeMode === "dark"
+                  ? "bg-[#18211E] text-warm-ivory border-antique-gold/20 hover:bg-[#232F2B]"
+                  : "bg-rice-paper text-heritage-green border-heritage-green/12 hover:bg-mist-cloud"
+                  }`}
+              >
+                <span className="flex items-center gap-2">
+                  <PenTool className="w-4 h-4 text-antique-gold" />
+                  {t('bilingual.write_reflection', 'Write a reflection')}
+                </span>
+                <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
           </div>
         </div>
