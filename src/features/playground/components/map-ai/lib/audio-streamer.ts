@@ -35,6 +35,7 @@ export class AudioStreamer {
   private scheduledTime: number = 0;
   private initialBufferTime: number = 0.1; //0.1 // 100ms initial buffer
   private currentGain: number = 1;
+  private playbackRate = 1;
   // Web Audio API nodes. source => gain => destination
   public gainNode: GainNode;
   public source: AudioBufferSourceNode;
@@ -174,6 +175,7 @@ export class AudioStreamer {
       }
 
       source.buffer = audioBuffer;
+      source.playbackRate.setValueAtTime(this.playbackRate, this.context.currentTime);
       source.connect(this.gainNode);
 
       const worklets = registeredWorklets.get(this.context);
@@ -195,7 +197,7 @@ export class AudioStreamer {
       // Ensure we never schedule in the past
       const startTime = Math.max(this.scheduledTime, this.context.currentTime);
       source.start(startTime);
-      this.scheduledTime = startTime + audioBuffer.duration;
+      this.scheduledTime = startTime + audioBuffer.duration / this.playbackRate;
     }
 
     if (this.audioQueue.length === 0) {
@@ -269,6 +271,10 @@ export class AudioStreamer {
     if (this.gainNode) {
       this.gainNode.gain.setValueAtTime(value, this.context.currentTime);
     }
+  }
+
+  setPlaybackRate(rate: number) {
+    this.playbackRate = rate;
   }
 
   complete() {

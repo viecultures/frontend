@@ -362,6 +362,7 @@
       "audio_output_off": "Audio output off",
       "mute_audio": "Mute audio output",
       "unmute_audio": "Unmute audio output",
+      "playback_rate_title": "AI speech speed: {{rate}}×. Press to change speed",
       "toggle_text_input": "Toggle text input",
       "placeholder_connected": "Type a message…",
       "placeholder_initial": "Type a message to begin…",

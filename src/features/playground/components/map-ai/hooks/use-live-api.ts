@@ -12,6 +12,7 @@ import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 export function useLiveApi({ apiKey, activeView }: { apiKey: string; activeView: ActiveView }) {
   const model = useSettings(state => state.model);
   const speakerMuted = useUI(state => state.speakerMuted);
+  const aiPlaybackRate = useSettings(state => state.aiPlaybackRate);
   const runtime = useMemo(() => {
     // Defer missing-key validation to a user action so the map remains usable offline.
     const client = new GenAILiveClient(apiKey || 'missing-key', model);
@@ -66,6 +67,7 @@ export function useLiveApi({ apiKey, activeView }: { apiKey: string; activeView:
   }, [controller]);
   useLayoutEffect(() => { controller.setActiveView(activeView); }, [controller, activeView]);
   useLayoutEffect(() => { audio.setMuted(speakerMuted); }, [audio, speakerMuted]);
+  useLayoutEffect(() => { audio.setPlaybackRate(activeView === 'chat' ? aiPlaybackRate : 1); }, [audio, activeView, aiPlaybackRate]);
 
   return {
     ...state, activeView,
