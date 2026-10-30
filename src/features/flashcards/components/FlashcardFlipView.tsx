@@ -235,10 +235,10 @@ export function FlashcardFlipView({
         </div>
       )}
 
-      {/* Back Face: Anki 4-Level Spaced Repetition Rating Buttons */}
+      {/* Match the rating choices to the review session that owns this card. */}
       {isFlipped && (
         <div className="vocab-anki-ratings pt-1 animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {onRate ? <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {/* 1. Again */}
             <button
               type="button"
@@ -310,10 +310,20 @@ export function FlashcardFlipView({
                 </kbd>
               </div>
             </button>
-          </div>
-
-          <p className="text-center text-[11px] text-ink-soft mt-2">
-            {t('flip_view.space_good_hint', 'Phím tắt: 1 Quên · 2 Khó · 3 Tốt (Space) · 4 Dễ')}
+          </div> : <div className="vocab-review-actions">
+            <button type="button" onClick={onReviewLater}>
+              <RotateCcw size={18} aria-hidden="true" />
+              <span>{t('flip_view.btn_forgot', 'Needs review')}</span>
+              <kbd aria-hidden="true">1</kbd>
+            </button>
+            <button type="button" onClick={onMastered}>
+              <CheckCircle2 size={18} aria-hidden="true" />
+              <span>{t('flip_view.btn_remembered', 'Remembered')}</span>
+              <kbd aria-hidden="true">2</kbd>
+            </button>
+          </div>}
+          <p className="text-center text-xs text-ink-soft mt-3">
+            {onRate ? t('flip_view.space_good_hint', 'Hotkeys: 1 Again · 2 Hard · 3 Good · 4 Easy') : t('flip_view.binary_hint', 'Choose how well you remembered this word.')}
           </p>
         </div>
       )}

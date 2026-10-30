@@ -46,6 +46,7 @@
     "anki_review": "Đã thuộc",
     "sample_decks_title": "Bộ Thẻ Bài Học Mẫu",
     "sample_decks_subtitle": "Khám phá các chủ đề di sản và nét đẹp văn hóa Việt Nam",
+    "browse_library": "Thư viện từ vựng",
     "switch_deck": "Đổi bộ thẻ",
     "current_deck": "Bộ thẻ hiện tại",
     "explore_samples": "Xem các bộ thẻ mẫu"
@@ -71,8 +72,11 @@
     "featured_title_emphasis": "thoáng nét Huế xưa.",
     "featured_desc": "Khám phá kiến trúc hoàng cung Huế qua từng tấm thẻ từ vựng.",
     "start_learning": "Bắt đầu học",
+    "quick_actions_aria": "Bắt đầu học từ vựng",
     "explore_decks": "Khám phá các bộ thẻ",
     "explore_decks_subtitle": "{{count}} bộ thẻ · 5 chủ đề văn hóa",
+    "review_saved": "Ôn từ đã lưu",
+    "review_saved_count": "{{count}} từ sẵn sàng để ôn",
     "create_deck": "Tạo bộ thẻ cá nhân",
     "create_deck_subtitle": "Lưu giữ những từ vựng bạn muốn ghi nhớ",
     "catalog_eyebrow": "HỌC NGOẠI NGỮ QUA DI SẢN",
@@ -85,9 +89,11 @@
     "btn_custom_deck": "Tạo bộ thẻ cá nhân"
   },
   "saved_decks": {
-    "title": "Sổ tay từ vựng của bạn",
-    "subtitle": "Các từ bạn chọn lưu trong bài đọc · Lưu trên trình duyệt này",
-    "words_count": "{{count}} từ đã lưu"
+    "eyebrow": "BỘ SƯU TẬP CỦA BẠN",
+    "title": "Từ đã lưu từ bài đọc",
+    "subtitle": "Danh sách ôn tập của bạn · Lưu trên trình duyệt này",
+    "words_count": "{{count}} từ đã lưu",
+    "review_action": "Ôn từ đã lưu"
   },
   "summary": {
     "aria_label": "Tổng kết phiên ôn tập",
@@ -135,8 +141,9 @@
     "key_space": "Space",
     "show_answer": "Hiện đáp án",
     "space_good_hint": "Phím tắt: 1 Quên · 2 Khó · 3 Tốt (Space) · 4 Dễ",
-    "btn_forgot": "Cần ôn lại (Forgot)",
-    "btn_remembered": "Đã nhớ (Remembered)",
+    "binary_hint": "Chọn mức độ bạn nhớ từ này. Có thể dùng phím 1 hoặc 2.",
+    "btn_forgot": "Cần ôn lại",
+    "btn_remembered": "Đã nhớ",
     "aria_front": "Tiếng Anh: {{word}}. Lật thẻ để xem giải nghĩa.",
     "aria_back": "Nghĩa: {{meaning}}. Lật thẻ để xem từ tiếng Anh."
   },

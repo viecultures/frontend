@@ -243,10 +243,10 @@
     "reader_reflections": {
       "section_aria": "Community Reflections",
       "policy_title": "No-Judgment Learning Policy",
-      "policy_subtitle": "Chính sách không phán xét ngữ pháp",
+      "policy_subtitle": "Non-judgmental grammar policy",
       "policy_desc": "49% of learners fear making language errors. At VieCultures, authentic cultural sharing comes first. Write freely in English, Vietnamese, or both — no red pen, no grades, no pressure. Every attempt to express your heritage is celebrated.",
       "policy_badge": "Safe Space",
-      "quick_vocab_title": "Quick Vocab Toolbar • Chèn nhanh từ vựng bài học",
+      "quick_vocab_title": "Quick Vocab Toolbar • Insert lesson vocabulary",
       "quick_vocab_desc": "Tap a word to insert into your reflection",
       "inserted_word": "Inserted \"{{word}}\" into editor!",
       "share_title": "Share your cultural reflection",
@@ -272,7 +272,18 @@
       "vocab_applied": "Vocab applied:",
       "space_label": "Non-judgmental community space",
       "encourage_aria": "Encourage reflection",
-      "support_label": "support"
+      "support_label": "support",
+      "vocab_suggestions_label": "Vocab suggestions:",
+      "safe_space_tip": "Safe space · Write freely in English or bilingually, zero pressure",
+      "ugc_feed_badge": "UGC Feed",
+      "default_author": "VieCultures learner",
+      "roles": {
+        "learner": "VieCultures learner",
+        "intl": "International learner",
+        "enthusiast": "Heritage enthusiast",
+        "community": "Community Learner",
+        "moderator": "Moderator"
+      }
     },
     "toasts": {
       "comment_added": "Comment added to this preview only.",
