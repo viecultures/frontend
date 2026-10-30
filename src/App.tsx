@@ -15,10 +15,10 @@ import { LanguageRouteLayout } from '@/layouts/LanguageRouteLayout';
 // Route Guards
 import { RequireAuth, RequireRole, GuestOnly } from '@/routes/guards';
 
-// Primary Entry Pages
-import LandingPage from '@/features/landing/pages/landing';
+// Primary Entry Pages (Lazy-loaded for bundle performance)
+const LandingPage = React.lazy(() => import('@/features/landing/pages/landing'));
 const FoodLandingPage = React.lazy(() => import('@/features/landing/pages/FoodLandingPage'));
-import LoginPage from '@/features/auth/pages/login';
+const LoginPage = React.lazy(() => import('@/features/auth/pages/login'));
 
 // Lazy-loaded Feature Pages (Bundle Optimization)
 const HomePage = React.lazy(() => import('@/features/home/pages/home'));
