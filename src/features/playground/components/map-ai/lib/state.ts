@@ -30,9 +30,10 @@ export interface SVGCameraTarget {
 }
 
 export type ConversationMode = 'discussion' | 'comprehension' | 'shadowing' | 'interview';
-export type CulturalTutorMode = 'guided-lesson' | 'free-conversation';
+export type CulturalTutorMode = 'guided-lesson' | 'free-conversation' | 'open-conversation';
 export type CorrectionMode = 'off' | 'after-turn' | 'end-of-session';
 export type MapContextMode = 'off' | 'on-demand' | 'always';
+export type VoiceInteractionMode = 'natural' | 'push-to-talk';
 
 /**
  * Settings Store
@@ -47,6 +48,7 @@ export const useSettings = create<{
   tutorMode: CulturalTutorMode;
   correctionMode: CorrectionMode;
   mapContextMode: MapContextMode;
+  voiceInteractionMode: VoiceInteractionMode;
   customGeminiApiKey: string;
   theme: 'dark' | 'light';
   setSystemPrompt: (prompt: string) => void;
@@ -58,6 +60,7 @@ export const useSettings = create<{
   setTutorMode: (mode: CulturalTutorMode) => void;
   setCorrectionMode: (mode: CorrectionMode) => void;
   setMapContextMode: (mode: MapContextMode) => void;
+  setVoiceInteractionMode: (mode: VoiceInteractionMode) => void;
   setCustomGeminiApiKey: (key: string) => void;
   setTheme: (theme: 'dark' | 'light') => void;
 }>(set => ({
@@ -70,6 +73,7 @@ export const useSettings = create<{
   tutorMode: 'free-conversation',
   correctionMode: readPreference('correction', ['off', 'after-turn', 'end-of-session'] as const, 'off'),
   mapContextMode: 'on-demand',
+  voiceInteractionMode: readPreference('voice_interaction', ['natural', 'push-to-talk'] as const, 'natural'),
   customGeminiApiKey:
     typeof window !== 'undefined'
       ? localStorage.getItem('custom_gemini_api_key') || ''
@@ -87,6 +91,7 @@ export const useSettings = create<{
   setTutorMode: tutorMode => set({ tutorMode }),
   setCorrectionMode: correctionMode => { savePreference('correction', correctionMode); set({ correctionMode }); },
   setMapContextMode: mapContextMode => set({ mapContextMode }),
+  setVoiceInteractionMode: voiceInteractionMode => { savePreference('voice_interaction', voiceInteractionMode); set({ voiceInteractionMode }); },
   setCustomGeminiApiKey: customGeminiApiKey => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('custom_gemini_api_key', customGeminiApiKey);

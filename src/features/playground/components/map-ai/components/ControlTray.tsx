@@ -17,7 +17,7 @@ import {
   Keyboard,
   Send,
 } from 'lucide-react';
-import { useLogStore, useUI } from '../lib/state';
+import { useLogStore, useUI, useSettings } from '../lib/state';
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 
@@ -45,7 +45,10 @@ export type ControlTrayProps = {
 
 export function ControlTray({ trayRef }: ControlTrayProps) {
   const { t } = useTranslation('playground');
-  const { speakerMuted, toggleSidebar } = useUI();
+  const { speakerMuted, toggleSidebar, isSidebarOpen } = useUI();
+  const voiceInteractionMode = useSettings(state => state.voiceInteractionMode);
+  const pushToTalk = voiceInteractionMode === 'push-to-talk';
+  const heldKey = useRef(false);
   const [textPrompt, setTextPrompt] = useState('');
   const handoffRevision = useReaderHandoff(state => state.draftRevision);
   const connectButtonRef = useRef<HTMLButtonElement>(null);
@@ -79,12 +82,14 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     isRestoringContext, isAwaitingResponse, isPlaying, recording, inputVolume,
     startConversation, resumeConversation, sendMessage, stopConversation,
     endConversation, setMicrophoneEnabled, setSpeakerMuted, retry,
+    pressPushToTalk, releasePushToTalk,
   } = useLiveAPIContext();
   const active = activeView === 'chat';
   const busy = connecting || ending || isSending || isRestoringContext;
   const muted = !recording;
   const hasHistory = turns.some(turn => turn.role !== 'system');
   const handleMicClick = () => {
+    if (pushToTalk) return;
     if (!active || busy) return;
     if (!connected) {
       if (hasHistory) {
@@ -96,6 +101,38 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     }
     void setMicrophoneEnabled(!recording);
   };
+
+  useEffect(() => {
+    if (!active || !pushToTalk) return;
+    const release = () => {
+      if (!heldKey.current) return;
+      heldKey.current = false;
+      releasePushToTalk();
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== 'KeyV' || event.repeat || heldKey.current || isSidebarOpen ||
+        event.ctrlKey || event.altKey || event.metaKey ||
+        (event.target instanceof HTMLElement && !!event.target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]'))) return;
+      event.preventDefault();
+      heldKey.current = true;
+      void pressPushToTalk();
+    };
+    const onKeyUp = (event: KeyboardEvent) => {
+      if (event.code === 'KeyV' && heldKey.current) { event.preventDefault(); release(); }
+    };
+    const onVisibilityChange = () => { if (document.hidden) release(); };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', release);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      release();
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', release);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [active, pushToTalk, isSidebarOpen, pressPushToTalk, releasePushToTalk]);
 
   const sendTextPrompt = async () => {
     console.log('[ControlTray] sendTextPrompt triggered:', { textPrompt, active, busy });
@@ -131,7 +168,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     toggleSidebar();
   };
 
-  const micButtonTitle = muted ? t('playground.tray.mic_on_title') : t('playground.tray.mic_off_title');
+  const micButtonTitle = pushToTalk ? t('playground.tray.hold_to_talk') : muted ? t('playground.tray.mic_on_title') : t('playground.tray.mic_off_title');
   const connectButtonTitle = connected || connecting || ending ? t('playground.tray.pause_convo_title') : hasHistory ? t('playground.tray.resume_convo_title') : t('playground.tray.start_speaking_title');
 
   if (!active) return null;
@@ -139,7 +176,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   return (
     <section className="control-tray" ref={trayRef}>
       <div role="status" className="px-3 py-1 text-xs text-slate-400">
-        {connecting ? t('playground.tray.connecting') : ending ? t('playground.tray.wrapping_up') : isRestoringContext ? t('playground.tray.restoring_context') : isPlaying ? t('playground.tray.ai_speaking') : isAwaitingResponse || isSending ? t('playground.tray.waiting_reply') : connected ? recording ? t('playground.tray.listening') : t('playground.tray.mic_off') : hasHistory ? t('playground.tray.paused') : t('playground.tray.ready')}
+        {connecting ? t('playground.tray.connecting') : ending ? t('playground.tray.wrapping_up') : isRestoringContext ? t('playground.tray.restoring_context') : isPlaying ? t('playground.tray.ai_speaking') : isAwaitingResponse || isSending ? t('playground.tray.waiting_reply') : pushToTalk ? recording ? t('playground.tray.release_to_reply') : t('playground.tray.hold_to_talk') : connected ? recording ? t('playground.tray.listening') : t('playground.tray.mic_off') : hasHistory ? t('playground.tray.paused') : t('playground.tray.ready')}
         {recording && <meter className="ml-2 w-16" min={0} max={1} value={inputVolume} aria-label={t('playground.tray.mic_meter_aria')} />}
         {connectionError && <div role="alert">{connectionError} <button type="button" disabled={busy} onClick={() => void handleRetry()}>{t('playground.tray_controls.retry')}</button></div>}
         {connected && !busy && <button type="button" className="ml-3 underline" onClick={() => void endConversation()}>{t('playground.tray_controls.finish_recap')}</button>}
@@ -191,8 +228,17 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             'mic-on': !muted,
             'mic-off': muted,
           })}
-          disabled={busy}
+          disabled={busy && !pushToTalk}
           onClick={handleMicClick}
+          onPointerDown={event => {
+            if (!pushToTalk || event.button !== 0) return;
+            event.preventDefault();
+            event.currentTarget.setPointerCapture(event.pointerId);
+            void pressPushToTalk();
+          }}
+          onPointerUp={() => { if (pushToTalk) releasePushToTalk(); }}
+          onPointerCancel={() => { if (pushToTalk) releasePushToTalk(); }}
+          onLostPointerCapture={() => { if (pushToTalk) releasePushToTalk(); }}
           title={micButtonTitle}
           aria-label={micButtonTitle}
         >

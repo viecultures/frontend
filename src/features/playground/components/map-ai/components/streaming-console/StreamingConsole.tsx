@@ -4,6 +4,7 @@
 
 import React, { memo } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useTranslation } from 'react-i18next';
 import remarkGfm from 'remark-gfm';
 
 import { useLiveAPIContext } from '../../contexts/LiveAPIContext';
@@ -16,9 +17,7 @@ import { useMapStore } from '../../lib/map-state';
 import { useChatWorkspace } from '../../lib/chat-workspace';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { User, MessageSquareText, RefreshCw, BookOpen, Compass, MapPin, Clock, ExternalLink } from 'lucide-react';
-import { findLessonById, LESSON_AGENT_CATALOG, type LessonAgentMetadata } from '@/data/lessonAgentCatalog';
 import type { ProficiencyLevel } from '../../lib/prompt-scaffolder';
-import AiMapLessonProgressBar from '../AiMapLessonProgressBar';
 import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
 import { useTimelineSelection } from './useTimelineSelection';
 import { maskProfanity } from '@/utils/dictionary-service';
@@ -86,54 +85,21 @@ const formatTimestamp = (date: Date) => {
   return `${hours}:${minutes}:${seconds}`;
 };
 
-// Lesson Prompt Recommendations Map (Strictly SVG icons / Clean text)
-const LESSON_QUICK_ACTIONS: Record<string, Array<{ text: string; label: string }>> = {
-  'pho-hanoi-history': [
-    { text: 'Can you summarize the main story of Hanoi Pho in English?', label: 'Hanoi phở broth' },
-    { text: 'How does Hanoi-style Pho differ from Southern Vietnamese Pho?', label: 'Northern & Southern phở' },
-    { text: 'Let’s practice using the phrase "culinary heritage" in a natural sentence.', label: 'Practise “culinary heritage”' },
-    { text: 'Could you ask me a comprehension question about Hanoi Pho?', label: 'Listening quiz' },
-  ],
-  'ha-long-bay': [
-    { text: 'Why is Ha Long Bay recognized as a UNESCO World Natural Heritage site?', label: 'Ha Long Bay' },
-    { text: 'Tell me the legend of the descending dragons in English.', label: 'The dragon legend' },
-    { text: 'Let’s practice discussing sustainable tourism in Ha Long Bay.', label: 'Sustainable tourism' },
-  ],
-  'gong-culture-tay-nguyen': [
-    { text: 'Tell me about the UNESCO Gong Culture in Central Highlands.', label: 'Gong culture' },
-    { text: 'What spiritual role do bronze gongs play in ethnic minority communities?', label: 'Spiritual traditions' },
-    { text: 'Let’s practice using the phrase "intangible heritage" in a sentence.', label: 'Practise “intangible heritage”' },
-  ],
-  'non-la-culture': [
-    { text: 'What makes the Hue poem-hat (nón bài thơ) so special in Vietnamese culture?', label: 'Hue poem hats' },
-    { text: 'Let’s practice describing traditional craft materials in English.', label: 'Traditional hat making' },
-  ],
-  'my-son-sanctuary': [
-    { text: 'Tell me about the ancient Champa brick towers at My Son Sanctuary.', label: 'My Son Sanctuary' },
-    { text: 'What architectural mystery makes Champa mortarless brickwork unique?', label: 'Champa brickwork' },
-  ],
-  'floating-markets-mekong': [
-    { text: 'How does Cai Rang Floating Market operate early in the morning?', label: 'Cai Rang floating market' },
-    { text: 'What is a "cay beo" bamboo sample pole used for?', label: 'Floating market signs' },
-  ],
-  'nem-ran-spring-rolls': [
-    { text: 'What ingredients make traditional northern Nem Ran so crispy?', label: 'Crispy spring rolls' },
-    { text: 'Let’s roleplay explaining how to wrap Vietnamese spring rolls in English.', label: 'Describe wrapping spring rolls' },
-  ],
-  'dong-ho-paintings': [
-    { text: 'How do Dong Ho village artisans make natural colors from plants and shells?', label: 'Natural colours in Dong Ho prints' },
-    { text: 'What cultural blessings do traditional woodblock prints represent?', label: 'Traditional blessings' },
-  ],
-};
-
 export default function StreamingConsole() {
+  const { t } = useTranslation('playground');
   const {
     activeView, connected, sendMessage, changeLevel, connecting, ending,
-    isSending, isRestoringContext, isAwaitingResponse,
+    isSending, isRestoringContext, isAwaitingResponse, resetConversation,
   } = useLiveAPIContext();
   const active = activeView === 'chat';
   const busy = !active || connecting || ending || isSending || isRestoringContext;
-  const { activeLessonId, proficiencyLevel, tutorMode } = useSettings();
+  const { proficiencyLevel, tutorMode } = useSettings();
+  React.useEffect(() => {
+    if (active && tutorMode === 'guided-lesson' && !connected && !busy) {
+      resetConversation();
+      useSettings.getState().setTutorMode('free-conversation');
+    }
+  }, [active, tutorMode, connected, busy, resetConversation]);
   const readerContext = useReaderHandoff(state => state.context);
   const turns = useLogStore(state => state.turns);
   const sessionId = useLogStore(state => state.sessionMetadata?.sessionId);
@@ -146,11 +112,25 @@ export default function StreamingConsole() {
 
   const [searchParams] = useSearchParams();
   const storyParam = searchParams.get('story');
-  const targetLessonId = storyParam || readerContext?.articleId || activeLessonId;
+  const selectedArticleId = useMapStore(state => state.selectedLandmarkId);
+  const selectedArticle = VIETNAM_LANDMARKS.find(item => item.id === selectedArticleId);
+  const selectedStoryId = readerContext?.articleId || selectedArticleId || storyParam || undefined;
+  const sessionStoryIdRef = React.useRef(selectedStoryId);
+  if (turns.length === 0 && !connected) sessionStoryIdRef.current = selectedStoryId;
+  const targetLessonId = tutorMode === 'free-conversation' ? sessionStoryIdRef.current : undefined;
+  React.useEffect(() => {
+    if (tutorMode === 'free-conversation' && !connected && !busy && sessionStoryIdRef.current !== selectedStoryId) {
+      resetConversation();
+      sessionStoryIdRef.current = selectedStoryId;
+    }
+  }, [selectedStoryId, tutorMode, connected, busy, resetConversation]);
 
   // Hydrate chat history from backend companionService on entering AI Workspace
   const isHydratedRef = React.useRef(false);
   React.useEffect(() => {
+    isHydratedRef.current = false;
+    lastSavedTurnCountRef.current = 0;
+    if (!targetLessonId) return;
     let isCancelled = false;
     const hydrateHistory = async () => {
       try {
@@ -187,7 +167,7 @@ export default function StreamingConsole() {
   // Synchronize new user or agent turns in AI Workspace back to companionService backend
   const lastSavedTurnCountRef = React.useRef(0);
   React.useEffect(() => {
-    if (!isHydratedRef.current) return;
+    if (!targetLessonId || !isHydratedRef.current) return;
     const completedDialogue = turns.filter(
       (t) => (t.role === 'user' || t.role === 'agent') && t.text.trim() && t.isFinal
     );
@@ -216,26 +196,30 @@ export default function StreamingConsole() {
       });
   }, [turns, targetLessonId]);
 
-  const activeLesson: LessonAgentMetadata =
-    findLessonById(activeLessonId) || LESSON_AGENT_CATALOG[0];
   const displayedTurns = showSystemMessages ? turns : turns.filter(turn => turn.role !== 'system');
-
-  const guidedActions =
-    LESSON_QUICK_ACTIONS[activeLesson.id] || [
-      { text: `Tell me about the history and importance of ${activeLesson.vietnameseTitle}.`, label: `Explore the story` },
-      { text: `What key English vocabulary should I know about this cultural topic?`, label: `Practise vocabulary` },
-      { text: `Let's practice discussing ${activeLesson.vietnameseTitle} together.`, label: `Start a conversation` },
-    ];
-  const conversationActions = readerContext ? [
-    { text: `Let's practise speaking about “${readerContext.title}”. Keep your turns brief so I can speak.`, label: 'Talk about this story' },
-    { text: `Help me express my opinion about “${readerContext.title}” in English.`, label: 'Express an opinion' },
+  const storyTitle = readerContext?.title || selectedArticle?.title;
+  const conversationActions = storyTitle ? [
+    { text: `Let's practise speaking about “${storyTitle}”. Keep your turns brief so I can speak.`, label: 'Talk about this story' },
+    { text: `Help me express my opinion about “${storyTitle}” in English.`, label: 'Express an opinion' },
+    { text: `What useful English words help me discuss “${storyTitle}”?`, label: 'Practise vocabulary' },
   ] : [
-    { text: 'Let’s have a natural conversation about Vietnamese food and regional flavors.', label: 'Food & flavours' },
-    { text: 'Let’s talk about a Vietnamese festival and what it means to local people.', label: 'Festivals' },
-    { text: 'Let’s discuss Vietnamese family traditions in everyday life.', label: 'Family & everyday life' },
-    { text: 'Let’s compare cultural life in Northern, Central, and Southern Vietnam.', label: 'Compare the regions' },
+    { text: 'Help me choose a story from the VieCultures library to practise speaking.', label: 'Choose a story' },
+    { text: 'Show me a cultural article about Vietnamese food to discuss.', label: 'Explore food stories' },
+    { text: 'Show me a story about a Vietnamese place or tradition.', label: 'Explore places and traditions' },
   ];
-  const quickActions = tutorMode === 'free-conversation' ? conversationActions : guidedActions;
+  const freeTalkActions = [
+    { text: 'Let’s have a natural conversation. Ask me about something I enjoy.', label: 'Start chatting' },
+    { text: 'Tell me a vivid short story, then let me choose what happens next.', label: 'Create a story' },
+    { text: 'Let’s roleplay a real situation in English. Help me find natural words.', label: 'Roleplay' },
+    { text: 'I have an idea to write. Help me express it clearly in English.', label: 'Write together' },
+  ];
+  const quickActions = tutorMode === 'open-conversation' ? freeTalkActions : conversationActions;
+
+  const handleModeChange = (mode: typeof tutorMode) => {
+    if (connected || busy || tutorMode === mode) return;
+    resetConversation();
+    useSettings.getState().setTutorMode(mode);
+  };
 
   const handleSendPrompt = async (text: string) => {
     if (!busy) await sendMessage({ text, source: 'suggestion' });
@@ -260,10 +244,12 @@ export default function StreamingConsole() {
 
   return (
     <div className="transcription-container flex flex-col h-full">
-      <AiMapLessonProgressBar />
-      <AiWorkspaceChatHeader title={tutorMode === 'free-conversation' ? readerContext?.title || 'English through Vietnamese culture' : activeLesson.title}
+      <AiWorkspaceChatHeader title={tutorMode === 'open-conversation' ? t('playground.chat_header.free_talk') : storyTitle || t('playground.chat_header.choose_story')}
         mode={tutorMode} level={proficiencyLevel} busy={busy} connected={connected}
-        onModeChange={mode => useSettings.getState().setTutorMode(mode)} onLevelChange={level => void handleLevelSwitch(level)} />
+        onModeChange={handleModeChange} onLevelChange={level => void handleLevelSwitch(level)} />
+      {connected && tutorMode === 'free-conversation' && selectedStoryId !== sessionStoryIdRef.current && (
+        <p className="px-4 py-2 text-xs text-amber-300">{t('playground.chat_header.story_changed')}</p>
+      )}
 
       {/* Message Timeline */}
       <div
@@ -275,9 +261,9 @@ export default function StreamingConsole() {
         onMouseUp={handleTextSelection}
         onDoubleClick={handleTextSelection}
       >
-        <ReaderWorkspaceReference active={active} />
+        <ReaderWorkspaceReference active={active && tutorMode === 'free-conversation'} />
         {displayedTurns.length === 0 && !isAwaitingFunctionResponse ? (
-          <AiWorkspaceWelcome hasReading={!!readerContext || tutorMode === 'guided-lesson'} actions={quickActions} busy={busy} onChoose={text => void handleSendPrompt(text)} />
+          <AiWorkspaceWelcome hasReading={tutorMode === 'free-conversation' && !!(readerContext || selectedArticle)} openTopic={tutorMode === 'open-conversation'} actions={quickActions} busy={busy} onChoose={text => void handleSendPrompt(text)} />
         ) : (
           <>
             {displayedTurns.map(turn => {
