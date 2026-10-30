@@ -168,17 +168,17 @@ export default function CommunityContestPage() {
   }, [entries, filterMode]);
 
   return (
-    <main className="community-ui min-h-screen bg-[#FAF7F0] text-[#314F49] relative">
+    <main className="community-ui min-h-screen bg-surface-muted text-text-body relative">
       {/* Toast Notification */}
       {toastMessage && (
-        <div role="status" className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-[#1D5046] text-white shadow-lg border border-[#153D35] flex items-center gap-2 text-xs font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw]">
-          <Check className="w-4 h-4 text-[#E8D7AE] shrink-0" />
+        <div role="status" className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-heritage-green text-white shadow-lg border border-[#153D35] flex items-center gap-2 text-xs font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw]">
+          <Check className="w-4 h-4 text-antique-gold shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <p className="mb-5 rounded-xl border border-[#E8E2D5] bg-white px-4 py-3 text-sm text-[#314F49]">
+        <p className="mb-5 rounded-xl border border-line bg-white px-4 py-3 text-sm text-text-body">
           {t("community.composer.preview_notice")}
         </p>
         {/* Header Switcher */}
@@ -215,8 +215,8 @@ export default function CommunityContestPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left 8 Cols: Submissions Showcase */}
           <div className="lg:col-span-8 space-y-4">
-            <div className="rounded-2xl bg-white border border-[#E8E2D5] shadow-[0_2px_8px_rgba(0,0,0,0.03)] p-3 space-y-2.5">
-              <h2 className="font-serif text-lg font-bold text-[#1D5046]">
+            <div className="rounded-2xl bg-white border border-line shadow-[0_2px_8px_rgba(0,0,0,0.03)] p-3 space-y-2.5">
+              <h2 className="font-serif text-lg font-bold text-heritage-green">
                 <span>{t("community.contest.entries_count_title", { count: filteredEntries.length })}</span>
               </h2>
 
@@ -226,8 +226,8 @@ export default function CommunityContestPage() {
                   aria-pressed={filterMode === "top"}
                   className={`px-3 py-1.5 rounded-xl transition-colors focus-ring cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     filterMode === "top"
-                      ? "bg-[#1D5046] text-white shadow-2xs"
-                      : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                      ? "bg-heritage-green text-white shadow-2xs"
+                      : "text-text-muted hover:text-heritage-green hover:bg-surface-muted"
                   }`}
                 >
                   <TrendingUp className="w-3.5 h-3.5" />
@@ -238,8 +238,8 @@ export default function CommunityContestPage() {
                   aria-pressed={filterMode === "new"}
                   className={`px-3 py-1.5 rounded-xl transition-colors focus-ring cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     filterMode === "new"
-                      ? "bg-[#1D5046] text-white shadow-2xs"
-                      : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                      ? "bg-heritage-green text-white shadow-2xs"
+                      : "text-text-muted hover:text-heritage-green hover:bg-surface-muted"
                   }`}
                 >
                   <Clock className="w-3.5 h-3.5" />
@@ -250,8 +250,8 @@ export default function CommunityContestPage() {
                   aria-pressed={filterMode === "mine"}
                   className={`px-3 py-1.5 rounded-xl transition-colors focus-ring cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     filterMode === "mine"
-                      ? "bg-[#1D5046] text-white shadow-2xs"
-                      : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
+                      ? "bg-heritage-green text-white shadow-2xs"
+                      : "text-text-muted hover:text-heritage-green hover:bg-surface-muted"
                   }`}
                 >
                   <span>{t("community.contest.filter_mine")}</span>
@@ -268,7 +268,7 @@ export default function CommunityContestPage() {
                 />
               ))
             ) : (
-              <div className="p-8 text-center rounded-2xl bg-white border border-[#E8E2D5] space-y-2.5">
+              <div className="p-8 text-center rounded-2xl bg-white border border-line space-y-2.5">
                 <h3 className="font-serif text-base font-bold text-heritage-green">
                   {t("community.contest.no_entries_title")}
                 </h3>
@@ -281,7 +281,7 @@ export default function CommunityContestPage() {
                     setIsFormOpen(true);
                     window.scrollTo({ top: 100, behavior: "smooth" });
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] transition-colors focus-ring"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-heritage-green hover:bg-heritage-dark transition-colors focus-ring"
                 >
                   {t("community.contest.submit_entry_action")}
                 </button>
@@ -306,11 +306,11 @@ export default function CommunityContestPage() {
           setIsFormOpen(true);
           window.scrollTo({ top: 100, behavior: "smooth" });
         }}
-        className="community-fab fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[#1D5046] text-white shadow-lg hover:bg-[#153D35] transition-colors flex items-center justify-center border border-[#153D35] z-40 focus-ring cursor-pointer"
+        className="community-fab fixed bottom-6 right-6 w-12 h-12 rounded-full bg-heritage-green text-white shadow-lg hover:bg-heritage-dark transition-colors flex items-center justify-center border border-[#153D35] z-40 focus-ring cursor-pointer"
         title={t("community.contest.submit_entry_action")}
         aria-label={t("community.contest.open_editor_aria")}
       >
-        <Plus className="w-5 h-5 text-[#E8D7AE]" />
+        <Plus className="w-5 h-5 text-antique-gold" />
       </button>
     </main>
   );

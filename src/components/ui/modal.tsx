@@ -10,13 +10,26 @@ export interface ModalProps {
   title?: string;
   children: React.ReactNode;
   className?: string;
+  hideHeader?: boolean;
+  backdropClassName?: string;
 }
 
-export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, className }) => (
+export const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  className,
+  hideHeader = false,
+  backdropClassName,
+}) => (
   <Dialog open={isOpen} onClose={onClose} className="fixed inset-0 z-50">
     <DialogBackdrop
       transition
-      className="fixed inset-0 bg-heritage-forest/60 transition-opacity duration-200 data-closed:opacity-0 motion-reduce:transition-none"
+      className={cn(
+        "fixed inset-0 bg-heritage-forest/60 transition-opacity duration-200 data-closed:opacity-0 motion-reduce:transition-none",
+        backdropClassName
+      )}
     />
     <div className="fixed inset-0 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
@@ -28,17 +41,31 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
             className
           )}
         >
-          <div className="mb-6 flex items-start justify-between gap-4">
-            <DialogTitle className={title ? "pt-2 text-xl font-semibold text-ink" : "sr-only"}>
-              {title || "Dialog"}
-            </DialogTitle>
-            <Button variant="ghost" size="icon" type="button" onClick={onClose} aria-label="Close dialog" className="ml-auto" data-autofocus>
-              <X className="size-5" aria-hidden="true" />
-            </Button>
-          </div>
+          {hideHeader ? (
+            <DialogTitle className="sr-only">{title || "Dialog"}</DialogTitle>
+          ) : (
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <DialogTitle className={title ? "pt-2 text-xl font-semibold text-ink" : "sr-only"}>
+                {title || "Dialog"}
+              </DialogTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                type="button"
+                onClick={onClose}
+                aria-label="Close dialog"
+                className="ml-auto"
+                data-autofocus
+              >
+                <X className="size-5" aria-hidden="true" />
+              </Button>
+            </div>
+          )}
           {children}
         </DialogPanel>
       </div>
     </div>
   </Dialog>
 );
+
+export { Dialog, DialogBackdrop, DialogPanel, DialogTitle };

@@ -1,3 +1,4 @@
+import { Modal } from '@/components/ui/modal';
 import React, { useState, useEffect } from 'react';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
@@ -168,8 +169,8 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-black/80 backdrop-blur-md">
-      <div className="relative w-full max-w-xl bg-warm-ivory text-ink-soft border-4 border-antique-gold rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden my-8">
+    <Modal isOpen={isOpen} onClose={onClose} title="Đóng Mộc Son Hoàn Thành" hideHeader className="max-w-xl bg-warm-ivory text-ink-soft border-4 border-antique-gold rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden my-8" backdropClassName="bg-black/80 backdrop-blur-md">
+
         {/* Close Button */}
         <button
           type="button"
@@ -344,8 +345,7 @@ export const MocSonSealModal: React.FC<MocSonSealModalProps> = ({
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };
 

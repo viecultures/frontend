@@ -175,19 +175,19 @@ export function CommunityPostEditor({
   return (
     <div
       id="reflection-editor"
-      className="community-editor mb-6 p-5 sm:p-7 rounded-2xl bg-white border border-[#E8E2D5] shadow-lg space-y-5 animate-in fade-in slide-in-from-top-3 duration-250 relative"
+      className="community-editor mb-6 p-5 sm:p-7 rounded-2xl bg-white border border-line shadow-lg space-y-5 animate-in fade-in slide-in-from-top-3 duration-250 relative"
     >
       {/* 1. Header Bar */}
-      <div className="flex items-center justify-between pb-3.5 border-b border-[#E8E2D5]">
+      <div className="flex items-center justify-between pb-3.5 border-b border-line">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#1D5046]/10 text-[#1D5046] font-bold text-xs flex items-center justify-center border border-[#1D5046]/20">
+          <div className="w-10 h-10 rounded-full bg-heritage-green/10 text-heritage-green font-bold text-xs flex items-center justify-center border border-heritage-green/20">
             HV
           </div>
           <div>
-            <h2 className="font-serif text-lg sm:text-xl font-bold text-[#1D5046]">
+            <h2 className="font-serif text-lg sm:text-xl font-bold text-heritage-green">
               {t("community.editor.header_title")}
             </h2>
-            <p className="text-xs text-[#6E7B75]">
+            <p className="text-xs text-text-muted">
               {t("community.editor.header_desc")}
             </p>
           </div>
@@ -198,7 +198,7 @@ export function CommunityPostEditor({
           <button
             type="button"
             onClick={() => setIsPreview(!isPreview)}
-            className="px-3 py-1.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs font-semibold text-[#1D5046] hover:bg-white flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-surface-muted border border-line text-xs font-semibold text-heritage-green hover:bg-white flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             {isPreview ? (
               <>
@@ -216,7 +216,7 @@ export function CommunityPostEditor({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-[#FAF7F0] text-[#6E7B75] hover:text-[#1D5046] transition-colors cursor-pointer focus-ring"
+            className="p-1.5 rounded-full hover:bg-surface-muted text-text-muted hover:text-heritage-green transition-colors cursor-pointer focus-ring"
             aria-label={t("community.editor.close_aria")}
           >
             <X className="w-5 h-5" />
@@ -232,16 +232,16 @@ export function CommunityPostEditor({
             <div>
               <label
                 htmlFor="lesson-select"
-                className="block text-xs font-semibold text-[#314F49] mb-1.5 flex items-center gap-1.5"
+                className="block text-xs font-semibold text-text-body mb-1.5 flex items-center gap-1.5"
               >
-                <BookOpen className="w-3.5 h-3.5 text-[#1D5046]" />
+                <BookOpen className="w-3.5 h-3.5 text-heritage-green" />
                 <span>{t("community.editor.topic_label")}</span>
               </label>
               <select
                 id="lesson-select"
                 value={selectedLesson}
                 onChange={(e) => onChangeLesson(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs font-medium text-[#1D5046] focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-muted border border-line text-xs font-medium text-heritage-green focus:outline-none focus:ring-1 focus:ring-heritage-green focus:bg-white"
               >
                 {TOPIC_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -255,9 +255,9 @@ export function CommunityPostEditor({
             <div>
               <label
                 htmlFor="title-input"
-                className="block text-xs font-semibold text-[#314F49] mb-1.5 flex items-center gap-1.5"
+                className="block text-xs font-semibold text-text-body mb-1.5 flex items-center gap-1.5"
               >
-                <Tag className="w-3.5 h-3.5 text-[#1D5046]" />
+                <Tag className="w-3.5 h-3.5 text-heritage-green" />
                 <span>{t("community.editor.title_label")}</span>
               </label>
               <input
@@ -266,7 +266,7 @@ export function CommunityPostEditor({
                 value={postTitle}
                 onChange={(e) => onChangePostTitle?.(e.target.value)}
                 placeholder={t("community.editor.title_placeholder")}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] placeholder:text-[#6E7B75]/60 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-muted border border-line text-xs text-text-body placeholder:text-text-muted/60 focus:outline-none focus:ring-1 focus:ring-heritage-green focus:bg-white"
               />
             </div>
           </div>
@@ -277,16 +277,16 @@ export function CommunityPostEditor({
               value={reflectionText}
               onChange={(e) => onChangeReflectionText(e.target.value)}
               placeholder={t("community.editor.content_placeholder")}
-              className="w-full h-36 sm:h-40 p-4 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs sm:text-sm text-[#314F49] placeholder:text-[#6E7B75]/60 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white leading-relaxed resize-y"
+              className="w-full h-36 sm:h-40 p-4 rounded-xl bg-surface-muted border border-line text-xs sm:text-sm text-text-body placeholder:text-text-muted/60 focus:outline-none focus:ring-1 focus:ring-heritage-green focus:bg-white leading-relaxed resize-y"
               aria-label={t("community.editor.content_aria")}
             />
-            <div className="flex items-center justify-between text-xs text-[#6E7B75] px-1">
+            <div className="flex items-center justify-between text-xs text-text-muted px-1">
               <button
                 type="button"
                 onClick={() => setShowWritingAssistance(!showWritingAssistance)}
-                className="inline-flex items-center gap-1 text-[#1D5046] font-semibold hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1 text-heritage-green font-semibold hover:underline cursor-pointer"
               >
-                <Lightbulb className="w-3.5 h-3.5 text-[#E8D7AE]" />
+                <Lightbulb className="w-3.5 h-3.5 text-antique-gold" />
                 <span>{showWritingAssistance ? t("community.editor.hide_tips_btn") : t("community.editor.writing_assist_btn")}</span>
               </button>
               <span className="font-medium">{t("community.editor.words_count", { count: wordCount })}</span>
@@ -295,17 +295,17 @@ export function CommunityPostEditor({
 
           {/* 4. Optional English Writing Assistant Box */}
           {showWritingAssistance && (
-            <div className="p-3.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-2 text-xs animate-in fade-in duration-200">
+            <div className="p-3.5 rounded-xl bg-surface-muted border border-line space-y-2 text-xs animate-in fade-in duration-200">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#1D5046] flex items-center gap-1.5">
-                  <PenLine className="w-3.5 h-3.5 text-[#1D5046]" />
+                <span className="font-bold text-heritage-green flex items-center gap-1.5">
+                  <PenLine className="w-3.5 h-3.5 text-heritage-green" />
                   <span>{t("community.editor.tips_title")}</span>
                 </span>
-                <span className="text-[11px] text-[#6E7B75]">
+                <span className="text-[11px] text-text-muted">
                   {t("community.editor.tips_subtitle")}
                 </span>
               </div>
-              <ul className="space-y-1 text-[#314F49] pl-4 list-disc text-xs leading-relaxed">
+              <ul className="space-y-1 text-text-body pl-4 list-disc text-xs leading-relaxed">
                 {writingTips.map((tip, idx) => (
                   <li key={idx}>{tip}</li>
                 ))}
@@ -317,16 +317,16 @@ export function CommunityPostEditor({
           )}
 
           {/* 5. Vocabulary Tags Attachment */}
-          <div className="space-y-2 pt-1 border-t border-[#E8E2D5]/60">
+          <div className="space-y-2 pt-1 border-t border-line/60">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#314F49] flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-[#1D5046]" />
+              <span className="text-xs font-semibold text-text-body flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-heritage-green" />
                 <span>{t("community.editor.vocab_tags_title")}</span>
               </span>
               <button
                 type="button"
                 onClick={() => setShowVocabInput(!showVocabInput)}
-                className="text-xs font-semibold text-[#1D5046] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-xs font-semibold text-heritage-green hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>{t("community.editor.add_word_btn")}</span>
@@ -338,10 +338,10 @@ export function CommunityPostEditor({
               {vocabList.map((v, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF7F0] border border-[#E8E2D5] text-xs font-medium text-[#1D5046]"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-muted border border-line text-xs font-medium text-heritage-green"
                 >
                   <span className="font-bold">{v.word}</span>
-                  <span className="text-[11px] text-[#6E7B75]">({v.meaning})</span>
+                  <span className="text-[11px] text-text-muted">({v.meaning})</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveVocab(idx)}
@@ -362,19 +362,19 @@ export function CommunityPostEditor({
                   placeholder={t("community.editor.word_placeholder")}
                   value={newVocabWord}
                   onChange={(e) => setNewVocabWord(e.target.value)}
-                  className="px-3 py-1.5 rounded-lg bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] focus:outline-none focus:ring-1 focus:ring-[#1D5046]"
+                  className="px-3 py-1.5 rounded-lg bg-surface-muted border border-line text-xs text-text-body focus:outline-none focus:ring-1 focus:ring-heritage-green"
                 />
                 <input
                   type="text"
                   placeholder={t("community.editor.meaning_placeholder")}
                   value={newVocabMeaning}
                   onChange={(e) => setNewVocabMeaning(e.target.value)}
-                  className="flex-1 px-3 py-1.5 rounded-lg bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] focus:outline-none focus:ring-1 focus:ring-[#1D5046]"
+                  className="flex-1 px-3 py-1.5 rounded-lg bg-surface-muted border border-line text-xs text-text-body focus:outline-none focus:ring-1 focus:ring-heritage-green"
                 />
                 <button
                   type="button"
                   onClick={handleAddVocab}
-                  className="px-3 py-1.5 rounded-lg bg-[#1D5046] text-white text-xs font-semibold hover:bg-[#153D35] cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-heritage-green text-white text-xs font-semibold hover:bg-heritage-dark cursor-pointer"
                 >
                   {t("community.editor.save_tag_btn")}
                 </button>
@@ -383,33 +383,33 @@ export function CommunityPostEditor({
           </div>
 
           {/* 6. Photo Attachment Selection */}
-          <div className="space-y-2 pt-1 border-t border-[#E8E2D5]/60">
+          <div className="space-y-2 pt-1 border-t border-line/60">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#314F49] flex items-center gap-1.5">
-                <ImageIcon className="w-3.5 h-3.5 text-[#1D5046]" />
+              <span className="text-xs font-semibold text-text-body flex items-center gap-1.5">
+                <ImageIcon className="w-3.5 h-3.5 text-heritage-green" />
                 <span>{t("community.editor.photo_attach_title")}</span>
               </span>
               <button
                 type="button"
                 onClick={() => setShowPhotoPicker(!showPhotoPicker)}
-                className="text-xs font-semibold text-[#1D5046] hover:underline cursor-pointer"
+                className="text-xs font-semibold text-heritage-green hover:underline cursor-pointer"
               >
                 {showPhotoPicker ? t("community.editor.close_photo_btn") : t("community.editor.choose_photo_btn")}
               </button>
             </div>
 
             {/* Currently Selected Photo Preview */}
-            <div className="flex items-center gap-3 p-2.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5]">
+            <div className="flex items-center gap-3 p-2.5 rounded-xl bg-surface-muted border border-line">
               <img
                 src={selectedPhoto}
                 alt={photoCaption}
-                className="w-16 h-12 object-cover rounded-lg border border-[#E8E2D5]"
+                className="w-16 h-12 object-cover rounded-lg border border-line"
               />
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-semibold text-[#1D5046] block truncate">
+                <span className="text-xs font-semibold text-heritage-green block truncate">
                   {photoCaption}
                 </span>
-                <span className="text-[11px] text-[#6E7B75]">
+                <span className="text-[11px] text-text-muted">
                   {t("community.editor.photo_badge")}
                 </span>
               </div>
@@ -417,7 +417,7 @@ export function CommunityPostEditor({
 
             {/* Photo Picker Gallery */}
             {showPhotoPicker && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3 rounded-xl bg-white border border-[#E8E2D5]">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3 rounded-xl bg-white border border-line">
                 {PRESET_PHOTOS.map((photo, idx) => (
                   <button
                     key={idx}
@@ -425,8 +425,8 @@ export function CommunityPostEditor({
                     onClick={() => handleSelectPresetPhoto(photo)}
                     className={`relative rounded-lg overflow-hidden border aspect-video text-left cursor-pointer group transition-all ${
                       selectedPhoto === photo.url
-                        ? "border-[#1D5046] ring-2 ring-[#1D5046]/30"
-                        : "border-[#E8E2D5] hover:border-[#1D5046]/40"
+                        ? "border-heritage-green ring-2 ring-heritage-green/30"
+                        : "border-line hover:border-heritage-green/40"
                     }`}
                   >
                     <img
@@ -445,25 +445,25 @@ export function CommunityPostEditor({
         </>
       ) : (
         /* Preview Card */
-        <div className="p-4 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-3">
+        <div className="p-4 rounded-xl bg-surface-muted border border-line space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-[#1D5046]">
+            <span className="text-xs font-bold text-heritage-green">
               {t("community.editor.preview_mode")}
             </span>
-            <span className="text-xs text-[#6E7B75]">
+            <span className="text-xs text-text-muted">
               · {selectedLesson}
             </span>
           </div>
           {postTitle && (
-            <h3 className="font-serif text-lg font-bold text-[#1D5046]">
+            <h3 className="font-serif text-lg font-bold text-heritage-green">
               {postTitle}
             </h3>
           )}
-          <p className="text-sm text-[#314F49] leading-relaxed whitespace-pre-line">
+          <p className="text-sm text-text-body leading-relaxed whitespace-pre-line">
             {reflectionText || t("community.editor.no_content_placeholder")}
           </p>
           {selectedPhoto && (
-            <div className="w-full rounded-xl overflow-hidden border border-[#E8E2D5] h-52 sm:h-60">
+            <div className="w-full rounded-xl overflow-hidden border border-line h-52 sm:h-60">
               <img
                 src={selectedPhoto}
                 alt={photoCaption}
@@ -475,8 +475,8 @@ export function CommunityPostEditor({
       )}
 
       {/* 7. Footer Action Bar */}
-      <div className="flex items-center justify-between pt-3 border-t border-[#E8E2D5]">
-        <span className="text-xs text-[#6E7B75] hidden sm:inline">
+      <div className="flex items-center justify-between pt-3 border-t border-line">
+        <span className="text-xs text-text-muted hidden sm:inline">
           {t("community.editor.footer_hint")}
         </span>
 
@@ -484,16 +484,16 @@ export function CommunityPostEditor({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0] transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-xl text-xs font-semibold text-text-muted hover:text-heritage-green hover:bg-surface-muted transition-colors cursor-pointer"
           >
             {t("community.editor.cancel_btn")}
           </button>
           <button
             type="button"
             onClick={handleSubmit}
-            className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] shadow-xs inline-flex items-center gap-1.5 transition-all cursor-pointer focus-ring"
+            className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-heritage-green hover:bg-heritage-dark shadow-xs inline-flex items-center gap-1.5 transition-all cursor-pointer focus-ring"
           >
-            <Send className="w-3.5 h-3.5 text-[#E8D7AE]" />
+            <Send className="w-3.5 h-3.5 text-antique-gold" />
             <span>{t("community.editor.publish_btn")}</span>
           </button>
         </div>
