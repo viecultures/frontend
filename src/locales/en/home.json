@@ -55,6 +55,23 @@
     "btn_review_now": "Review now",
     "btn_open_notebook": "Open notebook"
   },
+  "study_calendar": {
+    "eyebrow": "YOUR LEARNING JOURNEY",
+    "title": "Study calendar",
+    "description": "See the time you spent reading and practising words.",
+    "previous": "Previous month",
+    "next": "Next month",
+    "reading": "Reading",
+    "vocabulary": "Vocabulary",
+    "no_time": "No study time",
+    "under_minute": "<1 min",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "empty": "No learning activity recorded for this day.",
+    "legend": "Study time intensity",
+    "less": "Less",
+    "more": "More"
+  },
   "recommendations": {
     "eyebrow": "LET CURIOSITY LEAD",
     "title": "Your next discovery",

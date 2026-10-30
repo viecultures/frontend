@@ -33,7 +33,7 @@
 .home-room-greeting p { color: var(--color-ink-soft); font-size: 14px; font-weight: 500; line-height: 1.6; }
 .home-room .home-room-date { font-size: 13px; font-weight: 600; color: var(--color-ink); white-space: nowrap; padding: 7px 14px; border-radius: 12px; background: color-mix(in srgb, var(--color-surface-muted) 65%, transparent); border: 1px solid color-mix(in srgb, var(--color-line) 65%, transparent); }
 
-.home-room-grid { display: grid; grid-template-columns: minmax(0, 2.05fr) minmax(285px, 1fr); grid-template-areas: "continue calendar" "stories vocabulary"; gap: 24px; align-items: start; }
+.home-room-grid { display: grid; grid-template-columns: minmax(0, 2.05fr) minmax(285px, 1fr); grid-template-areas: "continue calendar" "stories activity" "vocabulary activity"; gap: 24px; align-items: start; }
 .home-room-grid > * { min-width: 0; }
 .home-room-panel { border: 1px solid var(--color-line); border-radius: 20px; background: var(--color-surface-raised); box-shadow: var(--shadow-panel); }
 .home-room-continue { grid-area: continue; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .9fr); min-height: 345px; overflow: hidden; align-self: stretch; height: 100%; }
@@ -106,7 +106,7 @@
 
 .home-vocab-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin-top: 16px;
 }
@@ -319,9 +319,45 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+@media (min-width: 1101px) {
+  .home-room-vocab { padding: 20px; }
+  .home-vocab-grid { gap: 10px; margin-top: 12px; }
+  .home-vocab-card { padding: 9px 10px; }
+  .home-vocab-label { margin-top: 5px; }
+  .home-vocab-progress-track { margin-top: 7px; }
+  .home-vocab-due-panel { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "due-header due-pills due-actions"; align-items: center; gap: 16px; margin-top: 12px; padding: 12px; }
+  .home-vocab-due-header { grid-area: due-header; flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 0; }
+  .home-vocab-pills { grid-area: due-pills; margin-bottom: 0; }
+  .home-vocab-actions { grid-area: due-actions; justify-content: flex-end; padding-top: 0; }
+}
 .home-room-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .home-room-section-heading h2 { font-size: 20px; font-weight: 600; line-height: 1.4; margin-top: 5px; letter-spacing: -.4px; }
 .home-room-recommendations { grid-area: stories; }
+.home-study-calendar { grid-area: activity; padding: 24px; min-width: 0; }
+.home-study-calendar-heading h2 { margin: 5px 0 4px; font-size: 22px; line-height: 1.3; }
+.home-study-calendar-heading > p:last-child { font-size: 13px; }
+.home-study-calendar-month { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 20px 0 10px; }
+.home-study-calendar-month h3 { font-size: 16px; font-weight: 700; text-transform: capitalize; }
+.home-study-calendar-month > div { display: flex; gap: 4px; }
+.home-study-calendar-month button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-surface); color: var(--color-action); }
+.home-study-calendar-month button:hover:enabled { background: var(--color-surface-feature); }
+.home-study-calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.home-study-calendar-weekday { text-align: center; font-size: 11px; font-weight: 700; color: var(--color-ink-soft); padding: 7px 0; }
+.home-study-calendar-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; height: 44px; padding: 2px 0; border: 1px solid var(--color-line); border-radius: 10px; color: var(--color-ink); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.home-study-calendar-day:hover { border-color: var(--color-action); }
+.home-study-calendar-day.is-today { box-shadow: inset 0 0 0 1px var(--color-action); }
+.home-study-calendar-day.is-selected { outline: 2px solid var(--color-action); outline-offset: 1px; }
+.home-study-calendar-icons { display: flex; justify-content: center; gap: 2px; min-height: 11px; }
+.home-study-calendar-day.level-0, .home-study-calendar-swatch.level-0 { background: var(--color-surface-muted); }
+.home-study-calendar-day.level-1, .home-study-calendar-swatch.level-1 { background: color-mix(in srgb, var(--color-action) 20%, var(--color-surface)); }
+.home-study-calendar-day.level-2, .home-study-calendar-swatch.level-2 { background: color-mix(in srgb, var(--color-action) 48%, var(--color-surface)); }
+.home-study-calendar-day.level-3, .home-study-calendar-swatch.level-3 { background: var(--color-action); color: var(--color-on-action); }
+.home-study-calendar-detail { margin-top: 18px; padding: 14px; border: 1px solid var(--color-line); border-radius: 14px; background: var(--color-surface-muted); }
+.home-study-calendar-detail > div { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+.home-study-calendar-detail p { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 7px; font-size: 12px; }
+.home-study-calendar-detail p span { display: inline-flex; align-items: center; gap: 4px; }
+.home-study-calendar-legend { display: flex; align-items: center; justify-content: flex-end; gap: 5px; margin-top: 13px; color: var(--color-ink-soft); font-size: 11px; }
+.home-study-calendar-swatch { width: 14px; height: 14px; border: 1px solid var(--color-line); border-radius: 4px; }
 .home-room-recommendations .home-room-section-heading { padding: 14px 22px; border-radius: 16px; background: color-mix(in srgb, var(--color-surface-raised) 92%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transform: translateZ(0); border: 1px solid color-mix(in srgb, var(--color-line) 80%, transparent); box-shadow: var(--shadow-panel); }
 .home-room-recommendations .home-room-section-heading h2 { margin-top: 4px; font-weight: 700; color: var(--color-ink); }
 .home-room-recommendations .home-room-link { font-weight: 600; color: var(--color-action); }
@@ -851,6 +887,7 @@
 
 @media (min-width: 1100px) { .home-room-review { min-height: 345px; display: flex; flex-direction: column; } .home-room-review .home-room-primary { margin-top: auto; } }
 @media (max-width: 1100px) {
+  .home-vocab-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-room-header-inner { gap: 15px; padding-inline: 24px; }
   .home-room-nav { gap: 1px; }
   .home-room-nav a { padding-inline: 10px; font-size: 12px; }
@@ -872,7 +909,7 @@
   .home-room-greeting { align-items: flex-start; margin-bottom: 22px; padding: 16px 20px; }
   .home-room-recommendations .home-room-section-heading { padding: 12px 18px; }
   .home-room .home-room-date { display: none; }
-  .home-room-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "continue" "calendar" "vocabulary" "stories" "focus"; gap: 22px; }
+  .home-room-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "continue" "calendar" "stories" "vocabulary" "activity"; gap: 22px; }
   .home-room-continue { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); min-height: 320px; }
   .home-room-continue-image { display: block; }
   .home-room-calendar { height: auto; align-self: auto; }

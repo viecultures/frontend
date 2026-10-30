@@ -55,6 +55,23 @@
     "btn_review_now": "Ôn ngay",
     "btn_open_notebook": "Mở sổ từ"
   },
+  "study_calendar": {
+    "eyebrow": "HÀNH TRÌNH HỌC TẬP",
+    "title": "Lịch học tập",
+    "description": "Theo dõi thời gian đọc bài và ôn từ vựng mỗi ngày.",
+    "previous": "Tháng trước",
+    "next": "Tháng sau",
+    "reading": "Đọc bài",
+    "vocabulary": "Ôn từ",
+    "no_time": "Chưa học",
+    "under_minute": "<1 phút",
+    "minutes_one": "{{count}} phút",
+    "minutes_other": "{{count}} phút",
+    "empty": "Ngày này chưa có hoạt động học được ghi nhận.",
+    "legend": "Mức thời gian học",
+    "less": "Ít",
+    "more": "Nhiều"
+  },
   "recommendations": {
     "eyebrow": "ĐỂ TRÍ TÒ MÒ DẪN LỐI",
     "title": "Khám phá tiếp theo của bạn",

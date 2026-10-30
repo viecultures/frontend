@@ -9,6 +9,7 @@ import { HomeContinueCard } from '../components/HomeContinueCard';
 import { HomeRecommendations } from '../components/HomeRecommendations';
 import { HomeVocabularyCard } from '../components/HomeVocabularyCard';
 import { HomeCalendarCard } from '../components/HomeCalendarCard';
+import { HomeStudyCalendar } from '../components/HomeStudyCalendar';
 import { readReadingHistory, readStudyTasks, saveStudyTasks, type StudyTask } from '../lib/studyRoomStorage';
 import { useSettings } from '@/context/SettingsContext';
 import { useAppNavigate } from '@/routes/useAppNavigate';
@@ -52,6 +53,7 @@ function StudyRoomContent({ account, userName }: StudyRoomContentProps) {
       <HomeCalendarCard />
       <HomeRecommendations currentId={bookmark?.id} />
       <HomeVocabularyCard />
+      <HomeStudyCalendar account={account} />
     </div>
   </main>;
 }
