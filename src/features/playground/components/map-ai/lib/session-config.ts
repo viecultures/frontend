@@ -1,4 +1,4 @@
-import { Modality, type LiveConnectConfig, type FunctionDeclaration } from '@google/genai';
+import { MediaResolution, Modality, type LiveConnectConfig, type FunctionDeclaration } from '@google/genai';
 import { buildCulturalTutorPrompt } from './constants';
 import type { CulturalTutorMode, CorrectionMode, MapContextMode, FunctionCall } from './state';
 import { CHAT_TOOL_NAMES } from './tools/tool-dispatcher';
@@ -53,10 +53,13 @@ When asked to open or read a specific article, the selected reader reference is 
   const declarations: FunctionDeclaration[] = tools
     .filter(tool => tool.isEnabled && !(view !== 'chat' && CHAT_TOOL_NAMES.has(tool.name))
       && !(settings.mapContextMode === 'off' && MAP_TOOL_NAMES.has(tool.name))
+      && !(tool.name === 'searchWikipedia' && !(view === 'chat' && settings.tutorMode === 'open-conversation'))
       && !(view === 'chat' && lessonTools.has(tool.name)))
     .map(({ name, description, parameters }) => ({ name, description, parameters }));
   const config: LiveConnectConfig = {
     responseModalities: [Modality.AUDIO],
+    ...(view === 'chat' && settings.tutorMode === 'open-conversation'
+      ? { mediaResolution: MediaResolution.MEDIA_RESOLUTION_MEDIUM } : {}),
     speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: settings.voice } } },
     inputAudioTranscription: {}, outputAudioTranscription: {},
     ...(view === 'chat' ? {

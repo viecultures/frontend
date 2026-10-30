@@ -25,6 +25,9 @@ import { paths } from '@/routes/paths';
 import { ReaderWorkspaceReference } from '../ReaderWorkspaceReference';
 import { AiWorkspaceWelcome } from '../AiWorkspaceWelcome';
 import { AiWorkspaceChatHeader } from '../AiWorkspaceChatHeader';
+import { WikipediaSourceCards } from '../WikipediaSourceCards';
+import { useImagePreviewStore } from '../../lib/image-previews';
+import type { WikipediaSearchResult } from '../../services/wikipediaSourceService';
 import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 import { useSearchParams } from 'react-router-dom';
 import { companionService } from '@/services/companionService';
@@ -102,6 +105,7 @@ export default function StreamingConsole() {
   }, [active, tutorMode, connected, busy, resetConversation]);
   const readerContext = useReaderHandoff(state => state.context);
   const turns = useLogStore(state => state.turns);
+  const imagePreviews = useImagePreviewStore(state => state.previews);
   const sessionId = useLogStore(state => state.sessionMetadata?.sessionId);
   const { showSystemMessages } = useUI();
   const isAwaitingFunctionResponse = useLogStore(state => state.isAwaitingFunctionResponse);
@@ -214,6 +218,7 @@ export default function StreamingConsole() {
     { text: 'I have an idea to write. Help me express it clearly in English.', label: 'Write together' },
   ];
   const quickActions = tutorMode === 'open-conversation' ? freeTalkActions : conversationActions;
+  const imagePreviewAlt = t('playground.tray_controls.image_preview');
 
   const handleModeChange = (mode: typeof tutorMode) => {
     if (connected || busy || tutorMode === mode) return;
@@ -271,6 +276,12 @@ export default function StreamingConsole() {
               const isSystem = t.role === 'system';
 
               if (isSystem) {
+                if (t.toolResponse && typeof t.toolResponse === 'object'
+                  && 'type' in t.toolResponse && t.toolResponse.type === 'wikipedia_sources') {
+                  return <div key={t.id} data-turn-id={t.id}>
+                    <WikipediaSourceCards result={t.toolResponse as unknown as WikipediaSearchResult} />
+                  </div>;
+                }
                 const articlePayload: VieCultureArticleItem[] | null =
                   t.toolResponse && (t.toolResponse as any).type === 'vieculture_articles'
                     ? (t.toolResponse as any).articles
@@ -434,8 +445,12 @@ export default function StreamingConsole() {
                     data-message-role={isUser ? 'user' : 'assistant'}
                     className={`chat-message-bubble max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed border shadow-md ${isUser ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}
                   >
+                    {isUser && imagePreviews[t.id] && <img src={imagePreviews[t.id]}
+                      alt={imagePreviewAlt} className="max-h-64 max-w-full rounded-lg object-contain mb-2"
+                      loading="lazy" />}
                     <div className="prose prose-invert prose-xs max-w-none select-text cursor-text">
-                      <MessageMarkdown text={t.text} />
+                      <MessageMarkdown text={isUser && imagePreviews[t.id]
+                        ? t.text.replace(/^\[Image shared; pixels are not saved\]\s*/, '') : t.text} />
                     </div>
                   </div>
                 </div>

@@ -384,7 +384,7 @@ export default function Sidebar() {
             <Download className="w-4 h-4 mr-1.5" />
             {t('playground.sidebar.export_history')}
           </button>}
-          <button
+          {activeView !== 'chat' && <button
             onClick={() => {
               if (activeView) resetConversation();
             }}
@@ -392,7 +392,7 @@ export default function Sidebar() {
           >
             <RefreshCw className="w-4 h-4 mr-1.5" />
             {t('playground.sidebar.new_conversation')}
-          </button>
+          </button>}
         </div>
         {import.meta.env.DEV && <button type="button" className="ai-workspace-developer-link" onClick={() => { useMapAiDebugStore.getState().setDrawerOpen(true); toggleSidebar(); }}>{t('playground.sidebar.developer_tools')}</button>}
       </div>

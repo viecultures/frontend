@@ -201,7 +201,9 @@ export class GenAILiveClient {
       turns: [{ role: 'user', parts: partsArray }],
       turnComplete,
     });
-    this.log(`client.send`, parts);
+    this.log(`client.send`, partsArray.map(part => part.inlineData
+      ? { mimeType: part.inlineData.mimeType, encodedLength: part.inlineData.data?.length ?? 0 }
+      : part));
   }
 
   public sendRealtimeText(text: string) {

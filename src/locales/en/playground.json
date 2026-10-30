@@ -33,9 +33,9 @@
       "waiting_reply": "Waiting for a reply…",
       "listening": "Listening",
       "mic_off": "Mic off · You can type a message",
-      "paused": "Paused · Press Play to resume",
+      "paused": "Paused · Ready to continue",
       "ready": "Ready when you are · Press Play to speak",
-      "hold_to_talk": "Hold V or the mic button to speak",
+      "hold_to_talk": "Hold V or the mic to talk",
       "release_to_reply": "Listening · Release for AI to reply",
       "mic_meter_aria": "Microphone volume",
       "retry": "Retry",
@@ -279,6 +279,14 @@
       "story_changed": "The selected story changed. End this conversation to start with the new story.",
       "level_aria": "Speaking level"
     },
+    "wikipedia_sources": {
+      "title": "Wikipedia sources",
+      "empty": "No source found for this topic.",
+      "image": "Image",
+      "file_details": "File details",
+      "retrieved": "Source: Wikipedia · Retrieved {{date}}.",
+      "check_full_context": "Check the linked page for full context."
+    },
     "chat_article": {
       "not_found": "This story could not be found.",
       "aria_story_details": "Story details",
@@ -361,6 +369,12 @@
       "send_aria": "Send message",
       "connect_and_send": "Connect and send",
       "type_to_send": "Type a message to send",
+      "send_image": "Share an image with Free Talk",
+      "image_preview": "Image shared in this conversation",
+      "image_invalid": "Choose a JPEG, PNG or WebP image under 5 MB.",
+      "image_failed": "Could not send the image. Check the connection and try again.",
+      "image_sent": "Image sent · not saved in chat history",
+      "image_default_prompt": "Let's discuss this image. What can you see?",
       "send": "Send message"
     },
     "shadowing": {

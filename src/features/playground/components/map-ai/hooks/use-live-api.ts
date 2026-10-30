@@ -76,6 +76,7 @@ export function useLiveApi({ apiKey, activeView }: { apiKey: string; activeView:
     startConversation: controller.startConversation,
     resumeConversation: controller.resumeConversation,
     sendMessage: controller.sendMessage,
+    sendImage: controller.sendImage,
     sendControlInstruction: controller.sendControlInstruction,
     changeLevel: controller.changeLevel,
     stopConversation: controller.stopConversation,

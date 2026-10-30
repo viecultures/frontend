@@ -33,9 +33,9 @@
       "waiting_reply": "Đang chờ phản hồi…",
       "listening": "Đang lắng nghe",
       "mic_off": "Đã tắt mic · Bạn có thể gõ tin nhắn",
-      "paused": "Đang tạm dừng · Nhấn Play để tiếp tục",
+      "paused": "Đang tạm dừng · Sẵn sàng tiếp tục",
       "ready": "Sẵn sàng bất cứ khi nào bạn muốn · Nhấn Play để nói",
-      "hold_to_talk": "Giữ V hoặc nút mic để nói",
+      "hold_to_talk": "Giữ V hoặc mic để nói",
       "release_to_reply": "Đang nghe · Thả để AI trả lời",
       "mic_meter_aria": "Âm lượng microphone",
       "retry": "Thử lại",
@@ -279,6 +279,14 @@
       "story_changed": "Bài được chọn đã đổi. Kết thúc cuộc trò chuyện để bắt đầu với bài mới.",
       "level_aria": "Trình độ nói"
     },
+    "wikipedia_sources": {
+      "title": "Nguồn Wikipedia",
+      "empty": "Không tìm thấy nguồn cho chủ đề này.",
+      "image": "Ảnh",
+      "file_details": "Thông tin file",
+      "retrieved": "Nguồn: Wikipedia · Truy xuất ngày {{date}}.",
+      "check_full_context": "Mở trang nguồn để xem đầy đủ ngữ cảnh."
+    },
     "chat_article": {
       "not_found": "Không tìm thấy câu chuyện này.",
       "aria_story_details": "Chi tiết câu chuyện",
@@ -361,6 +369,12 @@
       "send_aria": "Gửi tin nhắn",
       "connect_and_send": "Kết nối và gửi",
       "type_to_send": "Nhập tin nhắn để gửi",
+      "send_image": "Chia sẻ ảnh với Free Talk",
+      "image_preview": "Ảnh đã chia sẻ trong cuộc trò chuyện",
+      "image_invalid": "Chọn ảnh JPEG, PNG hoặc WebP dưới 5 MB.",
+      "image_failed": "Không gửi được ảnh. Kiểm tra kết nối và thử lại.",
+      "image_sent": "Đã gửi ảnh · không lưu trong lịch sử chat",
+      "image_default_prompt": "Cùng thảo luận về bức ảnh này. Bạn nhìn thấy gì?",
       "send": "Gửi tin nhắn"
     },
     "shadowing": {
