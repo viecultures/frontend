@@ -18,7 +18,9 @@
  * limitations under the License.
  */
 
-import React, { createContext, type FC, type ReactNode, useContext } from 'react';
+import React, { createContext, type FC, type ReactNode, useContext, useEffect, useState } from 'react';
+import { fetchLiveSessionCredentials, getCachedLiveApiKey } from '@/features/playground/services/voiceLiveApiService';
+import { getStoredToken } from '@/utils/auth-storage';
 import { useLiveApi, type UseLiveApiResults } from '../hooks/use-live-api';
 import { useSettings } from '../lib/state';
 import type { ActiveView } from '../lib/session-controller';
@@ -35,7 +37,25 @@ export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
   children,
 }) => {
   const customGeminiApiKey = useSettings(state => state.customGeminiApiKey);
-  const apiKey = customGeminiApiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
+  const [serverApiKey, setServerApiKey] = useState<string>(() => getCachedLiveApiKey() || '');
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!customGeminiApiKey && !serverApiKey && getStoredToken()) {
+      fetchLiveSessionCredentials()
+        .then(key => {
+          if (isMounted) setServerApiKey(key);
+        })
+        .catch(err => {
+          console.warn('[LiveAPIProvider] Không thể lấy live session key từ backend:', err?.message || err);
+        });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [customGeminiApiKey, serverApiKey]);
+
+  const apiKey = customGeminiApiKey || serverApiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
   const liveAPI = useLiveApi({ apiKey, activeView });
 
   return (

@@ -41,7 +41,7 @@ const DesignSystemPage = import.meta.env.DEV
   ? React.lazy(() => import('@/pages/DesignSystemPage'))
   : null;
 import { getStoredUser, setStoredUser, getStoredToken, clearAuthStorage, type AppUser } from '@/utils/auth-storage';
-import { PATHS, getLocalizedPath } from '@/routes/paths';
+import { PATHS, getLocalizedPath, resolveLanguage } from '@/routes/paths';
 const CompanionFloatingButton = React.lazy(() =>
   import('@/features/companion/CompanionFloatingButton').then((module) => ({ default: module.CompanionFloatingButton }))
 );
@@ -126,10 +126,12 @@ export const App: React.FC = () => {
     // Return to previous target URL if available
     const params = new URLSearchParams(window.location.search);
     const redirectUrl = params.get('redirect');
+    const match = location.pathname.match(/^\/(vi|en)(\/|$)/);
+    const currentLang = resolveLanguage(match ? match[1] : undefined);
     if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
-      navigate(redirectUrl, { replace: true });
+      navigate(getLocalizedPath(redirectUrl, currentLang), { replace: true });
     } else {
-      navigate(getLocalizedPath(PATHS.home), { replace: true });
+      navigate(getLocalizedPath(PATHS.home, currentLang), { replace: true });
     }
   };
 
@@ -137,7 +139,9 @@ export const App: React.FC = () => {
     clearAuthStorage();
     setIsLoggedIn(false);
     setUser(null);
-    navigate(getLocalizedPath(PATHS.landing), { replace: true });
+    const match = location.pathname.match(/^\/(vi|en)(\/|$)/);
+    const currentLang = resolveLanguage(match ? match[1] : undefined);
+    navigate(getLocalizedPath(PATHS.landing, currentLang), { replace: true });
   };
 
   const content = (

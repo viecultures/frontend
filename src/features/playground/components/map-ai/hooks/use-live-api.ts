@@ -8,6 +8,8 @@ import { useSettings, useTools, useUI, useMapStore } from '../lib/state';
 import { debugLog } from '../lib/debug-logger';
 import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
+import { getCachedLiveApiKey, fetchLiveSessionCredentials } from '@/features/playground/services/voiceLiveApiService';
+import { getStoredToken } from '@/utils/auth-storage';
 
 export function useLiveApi({ apiKey, activeView }: { apiKey: string; activeView: ActiveView }) {
   const model = useSettings(state => state.model);
@@ -18,8 +20,22 @@ export function useLiveApi({ apiKey, activeView }: { apiKey: string; activeView:
     const audio = new ConversationAudio(state => controller.updateAudio(state));
     const controller: SessionController = new SessionController({
       client, audio,
-      configuration: () => {
-        if (!apiKey) throw new Error('Vui lòng nhập Gemini API key trong Cài đặt để bắt đầu.');
+      configuration: async () => {
+        let effectiveKey = apiKey || getCachedLiveApiKey() || '';
+        if (!effectiveKey && getStoredToken()) {
+          try {
+            effectiveKey = await fetchLiveSessionCredentials();
+          } catch (fetchErr) {
+            console.warn('[useLiveApi] fetchLiveSessionCredentials error:', fetchErr);
+          }
+        }
+        if (!effectiveKey) {
+          if (!getStoredToken()) {
+            throw new Error('Vui lòng đăng nhập để bắt đầu trò chuyện bằng giọng nói.');
+          }
+          throw new Error('Không thể kết nối máy chủ thoại của hệ thống. Vui lòng kiểm tra lại kết nối hoặc thử lại sau.');
+        }
+        client.setApiKey(effectiveKey);
         const settings = useSettings.getState();
         const view = controller.getSnapshot().activeView;
         client.setUsageContext({ view, tutorMode: settings.tutorMode, voiceInteractionMode: settings.voiceInteractionMode });

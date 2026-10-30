@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+﻿import React, { useState, useEffect, useRef } from 'react';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, ArrowUpRight, CheckCircle2, Loader2, Lock, Mail, RefreshCw } from 'lucide-react';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { BrandLogo } from '@/components/BrandLogo';
-import { PATHS } from '@/routes/paths';
+import { PATHS, getLocalizedPath } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import { authService, backendAuthService, type AuthResult } from '@/services/authService';
 import { localAuthService } from '@/services/localAuthService';
@@ -30,7 +30,12 @@ const readAuthLanguage = (): AppLanguage => {
 };
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
-  const [language, setAuthLanguage] = useState<AppLanguage>(readAuthLanguage);
+  const { lang: routeLang } = useParams<{ lang?: string }>();
+  const location = useLocation();
+  const [language, setAuthLanguage] = useState<AppLanguage>(() => {
+    if (routeLang === 'vi' || routeLang === 'en') return routeLang;
+    return readAuthLanguage();
+  });
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
   const [registerStep, setRegisterStep] = useState<'form' | 'otp'>('form');
   const [email, setEmail] = useState('');
@@ -71,6 +76,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     } catch {
       // The current page still switches language when storage is unavailable.
     }
+    const currentPath = location.pathname.replace(/^\/(vi|en)(\/|$)/, '/');
+    const nextPath = '/' + nextLanguage + (currentPath === '/' ? '' : currentPath) + location.search + location.hash;
+    window.history.replaceState(null, '', nextPath);
     setErrorMessage(null);
     setSuccessMessage(null);
   };
@@ -91,9 +99,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     }
     const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
     if (redirectUrl?.startsWith('/') && !redirectUrl.startsWith('//')) {
-      window.location.href = redirectUrl;
+      window.location.href = getLocalizedPath(redirectUrl, language);
     } else {
-      navigate(PATHS.home);
+      navigate(getLocalizedPath(PATHS.home, language));
     }
   };
 

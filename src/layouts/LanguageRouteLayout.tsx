@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams, useLocation, useNavigate, Navigate, Outlet } from 'react-router-dom';
 import i18n, { SUPPORTED_LANGS, type SupportedLanguage } from '@/lib/i18n';
+import { PATHS } from '@/routes/paths';
 
 const isValidLanguage = (lang?: string): lang is SupportedLanguage => {
   return typeof lang === 'string' && (SUPPORTED_LANGS as readonly string[]).includes(lang);
@@ -13,12 +14,17 @@ export const LanguageRouteLayout: React.FC = () => {
 
   // If lang parameter is not valid ('vi' | 'en'), redirect to /vi + remaining path
   if (!isValidLanguage(lang)) {
-    let rest = location.pathname;
-    if (lang && rest.startsWith(`/${lang}`)) {
-      rest = rest.slice(lang.length + 1);
+    const isIsoLangCode =
+      typeof lang === 'string' &&
+      /^[a-z]{2}(-[A-Z]{2})?$/i.test(lang) &&
+      !Object.values(PATHS).includes(`/${lang}` as any);
+
+    let cleanPath = location.pathname;
+    if (isIsoLangCode && lang && cleanPath.startsWith(`/${lang}`)) {
+      cleanPath = cleanPath.slice(lang.length + 1);
     }
-    const cleanRest = rest.startsWith('/') ? rest : `/${rest}`;
-    const redirectTarget = `/vi${cleanRest === '/' ? '' : cleanRest}${location.search}${location.hash}`;
+    const normalized = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
+    const redirectTarget = `/vi${normalized === '/' ? '' : normalized}${location.search}${location.hash}`;
     return <Navigate to={redirectTarget} replace />;
   }
 
@@ -82,4 +88,3 @@ export const LanguageRouteLayout: React.FC = () => {
 };
 
 export default LanguageRouteLayout;
-

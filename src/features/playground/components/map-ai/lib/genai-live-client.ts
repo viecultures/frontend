@@ -65,7 +65,7 @@ export class GenAILiveClient {
   public on = this.emitter.on.bind(this.emitter);
   public off = this.emitter.off.bind(this.emitter);
 
-  protected readonly client: GoogleGenAI;
+  protected client: GoogleGenAI;
   protected session?: Session;
   private cancelSetup?: () => void;
   private generation = 0;
@@ -79,6 +79,12 @@ export class GenAILiveClient {
   private _status: 'connected' | 'disconnected' | 'connecting' = 'disconnected';
   public get status() {
     return this._status;
+  }
+
+  public setApiKey(apiKey: string) {
+    this.client = new GoogleGenAI({
+      apiKey: apiKey,
+    });
   }
 
   constructor(apiKey: string, model?: string) {

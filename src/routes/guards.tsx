@@ -1,11 +1,16 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { getStoredUser, getStoredToken, getUserRole } from '@/utils/auth-storage';
-import { PATHS } from './paths';
+import { PATHS, getLocalizedPath, resolveLanguage } from './paths';
 
 interface GuardProps {
   children: React.ReactElement;
 }
+
+const getCurrentLang = (pathname: string): string => {
+  const match = pathname.match(/^\/(vi|en)(\/|$)/);
+  return resolveLanguage(match ? match[1] : undefined);
+};
 
 /**
  * Ensures the user is logged in. If not, redirects to /login with redirect parameter.
@@ -15,8 +20,9 @@ export const RequireAuth: React.FC<GuardProps> = ({ children }) => {
   const isLoggedIn = !!getStoredUser() || !!getStoredToken();
 
   if (!isLoggedIn) {
+    const currentLang = getCurrentLang(location.pathname);
     const redirect = encodeURIComponent(location.pathname + location.search);
-    return <Navigate to={`${PATHS.login}?redirect=${redirect}`} replace />;
+    return <Navigate to={`${getLocalizedPath(PATHS.login, currentLang)}?redirect=${redirect}`} replace />;
   }
 
   return children;
@@ -37,10 +43,11 @@ export const RequireRole: React.FC<RequireRoleProps> = ({
 }) => {
   const location = useLocation();
   const isLoggedIn = !!getStoredUser() || !!getStoredToken();
+  const currentLang = getCurrentLang(location.pathname);
 
   if (!isLoggedIn) {
     const redirect = encodeURIComponent(location.pathname + location.search);
-    return <Navigate to={`${PATHS.login}?redirect=${redirect}`} replace />;
+    return <Navigate to={`${getLocalizedPath(PATHS.login, currentLang)}?redirect=${redirect}`} replace />;
   }
 
   const userRole = getUserRole()?.toUpperCase() || '';
@@ -51,7 +58,7 @@ export const RequireRole: React.FC<RequireRoleProps> = ({
     (targetRole.startsWith('ROLE_') && userRole === targetRole.replace('ROLE_', ''));
 
   if (!hasRole) {
-    return <Navigate to={redirectTo} replace />;
+    return <Navigate to={getLocalizedPath(redirectTo, currentLang)} replace />;
   }
 
   return children;
@@ -65,10 +72,12 @@ export const GuestOnly: React.FC<GuardProps> = ({ children }) => {
   const isLoggedIn = !!getStoredUser() || !!getStoredToken();
 
   if (isLoggedIn) {
+    const currentLang = getCurrentLang(location.pathname);
     const redirect = new URLSearchParams(location.search).get('redirect');
-    const destination = redirect?.startsWith('/') && !redirect.startsWith('//')
+    const target = redirect?.startsWith('/') && !redirect.startsWith('//')
       ? redirect
       : PATHS.home;
+    const destination = getLocalizedPath(target, currentLang);
     return <Navigate to={destination} replace />;
   }
 
