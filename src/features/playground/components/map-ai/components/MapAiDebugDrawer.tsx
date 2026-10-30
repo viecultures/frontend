@@ -56,6 +56,7 @@ export const MapAiDebugDrawer: React.FC<MapAiDebugDrawerProps> = ({ mode = 'all'
 function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
   const {
     logs,
+    usageSamples,
     isDrawerOpen,
     activeTab,
     selectedCategory,
@@ -67,6 +68,7 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
     setSelectedCategory,
     setSearchQuery,
     clearLogs,
+    clearUsage,
   } = useMapAiDebugStore();
 
   const { activeView, connected, client, volume } = useLiveAPIContext();
@@ -94,6 +96,31 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
       return true;
     });
   }, [logs, selectedCategory, searchQuery]);
+
+  const latestChatUsage = useMemo(() => {
+    const latest = usageSamples.find(sample => sample.view === 'chat');
+    if (!latest) return null;
+    const samples = usageSamples.filter(sample => sample.connectionId === latest.connectionId);
+    return {
+      connectionId: latest.connectionId,
+      count: samples.length,
+      reportedTokens: samples.reduce((sum, sample) => sum + (sample.totalTokenCount ?? 0), 0),
+      estimatedUsd: samples.reduce((sum, sample) => sum + (sample.estimatedUsd ?? 0), 0),
+      priced: samples.filter(sample => sample.estimatedUsd !== null).length,
+      unpriced: samples.filter(sample => sample.estimatedUsd === null).length,
+    };
+  }, [usageSamples]);
+
+  const handleDownloadUsage = () => {
+    const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), samples: usageSamples }, null, 2)],
+      { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `ai-workspace-usage-${Date.now()}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
 
   // Copy logs as text / JSON
   const handleCopyLogs = async () => {
@@ -696,6 +723,27 @@ function MapAiDebugDrawerInner({ mode }: { mode: 'button' | 'panel' | 'all' }) {
             {/* 3. SYSTEM HEALTH TAB */}
             {activeTab === 'health' && (
               <div className="space-y-3">
+                <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-300">AI Workspace usage</span>
+                    <span className="text-[10px] text-amber-300">Ước tính, không phải hóa đơn</span>
+                  </div>
+                  {latestChatUsage ? (
+                    <div className="text-[11px] font-mono text-slate-300 space-y-1">
+                      <div>Mẫu nhận được: {latestChatUsage.count}</div>
+                      <div>Token báo cáo: {latestChatUsage.reportedTokens.toLocaleString()}</div>
+                      <div>Chi phí từ mẫu có đủ loại token: {latestChatUsage.priced > 0
+                        ? `$${latestChatUsage.estimatedUsd.toFixed(5)}` : 'Không đủ dữ liệu'}</div>
+                      {latestChatUsage.unpriced > 0 && <div>{latestChatUsage.unpriced} mẫu thiếu dữ liệu để ước tính.</div>}
+                    </div>
+                  ) : <p className="text-[11px] text-slate-400">Chưa có usageMetadata từ phiên chat Live.</p>}
+                  <div className="flex gap-2">
+                    <button type="button" onClick={handleDownloadUsage} disabled={!usageSamples.length}
+                      className="text-[11px] text-sky-300 disabled:text-slate-500">Xuất số liệu JSON</button>
+                    <button type="button" onClick={clearUsage} disabled={!usageSamples.length}
+                      className="text-[11px] text-slate-400 disabled:text-slate-600">Xóa số liệu</button>
+                  </div>
+                </div>
                 {/* WebSocket Card */}
                 <div className="p-3 rounded-xl bg-[#0e1625] border border-[#1b2b40] space-y-2">
                   <div className="flex items-center justify-between">

@@ -33,7 +33,7 @@ function fixture() {
     prefill: (turns: Content[]) => { calls.push('prefill'); prefills.push(turns); },
     send: (parts: Part | Part[]) => { calls.push('send'); messages.push(parts); },
     sendToolResponse: (_response: LiveClientToolResponse) => { calls.push('tool-response'); },
-    endAudioInput: () => {}, sendRealtimeInput: () => {},
+    endAudioInput: () => {}, startActivity: () => { calls.push('activity-start'); }, endActivity: () => { calls.push('activity-end'); }, sendRealtimeInput: () => {},
   };
   const audio: ConversationAudioPort = {
     unlock: () => { calls.push('unlock'); return unlock; },

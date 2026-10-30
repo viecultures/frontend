@@ -14,7 +14,7 @@ const text = z.string().trim().min(1).max(4000);
 const region = z.enum(['north', 'central', 'south', 'all']);
 const level = z.enum(['Level 1', 'Level 2', 'Level 3']);
 
-export const CHAT_TOOL_NAMES = new Set(['openMap', 'openArticleDetail']);
+export const CHAT_TOOL_NAMES = new Set(['openMap', 'openArticleDetail', 'searchWikipedia']);
 
 export const toolSchemas = {
   openMap: z.strictObject({ provinceName: text.optional(), region: region.optional() })
@@ -48,6 +48,10 @@ export const toolSchemas = {
     topic: text.optional(),
     category: z.enum(['Cuisine', 'Heritage', 'Crafts', 'Nature', 'Folklore']).optional(),
   }),
+  searchWikipedia: z.strictObject({
+    query: z.string().trim().min(2).max(100),
+    language: z.enum(['en', 'vi']).optional(),
+  }),
 } satisfies Record<string, z.ZodType>;
 
 const GUIDED_TOOL_NAMES = new Set(['listCulturalLessons', 'loadLessonDiscussionPlan', 'recordLessonQuizResult']);
@@ -72,6 +76,9 @@ export async function dispatchTool(name: string, args: unknown, context: ToolCon
       return { error: 'MAP_TOOLS_DISABLED', message: 'Map tools are disabled for this session.' };
     }
     const tutorMode = context.tutorMode ?? useSettings.getState().tutorMode;
+    if (name === 'searchWikipedia' && tutorMode !== 'open-conversation') {
+      return { error: 'FREE_TALK_REQUIRED', message: 'Wikipedia search is available only in Free Talk.' };
+    }
     if (GUIDED_TOOL_NAMES.has(name) && tutorMode !== 'guided-lesson') {
       return { error: 'GUIDED_MODE_REQUIRED', message: 'This tool requires guided lesson mode.' };
     }

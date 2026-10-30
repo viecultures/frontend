@@ -16,10 +16,13 @@ import {
   MicOff,
   Keyboard,
   Send,
+  ImagePlus,
+  RotateCcw,
 } from 'lucide-react';
-import { useLogStore, useUI } from '../lib/state';
+import { useLogStore, useUI, useSettings } from '../lib/state';
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
+import { useImagePreviewStore } from '../lib/image-previews';
 
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -45,8 +48,15 @@ export type ControlTrayProps = {
 
 export function ControlTray({ trayRef }: ControlTrayProps) {
   const { t } = useTranslation('playground');
-  const { speakerMuted, toggleSidebar } = useUI();
+  const { speakerMuted, toggleSidebar, isSidebarOpen } = useUI();
+  const voiceInteractionMode = useSettings(state => state.voiceInteractionMode);
+  const tutorMode = useSettings(state => state.tutorMode);
+  const pushToTalk = voiceInteractionMode === 'push-to-talk';
+  const heldKey = useRef(false);
   const [textPrompt, setTextPrompt] = useState('');
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [imageStatus, setImageStatus] = useState<{ kind: 'success' | 'error'; message: string } | null>(null);
+  useEffect(() => setImageStatus(null), [tutorMode]);
   const handoffRevision = useReaderHandoff(state => state.draftRevision);
   const connectButtonRef = useRef<HTMLButtonElement>(null);
   const isMobile = useMediaQuery('(max-width: 768px), (orientation: landscape) and (max-height: 768px)');
@@ -77,14 +87,21 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   const {
     activeView, connected, connecting, ending, connectionError, pendingPrompt, isSending,
     isRestoringContext, isAwaitingResponse, isPlaying, recording, inputVolume,
-    startConversation, resumeConversation, sendMessage, stopConversation,
+    startConversation, resumeConversation, sendMessage, sendImage, stopConversation, resetConversation,
     endConversation, setMicrophoneEnabled, setSpeakerMuted, retry,
+    pressPushToTalk, releasePushToTalk,
   } = useLiveAPIContext();
   const active = activeView === 'chat';
   const busy = connecting || ending || isSending || isRestoringContext;
   const muted = !recording;
   const hasHistory = turns.some(turn => turn.role !== 'system');
+  useEffect(() => {
+    if (imageStatus?.kind !== 'success') return;
+    const timer = window.setTimeout(() => setImageStatus(current => current === imageStatus ? null : current), 4000);
+    return () => window.clearTimeout(timer);
+  }, [imageStatus]);
   const handleMicClick = () => {
+    if (pushToTalk) return;
     if (!active || busy) return;
     if (!connected) {
       if (hasHistory) {
@@ -96,6 +113,38 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     }
     void setMicrophoneEnabled(!recording);
   };
+
+  useEffect(() => {
+    if (!active || !pushToTalk) return;
+    const release = () => {
+      if (!heldKey.current) return;
+      heldKey.current = false;
+      releasePushToTalk();
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== 'KeyV' || event.repeat || heldKey.current || isSidebarOpen ||
+        event.ctrlKey || event.altKey || event.metaKey ||
+        (event.target instanceof HTMLElement && !!event.target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]'))) return;
+      event.preventDefault();
+      heldKey.current = true;
+      void pressPushToTalk();
+    };
+    const onKeyUp = (event: KeyboardEvent) => {
+      if (event.code === 'KeyV' && heldKey.current) { event.preventDefault(); release(); }
+    };
+    const onVisibilityChange = () => { if (document.hidden) release(); };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', release);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      release();
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', release);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [active, pushToTalk, isSidebarOpen, pressPushToTalk, releasePushToTalk]);
 
   const sendTextPrompt = async () => {
     console.log('[ControlTray] sendTextPrompt triggered:', { textPrompt, active, busy });
@@ -120,6 +169,42 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     await sendTextPrompt();
   };
 
+  const handleSelectedImage = async (file?: File) => {
+    if (!file || !active || !connected || busy || tutorMode !== 'open-conversation') return;
+    setImageStatus(null);
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5_000_000) {
+      setImageStatus({ kind: 'error', message: t('playground.tray_controls.image_invalid') });
+      return;
+    }
+    let previewUrl: string | null = null;
+    try {
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, 1024 / Math.max(bitmap.width, bitmap.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Canvas unavailable');
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      bitmap.close();
+      const data = canvas.toDataURL('image/jpeg', 0.78).split(',')[1];
+      if (!data || data.length > 1_500_000) throw new Error('Image too large');
+      const prompt = textPrompt.trim() || t('playground.tray_controls.image_default_prompt');
+      previewUrl = URL.createObjectURL(file);
+      const result = sendImage({ data, text: prompt });
+      if (result.status !== 'ok' || !result.turnId) throw new Error(result.message);
+      useImagePreviewStore.getState().addPreview(result.turnId, previewUrl);
+      previewUrl = null;
+      setTextPrompt('');
+      setImageStatus({ kind: 'success', message: t('playground.tray_controls.image_sent') });
+    } catch {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setImageStatus({ kind: 'error', message: t('playground.tray_controls.image_failed') });
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (active && e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
@@ -131,19 +216,42 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     toggleSidebar();
   };
 
-  const micButtonTitle = muted ? t('playground.tray.mic_on_title') : t('playground.tray.mic_off_title');
+  const handleNewConversation = () => {
+    if (connected || busy) return;
+    resetConversation();
+    setTextPrompt('');
+    setImageStatus(null);
+  };
+
+  const micButtonTitle = pushToTalk ? t('playground.tray.hold_to_talk') : muted ? t('playground.tray.mic_on_title') : t('playground.tray.mic_off_title');
   const connectButtonTitle = connected || connecting || ending ? t('playground.tray.pause_convo_title') : hasHistory ? t('playground.tray.resume_convo_title') : t('playground.tray.start_speaking_title');
+  const trayStatus = connecting ? t('playground.tray.connecting')
+    : ending ? t('playground.tray.wrapping_up')
+      : isRestoringContext ? t('playground.tray.restoring_context')
+        : isPlaying ? t('playground.tray.ai_speaking')
+          : isAwaitingResponse || isSending ? t('playground.tray.waiting_reply')
+            : pushToTalk ? recording ? t('playground.tray.release_to_reply') : t('playground.tray.hold_to_talk')
+              : connected ? recording ? t('playground.tray.listening') : t('playground.tray.mic_off')
+                : hasHistory ? t('playground.tray.paused') : t('playground.tray.ready');
 
   if (!active) return null;
 
   return (
     <section className="control-tray" ref={trayRef}>
-      <div role="status" className="px-3 py-1 text-xs text-slate-400">
-        {connecting ? t('playground.tray.connecting') : ending ? t('playground.tray.wrapping_up') : isRestoringContext ? t('playground.tray.restoring_context') : isPlaying ? t('playground.tray.ai_speaking') : isAwaitingResponse || isSending ? t('playground.tray.waiting_reply') : connected ? recording ? t('playground.tray.listening') : t('playground.tray.mic_off') : hasHistory ? t('playground.tray.paused') : t('playground.tray.ready')}
-        {recording && <meter className="ml-2 w-16" min={0} max={1} value={inputVolume} aria-label={t('playground.tray.mic_meter_aria')} />}
-        {connectionError && <div role="alert">{connectionError} <button type="button" disabled={busy} onClick={() => void handleRetry()}>{t('playground.tray_controls.retry')}</button></div>}
-        {connected && !busy && <button type="button" className="ml-3 underline" onClick={() => void endConversation()}>{t('playground.tray_controls.finish_recap')}</button>}
-        {!connected && !busy && hasHistory && <button type="button" className="ml-3 underline" onClick={() => void resumeConversation({ input: 'text' })}>{t('playground.tray_controls.resume_conversation')}</button>}
+      <div className="ai-tray-status-row">
+        <div className="ai-tray-status-content">
+          <span className="ai-tray-current-status" role="status">{trayStatus}</span>
+          {recording && <meter className="ai-tray-meter" min={0} max={1} value={inputVolume} aria-label={t('playground.tray.mic_meter_aria')} />}
+          {imageStatus && <span className={cn('ai-tray-image-notice', `ai-tray-image-notice--${imageStatus.kind}`)} role={imageStatus.kind === 'error' ? 'alert' : 'status'}>{imageStatus.message}</span>}
+          {connectionError && <span className="ai-tray-error" role="alert">{connectionError} <button type="button" disabled={busy} onClick={() => void handleRetry()}>{t('playground.tray_controls.retry')}</button></span>}
+        </div>
+        <div className="ai-tray-session-actions">
+          {connected && !busy && <button type="button" onClick={() => void endConversation()}>{t('playground.tray_controls.finish_recap')}</button>}
+          {!connected && !busy && hasHistory && <>
+            {!connectionError && <button type="button" onClick={() => void resumeConversation({ input: 'voice' })}>{t('playground.tray_controls.resume_conversation')}</button>}
+            <button type="button" onClick={handleNewConversation}><RotateCcw size={14} aria-hidden="true" />{t('playground.sidebar.new_conversation')}</button>
+          </>}
+        </div>
       </div>
       <nav className={cn('actions-nav', { 'text-entry-visible-landscape': isLandscape && isTextEntryVisible })}>
         <button
@@ -191,8 +299,17 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
             'mic-on': !muted,
             'mic-off': muted,
           })}
-          disabled={busy}
+          disabled={busy && !pushToTalk}
           onClick={handleMicClick}
+          onPointerDown={event => {
+            if (!pushToTalk || event.button !== 0) return;
+            event.preventDefault();
+            event.currentTarget.setPointerCapture(event.pointerId);
+            void pressPushToTalk();
+          }}
+          onPointerUp={() => { if (pushToTalk) releasePushToTalk(); }}
+          onPointerCancel={() => { if (pushToTalk) releasePushToTalk(); }}
+          onLostPointerCapture={() => { if (pushToTalk) releasePushToTalk(); }}
           title={micButtonTitle}
           aria-label={micButtonTitle}
         >
@@ -207,8 +324,21 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
         >
           <Keyboard className="w-5 h-5" />
         </button>
+        {tutorMode === 'open-conversation' && <>
+          <input ref={imageInputRef} type="file" accept="image/jpeg,image/png,image/webp" hidden
+            onChange={event => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+              void handleSelectedImage(file);
+            }} />
+          <button type="button" className="action-button" disabled={!connected || busy}
+            onClick={() => imageInputRef.current?.click()}
+            title={t('playground.tray_controls.send_image')}
+            aria-label={t('playground.tray_controls.send_image')}>
+            <ImagePlus className="w-5 h-5" />
+          </button>
+        </>}
       </nav>
-
       {(!isMobile || isTextEntryVisible) && (
         <form className="prompt-form" onSubmit={handleTextSubmit}>
           <textarea

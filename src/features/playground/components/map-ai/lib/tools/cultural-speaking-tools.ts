@@ -9,6 +9,19 @@ import type { FunctionResponseScheduling } from '@google/genai';
 
 export const culturalSpeakingTools: FunctionCall[] = [
   {
+    name: 'searchWikipedia',
+    description: 'Search Wikipedia only when the learner explicitly asks to verify a fact, find a source, or see an illustrative image. Return up to three cited summaries. Never use for routine conversation or send personal information as a query.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        query: { type: 'STRING', description: 'Short public topic to search, 2-100 characters. Do not include private user information.' },
+        language: { type: 'STRING', enum: ['en', 'vi'], description: 'Wikipedia language; default English.' },
+      },
+      required: ['query'],
+    },
+    isEnabled: true,
+  },
+  {
     name: 'openMap',
     description: 'Opens the Vietnam map panel in AI Map Chat. Call when the learner asks to open or see the map. Optionally focus one province or region. Without arguments, show the whole country.',
     parameters: {

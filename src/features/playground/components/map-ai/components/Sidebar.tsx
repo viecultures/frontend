@@ -13,6 +13,7 @@ import {
   type CulturalTutorMode,
   type CorrectionMode,
   type MapContextMode,
+  type VoiceInteractionMode,
 } from '../lib/state';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import {
@@ -59,14 +60,16 @@ export default function Sidebar() {
     tutorMode,
     correctionMode,
     mapContextMode,
+    voiceInteractionMode,
     proficiencyLevel,
     customGeminiApiKey,
     theme,
     setVoice,
-    setActiveLessonId,
     setTutorMode,
+    setActiveLessonId,
     setCorrectionMode,
     setMapContextMode,
+    setVoiceInteractionMode,
     setCustomGeminiApiKey,
     setTheme,
   } = useSettings();
@@ -90,15 +93,18 @@ export default function Sidebar() {
     }
   }, [activeView, availableVoices, voice, setVoice]);
 
-  // When lesson changes
+  const handleTutorModeChange = (mode: CulturalTutorMode) => {
+    if (!activeView || connected || busy || tutorMode === mode) return;
+    resetConversation();
+    setTutorMode(mode);
+  };
+
   const handleLessonChange = (newLessonId: string) => {
     if (!activeView || connected) return;
     setActiveLessonId(newLessonId);
     const targetLesson = findLessonById(newLessonId);
-    if (targetLesson) {
-      if (targetLesson.provinceId && mapContextMode !== 'off') {
-        useMapStore.getState().selectProvince(targetLesson.provinceId, 'user');
-      }
+    if (targetLesson?.provinceId && mapContextMode !== 'off') {
+      useMapStore.getState().selectProvince(targetLesson.provinceId, 'user');
     }
   };
 
@@ -184,29 +190,19 @@ export default function Sidebar() {
         )}
 
         <div className="sidebar-section">
-          {/* Target Reading Lesson Selector */}
-          {tutorMode !== 'free-conversation' && <div className="space-y-1.5 mb-4">
+          {activeView === 'immersive' && tutorMode === 'guided-lesson' && <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <BookOpen className="w-3.5 h-3.5" />
               <span>{t('playground.sidebar.story_to_practice')}</span>
             </label>
-            <select
-              aria-label={t('playground.sidebar.story_to_practice')} value={activeLessonId}
-              disabled={connected}
-              onChange={e => handleLessonChange(e.target.value)}
-              className="w-full text-xs font-serif"
-            >
+            <select aria-label={t('playground.sidebar.story_to_practice')} value={activeLessonId}
+              disabled={connected} onChange={e => handleLessonChange(e.target.value)} className="w-full text-xs font-serif">
               {LESSON_AGENT_CATALOG.map((lesson: LessonAgentMetadata) => (
-                <option key={lesson.id} value={lesson.id}>
-                  {lesson.title} ({lesson.provinceName})
-                </option>
+                <option key={lesson.id} value={lesson.id}>{lesson.title} ({lesson.provinceName})</option>
               ))}
             </select>
-            <p className="text-[11px] text-gray-400">
-              {t('playground.sidebar.story_hint')}
-            </p>
+            <p className="text-[11px] text-gray-400">{t('playground.sidebar.story_hint')}</p>
           </div>}
-
           {/* Proficiency Level Selector (Level 1, Level 2, Level 3) */}
           <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
@@ -232,6 +228,20 @@ export default function Sidebar() {
 
           {/* Cultural Tutor Mode */}
           <div className="space-y-1.5 mb-4">
+            <label htmlFor="voice-interaction-mode" className="text-xs font-bold text-antique-gold uppercase tracking-wider">
+              {t('playground.sidebar.voice_interaction_label')}
+            </label>
+            <select id="voice-interaction-mode" value={voiceInteractionMode} disabled={connected}
+              onChange={e => setVoiceInteractionMode(e.target.value as VoiceInteractionMode)} className="w-full text-xs">
+              <option value="natural">{t('playground.sidebar.voice_natural')}</option>
+              <option value="push-to-talk">{t('playground.sidebar.voice_push_to_talk')}</option>
+            </select>
+            <p className="text-[11px] text-gray-400">{t(voiceInteractionMode === 'push-to-talk'
+              ? 'playground.sidebar.voice_push_to_talk_hint' : 'playground.sidebar.voice_natural_hint')}</p>
+          </div>
+
+          {/* Cultural Tutor Mode */}
+          <div className="space-y-1.5 mb-4">
             <label className="flex items-center gap-1.5 text-xs font-bold text-antique-gold uppercase tracking-wider">
               <Mic className="w-3.5 h-3.5" />
               <span>{t('playground.sidebar.practice_mode')}</span>
@@ -239,37 +249,40 @@ export default function Sidebar() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                disabled={connected}
-                onClick={() => setTutorMode('free-conversation')}
+                disabled={connected || busy}
+                onClick={() => activeView === 'chat' ? handleTutorModeChange('free-conversation') : setTutorMode('free-conversation')}
                 className={`py-2 px-2 rounded-lg text-xs font-semibold text-center border transition-all ${
-                  tutorMode === 'free-conversation'
+                  (activeView === 'immersive' ? tutorMode !== 'guided-lesson' : tutorMode === 'free-conversation')
                     ? 'bg-heritage-green text-antique-gold border-antique-gold/60 shadow-md font-bold'
                     : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
                 }`}
               >
-                {t('playground.sidebar.free_talk')}
+                {t(activeView === 'chat' ? 'playground.sidebar.story_practice' : 'playground.sidebar.free_talk')}
               </button>
               <button
                 type="button"
-                disabled={connected}
-                onClick={() => setTutorMode('guided-lesson')}
+                disabled={connected || busy}
+                onClick={() => activeView === 'chat' ? handleTutorModeChange('open-conversation') : setTutorMode('guided-lesson')}
                 className={`py-2 px-2 rounded-lg text-xs font-semibold text-center border transition-all ${
-                  tutorMode === 'guided-lesson'
+                  tutorMode === (activeView === 'chat' ? 'open-conversation' : 'guided-lesson')
                     ? 'bg-heritage-green text-antique-gold border-antique-gold/60 shadow-md font-bold'
                     : 'bg-[#141b22] text-gray-400 border-white/10 hover:text-white'
                 }`}
               >
-                {t('playground.sidebar.story_practice')}
+                {t(activeView === 'chat' ? 'playground.sidebar.free_talk' : 'playground.sidebar.story_practice')}
               </button>
             </div>
             <p className="text-[11px] text-gray-400 mt-1">
-              {tutorMode === 'guided-lesson'
-                ? t('playground.sidebar.guided_lesson_desc')
-                : t('playground.sidebar.free_convo_desc')}
+              {activeView === 'chat'
+                ? t(tutorMode === 'open-conversation' ? 'playground.sidebar.free_convo_desc' : 'playground.sidebar.guided_lesson_desc')
+                : t(tutorMode === 'guided-lesson' ? 'playground.sidebar.guided_lesson_desc_immersive' : 'playground.sidebar.free_convo_desc_immersive')}
             </p>
           </div>
 
-          {tutorMode === 'free-conversation' && (
+          <details className="mb-4 text-xs text-gray-400">
+            <summary className="cursor-pointer font-bold text-antique-gold">{t('playground.sidebar.advanced_settings')}</summary>
+            <div className="mt-4">
+          {(activeView === 'chat' || tutorMode !== 'guided-lesson') && (
             <>
               <div className="space-y-1.5 mb-4">
                 <label className="text-xs font-bold text-antique-gold uppercase tracking-wider">{t('playground.sidebar.corrections_label')}</label>
@@ -342,7 +355,7 @@ export default function Sidebar() {
               htmlFor="system-message-toggle"
               className="settings-toggle-label text-xs"
             >
-              {t('playground.sidebar.feedback_toggle')}
+              {t('playground.sidebar.system_messages_toggle')}
             </label>
           </div>
 
@@ -361,15 +374,17 @@ export default function Sidebar() {
               <option value="light">{t('playground.sidebar.theme_light')}</option>
             </select>
           </div>
+          </div>
+          </details>
         </div>
 
         {/* Footer Actions */}
         <div className="sidebar-actions">
-          <button onClick={handleExportLogs} title={t('playground.sidebar.export_history_title')}>
+          {import.meta.env.DEV && <button onClick={handleExportLogs} title={t('playground.sidebar.export_history_title')}>
             <Download className="w-4 h-4 mr-1.5" />
             {t('playground.sidebar.export_history')}
-          </button>
-          <button
+          </button>}
+          {activeView !== 'chat' && <button
             onClick={() => {
               if (activeView) resetConversation();
             }}
@@ -377,9 +392,9 @@ export default function Sidebar() {
           >
             <RefreshCw className="w-4 h-4 mr-1.5" />
             {t('playground.sidebar.new_conversation')}
-          </button>
+          </button>}
         </div>
-        <button type="button" className="ai-workspace-developer-link" onClick={() => { useMapAiDebugStore.getState().setDrawerOpen(true); toggleSidebar(); }}>{t('playground.sidebar.developer_tools')}</button>
+        {import.meta.env.DEV && <button type="button" className="ai-workspace-developer-link" onClick={() => { useMapAiDebugStore.getState().setDrawerOpen(true); toggleSidebar(); }}>{t('playground.sidebar.developer_tools')}</button>}
       </div>
       </DialogPanel>
     </Dialog>
