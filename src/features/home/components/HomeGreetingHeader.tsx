@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Sparkles, Target } from 'lucide-react';
+import { Flame, Target } from 'lucide-react';
 
 interface HomeGreetingHeaderProps {
   userName?: string;
@@ -45,7 +45,7 @@ export function HomeGreetingHeader({
 
       <div className="home-status-chips">
         <span className="home-status-chip home-status-streak" title={streakText}>
-          <Sparkles size={14} className="home-chip-icon" aria-hidden="true" />
+          <Flame size={14} className="home-chip-icon" aria-hidden="true" />
           <span>{streakText}</span>
         </span>
         <span className="home-status-chip home-status-goal" title={goalText}>
