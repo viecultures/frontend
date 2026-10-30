@@ -3,6 +3,7 @@ import '../flashcard-study.css';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   Volume2,
   BookOpen,
@@ -11,11 +12,21 @@ import {
   Shuffle,
   VolumeX,
   RotateCw,
+  RotateCcw,
+  HelpCircle,
   CheckCircle2,
+  Sparkles,
+  Layers,
+  Award,
+  ChevronRight,
 } from 'lucide-react';
 import { useGamification } from '@/context/GamificationContext';
 import type { RewardCelebrationPayload } from '@/types';
-import type { Flashcard } from '@/data/flashcardsData';
+import {
+  type Flashcard,
+  SAMPLE_STUDY_DECKS,
+  type SampleDeckMeta,
+} from '@/data/flashcardsData';
 import {
   readSavedVocabulary,
   getAllSavedVocabularies,
@@ -29,17 +40,29 @@ import {
 } from '../components';
 import { cardsFromVocabulary, loadStudyDeck, type StudyDeck } from '../services/studyDeck';
 import { persistVocabProgress } from '../services/vocabProgressService';
+import {
+  calculateNextSRS,
+  getSRSState,
+  saveSRSState,
+  type AnkiRating,
+  type CardSRSState,
+} from '../services/srsEngine';
 import { paths } from '@/routes/paths';
 import { MocSonSealModal, StreakBadge } from '@/features/gamification';
-import { Award } from 'lucide-react';
 
 /**
- * FlashcardsPage: Main 2-Sided Leitner Binary Flashcard Study Experience.
- * Implements Active Recall with masked context sentences, binary Remembered/Forgot evaluation,
- * Leitner queue re-insertion, EC-04.1 cognitive fatigue prevention, and offline progress sync.
+ * FlashcardsPage: Full Anki Spaced-Repetition Experience for Vietnamese Cultural Heritage.
+ * Features:
+ * - 4-Level Anki Evaluation (Again, Hard, Good, Easy) with SM-2 calculated intervals
+ * - In-session active recall queue cycling (Again re-queues until graduated)
+ * - Anki status counter pill bar: [New] [Learning] [Graduated]
+ * - Interactive Sample Cultural Decks Shelf with 1-click switching
+ * - 100% SVG iconography, zero raw emojis
  */
 export const FlashcardsPage: React.FC = () => {
-  const { t } = useTranslation('flashcards');
+  const { t, i18n } = useTranslation('flashcards');
+  const isEn = (i18n.language || '').toLowerCase().startsWith('en');
+  const navigate = useAppNavigate();
   const [searchParams] = useSearchParams();
   const deckId = searchParams.get('deck') || 'imperial-hue';
   const level = searchParams.get('level') || 'Level 1';
@@ -50,24 +73,26 @@ export const FlashcardsPage: React.FC = () => {
   const [isLoadingDeck, setIsLoadingDeck] = useState<boolean>(true);
   const [reward, setReward] = useState<RewardCelebrationPayload | null>(null);
 
-  // Deck / cards loading
+  // Deck & Card states
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [queue, setQueue] = useState<string[]>([]);
   const [currentQueueIndex, setCurrentQueueIndex] = useState<number>(0);
-  const [ratings, setRatings] = useState<Record<string, 'mastered' | 'review'>>({});
+  const [ratings, setRatings] = useState<Record<string, AnkiRating>>({});
   const [forgotCounts, setForgotCounts] = useState<Record<string, number>>({});
+  const [cardSRSMap, setCardSRSMap] = useState<Record<string, CardSRSState>>({});
   const [cognitiveFatigueAlert, setCognitiveFatigueAlert] = useState<string | null>(null);
   const [isSealModalOpen, setIsSealModalOpen] = useState<boolean>(false);
 
-  // Card view state
+  // View settings
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
   const [isAutoAudio, setIsAutoAudio] = useState<boolean>(false);
   const [accentVoice] = useState<'en-US' | 'en-GB'>('en-US');
   const [isShuffled, setIsShuffled] = useState<boolean>(false);
+  const [showSampleDecks, setShowSampleDecks] = useState<boolean>(false);
 
-  // Session key for persistent progress (EC-04.2)
+  // Persistent storage key
   const sessionStorageKey = useMemo(() => {
-    return `leitner_${deckId}_${level}${savedOnly ? '_saved' : ''}`;
+    return `anki_${deckId}_${level}${savedOnly ? '_saved' : ''}`;
   }, [deckId, level, savedOnly]);
 
   // Load Deck & Cards
@@ -109,12 +134,25 @@ export const FlashcardsPage: React.FC = () => {
     };
   }, [deckId, level, savedOnly]);
 
-  // Restore saved session (EC-04.2)
+  // Load SRS state for all cards
+  useEffect(() => {
+    if (!cards.length) return;
+    const initialSRS: Record<string, CardSRSState> = {};
+    for (const card of cards) {
+      const existing = getSRSState(card.id) || getSRSState(card.word);
+      if (existing) {
+        initialSRS[card.id] = existing;
+      }
+    }
+    setCardSRSMap(initialSRS);
+  }, [cards]);
+
+  // Restore saved session
   useEffect(() => {
     if (!cards.length) return;
     const cached = readReviewSession(sessionStorageKey) as {
       queue?: string[];
-      ratings?: Record<string, 'mastered' | 'review'>;
+      ratings?: Record<string, AnkiRating>;
       forgotCounts?: Record<string, number>;
       currentIndex?: number;
     } | null;
@@ -131,7 +169,7 @@ export const FlashcardsPage: React.FC = () => {
     }
   }, [sessionStorageKey, cards.length]);
 
-  // Auto-save session state on change
+  // Auto-save session state
   useEffect(() => {
     if (!cards.length) return;
     saveReviewSession(sessionStorageKey, {
@@ -164,7 +202,7 @@ export const FlashcardsPage: React.FC = () => {
     [currentCard?.word, accentVoice]
   );
 
-  // Auto-play audio when flipped to the back (per spaced_repetition.md)
+  // Auto-play audio when flipped to the back
   useEffect(() => {
     if (isFlipped && isAutoAudio && currentCard?.word) {
       playAudio(currentCard.word);
@@ -192,66 +230,67 @@ export const FlashcardsPage: React.FC = () => {
     }
   }, [isComplete, handleSessionComplete]);
 
-  // Evaluation Actions
-  const handleRemembered = async () => {
+  // Anki 4-Level Evaluation Handler
+  const handleRate = async (rating: AnkiRating) => {
     if (!currentCard) return;
     const cardId = currentCard.id;
+    const currentSRS = cardSRSMap[cardId] || getSRSState(cardId);
 
-    // 1. Mark as mastered
-    setRatings((prev) => ({ ...prev, [cardId]: 'mastered' }));
+    // 1. Calculate next SRS parameters via SM-2
+    const { nextState, repeatInSession } = calculateNextSRS(
+      currentSRS,
+      cardId,
+      currentCard.word,
+      rating
+    );
+
+    // Save SRS state to engine & local state
+    saveSRSState(nextState);
+    setCardSRSMap((prev) => ({ ...prev, [cardId]: nextState }));
+    setRatings((prev) => ({ ...prev, [cardId]: rating }));
     setIsFlipped(false);
-    setCognitiveFatigueAlert(null);
 
-    // 2. Persist to API / localStorage
+    // 2. Persist to API & learningStorage
     void persistVocabProgress({
       vocabId: cardId,
       word: currentCard.word,
-      status: 'mastered',
-      reviewCount: (forgotCounts[cardId] || 0) + 1,
+      status: rating === 'easy' ? 'mastered' : 'learning',
+      reviewCount: nextState.reps + nextState.lapses,
       contextSentence: currentCard.contextEn,
     });
 
-    // 3. Remove current card from active queue
-    setQueue((prevQueue) => {
-      const nextQueue = prevQueue.filter((_, idx) => idx !== currentQueueIndex);
-      return nextQueue;
-    });
-  };
+    // 3. Queue Management
+    if (rating === 'again') {
+      const nextForgot = (forgotCounts[cardId] || 0) + 1;
+      setForgotCounts((prev) => ({ ...prev, [cardId]: nextForgot }));
 
-  const handleForgot = async () => {
-    if (!currentCard) return;
-    const cardId = currentCard.id;
-    const nextForgotCount = (forgotCounts[cardId] || 0) + 1;
+      if (nextForgot >= 3) {
+        setCognitiveFatigueAlert(
+          t('study.fatigue_word_hint', {
+            word: currentCard.word,
+            defaultValue: `Từ "${currentCard.word}" có vẻ khó, hãy đọc lại câu ngữ cảnh trong bài đọc!`,
+          })
+        );
+        // Graduate to prevent endless cognitive fatigue
+        setQueue((prevQueue) => prevQueue.filter((_, idx) => idx !== currentQueueIndex));
+        return;
+      }
 
-    setForgotCounts((prev) => ({ ...prev, [cardId]: nextForgotCount }));
-    setRatings((prev) => ({ ...prev, [cardId]: 'review' }));
-    setIsFlipped(false);
-
-    // 2. Persist to API / localStorage
-    void persistVocabProgress({
-      vocabId: cardId,
-      word: currentCard.word,
-      status: 'learning',
-      reviewCount: nextForgotCount,
-      contextSentence: currentCard.contextEn,
-    });
-
-    // 3. EC-04.1 Cognitive Fatigue Check: Max 3 repeats in 1 session
-    if (nextForgotCount >= 3) {
-      setCognitiveFatigueAlert(
-        t('study.fatigue_word_hint', { word: currentCard.word, defaultValue: `Từ "${currentCard.word}" có vẻ khó với bạn, hãy đọc lại câu ngữ cảnh trong bài đọc!` })
-      );
-      // Remove from active queue to prevent infinite fatigue
+      // Re-insert into session queue (3 cards later or at the end)
+      setQueue((prevQueue) => {
+        const item = prevQueue[currentQueueIndex];
+        const remaining = prevQueue.filter((_, idx) => idx !== currentQueueIndex);
+        if (remaining.length === 0) return [item];
+        const insertIndex = Math.min(remaining.length, 3);
+        const next = [...remaining];
+        next.splice(insertIndex, 0, item);
+        return next;
+      });
+    } else {
+      // Hard, Good, Easy: Graduate card from active queue for this session
+      setCognitiveFatigueAlert(null);
       setQueue((prevQueue) => prevQueue.filter((_, idx) => idx !== currentQueueIndex));
-      return;
     }
-
-    // 4. Leitner Queue re-insertion: Move to the end of the queue
-    setQueue((prevQueue) => {
-      const item = prevQueue[currentQueueIndex];
-      const remaining = prevQueue.filter((_, idx) => idx !== currentQueueIndex);
-      return [...remaining, item];
-    });
   };
 
   const handleRestart = () => {
@@ -276,7 +315,13 @@ export const FlashcardsPage: React.FC = () => {
     });
   };
 
-  // Keyboard navigation
+  const handleSelectSampleDeck = (sampleId: string) => {
+    navigate(paths.flashcardStudy({ deck: sampleId }));
+  };
+
+  // Keyboard navigation: Anki standard
+  // Front: Space -> Flip
+  // Back: Space -> Good (3); 1 -> Again; 2 -> Hard; 3 -> Good; 4 -> Easy
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (
@@ -290,13 +335,25 @@ export const FlashcardsPage: React.FC = () => {
 
       if (e.code === 'Space') {
         e.preventDefault();
-        setIsFlipped((f) => !f);
-      } else if (e.key === '1') {
-        e.preventDefault();
-        void handleForgot();
-      } else if (e.key === '2') {
-        e.preventDefault();
-        void handleRemembered();
+        if (!isFlipped) {
+          setIsFlipped(true);
+        } else {
+          void handleRate('good');
+        }
+      } else if (isFlipped) {
+        if (e.key === '1') {
+          e.preventDefault();
+          void handleRate('again');
+        } else if (e.key === '2') {
+          e.preventDefault();
+          void handleRate('hard');
+        } else if (e.key === '3') {
+          e.preventDefault();
+          void handleRate('good');
+        } else if (e.key === '4') {
+          e.preventDefault();
+          void handleRate('easy');
+        }
       }
     };
 
@@ -311,7 +368,7 @@ export const FlashcardsPage: React.FC = () => {
         <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 text-center space-y-4">
           <div className="w-10 h-10 border-4 border-antique-gold/30 border-t-antique-gold rounded-full animate-spin" />
           <p className="text-sm font-medium text-ink-soft">
-            {t('study.loading', 'Đang tải dữ liệu thẻ từ vựng ngữ cảnh...')}
+            {t('study.loading', 'Đang tải dữ liệu thẻ từ vựng Anki Spaced Repetition...')}
           </p>
         </div>
       </FlashcardSidebarLayout>
@@ -331,10 +388,14 @@ export const FlashcardsPage: React.FC = () => {
           </h1>
           <p className="text-sm text-ink-soft">
             {savedOnly
-              ? t('study.no_cards_desc', 'Hãy dùng tính năng 1-Click Save khi đọc bài để tự động đính kèm câu ngữ cảnh vào sổ tay cá nhân.')
-              : t('study.no_cards_desc', 'Bài học này hiện chưa có bộ thẻ từ vựng hoặc chưa được đồng bộ.')}
+              ? t(
+                  'study.no_cards_desc',
+                  'Hãy dùng tính năng 1-Click Save khi đọc bài để tự động lưu vào sổ tay cá nhân.'
+                )
+              : t('study.no_cards_desc', 'Hãy chọn một trong các bộ thẻ học mẫu bên dưới để bắt đầu luyện tập.')}
           </p>
-          <div className="pt-2">
+
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to={paths.reader({ postId: deckId, level })}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-heritage-green text-warm-ivory font-medium hover:bg-heritage-dark transition-colors"
@@ -342,14 +403,35 @@ export const FlashcardsPage: React.FC = () => {
               <ArrowLeft className="w-4 h-4" />
               <span>{t('study.read_article', 'Quay lại bài đọc')}</span>
             </Link>
+            <button
+              type="button"
+              onClick={() => handleSelectSampleDeck('pho-hanoi')}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-antique-gold text-heritage-dark font-bold hover:bg-antique-bright transition-colors"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>{t('study.explore_samples', 'Học bộ thẻ Phở Hà Nội')}</span>
+            </button>
           </div>
         </div>
       </FlashcardSidebarLayout>
     );
   }
 
-  const reviewedCount = cards.length - queue.length;
-  const masteredCount = Object.values(ratings).filter((r) => r === 'mastered').length;
+  // Anki stats calculation
+  const totalCards = cards.length;
+  const reviewedCount = totalCards - queue.length;
+  const againCount = Object.values(ratings).filter((r) => r === 'again').length;
+  const hardCount = Object.values(ratings).filter((r) => r === 'hard').length;
+  const goodCount = Object.values(ratings).filter((r) => r === 'good').length;
+  const easyCount = Object.values(ratings).filter((r) => r === 'easy').length;
+  const masteredCount = goodCount + easyCount;
+
+  // Anki 3-Counter badges: New, Learning, To Review
+  const ankiNewCount = cards.filter(
+    (c) => !ratings[c.id] && (!cardSRSMap[c.id] || cardSRSMap[c.id].reps === 0)
+  ).length;
+  const ankiLearningCount = queue.length;
+  const ankiReviewCount = masteredCount;
 
   return (
     <FlashcardSidebarLayout>
@@ -364,7 +446,22 @@ export const FlashcardsPage: React.FC = () => {
               <ArrowLeft className="w-4 h-4" />
               <span>{t('study.read_article', 'Quay lại bài đọc')}</span>
             </Link>
+
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowSampleDecks((v) => !v)}
+                className={`p-2 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition-colors ${
+                  showSampleDecks
+                    ? 'bg-antique-gold/25 text-antique-gold border-antique-gold'
+                    : 'bg-surface-raised border-antique-gold/20 text-ink-soft hover:text-ink'
+                }`}
+                title={t('study.switch_deck', 'Đổi bộ thẻ bài học mẫu')}
+              >
+                <Layers className="w-3.5 h-3.5 text-antique-gold" />
+                <span>{t('study.switch_deck', 'Bộ thẻ mẫu')}</span>
+              </button>
+
               <button
                 type="button"
                 onClick={handleToggleShuffle}
@@ -378,6 +475,7 @@ export const FlashcardsPage: React.FC = () => {
                 <Shuffle className="w-3.5 h-3.5" />
                 <span>{t('header.shuffle', 'Trộn thẻ')}</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setIsAutoAudio((v) => !v)}
@@ -394,23 +492,45 @@ export const FlashcardsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-antique-gold/20 pb-3">
+          {/* Title and Anki 3-Counter Status Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-antique-gold/20 pb-3">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-antique-gold">
-                {savedOnly ? t('study.progress_saved_personal', 'Sổ tay cá nhân') : t('study.progress_saved_deck', 'Bộ thẻ theo bài đọc')}
+                {savedOnly
+                  ? t('study.progress_saved_personal', 'Sổ tay cá nhân')
+                  : t('study.progress_saved_deck', 'Bộ thẻ văn hóa')}
               </p>
               <h1 className="text-xl sm:text-2xl font-bold text-heritage-green dark:text-warm-ivory">
                 {deck?.lesson.title || t('study.progress_title_default', 'Ôn tập từ vựng văn hóa')}
               </h1>
             </div>
-            <div className="text-xs text-ink-soft flex items-center gap-3">
-              <span className="inline-flex items-center gap-1">
-                <CheckCircle2 size={13} className="text-[#059669]" />
-                {t('study.progress_mastered', 'Đã nhớ')}: <strong className="text-[#059669]">{masteredCount}</strong>
-              </span>
-              <span>
-                {t('study.progress_remaining', 'Còn lại trong hàng đợi')}: <strong>{queue.length}</strong>
-              </span>
+
+            {/* Anki 3-Counter Pill Badges */}
+            <div className="flex items-center gap-2 text-xs font-mono">
+              {/* New */}
+              <div
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/25 text-sky-600 dark:text-sky-400 font-semibold"
+                title="Thẻ mới chưa học"
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>{t('study.anki_new', 'Mới')}: {ankiNewCount}</span>
+              </div>
+              {/* Learning */}
+              <div
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 font-semibold"
+                title="Thẻ đang học / trong hàng đợi"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>{t('study.anki_learning', 'Đang học')}: {ankiLearningCount}</span>
+              </div>
+              {/* Mastered */}
+              <div
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#059669]/10 border border-[#059669]/25 text-[#059669] font-semibold"
+                title="Thẻ đã thuộc / hoàn thành hôm nay"
+              >
+                <CheckCircle2 className="w-3 h-3" />
+                <span>{t('study.anki_review', 'Đã thuộc')}: {ankiReviewCount}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -428,7 +548,9 @@ export const FlashcardsPage: React.FC = () => {
           <div className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-200 flex items-start gap-2.5 text-xs animate-in fade-in">
             <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
             <div className="flex-1">
-              <p className="font-semibold">{t('study.fatigue_title', 'Nhắc nhở nhận thức (Spaced Repetition):')}</p>
+              <p className="font-semibold">
+                {t('study.fatigue_title', 'Nhắc nhở nhận thức (Spaced Repetition):')}
+              </p>
               <p className="mt-0.5 opacity-90">{cognitiveFatigueAlert}</p>
             </div>
           </div>
@@ -446,22 +568,52 @@ export const FlashcardsPage: React.FC = () => {
                   {t('study.complete_title', 'Xuất sắc! Đã hoàn thành phiên ôn tập!')}
                 </h2>
                 <p className="text-sm text-ink-soft">
-                  {t('study.complete_desc', { mastered: masteredCount, total: cards.length, defaultValue: `Bạn đã nắm vững ${masteredCount} / ${cards.length} từ vựng ngữ cảnh. Dữ liệu đã được lưu vào hệ thống Spaced Repetition.` })}
+                  {t('study.complete_desc', {
+                    mastered: masteredCount,
+                    total: cards.length,
+                    defaultValue: `Bạn đã nắm vững ${masteredCount} / ${cards.length} từ vựng văn hóa theo thuật toán Anki SM-2.`,
+                  })}
                 </p>
+              </div>
+
+              {/* Anki Ratings Breakdown */}
+              <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400">
+                  <p className="text-[10px] uppercase font-bold opacity-80">Quên</p>
+                  <p className="text-lg font-bold font-mono mt-0.5">{againCount}</p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300">
+                  <p className="text-[10px] uppercase font-bold opacity-80">Khó</p>
+                  <p className="text-lg font-bold font-mono mt-0.5">{hardCount}</p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                  <p className="text-[10px] uppercase font-bold opacity-80">Tốt</p>
+                  <p className="text-lg font-bold font-mono mt-0.5">{goodCount}</p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400">
+                  <p className="text-[10px] uppercase font-bold opacity-80">Dễ</p>
+                  <p className="text-lg font-bold font-mono mt-0.5">{easyCount}</p>
+                </div>
               </div>
 
               {reward && (
                 <div className="p-4 rounded-xl bg-antique-gold/15 border border-antique-gold/30 text-antique-gold font-bold flex items-center justify-center gap-2">
                   <BookOpen className="w-5 h-5" />
-                  <span>{t('study.complete_xp_bonus', { xp: reward.xpEarned || 20, defaultValue: `+${reward.xpEarned || 20} XP Cột mốc Flashcard!` })}</span>
+                  <span>
+                    {t('study.complete_xp_bonus', {
+                      xp: reward.xpEarned || 20,
+                      defaultValue: `+${reward.xpEarned || 20} XP Cột mốc Flashcard!`,
+                    })}
+                  </span>
                 </div>
               )}
 
-              {/* Daily Streak & Gamification Habit Loop */}
+              {/* Daily Streak Habit Loop */}
               <div className="w-full max-w-md mx-auto">
                 <StreakBadge variant="banner" interactive={true} />
               </div>
 
+              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                 <button
                   type="button"
@@ -496,9 +648,9 @@ export const FlashcardsPage: React.FC = () => {
                 onToggleFlip={() => setIsFlipped((f) => !f)}
                 currentIndex={reviewedCount}
                 totalCards={cards.length}
+                cardSRS={cardSRSMap[currentCard.id]}
                 onPlayAudio={playAudio}
-                onReviewLater={handleForgot}
-                onMastered={handleRemembered}
+                onRate={handleRate}
               />
             )
           )}
@@ -513,6 +665,100 @@ export const FlashcardsPage: React.FC = () => {
           wordsLearnedCount={masteredCount}
           source="flashcard"
         />
+
+        {/* Sample Lesson Decks Shelf (Chuẩn bị các deck bài học mẫu) */}
+        <section
+          className="mt-8 pt-6 border-t border-antique-gold/20 space-y-4"
+          aria-labelledby="sample-decks-heading"
+        >
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-antique-gold" />
+                <h2 id="sample-decks-heading" className="text-base sm:text-lg font-bold text-heritage-green dark:text-warm-ivory">
+                  {t('study.sample_decks_title', 'Bộ Thẻ Bài Học Mẫu')}
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-antique-gold/15 text-antique-gold">
+                  {SAMPLE_STUDY_DECKS.length} chủ đề
+                </span>
+              </div>
+              <p className="text-xs text-ink-soft">
+                {t('study.sample_decks_subtitle', 'Khám phá các chủ đề di sản và nét đẹp văn hóa Việt Nam qua hệ thống Spaced Repetition')}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowSampleDecks((v) => !v)}
+              className="text-xs text-antique-gold font-semibold hover:underline flex items-center gap-1"
+            >
+              <span>{showSampleDecks ? 'Thu gọn' : 'Xem tất cả'}</span>
+              <ChevronRight className={`w-3.5 h-3.5 transition-transform ${showSampleDecks ? 'rotate-90' : ''}`} />
+            </button>
+          </div>
+
+          <div
+            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-300 ${
+              showSampleDecks ? 'max-h-[2000px] opacity-100' : 'max-h-72 overflow-hidden'
+            }`}
+          >
+            {SAMPLE_STUDY_DECKS.map((sample: SampleDeckMeta) => {
+              const isCurrent = sample.id === deckId;
+              return (
+                <div
+                  key={sample.id}
+                  onClick={() => handleSelectSampleDeck(sample.id)}
+                  className={`group relative p-3 rounded-2xl border transition-all cursor-pointer flex gap-3 items-center ${
+                    isCurrent
+                      ? 'bg-antique-gold/15 border-antique-gold shadow-sm ring-1 ring-antique-gold/40'
+                      : 'bg-surface-raised border-antique-gold/20 hover:border-antique-gold/60 hover:shadow-md'
+                  }`}
+                >
+                  {/* Thumbnail */}
+                  <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-antique-gold/30">
+                    <img
+                      src={sample.imageUrl}
+                      alt={sample.titleVi}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1 mb-0.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-antique-gold truncate">
+                        {sample.categoryVi}
+                      </span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/5 dark:bg-white/10 text-ink-soft">
+                        {sample.level}
+                      </span>
+                    </div>
+
+                    <h3 className="font-bold text-sm text-ink dark:text-warm-ivory truncate group-hover:text-heritage-green transition-colors">
+                      {isEn ? sample.titleEn : sample.titleVi}
+                    </h3>
+
+                    <div className="flex items-center justify-between text-[11px] text-ink-soft mt-1">
+                      <span>{sample.cardCount} thẻ từ vựng</span>
+                      {isCurrent ? (
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Đang học
+                        </span>
+                      ) : (
+                        <span className="group-hover:translate-x-0.5 transition-transform text-antique-gold font-semibold flex items-center">
+                          Học ngay <ChevronRight className="w-3 h-3" />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </FlashcardSidebarLayout>
   );

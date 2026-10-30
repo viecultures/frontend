@@ -1,7 +1,7 @@
 import type { Flashcard } from '@/data/flashcardsData';
 import type { PlayerMode } from '../components/FlashcardModeTabs';
 
-export type CardRating = 'mastered' | 'review';
+export type CardRating = 'mastered' | 'review' | 'again' | 'hard' | 'good' | 'easy' | 'familiar';
 export interface ReviewSession {
   signature: string;
   order: string[];
@@ -28,7 +28,7 @@ export function restoreReviewSession(value: unknown, cards: Flashcard[]): Review
   const ratings: Record<string, CardRating> = {};
   for (const id of initial.order) {
     const rating = saved.ratings?.[id];
-    if (rating === 'mastered' || rating === 'review') ratings[id] = rating;
+    if (rating === 'mastered' || rating === 'review' || rating === 'again' || rating === 'hard' || rating === 'good' || rating === 'easy' || rating === 'familiar') ratings[id] = rating;
   }
   return {
     ...initial, order: saved.order, ratings,

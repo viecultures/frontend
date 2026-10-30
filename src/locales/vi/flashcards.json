@@ -40,7 +40,15 @@
     "complete_xp_bonus": "+{{xp}} XP Cột mốc Flashcard!",
     "seal_btn": "Dập Mộc Son Hoàn Thành",
     "btn_restart": "Ôn lại từ đầu",
-    "btn_continue_reading": "Tiếp tục đọc bài"
+    "btn_continue_reading": "Tiếp tục đọc bài",
+    "anki_new": "Mới",
+    "anki_learning": "Đang học",
+    "anki_review": "Đã thuộc",
+    "sample_decks_title": "Bộ Thẻ Bài Học Mẫu",
+    "sample_decks_subtitle": "Khám phá các chủ đề di sản và nét đẹp văn hóa Việt Nam",
+    "switch_deck": "Đổi bộ thẻ",
+    "current_deck": "Bộ thẻ hiện tại",
+    "explore_samples": "Xem các bộ thẻ mẫu"
   },
   "dictionary": {
     "all_category": "Tất cả ({{count}})",
@@ -125,6 +133,8 @@
     "tap_to_reveal": "Chạm để lật mặt sau",
     "tap_to_return": "Chạm để quay lại mặt trước",
     "key_space": "Space",
+    "show_answer": "Hiện đáp án",
+    "space_good_hint": "Phím tắt: 1 Quên · 2 Khó · 3 Tốt (Space) · 4 Dễ",
     "btn_forgot": "Cần ôn lại (Forgot)",
     "btn_remembered": "Đã nhớ (Remembered)",
     "aria_front": "Tiếng Anh: {{word}}. Lật thẻ để xem giải nghĩa.",

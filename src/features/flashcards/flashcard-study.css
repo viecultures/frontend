@@ -61,6 +61,9 @@
 .vocab-study-meaning { font-size: clamp(24px, 2.5vw, 32px); line-height: 1.4; overflow-wrap: anywhere; }
 .vocab-study-shell .vocab-flip-hint { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--vocab-muted); }
 .vocab-study-shell kbd { padding: 1px 5px; border: 1px solid var(--vocab-line); border-radius: 4px; background: transparent; color: inherit; font-size: 11px; font-weight: 400; }
+.vocab-study-shell .vocab-anki-ratings { width: 100%; max-width: 680px; margin-inline: auto; }
+.vocab-study-shell .vocab-anki-ratings button { min-height: 52px; font-family: var(--font-sans); }
+.vocab-study-shell .vocab-anki-ratings kbd { font-family: monospace; font-weight: 600; }
 .vocab-study-shell .vocab-review-actions { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0; background: transparent; border: 0; }
 .vocab-study-shell :is(.vocab-study-primary, .vocab-study-secondary, .vocab-review-actions button, .vocab-session-actions button) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px; border: 1px solid var(--vocab-line); border-radius: var(--radius-xl); font-size: 14px; font-weight: 400; line-height: 1.5; background: var(--vocab-card); color: var(--vocab-ink); box-shadow: none; transition: background .2s; }
 .vocab-study-shell :is(.vocab-study-primary, .vocab-review-actions button:last-child, .vocab-session-actions button:first-child) { background: var(--color-action); color: var(--color-on-action); border-color: transparent; }

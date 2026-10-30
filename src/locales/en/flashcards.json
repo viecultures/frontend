@@ -40,7 +40,15 @@
     "complete_xp_bonus": "+{{xp}} XP Flashcard Milestone!",
     "seal_btn": "Stamp Ceremonial Seal",
     "btn_restart": "Restart review",
-    "btn_continue_reading": "Continue reading"
+    "btn_continue_reading": "Continue reading",
+    "anki_new": "New",
+    "anki_learning": "Learning",
+    "anki_review": "To Review",
+    "sample_decks_title": "Sample Cultural Decks",
+    "sample_decks_subtitle": "Explore Vietnamese heritage and traditions through Spaced Repetition",
+    "switch_deck": "Switch Deck",
+    "current_deck": "Current Deck",
+    "explore_samples": "Explore Sample Decks"
   },
   "dictionary": {
     "all_category": "All ({{count}})",
@@ -125,8 +133,10 @@
     "tap_to_reveal": "Tap to reveal definition",
     "tap_to_return": "Tap to return to front",
     "key_space": "Space",
-    "btn_forgot": "Cần ôn lại (Forgot)",
-    "btn_remembered": "Đã nhớ (Remembered)",
+    "show_answer": "Show Answer",
+    "space_good_hint": "Hotkeys: 1 Again · 2 Hard · 3 Good (Space) · 4 Easy",
+    "btn_forgot": "Again (Forgot)",
+    "btn_remembered": "Good (Remembered)",
     "aria_front": "English: {{word}}. Flip to see the meaning.",
     "aria_back": "Meaning: {{meaning}}. Flip to see the English word."
   },
