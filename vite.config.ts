@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
               if (id.includes("@google/genai")) {
                 return "vendor-genai";
               }
-              if (id.includes("lucide-react") || id.includes("react-bootstrap-icons")) {
+              if (id.includes("lucide-react")) {
                 return "vendor-icons";
               }
               if (id.includes("react-markdown") || id.includes("remark-gfm") || id.includes("micromark") || id.includes("unist")) {
