@@ -4,6 +4,8 @@
  * Do NOT hard-code URL strings in components — use PATHS / builders below.
  */
 
+import i18n, { SUPPORTED_LANGS, type SupportedLanguage } from '@/lib/i18n';
+
 export const PATHS = {
   landing: '/',
   landingConcept: '/landing-concept',
@@ -24,6 +26,43 @@ export const PATHS = {
 } as const;
 
 export type AppPath = (typeof PATHS)[keyof typeof PATHS];
+
+/**
+ * Resolves a valid language code ('vi' | 'en').
+ * Falls back to current i18n.language or 'vi'.
+ */
+export const resolveLanguage = (lang?: string): SupportedLanguage => {
+  if (lang && (SUPPORTED_LANGS as readonly string[]).includes(lang)) {
+    return lang as SupportedLanguage;
+  }
+  const current = (i18n?.language || '').toLowerCase();
+  if (current.startsWith('en')) {
+    return 'en';
+  }
+  return 'vi';
+};
+
+/**
+ * Prefix a path with a language code ('vi' | 'en').
+ * - getLocalizedPath('/login', 'en') -> '/en/login'
+ * - getLocalizedPath('/', 'en') -> '/en'
+ * - getLocalizedPath('/vi/login', 'en') -> '/en/login'
+ * Defaults fallback from i18n.language or 'vi'.
+ */
+export const getLocalizedPath = (path: string, lang?: string): string => {
+  const targetLang = resolveLanguage(lang);
+  const [pathAndQuery, hash = ''] = path.split('#');
+  const [cleanPath, query = ''] = pathAndQuery.split('?');
+
+  const stripped = cleanPath.replace(/^\/(vi|en)(\/|$)/, '/');
+  const normalized = stripped.startsWith('/') ? stripped : `/${stripped}`;
+
+  const localizedBase = normalized === '/' ? `/${targetLang}` : `/${targetLang}${normalized}`;
+  const qs = query ? `?${query}` : '';
+  const hs = hash ? `#${hash}` : '';
+
+  return `${localizedBase}${qs}${hs}`;
+};
 
 type QueryValue = string | number | boolean | null | undefined;
 

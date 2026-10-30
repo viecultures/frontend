@@ -12,6 +12,7 @@
  */
 
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Volume2, Radio, BookOpen } from 'lucide-react';
 import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
 import { useReaderDictionary } from '@/features/reader/hooks/useReaderDictionary';
@@ -41,6 +42,7 @@ const ComicBubbleItem: React.FC<ComicBubbleItemProps> = ({
   showTail = true,
   onTextSelection,
 }) => {
+  const { t } = useTranslation('playground');
   const isShortText = text.length <= 40;
 
   return (
@@ -95,7 +97,7 @@ const ComicBubbleItem: React.FC<ComicBubbleItemProps> = ({
           <div className="flex items-center justify-between gap-4 pb-1.5 mb-2 border-b border-[#132A18]/15 text-[11px] font-medium text-[#132A18]/70 select-none">
             <span className="flex items-center gap-1.5 whitespace-nowrap">
               <BookOpen className="w-3.5 h-3.5 text-[#132A18]/80 shrink-0" />
-              <span>Bôi đen hoặc nhấp đúp để tra từ vựng</span>
+              <span>{t('playground.mascot_bubble.vocab_hint')}</span>
             </span>
 
             {onSpeak && (
@@ -106,8 +108,8 @@ const ComicBubbleItem: React.FC<ComicBubbleItemProps> = ({
                   onSpeak(maskProfanity(text));
                 }}
                 className="p-1 rounded-full hover:bg-black/10 text-[#132A18]/80 hover:text-[#132A18] transition-colors cursor-pointer shrink-0"
-                title="Nghe phát âm toàn bài (TTS)"
-                aria-label="Nghe phát âm"
+                title={t('playground.mascot_bubble.tts_listen_title')}
+                aria-label={t('playground.mascot_bubble.tts_listen_aria')}
               >
                 <Volume2 className="w-3.5 h-3.5" />
               </button>
@@ -141,8 +143,8 @@ const ComicBubbleItem: React.FC<ComicBubbleItemProps> = ({
                   onSpeak(maskProfanity(text));
                 }}
                 className="ml-2.5 p-1 rounded-full hover:bg-black/10 text-[#132A18]/70 hover:text-[#132A18] transition-colors cursor-pointer shrink-0"
-                title="Nghe phát âm (TTS)"
-                aria-label="Nghe phát âm"
+                title={t('playground.mascot_bubble.tts_listen_short_title')}
+                aria-label={t('playground.mascot_bubble.tts_listen_aria')}
               >
                 <Volume2 className="w-3.5 h-3.5" />
               </button>
@@ -162,6 +164,7 @@ export const MascotChatBubble: React.FC<MascotChatBubbleProps> = ({
   onSpeak,
   className = '',
 }) => {
+  const { t } = useTranslation('playground');
   const isUser = role === 'user';
   const showThinking = isAwaitingResponse || isThinking;
   const { popupState, closeDictionary, handleTextSelection } = useReaderDictionary();
@@ -171,14 +174,14 @@ export const MascotChatBubble: React.FC<MascotChatBubbleProps> = ({
     if (!latestText) {
       // Default greeting bubbles matching mockup: "Hello" / "Nice to meet you"
       return [
-        { id: 'b1', text: 'Hello' },
-        { id: 'b2', text: 'Nice to meet you' },
+        { id: 'b1', text: t('playground.mascot_bubble.default_greeting_1') },
+        { id: 'b2', text: t('playground.mascot_bubble.default_greeting_2') },
       ];
     }
 
     // When AI speaks, display the speech turn
     return [{ id: 'b-main', text: latestText }];
-  }, [latestText]);
+  }, [latestText, t]);
 
   return (
     <>

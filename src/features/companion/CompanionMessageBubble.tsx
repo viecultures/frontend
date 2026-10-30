@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { Languages } from 'lucide-react';
 import type { CompanionChatMessage } from '@/types/companion';
@@ -40,6 +41,7 @@ export const CompanionMessageBubble: React.FC<CompanionMessageBubbleProps> = ({
   translateDisabled,
   onTranslate,
 }) => {
+  const { t } = useTranslation('playground');
   const isUser = message.role === 'user';
   const target = detectTranslateTarget(message.content);
 
@@ -80,7 +82,7 @@ export const CompanionMessageBubble: React.FC<CompanionMessageBubbleProps> = ({
                   isUser ? 'text-white/70' : 'text-[#7a8a66]'
                 }`}
               >
-                Translation
+                {t('playground.companion.bubble.translation_label')}
               </span>
               <p className={`whitespace-pre-wrap break-words ${isUser ? 'text-white/90' : 'text-[#4a5a40]'}`}>
                 {message.translatedContent}
@@ -95,17 +97,25 @@ export const CompanionMessageBubble: React.FC<CompanionMessageBubbleProps> = ({
           }`}
         >
           {isTranslating ? (
-            <span className="text-[11px] italic text-[#7a8a66]">Translating...</span>
+            <span className="text-[11px] italic text-[#7a8a66]">
+              {t('playground.companion.bubble.translating')}
+            </span>
           ) : (
             <button
               type="button"
               onClick={() => onTranslate(target)}
               disabled={translateDisabled}
-              title={target === 'en' ? 'Translate to English' : 'Translate to Vietnamese'}
+              title={
+                target === 'en'
+                  ? t('playground.companion.bubble.translate_to_en')
+                  : t('playground.companion.bubble.translate_to_vi')
+              }
               className="flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-medium text-[#7a8a66] hover:bg-[#eef3e2] hover:text-[#3e5a3a] disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Languages className="h-3 w-3" />
-              {target === 'en' ? 'Translate to EN' : 'Translate to VI'}
+              {target === 'en'
+                ? t('playground.companion.bubble.translate_btn_en')
+                : t('playground.companion.bubble.translate_btn_vi')}
             </button>
           )}
         </div>

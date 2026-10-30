@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Search,
   Filter,
@@ -12,13 +13,6 @@ import {
   Check,
 } from 'lucide-react';
 import { CEFR_LEVELS } from '@/data/discoveryData';
-
-export const SORT_OPTIONS = [
-  { label: 'Mới nhất', value: 'recent' },
-  { label: 'Nhiều từ vựng', value: 'vocab' },
-  { label: 'Đọc ngắn (< 6 phút)', value: 'time_asc' },
-  { label: 'Đọc sâu (> 8 phút)', value: 'time_desc' },
-];
 
 interface DiscoveryFilterToolbarProps {
   searchQuery: string;
@@ -55,6 +49,22 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
   selectedReadTime,
   onSelectReadTime,
 }) => {
+  const { t } = useTranslation('discovery');
+
+  const sortOptions = [
+    { label: t('filter_toolbar.sort_recent'), value: 'recent' },
+    { label: t('filter_toolbar.sort_vocab'), value: 'vocab' },
+    { label: t('filter_toolbar.sort_time_asc'), value: 'time_asc' },
+    { label: t('filter_toolbar.sort_time_desc'), value: 'time_desc' },
+  ];
+
+  const durationOptions = [
+    { label: t('filter_toolbar.duration_all'), value: 'All' },
+    { label: t('filter_toolbar.duration_short'), value: 'short' },
+    { label: t('filter_toolbar.duration_medium'), value: 'medium' },
+    { label: t('filter_toolbar.duration_long'), value: 'long' },
+  ];
+
   return (
     <section className="mb-8 relative z-30">
       <div className="p-6 rounded-3xl bg-rice-paper/90 border border-heritage-green/12 shadow-[0_4px_20px_-4px] shadow-heritage-green/6 backdrop-blur-sm space-y-5 relative z-30">
@@ -67,7 +77,7 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Tìm thông minh (gõ không dấu: banh mi, hue, son doong)..."
+              placeholder={t('filter_toolbar.search_placeholder')}
               className="w-full pl-11 pr-10 py-3 rounded-2xl bg-warm-ivory border border-heritage-green/16 text-sm text-heritage-green placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-heritage-green/30 focus:border-heritage-green transition-all shadow-xs"
             />
             {searchQuery && (
@@ -75,7 +85,7 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
                 type="button"
                 onClick={() => onSearchChange('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-text-muted hover:text-heritage-green p-1 rounded-full hover:bg-mist-cloud cursor-pointer"
-                title="Xóa tìm kiếm"
+                title={t('filter_toolbar.clear_search_title')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -99,7 +109,7 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
                   onlyBookmarked ? 'fill-antique-gold text-antique-gold' : 'text-antique-gold'
                 }`}
               />
-              <span>Đã lưu</span>
+              <span>{t('filter_toolbar.saved_stories')}</span>
             </button>
 
             {/* Custom React Floating Sort Dropdown Menu */}
@@ -110,9 +120,9 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
                 className="flex items-center gap-2 bg-warm-ivory px-4 py-2.5 rounded-2xl border border-heritage-green/18 text-xs font-bold text-heritage-green shadow-xs hover:border-antique-gold transition-all cursor-pointer"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5 text-antique-gold shrink-0" />
-                <span className="text-text-secondary">Sắp xếp:</span>
+                <span className="text-text-secondary">{t('filter_toolbar.sort_label')}</span>
                 <span className="font-extrabold text-heritage-green">
-                  {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}
+                  {sortOptions.find((o) => o.value === sortBy)?.label}
                 </span>
                 <ChevronDown
                   className={`w-3.5 h-3.5 text-heritage-green transition-transform duration-200 ${
@@ -128,7 +138,7 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
 
                   {/* Custom Floating Popover Dropdown Card */}
                   <div className="absolute right-0 top-full mt-2 w-52 bg-warm-ivory border border-antique-gold/40 rounded-2xl shadow-xl z-50 p-1.5 space-y-1 backdrop-blur-md">
-                    {SORT_OPTIONS.map((opt) => {
+                    {sortOptions.map((opt) => {
                       const isSelected = sortBy === opt.value;
                       return (
                         <button
@@ -166,8 +176,8 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
                     ? 'bg-heritage-green text-warm-ivory shadow-xs scale-102'
                     : 'text-text-secondary hover:text-heritage-green hover:bg-rice-paper'
                 }`}
-                title="Chế độ lưới (Grid 12 bài/trang)"
-                aria-label="Chế độ lưới"
+                title={t('filter_toolbar.grid_view_title')}
+                aria-label={t('filter_toolbar.grid_view_aria')}
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
@@ -179,8 +189,8 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
                     ? 'bg-heritage-green text-warm-ivory shadow-xs scale-102'
                     : 'text-text-secondary hover:text-heritage-green hover:bg-rice-paper'
                 }`}
-                title="Chế độ danh sách (List 20 bài/trang)"
-                aria-label="Chế độ danh sách"
+                title={t('filter_toolbar.list_view_title')}
+                aria-label={t('filter_toolbar.list_view_aria')}
               >
                 <List className="w-4 h-4" />
               </button>
@@ -194,7 +204,7 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-bold uppercase tracking-wider text-heritage-green flex items-center gap-1 mr-1">
               <Filter className="w-3.5 h-3.5" />
-              Trình độ:
+              {t('filter_toolbar.level_label')}
             </span>
             {CEFR_LEVELS.map((lvl) => (
               <button
@@ -207,7 +217,7 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
                     : 'bg-warm-ivory text-heritage-green hover:bg-mist-cloud border border-heritage-green/12'
                 }`}
               >
-                {lvl === 'All' ? 'Tất cả' : lvl}
+                {lvl === 'All' ? t('filter_toolbar.level_all') : lvl}
               </button>
             ))}
           </div>
@@ -216,14 +226,9 @@ export const DiscoveryFilterToolbar: React.FC<DiscoveryFilterToolbarProps> = ({
           <div className="flex items-center gap-2 flex-wrap text-xs">
             <span className="font-bold text-heritage-green flex items-center gap-1 mr-1">
               <Clock className="w-3.5 h-3.5 text-antique-gold" />
-              Thời lượng:
+              {t('filter_toolbar.duration_label')}
             </span>
-            {[
-              { label: 'Tất cả', value: 'All' },
-              { label: '< 6 phút', value: 'short' },
-              { label: '6-8 phút', value: 'medium' },
-              { label: '> 8 phút', value: 'long' },
-            ].map((dur) => (
+            {durationOptions.map((dur) => (
               <button
                 key={dur.value}
                 type="button"

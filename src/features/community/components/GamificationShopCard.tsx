@@ -1,5 +1,6 @@
+import { useTranslation } from "react-i18next";
 import { communityLabel } from "../community-copy";
-import { ShoppingBag, Coins, Headphones, Palette, Medal, Check } from "lucide-react";
+import { ShoppingBag, Coins, Headphones, Palette, Medal } from "lucide-react";
 
 interface GamificationShopCardProps {
   userCoins: number;
@@ -37,19 +38,21 @@ export function GamificationShopCard({
   userCoins,
   onRedeem,
 }: GamificationShopCardProps) {
+  const { t } = useTranslation("community");
+
   return (
     <div
       id="gamification-shop"
-      className="p-6 rounded-3xl bg-surface border border-line space-y-5 shadow-sm"
+      className="p-5 rounded-2xl bg-white border border-[#E8E2D5] space-y-3.5 shadow-[0_2px_8px_rgba(0,0,0,0.03)]"
     >
       <div className="flex items-center justify-between pb-3 border-b border-line">
         <h3 className="font-serif text-base font-bold text-heritage-green flex items-center gap-2">
           <ShoppingBag className="w-4 h-4 text-antique-gold" />
-          <span>Coin & reward shop</span>
+          <span>{t("community.gamification.shop_title")}</span>
         </h3>
         <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
           <Coins className="w-3.5 h-3.5 text-antique-gold" />
-          <span>Balance: {userCoins} coins</span>
+          <span>{t("community.gamification.shop_balance", { count: userCoins })}</span>
         </span>
       </div>
 
@@ -61,7 +64,7 @@ export function GamificationShopCard({
           return (
             <div
               key={item.id}
-              className="p-3.5 rounded-2xl bg-rice-paper/60 border border-line space-y-2 hover:bg-rice-paper transition-colors"
+              className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-2 hover:bg-white transition-colors"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
@@ -79,16 +82,16 @@ export function GamificationShopCard({
                 </div>
 
                 <button
-                  aria-label={`Redeem ${communityLabel(item.name)} for ${item.cost} coins`}
+                  aria-label={t("community.gamification.redeem_aria", { name: communityLabel(item.name), cost: item.cost })}
                   onClick={() => onRedeem(item.name, item.cost)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1 shrink-0 cursor-pointer focus-ring ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1 shrink-0 cursor-pointer focus-ring ${
                     canAfford
                       ? "bg-heritage-green text-warm-ivory hover:bg-heritage-dark shadow-sm"
                       : "bg-surface text-text-secondary border border-line hover:bg-mist-cloud"
                   }`}
                 >
                   <Coins className="w-3 h-3 text-antique-gold" />
-                  <span>{item.cost} coins</span>
+                  <span>{t("community.gamification.cost_coins", { cost: item.cost })}</span>
                 </button>
               </div>
 
@@ -102,3 +105,5 @@ export function GamificationShopCard({
     </div>
   );
 }
+
+export default GamificationShopCard;

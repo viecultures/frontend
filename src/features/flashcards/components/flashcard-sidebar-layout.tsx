@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useAppNavigate } from '@/routes/useAppNavigate';
 import { PATHS } from '@/routes/paths';
 import { AddWordModal } from './AddWordModal';
 import { VocabularyMobileNav } from './VocabularyMobileNav';
@@ -12,7 +13,7 @@ interface FlashcardSidebarLayoutProps {
 
 export function FlashcardSidebarLayout({ children }: FlashcardSidebarLayoutProps) {
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const [isAddWordOpen, setIsAddWordOpen] = useState(false);
   const isStudy = location.pathname === PATHS.flashcardStudy;
   const handleOpenAddWord = () => setIsAddWordOpen(true);

@@ -1,7 +1,7 @@
 import { X, Volume2, ArrowRight } from "lucide-react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { useTranslation } from "react-i18next";
 import type { Lesson } from "@/data/discoveryData";
-import { VOCABULARY_CATEGORY_LABELS } from "../lib/vocabulary-catalog";
 import { getDeckData } from "@/data/flashcardsData";
 
 interface DictionaryInspectorModalProps {
@@ -17,6 +17,8 @@ export function DictionaryInspectorModal({
   onPlayAudio,
   onGoToStudy,
 }: DictionaryInspectorModalProps) {
+  const { t } = useTranslation('flashcards');
+
   if (!lesson) return null;
 
   const deckData = getDeckData(lesson);
@@ -27,15 +29,15 @@ export function DictionaryInspectorModal({
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div>
             <span className="text-[10px] font-bold uppercase bg-[#ECFDF5] text-[#059669] px-2.5 py-0.5 rounded-full">
-              {VOCABULARY_CATEGORY_LABELS[lesson.category]}
+              {t(`categories.${lesson.category}`, lesson.category)}
             </span>
             <DialogTitle className="font-serif text-xl font-bold text-ink mt-1">
-              Vocabulary preview: {lesson.title}
+              {t('inspector.title', { title: lesson.title, defaultValue: `Vocabulary preview: ${lesson.title}` })}
             </DialogTitle>
           </div>
           <button
             onClick={onClose}
-            aria-label="Close vocabulary preview"
+            aria-label={t('inspector.close_aria', 'Close vocabulary preview')}
             className="p-2.5 rounded-full hover:bg-surface-muted text-ink-soft cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
@@ -61,10 +63,10 @@ export function DictionaryInspectorModal({
                   </span>
                 </div>
                 <div className="text-xs font-bold text-ink">
-                  Meaning: {card.viMeaning}
+                  {t('inspector.meaning_label', { meaning: card.viMeaning, defaultValue: `Meaning: ${card.viMeaning}` })}
                 </div>
                 <div className="text-xs text-ink-soft">
-                  Definition: {card.viDefinition}
+                  {t('inspector.definition_label', { definition: card.viDefinition, defaultValue: `Definition: ${card.viDefinition}` })}
                 </div>
                 <div className="text-xs italic text-ink-faint">
                   "{card.contextEn}"
@@ -74,8 +76,8 @@ export function DictionaryInspectorModal({
               <button
                 onClick={() => onPlayAudio(card.word)}
                 className="p-2.5 rounded-full bg-heritage-green text-white hover:bg-heritage-dark cursor-pointer shrink-0 shadow-xs"
-                title="Play pronunciation"
-                aria-label={`Pronounce ${card.word}`}
+                title={t('inspector.play_audio', 'Play pronunciation')}
+                aria-label={t('inspector.pronounce_word', { word: card.word, defaultValue: `Pronounce ${card.word}` })}
               >
                 <Volume2 className="w-4 h-4 text-antique-gold" />
               </button>
@@ -92,7 +94,7 @@ export function DictionaryInspectorModal({
             }}
             className="px-6 py-2.5 rounded-full bg-heritage-green text-white text-xs font-bold hover:bg-heritage-dark cursor-pointer shadow-xs inline-flex items-center gap-1.5"
           >
-            <span>Study these cards</span>
+            <span>{t('inspector.btn_study_these', 'Study these cards')}</span>
             <ArrowRight className="w-4 h-4 text-antique-gold" />
           </button>
         </div>

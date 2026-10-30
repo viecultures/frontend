@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Shared Ghibli-inspired palette and keyframes for the AI Companion feature.
  * Injected once via <CompanionThemeStyles /> to avoid duplicated <style> tags.
  */
@@ -19,7 +19,6 @@ export const companionKeyframes = `
 @keyframes vc-spirit-blink { 0%,92%,100% { transform: scaleY(1) } 95% { transform: scaleY(0.1) } }
 @keyframes vc-cloud-drift { 0%,100% { transform: translateX(0) } 50% { transform: translateX(4px) } }
 @keyframes vc-cloud-slide { 0% { transform: translateX(-30%) } 100% { transform: translateX(130%) } }
-@keyframes vc-sparkle { 0%,100% { opacity: 0; transform: scale(0.4) } 50% { opacity: 1; transform: scale(1) } }
 @keyframes vc-leaf-sway { 0%,100% { transform: rotate(-8deg) } 50% { transform: rotate(10deg) } }
 @keyframes vc-window-pop {
   0% { opacity: 0; transform: translateY(16px) scale(0.86) }
@@ -39,7 +38,6 @@ export const companionKeyframes = `
 .vc-spirit-eye { transform-origin: center; transform-box: fill-box; animation: vc-spirit-blink 4.5s infinite; }
 .vc-cloud-drift { animation: vc-cloud-drift 6s ease-in-out infinite; }
 .vc-cloud-slide { animation: vc-cloud-slide 28s linear infinite; }
-.vc-sparkle { transform-origin: center; transform-box: fill-box; animation: vc-sparkle 2.8s ease-in-out infinite; }
 .vc-leaf { transform-origin: bottom center; transform-box: fill-box; animation: vc-leaf-sway 2.6s ease-in-out infinite; }
 .vc-window-pop { transform-origin: bottom right; animation: vc-window-pop .42s cubic-bezier(.2,.9,.3,1.2) both; }
 .vc-menu-in { transform-origin: top right; animation: vc-menu-in .16s ease-out both; }
@@ -48,7 +46,7 @@ export const companionKeyframes = `
 .vc-scroll::-webkit-scrollbar { width: 8px; }
 .vc-scroll::-webkit-scrollbar-thumb { background: #d6dcc4; border-radius: 9999px; border: 2px solid #fffaf0; }
 @media (prefers-reduced-motion: reduce) {
-  .vc-spirit-bob, .vc-spirit-eye, .vc-cloud-drift, .vc-cloud-slide, .vc-sparkle, .vc-leaf,
+  .vc-spirit-bob, .vc-spirit-eye, .vc-cloud-drift, .vc-cloud-slide, .vc-leaf,
   .vc-window-pop, .vc-menu-in, .vc-msg-in, .vc-dot-hop, .vc-bubble-in { animation: none; }
 }
 `;

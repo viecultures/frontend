@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { CheckCircle2, Lightbulb, Brain, HelpCircle, Layers, ArrowRight } from 'lucide-react';
+import { useTranslation, Trans } from 'react-i18next';
 import { listSavedArticles, articleKey, readReviewSession, readSavedVocabulary, getAllSavedVocabularies } from '@/services/learning/learningStorage';
 import { cardsFromVocabulary } from '@/features/flashcards/services/studyDeck';
 import { restoreReviewSession } from '@/features/flashcards/lib/reviewSession';
@@ -16,6 +17,7 @@ const SAMPLE_DUE_WORDS = [
 ];
 
 export function HomeVocabularyCard() {
+  const { t } = useTranslation('home');
   const savedVocabList = getAllSavedVocabularies();
   const decks = listSavedArticles().filter(item => item.count > 0).map(item => {
     const cards = cardsFromVocabulary(readSavedVocabulary(item.article.id, item.level));
@@ -84,11 +86,21 @@ export function HomeVocabularyCard() {
       {/* Header */}
       <div className="home-vocab-header">
         <div>
-          <p className="home-room-eyebrow">TỪ VỰNG CỦA BẠN</p>
-          <h2 id="home-vocab-title">Từ vựng của bạn.</h2>
+          <p className="home-room-eyebrow">{t('vocabulary_card.eyebrow', 'YOUR VOCABULARY')}</p>
+          <h2 id="home-vocab-title">{t('vocabulary_card.title', 'Your vocabulary.')}</h2>
         </div>
         <p className="home-vocab-summary">
-          Đã học <strong>{totalWords}</strong> từ · <strong>{dueTodayCount}</strong> từ cần ôn hôm nay
+          <Trans
+            i18nKey="vocabulary_card.summary"
+            ns="home"
+            values={{ total: totalWords, due: dueTodayCount }}
+            components={{
+              1: <strong />,
+              3: <strong />,
+            }}
+          >
+            Learned <strong>{totalWords}</strong> words · <strong>{dueTodayCount}</strong> words due today
+          </Trans>
         </p>
       </div>
 
@@ -102,12 +114,12 @@ export function HomeVocabularyCard() {
             </span>
             <span className="home-vocab-count">{masteredCount}</span>
           </div>
-          <span className="home-vocab-label">Nhớ chắc</span>
+          <span className="home-vocab-label">{t('vocabulary_card.mastered', 'Mastered')}</span>
           <div className="home-vocab-progress-track">
             <div
               className="home-vocab-progress-bar bg-success"
               style={{ width: `${masteredPct}%` }}
-              aria-label={`Nhớ chắc: ${masteredCount} từ`}
+              aria-label={t('vocabulary_card.mastered_aria', { count: masteredCount, defaultValue: `Mastered: ${masteredCount} words` })}
             />
           </div>
         </div>
@@ -120,17 +132,17 @@ export function HomeVocabularyCard() {
             </span>
             <span className="home-vocab-count">{familiarCount}</span>
           </div>
-          <span className="home-vocab-label">Hơi nhớ</span>
+          <span className="home-vocab-label">{t('vocabulary_card.familiar', 'Familiar')}</span>
           <div className="home-vocab-progress-track">
             <div
               className="home-vocab-progress-bar bg-warning"
               style={{ width: `${familiarPct}%` }}
-              aria-label={`Hơi nhớ: ${familiarCount} từ`}
+              aria-label={t('vocabulary_card.familiar_aria', { count: familiarCount, defaultValue: `Familiar: ${familiarCount} words` })}
             />
           </div>
         </div>
 
-        {/* 3. Hmmmm (Reviewing) */}
+        {/* 3. Đang ôn (Reviewing) */}
         <div className="home-vocab-card home-vocab-card-reviewing">
           <div className="home-vocab-card-top">
             <span className="home-vocab-badge home-vocab-badge-info" aria-hidden="true">
@@ -138,12 +150,12 @@ export function HomeVocabularyCard() {
             </span>
             <span className="home-vocab-count">{reviewingCount}</span>
           </div>
-          <span className="home-vocab-label">Hmmmm</span>
+          <span className="home-vocab-label">{t('vocabulary_card.reviewing', 'Reviewing')}</span>
           <div className="home-vocab-progress-track">
             <div
               className="home-vocab-progress-bar bg-info"
               style={{ width: `${reviewingPct}%` }}
-              aria-label={`Đang ôn tập: ${reviewingCount} từ`}
+              aria-label={t('vocabulary_card.reviewing_aria', { count: reviewingCount, defaultValue: `Reviewing: ${reviewingCount} words` })}
             />
           </div>
         </div>
@@ -156,12 +168,12 @@ export function HomeVocabularyCard() {
             </span>
             <span className="home-vocab-count">{learningCount}</span>
           </div>
-          <span className="home-vocab-label">Chưa nhớ</span>
+          <span className="home-vocab-label">{t('vocabulary_card.learning', 'Learning')}</span>
           <div className="home-vocab-progress-track">
             <div
               className="home-vocab-progress-bar bg-danger"
               style={{ width: `${learningPct}%` }}
-              aria-label={`Chưa nhớ: ${learningCount} từ`}
+              aria-label={t('vocabulary_card.learning_aria', { count: learningCount, defaultValue: `Learning: ${learningCount} words` })}
             />
           </div>
         </div>
@@ -170,8 +182,8 @@ export function HomeVocabularyCard() {
       {/* Due Today Sub-Section (CẦN ÔN HÔM NAY) */}
       <div className="home-vocab-due-panel">
         <div className="home-vocab-due-header">
-          <span>CẦN ÔN HÔM NAY</span>
-          <span className="home-vocab-due-badge">{dueWords.length} từ</span>
+          <span>{t('vocabulary_card.due_today', 'DUE TODAY')}</span>
+          <span className="home-vocab-due-badge">{t('vocabulary_card.due_count', { count: dueWords.length, defaultValue: `${dueWords.length} words` })}</span>
         </div>
 
         {/* Word Pills */}
@@ -188,10 +200,10 @@ export function HomeVocabularyCard() {
         <div className="home-vocab-actions">
           <Link to={reviewUrl} className="home-vocab-primary-btn">
             <Layers size={16} aria-hidden="true" />
-            <span>Ôn ngay</span>
+            <span>{t('vocabulary_card.btn_review_now', 'Review now')}</span>
           </Link>
           <Link to={PATHS.dictionary} className="home-vocab-secondary-link">
-            <span>Mở sổ từ</span>
+            <span>{t('vocabulary_card.btn_open_notebook', 'Open notebook')}</span>
             <ArrowRight size={14} aria-hidden="true" />
           </Link>
         </div>

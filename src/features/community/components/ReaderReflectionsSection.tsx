@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Heart,
-  MessageSquare,
   BookOpen,
   ShieldCheck,
   Flag,
@@ -112,6 +112,7 @@ export function ReaderReflectionsSection({
   vocabularies = [],
   themeMode = "paper",
 }: ReaderReflectionsSectionProps) {
+  const { t } = useTranslation("community");
   const isDark = themeMode === "dark";
   const currentUser = getStoredUser();
 
@@ -262,12 +263,12 @@ export function ReaderReflectionsSection({
     if (moderation.status === "pending_review") {
       setNotice({
         type: "pending",
-        text: "🛡️ Reflection submitted! Because it contains links or keywords requiring review, it is currently in 'pending_review' status and only visible to you until approved.",
+        text: t("community.reader_reflections.notice_pending"),
       });
     } else {
       setNotice({
         type: "success",
-        text: "Thank you! Your reflection is published. Celebrate expressing yourself in your own voice!",
+        text: t("community.reader_reflections.notice_success"),
       });
     }
 
@@ -322,20 +323,20 @@ export function ReaderReflectionsSection({
 
     setNotice({
       type: "info",
-      text: "🚩 Thank you for helping keep VieCultures a safe, non-judgmental environment. Our moderation team has received your report.",
+      text: t("community.reader_reflections.notice_reported"),
     });
   };
 
   return (
     <section
-      aria-label="Community Reflections"
+      aria-label={t("community.reader_reflections.section_aria")}
       className={`reader-reflections-section my-10 p-6 sm:p-8 rounded-3xl border transition-all ${
         isDark
           ? "bg-[#16211C] border-antique-gold/25 text-warm-ivory shadow-lg"
           : "bg-surface border-antique-gold/30 text-heritage-green shadow-sm"
       }`}
     >
-      {/* ─── 1. Non-Judgmental English Policy Banner (Core Acceptance Criteria) ─── */}
+      {/* 1. Non-Judgmental English Policy Banner */}
       <div
         className={`policy-banner mb-8 p-5 rounded-2xl border flex flex-col md:flex-row items-start md:items-center gap-4 transition-all ${
           isDark
@@ -343,43 +344,38 @@ export function ReaderReflectionsSection({
             : "bg-rice-paper border-antique-gold/40 text-heritage-green"
         }`}
       >
-        <div className="w-12 h-12 rounded-2xl bg-antique-gold/20 flex items-center justify-center shrink-0 border border-antique-gold/40 text-2xl">
-          🕊️
+        <div className="w-12 h-12 rounded-2xl bg-antique-gold/20 flex items-center justify-center shrink-0 border border-antique-gold/40 text-[#1D5046]">
+          <ShieldCheck className="w-6 h-6 text-antique-gold" />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-antique-gold/20 text-antique-gold border border-antique-gold/30">
-              No-Judgment Learning Policy
+              {t("community.reader_reflections.policy_title")}
             </span>
             <span className="text-xs font-semibold opacity-75">
-              Chính sách không phán xét ngữ pháp
+              {t("community.reader_reflections.policy_subtitle")}
             </span>
           </div>
           <p className="text-xs sm:text-sm leading-relaxed opacity-90">
-            <strong>49% of learners fear making language errors.</strong> At VieCultures, authentic
-            cultural sharing comes first. Write freely in English, Vietnamese, or both —{" "}
-            <span className="underline decoration-antique-gold font-semibold">
-              no red pen, no grades, no pressure
-            </span>
-            . Every attempt to express your heritage is celebrated.
+            {t("community.reader_reflections.policy_desc")}
           </p>
         </div>
         <div className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-antique-gold px-3 py-1.5 rounded-xl bg-antique-gold/10 border border-antique-gold/20">
           <ShieldCheck className="w-4 h-4 text-antique-gold" />
-          <span>Safe Space</span>
+          <span>{t("community.reader_reflections.policy_badge")}</span>
         </div>
       </div>
 
-      {/* ─── 2. Quick Vocab Toolbar (interface_community.md) ─── */}
+      {/* 2. Quick Vocab Toolbar */}
       {vocabularies && vocabularies.length > 0 && (
         <div className="quick-vocab-toolbar mb-6">
           <div className="flex items-center justify-between mb-2.5">
             <label className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 text-antique-gold">
               <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-              <span>Quick Vocab Toolbar • Chèn nhanh từ vựng bài học</span>
+              <span>{t("community.reader_reflections.quick_vocab_title")}</span>
             </label>
             <span className="text-[11px] opacity-70">
-              Tap a word to insert into your reflection
+              {t("community.reader_reflections.quick_vocab_desc")}
             </span>
           </div>
 
@@ -415,36 +411,36 @@ export function ReaderReflectionsSection({
           {lastInsertedWord && (
             <div className="text-[11px] text-antique-gold flex items-center gap-1 mt-1 animate-in fade-in">
               <CheckCircle2 className="w-3 h-3" />
-              <span>Inserted &quot;{lastInsertedWord}&quot; into editor!</span>
+              <span>{t("community.reader_reflections.inserted_word", { word: lastInsertedWord })}</span>
             </div>
           )}
         </div>
       )}
 
-      {/* ─── 3. Reflection Composer (Acceptance Criteria #1 & EC-03.3) ─── */}
+      {/* 3. Reflection Composer */}
       <form onSubmit={handleSubmitReflection} className="reflection-composer mb-10 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 className="font-serif text-lg sm:text-xl font-bold flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-antique-gold" />
-              <span>Share your cultural reflection</span>
+              <span>{t("community.reader_reflections.share_title")}</span>
             </h3>
             <p className="text-xs opacity-75 mt-0.5">
-              What does &quot;{postTitle || "this heritage story"}&quot; bring to your heart?
+              {t("community.reader_reflections.share_desc", { story: postTitle || t("community.reader_reflections.this_story_fallback") })}
             </p>
           </div>
 
           {/* Author Name Input */}
           <div className="flex items-center gap-2">
             <label htmlFor="reflection-author" className="text-xs font-semibold opacity-70 shrink-0">
-              Your name:
+              {t("community.reader_reflections.your_name_label")}
             </label>
             <input
               id="reflection-author"
               type="text"
               value={authorNameInput}
               onChange={(e) => setAuthorNameInput(e.target.value)}
-              placeholder="e.g. Mai Anh"
+              placeholder={t("community.reader_reflections.author_placeholder")}
               className={`text-xs px-3 py-1.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-antique-gold/40 ${
                 isDark
                   ? "bg-[#1E2E27] border-line/60 text-warm-ivory placeholder:text-warm-ivory/40"
@@ -460,7 +456,7 @@ export function ReaderReflectionsSection({
             ref={textareaRef}
             value={reflectionText}
             onChange={(e) => setReflectionText(e.target.value)}
-            placeholder="Write your personal thought, memories, or cultural perspective in English or bilingually (e.g. When I smell lotus tea, it reminds me of my grandmother's porch...)..."
+            placeholder={t("community.reader_reflections.textarea_placeholder")}
             rows={4}
             className={`w-full p-4 rounded-2xl border text-sm leading-relaxed transition-all focus:outline-none focus:ring-2 focus:ring-antique-gold/50 ${
               isDark
@@ -475,14 +471,14 @@ export function ReaderReflectionsSection({
               {detectedVocab.matchedWords.length > 0 ? (
                 <span className="text-antique-gold font-bold inline-flex items-center gap-1">
                   <BookOpen className="w-3.5 h-3.5" />
-                  <span>Heritage words used ({detectedVocab.matchedWords.length}):</span>
+                  <span>{t("community.reader_reflections.heritage_words_used", { count: detectedVocab.matchedWords.length })}</span>
                   <span className="font-semibold underline">
                     {detectedVocab.matchedWords.join(", ")}
                   </span>
                 </span>
               ) : (
                 <span className="text-[11px] opacity-65 italic">
-                  Tip: Tap words in the toolbar above to enrich your reflection.
+                  {t("community.reader_reflections.vocab_tip")}
                 </span>
               )}
             </div>
@@ -495,7 +491,7 @@ export function ReaderReflectionsSection({
                     : "text-amber-500 dark:text-amber-400"
                 }`}
               >
-                {validation.length} chars (min {MIN_REFLECTION_LENGTH})
+                {t("community.reader_reflections.char_count", { chars: validation.length, min: MIN_REFLECTION_LENGTH })}
               </span>
 
               <button
@@ -508,14 +504,14 @@ export function ReaderReflectionsSection({
                 }`}
               >
                 <Send className="w-3.5 h-3.5 text-antique-gold" />
-                <span>Publish reflection</span>
+                <span>{t("community.reader_reflections.publish_btn")}</span>
               </button>
             </div>
           </div>
         </div>
       </form>
 
-      {/* ─── Feedback / Moderation Notice Banner ─── */}
+      {/* Feedback / Moderation Notice Banner */}
       {notice && (
         <div
           role="status"
@@ -541,25 +537,25 @@ export function ReaderReflectionsSection({
         </div>
       )}
 
-      {/* ─── 4. UGC Reflections Feed ─── */}
+      {/* 4. UGC Reflections Feed */}
       <div className="reflections-feed space-y-4">
         <div className="flex items-center justify-between border-b border-line pb-3">
           <div className="flex items-center gap-2">
             <h4 className="font-serif text-base sm:text-lg font-bold">
-              Community Voices ({reflections.length})
+              {t("community.reader_reflections.community_voices", { count: reflections.length })}
             </h4>
             <span className="text-[11px] px-2 py-0.5 rounded-full bg-antique-gold/15 text-antique-gold font-bold">
               UGC Feed
             </span>
           </div>
           <span className="text-xs opacity-65 hidden sm:inline">
-            Celebrating bilingual cultural expressions
+            {t("community.reader_reflections.celebrating_sub")}
           </span>
         </div>
 
         {reflections.length === 0 ? (
           <div className="text-center py-10 opacity-70 text-sm">
-            No reflections yet. Be the first to share your cultural thoughts!
+            {t("community.reader_reflections.no_reflections")}
           </div>
         ) : (
           <div className="space-y-4">
@@ -598,7 +594,7 @@ export function ReaderReflectionsSection({
                           {isPending && (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-500 border border-amber-500/40 flex items-center gap-1">
                               <Clock className="w-3 h-3" />
-                              <span>Pending moderation review (Only you see this)</span>
+                              <span>{t("community.reader_reflections.pending_tag")}</span>
                             </span>
                           )}
                         </div>
@@ -606,7 +602,7 @@ export function ReaderReflectionsSection({
                       </div>
                     </div>
 
-                    {/* Report Button (EC-03.1 & reflections_moderation.md) */}
+                    {/* Report Button */}
                     <button
                       type="button"
                       onClick={() => handleReport(ref.id)}
@@ -616,10 +612,10 @@ export function ReaderReflectionsSection({
                           ? "opacity-50 text-amber-500 border-amber-500/30"
                           : "opacity-60 hover:opacity-100 border-transparent hover:border-line text-text-secondary"
                       }`}
-                      title="Report inappropriate content"
+                      title={t("community.reader_reflections.report_aria")}
                     >
                       <Flag className="w-3 h-3" />
-                      <span>{isReported ? "Reported" : "Report"}</span>
+                      <span>{isReported ? t("community.reader_reflections.reported") : t("community.reader_reflections.report")}</span>
                     </button>
                   </div>
 
@@ -633,7 +629,7 @@ export function ReaderReflectionsSection({
                     <div className="flex flex-wrap items-center gap-1.5 mb-3">
                       <span className="text-[10px] font-bold uppercase tracking-wider opacity-65 flex items-center gap-1">
                         <BookOpen className="w-2.5 h-2.5 text-antique-gold" />
-                        <span>Vocab applied:</span>
+                        <span>{t("community.reader_reflections.vocab_applied")}</span>
                       </span>
                       {ref.usedWords.map((word) => (
                         <span
@@ -649,7 +645,7 @@ export function ReaderReflectionsSection({
                   {/* Card Footer: Positive Support Reactions Only (No Dislike) */}
                   <div className="flex items-center justify-between pt-2 border-t border-line/60 text-xs">
                     <span className="text-[11px] opacity-60 italic">
-                      Non-judgmental community space
+                      {t("community.reader_reflections.space_label")}
                     </span>
 
                     <button
@@ -660,7 +656,7 @@ export function ReaderReflectionsSection({
                           ? "bg-rose-500/15 border-rose-500/40 text-rose-500 font-bold"
                           : "border-line opacity-75 hover:opacity-100 hover:border-rose-400/50 hover:text-rose-500"
                       }`}
-                      aria-label="Encourage reflection"
+                      aria-label={t("community.reader_reflections.encourage_aria")}
                     >
                       <Heart
                         className={`w-3.5 h-3.5 transition-transform ${
@@ -668,7 +664,7 @@ export function ReaderReflectionsSection({
                         }`}
                       />
                       <span>{ref.reactionsCount}</span>
-                      <span className="text-[10px] hidden sm:inline">support</span>
+                      <span className="text-[10px] hidden sm:inline">{t("community.reader_reflections.support_label")}</span>
                     </button>
                   </div>
                 </article>

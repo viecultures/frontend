@@ -1,5 +1,6 @@
 import React from "react";
 import { MessageSquare, Plus, Trophy, PenTool } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Link from "@/components/Link";
 import '../community-ui.css';
 import { PATHS } from "@/routes/paths";
@@ -15,6 +16,7 @@ export function CommunityHeader({
   onToggleEditor,
   activeTab = 'reflections',
 }: CommunityHeaderProps) {
+  const { t } = useTranslation('community');
   const isContest = activeTab === 'contest';
 
   return (
@@ -23,12 +25,12 @@ export function CommunityHeader({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1D5046] tracking-tight m-0">
-            {isContest ? "Weekly Heritage Essay Challenge" : "Cultural Ambassador Reflections"}
+            {isContest ? t('community.header.contest_title') : t('community.header.reflections_title')}
           </h1>
           <p className="text-xs sm:text-sm text-[#6E7B75] mt-1 max-w-xl leading-relaxed">
             {isContest
-              ? "Write a short essay (100–300 words) in English using heritage vocabulary. Top entries earn community ambassador badges."
-              : "Share stories. Practice English. Explore Vietnamese culture together."}
+              ? t('community.header.contest_desc')
+              : t('community.header.reflections_desc')}
           </p>
         </div>
 
@@ -46,7 +48,13 @@ export function CommunityHeader({
             ) : (
               <Plus className="w-4 h-4 text-[#E8D7AE]" />
             )}
-            <span>{isEditorOpen ? "Close editor" : isContest ? "Submit entry" : "Write Reflection"}</span>
+            <span>
+              {isEditorOpen
+                ? t('community.header.close_editor')
+                : isContest
+                ? t('community.header.submit_entry')
+                : t('community.header.write_reflection')}
+            </span>
           </button>
         </div>
       </div>
@@ -62,7 +70,7 @@ export function CommunityHeader({
           }`}
         >
           <MessageSquare className="w-3.5 h-3.5" />
-          <span>Reflections</span>
+          <span>{t('community.header.tab_reflections')}</span>
         </Link>
 
         <Link
@@ -74,7 +82,7 @@ export function CommunityHeader({
           }`}
         >
           <Trophy className="w-3.5 h-3.5 text-[#E8D7AE]" />
-          <span>Weekly Challenge</span>
+          <span>{t('community.header.tab_contest')}</span>
         </Link>
       </nav>
     </header>

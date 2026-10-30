@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Headphones, Mic, PenLine, Pause, Pencil, Play, ChevronUp, ChevronDown } from 'lucide-react';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useReaderDictionary } from '@/features/reader/hooks/useReaderDictionary';
@@ -22,6 +23,7 @@ import '../shadowing/practice-workspace.css';
 interface Props { isActive?: boolean }
 
 export function VideoDictationShadowingScreen({ isActive = true }: Props) {
+  const { t } = useTranslation('playground');
   const [url, setUrl] = useState(''), [lang, setLang] = useState('en');
   const [mode, setMode] = useState<TranscriptMode>('SHADOWING'), [clean, setClean] = useState(true);
   const [tab, setTab] = useState<'shadowing' | 'dictation'>('shadowing');
@@ -65,42 +67,42 @@ export function VideoDictationShadowingScreen({ isActive = true }: Props) {
 
   const draftErrors = draft ? validateDraft(draft, player.duration) : [];
   const removedTakes = draft ? Object.keys(session.takes).filter(id => !draft.rows.some(row => row.id === id)).length : 0;
-  const sourceError = uiError ? 'This transcript could not be prepared. Try reloading it or choose another video.'
+  const sourceError = uiError ? t('playground.shadowing.screen.transcript_prepare_error')
     : source.error;
   const sourceForm = <PracticeSourceForm url={url} language={lang} mode={mode} clean={clean}
     loading={source.loading} disabled={busy || !!draft} onUrl={setUrl} onLanguage={setLang} onMode={setMode} onClean={setClean}
     onSubmit={() => { sample.stop(); void fetchTranscript(url, lang, mode, clean); }} />;
 
   return <div className="sh-hub sh-practice-workspace" data-theme={theme} onMouseUp={handleTextSelection} onDoubleClick={handleTextSelection}>
-    <PracticeHeader title={draft?.title || session.lesson?.title || 'Dictation & Shadowing'} tab={tab}
+    <PracticeHeader title={draft?.title || session.lesson?.title || t('playground.shadowing.screen.default_title')} tab={tab}
       disabled={busy || source.loading || !!draft} onTab={switchTab} onSettings={() => setSettingsOpen(true)} />
-    {sourceError && <p role="alert" className="sh-error">{sourceError}{session.lesson && ' Your current lesson and recordings are still available.'}</p>}
+    {sourceError && <p role="alert" className="sh-error">{sourceError}{session.lesson && t('playground.shadowing.screen.lesson_safe_note')}</p>}
     {!videoId && <div className="sh-start-screen"><div className="sh-start-card">
       <div className="sh-start-icon"><Headphones size={24} /></div>
-      <span className="sh-eyebrow">Listen. Understand. Make it your own.</span>
-      <h1>Practice with a video you enjoy</h1>
-      <p>Listen closely with Dictation, or practice your voice with Shadowing. Start with a YouTube video and work through it one sentence at a time.</p>
+      <span className="sh-eyebrow">{t('playground.shadowing.screen.hero_eyebrow')}</span>
+      <h1>{t('playground.shadowing.screen.hero_title')}</h1>
+      <p>{t('playground.shadowing.screen.hero_desc')}</p>
       {sourceForm}
-      <div className="sh-start-methods"><div><PenLine size={18} aria-hidden="true" /><h2>Dictation</h2><p>Train your ear. Listen, write and check each sentence.</p></div><div><Mic size={18} aria-hidden="true" /><h2>Shadowing</h2><p>Find your rhythm. Record, replay and compare your voice.</p></div></div>
-      <p className="sh-session-note">You can review the transcript before you start. Recordings are kept for this session.</p>
+      <div className="sh-start-methods"><div><PenLine size={18} aria-hidden="true" /><h2>{t('playground.shadowing.screen.dictation_title')}</h2><p>{t('playground.shadowing.screen.dictation_desc')}</p></div><div><Mic size={18} aria-hidden="true" /><h2>{t('playground.shadowing.screen.shadowing_title')}</h2><p>{t('playground.shadowing.screen.shadowing_desc')}</p></div></div>
+      <p className="sh-session-note">{t('playground.shadowing.screen.hero_session_note')}</p>
     </div></div>}
     <div className="sh-workspace" hidden={!videoId}>
-      <aside className="sh-video-column" aria-label="Practice video">
-        <div className="sh-row sh-between"><span className="sh-eyebrow">Your video</span><span className="sh-time">{formatTime(player.time)} / {formatTime(player.duration)}</span></div>
-        <button type="button" className="sh-btn sh-video-toggle" aria-expanded={!videoCollapsed} onClick={() => { if (!videoCollapsed) { sample.stop(); player.playerRef.current?.pauseVideo(); } setVideoCollapsed(value => !value); }} disabled={busy}>{videoCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}{videoCollapsed ? 'Show video' : 'Collapse video'}</button>
+      <aside className="sh-video-column" aria-label={t('playground.shadowing.screen.video_aria')}>
+        <div className="sh-row sh-between"><span className="sh-eyebrow">{t('playground.shadowing.screen.your_video')}</span><span className="sh-time">{formatTime(player.time)} / {formatTime(player.duration)}</span></div>
+        <button type="button" className="sh-btn sh-video-toggle" aria-expanded={!videoCollapsed} onClick={() => { if (!videoCollapsed) { sample.stop(); player.playerRef.current?.pauseVideo(); } setVideoCollapsed(value => !value); }} disabled={busy}>{videoCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}{videoCollapsed ? t('playground.shadowing.screen.show_video') : t('playground.shadowing.screen.collapse_video')}</button>
         <div className="sh-video relative" hidden={videoCollapsed}><div ref={player.containerRef} /></div>
-        {player.error && <div className="sh-error" role="alert"><p>{player.error}</p><button className="sh-btn" disabled={busy} onClick={player.retry}>Reload player</button></div>}
-        <div className="sh-row sh-between"><button className="sh-btn" disabled={!player.ready || busy} onClick={() => { sample.stop(); player.playerRef.current?.pauseVideo(); }}><Pause size={15} /> Pause sample</button><button className="sh-btn" disabled={busy || !!draft} onClick={() => setSettingsOpen(true)} aria-label="Adjust listening speed">{rate}x</button></div>
-        <div className="sh-session-guide"><span className="sh-eyebrow">Your practice flow</span><h3>{tab === 'shadowing' ? 'From listening to speaking' : 'From sound to understanding'}</h3><ol><li><span>01</span><div>Listen closely<p>Follow the original voice, one sentence at a time.</p></div></li><li><span>02</span><div>{tab === 'shadowing' ? 'Make it your own' : 'Write what you hear'}<p>{tab === 'shadowing' ? 'Record with the video as your silent cue.' : 'Notice the small words and connected sounds.'}</p></div></li><li><span>03</span><div>{tab === 'shadowing' ? 'Replay and compare' : 'Check and refine'}<p>{tab === 'shadowing' ? 'Listen back to a part or the full video.' : 'Use feedback to catch what you missed.'}</p></div></li></ol></div>
-        <details className="sh-practice-help"><summary>How to practice</summary><p>Listen to a sentence, then type what you hear or record your voice. You can review each part and the whole video.</p><p>Recordings are kept for this session. Reloading or leaving this page will clear them.</p></details>
+        {player.error && <div className="sh-error" role="alert"><p>{player.error}</p><button className="sh-btn" disabled={busy} onClick={player.retry}>{t('playground.shadowing.screen.reload_player')}</button></div>}
+        <div className="sh-row sh-between"><button className="sh-btn" disabled={!player.ready || busy} onClick={() => { sample.stop(); player.playerRef.current?.pauseVideo(); }}><Pause size={15} /> {t('playground.shadowing.screen.pause_sample')}</button><button className="sh-btn" disabled={busy || !!draft} onClick={() => setSettingsOpen(true)} aria-label={t('playground.shadowing.screen.adjust_speed_aria')}>{rate}x</button></div>
+        <div className="sh-session-guide"><span className="sh-eyebrow">{t('playground.shadowing.screen.practice_flow_title')}</span><h3>{tab === 'shadowing' ? t('playground.shadowing.screen.flow_shadowing_sub') : t('playground.shadowing.screen.flow_dictation_sub')}</h3><ol><li><span>01</span><div>{t('playground.shadowing.screen.step_01_title')}<p>{t('playground.shadowing.screen.step_01_desc')}</p></div></li><li><span>02</span><div>{tab === 'shadowing' ? t('playground.shadowing.screen.step_02_shadowing_title') : t('playground.shadowing.screen.step_02_dictation_title')}<p>{tab === 'shadowing' ? t('playground.shadowing.screen.step_02_shadowing_desc') : t('playground.shadowing.screen.step_02_dictation_desc')}</p></div></li><li><span>03</span><div>{tab === 'shadowing' ? t('playground.shadowing.screen.step_03_shadowing_title') : t('playground.shadowing.screen.step_03_dictation_title')}<p>{tab === 'shadowing' ? t('playground.shadowing.screen.step_03_shadowing_desc') : t('playground.shadowing.screen.step_03_dictation_desc')}</p></div></li></ol></div>
+        <details className="sh-practice-help"><summary>{t('playground.shadowing.screen.how_to_practice')}</summary><p>{t('playground.shadowing.screen.practice_help_p1')}</p><p>{t('playground.shadowing.screen.practice_help_p2')}</p></details>
       </aside>
-      <main className="sh-content" id="practice-panel" role="tabpanel" aria-label={draft ? 'Transcript preparation' : tab === 'shadowing' ? 'Shadowing practice' : 'Dictation practice'}>
+      <main className="sh-content" id="practice-panel" role="tabpanel" aria-label={draft ? t('playground.shadowing.screen.aria_transcript_prep') : tab === 'shadowing' ? t('playground.shadowing.screen.aria_shadowing_practice') : t('playground.shadowing.screen.aria_dictation_practice')}>
         {draft ? editingDraft ? <ShadowingTranscriptEditor key={draft.videoId} draft={draft} onChange={setDraft} duration={player.duration} ready={player.ready && !player.error && !source.loading} takes={session.takes} onApply={apply} onCancel={cancelDraft} onPreview={sample.play} getTime={() => player.playerRef.current?.getCurrentTime() ?? 0} />
-          : <section className="sh-ready-card"><span className="sh-eyebrow">Transcript ready</span><h3>A few moments to get familiar</h3><p>{draft.rows.length} sentences · {draft.rows.filter((row, index) => index === 0 || row.partStart).length} parts</p><p>Preview the video, then start practicing. You can edit the words, sentence timing and parts whenever you need.</p>
-            {!player.ready && !player.error && <p role="status">Waiting for the video player…</p>}
-            {player.ready && draftErrors.length > 0 && <p className="sh-notice" role="status">Some transcript timings or sentences need a review. Open the editor before starting.</p>}
-            {removedTakes > 0 && <p className="sh-notice" role="status">This transcript replaces sentences with recordings. Review the changes in the editor before applying them.</p>}
-            <div className="sh-row sh-wrap"><button className="sh-btn sh-primary" disabled={!player.ready || !!player.error || !!draftErrors.length || removedTakes > 0} onClick={() => apply(applyDraft(draft, player.duration))}><Play size={15} /> Start practice</button><button className="sh-btn" onClick={() => setEditingDraft(true)}><Pencil size={14} /> Edit transcript</button><button className="sh-btn" onClick={cancelDraft}>Cancel</button></div>
+          : <section className="sh-ready-card"><span className="sh-eyebrow">{t('playground.shadowing.screen.transcript_ready')}</span><h3>{t('playground.shadowing.screen.ready_card_title')}</h3><p>{t('playground.shadowing.screen.ready_card_info', { sentences: draft.rows.length, parts: draft.rows.filter((row, index) => index === 0 || row.partStart).length })}</p><p>{t('playground.shadowing.screen.ready_card_desc')}</p>
+            {!player.ready && !player.error && <p role="status">{t('playground.shadowing.screen.waiting_player')}</p>}
+            {player.ready && draftErrors.length > 0 && <p className="sh-notice" role="status">{t('playground.shadowing.screen.review_timing_notice')}</p>}
+            {removedTakes > 0 && <p className="sh-notice" role="status">{t('playground.shadowing.screen.review_takes_notice')}</p>}
+            <div className="sh-row sh-wrap"><button className="sh-btn sh-primary" disabled={!player.ready || !!player.error || !!draftErrors.length || removedTakes > 0} onClick={() => apply(applyDraft(draft, player.duration))}><Play size={15} /> {t('playground.shadowing.screen.start_practice_btn')}</button><button className="sh-btn" onClick={() => setEditingDraft(true)}><Pencil size={14} /> {t('playground.shadowing.screen.edit_transcript_btn')}</button><button className="sh-btn" onClick={cancelDraft}>{t('playground.shadowing.screen.cancel_btn')}</button></div>
           </section>
           : session.lesson ? tab === 'shadowing' ? <ShadowingPracticePanel lesson={session.lesson} takes={session.takes} dispatch={session.dispatch} playerRef={player.playerRef} playerTime={player.time} ready={player.ready} active={isActive && !source.loading && !player.error} onBusy={setBusy} onEdit={edit} onSample={sample.play} onStopSample={sample.stop} />
             : <ShadowingDictationPanel key={session.lesson.videoId} lesson={session.lesson} ready={player.ready} onSample={sample.play} onStop={sample.stop} /> : null}
@@ -114,10 +116,10 @@ export function VideoDictationShadowingScreen({ isActive = true }: Props) {
       onReload={() => { if (session.lesson) { sample.stop(); void fetchTranscript(session.lesson.videoId, lang, mode, clean); } }} />
     <Dialog open={sourceOpen} onClose={() => { if (!source.loading) setSourceOpen(false); }} className="sh-dialog">
       <DialogBackdrop className="sh-dialog-backdrop" /><div className="sh-source-dialog-position"><DialogPanel className="sh-overlay-theme sh-source-dialog" data-theme={theme}>
-        <DialogTitle>Open a video</DialogTitle><p>Your current lesson stays available until you apply a new transcript. Starting a different video clears the current recordings.</p>
+        <DialogTitle>{t('playground.shadowing.screen.open_video_dialog_title')}</DialogTitle><p>{t('playground.shadowing.screen.open_video_dialog_desc')}</p>
         {sourceForm}
         {sourceError && <p role="alert" className="sh-error">{sourceError}</p>}
-        <button className="sh-btn" disabled={source.loading} onClick={() => setSourceOpen(false)}>Cancel</button>
+        <button className="sh-btn" disabled={source.loading} onClick={() => setSourceOpen(false)}>{t('playground.shadowing.screen.cancel_btn')}</button>
       </DialogPanel></div>
     </Dialog>
     <InPlaceDictionaryPopup {...popupState} onClose={closeDictionary} themeMode={theme === 'paper' ? 'paper' : 'dark'} />

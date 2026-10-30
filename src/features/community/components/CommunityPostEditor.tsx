@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   X,
   Send,
@@ -88,6 +89,7 @@ export function CommunityPostEditor({
   onChangeReflectionText,
   onPublish,
 }: CommunityPostEditorProps) {
+  const { t } = useTranslation("community");
   const [selectedPhoto, setSelectedPhoto] = useState<string>(
     PRESET_PHOTOS[0].url
   );
@@ -145,7 +147,7 @@ export function CommunityPostEditor({
 
   const handleSubmit = () => {
     if (!reflectionText.trim()) {
-      alert("Please write your reflection content before publishing.");
+      alert(t("community.editor.alert_empty_content"));
       return;
     }
     onPublish({
@@ -159,15 +161,15 @@ export function CommunityPostEditor({
   };
 
   // Heuristic Writing Advice (Non-intrusive, educational)
-  const writingTips = [];
+  const writingTips: string[] = [];
   if (wordCount < 20) {
-    writingTips.push("Aim for at least 30–50 words to express a rich reflection.");
+    writingTips.push(t("community.editor.tip_min_words"));
   }
   if (!reflectionText.includes("because") && !reflectionText.includes("which") && !reflectionText.includes("when")) {
-    writingTips.push("Tip: Use linking words like 'when', 'because', or 'which' to create complex sentences.");
+    writingTips.push(t("community.editor.tip_linking_words"));
   }
   if (vocabList.length === 0) {
-    writingTips.push("Tip: Attach 1–2 target English words to help peers learn vocabulary from your post.");
+    writingTips.push(t("community.editor.tip_vocab"));
   }
 
   return (
@@ -183,10 +185,10 @@ export function CommunityPostEditor({
           </div>
           <div>
             <h2 className="font-serif text-lg sm:text-xl font-bold text-[#1D5046]">
-              Share your Cultural Reflection
+              {t("community.editor.header_title")}
             </h2>
             <p className="text-xs text-[#6E7B75]">
-              Write in English, explore heritage, and help peers discover vocabulary.
+              {t("community.editor.header_desc")}
             </p>
           </div>
         </div>
@@ -201,12 +203,12 @@ export function CommunityPostEditor({
             {isPreview ? (
               <>
                 <Edit3 className="w-3.5 h-3.5" />
-                <span>Edit</span>
+                <span>{t("community.editor.edit")}</span>
               </>
             ) : (
               <>
                 <Eye className="w-3.5 h-3.5" />
-                <span>Preview</span>
+                <span>{t("community.editor.preview")}</span>
               </>
             )}
           </button>
@@ -215,7 +217,7 @@ export function CommunityPostEditor({
             type="button"
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-[#FAF7F0] text-[#6E7B75] hover:text-[#1D5046] transition-colors cursor-pointer focus-ring"
-            aria-label="Close reflection editor"
+            aria-label={t("community.editor.close_aria")}
           >
             <X className="w-5 h-5" />
           </button>
@@ -233,7 +235,7 @@ export function CommunityPostEditor({
                 className="block text-xs font-semibold text-[#314F49] mb-1.5 flex items-center gap-1.5"
               >
                 <BookOpen className="w-3.5 h-3.5 text-[#1D5046]" />
-                <span>Cultural Topic</span>
+                <span>{t("community.editor.topic_label")}</span>
               </label>
               <select
                 id="lesson-select"
@@ -256,14 +258,14 @@ export function CommunityPostEditor({
                 className="block text-xs font-semibold text-[#314F49] mb-1.5 flex items-center gap-1.5"
               >
                 <Tag className="w-3.5 h-3.5 text-[#1D5046]" />
-                <span>Reflection Title (Optional)</span>
+                <span>{t("community.editor.title_label")}</span>
               </label>
               <input
                 id="title-input"
                 type="text"
                 value={postTitle}
                 onChange={(e) => onChangePostTitle?.(e.target.value)}
-                placeholder="e.g. Architectural symmetry of Ngọ Môn Gate..."
+                placeholder={t("community.editor.title_placeholder")}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] placeholder:text-[#6E7B75]/60 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white"
               />
             </div>
@@ -274,9 +276,9 @@ export function CommunityPostEditor({
             <textarea
               value={reflectionText}
               onChange={(e) => onChangeReflectionText(e.target.value)}
-              placeholder="Share a cultural story or something you learned today in English... Express your feelings, vocabulary or memories."
+              placeholder={t("community.editor.content_placeholder")}
               className="w-full h-36 sm:h-40 p-4 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] text-xs sm:text-sm text-[#314F49] placeholder:text-[#6E7B75]/60 focus:outline-none focus:ring-1 focus:ring-[#1D5046] focus:bg-white leading-relaxed resize-y"
-              aria-label="Reflection text in English"
+              aria-label={t("community.editor.content_aria")}
             />
             <div className="flex items-center justify-between text-xs text-[#6E7B75] px-1">
               <button
@@ -285,9 +287,9 @@ export function CommunityPostEditor({
                 className="inline-flex items-center gap-1 text-[#1D5046] font-semibold hover:underline cursor-pointer"
               >
                 <Lightbulb className="w-3.5 h-3.5 text-[#E8D7AE]" />
-                <span>{showWritingAssistance ? "Hide writing tips" : "English Writing Assistance"}</span>
+                <span>{showWritingAssistance ? t("community.editor.hide_tips_btn") : t("community.editor.writing_assist_btn")}</span>
               </button>
-              <span className="font-medium">{wordCount} words</span>
+              <span className="font-medium">{t("community.editor.words_count", { count: wordCount })}</span>
             </div>
           </div>
 
@@ -297,10 +299,10 @@ export function CommunityPostEditor({
               <div className="flex items-center justify-between">
                 <span className="font-bold text-[#1D5046] flex items-center gap-1.5">
                   <PenLine className="w-3.5 h-3.5 text-[#1D5046]" />
-                  <span>Writing Suggestions (Non-intrusive)</span>
+                  <span>{t("community.editor.tips_title")}</span>
                 </span>
                 <span className="text-[11px] text-[#6E7B75]">
-                  Vocabulary &amp; Sentence Flow
+                  {t("community.editor.tips_subtitle")}
                 </span>
               </div>
               <ul className="space-y-1 text-[#314F49] pl-4 list-disc text-xs leading-relaxed">
@@ -308,7 +310,7 @@ export function CommunityPostEditor({
                   <li key={idx}>{tip}</li>
                 ))}
                 <li>
-                  Sentence starter ideas: <em>&ldquo;What struck me most about...&rdquo;</em>, <em>&ldquo;Exploring the history of... gave me a fresh perspective on...&rdquo;</em>
+                  {t("community.editor.sentence_starters_label")} <em>&ldquo;{t("community.editor.starter_1")}&rdquo;</em>, <em>&ldquo;{t("community.editor.starter_2")}&rdquo;</em>
                 </li>
               </ul>
             </div>
@@ -319,7 +321,7 @@ export function CommunityPostEditor({
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-[#314F49] flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-[#1D5046]" />
-                <span>Practiced Vocabulary Tags</span>
+                <span>{t("community.editor.vocab_tags_title")}</span>
               </span>
               <button
                 type="button"
@@ -327,7 +329,7 @@ export function CommunityPostEditor({
                 className="text-xs font-semibold text-[#1D5046] hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Add word</span>
+                <span>{t("community.editor.add_word_btn")}</span>
               </button>
             </div>
 
@@ -344,7 +346,7 @@ export function CommunityPostEditor({
                     type="button"
                     onClick={() => handleRemoveVocab(idx)}
                     className="hover:text-red-600 ml-0.5 cursor-pointer"
-                    aria-label={`Remove ${v.word}`}
+                    aria-label={t("community.editor.remove_word_aria", { word: v.word })}
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -357,14 +359,14 @@ export function CommunityPostEditor({
               <div className="flex flex-col sm:flex-row gap-2 pt-1">
                 <input
                   type="text"
-                  placeholder="English word (e.g. craftsmanship)"
+                  placeholder={t("community.editor.word_placeholder")}
                   value={newVocabWord}
                   onChange={(e) => setNewVocabWord(e.target.value)}
                   className="px-3 py-1.5 rounded-lg bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] focus:outline-none focus:ring-1 focus:ring-[#1D5046]"
                 />
                 <input
                   type="text"
-                  placeholder="Vietnamese meaning (e.g. tay nghề thủ công)"
+                  placeholder={t("community.editor.meaning_placeholder")}
                   value={newVocabMeaning}
                   onChange={(e) => setNewVocabMeaning(e.target.value)}
                   className="flex-1 px-3 py-1.5 rounded-lg bg-[#FAF7F0] border border-[#E8E2D5] text-xs text-[#314F49] focus:outline-none focus:ring-1 focus:ring-[#1D5046]"
@@ -374,7 +376,7 @@ export function CommunityPostEditor({
                   onClick={handleAddVocab}
                   className="px-3 py-1.5 rounded-lg bg-[#1D5046] text-white text-xs font-semibold hover:bg-[#153D35] cursor-pointer"
                 >
-                  Save tag
+                  {t("community.editor.save_tag_btn")}
                 </button>
               </div>
             )}
@@ -385,14 +387,14 @@ export function CommunityPostEditor({
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-[#314F49] flex items-center gap-1.5">
                 <ImageIcon className="w-3.5 h-3.5 text-[#1D5046]" />
-                <span>Cultural Photo Attachment</span>
+                <span>{t("community.editor.photo_attach_title")}</span>
               </span>
               <button
                 type="button"
                 onClick={() => setShowPhotoPicker(!showPhotoPicker)}
                 className="text-xs font-semibold text-[#1D5046] hover:underline cursor-pointer"
               >
-                {showPhotoPicker ? "Close gallery" : "Choose from library"}
+                {showPhotoPicker ? t("community.editor.close_photo_btn") : t("community.editor.choose_photo_btn")}
               </button>
             </div>
 
@@ -408,7 +410,7 @@ export function CommunityPostEditor({
                   {photoCaption}
                 </span>
                 <span className="text-[11px] text-[#6E7B75]">
-                  Authentic heritage photograph
+                  {t("community.editor.photo_badge")}
                 </span>
               </div>
             </div>
@@ -446,7 +448,7 @@ export function CommunityPostEditor({
         <div className="p-4 rounded-xl bg-[#FAF7F0] border border-[#E8E2D5] space-y-3">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-[#1D5046]">
-              Preview Mode
+              {t("community.editor.preview_mode")}
             </span>
             <span className="text-xs text-[#6E7B75]">
               · {selectedLesson}
@@ -458,7 +460,7 @@ export function CommunityPostEditor({
             </h3>
           )}
           <p className="text-sm text-[#314F49] leading-relaxed whitespace-pre-line">
-            {reflectionText || "(No reflection content written yet...)"}
+            {reflectionText || t("community.editor.no_content_placeholder")}
           </p>
           {selectedPhoto && (
             <div className="w-full rounded-xl overflow-hidden border border-[#E8E2D5] h-52 sm:h-60">
@@ -475,7 +477,7 @@ export function CommunityPostEditor({
       {/* 7. Footer Action Bar */}
       <div className="flex items-center justify-between pt-3 border-t border-[#E8E2D5]">
         <span className="text-xs text-[#6E7B75] hidden sm:inline">
-          Express yourself freely · Build cultural confidence
+          {t("community.editor.footer_hint")}
         </span>
 
         <div className="flex items-center gap-2.5 ml-auto">
@@ -484,7 +486,7 @@ export function CommunityPostEditor({
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0] transition-colors cursor-pointer"
           >
-            Cancel
+            {t("community.editor.cancel_btn")}
           </button>
           <button
             type="button"
@@ -492,7 +494,7 @@ export function CommunityPostEditor({
             className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] shadow-xs inline-flex items-center gap-1.5 transition-all cursor-pointer focus-ring"
           >
             <Send className="w-3.5 h-3.5 text-[#E8D7AE]" />
-            <span>Publish Reflection</span>
+            <span>{t("community.editor.publish_btn")}</span>
           </button>
         </div>
       </div>

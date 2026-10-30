@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export interface DictionaryPaginationProps {
   currentPage: number;
@@ -29,6 +30,8 @@ export const DictionaryPagination: React.FC<DictionaryPaginationProps> = ({
   itemsPerPage,
   onPageChange,
 }) => {
+  const { t } = useTranslation('flashcards');
+
   if (totalDecks === 0 || totalPages <= 1) return null;
 
   const startIdx = (currentPage - 1) * itemsPerPage + 1;
@@ -36,9 +39,9 @@ export const DictionaryPagination: React.FC<DictionaryPaginationProps> = ({
   const pages = getPageNumbers(currentPage, totalPages);
 
   return (
-    <nav className="vocab-pagination" aria-label="Vocabulary pagination">
+    <nav className="vocab-pagination" aria-label={t('pagination.aria_label', 'Vocabulary pagination')}>
       <div className="vocab-pagination-info" role="status">
-        Showing <strong>{startIdx}</strong>–<strong>{endIdx}</strong> of <strong>{totalDecks}</strong> decks
+        {t('pagination.showing', { start: startIdx, end: endIdx, total: totalDecks, defaultValue: `Showing ${startIdx}–${endIdx} of ${totalDecks} decks` })}
       </div>
 
       <div className="vocab-pagination-controls">
@@ -47,8 +50,8 @@ export const DictionaryPagination: React.FC<DictionaryPaginationProps> = ({
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage <= 1}
           className="vocab-pagination-button vocab-pagination-prev"
-          title="Previous page"
-          aria-label="Previous page"
+          title={t('pagination.prev_page', 'Previous page')}
+          aria-label={t('pagination.prev_page', 'Previous page')}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -65,7 +68,7 @@ export const DictionaryPagination: React.FC<DictionaryPaginationProps> = ({
                 type="button"
                 onClick={() => onPageChange(item)}
                 aria-current={currentPage === item ? 'page' : undefined}
-                aria-label={`Page ${item}`}
+                aria-label={t('pagination.page_number', { page: item, defaultValue: `Page ${item}` })}
                 className="vocab-pagination-button"
               >
                 {item}
@@ -79,8 +82,8 @@ export const DictionaryPagination: React.FC<DictionaryPaginationProps> = ({
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage >= totalPages}
           className="vocab-pagination-button vocab-pagination-next"
-          title="Next page"
-          aria-label="Next page"
+          title={t('pagination.next_page', 'Next page')}
+          aria-label={t('pagination.next_page', 'Next page')}
         >
           <ChevronRight className="w-4 h-4" />
         </button>

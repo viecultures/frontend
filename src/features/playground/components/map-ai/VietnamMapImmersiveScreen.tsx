@@ -15,6 +15,7 @@
  */
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import './map-ai.css';
 import Sidebar from './components/Sidebar';
 import { useLiveAPIContext } from './contexts/LiveAPIContext';
@@ -49,6 +50,7 @@ import {
 import { paths } from '@/routes/paths';
 
 function VietnamMapImmersiveContent() {
+  const { t } = useTranslation('playground');
   const { toggleSidebar, speakerMuted } = useUI();
   const {
     activeView,
@@ -351,10 +353,10 @@ function VietnamMapImmersiveContent() {
           disabled={busy}
           onClick={handleRequestArticles}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-heritage-green text-gray-200 hover:text-antique-gold border border-white/10 text-xs font-medium transition-all cursor-pointer shadow-sm disabled:opacity-50"
-          title="Yêu cầu Sứ Giả AI tìm bài đọc văn hóa cho địa danh hiện tại"
+          title={t('playground.immersive.cultural_reading_button_title')}
         >
           <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-          <span>Bài đọc văn hóa</span>
+          <span>{t('playground.immersive.cultural_reading_button')}</span>
         </button>
 
         {/* Play / Pause Toggle Button */}
@@ -368,12 +370,12 @@ function VietnamMapImmersiveContent() {
           }`}
           title={
             connected || connecting || ending
-              ? 'Dừng đàm thoại'
+              ? t('playground.immersive.stop_convo')
               : hasHistory
-                ? 'Tiếp tục đàm thoại'
-                : 'Bắt đầu đàm thoại'
+                ? t('playground.immersive.resume_convo')
+                : t('playground.immersive.start_convo')
           }
-          aria-label="Đàm thoại"
+          aria-label={t('playground.immersive.convo_aria')}
         >
           {connecting ? (
             <RefreshCw className="w-4 h-4 animate-spin" />
@@ -394,8 +396,8 @@ function VietnamMapImmersiveContent() {
               ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30'
               : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10'
           }`}
-          title={muted ? 'Bật microphone' : 'Tắt microphone'}
-          aria-label="Microphone"
+          title={muted ? t('playground.immersive.mic_on_title') : t('playground.immersive.mic_off_title')}
+          aria-label={t('playground.immersive.mic_aria')}
         >
           {!muted ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
         </button>
@@ -409,8 +411,8 @@ function VietnamMapImmersiveContent() {
               ? 'bg-white/5 text-gray-200 border-white/10 hover:bg-white/10'
               : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
           }`}
-          title={speakerMuted ? 'Bật âm thanh loa' : 'Tắt âm thanh loa'}
-          aria-label="Loa"
+          title={speakerMuted ? t('playground.immersive.speaker_on_title') : t('playground.immersive.speaker_off_title')}
+          aria-label={t('playground.immersive.speaker_aria')}
         >
           {!speakerMuted ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
         </button>
@@ -431,8 +433,8 @@ function VietnamMapImmersiveContent() {
               ? 'bg-antique-gold/20 text-antique-gold border-antique-gold/50'
               : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10'
           }`}
-          title="Khôi phục toàn cảnh (ESC)"
-          aria-label="Tiêu điểm"
+          title={t('playground.immersive.reset_focus_title')}
+          aria-label={t('playground.immersive.reset_focus_aria')}
         >
           <Compass className="w-4 h-4" />
         </button>
@@ -442,8 +444,8 @@ function VietnamMapImmersiveContent() {
           type="button"
           onClick={toggleSidebar}
           className="p-2 rounded-xl bg-white/5 hover:bg-heritage-green text-gray-300 hover:text-antique-gold border border-white/10 transition-colors cursor-pointer"
-          title="Cài đặt giọng nói &amp; chủ đề"
-          aria-label="Cài đặt"
+          title={t('playground.immersive.settings_title')}
+          aria-label={t('playground.immersive.settings_aria')}
         >
           <SlidersHorizontal className="w-4 h-4" />
         </button>
@@ -468,14 +470,14 @@ function VietnamMapImmersiveContent() {
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-xs">
               <span className="font-serif font-bold text-antique-bright flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
-                Bài Đọc Được AI Đề Cử ({retrievedArticles.length} bài)
+                {t('playground.immersive.recommended_articles_title', { count: retrievedArticles.length })}
               </span>
               <button
                 type="button"
                 onClick={() => setShowArticlesCard(false)}
                 className="text-gray-400 hover:text-white p-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
-                title="Ẩn danh sách bài đọc"
-                aria-label="Đóng"
+                title={t('playground.immersive.hide_articles_title')}
+                aria-label={t('playground.immersive.close_aria')}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -511,20 +513,20 @@ function VietnamMapImmersiveContent() {
                         type="button"
                         onClick={() => selectLandmark(art.id, 'user')}
                         className="px-2 py-0.5 rounded text-[10px] bg-white/5 hover:bg-heritage-green text-antique-bright border border-white/10 flex items-center gap-1 cursor-pointer transition-colors"
-                        title="Xem trên bản đồ"
+                        title={t('playground.immersive.view_on_map_title')}
                       >
                         <Compass className="w-2.5 h-2.5" />
-                        <span>Xem</span>
+                        <span>{t('playground.immersive.view_on_map')}</span>
                       </button>
                       <a
                         href={paths.reader({ article: art.id, level: art.level })}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-2 py-0.5 rounded text-[10px] bg-antique-gold/20 hover:bg-antique-gold/35 text-antique-bright border border-antique-gold/40 flex items-center gap-1 cursor-pointer transition-colors"
-                        title="Mở bài đọc song ngữ trên tab mới"
+                        title={t('playground.immersive.read_article_title')}
                       >
                         <ExternalLink className="w-2.5 h-2.5" />
-                        <span>Đọc bài</span>
+                        <span>{t('playground.immersive.read_article')}</span>
                       </a>
                     </div>
                   </div>
@@ -565,7 +567,7 @@ function VietnamMapImmersiveContent() {
             type="button"
             onClick={() => handleSelectProvince(null)}
             className="ml-1 p-0.5 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
-            title="Khôi phục toàn cảnh (ESC)"
+            title={t('playground.immersive.restore_panorama_title')}
           >
             <X className="w-3.5 h-3.5" />
           </button>

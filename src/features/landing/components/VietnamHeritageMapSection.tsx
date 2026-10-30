@@ -1,13 +1,15 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { VietnamMap } from '@/components/map/VietnamMap';
 import type { ProvinceMapItem } from '@/data/vietnamMapData';
 import { HERITAGE_SITES } from '@/data/vietnamCultureData';
 import type { CulturalHeritageSite } from '@/types/sampleTypes';
-import { paths } from '@/routes/paths';
+import { PATHS, paths, withQuery } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import { MapWatercolorArtwork } from './MapWatercolorArtwork';
 import { MapJourneyPanel } from './MapJourneyPanel';
 import type { RegionKey } from '@/utils/useVietnamMap';
+import { readFirstRegionChoice, saveFirstRegionChoice, type FirstRegion } from '@/services/learning/firstRegionChoice';
 
 export interface LocationStoryPin {
   id: string;
@@ -114,9 +116,11 @@ const FEATURED_PINS: LocationStoryPin[] = [
 ];
 
 export const VietnamHeritageMapSection: React.FC = () => {
+  const { t } = useTranslation('landing');
   const go = useAppNavigate();
-  const [selectedRegion, setSelectedRegion] = useState<RegionKey>('north');
-  const [selectedPinId, setSelectedPinId] = useState<string>('hanoi');
+  const [firstRegion, setFirstRegion] = useState<FirstRegion | null>(readFirstRegionChoice);
+  const [selectedRegion, setSelectedRegion] = useState<RegionKey>(() => readFirstRegionChoice() || 'all');
+  const [selectedPinId, setSelectedPinId] = useState<string>(() => FEATURED_PINS.find(pin => pin.region === readFirstRegionChoice())?.id || 'hanoi');
 
   const activePin = useMemo(() => {
     return FEATURED_PINS.find((p) => p.id === selectedPinId) || FEATURED_PINS[1];
@@ -129,11 +133,18 @@ export const VietnamHeritageMapSection: React.FC = () => {
 
     if (foundSite) return foundSite;
 
+    const regionType: 'Bắc Bộ' | 'Trung Bộ' | 'Nam Bộ' =
+      activePin.region === 'north'
+        ? 'Bắc Bộ'
+        : activePin.region === 'central'
+        ? 'Trung Bộ'
+        : 'Nam Bộ';
+
     return {
       id: activePin.id,
       name: activePin.name,
       englishTitle: activePin.englishTitle,
-      region: activePin.region === 'north' ? 'Bắc Bộ' : activePin.region === 'central' ? 'Trung Bộ' : 'Nam Bộ',
+      region: regionType,
       category: 'Di sản UNESCO',
       province: activePin.provinceName,
       x: activePin.anchorX,
@@ -145,15 +156,23 @@ export const VietnamHeritageMapSection: React.FC = () => {
       presentationSnippet: '',
       vocabularyList: [],
     };
-  }, [activePin]);
+  }, [activePin, t]);
 
   const handleSelectRegion = (region: RegionKey) => {
-    if (region !== 'north') return;
+    if (region === 'all' || (firstRegion && region !== firstRegion)) return;
+    setFirstRegion(region);
+    saveFirstRegionChoice(region);
     setSelectedRegion(region);
     const firstPinInRegion = FEATURED_PINS.find((p) => p.region === region);
     if (firstPinInRegion) {
       setSelectedPinId(firstPinInRegion.id);
     }
+  };
+
+  const handleChangeFirstRegion = () => {
+    setFirstRegion(null);
+    saveFirstRegionChoice(null);
+    setSelectedRegion('all');
   };
 
   const handleSelectPin = (pin: LocationStoryPin) => {
@@ -181,13 +200,13 @@ export const VietnamHeritageMapSection: React.FC = () => {
             id="heritage-map-title"
             className="font-serif text-3xl sm:text-4xl lg:text-[38px] xl:text-[42px] font-bold text-[#1A3B32] leading-[1.22] tracking-tight m-0"
           >
-            <span className="whitespace-nowrap">Khám phá bài đọc</span>
+            <span className="whitespace-nowrap">{t('map_section.headline_part1')}</span>
             <br />
-            <span className="text-[#C08B3E] italic font-serif whitespace-nowrap">theo vùng miền</span>
+            <span className="text-[#C08B3E] italic font-serif whitespace-nowrap">{t('map_section.headline_part2')}</span>
           </h2>
 
           <p className="text-sm sm:text-base text-[#4A5550] leading-relaxed max-w-sm mt-4 font-normal">
-            Bắt đầu với bài đọc Hà Nội; các địa điểm khác đang được chuẩn bị.
+            {t('map_section.subtitle')}
           </p>
 
           <div className="w-14 h-[2px] bg-[#C08B3E] mt-5" aria-hidden="true" />
@@ -201,7 +220,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
             <VietnamMap
               activeRegion="all"
               customViewBox="10 -20 600 1060"
-              selectedProvinceId={activePin.provinceId}
+              selectedProvinceId={firstRegion ? activePin.provinceId : null}
               onSelectProvince={(prov: ProvinceMapItem | null) => {
                 if (!prov) return;
                 const matchingPin = FEATURED_PINS.find(
@@ -235,7 +254,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
                     fontWeight="700"
                     fontFamily="var(--font-sans)"
                   >
-                    Hoàng Sa
+                    {t('map_section.paracel_name')}
                   </text>
                   <text
                     x="524"
@@ -245,7 +264,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
                     fontWeight="600"
                     fontFamily="var(--font-sans)"
                   >
-                    (Việt Nam)
+                    {t('map_section.vietnam_claim')}
                   </text>
                 </g>
 
@@ -266,7 +285,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
                     fontWeight="700"
                     fontFamily="var(--font-sans)"
                   >
-                    Trường Sa
+                    {t('map_section.spratly_name')}
                   </text>
                   <text
                     x="526"
@@ -276,59 +295,63 @@ export const VietnamHeritageMapSection: React.FC = () => {
                     fontWeight="600"
                     fontFamily="var(--font-sans)"
                   >
-                    (Việt Nam)
+                    {t('map_section.vietnam_claim')}
                   </text>
                 </g>
 
                 {/* Central Region Lock Badge: Placed inside Central Vietnam */}
-                <g
-                  transform="translate(320, 510)"
-                  className="select-none"
-                  role="img"
-                  aria-label="Miền Trung sắp mở"
-                >
-                  <circle
-                    r="16"
-                    fill="#FFFFFF"
-                    filter="drop-shadow(0 2px 6px rgba(0,0,0,0.22))"
-                    className="transition-transform group-hover:scale-110"
-                  />
-                  <path
-                    d="M -4.5 -1 L -4.5 -4.5 C -4.5 -7 -2.2 -9 0 -9 C 2.2 -9 4.5 -7 4.5 -4.5 L 4.5 -1 M -5.5 -1 L 5.5 -1 L 5.5 6.5 L -5.5 6.5 Z"
-                    fill="#1C382F"
-                    stroke="#1C382F"
-                    strokeWidth="1"
-                    strokeLinejoin="round"
-                  />
-                  <circle cx="0" cy="2.5" r="1" fill="#FFFFFF" />
-                </g>
+                {firstRegion && firstRegion !== 'central' && (
+                  <g
+                    transform="translate(320, 510)"
+                    className="select-none"
+                    role="img"
+                    aria-label={t('map_section.central_locked')}
+                  >
+                    <circle
+                      r="16"
+                      fill="#FFFFFF"
+                      filter="drop-shadow(0 2px 6px rgba(0,0,0,0.22))"
+                      className="transition-transform group-hover:scale-110"
+                    />
+                    <path
+                      d="M -4.5 -1 L -4.5 -4.5 C -4.5 -7 -2.2 -9 0 -9 C 2.2 -9 4.5 -7 4.5 -4.5 L 4.5 -1 M -5.5 -1 L 5.5 -1 L 5.5 6.5 L -5.5 6.5 Z"
+                      fill="#1C382F"
+                      stroke="#1C382F"
+                      strokeWidth="1"
+                      strokeLinejoin="round"
+                    />
+                    <circle cx="0" cy="2.5" r="1" fill="#FFFFFF" />
+                  </g>
+                )}
 
                 {/* South Region Lock Badge: Placed inside Southern Vietnam */}
-                <g
-                  transform="translate(265, 840)"
-                  className="select-none"
-                  role="img"
-                  aria-label="Miền Nam sắp mở"
-                >
-                  <circle
-                    r="16"
-                    fill="#FFFFFF"
-                    filter="drop-shadow(0 2px 6px rgba(0,0,0,0.22))"
-                    className="transition-transform group-hover:scale-110"
-                  />
-                  <path
-                    d="M -4.5 -1 L -4.5 -4.5 C -4.5 -7 -2.2 -9 0 -9 C 2.2 -9 4.5 -7 4.5 -4.5 L 4.5 -1 M -5.5 -1 L 5.5 -1 L 5.5 6.5 L -5.5 6.5 Z"
-                    fill="#1C382F"
-                    stroke="#1C382F"
-                    strokeWidth="1"
-                    strokeLinejoin="round"
-                  />
-                  <circle cx="0" cy="2.5" r="1" fill="#FFFFFF" />
-                </g>
+                {firstRegion && firstRegion !== 'south' && (
+                  <g
+                    transform="translate(265, 840)"
+                    className="select-none"
+                    role="img"
+                    aria-label={t('map_section.south_locked')}
+                  >
+                    <circle
+                      r="16"
+                      fill="#FFFFFF"
+                      filter="drop-shadow(0 2px 6px rgba(0,0,0,0.22))"
+                      className="transition-transform group-hover:scale-110"
+                    />
+                    <path
+                      d="M -4.5 -1 L -4.5 -4.5 C -4.5 -7 -2.2 -9 0 -9 C 2.2 -9 4.5 -7 4.5 -4.5 L 4.5 -1 M -5.5 -1 L 5.5 -1 L 5.5 6.5 L -5.5 6.5 Z"
+                      fill="#1C382F"
+                      stroke="#1C382F"
+                      strokeWidth="1"
+                      strokeLinejoin="round"
+                    />
+                    <circle cx="0" cy="2.5" r="1" fill="#FFFFFF" />
+                  </g>
+                )}
 
                 {/* 6 Featured Location Story Pills with True Geographic Anchor Dots */}
                 {FEATURED_PINS.map((pin) => {
-                  const isSelected = selectedPinId === pin.id;
+                  const isSelected = !!firstRegion && selectedPinId === pin.id;
                   const halfWidth = pin.pillWidth / 2;
 
                   return (
@@ -347,7 +370,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
                       tabIndex={pin.storyId ? 0 : undefined}
                       role={pin.storyId ? 'button' : 'img'}
                       aria-pressed={pin.storyId ? isSelected : undefined}
-                      aria-label={pin.storyId ? `Đọc bài tại ${pin.name}` : `${pin.name}: bài đọc đang chuẩn bị`}
+                      aria-label={pin.storyId ? t('map_section.read_story_from', { name: pin.name }) : t('map_section.coming_soon', { name: pin.name })}
                       className={pin.storyId ? 'cursor-pointer group select-none focus:outline-none' : 'select-none opacity-75'}
                     >
                       {/* Connecting Stem Line */}
@@ -423,7 +446,10 @@ export const VietnamHeritageMapSection: React.FC = () => {
         <div className="w-full lg:w-[320px] xl:w-[340px] shrink-0 flex justify-end z-10">
           <MapJourneyPanel
             selectedRegion={selectedRegion}
+            firstRegion={firstRegion}
             onSelectRegion={handleSelectRegion}
+            onChangeFirstRegion={handleChangeFirstRegion}
+            onOpenJourney={() => go(withQuery(PATHS.discovery, { region: firstRegion }))}
             selectedSite={activeSite}
           />
         </div>

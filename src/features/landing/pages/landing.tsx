@@ -11,6 +11,7 @@ import { LandingFaqSection } from '../components/LandingFaqSection';
 import { ContactSection } from '../components/ContactSection';
 import { LandingConversionSection } from '../components/LandingConversionSection';
 import { LandingPhotoCredits } from '../components/LandingPhotoCredits';
+import { LandingPlansSection } from '../components/LandingPlansSection';
 import '../landing.css';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 
@@ -80,6 +81,7 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
       'ban-do-di-san',
       'methodology',
       'flashcard-demo',
+      'plans',
       'faq',
       'contact',
     ];
@@ -157,6 +159,8 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
           <div id="flashcard-demo">
             <InteractiveFlashcardDemoSection onNavigate={handleNavigate} />
           </div>
+
+          <LandingPlansSection onNavigate={handleNavigate} />
 
           <div id="faq">
             <LandingFaqSection />

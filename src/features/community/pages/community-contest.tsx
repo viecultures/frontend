@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import type { ContestEntry } from "../types";
 import {
   ContestHeroBanner,
@@ -9,7 +10,7 @@ import {
 } from "../components";
 import { CommunityHeader } from "../components/CommunityHeader";
 import { communityLabel } from "../community-copy";
-import { Trophy, Coins, TrendingUp, Clock, Plus, Check, Heart } from "lucide-react";
+import { TrendingUp, Clock, Plus, Check } from "lucide-react";
 
 const INITIAL_CONTEST_ENTRIES: ContestEntry[] = [
   {
@@ -66,6 +67,7 @@ const INITIAL_CONTEST_ENTRIES: ContestEntry[] = [
 ];
 
 export default function CommunityContestPage() {
+  const { t } = useTranslation("community");
   const [userCoins, setUserCoins] = useState<number>(450);
   const [entries, setEntries] = useState<ContestEntry[]>(INITIAL_CONTEST_ENTRIES);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
@@ -98,8 +100,8 @@ export default function CommunityContestPage() {
           };
           showToast(
             !voted
-              ? "Vote recorded. You receive +10 interaction XP."
-              : "Vote removed."
+              ? t("community.toasts.vote_added")
+              : t("community.toasts.vote_removed")
           );
           return updated;
         }
@@ -112,18 +114,18 @@ export default function CommunityContestPage() {
   const handleRedeem = (itemName: string, cost: number) => {
     if (userCoins < cost) {
       showToast(
-        `This reward costs ${cost} coins. Your balance is ${userCoins} coins. Submit a challenge entry to earn more.`
+        t("community.toasts.insufficient_coins", { cost, balance: userCoins })
       );
       return;
     }
     setUserCoins((prev) => prev - cost);
-    showToast(`You redeemed "${communityLabel(itemName)}" for ${cost} coins!`);
+    showToast(t("community.toasts.item_redeemed", { item: communityLabel(itemName), cost }));
   };
 
   // Submit Contest Entry
   const handleSubmitEntry = () => {
     if (!entryTitle.trim() || !entryText.trim()) {
-      alert("Enter a title and your challenge entry.");
+      alert(t("community.toasts.alert_fill_entry"));
       return;
     }
 
@@ -150,7 +152,7 @@ export default function CommunityContestPage() {
     setEntryTitle("");
     setEntryText("");
     setIsFormOpen(false);
-    showToast("Your entry has been submitted. You received +100 cultural coins!");
+    showToast(t("community.toasts.entry_submitted"));
   };
 
   // Filtered Entries
@@ -166,16 +168,19 @@ export default function CommunityContestPage() {
   }, [entries, filterMode]);
 
   return (
-    <main className="community-ui min-h-screen bg-surface text-text-body relative selection:bg-sky-mist selection:text-heritage-green">
+    <main className="community-ui min-h-screen bg-[#FAF7F0] text-[#314F49] relative">
       {/* Toast Notification */}
       {toastMessage && (
-        <div role="status" className="community-toast fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-heritage-green/95 backdrop-blur-md text-warm-ivory shadow-2xl border border-antique-gold/50 flex items-center gap-2.5 text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw] whitespace-nowrap">
-          <Check className="w-4 h-4 text-antique-gold shrink-0" />
+        <div role="status" className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-[#1D5046] text-white shadow-lg border border-[#153D35] flex items-center gap-2 text-xs font-medium animate-in fade-in slide-in-from-top-3 duration-300 max-w-[90vw]">
+          <Check className="w-4 h-4 text-[#E8D7AE] shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <p className="mb-5 rounded-xl border border-[#E8E2D5] bg-white px-4 py-3 text-sm text-[#314F49]">
+          {t("community.composer.preview_notice")}
+        </p>
         {/* Header Switcher */}
         <CommunityHeader
           isEditorOpen={isFormOpen}
@@ -187,7 +192,7 @@ export default function CommunityContestPage() {
         <ContestHeroBanner
           onOpenForm={() => {
             setIsFormOpen(true);
-            window.scrollTo({ top: 400, behavior: "smooth" });
+            window.scrollTo({ top: 100, behavior: "smooth" });
           }}
         />
 
@@ -207,50 +212,49 @@ export default function CommunityContestPage() {
         />
 
         {/* Layout: Main Feed (8/12) + Shop/Milestones Sidebar (4/12) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left 8 Cols: Submissions Showcase */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
-              <h2 className="font-serif text-2xl font-bold text-heritage-green flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-antique-gold" />
-                <span>Weekly challenge entries ({filteredEntries.length})</span>
+          <div className="lg:col-span-8 space-y-4">
+            <div className="rounded-2xl bg-white border border-[#E8E2D5] shadow-[0_2px_8px_rgba(0,0,0,0.03)] p-3 space-y-2.5">
+              <h2 className="font-serif text-lg font-bold text-[#1D5046]">
+                <span>{t("community.contest.entries_count_title", { count: filteredEntries.length })}</span>
               </h2>
 
-              <div className="community-contest-filters flex items-center gap-1 bg-rice-paper p-1 rounded-xl border border-line text-xs font-bold">
+              <div className="community-contest-filters flex items-center gap-1 overflow-x-auto no-scrollbar text-xs font-semibold" aria-label={t("community.contest.sort_aria")}>
                 <button
                   onClick={() => setFilterMode("top")}
                   aria-pressed={filterMode === "top"}
-                  className={`px-3 py-1.5 rounded-lg transition-all focus-ring cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-xl transition-colors focus-ring cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     filterMode === "top"
-                      ? "bg-heritage-green text-warm-ivory shadow-sm"
-                      : "text-heritage-green hover:bg-mist-cloud"
+                      ? "bg-[#1D5046] text-white shadow-2xs"
+                      : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
                   }`}
                 >
                   <TrendingUp className="w-3.5 h-3.5" />
-                  <span>Most voted</span>
+                  <span>{t("community.contest.filter_top")}</span>
                 </button>
                 <button
                   onClick={() => setFilterMode("new")}
                   aria-pressed={filterMode === "new"}
-                  className={`px-3 py-1.5 rounded-lg transition-all focus-ring cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-xl transition-colors focus-ring cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     filterMode === "new"
-                      ? "bg-heritage-green text-warm-ivory shadow-sm"
-                      : "text-heritage-green hover:bg-mist-cloud"
+                      ? "bg-[#1D5046] text-white shadow-2xs"
+                      : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
                   }`}
                 >
                   <Clock className="w-3.5 h-3.5" />
-                  <span>Newest</span>
+                  <span>{t("community.contest.filter_new")}</span>
                 </button>
                 <button
                   onClick={() => setFilterMode("mine")}
                   aria-pressed={filterMode === "mine"}
-                  className={`px-3 py-1.5 rounded-lg transition-all focus-ring cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-xl transition-colors focus-ring cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     filterMode === "mine"
-                      ? "bg-heritage-green text-warm-ivory shadow-sm"
-                      : "text-heritage-green hover:bg-mist-cloud"
+                      ? "bg-[#1D5046] text-white shadow-2xs"
+                      : "text-[#6E7B75] hover:text-[#1D5046] hover:bg-[#FAF7F0]"
                   }`}
                 >
-                  <span>My entries</span>
+                  <span>{t("community.contest.filter_mine")}</span>
                 </button>
               </div>
             </div>
@@ -264,20 +268,29 @@ export default function CommunityContestPage() {
                 />
               ))
             ) : (
-              <div className="p-12 text-center rounded-3xl bg-surface border border-line space-y-3">
-                <Trophy className="w-8 h-8 text-text-secondary/40 mx-auto" />
+              <div className="p-8 text-center rounded-2xl bg-white border border-[#E8E2D5] space-y-2.5">
                 <h3 className="font-serif text-base font-bold text-heritage-green">
-                  You have no entries this week
+                  {t("community.contest.no_entries_title")}
                 </h3>
                 <p className="text-xs text-text-secondary max-w-sm mx-auto">
-                  Choose “Submit an entry” to share your perspective and receive +100 cultural coins.
+                  {t("community.contest.no_entries_desc")}
                 </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsFormOpen(true);
+                    window.scrollTo({ top: 100, behavior: "smooth" });
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#1D5046] hover:bg-[#153D35] transition-colors focus-ring"
+                >
+                  {t("community.contest.submit_entry_action")}
+                </button>
               </div>
             )}
           </div>
 
           {/* Right 4 Cols: Gamification Shop & Milestones */}
-          <aside className="lg:col-span-4 space-y-6">
+          <aside className="lg:col-span-4 space-y-4">
             <GamificationShopCard
               userCoins={userCoins}
               onRedeem={handleRedeem}
@@ -291,13 +304,13 @@ export default function CommunityContestPage() {
       <button
         onClick={() => {
           setIsFormOpen(true);
-          window.scrollTo({ top: 350, behavior: "smooth" });
+          window.scrollTo({ top: 100, behavior: "smooth" });
         }}
-        className="community-fab fixed bottom-8 right-8 w-14 h-14 rounded-full bg-heritage-green text-warm-ivory font-bold shadow-xl hover:scale-110 transition-transform flex items-center justify-center border-2 border-antique-gold z-40 focus-ring cursor-pointer"
-        title="Submit an entry"
-        aria-label="Open contest editor"
+        className="community-fab fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[#1D5046] text-white shadow-lg hover:bg-[#153D35] transition-colors flex items-center justify-center border border-[#153D35] z-40 focus-ring cursor-pointer"
+        title={t("community.contest.submit_entry_action")}
+        aria-label={t("community.contest.open_editor_aria")}
       >
-        <Plus className="w-6 h-6 text-antique-gold" />
+        <Plus className="w-5 h-5 text-[#E8D7AE]" />
       </button>
     </main>
   );

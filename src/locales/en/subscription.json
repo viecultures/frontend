@@ -1,0 +1,176 @@
+{
+  "pricing": {
+    "back_to_previous": "Back to previous page",
+    "badge": "Pricing & Member Privileges",
+    "title": "Elevate Your English With Vietnamese Heritage",
+    "subtitle": "Choose the right companion plan to fully unlock 63 provinces of cultural readings and unlimited conversations with your AI companion.",
+    "billing_cycle": {
+      "monthly": "Monthly Plan",
+      "yearly": "1-Year Plan",
+      "discount_badge": "-20%"
+    },
+    "free_plan": {
+      "badge": "Starter Plan",
+      "name": "Free Plan",
+      "description": "For learners beginning their journey with bilingual reading methodology.",
+      "price": "0 VND",
+      "period": "Free forever",
+      "current_plan": "Your Current Plan",
+      "basic_plan": "Basic Plan",
+      "features": {
+        "ai_chat": "3 AI chat turns/day",
+        "vocabulary_save": "1-Click Save vocabulary with sentence context (up to 30 words)",
+        "sample_articles": "15 sample cultural reading articles",
+        "audio_speed": "Standard speed audio shadowing (1x)",
+        "no_mascot_feedback": "No personalized mascot feedback",
+        "has_ads": "Includes footer ad banner"
+      }
+    },
+    "pro_plan": {
+      "best_value": "Recommended",
+      "badge": "Full Experience",
+      "name": "Heritage Member Pro",
+      "description": "Unlock the full potential of learning English through cultural immersion and in-depth AI dialogues.",
+      "monthly_price": "39,000 VND",
+      "yearly_price": "375,000 VND",
+      "monthly_period": "Billed monthly",
+      "yearly_period": "Save ~2 months",
+      "upgrade_cta": "Upgrade to Pro Now (39,000 VND)",
+      "already_pro": "You Are a Pro Member",
+      "features": {
+        "ai_companion": "Deep dialogues with AI Cultural Companion: Unlimited conversations in English, completely lifting the 3 turns/day limit.",
+        "mascot_feedback": "Personalized feedback from Heritage Mascot: Assessment of pronunciation, vocabulary, and cultural reflex tips.",
+        "all_provinces": "Full access to all 63 provinces: Explore landmarks, customs, and UNESCO intangible cultural heritages.",
+        "audio_speeds": "All 3 audio speeds (0.5x, 0.8x, 1x): Google Gemini Real Audio reading naturally like a native speaker.",
+        "unlimited_vocab": "Unlimited 1-Click Save & Vocabulary notebook: Save and synchronize learning progress permanently in the cloud.",
+        "no_ads": "100% Ad-Free & Exclusive Pro Badge."
+      }
+    },
+    "comparison_table": {
+      "title": "Detailed Privileges Comparison",
+      "subtitle": "Transparent comparison according to VieCultures system architecture standards",
+      "feature_col": "Feature / Privilege",
+      "free_col": "Free Plan",
+      "pro_col": "Pro Member (39k)",
+      "rows": {
+        "ai_chat": {
+          "label": "Deep conversation with AI Cultural Companion",
+          "free": "3 turns / day",
+          "pro": "Unlimited"
+        },
+        "mascot": {
+          "label": "Personalized mascot feedback & insights",
+          "free": "Default basic template",
+          "pro": "Deep personalization"
+        },
+        "vocab": {
+          "label": "1-Click Save vocabulary with sentence context",
+          "free": "Up to 30 words",
+          "pro": "Unlimited"
+        },
+        "content": {
+          "label": "Bilingual reading library across 3 regions",
+          "free": "15 sample stories",
+          "pro": "All 63 provinces"
+        },
+        "audio": {
+          "label": "Audio speed & Gemini voice narration",
+          "free": "1x only",
+          "pro": "0.5x, 0.8x, 1x (Gemini Voices)"
+        },
+        "cloud_sync": {
+          "label": "Cloud sync for Moc Son stamps & Daily Streak",
+          "free": "Local storage only",
+          "pro": "Permanent cloud sync"
+        },
+        "ads": {
+          "label": "Display advertising",
+          "free": "Banner ads present",
+          "pro": "100% Ad-Free"
+        }
+      }
+    }
+  },
+  "checkout": {
+    "back_to_pricing": "Back to Pricing",
+    "badge": "Pro Plan Subscription Payment",
+    "title": "Confirm Heritage Pro Membership Upgrade",
+    "subtitle": "Scan VietQR for 24/7 instant transfer to unlock unlimited AI companion chats and all 63 provinces.",
+    "success": {
+      "badge": "TRANSACTION SUCCESSFUL • PRO ACTIVATED",
+      "title": "Welcome to Pro Membership!",
+      "message": "Account {{name}} has been successfully upgraded to Heritage Pro Member. The 3 turns/day limit on your AI companion has been lifted.",
+      "default_member": "Member",
+      "perks": {
+        "companion_title": "AI Companion",
+        "companion_desc": "Unlimited conversations, no rate limit.",
+        "content_title": "Reading Library",
+        "content_desc": "Full unlock across 63 provinces and 3 regions.",
+        "audio_title": "Audio & Vocab",
+        "audio_desc": "3 speeds (0.5x, 0.8x, 1x) & unlimited notebook."
+      },
+      "cta_reader": "Go to Reading & AI Chat Now",
+      "cta_discovery": "Explore 63 Provinces Map",
+      "cta_home": "Back to Home"
+    },
+    "order_summary": {
+      "title": "YOUR ORDER",
+      "plan_name": "Heritage Member Pro Plan",
+      "billing_cycle": "Billing cycle: 1 Month (Auto-activation)",
+      "list_price_label": "List price:",
+      "list_price": "69,000 VND",
+      "discount_label": "Checkpoint 4 Promotion (EXE101):",
+      "discount_val": "-30,000 VND",
+      "total_label": "Total amount:",
+      "total_val": "39,000 VND",
+      "unlocked_perks_label": "Privileges unlocked immediately:",
+      "perks": {
+        "ai_unlimited": "Unlimited dialogues with AI Cultural Companion (3 turns/day limit lifted)",
+        "mascot_feedback": "Personalized feedback from Heritage Mascot",
+        "all_provinces": "Full access to 63 provinces of cultural stories",
+        "all_speeds": "All 3 audio speeds (0.5x, 0.8x, 1x) Google Gemini Real Audio",
+        "no_ads": "100% Ad-Free experience"
+      },
+      "security_note": "VietQR bank transfer secured according to State Bank of Vietnam standards."
+    },
+    "gateway": {
+      "badge": "VIETQR PAYMENT GATEWAY",
+      "title": "Scan Code For Instant Activation",
+      "validity": "Validity:",
+      "methods": {
+        "bank": "VietQR / MB Bank",
+        "momo": "MoMo E-Wallet"
+      },
+      "auto_recording": "Automated Transaction Detection Gateway",
+      "bank_title": "VietQR MB Bank 24/7",
+      "momo_title": "MoMo Money Transfer",
+      "qr_alt": "VietQR payment code for Pro plan",
+      "loading_qr": "Loading VietQR code...",
+      "qr_expired": "QR code has expired",
+      "generate_new_qr": "Generate new code",
+      "scan_hint": "Scan using your Banking App",
+      "account_details": {
+        "bank_name_label": "Beneficiary bank:",
+        "bank_name": "MB Bank (Military Bank)",
+        "account_num_label": "Account number:",
+        "account_num": "0388912345",
+        "copy_account": "Copy account number",
+        "recipient_name_label": "Account holder:",
+        "recipient_name": "CONG TY CO PHAN VIECULTURES",
+        "amount_label": "Amount:",
+        "amount_val": "39,000 VND",
+        "copy_amount": "Copy amount",
+        "memo_label": "Transfer memo:",
+        "copy_memo": "Copy transfer memo"
+      },
+      "connecting_webhook": "Connecting to VietQR payment gateway & listening for Webhook...",
+      "received_balance": "Balance update received (+39,000 VND)! Upgrading to Pro account...",
+      "verifying_system": "Verifying bank transaction in the system...",
+      "simulate_btn": "Simulate Instant Transfer",
+      "confirm_btn": "Confirm Payment Completed (Manual)",
+      "test_hint": "Simulation Button: Helps examiners and instructors test the instant payment flow without transferring actual funds.",
+      "auto_sync_hint": "The system automatically synchronizes Pro privileges as soon as the transaction succeeds."
+    }
+  }
+}
+

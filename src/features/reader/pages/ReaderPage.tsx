@@ -1,7 +1,9 @@
 import '../reader-components.css';
 import '../reader-design.css';
 import { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import {
   AudioShadowingBar,
   BilingualReaderView,
@@ -10,7 +12,6 @@ import {
   ReaderVocabDrawer,
   ReaderRecommendedSection,
   VoiceCustomizerModal,
-  StickyAudioPlayer,
 } from "../components";
 import { useCompanionArticleContext } from "@/features/companion/useCompanionArticleContext";
 import { Footer } from "@/components/Footer";
@@ -23,7 +24,6 @@ import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
 import { readerApiService, readerLevelFor } from "../services/readerApiService";
 import type { ReaderArticleData } from "../services/readerApiService";
 import { getStoredUser, clearAuthStorage, getIsProUser, type AppUser } from "@/utils/auth-storage";
-import { getActiveParagraphIndex } from "../constants";
 
 import { articleKey, cacheArticle, getCachedArticle } from '@/services/learning/learningStorage';
 import { useSavedVocabulary, SavedVocabularyContext } from '../hooks/useSavedVocabulary';
@@ -33,6 +33,7 @@ import { MocSonSealModal } from '@/features/gamification';
 import { ReaderReflectionsSection } from '@/features/community/components/ReaderReflectionsSection';
 
 export default function ReaderPage() {
+  const { t } = useTranslation('reader');
   const [searchParams, setSearchParams] = useSearchParams();
 
   // User & Pro status
@@ -178,7 +179,7 @@ export default function ReaderPage() {
     setLevelError('');
     let nextId = targetId;
     if (articleData?.cefrLevel && /^[ABC][12]$/.test(articleData.cefrLevel) && !articleData.topicGroup && newLevel !== selectedLevel) {
-      setLevelError('This article is not available at the selected level.');
+      setLevelError(t('level_error_unavailable', 'This article is not available at the selected level.'));
       return;
     }
     if (articleData?.topicGroup) {
@@ -189,7 +190,7 @@ export default function ReaderPage() {
         if (request !== levelRequest.current) return;
         if (post) { nextId = post.id; found = true; break; }
       }
-      if (!found) { setLevelError('This article has no content at the selected level.'); return; }
+      if (!found) { setLevelError(t('level_error_no_content', 'This article has no content at the selected level.')); return; }
     }
     if (request !== levelRequest.current) return;
     setSelectedLevel(newLevel);
@@ -324,13 +325,6 @@ export default function ReaderPage() {
     }
   }, [isMuted]);
 
-  // Active paragraph calculation
-  const activeParagraphIndex = getActiveParagraphIndex(
-    currentTime,
-    duration,
-    articleData?.paragraphs
-  );
-
   // Handle Play/Pause
   const handleTogglePlay = () => {
     if (!audioRef.current) return;
@@ -358,26 +352,6 @@ export default function ReaderPage() {
       audioRef.current.currentTime = 0;
       setCurrentTime(0);
       audioRef.current.play().catch(() => {});
-    }
-  };
-
-  // Scroll to active paragraph
-  const scrollToActiveParagraph = () => {
-    if (activeParagraphIndex >= 0) {
-      const el = document.getElementById(`paragraph-pair-${activeParagraphIndex}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-  };
-
-  // Handle Play specific paragraph audio
-  const handlePlayParagraphAudio = (index: number, timestamp: number) => {
-    handleSeek(timestamp);
-    if (!isPlaying && audioRef.current) {
-      audioRef.current.play().catch((err) => {
-        console.warn("Audio play error:", err);
-      });
     }
   };
 
@@ -415,8 +389,8 @@ export default function ReaderPage() {
       ? "bg-[#1E2925] text-warm-ivory border-antique-gold/30 shadow-xl"
       : "bg-warm-ivory text-ink-soft border-heritage-green/12 shadow-xl";
 
-  if (loadedKey !== requestedKey) return <main className="p-12" role="status">Loading article…</main>;
-  if (articleError) return <main className="p-12" role="alert"><h1>Could not load this article</h1><p>Check your connection or choose another article.</p><button onClick={() => setReloadAttempt(value => value + 1)}>Try again</button> <Link to={PATHS.discovery}>Browse articles</Link></main>;
+  if (loadedKey !== requestedKey) return <main className="p-12" role="status">{t('loading_article', 'Loading article…')}</main>;
+  if (articleError) return <main className="p-12" role="alert"><h1>{t('error_title', 'Could not load this article')}</h1><p>{t('error_desc', 'Check your connection or choose another article.')}</p><button onClick={() => setReloadAttempt(value => value + 1)}>{t('try_again', 'Try again')}</button> <Link to={PATHS.discovery}>{t('browse_articles', 'Browse articles')}</Link></main>;
 
   return (
     <SavedVocabularyContext.Provider value={savedVocabulary}>
@@ -453,20 +427,20 @@ export default function ReaderPage() {
       />
 
       {levelError && <p role="alert" className="px-8 py-3">{levelError}</p>}
-      {!savedVocabulary.canSave && <p role="alert" className="px-8 py-3">Could not save vocabulary. Check your browser storage space and permissions.</p>}
+      {!savedVocabulary.canSave && <p role="alert" className="px-8 py-3">{t('save_vocab_error', 'Could not save vocabulary. Check your browser storage space and permissions.')}</p>}
 
-      {/* Main Canvas Container with extra bottom padding for StickyAudioPlayer */}
+      {/* Main Reader canvas */}
       <section
-        className="reader-desk-canvas pb-28 sm:pb-32"
+        className="reader-desk-canvas"
       >
         <div className="reader-desk-content">
           <aside className="reader-margin-note reader-margin-note-left" aria-hidden="true">Rooted<br />in<br />heritage</aside>
           <aside className="reader-margin-note reader-margin-note-right" aria-hidden="true">Vietnamese<br />culture<br />a brighter<br />tomorrow</aside>
 
-          {/* Optional inline audio disclosure for Shadowing / Pronunciation practice */}
-          {readingMode === 'bilingual' && <details id="reader-audio" className="reader-audio-disclosure">
-          <summary>Listen & practice pronunciation</summary>
-          {articleData && articleData.id !== 'tet-holiday' && !articleData.shadowingAudioUrl ? <p role="status">Audio is not available for this article yet. You can continue reading and reviewing vocabulary.</p> : <AudioShadowingBar
+          {/* Always-visible listening and pronunciation controls. */}
+          {readingMode === 'bilingual' && <section id="reader-audio" className="reader-audio-section" aria-labelledby="reader-audio-title">
+          <h2 id="reader-audio-title" className="mb-3 font-sans text-lg font-semibold text-ink">{t('listen_section_title', 'Listen & practice pronunciation')}</h2>
+          {articleData && articleData.id !== 'tet-holiday' && !articleData.shadowingAudioUrl ? <p role="status">{t('audio_unavailable', 'Audio is not available for this article yet. You can continue reading and reviewing vocabulary.')}</p> : <AudioShadowingBar
             articleTitle={articleData?.titleEn}
             onStartShadowing={() => handleStartPractice('shadowing')}
             isPlaying={isPlaying}
@@ -490,7 +464,7 @@ export default function ReaderPage() {
             audioScope={audioScope}
             onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
           />}
-          </details>}
+          </section>}
 
           {/* Reading and Practice retain the same article and level. */}
           {readingMode === "bilingual" ? (
@@ -510,8 +484,6 @@ export default function ReaderPage() {
               onChangeLevel={handleLevelChange}
               articleData={articleData}
               onStartPractice={handleStartPractice}
-              activeParagraphIndex={activeParagraphIndex}
-              onPlayParagraphAudio={handlePlayParagraphAudio}
               onOpenSealModal={() => setIsSealModalOpen(true)}
             />
           ) : (
@@ -548,31 +520,6 @@ export default function ReaderPage() {
 
       {/* Main Reader Footer */}
       <Footer />
-
-      {/* Persistent Sticky Audio Player Bar (mandated by TASK-004 & system_constants.md) */}
-      {readingMode === 'bilingual' && currentAudioUrl && (
-        <StickyAudioPlayer
-          articleTitle={articleData?.titleEn}
-          isPlaying={isPlaying}
-          onTogglePlay={handleTogglePlay}
-          playbackSpeed={playbackSpeed}
-          onChangeSpeed={(speed: number) => setPlaybackSpeed(speed)}
-          currentTime={currentTime}
-          duration={duration}
-          onSeek={handleSeek}
-          isRepeatLoop={isRepeatLoop}
-          onToggleRepeatLoop={() => setIsRepeatLoop(!isRepeatLoop)}
-          isMuted={isMuted}
-          onToggleMute={() => setIsMuted(!isMuted)}
-          activeParagraphIndex={activeParagraphIndex}
-          totalParagraphs={articleData?.paragraphs?.length || 0}
-          onScrollToActiveParagraph={scrollToActiveParagraph}
-          selectedVoiceName={currentVoice.name}
-          selectedVoiceFlag={currentVoice.flag}
-          onOpenVoiceCustomizer={() => setIsVoiceModalOpen(true)}
-          themeMode={themeMode}
-        />
-      )}
 
       {/* Vocabulary Slide-Over Drawer Modal */}
       <ReaderVocabDrawer

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Send, CheckCircle2, Mail, User, MessageSquare, Building, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const ContactSection: React.FC = () => {
+  const { t } = useTranslation('landing');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [topic, setTopic] = useState('general');
+  const [topic, setTopic] = useState<'general' | 'partnership' | 'enterprise'>('general');
   const [message, setMessage] = useState('');
   const [emailError, setEmailError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,7 +29,7 @@ export const ContactSection: React.FC = () => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address (e.g. name@example.com).');
+      setEmailError(t('contact_section.email_invalid_error'));
       return;
     }
 
@@ -50,13 +52,12 @@ export const ContactSection: React.FC = () => {
       <div className="max-w-2xl mx-auto rounded-3xl border border-line p-6 sm:p-10 bg-surface shadow-lg space-y-6">
         {/* Section Header */}
         <div className="text-center space-y-2.5">
-
           <h2 id="contact-heading" className="font-serif text-2xl sm:text-3xl font-bold text-ink tracking-tight">
-            Contact the VieCultures team
+            {t('contact_section.title')}
           </h2>
 
           <p className="text-xs sm:text-sm text-ink-soft max-w-md mx-auto font-normal leading-relaxed">
-            Have a question about bilingual learning, heritage partnerships, or feedback? We’d love to hear from you.
+            {t('contact_section.subtitle')}
           </p>
         </div>
 
@@ -69,9 +70,9 @@ export const ContactSection: React.FC = () => {
             <div className="w-12 h-12 rounded-full bg-action/10 text-action flex items-center justify-center">
               <CheckCircle2 className="w-7 h-7" aria-hidden="true" />
             </div>
-            <h3 className="font-serif text-xl font-bold text-ink">Thanks for reaching out!</h3>
+            <h3 className="font-serif text-xl font-bold text-ink">{t('contact_section.success_title')}</h3>
             <p className="text-xs sm:text-sm text-ink-soft max-w-sm leading-relaxed">
-              We received your message and will respond to your email within one business day.
+              {t('contact_section.success_desc')}
             </p>
             <button
               type="button"
@@ -83,7 +84,7 @@ export const ContactSection: React.FC = () => {
               }}
               className="mt-2 px-5 py-2.5 rounded-xl bg-action text-surface text-xs font-semibold hover:bg-action-hover transition-colors cursor-pointer shadow-xs focus-ring"
             >
-              Send another message
+              {t('contact_section.send_another')}
             </button>
           </div>
         ) : (
@@ -95,13 +96,13 @@ export const ContactSection: React.FC = () => {
                   className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-1.5 mb-1.5"
                 >
                   <User className="w-3.5 h-3.5 text-antique-gold" aria-hidden="true" />
-                  <span>Full name</span>
+                  <span>{t('contact_section.name_label')}</span>
                 </label>
                 <input
                   id="contact-name"
                   type="text"
                   required
-                  placeholder="e.g. Alex Nguyen"
+                  placeholder={t('contact_section.name_placeholder')}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-surface-feature text-xs sm:text-sm text-ink placeholder:text-ink-soft/60 focus:bg-surface focus:outline-none focus-ring shadow-xs transition-colors"
@@ -114,7 +115,7 @@ export const ContactSection: React.FC = () => {
                   className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-1.5 mb-1.5"
                 >
                   <Mail className="w-3.5 h-3.5 text-antique-gold" aria-hidden="true" />
-                  <span>Email address</span>
+                  <span>{t('contact_section.email_label')}</span>
                 </label>
                 <input
                   id="contact-email"
@@ -122,7 +123,7 @@ export const ContactSection: React.FC = () => {
                   required
                   aria-invalid={!!emailError}
                   aria-describedby={emailError ? 'contact-email-error' : undefined}
-                  placeholder="name@example.com"
+                  placeholder={t('contact_section.email_placeholder')}
                   value={email}
                   onChange={handleEmailChange}
                   className={`w-full px-3.5 py-2.5 rounded-xl border bg-surface-feature text-xs sm:text-sm text-ink placeholder:text-ink-soft/60 focus:bg-surface focus:outline-none focus-ring shadow-xs transition-colors ${
@@ -141,25 +142,21 @@ export const ContactSection: React.FC = () => {
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-1.5 mb-1.5">
                 <Building className="w-3.5 h-3.5 text-antique-gold" aria-hidden="true" />
-                <span>Topic</span>
+                <span>{t('contact_section.topic_label')}</span>
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-medium">
-                {[
-                  { key: 'general', label: 'Learner Inquiry' },
-                  { key: 'partnership', label: 'Content Partner' },
-                  { key: 'enterprise', label: 'School / Team' },
-                ].map((item) => (
+                {(['general', 'partnership', 'enterprise'] as const).map((topicKey) => (
                   <button
-                    key={item.key}
+                    key={topicKey}
                     type="button"
-                    onClick={() => setTopic(item.key)}
+                    onClick={() => setTopic(topicKey)}
                     className={`py-2 px-2.5 rounded-xl border text-center transition-all cursor-pointer focus-ring ${
-                      topic === item.key
+                      topic === topicKey
                         ? 'bg-action text-surface border-action font-semibold shadow-xs'
                         : 'bg-surface-feature text-ink-soft border-line hover:text-ink'
                     }`}
                   >
-                    {item.label}
+                    {t(`contact_section.topics.${topicKey}`)}
                   </button>
                 ))}
               </div>
@@ -172,13 +169,13 @@ export const ContactSection: React.FC = () => {
                 className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-1.5 mb-1.5"
               >
                 <MessageSquare className="w-3.5 h-3.5 text-antique-gold" aria-hidden="true" />
-                <span>Message</span>
+                <span>{t('contact_section.message_label')}</span>
               </label>
               <textarea
                 id="contact-message"
                 required
                 rows={3}
-                placeholder="Share your questions, thoughts, or suggestions..."
+                placeholder={t('contact_section.message_placeholder')}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-line bg-surface-feature text-xs sm:text-sm text-ink placeholder:text-ink-soft/60 focus:bg-surface focus:outline-none focus-ring shadow-xs transition-colors resize-y"
@@ -194,12 +191,12 @@ export const ContactSection: React.FC = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                  <span>Sending message...</span>
+                  <span>{t('contact_section.btn_sending')}</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4" aria-hidden="true" />
-                  <span>Send Message</span>
+                  <span>{t('contact_section.btn_send')}</span>
                 </>
               )}
             </button>

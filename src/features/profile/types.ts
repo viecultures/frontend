@@ -1,4 +1,4 @@
-export type RegionType = 'north' | 'central' | 'south';
+﻿export type RegionType = 'north' | 'central' | 'south';
 
 export interface CulturalSeal {
   id: string;
