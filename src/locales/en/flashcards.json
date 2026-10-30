@@ -125,8 +125,8 @@
     "tap_to_reveal": "Tap to reveal definition",
     "tap_to_return": "Tap to return to front",
     "key_space": "Space",
-    "btn_forgot": "🔴 Cần ôn lại (Forgot)",
-    "btn_remembered": "🟢 Đã nhớ (Remembered)",
+    "btn_forgot": "Cần ôn lại (Forgot)",
+    "btn_remembered": "Đã nhớ (Remembered)",
     "aria_front": "English: {{word}}. Flip to see the meaning.",
     "aria_back": "Meaning: {{meaning}}. Flip to see the English word."
   },

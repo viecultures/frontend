@@ -11,6 +11,7 @@ import {
   Shuffle,
   VolumeX,
   RotateCw,
+  CheckCircle2,
 } from 'lucide-react';
 import { useGamification } from '@/context/GamificationContext';
 import type { RewardCelebrationPayload } from '@/types';
@@ -403,8 +404,9 @@ export const FlashcardsPage: React.FC = () => {
               </h1>
             </div>
             <div className="text-xs text-ink-soft flex items-center gap-3">
-              <span>
-                🟢 {t('study.progress_mastered', 'Đã nhớ')}: <strong className="text-[#059669]">{masteredCount}</strong>
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle2 size={13} className="text-[#059669]" />
+                {t('study.progress_mastered', 'Đã nhớ')}: <strong className="text-[#059669]">{masteredCount}</strong>
               </span>
               <span>
                 {t('study.progress_remaining', 'Còn lại trong hàng đợi')}: <strong>{queue.length}</strong>

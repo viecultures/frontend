@@ -1,4 +1,4 @@
-.ai-workspace-page { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: var(--color-surface); color: var(--color-ink); font: 400 14px/1.6 var(--font-sans); }
+﻿.ai-workspace-page { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: var(--color-surface); color: var(--color-ink); font: 400 14px/1.6 var(--font-sans); }
 .ai-workspace-page-header { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; min-height: 64px; padding: 8px 24px; background: var(--color-surface-feature); border-bottom: 1px solid var(--color-surface-feature-strong); box-shadow: var(--shadow-panel); }
 .ai-workspace-page-header a { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 6px 10px; border-radius: var(--radius-xl); color: var(--color-on-feature); }
 .ai-workspace-page-header a:hover { background: var(--color-surface-feature-strong); }
@@ -62,7 +62,7 @@
 .ai-chat-ui.map-ai-app .ai-tray-current-status { font-weight: 600; color: var(--workspace-ink); }
 .ai-chat-ui.map-ai-app .ai-tray-meter { width: 64px; }
 .ai-chat-ui.map-ai-app .ai-tray-image-notice { padding: 4px 9px; border: 1px solid var(--workspace-line); border-radius: 999px; background: var(--workspace-soft); color: var(--workspace-accent); }
-.ai-chat-ui.map-ai-app .ai-tray-image-notice--error, .ai-chat-ui.map-ai-app .ai-tray-error { color: #a53827; }
+.ai-chat-ui.map-ai-app .ai-tray-image-notice--error, .ai-chat-ui.map-ai-app .ai-tray-error { color: var(--color-danger); }
 .ai-chat-ui.map-ai-app .ai-tray-error button { margin-left: 6px; text-decoration: underline; }
 .ai-chat-ui.map-ai-app .ai-tray-session-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 6px; flex-shrink: 0; }
 .ai-chat-ui.map-ai-app .ai-tray-session-actions button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 11px; border: 1px solid var(--workspace-line); border-radius: var(--radius-xl); background: var(--workspace-soft); color: var(--workspace-accent); font-size: 12px; font-weight: 600; cursor: pointer; }

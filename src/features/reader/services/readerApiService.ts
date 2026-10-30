@@ -298,11 +298,11 @@ export const readerApiService = {
         : (['Level 1', 'Level 2', 'Level 3'] as any);
 
     const iconMap: Record<string, string> = {
-      Heritage: '🏛️',
-      Cuisine: '🍜',
-      Crafts: '🎨',
-      Nature: '🏔️',
-      Folklore: '🏮',
+      Heritage: 'landmark',
+      Cuisine: 'utensils',
+      Crafts: 'palette',
+      Nature: 'mountain',
+      Folklore: 'lamp',
     };
 
     const categorySafe = item.category || 'Heritage';
@@ -321,7 +321,7 @@ export const readerApiService = {
       vocabCount: safeVocabCount,
       summary: safeSummary,
       gradient: 'from-amber-600/40 via-emerald-800/60 to-heritage-green/90',
-      iconSymbol: iconMap[categorySafe] || '🏛️',
+      iconSymbol: iconMap[categorySafe] || 'landmark',
       imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80',
       featured: item.featured ?? false,
       isFromDatabase: true,

@@ -162,7 +162,7 @@ export function FlashcardFlipView({
           title="Review again (Key 1)"
         >
           <RotateCw size={18} />
-          <span>{t('flip_view.btn_forgot', '🔴 Cần ôn lại (Forgot)')}</span>
+          <span>{t('flip_view.btn_forgot', 'Cần ôn lại (Forgot)')}</span>
           <kbd className="px-1.5 py-0.5 text-[10px] bg-red-500/20 rounded">1</kbd>
         </button>
         <button
@@ -172,7 +172,7 @@ export function FlashcardFlipView({
           title="Remembered (Key 2)"
         >
           <CheckCircle2 size={18} />
-          <span>{t('flip_view.btn_remembered', '🟢 Đã nhớ (Remembered)')}</span>
+          <span>{t('flip_view.btn_remembered', 'Đã nhớ (Remembered)')}</span>
           <kbd className="px-1.5 py-0.5 text-[10px] bg-black/20 rounded">2</kbd>
         </button>
       </div>
