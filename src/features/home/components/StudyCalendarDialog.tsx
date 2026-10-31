@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { localDateKey, readStudyCalendar } from '../lib/learningCalendarStorage';
+import { localDateKey, readStudyCalendar, type StudyCalendar } from '../lib/learningCalendarStorage';
 
 interface StudyCalendarDialogProps {
   isOpen: boolean;
   onClose: () => void;
   account: string;
   initialDate?: Date;
+  calendarData?: StudyCalendar;
 }
 
 function intensity(seconds: number): 'none' | 'light' | 'medium' | 'deep' {
@@ -22,6 +23,7 @@ export function StudyCalendarDialog({
   onClose,
   account,
   initialDate = new Date(),
+  calendarData: propCalendarData,
 }: StudyCalendarDialogProps) {
   const { t, i18n } = useTranslation('home');
   const isVi = i18n.language === 'vi';
@@ -29,19 +31,19 @@ export function StudyCalendarDialog({
 
   const [currentMonth, setCurrentMonth] = useState(() => new Date(initialDate.getFullYear(), initialDate.getMonth(), 1));
   const [selectedKey, setSelectedKey] = useState(() => localDateKey(initialDate));
-  const [calendarData, setCalendarData] = useState(() => readStudyCalendar(account));
+  const [calendarData, setCalendarData] = useState(() => propCalendarData || readStudyCalendar(account));
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setCalendarData(readStudyCalendar(account));
+      setCalendarData(propCalendarData || readStudyCalendar(account));
       setCurrentMonth(new Date(initialDate.getFullYear(), initialDate.getMonth(), 1));
       setSelectedKey(localDateKey(initialDate));
       closeButtonRef.current?.focus();
     }
-  }, [isOpen, account, initialDate]);
+  }, [isOpen, account, initialDate, propCalendarData]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -107,9 +109,10 @@ export function StudyCalendarDialog({
       count: totalMinutes,
       defaultValue: `${totalMinutes} min studied`,
     });
+    const minUnit = isVi ? 'ph' : 'm';
     const parts: string[] = [];
-    if (readingMin > 0) parts.push(`${t('study_calendar.reading', 'Reading')}: ${readingMin}m`);
-    if (vocabMin > 0) parts.push(`${t('study_calendar.vocabulary', 'Vocabulary')}: ${vocabMin}m`);
+    if (readingMin > 0) parts.push(`${t('study_calendar.reading', 'Reading')}: ${readingMin}${minUnit}`);
+    if (vocabMin > 0) parts.push(`${t('study_calendar.vocabulary', 'Vocabulary')}: ${vocabMin}${minUnit}`);
     detailString = `${selectedDateLabel} · ${minStr}${parts.length ? ` (${parts.join(', ')})` : ''}`;
   } else {
     detailString = `${selectedDateLabel} · ${t('study_calendar.empty', 'No activity yet')}`;
