@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { MapProvincesLayerProps } from './types';
 import { REGION_PALETTES } from './constants';
 
@@ -61,9 +61,24 @@ export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
     );
   }
 
+  // In SVG, render selected and hovered province paths last so their glow and thick borders render on top
+  const sortedProvinces = useMemo(() => {
+    return [...provinces].sort((a, b) => {
+      const aSelected = selectedProvinceId === a.id ? 1 : 0;
+      const bSelected = selectedProvinceId === b.id ? 1 : 0;
+      if (aSelected !== bSelected) return aSelected - bSelected;
+
+      const aHovered = hoveredProvinceId === a.id ? 1 : 0;
+      const bHovered = hoveredProvinceId === b.id ? 1 : 0;
+      if (aHovered !== bHovered) return aHovered - bHovered;
+
+      return 0;
+    });
+  }, [provinces, selectedProvinceId, hoveredProvinceId]);
+
   return (
     <g id="layer-provinces" style={{ filter: 'drop-shadow(0 0 6px rgba(235, 195, 120, 0.45))' }}>
-      {provinces.map((p) => {
+      {sortedProvinces.map((p) => {
         const isSelected = selectedProvinceId === p.id;
         const isHovered = hoveredProvinceId === p.id;
 

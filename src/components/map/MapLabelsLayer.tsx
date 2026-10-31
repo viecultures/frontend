@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { MapLabelsLayerProps } from './types';
 import { toEnglishPlaceName } from '@/utils/vietnamMapUtils';
 
@@ -40,9 +40,34 @@ export const MapLabelsLayer: React.FC<MapLabelsLayerProps> = ({
   const isNationalOverview = activeRegion === 'all';
   const isZoomedIn = zoomScale >= 1.45;
 
+  // In SVG, rendering order determines z-index (later elements appear on top).
+  // Sort so normal provinces render first, then anchor hubs, then national capital ('ha-noi'),
+  // then hovered province, and finally selected province on the absolute top.
+  const sortedProvinces = useMemo(() => {
+    return [...provinces].sort((a, b) => {
+      const aSelected = selectedProvinceId === a.id ? 1 : 0;
+      const bSelected = selectedProvinceId === b.id ? 1 : 0;
+      if (aSelected !== bSelected) return aSelected - bSelected;
+
+      const aHovered = hoveredProvinceId === a.id ? 1 : 0;
+      const bHovered = hoveredProvinceId === b.id ? 1 : 0;
+      if (aHovered !== bHovered) return aHovered - bHovered;
+
+      const aCapital = a.id === 'ha-noi' ? 1 : 0;
+      const bCapital = b.id === 'ha-noi' ? 1 : 0;
+      if (aCapital !== bCapital) return aCapital - bCapital;
+
+      const aAnchor = MAJOR_ANCHOR_PROVINCES.has(a.id) ? 1 : 0;
+      const bAnchor = MAJOR_ANCHOR_PROVINCES.has(b.id) ? 1 : 0;
+      if (aAnchor !== bAnchor) return aAnchor - bAnchor;
+
+      return 0;
+    });
+  }, [provinces, selectedProvinceId, hoveredProvinceId]);
+
   return (
     <g id="layer-labels" className="pointer-events-none select-none">
-      {provinces.map((p) => {
+      {sortedProvinces.map((p) => {
         const isSelected = selectedProvinceId === p.id;
         const isHovered = hoveredProvinceId === p.id;
 
