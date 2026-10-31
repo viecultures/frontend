@@ -155,7 +155,7 @@ export function HomePage({ isLoggedIn = false, user, onLogout }: HomePageProps) 
         </div>
 
         {/* 3. Full-width Weekly Study Progress Strip */}
-        <HomeWeeklyStrip account={account} />
+        <HomeWeeklyStrip account={account} calendarData={calendar} />
 
         {/* 4. Suggested Cultural Stories Section */}
         <HomeSuggestedStories currentId={currentBookmark?.id} />

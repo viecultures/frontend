@@ -1,22 +1,43 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ArrowUpRight, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { localDateKey, readStudyCalendar } from '../lib/learningCalendarStorage';
+import {
+  localDateKey,
+  readStudyCalendar,
+  STUDY_CALENDAR_UPDATED,
+  type StudyCalendar,
+} from '../lib/learningCalendarStorage';
 import { StudyCalendarDialog } from './StudyCalendarDialog';
 
 interface HomeWeeklyStripProps {
   account: string;
+  calendarData?: StudyCalendar;
 }
 
-export function HomeWeeklyStrip({ account }: HomeWeeklyStripProps) {
+export function HomeWeeklyStrip({ account, calendarData: propCalendarData }: HomeWeeklyStripProps) {
   const { t, i18n } = useTranslation('home');
   const isVi = i18n.language === 'vi';
   const locale = isVi ? 'vi-VN' : 'en-GB';
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [targetDate, setTargetDate] = useState(() => new Date());
+  const [localCalendar, setLocalCalendar] = useState(() => readStudyCalendar(account));
 
-  const calendarData = useMemo(() => readStudyCalendar(account), [account]);
+  useEffect(() => {
+    if (propCalendarData) return;
+    const refresh = () => setLocalCalendar(readStudyCalendar(account));
+    const onUpdate = (event: Event) => {
+      if ((event as CustomEvent<string>).detail === account) refresh();
+    };
+    window.addEventListener(STUDY_CALENDAR_UPDATED, onUpdate);
+    window.addEventListener('storage', refresh);
+    return () => {
+      window.removeEventListener(STUDY_CALENDAR_UPDATED, onUpdate);
+      window.removeEventListener('storage', refresh);
+    };
+  }, [account, propCalendarData]);
+
+  const calendarData = propCalendarData || localCalendar;
 
   // Compute 7 days of the current week (Monday to Sunday) in the user's timezone
   const { weekDays, weekTotalMinutes, weekStoriesCount } = useMemo(() => {
@@ -145,6 +166,7 @@ export function HomeWeeklyStrip({ account }: HomeWeeklyStripProps) {
         onClose={() => setIsCalendarOpen(false)}
         account={account}
         initialDate={targetDate}
+        calendarData={calendarData}
       />
     </>
   );
