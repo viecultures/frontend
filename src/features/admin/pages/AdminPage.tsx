@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, MotionConfig } from 'motion/react';
 import {
@@ -34,17 +35,48 @@ import { adminUserService } from '../services/adminUserService';
 import { PostFormModal } from '../components/PostFormModal';
 import { UserManagementView } from '../components/UserManagementView';
 import { JourneyManagementView } from '../components/JourneyManagementView';
+import { AdminActivityLogView } from '../components/AdminActivityLogView';
 import { PostPreviewModal } from '../components/PostPreviewModal';
 import { AdminDialog } from '../components/AdminDialog';
 import { AdminServiceConnections } from '../components/AdminServiceConnections';
 import { adminTopicLabel, adminRegionLabel, adminReadTimeLabel } from '../admin-presentation';
+import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 import '../admin-ui.css';
 
-type AdminTab = 'journeys' | 'posts' | 'users' | 'system_stats';
+export type AdminTab = 'journeys' | 'posts' | 'users' | 'logs' | 'system_stats';
+const VALID_TABS: AdminTab[] = ['journeys', 'posts', 'users', 'logs', 'system_stats'];
 
 export const AdminPage: React.FC = () => {
   const { t } = useTranslation('admin');
-  const [activeTab, setActiveTab] = useState<AdminTab>('posts');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { lang, tab } = useParams<{ lang?: string; tab?: string }>();
+  const currentLang = resolveLanguage(lang);
+
+  const activeTab: AdminTab = useMemo(() => {
+    if (tab && (VALID_TABS as string[]).includes(tab)) {
+      return tab as AdminTab;
+    }
+    const match = location.pathname.match(/\/admin\/([a-zA-Z0-9_-]+)/);
+    if (match && (VALID_TABS as string[]).includes(match[1])) {
+      return match[1] as AdminTab;
+    }
+    return 'journeys';
+  }, [tab, location.pathname]);
+
+  // When visiting /admin or /:lang/admin without subpath, redirect to /admin/journeys
+  useEffect(() => {
+    const stripped = location.pathname.replace(/^\/(vi|en)(\/|$)/, '/');
+    if (stripped === '/admin' || stripped === '/admin/') {
+      navigate(getLocalizedPath('/admin/journeys', currentLang), { replace: true });
+    }
+  }, [location.pathname, currentLang, navigate]);
+
+  const handleTabChange = (newTab: AdminTab) => {
+    if (newTab !== activeTab) {
+      navigate(getLocalizedPath(`/admin/${newTab}`, currentLang));
+    }
+  };
 
   // Posts State
   const [posts, setPosts] = useState<ReadingPostItem[]>([]);
@@ -204,148 +236,254 @@ export const AdminPage: React.FC = () => {
 
   return (
     <MotionConfig reducedMotion="user">
-    <div className="admin-ui min-h-screen bg-warm-ivory dark:bg-heritage-forest text-text-body dark:text-warm-ivory py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* ── Top Header Banner ─────────────────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-3xl bg-heritage-green text-warm-ivory p-6 sm:p-8 shadow-xl border border-antique-gold/40">
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-antique-gold/20 text-antique-bright border border-antique-gold/30 text-xs font-bold">
-                <BookOpen aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
-                <span>{t('header.badge')}</span>
+    <div className="admin-ui min-h-screen bg-warm-ivory dark:bg-heritage-forest text-text-body dark:text-warm-ivory py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-start">
+        {/* ── Left Column: Admin Sidebar (~240px - 260px) ───────────────── */}
+        <aside className="w-full lg:w-64 shrink-0 space-y-4 lg:sticky lg:top-24">
+          <div className="rounded-3xl bg-rice-paper/90 dark:bg-heritage-dark/80 border border-antique-gold/30 p-5 shadow-md space-y-6">
+            {/* Logo / Admin Title */}
+            <div className="space-y-1.5 border-b border-antique-gold/25 pb-4">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-antique-gold/20 text-antique-bright border border-antique-gold/30 text-[10px] font-bold uppercase tracking-wider">
+                VieCultures Admin
               </div>
-              <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
-                {t('header.title')}
-              </h1>
-              <p className="text-xs sm:text-sm text-warm-ivory/80 max-w-2xl font-light">
-                {t('header.subtitle')}
+              <h2 className="font-heading text-lg font-bold text-heritage-green dark:text-antique-bright">
+                Ban Quản Trị
+              </h2>
+              <p className="text-xs text-text-muted leading-relaxed">
+                Trung tâm điều hành và kiểm duyệt nội dung văn hóa
               </p>
             </div>
 
-            {/* Quick Actions (Contextual based on active tab) */}
-            <div className="flex flex-wrap items-center gap-3">
-              {activeTab === 'posts' && (
-                <>
-                  <button
-                    onClick={fetchPosts}
-                    disabled={isLoading}
-                    className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-bold text-warm-ivory flex items-center gap-2 transition-all cursor-pointer"
-                    title={t('header.refresh_articles')} aria-label={t('header.refresh_articles')}
-                  >
-                    <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                    <span>{t('header.refresh_articles')}</span>
-                  </button>
-
-                  <button
-                    onClick={handleOpenCreate}
-                    className="px-5 py-2.5 rounded-xl bg-antique-gold text-heritage-dark hover:bg-antique-bright text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer shadow-lg hover:shadow-xl"
-                  >
-                    <Plus aria-hidden="true" className="w-4 h-4" />
-                    <span>{t('header.new_article')}</span>
-                  </button>
-                </>
-              )}
-
-              {activeTab === 'users' && (
-                <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-2">
-                  <ShieldCheck aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                  <span>{t('header.admin_access')}</span>
-                </div>
-              )}
-
-              {activeTab === 'system_stats' && (
-                <button
-                  onClick={() => {
-                    fetchPosts();
-                    fetchTotalUsers();
-                  }}
-                  className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-bold text-warm-ivory flex items-center gap-2 transition-all cursor-pointer"
-                >
-                  <RefreshCw aria-hidden="true" className="w-4 h-4" />
-                  <span>{t('header.refresh_overview')}</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Decorative Pattern Background */}
-          <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-antique-gold/10 to-transparent pointer-events-none" />
-        </div>
-
-        {/* ── Navigation Tabs ───────────────────────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-2.5 p-1.5 rounded-2xl bg-rice-paper/80 dark:bg-heritage-dark/60 border border-antique-gold/25 shadow-sm">
-                    <button
-            aria-pressed={activeTab === 'journeys'}
-            onClick={() => setActiveTab('journeys')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === 'journeys'
-                ? 'bg-heritage-green text-warm-ivory shadow-md border border-antique-gold/40'
-                : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/60 dark:hover:bg-white/5'
-            }`}
-          >
-            <Compass aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>Hành trình học</span>
-          </button>
-
-          <button
-            aria-pressed={activeTab === 'posts'}
-            onClick={() => setActiveTab('posts')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === 'posts'
-                ? 'bg-heritage-green text-warm-ivory shadow-md border border-antique-gold/40'
-                : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/60 dark:hover:bg-white/5'
-            }`}
-          >
-            <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>{t('tabs.posts')}</span>
-            <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                activeTab === 'posts'
-                  ? 'bg-antique-gold text-heritage-dark'
-                  : 'bg-heritage-green/10 dark:bg-white/10 text-heritage-dark dark:text-warm-ivory'
-              }`}
-            >
-              {posts.length}
-            </span>
-          </button>
-
-          <button
-            aria-pressed={activeTab === 'users'}
-            onClick={() => setActiveTab('users')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === 'users'
-                ? 'bg-heritage-green text-warm-ivory shadow-md border border-antique-gold/40'
-                : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/60 dark:hover:bg-white/5'
-            }`}
-          >
-            <Users aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>{t('tabs.users')}</span>
-            {totalUsersCount !== null && totalUsersCount > 0 && (
-              <span
-                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                  activeTab === 'users'
-                    ? 'bg-antique-gold text-heritage-dark'
-                    : 'bg-heritage-green/10 dark:bg-white/10 text-heritage-dark dark:text-warm-ivory'
+            {/* Navigation */}
+            <nav className="flex flex-col gap-1.5" aria-label="Thanh điều hướng quản trị">
+              <button
+                type="button"
+                aria-pressed={activeTab === 'journeys'}
+                onClick={() => handleTabChange('journeys')}
+                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
+                  activeTab === 'journeys'
+                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
                 }`}
               >
-                {totalUsersCount?.toLocaleString('en-US') ?? '—'}
-              </span>
-            )}
-          </button>
+                <span>Hành trình học</span>
+              </button>
 
-          <button
-            aria-pressed={activeTab === 'system_stats'}
-            onClick={() => setActiveTab('system_stats')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === 'system_stats'
-                ? 'bg-heritage-green text-warm-ivory shadow-md border border-antique-gold/40'
-                : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/60 dark:hover:bg-white/5'
-            }`}
-          >
-            <BarChart3 aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span>{t('tabs.overview')}</span>
-          </button>
-        </div>
+              <button
+                type="button"
+                aria-pressed={activeTab === 'posts'}
+                onClick={() => handleTabChange('posts')}
+                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
+                  activeTab === 'posts'
+                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
+                }`}
+              >
+                <span>{t('tabs.posts')}</span>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    activeTab === 'posts'
+                      ? 'bg-antique-gold text-heritage-dark'
+                      : 'bg-heritage-green/10 dark:bg-white/10 text-heritage-dark dark:text-warm-ivory'
+                  }`}
+                >
+                  {posts.length}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                aria-pressed={activeTab === 'users'}
+                onClick={() => handleTabChange('users')}
+                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
+                  activeTab === 'users'
+                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
+                }`}
+              >
+                <span>{t('tabs.users')}</span>
+                {totalUsersCount !== null && totalUsersCount > 0 && (
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      activeTab === 'users'
+                        ? 'bg-antique-gold text-heritage-dark'
+                        : 'bg-heritage-green/10 dark:bg-white/10 text-heritage-dark dark:text-warm-ivory'
+                    }`}
+                  >
+                    {totalUsersCount?.toLocaleString('en-US') ?? '—'}
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                aria-pressed={activeTab === 'logs'}
+                onClick={() => handleTabChange('logs')}
+                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
+                  activeTab === 'logs'
+                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
+                }`}
+              >
+                <span>Nhật ký hành vi</span>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    activeTab === 'logs'
+                      ? 'bg-antique-gold text-heritage-dark'
+                      : 'bg-heritage-green/10 dark:bg-white/10 text-heritage-dark dark:text-warm-ivory'
+                  }`}
+                >
+                  Kiểm toán
+                </span>
+              </button>
+
+              <button
+                type="button"
+                aria-pressed={activeTab === 'system_stats'}
+                onClick={() => handleTabChange('system_stats')}
+                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
+                  activeTab === 'system_stats'
+                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
+                }`}
+              >
+                <span>{t('tabs.overview')}</span>
+              </button>
+            </nav>
+
+            {/* Trạng thái kết nối */}
+            <div className="pt-4 border-t border-antique-gold/25 space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-text-secondary">
+                <span>Trạng thái kết nối</span>
+                <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Sẵn sàng
+                </span>
+              </div>
+              <p className="text-[10px] text-text-muted leading-tight">
+                Backend API & CSDL kết nối ổn định
+              </p>
+            </div>
+          </div>
+        </aside>
+
+        {/* ── Right Column: Main Content ──────────────────────────── */}
+        <div className="flex-1 min-w-0 w-full space-y-6">
+          {/* Sub-page Header Banner */}
+          <div className="relative overflow-hidden rounded-3xl bg-heritage-green text-warm-ivory p-6 sm:p-7 shadow-xl border border-antique-gold/40">
+            <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="space-y-1">
+                <div className="text-[11px] font-bold text-antique-bright uppercase tracking-wider">
+                  {activeTab === 'journeys' && 'Lộ trình di sản'}
+                  {activeTab === 'posts' && 'Biên tập & Phân cấp'}
+                  {activeTab === 'users' && 'Quản trị phân quyền'}
+                  {activeTab === 'logs' && 'Nhật ký bảo mật'}
+                  {activeTab === 'system_stats' && 'Giám sát hệ thống'}
+                </div>
+                <h1 className="font-heading text-xl sm:text-2xl font-bold tracking-tight">
+                  {activeTab === 'journeys' && 'Quản lý hành trình học'}
+                  {activeTab === 'posts' && t('header.title')}
+                  {activeTab === 'users' && 'Quản lý người dùng'}
+                  {activeTab === 'logs' && 'Nhật ký hành vi'}
+                  {activeTab === 'system_stats' && 'Thống kê và trạng thái hệ thống'}
+                </h1>
+                <p className="text-xs sm:text-sm text-warm-ivory/80 max-w-xl font-light">
+                  {activeTab === 'journeys' && 'Thiết lập lộ trình học tập văn hóa từng bước và quản lý trạm di sản'}
+                  {activeTab === 'posts' && t('header.subtitle')}
+                  {activeTab === 'users' && 'Phân quyền vai trò và giám sát học viên trên toàn nền tảng'}
+                  {activeTab === 'logs' && 'Theo dõi thao tác quản trị, truy cập và kiểm toán thay đổi dữ liệu'}
+                  {activeTab === 'system_stats' && 'Giám sát hiệu năng và kết nối dịch vụ backend'}
+                </p>
+              </div>
+
+              {/* Quick Actions (Contextual based on active tab) */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                {activeTab === 'posts' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={fetchPosts}
+                      disabled={isLoading}
+                      className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-bold text-warm-ivory flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                      title={t('header.refresh_articles')}
+                      aria-label={t('header.refresh_articles')}
+                    >
+                      <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                      <span>{t('header.refresh_articles')}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleOpenCreate}
+                      className="px-5 py-2.5 rounded-xl bg-antique-gold text-heritage-dark hover:bg-antique-bright text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer shadow-lg hover:shadow-xl"
+                    >
+                      <Plus aria-hidden="true" className="w-4 h-4" />
+                      <span>{t('header.new_article')}</span>
+                    </button>
+                  </>
+                )}
+
+                {activeTab === 'users' && (
+                  <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-2">
+                    <ShieldCheck aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                    <span>{t('header.admin_access')}</span>
+                  </div>
+                )}
+
+                {activeTab === 'logs' && (
+                  <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-2">
+                    <ShieldCheck aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                    <span>Kiểm toán tự động</span>
+                  </div>
+                )}
+
+                {activeTab === 'system_stats' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      fetchPosts();
+                      fetchTotalUsers();
+                    }}
+                    className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-bold text-warm-ivory flex items-center gap-2 transition-all cursor-pointer"
+                  >
+                    <RefreshCw aria-hidden="true" className="w-4 h-4" />
+                    <span>{t('header.refresh_overview')}</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Decorative Pattern Background */}
+            <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-antique-gold/10 to-transparent pointer-events-none" />
+          </div>
+
+          {/* Error Message Toast */}
+          {errorMsg && (
+            <div className="p-4 rounded-2xl bg-rose-100 dark:bg-rose-900/40 border border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200 text-xs flex items-center justify-between">
+              <span>{errorMsg}</span>
+              <button
+                type="button"
+                onClick={() => setErrorMsg(null)}
+                className="font-bold underline cursor-pointer"
+              >
+                Đóng
+              </button>
+            </div>
+          )}
+
+          {/* Success Toast */}
+          {successToast && (
+            <div className="p-4 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-xs flex items-center justify-between">
+              <span>{successToast}</span>
+              <button
+                type="button"
+                onClick={() => setSuccessToast(null)}
+                className="font-bold underline cursor-pointer"
+              >
+                Đóng
+              </button>
+            </div>
+          )}
 
         {/* ── TAB 0: HÀNH TRÌNH HỌC ─────────────────────────────────── */}
         {activeTab === 'journeys' && <JourneyManagementView />}
@@ -642,7 +780,10 @@ export const AdminPage: React.FC = () => {
         {/* ── TAB 2: QUẢN LÝ NGƯỜI DÙNG ─────────────────────────────────── */}
         {activeTab === 'users' && <UserManagementView />}
 
-        {/* ── TAB 3: THỐNG KÊ HỆ THỐNG ──────────────────────────────────── */}
+        {/* ── TAB 3: NHẬT KÝ HÀNH VI ───────────────────────────────────── */}
+        {activeTab === 'logs' && <AdminActivityLogView />}
+
+        {/* ── TAB 4: THỐNG KÊ HỆ THỐNG ──────────────────────────────────── */}
         {activeTab === 'system_stats' && (
           <div className="space-y-6">
             {/* Top KPI Cards */}
@@ -766,6 +907,8 @@ export const AdminPage: React.FC = () => {
             <AdminServiceConnections />
           </div>
         )}
+        </div>
+      </div>
 
         {/* ── Post Create / Edit Modal ──────────────────────────────────── */}
         <PostFormModal
@@ -819,7 +962,6 @@ export const AdminPage: React.FC = () => {
           </AdminDialog>
         )}
       </div>
-    </div>
     </MotionConfig>
   );
 };

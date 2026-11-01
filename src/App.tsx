@@ -227,7 +227,14 @@ export const App: React.FC = () => {
                     </RequireRole>
                   }
                 />
-                <Route path="admin/posts" element={<RedirectWithLang to={PATHS.admin} />} />
+                <Route
+                  path={`${toRel(PATHS.admin)}/:tab`}
+                  element={
+                    <RequireRole role="ADMIN">
+                      <AdminPage />
+                    </RequireRole>
+                  }
+                />
 
                 {DesignSystemPage && <Route path="design-system" element={<DesignSystemPage />} />}
 
