@@ -56,6 +56,10 @@ export interface QuizQuestionDto {
 
 export interface ReadingPostPayload {
   id?: string;
+  journeyId?: string;
+  journeyTitleEn?: string;
+  chapterOrder?: number;
+  provinceId?: string;
   topicGroup?: string;
   titleEn: string;
   titleVi: string;
@@ -81,6 +85,36 @@ export interface ReadingPostItem extends ReadingPostPayload {
   totalReads?: number;
   likesCount?: number;
   createdAt?: string;
+}
+
+export interface JourneyChapterSummary {
+  id: string;
+  chapterOrder: number;
+  titleEn: string;
+  titleVi: string;
+  summary?: string;
+  readTime?: string;
+  level?: string;
+  imageUrl?: string;
+}
+
+export interface LearningJourneyPayload {
+  id?: string; // Slug
+  titleEn: string;
+  titleVi: string;
+  theme: 'cuisine' | 'places' | 'crafts' | 'festivals' | 'history' | string;
+  provinceId: string;
+  region: 'north' | 'central' | 'south' | string;
+  description?: string;
+  imageUrl?: string;
+  status?: 'published' | 'draft' | 'upcoming' | string;
+  chapterPostIds?: string[];
+}
+
+export interface LearningJourneyItem extends LearningJourneyPayload {
+  id: string;
+  createdAt?: string;
+  chapters?: JourneyChapterSummary[];
 }
 
 export interface AdminStats {
@@ -137,4 +171,3 @@ export interface ApiResponseEnvelope<T> {
   errorCode?: string;
   timestamp?: string;
 }
-

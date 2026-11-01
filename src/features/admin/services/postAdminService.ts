@@ -20,6 +20,9 @@ export interface PostFilterParams {
   topicGroup?: string;
   level?: string;
   query?: string;
+  standalone?: boolean;
+  journeyId?: string;
+  provinceId?: string;
 }
 
 export const postAdminService = {
@@ -32,6 +35,9 @@ export const postAdminService = {
     if (params?.topicGroup) searchParams.append('topicGroup', params.topicGroup);
     if (params?.level) searchParams.append('level', params.level);
     if (params?.query) searchParams.append('query', params.query);
+    if (params?.standalone !== undefined) searchParams.append('standalone', String(params.standalone));
+    if (params?.journeyId) searchParams.append('journeyId', params.journeyId);
+    if (params?.provinceId) searchParams.append('provinceId', params.provinceId);
 
     const url = `${API_BASE_URL}/api/posts${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
     const res = await fetch(url);
@@ -371,4 +377,3 @@ export const postAdminService = {
     return res.json();
   },
 };
-

@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Clock,
   Layers,
+  Compass,
   MapPin,
   HelpCircle,
   Wand2,
@@ -24,6 +25,7 @@ import {
 } from 'lucide-react';
 import type {
   ReadingPostPayload,
+  LearningJourneyItem,
   ReadingPostItem,
   ParagraphPairDto,
   VocabItemDto,
@@ -34,6 +36,8 @@ import type {
   QuizOptionDto,
 } from '../types/adminTypes';
 import { postAdminService } from '../services/postAdminService';
+import { journeyAdminService } from '../services/journeyAdminService';
+import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 import { AdminDialog } from './AdminDialog';
 import { adminTopicLabel } from '../admin-presentation';
 
@@ -85,6 +89,10 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   const [activeTab, setActiveTab] = useState<'info' | 'bilingual' | 'vocab' | 'voices' | 'quiz' | 'tsv'>('info');
 
   // Form states
+  const [journeyId, setJourneyId] = useState<string>('');
+  const [chapterOrder, setChapterOrder] = useState<number>(1);
+  const [provinceId, setProvinceId] = useState<string>('');
+  const [journeysList, setJourneysList] = useState<LearningJourneyItem[]>([]);
   const [topicGroup, setTopicGroup] = useState('');
   const [titleEn, setTitleEn] = useState('');
   const [titleVi, setTitleVi] = useState('');
@@ -134,9 +142,17 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
         .then((models) => setVoiceModels(models))
         .catch((err) => console.error('Error fetching voice models:', err))
         .finally(() => setIsLoadingModels(false));
+
+      journeyAdminService
+        .getJourneys()
+        .then((data) => setJourneysList(data))
+        .catch((err) => console.error('Error loading journeys:', err));
     }
 
     if (initialData) {
+      setJourneyId(initialData.journeyId || '');
+      setChapterOrder(initialData.chapterOrder || 1);
+      setProvinceId(initialData.provinceId || '');
       setTopicGroup(initialData.topicGroup || '');
       setTitleEn(initialData.titleEn || '');
       setTitleVi(initialData.titleVi || '');
@@ -214,6 +230,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   }, [initialData, isOpen]);
 
   const resetForm = () => {
+    setJourneyId('');
+    setChapterOrder(1);
+    setProvinceId('');
     setTopicGroup('');
     setTitleEn('');
     setTitleVi('');
@@ -496,6 +515,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
     setIsSubmitting(true);
     try {
       const payload: ReadingPostPayload = {
+        journeyId: journeyId.trim() || undefined,
+        chapterOrder: journeyId.trim() ? Number(chapterOrder) || 1 : undefined,
+        provinceId: provinceId.trim() || undefined,
         topicGroup: topicGroup.trim() || undefined,
         titleEn: titleEn.trim(),
         titleVi: titleVi.trim(),
@@ -672,6 +694,81 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
           {activeTab === 'info' && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* ── Journey & Chapter Order Selector ── */}
+                <div className="md:col-span-2 p-4 rounded-2xl bg-antique-gold/15 border border-antique-gold/30 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="block text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center gap-1.5">
+                      <Compass aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                      <span>Hành trình học (Learning Journey)</span>
+                    </label>
+                    <select
+                      value={journeyId}
+                      onChange={(e) => {
+                        const jId = e.target.value;
+                        setJourneyId(jId);
+                        if (jId) {
+                          const found = journeysList.find((j) => j.id === jId);
+                          if (found?.provinceId) setProvinceId(found.provinceId);
+                          if (found?.region) setRegion(found.region);
+                        }
+                      }}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-rice-paper dark:bg-heritage-dark border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                    >
+                      <option value="">Bài đọc độc lập (Không thuộc hành trình)</option>
+                      {journeysList.map((j) => (
+                        <option key={j.id} value={j.id}>
+                          {j.titleEn} ({j.titleVi}) · {j.region}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[10px] text-text-muted">
+                      {journeyId
+                        ? 'Bài viết được xếp vào chuỗi chặng của hành trình trên bản đồ.'
+                        : 'Bài viết độc lập sẽ hiển thị ở danh mục bài xã luận (/discovery?view=stories).'}
+                    </p>
+                  </div>
+
+                  {journeyId ? (
+                    <div className="space-y-1">
+                      <label className="block text-xs font-bold text-heritage-green dark:text-warm-ivory flex items-center gap-1.5">
+                        <Layers aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                        <span>Vị trí chặng (Chapter Order)</span>
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={30}
+                        value={chapterOrder || 1}
+                        onChange={(e) => setChapterOrder(parseInt(e.target.value, 10) || 1)}
+                        placeholder="1, 2, 3..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-rice-paper dark:bg-heritage-dark border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                      />
+                      <p className="text-[10px] text-text-muted">
+                        Vị trí chặng bài đọc trong chuỗi hành trình (ví dụ: Chặng 1, Chặng 2, Chặng 3).
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <label className="block text-xs font-bold text-text-body dark:text-warm-ivory flex items-center gap-1.5">
+                        <MapPin aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                        <span>Tỉnh thành (Province - 34 tỉnh)</span>
+                      </label>
+                      <select
+                        value={provinceId}
+                        onChange={(e) => setProvinceId(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                      >
+                        <option value="">-- Chọn tỉnh thành liên kết --</option>
+                        {VIETNAM_34_PROVINCES.map((prov) => (
+                          <option key={prov.id} value={prov.id}>
+                            {prov.name} ({prov.regionName})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
                 {/* Topic Group */}
                 <div>
                   <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">

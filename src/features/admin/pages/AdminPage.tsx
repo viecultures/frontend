@@ -26,18 +26,21 @@ import {
   Server,
   ShieldCheck,
   CheckCircle,
+  Compass,
 } from 'lucide-react';
 import type { ReadingPostItem, CefrLevel } from '../types/adminTypes';
 import { postAdminService, type PostFilterParams } from '../services/postAdminService';
 import { adminUserService } from '../services/adminUserService';
 import { PostFormModal } from '../components/PostFormModal';
 import { UserManagementView } from '../components/UserManagementView';
+import { JourneyManagementView } from '../components/JourneyManagementView';
+import { PostPreviewModal } from '../components/PostPreviewModal';
 import { AdminDialog } from '../components/AdminDialog';
 import { AdminServiceConnections } from '../components/AdminServiceConnections';
 import { adminTopicLabel, adminRegionLabel, adminReadTimeLabel } from '../admin-presentation';
 import '../admin-ui.css';
 
-type AdminTab = 'posts' | 'users' | 'system_stats';
+type AdminTab = 'journeys' | 'posts' | 'users' | 'system_stats';
 
 export const AdminPage: React.FC = () => {
   const { t } = useTranslation('admin');
@@ -55,6 +58,7 @@ export const AdminPage: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedTopic, setSelectedTopic] = useState<string>('');
+  const [standaloneFilter, setStandaloneFilter] = useState<'all' | 'standalone' | 'journey'>('all');
 
   // Modals state for Posts
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -75,6 +79,8 @@ export const AdminPage: React.FC = () => {
       if (selectedLevel) params.level = selectedLevel;
       if (selectedRegion) params.region = selectedRegion;
       if (selectedTopic) params.topic = selectedTopic;
+      if (standaloneFilter === 'standalone') params.standalone = true;
+      if (standaloneFilter === 'journey') params.standalone = false;
 
       const data = await postAdminService.getPosts(params);
       setPosts(data);
@@ -100,7 +106,7 @@ export const AdminPage: React.FC = () => {
 
   useEffect(() => {
     fetchPosts();
-  }, [selectedLevel, selectedRegion, selectedTopic]);
+  }, [selectedLevel, selectedRegion, selectedTopic, standaloneFilter]);
 
   useEffect(() => {
     fetchTotalUsers();
@@ -268,6 +274,19 @@ export const AdminPage: React.FC = () => {
 
         {/* ── Navigation Tabs ───────────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-2.5 p-1.5 rounded-2xl bg-rice-paper/80 dark:bg-heritage-dark/60 border border-antique-gold/25 shadow-sm">
+                    <button
+            aria-pressed={activeTab === 'journeys'}
+            onClick={() => setActiveTab('journeys')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+              activeTab === 'journeys'
+                ? 'bg-heritage-green text-warm-ivory shadow-md border border-antique-gold/40'
+                : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/60 dark:hover:bg-white/5'
+            }`}
+          >
+            <Compass aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+            <span>Hành trình học</span>
+          </button>
+
           <button
             aria-pressed={activeTab === 'posts'}
             onClick={() => setActiveTab('posts')}
@@ -327,6 +346,9 @@ export const AdminPage: React.FC = () => {
             <span>{t('tabs.overview')}</span>
           </button>
         </div>
+
+        {/* ── TAB 0: HÀNH TRÌNH HỌC ─────────────────────────────────── */}
+        {activeTab === 'journeys' && <JourneyManagementView />}
 
         {/* ── TAB 1: BÀI ĐỌC VĂN HÓA ────────────────────────────────────── */}
         {activeTab === 'posts' && (
@@ -401,6 +423,17 @@ export const AdminPage: React.FC = () => {
               </form>
 
               <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                                {/* Standalone / Journey Filter */}
+                <select
+                  aria-label="Hình thức bài đọc"
+                  value={standaloneFilter}
+                  onChange={(e) => setStandaloneFilter(e.target.value as 'all' | 'standalone' | 'journey')}
+                  className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+                >
+                  <option value="all">Tất cả hình thức</option>
+                  <option value="standalone">Chỉ bài độc lập</option>
+                  <option value="journey">Thuộc hành trình học</option>
+                </select>
                 {/* Level Filter */}
                 <select
                   aria-label={t('filters.all_levels')}
@@ -512,11 +545,23 @@ export const AdminPage: React.FC = () => {
                         >
                           <td className="px-5 py-4 max-w-sm">
                             <div className="space-y-1">
-                              {post.topicGroup && (
-                                <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 text-heritage-dark dark:text-antique-bright border border-antique-gold/30">
-                                  {post.topicGroup}
-                                </span>
-                              )}
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {post.journeyTitleEn ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/35">
+                                    <Compass aria-hidden="true" className="w-3 h-3 text-antique-gold" />
+                                    <span>Chặng {post.chapterOrder || 1}: {post.journeyTitleEn}</span>
+                                  </span>
+                                ) : (
+                                  <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 dark:bg-white/10 text-text-muted">
+                                    Độc lập
+                                  </span>
+                                )}
+                                {post.topicGroup && (
+                                  <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-antique-gold/20 text-heritage-dark dark:text-antique-bright border border-antique-gold/30">
+                                    {post.topicGroup}
+                                  </span>
+                                )}
+                              </div>
                               <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-warm-ivory line-clamp-1 group-hover:text-antique-gold transition-colors">
                                 {post.titleEn}
                               </h4>
@@ -734,96 +779,7 @@ export const AdminPage: React.FC = () => {
         />
 
         {/* ── Preview Modal ─────────────────────────────────────────────── */}
-        {previewPost && (
-          <AdminDialog title={t('preview_dialog.title')} onClose={() => setPreviewPost(null)}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-3xl bg-rice-paper dark:bg-heritage-forest border border-antique-gold/40 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
-            >
-              <div className="p-5 bg-heritage-green text-warm-ivory flex items-center justify-between border-b border-antique-gold/30">
-                <div className="space-y-0.5">
-                  <span className="text-[10px] font-bold text-antique-gold uppercase tracking-wider">
-                    {adminRegionLabel(previewPost.region)} · {t('filters.level_option', { level: previewPost.level })}
-                  </span>
-                  <h3 className="font-heading font-bold text-base sm:text-lg">
-                    {previewPost.titleEn}
-                  </h3>
-                  <p className="text-xs text-warm-ivory/80 italic">{previewPost.titleVi}</p>
-                </div>
-                <button aria-label={t('preview_dialog.close')}
-                  onClick={() => setPreviewPost(null)}
-                  className="p-1.5 rounded-xl hover:bg-white/10 text-warm-ivory cursor-pointer"
-                >
-                  <X aria-hidden="true" className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-6 space-y-6 overflow-y-auto flex-1">
-                {/* Paragraphs preview */}
-                <div className="space-y-4">
-                  <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-antique-bright border-b border-antique-gold/20 pb-2 flex items-center gap-2">
-                    <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                    <span>{t('preview_dialog.bilingual_content', { count: previewPost.paragraphs?.length || 0 })}</span>
-                  </h4>
-                  {previewPost.paragraphs && previewPost.paragraphs.length > 0 ? (
-                    previewPost.paragraphs.map((p, idx) => (
-                      <div
-                        key={idx}
-                        className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/60 border border-antique-gold/20 space-y-2"
-                      >
-                        <div className="text-xs font-serif leading-relaxed text-text-body dark:text-warm-ivory">
-                          {p.enText}
-                        </div>
-                        <div className="text-xs italic text-text-secondary leading-relaxed border-t border-antique-gold/15 pt-2">
-                          {p.viText}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-xs text-text-muted">
-                      {previewPost.contentEn || t('preview_dialog.no_content')}
-                    </div>
-                  )}
-                </div>
-
-                {/* Vocabulary preview */}
-                {previewPost.vocabularies && previewPost.vocabularies.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-antique-bright border-b border-antique-gold/20 pb-2 flex items-center gap-2">
-                      <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                      <span>{t('preview_dialog.vocabulary', { count: previewPost.vocabularies.length })}</span>
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {previewPost.vocabularies.map((v, idx) => (
-                        <div
-                          key={idx}
-                          className="p-3 rounded-xl bg-warm-ivory dark:bg-heritage-dark/60 border border-antique-gold/20 text-xs space-y-1"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-heritage-green dark:text-antique-bright">
-                              {v.word}
-                            </span>
-                            {v.pos && (
-                              <span className="text-[10px] text-text-muted italic">{v.pos}</span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-text-secondary">{v.viMeaning}</p>
-                          {v.contextSentence && (
-                            <p className="text-[10px] text-text-muted italic border-t border-antique-gold/10 pt-1">
-                              "{v.contextSentence}"
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </AdminDialog>
-        )}
+        <PostPreviewModal post={previewPost} onClose={() => setPreviewPost(null)} />
 
         {/* ── Delete Confirmation Dialog ─────────────────────────────────── */}
         {deletingId && (
