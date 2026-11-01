@@ -26,6 +26,7 @@ import { paths } from '@/routes/paths';
 import { readLearningValue, writeLearningValue } from '@/services/learning/learningStorage';
 import { readFirstRegionChoice, saveFirstRegionChoice, type FirstRegion } from '@/services/learning/firstRegionChoice';
 import { JOURNEY_SERIES, type JourneySeries } from '../data/learningJourney';
+import { journeyApiService } from '../services/journeyApiService';
 
 const REGIONS = [
   { id: 'north', nameKey: 'journey.region_north', fallbackName: 'Northern Vietnam', number: "1" },
@@ -109,11 +110,37 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
     }, { replace: true });
   }, [firstRegion, params, requestedPlace, setParams]);
 
+  const [allJourneys, setAllJourneys] = useState<JourneySeries[]>(JOURNEY_SERIES);
+
+  useEffect(() => {
+    let active = true;
+    journeyApiService.getJourneys().then(journeys => {
+      if (active && Array.isArray(journeys) && journeys.length > 0) {
+        setAllJourneys(journeys);
+      }
+    }).catch(err => {
+      console.warn('[DiscoveryJourney] Failed to load remote journeys, retaining mock data:', err);
+    });
+    return () => { active = false; };
+  }, []);
+
   const [unlockedPlaces, setUnlockedPlaces] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(JOURNEY_SERIES.map(series => [
       series.provinceId,
       readLearningValue<boolean>(`journey:unlocked:${series.provinceId}`) === true,
     ])));
+
+  useEffect(() => {
+    setUnlockedPlaces(prev => {
+      const next = { ...prev };
+      allJourneys.forEach(series => {
+        if (next[series.provinceId] === undefined) {
+          next[series.provinceId] = readLearningValue<boolean>(`journey:unlocked:${series.provinceId}`) === true;
+        }
+      });
+      return next;
+    });
+  }, [allJourneys]);
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
   // Floating Chapter Popover State
@@ -157,23 +184,23 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
     if (hoverPopover?.pinned) document.querySelector<HTMLButtonElement>('.journey-hover-chapter-link')?.focus();
   }, [hoverPopover?.pinned, hoverPopover?.series.id]);
 
-  const availableSeries = JOURNEY_SERIES.filter(series =>
+  const availableSeries = allJourneys.filter(series =>
     VIETNAM_34_PROVINCES.some(province => province.id === series.provinceId && province.region === firstRegion));
 
   // Nominated Series Slider State
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   const hasOwnSeries = selectedProvince
-    ? JOURNEY_SERIES.some(s => s.provinceId === selectedProvince.id)
+    ? allJourneys.some(s => s.provinceId === selectedProvince.id)
     : true;
 
   const nominatedSlides = useMemo(() => {
     if (selectedProvince && hasOwnSeries) {
-      return JOURNEY_SERIES.filter(s => s.provinceId === selectedProvince.id);
+      return allJourneys.filter(s => s.provinceId === selectedProvince.id);
     }
-    if (firstRegion !== 'north') return JOURNEY_SERIES.filter(s => s.region === firstRegion);
+    if (firstRegion !== 'north') return allJourneys.filter(s => s.region === firstRegion);
     // Default regional nominated series for Northern Vietnam:
-    const northernSeries = JOURNEY_SERIES.filter(s =>
+    const northernSeries = allJourneys.filter(s =>
       s.region === 'north' || ['ha-noi', 'hung-yen', 'ninh-binh'].includes(s.provinceId)
     );
     const preferredOrder = [

@@ -8,6 +8,15 @@ const getAuthHeaders = (): Record<string, string> => {
   return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
 };
 
+const getOptionalAuthHeaders = (): Record<string, string> => {
+  const token = getStoredToken();
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+};
+
 export interface JourneyFilterParams {
   region?: string;
   provinceId?: string;
@@ -26,7 +35,9 @@ export const journeyAdminService = {
     if (params?.query) searchParams.append('query', params.query);
 
     const url = `${API_BASE_URL}/api/journeys${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: getOptionalAuthHeaders(),
+    });
     if (!res.ok) {
       throw new Error(`Không thể tải danh sách hành trình học (HTTP ${res.status})`);
     }
@@ -34,7 +45,9 @@ export const journeyAdminService = {
   },
 
   async getJourneyById(id: string): Promise<LearningJourneyItem> {
-    const res = await fetch(`${API_BASE_URL}/api/journeys/${encodeURIComponent(id)}`);
+    const res = await fetch(`${API_BASE_URL}/api/journeys/${encodeURIComponent(id)}`, {
+      headers: getOptionalAuthHeaders(),
+    });
     if (!res.ok) {
       throw new Error(`Không tìm thấy hành trình học ID: ${id}`);
     }
