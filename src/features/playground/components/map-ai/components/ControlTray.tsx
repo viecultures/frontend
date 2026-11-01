@@ -19,7 +19,7 @@ import {
   ImagePlus,
   RotateCcw,
 } from 'lucide-react';
-import { useLogStore, useUI, useSettings } from '../lib/state';
+import { AI_PLAYBACK_RATES, useLogStore, useUI, useSettings } from '../lib/state';
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 import { useImagePreviewStore } from '../lib/image-previews';
@@ -51,6 +51,8 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   const { speakerMuted, toggleSidebar, isSidebarOpen } = useUI();
   const voiceInteractionMode = useSettings(state => state.voiceInteractionMode);
   const tutorMode = useSettings(state => state.tutorMode);
+  const aiPlaybackRate = useSettings(state => state.aiPlaybackRate);
+  const setAiPlaybackRate = useSettings(state => state.setAiPlaybackRate);
   const pushToTalk = voiceInteractionMode === 'push-to-talk';
   const heldKey = useRef(false);
   const [textPrompt, setTextPrompt] = useState('');
@@ -293,6 +295,18 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           title={!speakerMuted ? t('playground.tray_controls.mute_audio') : t('playground.tray_controls.unmute_audio')}
         >
           {!speakerMuted ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+        </button>
+        <button
+          type="button"
+          className="action-button ai-playback-rate-button"
+          onClick={() => {
+            const index = AI_PLAYBACK_RATES.indexOf(aiPlaybackRate);
+            setAiPlaybackRate(AI_PLAYBACK_RATES[(index + 1) % AI_PLAYBACK_RATES.length]);
+          }}
+          title={t('playground.tray_controls.playback_rate_title', { rate: aiPlaybackRate })}
+          aria-label={t('playground.tray_controls.playback_rate_title', { rate: aiPlaybackRate })}
+        >
+          {aiPlaybackRate}×
         </button>
         <button
           className={cn('action-button mic-button', {

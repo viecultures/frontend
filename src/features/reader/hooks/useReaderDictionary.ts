@@ -112,6 +112,7 @@ export function useReaderDictionary(customVocabMap?: Record<string, VocabItem> |
     const position = rect
       ? { x: rect.left + rect.width / 2, y: rect.bottom }
       : { x: window.innerWidth / 2, y: window.innerHeight / 3 };
+    const currentReqId = ++requestIdRef.current;
 
     if (vocabData) {
       setPopupState({
@@ -122,10 +123,18 @@ export function useReaderDictionary(customVocabMap?: Record<string, VocabItem> |
         },
         position,
       });
+      if (!vocabData.enDefinition) {
+        const lookup = await lookupWordInstant(targetWord, fullSentence);
+        if (requestIdRef.current === currentReqId && lookup.enDefinition) {
+          setPopupState(prev => ({
+            ...prev,
+            vocab: prev.vocab ? { ...prev.vocab, enDefinition: lookup.enDefinition } : null,
+          }));
+        }
+      }
       return;
     }
 
-    const currentReqId = ++requestIdRef.current;
     setPopupState({
       isOpen: true,
       vocab: {

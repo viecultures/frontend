@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Compass, Plus } from "lucide-react";
+import { ArrowRight, BookOpen, Compass, BookmarkCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LESSONS_DATA } from "@/data/discoveryData";
 import { resolveDeckCards } from "@/data/flashcardsData";
@@ -7,14 +7,15 @@ import { DeckCoverIllustration } from "./DeckCoverIllustration";
 interface DictionaryQuickActionCardsProps {
   onGoToRecent: () => void;
   onExploreMore: () => void;
-  onOpenCreateDeck: () => void;
+  onReviewSaved: () => void;
+  savedWordCount: number;
 }
 
-export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onOpenCreateDeck }: DictionaryQuickActionCardsProps) {
+export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onReviewSaved, savedWordCount }: DictionaryQuickActionCardsProps) {
   const { t } = useTranslation('flashcards');
 
   return (
-    <section className="vocab-actions" aria-label="Start learning vocabulary">
+    <section className="vocab-actions" aria-label={t('dictionary.quick_actions_aria', 'Start learning vocabulary')}>
       <article className="vocab-featured">
         <DeckCoverIllustration category="Heritage" className="vocab-featured-image" />
         <div className="vocab-featured-content">
@@ -48,14 +49,14 @@ export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onOpen
           </span>
           <ArrowRight size={18} />
         </button>
-        <button className="vocab-action-tile vocab-action-create" onClick={onOpenCreateDeck}>
-          <span className="vocab-tile-icon"><Plus size={23} /></span>
+        {savedWordCount > 0 && <button className="vocab-action-tile vocab-action-create" onClick={onReviewSaved}>
+          <span className="vocab-tile-icon"><BookmarkCheck size={23} /></span>
           <span className="vocab-tile-copy">
-            <strong>{t('dictionary.create_deck', 'Create your own deck')}</strong>
-            <span>{t('dictionary.create_deck_subtitle', 'Keep the words you want to remember')}</span>
+            <strong>{t('dictionary.review_saved', 'Review saved words')}</strong>
+            <span>{t('dictionary.review_saved_count', { count: savedWordCount, defaultValue: `${savedWordCount} words ready to review` })}</span>
           </span>
           <ArrowRight size={18} />
-        </button>
+        </button>}
       </div>
     </section>
   );

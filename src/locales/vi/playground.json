@@ -362,6 +362,7 @@
       "audio_output_off": "Tắt âm thanh loa",
       "mute_audio": "Tắt âm thanh phát ra",
       "unmute_audio": "Bật âm thanh phát ra",
+      "playback_rate_title": "Tốc độ nói của AI: {{rate}}×. Nhấn để đổi tốc độ",
       "toggle_text_input": "Bật/tắt nhập tin nhắn văn bản",
       "placeholder_connected": "Nhập tin nhắn…",
       "placeholder_initial": "Nhập tin nhắn để bắt đầu…",

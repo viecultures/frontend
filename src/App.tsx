@@ -4,6 +4,7 @@ import { isLocalAuthMode } from '@/config/authConfig';
 
 import { SettingsModal } from './components/SettingsModal';
 import { PwaInstallBanner } from './components/pwa';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 // Layouts
 import { AppLayout } from '@/layouts/AppLayout';
@@ -42,6 +43,7 @@ const DesignSystemPage = import.meta.env.DEV
   : null;
 import { getStoredUser, setStoredUser, getStoredToken, clearAuthStorage, type AppUser } from '@/utils/auth-storage';
 import { PATHS, getLocalizedPath, resolveLanguage } from '@/routes/paths';
+import { useStudyActivityTracking } from '@/features/home/hooks/useStudyActivityTracking';
 const CompanionFloatingButton = React.lazy(() =>
   import('@/features/companion/CompanionFloatingButton').then((module) => ({ default: module.CompanionFloatingButton }))
 );
@@ -106,6 +108,7 @@ export const App: React.FC = () => {
 
   const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser() || !!getStoredToken());
+  useStudyActivityTracking(pathWithoutLang, user?.email || 'guest');
 
   useEffect(() => {
     const handleAuthChange = () => {
@@ -154,7 +157,8 @@ export const App: React.FC = () => {
             </div>
           }
         >
-          <Routes>
+          <ErrorBoundary>
+            <Routes>
             {/* Root URL redirect to /vi */}
             <Route path="/" element={<Navigate to="/vi" replace />} />
 
@@ -280,6 +284,7 @@ export const App: React.FC = () => {
             {/* Fallback for un-prefixed routes (e.g. legacy /login -> /vi/login) */}
             <Route path="*" element={<UnprefixedFallbackRedirect />} />
           </Routes>
+        </ErrorBoundary>
         </React.Suspense>
 
         {/* Global Modals & Banners */}

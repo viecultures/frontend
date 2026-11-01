@@ -4,7 +4,7 @@
 .community-ui {
   font-family: var(--font-sans);
   font-weight: 400;
-  color: #314F49;
+  color: var(--color-ink-soft);
 }
 
 .community-ui .font-serif {
@@ -16,7 +16,7 @@
 }
 
 .community-ui :is(button, a, input, textarea, select, [role="button"]):focus-visible {
-  outline: 2px solid #1D5046;
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 

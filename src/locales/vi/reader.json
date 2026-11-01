@@ -113,6 +113,9 @@
     "sensitive_language": "Từ ngữ nhạy cảm",
     "vietnamese_meaning": "Nghĩa tiếng Việt:",
     "english_definition": "Định nghĩa tiếng Anh:",
+    "no_english_definition": "Chưa có giải nghĩa tiếng Anh.",
+    "show_vietnamese": "Xem tiếng Việt",
+    "hide_vietnamese": "Ẩn tiếng Việt",
     "article_context": "Ngữ cảnh bài đọc:",
     "sensitive_unavailable": "Không hỗ trợ lưu từ ngữ nhạy cảm",
     "saved_to_vocab": "Đã lưu vào sổ từ",
@@ -317,7 +320,7 @@
     "companion_desc": "Mở trợ lý văn hóa ở góc dưới bên phải để tìm hiểu sâu hơn. Nâng cấp Pro để trò chuyện không giới hạn.",
     "btn_view_passport": "Xem hộ chiếu di sản",
     "btn_next_lesson": "Bài tiếp theo: {{title}}",
-    "btn_upgrade_pro": "Nâng cấp Pro (39.000 đ)",
+    "btn_upgrade_pro": "Nâng cấp Plus (49.000 đ)",
     "btn_close_return": "Đóng & quay lại bài đọc"
   }
 }

@@ -1,5 +1,6 @@
 import type { ReadingPostItem } from '@/features/admin/types/adminTypes';
 import type { VocabItem } from '@/data/readerData';
+import { VOCAB_DATABASE } from '@/data/readerData';
 import { LESSONS_DATA, type Lesson, type LevelDetail } from '@/data/discoveryData';
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { resolveDeckCards } from '@/data/flashcardsData';
@@ -151,7 +152,7 @@ export const readerApiService = {
           ipa: v.ipa || `/${key}/`,
           viMeaning: v.viMeaning,
           contextSentence: v.contextSentence || '',
-          enDefinition: v.usageNote || undefined,
+          enDefinition: VOCAB_DATABASE[key]?.enDefinition,
         };
         vocabMap[key] = item;
         mappedVocabs.push(item);
@@ -298,11 +299,11 @@ export const readerApiService = {
         : (['Level 1', 'Level 2', 'Level 3'] as any);
 
     const iconMap: Record<string, string> = {
-      Heritage: '🏛️',
-      Cuisine: '🍜',
-      Crafts: '🎨',
-      Nature: '🏔️',
-      Folklore: '🏮',
+      Heritage: 'landmark',
+      Cuisine: 'utensils',
+      Crafts: 'palette',
+      Nature: 'mountain',
+      Folklore: 'lamp',
     };
 
     const categorySafe = item.category || 'Heritage';
@@ -321,7 +322,7 @@ export const readerApiService = {
       vocabCount: safeVocabCount,
       summary: safeSummary,
       gradient: 'from-amber-600/40 via-emerald-800/60 to-heritage-green/90',
-      iconSymbol: iconMap[categorySafe] || '🏛️',
+      iconSymbol: iconMap[categorySafe] || 'landmark',
       imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80',
       featured: item.featured ?? false,
       isFromDatabase: true,
@@ -361,7 +362,7 @@ export const readerApiService = {
             ipa: c.ipa,
             viMeaning: c.viMeaning,
             contextSentence: c.contextEn,
-            enDefinition: c.viDefinition,
+            enDefinition: VOCAB_DATABASE[c.word.toLowerCase()]?.enDefinition,
           };
           vocabMap[c.word.toLowerCase()] = item;
           vocabList.push(item);
@@ -405,7 +406,7 @@ export const readerApiService = {
 
       resolveDeckCards(landmark.id).forEach(card => {
         const item: VocabItem = { id: card.id, word: card.word, pos: card.pos, ipa: card.ipa,
-          viMeaning: card.viMeaning, contextSentence: card.contextEn, enDefinition: card.viDefinition };
+          viMeaning: card.viMeaning, contextSentence: card.contextEn, enDefinition: VOCAB_DATABASE[card.word.toLowerCase()]?.enDefinition };
         vocabMap[item.word.toLowerCase()] = item;
         vocabList.push(item);
       });

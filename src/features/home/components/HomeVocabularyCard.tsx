@@ -45,9 +45,11 @@ export function HomeVocabularyCard() {
     decks.forEach(deck => {
       deck.cards.forEach(card => {
         const rating = deck.session.ratings[card.id];
-        if (rating === 'mastered') {
+        if (rating === 'mastered' || rating === 'easy') {
           masteredCount++;
-        } else if (rating === 'review') {
+        } else if (rating === 'familiar' || rating === 'good') {
+          familiarCount++;
+        } else if (rating === 'review' || rating === 'hard') {
           reviewingCount++;
         } else {
           learningCount++;
@@ -188,12 +190,17 @@ export function HomeVocabularyCard() {
 
         {/* Word Pills */}
         <div className="home-vocab-pills">
-          {dueWords.map((word) => (
+          {dueWords.slice(0, 4).map((word) => (
             <span key={word} className="home-vocab-pill">
               <span className="home-vocab-pill-dot" aria-hidden="true" />
               {word}
             </span>
           ))}
+          {dueWords.length > 4 && (
+            <span className="home-vocab-pill opacity-75 font-mono text-[11px]">
+              +{dueWords.length - 4} {t('vocabulary_card.more_words', 'khác')}
+            </span>
+          )}
         </div>
 
         {/* Actions */}

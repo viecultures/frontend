@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import {
   ArrowLeft,
   Crown,
-  CheckCircle2,
   QrCode,
   ShieldCheck,
-  Zap,
   BookOpen,
-  ArrowRight,
   CreditCard,
   Smartphone,
   Clock,
@@ -23,10 +21,20 @@ import {
 import { setIsProUser, getStoredUser, getIsProUser } from '@/utils/auth-storage';
 import { PATHS } from '@/routes/paths';
 
+export type CheckoutPlanKey = 'monthly' | 'quarterly' | 'yearly' | 'student' | 'student_yearly';
+
 export const CheckoutPage: React.FC = () => {
   const { t } = useTranslation('subscription');
   const navigate = useAppNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const currentUser = getStoredUser();
+
+  const validPlans: CheckoutPlanKey[] = ['monthly', 'quarterly', 'yearly', 'student', 'student_yearly'];
+  const initialPlan = (searchParams.get('plan') as CheckoutPlanKey) || 'yearly';
+  const [selectedPlan, setSelectedPlan] = useState<CheckoutPlanKey>(
+    validPlans.includes(initialPlan) ? initialPlan : 'yearly'
+  );
+  const [studentEmail, setStudentEmail] = useState<string>('');
 
   const [paymentMethod, setPaymentMethod] = useState<'bank' | 'momo'>('bank');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -44,10 +52,23 @@ export const CheckoutPage: React.FC = () => {
       ? currentUser.name.trim().split(/\s+/).pop()?.toUpperCase() || 'MEMBER'
       : 'MEMBER';
     const rand = Math.floor(1000 + Math.random() * 9000);
-    return `PRO_${userSlug}_${rand}`;
+    return `PLUS_${userSlug}_${rand}`;
   });
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const plan = searchParams.get('plan') as CheckoutPlanKey;
+    if (plan && validPlans.includes(plan)) {
+      setSelectedPlan(plan);
+    }
+  }, [searchParams]);
+
+  const handleSelectPlan = (plan: CheckoutPlanKey) => {
+    setSelectedPlan(plan);
+    setSearchParams({ plan });
+    setQrLoaded(false);
+  };
 
   // Run countdown timer
   useEffect(() => {
@@ -66,25 +87,22 @@ export const CheckoutPage: React.FC = () => {
     };
   }, []);
 
-  // Format MM:SS
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  // Reset QR and timer
   const handleResetTimer = () => {
     const userSlug = currentUser?.name
       ? currentUser.name.trim().split(/\s+/).pop()?.toUpperCase() || 'MEMBER'
       : 'MEMBER';
     const rand = Math.floor(1000 + Math.random() * 9000);
-    setTransferCode(`PRO_${userSlug}_${rand}`);
+    setTransferCode(`PLUS_${userSlug}_${rand}`);
     setTimeLeft(900);
     setQrLoaded(false);
   };
 
-  // Copy helper
   const handleCopy = (text: string, fieldName: string) => {
     if (navigator?.clipboard?.writeText) {
       navigator.clipboard.writeText(text);
@@ -95,7 +113,61 @@ export const CheckoutPage: React.FC = () => {
     }, 2000);
   };
 
-  // Instant simulation of VietQR bank transfer (Demo testing button)
+  const planConfig = useMemo(() => {
+    switch (selectedPlan) {
+      case 'monthly':
+        return {
+          name: 'Gói Hội Viên Di Sản Plus (1 Tháng)',
+          cycle: 'Chu kỳ thanh toán: 1 Tháng',
+          listPrice: '69.000 VNĐ',
+          discount: '-20.000 VNĐ',
+          total: '49.000 VNĐ',
+          amount: 49000,
+          periodText: 'mỗi tháng',
+        };
+      case 'quarterly':
+        return {
+          name: 'Gói Hội Viên Di Sản Plus (3 Tháng)',
+          cycle: 'Chu kỳ thanh toán: 3 Tháng (Quý)',
+          listPrice: '147.000 VNĐ',
+          discount: '-18.000 VNĐ (Giảm 12%)',
+          total: '129.000 VNĐ',
+          amount: 129000,
+          periodText: '3 tháng',
+        };
+      case 'yearly':
+        return {
+          name: 'Gói Hội Viên Di Sản Plus (1 Năm)',
+          cycle: 'Chu kỳ thanh toán: 1 Năm (≈ 41.583đ/tháng)',
+          listPrice: '588.000 VNĐ',
+          discount: '-89.000 VNĐ (Tiết kiệm 15%)',
+          total: '499.000 VNĐ',
+          amount: 499000,
+          periodText: '1 năm',
+        };
+      case 'student':
+        return {
+          name: 'Gói Hội Viên Di Sản Plus (Sinh Viên - Tháng)',
+          cycle: 'Chu kỳ thanh toán: 1 Tháng (Trợ giá sinh viên)',
+          listPrice: '49.000 VNĐ',
+          discount: '-20.000 VNĐ (Trợ giá 40%)',
+          total: '29.000 VNĐ',
+          amount: 29000,
+          periodText: 'mỗi tháng',
+        };
+      case 'student_yearly':
+        return {
+          name: 'Gói Hội Viên Di Sản Plus (Sinh Viên - 1 Năm)',
+          cycle: 'Chu kỳ thanh toán: 1 Năm (≈ 29.166đ/tháng)',
+          listPrice: '588.000 VNĐ',
+          discount: '-238.000 VNĐ (Tiết kiệm nhất cho SV)',
+          total: '350.000 VNĐ',
+          amount: 350000,
+          periodText: '1 năm',
+        };
+    }
+  }, [selectedPlan]);
+
   const handleSimulateInstantTransfer = () => {
     setIsProcessing(true);
     setProcessingMessage(t('checkout.gateway.connecting_webhook'));
@@ -105,7 +177,6 @@ export const CheckoutPage: React.FC = () => {
     }, 500);
 
     setTimeout(() => {
-      // Instant transition to Pro status upon payment confirmation; lifts the 3 turns/day AI rate limit immediately
       setIsProUser(true);
       setIsProcessing(false);
       setProcessingMessage('');
@@ -113,7 +184,6 @@ export const CheckoutPage: React.FC = () => {
     }, 1100);
   };
 
-  // Standard manual confirmation
   const handleConfirmPayment = () => {
     setIsProcessing(true);
     setProcessingMessage(t('checkout.gateway.verifying_system'));
@@ -125,10 +195,12 @@ export const CheckoutPage: React.FC = () => {
     }, 800);
   };
 
-  // VietQR Quick Link MB Bank
-  const vietQrUrl = `https://img.vietqr.io/image/MB-0388912345-compact2.png?amount=39000&addInfo=${encodeURIComponent(
+  // VietQR URL with selected amount
+  const vietQrUrl = `https://img.vietqr.io/image/MB-0388912345-compact2.png?amount=${planConfig.amount}&addInfo=${encodeURIComponent(
     transferCode
   )}&accountName=CONG%20TY%20CO%20PHAN%20VIECULTURES`;
+
+  const isStudentPlan = selectedPlan === 'student' || selectedPlan === 'student_yearly';
 
   return (
     <div className="w-full text-ink-soft dark:text-warm-ivory font-sans">
@@ -147,8 +219,7 @@ export const CheckoutPage: React.FC = () => {
 
         {/* Page Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-heritage-forest text-antique-gold text-xs font-bold uppercase tracking-wider border border-antique-gold">
-            <Crown className="w-3.5 h-3.5 fill-current" />
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-heritage-forest text-antique-gold text-xs font-bold uppercase tracking-wider border border-antique-gold">
             <span>{t('checkout.badge')}</span>
           </div>
           <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-heritage-green dark:text-warm-ivory">
@@ -159,6 +230,67 @@ export const CheckoutPage: React.FC = () => {
           </p>
         </div>
 
+        {/* Plan Switcher Pills */}
+        {!paymentSuccess && (
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleSelectPlan('monthly')}
+              className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                selectedPlan === 'monthly'
+                  ? 'bg-heritage-green text-white shadow-md'
+                  : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-300'
+              }`}
+            >
+              {t('checkout.plan_tabs.monthly')}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectPlan('quarterly')}
+              className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                selectedPlan === 'quarterly'
+                  ? 'bg-heritage-green text-white shadow-md'
+                  : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-300'
+              }`}
+            >
+              {t('checkout.plan_tabs.quarterly')}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectPlan('yearly')}
+              className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                selectedPlan === 'yearly'
+                  ? 'bg-[#9E2A2B] text-white shadow-md ring-2 ring-antique-gold'
+                  : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-300'
+              }`}
+            >
+              <span>{t('checkout.plan_tabs.yearly')}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectPlan('student')}
+              className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                selectedPlan === 'student'
+                  ? 'bg-blue-700 text-white shadow-md'
+                  : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-300'
+              }`}
+            >
+              <span>{t('checkout.plan_tabs.student')}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectPlan('student_yearly')}
+              className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                selectedPlan === 'student_yearly'
+                  ? 'bg-blue-800 text-white shadow-md'
+                  : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-300'
+              }`}
+            >
+              <span>{t('checkout.plan_tabs.student_yearly')}</span>
+            </button>
+          </div>
+        )}
+
         {paymentSuccess ? (
           /* Payment Success Confirmation View */
           <div className="max-w-2xl mx-auto bg-heritage-forest text-warm-ivory border-4 border-antique-gold rounded-3xl p-8 sm:p-12 text-center shadow-2xl space-y-6 animate-in zoom-in-95 duration-500">
@@ -168,7 +300,7 @@ export const CheckoutPage: React.FC = () => {
 
             <div className="space-y-3">
               <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold uppercase tracking-widest">
-                <CheckCircle2 className="w-4 h-4" />
+                <Check className="w-4 h-4" aria-hidden="true" />
                 <span>{t('checkout.success.badge')}</span>
               </div>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">
@@ -208,26 +340,23 @@ export const CheckoutPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate(PATHS.reader)}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-serif font-bold text-xs sm:text-sm shadow-xl border border-antique-gold transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-105"
+                className="w-full sm:w-auto min-h-[44px] px-8 py-3.5 rounded-full bg-[#9E2A2B] hover:bg-[#852223] text-white font-bold text-xs sm:text-sm shadow-xl border border-antique-gold transition-colors flex items-center justify-center cursor-pointer"
               >
-                <BookOpen className="w-4 h-4 text-antique-gold" />
                 <span>{t('checkout.success.cta_reader')}</span>
-                <ArrowRight className="w-4 h-4 text-antique-gold" />
               </button>
 
               <button
                 type="button"
                 onClick={() => navigate(PATHS.discovery)}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-heritage-green/60 hover:bg-heritage-green text-antique-gold border border-antique-gold/40 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto min-h-[44px] px-6 py-3.5 rounded-full bg-heritage-green/60 hover:bg-heritage-green text-antique-gold border border-antique-gold/40 text-xs font-bold transition-colors flex items-center justify-center cursor-pointer"
               >
-                <MapPin className="w-4 h-4" />
                 <span>{t('checkout.success.cta_discovery')}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => navigate(PATHS.home)}
-                className="w-full sm:w-auto px-5 py-3.5 rounded-full border border-white/20 text-stone-300 hover:text-white hover:bg-white/5 text-xs font-bold transition-all cursor-pointer"
+                className="w-full sm:w-auto min-h-[44px] px-5 py-3.5 rounded-full border border-white/20 text-stone-300 hover:text-white hover:bg-white/5 text-xs font-bold transition-colors cursor-pointer"
               >
                 {t('checkout.success.cta_home')}
               </button>
@@ -242,31 +371,49 @@ export const CheckoutPage: React.FC = () => {
                 <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
                   {t('checkout.order_summary.title')}
                 </span>
-                <h3 className="font-serif text-xl font-bold text-heritage-green dark:text-warm-ivory flex items-center gap-2">
-                  <span>{t('checkout.order_summary.plan_name')}</span>
-                  <Crown className="w-4 h-4 text-antique-gold fill-current" />
+                <h3 className="font-serif text-xl font-bold text-heritage-green dark:text-warm-ivory">
+                  {planConfig.name}
                 </h3>
                 <p className="text-xs text-stone-600 dark:text-stone-300">
-                  {t('checkout.order_summary.billing_cycle')}
+                  {planConfig.cycle}
                 </p>
               </div>
+
+              {/* Student Notice Box if Student Plan */}
+              {isStudentPlan && (
+                <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 space-y-2">
+                  <div className="text-blue-700 dark:text-blue-300 font-bold text-xs">
+                    <span>Xác thực email sinh viên</span>
+                  </div>
+                  <p className="text-[11px] text-blue-800 dark:text-blue-200">
+                    {t('checkout.student_edu_notice')}
+                  </p>
+                  <input
+                    type="email"
+                    value={studentEmail}
+                    onChange={(e) => setStudentEmail(e.target.value)}
+                    placeholder={t('checkout.student_email_placeholder')}
+                    className="w-full px-3 py-1.5 rounded-xl border border-blue-300 dark:border-blue-700 bg-white dark:bg-[#111A18] text-xs text-stone-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+              )}
 
               {/* Price Details */}
               <div className="space-y-2 py-2">
                 <div className="flex justify-between text-xs text-stone-600 dark:text-stone-300">
                   <span>{t('checkout.order_summary.list_price_label')}</span>
-                  <span className="line-through">{t('checkout.order_summary.list_price')}</span>
+                  <span className="line-through">{planConfig.listPrice}</span>
                 </div>
                 <div className="flex justify-between text-xs text-emerald-600 font-bold">
                   <span>{t('checkout.order_summary.discount_label')}</span>
-                  <span>{t('checkout.order_summary.discount_val')}</span>
+                  <span>{planConfig.discount}</span>
                 </div>
                 <div className="flex justify-between items-baseline pt-2 border-t border-stone-200 dark:border-white/10">
                   <span className="font-serif font-bold text-sm text-heritage-green dark:text-white">
                     {t('checkout.order_summary.total_label')}
                   </span>
                   <span className="font-serif text-2xl font-black text-[#9E2A2B] dark:text-antique-gold">
-                    {t('checkout.order_summary.total_val')}
+                    {planConfig.total}
                   </span>
                 </div>
               </div>
@@ -278,23 +425,27 @@ export const CheckoutPage: React.FC = () => {
                 </span>
                 <ul className="text-xs space-y-2.5 text-stone-700 dark:text-stone-300">
                   <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>{t('checkout.order_summary.perks.ai_unlimited')}</span>
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+                    <span>{t('checkout.order_summary.perks.level3_reading')}</span>
                   </li>
                   <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>{t('checkout.order_summary.perks.mascot_feedback')}</span>
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+                    <span>{t('checkout.order_summary.perks.unlimited_audio')}</span>
                   </li>
                   <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>{t('checkout.order_summary.perks.all_provinces')}</span>
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+                    <span>{t('checkout.order_summary.perks.srs_and_games')}</span>
                   </li>
                   <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>{t('checkout.order_summary.perks.all_speeds')}</span>
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+                    <span>{t('checkout.order_summary.perks.ai_expanded')}</span>
                   </li>
                   <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+                    <span>{t('checkout.order_summary.perks.progress_analytics')}</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
                     <span>{t('checkout.order_summary.perks.no_ads')}</span>
                   </li>
                 </ul>
@@ -306,7 +457,7 @@ export const CheckoutPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Payment Gateway / VietQR Mock Presentation */}
+            {/* Right Column: Payment Gateway / VietQR Presentation */}
             <div className="lg:col-span-7 bg-heritage-forest text-warm-ivory border-4 border-antique-gold rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="space-y-1">
@@ -445,10 +596,10 @@ export const CheckoutPage: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-stone-500">{t('checkout.gateway.account_details.amount_label')}</span>
                     <div className="flex items-center gap-1.5">
-                      <strong className="text-[#9E2A2B] font-bold text-sm">{t('checkout.gateway.account_details.amount_val')}</strong>
+                      <strong className="text-[#9E2A2B] font-bold text-sm">{planConfig.total}</strong>
                       <button
                         type="button"
-                        onClick={() => handleCopy('39000', 'amount')}
+                        onClick={() => handleCopy(String(planConfig.amount), 'amount')}
                         className="p-1 rounded hover:bg-stone-200 text-stone-500 cursor-pointer transition-colors"
                         title={t('checkout.gateway.account_details.copy_amount')}
                       >
@@ -497,9 +648,8 @@ export const CheckoutPage: React.FC = () => {
                     type="button"
                     onClick={handleSimulateInstantTransfer}
                     disabled={isProcessing}
-                    className="w-full py-4 rounded-full bg-[#9E2A2B] hover:bg-[#822122] text-white font-serif font-bold text-xs sm:text-sm shadow-xl border-2 border-antique-gold transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-[1.01] disabled:opacity-50"
+                    className="w-full min-h-[44px] py-4 rounded-full bg-[#9E2A2B] hover:bg-[#822122] text-white font-bold text-xs sm:text-sm shadow-xl border-2 border-antique-gold transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50"
                   >
-                    <Zap className="w-4 h-4 text-antique-gold fill-current" />
                     <span>{t('checkout.gateway.simulate_btn')}</span>
                   </button>
 
@@ -508,9 +658,9 @@ export const CheckoutPage: React.FC = () => {
                     type="button"
                     onClick={handleConfirmPayment}
                     disabled={isProcessing}
-                    className="w-full py-3 rounded-full bg-heritage-green hover:bg-heritage-dark text-white font-serif font-bold text-xs shadow-md border border-antique-gold/50 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full min-h-[44px] py-3 rounded-full bg-heritage-green hover:bg-heritage-dark text-white font-bold text-xs shadow-md border border-antique-gold/50 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-antique-gold" />
+                    <Check className="w-4 h-4 text-antique-gold" aria-hidden="true" />
                     <span>{t('checkout.gateway.confirm_btn')}</span>
                   </button>
                 </div>

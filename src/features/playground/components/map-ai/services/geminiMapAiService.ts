@@ -102,17 +102,17 @@ function generateLocalFallbackResponse(query: string, currentProvinceId?: string
   if (normQuery.includes('an') || normQuery.includes('am thuc') || normQuery.includes('dac san') || normQuery.includes('food')) {
     text = `**Khám phá Ẩm thực trứ danh tại ${province.name}**\n\n${province.name} mang nét đặc trưng ẩm thực độc đáo của vùng đất ${detail.regionName}:\n\n` +
       detail.specialties.map((s) => `* **${s}**`).join('\n') +
-      `\n\n💡 *Từ vựng di sản tiếng Anh:* **Local Specialty** (\`/ˈləʊ.kəl ˈspeʃ.əl.ti/\` - Đặc sản địa phương) & **Culinary Heritage** (\`/ˈkʌl.ɪ.nər.i ˈher.ɪ.tɪdʒ/\`).`;
+      `\n\n*Từ vựng di sản tiếng Anh:* **Local Specialty** (\`/ˈləʊ.kəl ˈspeʃ.əl.ti/\` - Đặc sản địa phương) & **Culinary Heritage** (\`/ˈkʌl.ɪ.nər.i ˈher.ɪ.tɪdʒ/\`).`;
   } else if (normQuery.includes('lo trinh') || normQuery.includes('tour') || normQuery.includes('itinerary') || normQuery.includes('ngay')) {
-    text = `🗺️ **Gợi ý Hành trình Khám phá Di sản tại ${province.name}**\n\n` +
+    text = `**Gợi ý Hành trình Khám phá Di sản tại ${province.name}**\n\n` +
       detail.itinerary.map((it) => `* **${it}**`).join('\n') +
-      `\n\n📌 *Lời khuyên hành trình:* ${detail.travelTips}`;
+      `\n\n*Lời khuyên hành trình:* ${detail.travelTips}`;
   } else if (normQuery.includes('tieng anh') || normQuery.includes('english') || normQuery.includes('vocab')) {
-    text = `📖 **Bộ Từ Vựng Tiếng Anh Di Sản về ${province.name}**\n\n` +
+    text = `**Bộ Từ Vựng Tiếng Anh Di Sản về ${province.name}**\n\n` +
       detail.englishVocab.map((v) => `* **${v.word}** \`${v.ipa}\`: *${v.meaning}*`).join('\n') +
       `\n\n*Hãy thử áp dụng những từ vựng học thuật này vào bài viết hoặc phần thi thuyết trình về văn hóa Việt Nam nhé!*`;
   } else {
-    text = `🏛️ **Giới thiệu Văn hóa & Di sản tại ${province.name}**\n\n` +
+    text = `**Giới thiệu Văn hóa & Di sản tại ${province.name}**\n\n` +
       `${detail.summary}\n\n` +
       `**Điểm đến tiêu biểu:**\n` +
       detail.landmarks.slice(0, 4).map((l) => `* ${l}`).join('\n') +

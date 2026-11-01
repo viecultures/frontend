@@ -58,7 +58,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       {showText && (
         <div className="flex items-center gap-2">
           <span
-            className={`font-serif font-bold tracking-tight ${textSizeClasses} ${mainTextColor} transition-colors ${
+            className={`font-sans font-bold tracking-tight ${textSizeClasses} ${mainTextColor} transition-colors ${
               onClick ? 'group-hover:text-antique-gold' : ''
             }`}
           >

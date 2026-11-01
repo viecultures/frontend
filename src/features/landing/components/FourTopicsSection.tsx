@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight } from 'react-bootstrap-icons';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PATHS } from '@/routes/paths';
 

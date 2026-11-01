@@ -1,3 +1,4 @@
+import { Modal } from '@/components/ui/modal';
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -16,16 +17,6 @@ import { useGamification } from '@/context/GamificationContext';
 export const RewardCelebrationModal: React.FC = () => {
   const { activeCelebration, dismissCelebration } = useGamification();
 
-  // Dismiss on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && activeCelebration) {
-        dismissCelebration();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeCelebration, dismissCelebration]);
 
   if (!activeCelebration) return null;
 
@@ -42,26 +33,14 @@ export const RewardCelebrationModal: React.FC = () => {
   } = activeCelebration;
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={dismissCelebration}
-          className="fixed inset-0 bg-black/75 backdrop-blur-md"
-          aria-hidden="true"
-        />
-
-        {/* Modal Container */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.88, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 15 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 320 }}
-          className="relative w-full max-w-md bg-heritage-dark border-2 border-antique-gold/70 rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] text-warm-ivory z-10 overflow-hidden text-center space-y-6"
-        >
+    <Modal
+      isOpen={Boolean(activeCelebration)}
+      onClose={dismissCelebration}
+      title={title}
+      hideHeader
+      className="max-w-md w-full bg-heritage-dark border-2 border-antique-gold/70 rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] text-warm-ivory text-center space-y-6 overflow-hidden"
+      backdropClassName="bg-black/80 backdrop-blur-md"
+    >
           {/* Subtle Ambient Radial Glow */}
           <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-antique-gold/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -209,9 +188,7 @@ export const RewardCelebrationModal: React.FC = () => {
             <CheckCircle2 className="w-4 h-4" />
             <span>Tuyệt Vời! Tiếp Tục Học</span>
           </button>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+    </Modal>
   );
 };
 

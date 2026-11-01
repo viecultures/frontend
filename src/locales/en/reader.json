@@ -112,7 +112,10 @@
     "audio_error": "Could not play dictionary audio.",
     "sensitive_language": "Sensitive language",
     "vietnamese_meaning": "Vietnamese meaning:",
-    "english_definition": "English Definition:",
+    "english_definition": "English definition:",
+    "no_english_definition": "English definition is not available yet.",
+    "show_vietnamese": "Show Vietnamese",
+    "hide_vietnamese": "Hide Vietnamese",
     "article_context": "Article context:",
     "sensitive_unavailable": "Saving sensitive language is unavailable",
     "saved_to_vocab": "Saved to vocabulary",
@@ -317,7 +320,7 @@
     "companion_desc": "Open the cultural companion in the bottom-right corner to explore more. Upgrade to Pro for more conversations.",
     "btn_view_passport": "View heritage passport",
     "btn_next_lesson": "Next lesson: {{title}}",
-    "btn_upgrade_pro": "Upgrade to Pro (VND 39,000)",
+    "btn_upgrade_pro": "Upgrade to Plus (VND 49,000)",
     "btn_close_return": "Close & return to reading"
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Book, Compass, Layers, ChatDots } from 'react-bootstrap-icons';
+import { ArrowRight, Book, Compass, Layers, MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PATHS, paths } from '@/routes/paths';
 
@@ -28,7 +28,7 @@ const STEPS_CONFIG: StepItemConfig[] = [
   },
   {
     key: 'step4',
-    icon: ChatDots,
+    icon: MessageSquare,
     view: PATHS.playground,
     optional: true,
   },

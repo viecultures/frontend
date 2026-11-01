@@ -48,7 +48,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
   isMuted = false,
   onToggleMute,
   selectedVoiceName = "Puck",
-  selectedVoiceFlag = "🇺🇸",
+  selectedVoiceFlag,
   audioScope = "full",
   onOpenVoiceCustomizer,
   onStartShadowing,
@@ -164,7 +164,7 @@ export const AudioShadowingBar: React.FC<AudioShadowingBarProps> = ({
                 }`}
                 title={t('audio_bar.choose_voice_title', 'Choose reading voice')}
               >
-                <span>{selectedVoiceFlag}</span>
+                <Volume2 className="w-3 h-3 opacity-80" />
                 <span>{t('audio_bar.voice_label', { name: selectedVoiceName, defaultValue: `Voice: ${selectedVoiceName}` })}</span>
                 <SlidersHorizontal className="w-2.5 h-2.5 opacity-70 group-hover:opacity-100" />
               </button>
