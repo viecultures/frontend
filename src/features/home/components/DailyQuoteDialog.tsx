@@ -59,7 +59,7 @@ const VOCAB_MEANINGS: Record<string, { ipa: string; pos: string; vi: string }> =
 export function DailyQuoteDialog({
   isOpen,
   onClose,
-  imageUrl = '/images/calendar/heritage-saigon.webp',
+  imageUrl = '/images/calendar/heritage-hagiang-a4.jpg',
   quoteVi = 'Không có gì quý hơn độc lập, tự do.',
   author = 'Hồ Chí Minh',
   authorIntro = 'Vietnamese revolutionary leader',

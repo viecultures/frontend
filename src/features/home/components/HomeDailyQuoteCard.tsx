@@ -11,7 +11,7 @@ interface HomeDailyQuoteCardProps {
 }
 
 export function HomeDailyQuoteCard({
-  imageUrl = '/images/calendar/heritage-saigon.webp',
+  imageUrl = '/images/calendar/heritage-hagiang-a4.jpg',
   quoteVi = 'Không có gì quý hơn độc lập, tự do.',
   author = 'Hồ Chí Minh',
   creator = 'VieCultures Daily',

@@ -539,17 +539,18 @@
 }
 
 .home-daily-image-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: 270px;
-  margin: 0 auto;
-  padding: 7px;
-  background: var(--color-home-peach-pill-bg);
-  border: 1px solid var(--color-home-peach-border);
-  border-radius: 11px;
+  margin: auto 0;
+  padding: 0;
+  background: none;
+  border: 0;
   cursor: pointer;
   line-height: 0;
   transition: transform 0.18s ease;
+  box-sizing: border-box;
 }
 
 .home-daily-image-btn:hover {
@@ -557,10 +558,15 @@
 }
 
 .home-daily-image-container {
-  width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 260px;
+  max-height: 265px;
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: 220 / 260;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--color-home-peach-border);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-heritage-forest) 12%, transparent);
   background: color-mix(in srgb, var(--color-home-peach-pill-bg) 60%, var(--color-home-peach-border));
 }
 
@@ -568,6 +574,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   display: block;
 }
 
@@ -933,7 +940,7 @@
 
 .home-heritage-art-frame {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 724 / 1024;
   background: var(--color-surface-muted);
   border: 1px solid var(--color-line);
   border-radius: 12px;
@@ -1395,7 +1402,7 @@
   }
 
   .home-daily-image-btn {
-    max-width: 290px;
+    max-width: 100%;
   }
 }
 
@@ -1545,7 +1552,8 @@
   }
 
   .home-daily-image-btn {
-    max-width: 260px;
+    max-width: 100%;
+    margin: 12px auto;
   }
 
   /* 5. Suggested Stories */
