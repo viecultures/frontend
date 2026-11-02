@@ -1,7 +1,8 @@
 import React from 'react';
 import { ArrowRight, Book, Compass, Layers, MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { PATHS, paths } from '@/routes/paths';
+import { PATHS } from '@/routes/paths';
+import { firstCuisineChapterPath } from '../lib/cuisineStories';
 
 interface StepItemConfig {
   key: 'step1' | 'step2' | 'step3' | 'step4';
@@ -14,12 +15,12 @@ const STEPS_CONFIG: StepItemConfig[] = [
   {
     key: 'step1',
     icon: Compass,
-    view: PATHS.discovery,
+    view: firstCuisineChapterPath,
   },
   {
     key: 'step2',
     icon: Book,
-    view: paths.reader({ story: 'imperial-hue' }),
+    view: firstCuisineChapterPath,
   },
   {
     key: 'step3',

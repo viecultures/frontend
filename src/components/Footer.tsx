@@ -1,173 +1,70 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { BrandLogo } from './BrandLogo';
-import { PATHS } from '@/routes/paths';
-import { useAppNavigate } from '@/routes/useAppNavigate';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
+import { getPublishedSeries } from '@/data/series';
+import { PATHS, paths } from '@/routes/paths';
+
+const foodSeries = getPublishedSeries()
+  .filter((series) => series.theme === 'cuisine' && series.chapters.length > 0);
+const storyLibraryPath = PATHS.discovery;
+
+const footerLinkClass =
+  'inline-flex min-h-11 items-center gap-2 py-2 text-sm leading-snug text-warm-ivory/85 transition-colors hover:text-antique-bright focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-antique-bright';
 
 export const Footer: React.FC = () => {
-  const { t } = useTranslation('common');
-  const handleNav = useAppNavigate();
-
-  const handleScrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
+  const { t, i18n } = useTranslation('common');
+  const isVietnamese = i18n.resolvedLanguage?.startsWith('vi') ?? i18n.language.startsWith('vi');
   return (
-    <footer className="w-full bg-heritage-dark text-warm-ivory border-t border-antique-gold/30 pt-16 pb-12 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
-          {/* Brand & Description */}
-          <div className="lg:col-span-2 space-y-4">
-            <BrandLogo size="md" theme="dark" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
-            <p className="text-xs sm:text-sm text-warm-ivory/80 leading-relaxed max-w-sm font-normal">
-              {t('footer.tagline', 'Learn English through the stories, places and traditions of Vietnam.')}
+    <footer className="w-full border-t border-antique-gold/25 bg-heritage-dark font-sans text-warm-ivory">
+      <div className="mx-auto max-w-7xl px-5 pb-8 sm:px-8 lg:px-10">
+        <div className="grid gap-10 py-11 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr] lg:gap-14 lg:py-14">
+          <div className="max-w-sm sm:col-span-2 lg:col-span-1">
+            <Link
+              to={PATHS.landing}
+              aria-label={t('footer.brand_home')}
+              className="inline-flex min-h-11 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-antique-bright"
+            >
+              <BrandLogo size="md" theme="dark" />
+            </Link>
+            <p className="mt-5 text-sm leading-relaxed text-warm-ivory/80">
+              {t('footer.tagline')}
             </p>
           </div>
 
-          {/* Col 1: Navigation */}
-          <div className="space-y-3">
-            <h4 className="font-sans text-sm font-bold uppercase tracking-wider text-antique-gold">
-              {t('footer.navigation_title', 'Navigation')}
-            </h4>
-            <ul className="space-y-2 text-xs text-warm-ivory/80 font-medium">
+          <nav aria-label={t('footer.food_title')}>
+            <h3 className="mb-3 text-sm font-bold text-antique-bright">{t('footer.food_title')}</h3>
+            <ul className="space-y-0.5">
+              {foodSeries.slice(0, 3).map((series) => (
+                <li key={series.id}>
+                  <Link to={paths.reader({ story: series.chapters[0].id })} className={footerLinkClass}>
+                    {isVietnamese ? series.titleVi : series.title}
+                  </Link>
+                </li>
+              ))}
               <li>
-                <button
-                  type="button"
-                  onClick={() => handleNav(PATHS.home)}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.home', 'Home')}
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleNav(PATHS.discovery)}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.discover_stories', 'Discover stories')}
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleNav(PATHS.reader)}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.read', 'Read')}
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleNav(PATHS.dictionary)}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.vocabulary', 'Vocabulary')}
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleNav(PATHS.community)}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.community', 'Community')}
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleNav(PATHS.playground)}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.practice', 'Practice')}
-                </button>
+                <Link to={storyLibraryPath} className={footerLinkClass}>
+                  {t('footer.all_stories')}
+                  <ArrowRight size={16} aria-hidden="true" />
+                </Link>
               </li>
             </ul>
-          </div>
+          </nav>
 
-          {/* Col 2: Topics */}
-          <div className="space-y-3">
-            <h4 className="font-sans text-sm font-bold uppercase tracking-wider text-antique-gold">
-              {t('footer.topics_title', 'Topics')}
-            </h4>
-            <ul className="space-y-2 text-xs text-warm-ivory/80 font-medium">
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleScrollTo('topics')}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.history_heritage', 'History & Heritage')}
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleScrollTo('topics')}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.cuisine_coffee', 'Cuisine & Coffee')}
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleScrollTo('topics')}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.arts_craft', 'Arts & Craft Villages')}
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleScrollTo('topics')}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.festivals_beliefs', 'Festivals & Beliefs')}
-                </button>
-              </li>
+          <nav aria-label={t('footer.learning_title')}>
+            <h3 className="mb-3 text-sm font-bold text-antique-bright">{t('footer.learning_title')}</h3>
+            <ul className="space-y-0.5">
+              <li><Link to={storyLibraryPath} className={footerLinkClass}>{t('footer.reading_library')}</Link></li>
+              <li><Link to={PATHS.dictionary} className={footerLinkClass}>{t('footer.vocabulary')}</Link></li>
+              <li><Link to={PATHS.playground} className={footerLinkClass}>{t('footer.practice')}</Link></li>
             </ul>
-          </div>
-
-          {/* Col 3: Contact & Legal */}
-          <div className="space-y-3">
-            <h4 className="font-sans text-sm font-bold uppercase tracking-wider text-antique-gold">
-              {t('footer.contact_legal_title', 'Contact & Legal')}
-            </h4>
-            <ul className="space-y-2 text-xs text-warm-ivory/80 font-medium">
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleScrollTo('contact')}
-                  className="hover:text-antique-bright transition-colors cursor-pointer"
-                >
-                  {t('footer.contact_support', 'Contact Support')}
-                </button>
-              </li>
-              <li>
-                <span>
-                  {t('footer.privacy', 'Privacy Policy')}
-                </span>
-              </li>
-              <li>
-                <span>
-                  {t('footer.terms', 'Terms of Service')}
-                </span>
-              </li>
-            </ul>
-          </div>
+          </nav>
         </div>
 
-        {/* Bottom copyright row */}
-        <div className="pt-8 border-t border-antique-gold/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-warm-ivory/60 font-medium">
-          <p>{t('footer.copyright', '© 2026 VieCultures • VN Culture Reader. All rights reserved.')}</p>
-          <p>{t('footer.slogan', 'Engrave words, Preserve cultures.')}</p>
+        <div className="flex flex-col gap-2 border-t border-warm-ivory/20 pt-6 text-xs text-warm-ivory/70 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} VieCultures. {t('footer.rights_reserved')}</p>
+          <p>{t('footer.slogan')}</p>
         </div>
       </div>
     </footer>

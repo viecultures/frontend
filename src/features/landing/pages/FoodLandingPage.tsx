@@ -6,7 +6,7 @@ import { BrandLogo } from '@/components/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { getPublishedSeries } from '@/data/series';
 import type { SeriesMetadata } from '@/data/series/types';
-import { PATHS, paths, withQuery } from '@/routes/paths';
+import { PATHS, paths } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import '../food-landing.css';
 
@@ -142,7 +142,7 @@ const FoodLandingPage: React.FC = () => {
             <div className="food-series-grid">
               {otherSeries.map((series, index) => <Reveal key={series.id} enabled={canAnimate} delay={(index % 3) * 0.12} className="food-series-card"><button type="button" onClick={() => openStory(series)} aria-label={`Read ${series.titleVi}`}><span className="food-series-image"><img src={series.imageUrl} alt="" width="1024" height="576" loading="lazy" /><span className="food-series-arrow"><ArrowRight size={20} aria-hidden="true" /></span></span><span className="food-card-kicker">{series.chapters.length} CHAPTERS · {series.region === 'north' ? 'NORTHERN VIETNAM' : 'SOUTHERN VIETNAM'}</span><strong>{series.titleVi}</strong><small>{series.title}</small></button></Reveal>)}
             </div>
-            <Reveal enabled={canAnimate} className="food-more-stories"><p>Curious beyond food? The full collection has stories across Vietnamese culture.</p><Link to={withQuery(PATHS.discovery, { view: 'stories' })} className="food-text-link">Explore all stories <ArrowRight size={18} aria-hidden="true" /></Link></Reveal>
+            <Reveal enabled={canAnimate} className="food-more-stories"><p>Curious beyond food? The full collection has stories across Vietnamese culture.</p><Link to={PATHS.discovery} className="food-text-link">Explore all stories <ArrowRight size={18} aria-hidden="true" /></Link></Reveal>
           </div>
         </section>
 

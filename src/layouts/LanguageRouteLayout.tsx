@@ -11,19 +11,13 @@ export const LanguageRouteLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // If lang parameter is not valid ('vi' | 'en'), redirect to /vi + remaining path
-  if (!isValidLanguage(lang)) {
-    let rest = location.pathname;
-    if (lang && rest.startsWith(`/${lang}`)) {
-      rest = rest.slice(lang.length + 1);
-    }
-    const cleanRest = rest.startsWith('/') ? rest : `/${rest}`;
-    const redirectTarget = `/vi${cleanRest === '/' ? '' : cleanRest}${location.search}${location.hash}`;
-    return <Navigate to={redirectTarget} replace />;
-  }
+  const isLangValid = isValidLanguage(lang);
 
-  // When lang is valid, synchronize i18n, document.documentElement.lang, and SEO tags
+  // When lang is valid, synchronize i18n, document.documentElement.lang, and SEO tags.
+  // Must run unconditionally at top-level to satisfy the Rules of Hooks.
   useEffect(() => {
+    if (!isLangValid || !lang) return;
+
     try {
       if (i18n.language !== lang) {
         i18n.changeLanguage(lang).catch((error: unknown) => {
@@ -76,10 +70,27 @@ export const LanguageRouteLayout: React.FC = () => {
     } catch (error) {
       console.error('[LanguageRouteLayout] Failed to sync SEO hreflang tags:', error);
     }
-  }, [lang, location.pathname, location.search, navigate]);
+  }, [isLangValid, lang, location.pathname, location.search, navigate]);
+
+  // If lang parameter is not valid ('vi' | 'en'), redirect to /vi + proper path
+  if (!isLangValid) {
+    let rest = location.pathname;
+    // Check if the segment resembles an unsupported ISO language code (e.g. /fr, /de, /es)
+    const isIsoLangCode = /^[a-z]{2}(-[a-z]{2,4})?$/i.test(lang || '');
+    if (isIsoLangCode && lang && rest.startsWith(`/${lang}`)) {
+      rest = rest.slice(lang.length + 1);
+      const cleanRest = rest.startsWith('/') ? rest : `/${rest}`;
+      const redirectTarget = `/vi${cleanRest === '/' ? '' : cleanRest}${location.search}${location.hash}`;
+      return <Navigate to={redirectTarget} replace />;
+    }
+
+    // Otherwise, this is an un-prefixed app route (e.g. /home, /login, /reader)
+    const cleanPath = location.pathname.startsWith('/') ? location.pathname : `/${location.pathname}`;
+    const redirectTarget = `/vi${cleanPath}${location.search}${location.hash}`;
+    return <Navigate to={redirectTarget} replace />;
+  }
 
   return <Outlet />;
 };
 
 export default LanguageRouteLayout;
-

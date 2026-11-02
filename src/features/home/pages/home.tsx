@@ -133,31 +133,34 @@ export function HomePage({ isLoggedIn = false, user, onLogout }: HomePageProps) 
 
       {/* Main Home Content Shell */}
       <main className="home-shell" id="main-study-content">
-        {/* 1. Greeting Row with Streak & Today's Goal Chips */}
+        {/* 1. Streamlined Greeting: 1 single welcoming sentence */}
         <HomeGreetingHeader
           userName={userName}
           hasHistory={history.length > 0}
+        />
+
+        {/* 2. Core 2-Column Study Grid: Học gì tiếp + Còn gì cần ôn + Điểm nghỉ thị giác */}
+        <div className="home-quick-start">
+          {/* Left Col Row 1: Continue Reading Hero Card (Học gì tiếp - Nổi bật nhất) */}
+          <HomeContinueReadingCard bookmark={currentBookmark} />
+
+          {/* Left Col Row 2: Streamlined Vocabulary Review Card (Còn gì cần ôn) */}
+          <HomeVocabularySummary />
+
+          {/* Right Col: Daily Quote Card (Điểm nghỉ thị giác - Spans Rows 1 & 2) */}
+          <HomeDailyQuoteCard />
+        </div>
+
+        {/* 3. Unified Progress Cluster: Streak + Hôm nay hoàn thành mấy mục tiêu + Tiến độ tuần 7 ngày */}
+        <HomeWeeklyStrip
+          account={account}
+          calendarData={calendar}
           streakDays={streakDays}
           completedGoals={completedGoals}
           totalGoals={totalGoals}
         />
 
-        {/* 2. Core 2-Column Study Grid */}
-        <div className="home-quick-start">
-          {/* Left Col Row 1: Continue Reading Hero Card */}
-          <HomeContinueReadingCard bookmark={currentBookmark} />
-
-          {/* Left Col Row 2: Your Vocabulary Compact Summary */}
-          <HomeVocabularySummary />
-
-          {/* Right Col: Daily Quote Card (Spans Rows 1 & 2) */}
-          <HomeDailyQuoteCard />
-        </div>
-
-        {/* 3. Full-width Weekly Study Progress Strip */}
-        <HomeWeeklyStrip account={account} calendarData={calendar} />
-
-        {/* 4. Suggested Cultural Stories Section */}
+        {/* 4. Suggested Cultural Stories Section (3 thẻ gợi ý ở cuối trang) */}
         <HomeSuggestedStories currentId={currentBookmark?.id} />
 
         {/* 5. Clean Heritage Footer */}

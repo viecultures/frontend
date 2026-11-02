@@ -238,93 +238,111 @@ export function FlashcardFlipView({
       {/* Match the rating choices to the review session that owns this card. */}
       {isFlipped && (
         <div className="vocab-anki-ratings pt-1 animate-in fade-in slide-in-from-bottom-2 duration-200">
-          {onRate ? <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            {/* 1. Again */}
-            <button
-              type="button"
-              onClick={() => handleRating('again')}
-              className="flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 active:scale-[0.98] transition-all shadow-xs"
-              title={isEn ? ratingIntervals.again.descriptionEn : ratingIntervals.again.descriptionVi}
-            >
-              <span className="text-[11px] font-mono font-bold tracking-tight opacity-90">
-                {isEn ? ratingIntervals.again.intervalTextEn : ratingIntervals.again.intervalTextVi}
-              </span>
-              <div className="flex items-center gap-1.5 mt-0.5 font-bold text-sm">
-                <RotateCcw size={15} />
-                <span>{isEn ? ratingIntervals.again.labelEn : ratingIntervals.again.labelVi}</span>
-                <kbd className="px-1.5 py-0.2 bg-rose-500/20 text-[10px] rounded">1</kbd>
-              </div>
-            </button>
+          {onRate ? (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {/* 1. Again / Quên mất (Cam đất) */}
+                <button
+                  type="button"
+                  onClick={() => handleRating('again')}
+                  className="flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl border border-[#c85a32]/35 bg-[#c85a32]/10 text-[#c85a32] dark:text-[#e07a5f] hover:bg-[#c85a32]/20 focus-visible:ring-2 focus-visible:ring-[#c85a32] active:scale-[0.98] transition-all shadow-xs group"
+                  title={isEn ? ratingIntervals.again.descriptionEn : ratingIntervals.again.descriptionVi}
+                  aria-label={`${isEn ? ratingIntervals.again.labelEn : ratingIntervals.again.labelVi}: ${isEn ? ratingIntervals.again.descriptionEn : ratingIntervals.again.descriptionVi} (${isEn ? ratingIntervals.again.intervalTextEn : ratingIntervals.again.intervalTextVi})`}
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-sm">
+                    <RotateCcw size={14} aria-hidden="true" />
+                    <span>{isEn ? ratingIntervals.again.labelEn : ratingIntervals.again.labelVi}</span>
+                    <kbd className="px-1.5 py-0.2 bg-black/10 dark:bg-white/10 text-[10px] font-mono rounded opacity-60 font-normal">
+                      1
+                    </kbd>
+                  </div>
+                  <span className="text-[11px] font-medium tracking-tight opacity-90 mt-1">
+                    {isEn ? ratingIntervals.again.intervalTextEn : ratingIntervals.again.intervalTextVi}
+                  </span>
+                </button>
 
-            {/* 2. Hard */}
-            <button
-              type="button"
-              onClick={() => handleRating('hard')}
-              className="flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 active:scale-[0.98] transition-all shadow-xs"
-              title={isEn ? ratingIntervals.hard.descriptionEn : ratingIntervals.hard.descriptionVi}
-            >
-              <span className="text-[11px] font-mono font-bold tracking-tight opacity-90">
-                {isEn ? ratingIntervals.hard.intervalTextEn : ratingIntervals.hard.intervalTextVi}
-              </span>
-              <div className="flex items-center gap-1.5 mt-0.5 font-bold text-sm">
-                <HelpCircle size={15} />
-                <span>{isEn ? ratingIntervals.hard.labelEn : ratingIntervals.hard.labelVi}</span>
-                <kbd className="px-1.5 py-0.2 bg-amber-500/20 text-[10px] rounded">2</kbd>
-              </div>
-            </button>
+                {/* 2. Hard / Khó nhớ (Vàng đất) */}
+                <button
+                  type="button"
+                  onClick={() => handleRating('hard')}
+                  className="flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl border border-[#b8860b]/35 bg-[#b8860b]/10 text-[#a06800] dark:text-[#e5b254] hover:bg-[#b8860b]/20 focus-visible:ring-2 focus-visible:ring-[#b8860b] active:scale-[0.98] transition-all shadow-xs group"
+                  title={isEn ? ratingIntervals.hard.descriptionEn : ratingIntervals.hard.descriptionVi}
+                  aria-label={`${isEn ? ratingIntervals.hard.labelEn : ratingIntervals.hard.labelVi}: ${isEn ? ratingIntervals.hard.descriptionEn : ratingIntervals.hard.descriptionVi} (${isEn ? ratingIntervals.hard.intervalTextEn : ratingIntervals.hard.intervalTextVi})`}
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-sm">
+                    <HelpCircle size={14} aria-hidden="true" />
+                    <span>{isEn ? ratingIntervals.hard.labelEn : ratingIntervals.hard.labelVi}</span>
+                    <kbd className="px-1.5 py-0.2 bg-black/10 dark:bg-white/10 text-[10px] font-mono rounded opacity-60 font-normal">
+                      2
+                    </kbd>
+                  </div>
+                  <span className="text-[11px] font-medium tracking-tight opacity-90 mt-1">
+                    {isEn ? ratingIntervals.hard.intervalTextEn : ratingIntervals.hard.intervalTextVi}
+                  </span>
+                </button>
 
-            {/* 3. Good */}
-            <button
-              type="button"
-              onClick={() => handleRating('good')}
-              className="flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold active:scale-[0.98] transition-all shadow-md border border-emerald-500"
-              title={isEn ? ratingIntervals.good.descriptionEn : ratingIntervals.good.descriptionVi}
-            >
-              <span className="text-[11px] font-mono font-bold tracking-tight text-emerald-100">
-                {isEn ? ratingIntervals.good.intervalTextEn : ratingIntervals.good.intervalTextVi}
-              </span>
-              <div className="flex items-center gap-1.5 mt-0.5 font-bold text-sm">
-                <CheckCircle2 size={15} />
-                <span>{isEn ? ratingIntervals.good.labelEn : ratingIntervals.good.labelVi}</span>
-                <kbd className="px-1.5 py-0.2 bg-black/25 text-[10px] rounded text-emerald-100">
-                  3
-                </kbd>
-              </div>
-            </button>
+                {/* 3. Good / Nhớ rồi (Xanh dịu) */}
+                <button
+                  type="button"
+                  onClick={() => handleRating('good')}
+                  className="flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl bg-[#2d7d6f] hover:bg-[#256b5e] text-white font-bold active:scale-[0.98] transition-all shadow-md border border-[#2d7d6f]/70 focus-visible:ring-2 focus-visible:ring-[#2d7d6f] group"
+                  title={isEn ? ratingIntervals.good.descriptionEn : ratingIntervals.good.descriptionVi}
+                  aria-label={`${isEn ? ratingIntervals.good.labelEn : ratingIntervals.good.labelVi}: ${isEn ? ratingIntervals.good.descriptionEn : ratingIntervals.good.descriptionVi} (${isEn ? ratingIntervals.good.intervalTextEn : ratingIntervals.good.intervalTextVi})`}
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-sm">
+                    <CheckCircle2 size={14} aria-hidden="true" />
+                    <span>{isEn ? ratingIntervals.good.labelEn : ratingIntervals.good.labelVi}</span>
+                    <kbd className="px-1.5 py-0.2 bg-black/25 text-white/90 text-[10px] font-mono rounded opacity-70 font-normal">
+                      3
+                    </kbd>
+                  </div>
+                  <span className="text-[11px] font-medium tracking-tight text-emerald-100 mt-1">
+                    {isEn ? ratingIntervals.good.intervalTextEn : ratingIntervals.good.intervalTextVi}
+                  </span>
+                </button>
 
-            {/* 4. Easy */}
-            <button
-              type="button"
-              onClick={() => handleRating('easy')}
-              className="flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold active:scale-[0.98] transition-all shadow-md border border-sky-500"
-              title={isEn ? ratingIntervals.easy.descriptionEn : ratingIntervals.easy.descriptionVi}
-            >
-              <span className="text-[11px] font-mono font-bold tracking-tight text-sky-100">
-                {isEn ? ratingIntervals.easy.intervalTextEn : ratingIntervals.easy.intervalTextVi}
-              </span>
-              <div className="flex items-center gap-1.5 mt-0.5 font-bold text-sm">
-                <Sparkles size={15} />
-                <span>{isEn ? ratingIntervals.easy.labelEn : ratingIntervals.easy.labelVi}</span>
-                <kbd className="px-1.5 py-0.2 bg-black/25 text-[10px] rounded text-sky-100">
-                  4
-                </kbd>
+                {/* 4. Easy / Thuộc làu (Xanh đậm) */}
+                <button
+                  type="button"
+                  onClick={() => handleRating('easy')}
+                  className="flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl bg-heritage-green hover:bg-heritage-forest text-white font-bold active:scale-[0.98] transition-all shadow-md border border-heritage-green/70 focus-visible:ring-2 focus-visible:ring-heritage-green group"
+                  title={isEn ? ratingIntervals.easy.descriptionEn : ratingIntervals.easy.descriptionVi}
+                  aria-label={`${isEn ? ratingIntervals.easy.labelEn : ratingIntervals.easy.labelVi}: ${isEn ? ratingIntervals.easy.descriptionEn : ratingIntervals.easy.descriptionVi} (${isEn ? ratingIntervals.easy.intervalTextEn : ratingIntervals.easy.intervalTextVi})`}
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-sm">
+                    <Sparkles size={14} aria-hidden="true" />
+                    <span>{isEn ? ratingIntervals.easy.labelEn : ratingIntervals.easy.labelVi}</span>
+                    <kbd className="px-1.5 py-0.2 bg-black/25 text-white/90 text-[10px] font-mono rounded opacity-70 font-normal">
+                      4
+                    </kbd>
+                  </div>
+                  <span className="text-[11px] font-medium tracking-tight text-emerald-100 mt-1">
+                    {isEn ? ratingIntervals.easy.intervalTextEn : ratingIntervals.easy.intervalTextVi}
+                  </span>
+                </button>
               </div>
-            </button>
-          </div> : <div className="vocab-review-actions">
-            <button type="button" onClick={onReviewLater}>
-              <RotateCcw size={18} aria-hidden="true" />
-              <span>{t('flip_view.btn_forgot', 'Needs review')}</span>
-              <kbd aria-hidden="true">1</kbd>
-            </button>
-            <button type="button" onClick={onMastered}>
-              <CheckCircle2 size={18} aria-hidden="true" />
-              <span>{t('flip_view.btn_remembered', 'Remembered')}</span>
-              <kbd aria-hidden="true">2</kbd>
-            </button>
-          </div>}
-          <p className="text-center text-xs text-ink-soft mt-3">
-            {onRate ? t('flip_view.space_good_hint', 'Hotkeys: 1 Again · 2 Hard · 3 Good · 4 Easy') : t('flip_view.binary_hint', 'Choose how well you remembered this word.')}
-          </p>
+
+              {/* Responsive Hotkey & Guidance Hint */}
+              <p className="text-center text-xs text-ink-soft mt-3">
+                {isEn
+                  ? 'Hotkeys: 1 Again · 2 Hard · 3 Good · 4 Easy'
+                  : 'Phím tắt: 1 Quên mất · 2 Khó nhớ · 3 Nhớ rồi · 4 Thuộc làu'}
+              </p>
+            </>
+          ) : (
+            <div className="vocab-review-actions">
+              <button type="button" onClick={onReviewLater}>
+                <RotateCcw size={18} aria-hidden="true" />
+                <span>{t('flip_view.btn_forgot', 'Cần ôn lại')}</span>
+                <kbd aria-hidden="true">1</kbd>
+              </button>
+              <button type="button" onClick={onMastered}>
+                <CheckCircle2 size={18} aria-hidden="true" />
+                <span>{t('flip_view.btn_remembered', 'Đã nhớ')}</span>
+                <kbd aria-hidden="true">2</kbd>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

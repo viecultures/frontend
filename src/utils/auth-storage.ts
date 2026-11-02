@@ -22,14 +22,37 @@ const AUTH_USER_KEY = 'vie_current_user';
 const AUTH_TOKEN_KEY = 'vie_auth_token';
 const PRO_STATUS_KEY = 'vie_user_is_pro';
 
-export const getStoredUser = (): AppUser | null => {
+/**
+ * Safely parse JWT payload without external library.
+ */
+export const parseJwt = (token: string): JwtClaims | null => {
   try {
-    const raw = globalThis.sessionStorage?.getItem(AUTH_USER_KEY) || localStorage.getItem(AUTH_USER_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
   } catch {
     return null;
   }
+};
+
+let isClearingExpiredSession = false;
+
+/**
+ * Checks whether a JWT token has expired based on its `exp` claim.
+ */
+export const isTokenExpired = (token: string | null): boolean => {
+  if (!token) return true;
+  const claims = parseJwt(token);
+  if (!claims || typeof claims.exp !== 'number') return false;
+  return claims.exp * 1000 <= Date.now();
 };
 
 const removeAuthStorage = () => {
@@ -66,6 +89,37 @@ export const clearAuthStorage = () => {
   window.dispatchEvent(new CustomEvent('auth:change'));
 };
 
+const handleExpiredTokenCleanup = () => {
+  if (!isClearingExpiredSession) {
+    isClearingExpiredSession = true;
+    try {
+      removeAuthStorage();
+      if (typeof window !== 'undefined') {
+        queueMicrotask(() => {
+          window.dispatchEvent(new CustomEvent('auth:change'));
+        });
+      }
+    } finally {
+      isClearingExpiredSession = false;
+    }
+  }
+};
+
+export const getStoredUser = (): AppUser | null => {
+  try {
+    const rawToken = globalThis.sessionStorage?.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem('token') || localStorage.getItem('jwt');
+    if (rawToken && isTokenExpired(rawToken)) {
+      handleExpiredTokenCleanup();
+      return null;
+    }
+    const raw = globalThis.sessionStorage?.getItem(AUTH_USER_KEY) || localStorage.getItem(AUTH_USER_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
 export const setAuthSession = (user: AppUser, token: string | null, rememberMe: boolean) => {
   removeAuthStorage();
   const storage = rememberMe ? localStorage : sessionStorage;
@@ -87,7 +141,13 @@ export const setStoredUser = (user: AppUser | null) => {
 
 export const getStoredToken = (): string | null => {
   try {
-    return globalThis.sessionStorage?.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem('token') || localStorage.getItem('jwt');
+    const token = globalThis.sessionStorage?.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem('token') || localStorage.getItem('jwt');
+    if (!token) return null;
+    if (isTokenExpired(token)) {
+      handleExpiredTokenCleanup();
+      return null;
+    }
+    return token;
   } catch {
     return null;
   }
@@ -104,27 +164,6 @@ export const setStoredToken = (token: string | null) => {
     sessionStorage.removeItem(AUTH_TOKEN_KEY);
   }
   window.dispatchEvent(new CustomEvent('auth:change'));
-};
-
-/**
- * Safely parse JWT payload without external library.
- */
-export const parseJwt = (token: string): JwtClaims | null => {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
-    const base64Url = parts[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch {
-    return null;
-  }
 };
 
 /**

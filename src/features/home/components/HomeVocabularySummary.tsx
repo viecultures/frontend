@@ -1,58 +1,97 @@
 import { useMemo } from 'react';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, BookMarked, Check, Compass } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PATHS, paths } from '@/routes/paths';
 import { getAllSavedVocabularies, listSavedArticles } from '@/services/learning/learningStorage';
-import { getAllSRSStates } from '@/features/flashcards/services/srsEngine';
+import { getAllSRSStates, type CardSRSState } from '@/features/flashcards/services/srsEngine';
 
 export function HomeVocabularySummary() {
   const { t } = useTranslation('home');
 
   // Compute live data from real application storage
-  const { total, mastered, familiar, learning, dueToday, estimatedMinutes, reviewUrl } = useMemo(() => {
+  const {
+    totalSaved,
+    dueToday,
+    estimatedMinutes,
+    againCount,
+    hardCount,
+    goodCount,
+    easyCount,
+    unreviewedCount,
+    reviewUrl,
+  } = useMemo(() => {
     const savedVocab = getAllSavedVocabularies();
     const srsStates = getAllSRSStates();
-    const decks = listSavedArticles().filter(item => item.count > 0);
+    const decks = listSavedArticles().filter((item) => item.count > 0);
 
     const now = Date.now();
-    let masteredCount = 0;
-    let familiarCount = 0;
-    let learningCount = 0;
     let dueCount = 0;
 
-    // Track processed word keys to avoid double-counting
-    const processedWords = new Set<string>();
+    let again = 0;
+    let hard = 0;
+    let good = 0;
+    let easy = 0;
+    let unreviewed = 0;
 
-    // 1. Process SRS tracked records
-    Object.values(srsStates).forEach((record) => {
-      processedWords.add(record.word.toLowerCase());
-      if (record.status === 'mastered') {
-        masteredCount++;
-      } else if (record.status === 'review') {
-        familiarCount++;
-      } else {
-        // 'learning' or 'new'
-        learningCount++;
-      }
+    // Track all unique saved words across storage
+    const wordMap = new Map<string, { id?: string; word: string; srs?: CardSRSState }>();
 
-      // Check if due
-      if (new Date(record.dueDate).getTime() <= now) {
-        dueCount++;
-      }
-    });
-
-    // 2. Count any saved vocabulary words that haven't entered SRS state yet (as 'learning' + due)
     savedVocab.forEach((item) => {
-      const normalized = item.word.toLowerCase();
-      if (!processedWords.has(normalized)) {
-        processedWords.add(normalized);
-        learningCount++;
-        dueCount++;
+      const key = item.word.toLowerCase();
+      if (!wordMap.has(key)) {
+        wordMap.set(key, { id: item.id, word: item.word });
       }
     });
 
-    const totalWords = masteredCount + familiarCount + learningCount;
+    Object.values(srsStates).forEach((record) => {
+      const key = record.word.toLowerCase();
+      if (wordMap.has(key)) {
+        wordMap.get(key)!.srs = record;
+      } else {
+        wordMap.set(key, { id: record.vocabId, word: record.word, srs: record });
+      }
+    });
+
+    wordMap.forEach(({ id, word, srs }) => {
+      const srsRecord = srs || (id ? srsStates[id] : undefined) || srsStates[word.toLowerCase()];
+
+      // 1. Spaced Repetition Due calculation (independent of tier, includes 'easy' if due)
+      if (srsRecord) {
+        if (new Date(srsRecord.dueDate).getTime() <= now) {
+          dueCount++;
+        }
+      } else {
+        // Unreviewed saved words are queued for study
+        dueCount++;
+      }
+
+      // 2. Classify by latest rating (đánh giá gần nhất của mỗi từ)
+      if (srsRecord && srsRecord.lastRating) {
+        switch (srsRecord.lastRating) {
+          case 'again':
+            again++;
+            break;
+          case 'hard':
+            hard++;
+            break;
+          case 'good':
+            good++;
+            break;
+          case 'easy':
+            easy++;
+            break;
+          default:
+            unreviewed++;
+            break;
+        }
+      } else {
+        // Words not yet evaluated are kept separate (never falsely assigned to 'again')
+        unreviewed++;
+      }
+    });
+
+    const total = wordMap.size;
     const estMin = Math.max(1, Math.ceil(dueCount * 0.5));
 
     const selectedDeck = decks[0];
@@ -61,109 +100,157 @@ export function HomeVocabularySummary() {
       : PATHS.flashcardStudy;
 
     return {
-      total: totalWords,
-      mastered: masteredCount,
-      familiar: familiarCount,
-      learning: learningCount,
+      totalSaved: total,
       dueToday: dueCount,
       estimatedMinutes: estMin,
+      againCount: again,
+      hardCount: hard,
+      goodCount: good,
+      easyCount: easy,
+      unreviewedCount: unreviewed,
       reviewUrl: targetReviewUrl,
     };
   }, []);
 
-  // Proportional percentages for the segmented bar (guarding against divide by 0)
-  const masteredPct = total > 0 ? (mastered / total) * 100 : 0;
-  const familiarPct = total > 0 ? (familiar / total) * 100 : 0;
-  const learningPct = total > 0 ? (learning / total) * 100 : 0;
+  // Proportional percentages for the 4-segment distribution bar
+  const totalEvaluated = againCount + hardCount + goodCount + easyCount;
+  const denominator = totalSaved > 0 ? totalSaved : 1;
+  const againPct = (againCount / denominator) * 100;
+  const hardPct = (hardCount / denominator) * 100;
+  const goodPct = (goodCount / denominator) * 100;
+  const easyPct = (easyCount / denominator) * 100;
+  const unreviewedPct = (unreviewedCount / denominator) * 100;
 
   return (
-    <section className="home-vocab-card" aria-label={t('vocabulary_card.eyebrow', 'YOUR VOCABULARY')}>
-      {/* Top row: Eyebrow + count and Notebook link */}
+    <section className="home-vocab-card" aria-label={t('vocabulary_card.title', 'Góc từ vựng')}>
+      {/* Top row: Title + Total count and Notebook link */}
       <div className="home-vocab-top">
         <div>
           <span className="home-eyebrow">
-            {t('vocabulary_card.eyebrow', 'YOUR VOCABULARY')}
+            {t('vocabulary_card.eyebrow', 'GÓC TỪ VỰNG')}
           </span>
           <h2 className="home-vocab-title">
-            <b>{total}</b> <span>{t('vocabulary_card.words_collected', 'words collected')}</span>
+            <b>{totalSaved}</b> <span>{t('vocabulary_card.words_collected', 'từ đã lưu')}</span>
           </h2>
         </div>
         <Link className="home-notebook-link" to={PATHS.dictionary}>
-          <span>{t('vocabulary_card.btn_open_notebook', 'Open notebook')}</span>
+          <span>{t('vocabulary_card.btn_open_notebook', 'Mở sổ từ')}</span>
           <ArrowUpRight size={13} aria-hidden="true" />
         </Link>
       </div>
 
-      {/* Middle row: 3 memory levels */}
+      {/* Middle row: 4 SRS tiers (1 row on desktop, 2x2 grid on mobile) */}
       <div
-        className="home-vocab-breakdown"
-        aria-label={`${mastered} ${t('vocabulary_card.mastered')}, ${familiar} ${t('vocabulary_card.familiar')}, ${learning} ${t('vocabulary_card.learning')}`}
+        className="home-srs-groups"
+        role="group"
+        aria-label={`Thống kê trí nhớ: ${againCount} Quên mất, ${hardCount} Khó nhớ, ${goodCount} Nhớ rồi, ${easyCount} Thuộc làu`}
       >
-        <div className="home-vocab-stat">
-          <span className="home-vocab-dot home-dot-mastered" aria-hidden="true" />
-          <span>{t('vocabulary_card.mastered', 'Mastered')}</span>
-          <b>{mastered}</b>
+        <div className="home-srs-group home-srs-again" title={t('vocabulary_card.rating_again_desc', 'Chưa nhớ ra, cần xem lại.')}>
+          <span className="home-srs-dot dot-again" aria-hidden="true" />
+          <span className="home-srs-name">{t('vocabulary_card.rating_again', 'Quên mất')}</span>
+          <b className="home-srs-count">{againCount}</b>
         </div>
-        <div className="home-vocab-stat">
-          <span className="home-vocab-dot home-dot-familiar" aria-hidden="true" />
-          <span>{t('vocabulary_card.familiar', 'Familiar')}</span>
-          <b>{familiar}</b>
+        <div className="home-srs-group home-srs-hard" title={t('vocabulary_card.rating_hard_desc', 'Nhớ ra nhưng còn chật vật.')}>
+          <span className="home-srs-dot dot-hard" aria-hidden="true" />
+          <span className="home-srs-name">{t('vocabulary_card.rating_hard', 'Khó nhớ')}</span>
+          <b className="home-srs-count">{hardCount}</b>
         </div>
-        <div className="home-vocab-stat">
-          <span className="home-vocab-dot home-dot-learning" aria-hidden="true" />
-          <span>{t('vocabulary_card.learning', 'Learning')}</span>
-          <b>{learning}</b>
+        <div className="home-srs-group home-srs-good" title={t('vocabulary_card.rating_good_desc', 'Nhớ được mà không cần gợi ý.')}>
+          <span className="home-srs-dot dot-good" aria-hidden="true" />
+          <span className="home-srs-name">{t('vocabulary_card.rating_good', 'Nhớ rồi')}</span>
+          <b className="home-srs-count">{goodCount}</b>
+        </div>
+        <div className="home-srs-group home-srs-easy" title={t('vocabulary_card.rating_easy_desc', 'Nhớ ngay, không cần nghĩ lâu.')}>
+          <span className="home-srs-dot dot-easy" aria-hidden="true" />
+          <span className="home-srs-name">{t('vocabulary_card.rating_easy', 'Thuộc làu')}</span>
+          <b className="home-srs-count">{easyCount}</b>
         </div>
       </div>
 
-      {/* Segmented distribution bar */}
+      {/* Unreviewed words indicator (shown separately, not merged into 'again') */}
+      {unreviewedCount > 0 && (
+        <div className="home-srs-unreviewed-line">
+          <span>{t('vocabulary_card.unreviewed_count', { count: unreviewedCount, defaultValue: `Chưa ôn: ${unreviewedCount}` })}</span>
+        </div>
+      )}
+
+      {/* 4-Segment proportional distribution bar */}
       <div
-        className="home-vocab-distribution"
+        className="home-srs-distribution"
         role="img"
-        aria-label={`Distribution: ${masteredPct.toFixed(0)}% mastered, ${familiarPct.toFixed(0)}% familiar, ${learningPct.toFixed(0)}% learning`}
+        aria-label={`Phân bổ trí nhớ: ${againCount} Quên mất, ${hardCount} Khó nhớ, ${goodCount} Nhớ rồi, ${easyCount} Thuộc làu${unreviewedCount > 0 ? `, ${unreviewedCount} Chưa ôn` : ''}`}
       >
-        {total > 0 ? (
+        {totalSaved > 0 ? (
           <>
-            <span style={{ width: `${masteredPct}%` }} className="home-bar-mastered" />
-            <span style={{ width: `${familiarPct}%` }} className="home-bar-familiar" />
-            <span style={{ width: `${learningPct}%` }} className="home-bar-learning" />
+            <span style={{ width: `${againPct}%` }} className="home-srs-bar-again" />
+            <span style={{ width: `${hardPct}%` }} className="home-srs-bar-hard" />
+            <span style={{ width: `${goodPct}%` }} className="home-srs-bar-good" />
+            <span style={{ width: `${easyPct}%` }} className="home-srs-bar-easy" />
+            {unreviewedCount > 0 && (
+              <span style={{ width: `${unreviewedPct}%` }} className="home-srs-bar-unreviewed" />
+            )}
           </>
         ) : (
-          <span style={{ width: '100%' }} className="home-bar-empty" />
+          <span style={{ width: '100%' }} className="home-srs-bar-empty" />
         )}
       </div>
 
-      {/* Bottom row: Due count + Review CTA */}
-      <div className="home-vocab-due-row">
-        <div className="home-vocab-due-info">
-          {dueToday > 0 ? (
-            <>
-              <b className="home-vocab-due-text">
-                <span className="home-vocab-due-dot" aria-hidden="true" />
-                <span>
-                  {dueToday === 1
-                    ? t('vocabulary_card.due_today_count_one', '1 word due today')
-                    : t('vocabulary_card.due_today_count', { count: dueToday, defaultValue: `${dueToday} words due today` })}
-                </span>
-              </b>
-              <span className="home-due-estimate">
-                {estimatedMinutes === 1
-                  ? t('vocabulary_card.about_minute', 'About 1 minute')
-                  : t('vocabulary_card.about_minutes', { count: estimatedMinutes, defaultValue: `About ${estimatedMinutes} minutes` })}
+      {/* Bottom action row: 3 explicit states */}
+      <div className="home-srs-due-row">
+        {totalSaved === 0 ? (
+          <>
+            <div className="home-srs-due-info">
+              <span className="home-srs-due-text">
+                <b>{t('vocabulary_card.no_words_yet', 'Chưa có từ nào trong sổ')}</b>
               </span>
-            </>
-          ) : (
-            <b className="home-vocab-due-text">
-              <span className="home-vocab-due-dot home-due-dot-clear" aria-hidden="true" />
-              <span>{t('vocabulary_card.all_caught_up', 'All caught up for today')}</span>
-            </b>
-          )}
-        </div>
-
-        <Link className="home-primary-btn home-vocab-review-btn" to={reviewUrl}>
-          <span>{t('vocabulary_card.btn_review_now', 'Review now')}</span>
-          <ArrowRight size={14} aria-hidden="true" />
-        </Link>
+              <span className="home-srs-due-hint">
+                {t('vocabulary_card.no_words_hint', 'Lưu từ mới khi đọc để bắt đầu chu kỳ ôn tập.')}
+              </span>
+            </div>
+            <Link className="home-primary-btn home-vocab-action-btn" to={PATHS.discovery}>
+              <Compass size={14} aria-hidden="true" />
+              <span>{t('vocabulary_card.btn_discover_stories', 'Khám phá bài đọc')}</span>
+            </Link>
+          </>
+        ) : dueToday > 0 ? (
+          <>
+            <div className="home-srs-due-info">
+              <span className="home-srs-due-text">
+                <span className="home-srs-due-pulse" aria-hidden="true" />
+                <b>
+                  {dueToday === 1
+                    ? t('vocabulary_card.due_count_one', '1 từ đến lịch ôn hôm nay')
+                    : t('vocabulary_card.due_count_many', { count: dueToday, defaultValue: `${dueToday} từ đến lịch ôn hôm nay` })}
+                </b>
+              </span>
+              <span className="home-srs-due-hint">
+                {estimatedMinutes === 1
+                  ? t('vocabulary_card.about_minute', 'Khoảng 1 phút')
+                  : t('vocabulary_card.about_minutes', { count: estimatedMinutes, defaultValue: `Khoảng ${estimatedMinutes} phút` })}
+              </span>
+            </div>
+            <Link className="home-primary-btn home-vocab-action-btn" to={reviewUrl}>
+              <span>{t('vocabulary_card.btn_review_now', 'Ôn ngay')}</span>
+              <ArrowRight size={14} aria-hidden="true" />
+            </Link>
+          </>
+        ) : (
+          <>
+            <div className="home-srs-due-info">
+              <span className="home-srs-due-text home-srs-completed-text">
+                <Check size={16} className="home-srs-check-icon" aria-hidden="true" />
+                <b>{t('vocabulary_card.all_done_today', 'Hôm nay ôn xong rồi')}</b>
+              </span>
+              <span className="home-srs-due-hint">
+                {t('vocabulary_card.all_done_hint', 'Tất cả từ vựng đã được củng cố theo chu kỳ Spaced Repetition.')}
+              </span>
+            </div>
+            <Link className="home-primary-btn home-vocab-action-btn home-vocab-secondary-btn" to={PATHS.dictionary}>
+              <BookMarked size={14} aria-hidden="true" />
+              <span>{t('vocabulary_card.btn_view_notebook', 'Xem sổ từ')}</span>
+            </Link>
+          </>
+        )}
       </div>
     </section>
   );

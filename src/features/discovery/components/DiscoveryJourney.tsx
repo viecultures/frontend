@@ -36,9 +36,6 @@ const REGION_SHAPES = Object.fromEntries(
   REGIONS.map(region => [region.id, VIETNAM_34_PROVINCES.filter(province => province.region === region.id).map(province => province.d).join(' ')]),
 ) as Record<(typeof REGIONS)[number]['id'], string>;
 
-interface DiscoveryJourneyProps {
-  onBrowseStories: () => void;
-}
 
 interface HoverPopoverState {
   series: JourneySeries;
@@ -53,7 +50,7 @@ interface SelectedChapter {
   seriesTitle: string;
 }
 
-export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
+export function DiscoveryJourney() {
   const { t, i18n } = useTranslation('discovery');
   const isEn = i18n.language === 'en';
   const mapPanelRef = useRef<HTMLElement>(null);
@@ -463,10 +460,6 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
           <h1>{t('journey.title')}</h1>
           <p>{t('journey.lead')}</p>
         </div>
-        <div className="discovery-modes" role="group" aria-label={t('journey.explore_by')}>
-          <button type="button" aria-pressed="true">{t('journey.tab_journey')}</button>
-          <button type="button" onClick={onBrowseStories}>{t('journey.tab_stories')}</button>
-        </div>
       </header>
 
       <div
@@ -610,9 +603,6 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
               {!currentSlide && (
                 <div className="journey-empty-region" role="status">
                   <p>{t('journey.stories_on_the_way', { regionName: getRegionName(region) })}</p>
-                  <button type="button" onClick={onBrowseStories}>
-                    {t('journey.browse_available_stories')} <ArrowRight size={16} aria-hidden="true" />
-                  </button>
                 </div>
               )}
 
@@ -660,9 +650,11 @@ export function DiscoveryJourney({ onBrowseStories }: DiscoveryJourneyProps) {
           {availableSeries.length === 0 && (
             <div className="journey-empty-region">
               <p>{firstRegion ? t('journey.no_published_series') : t('journey.choose_first_to_see')}</p>
-              <button type="button" onClick={onBrowseStories}>
-                {t('journey.browse_available_stories')} <ArrowRight size={16} aria-hidden="true" />
-              </button>
+              {region && (
+                <button type="button" onClick={() => selectRegion('all')}>
+                  {t('journey.all_regions')} <ArrowRight size={16} aria-hidden="true" />
+                </button>
+              )}
             </div>
           )}
         </div>

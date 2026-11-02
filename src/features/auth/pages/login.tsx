@@ -1,6 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, ArrowUpRight, CheckCircle2, Loader2, Lock, Mail, RefreshCw } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Leaf,
+  Loader2,
+  Lock,
+  Mail,
+  User,
+} from 'lucide-react';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { BrandLogo } from '@/components/BrandLogo';
 import { PATHS } from '@/routes/paths';
@@ -30,13 +42,18 @@ const readAuthLanguage = (): AppLanguage => {
 };
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const requestedTab = searchParams.get('tab') === 'register' || searchParams.get('mode') === 'register' ? 'register' : 'login';
+
   const [language, setAuthLanguage] = useState<AppLanguage>(readAuthLanguage);
-  const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
+  const [authTab, setAuthTab] = useState<'login' | 'register'>(requestedTab);
   const [registerStep, setRegisterStep] = useState<'form' | 'otp'>('form');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [cooldown, setCooldown] = useState(0);
   const [pendingAuthResult, setPendingAuthResult] = useState<AuthResult | null>(null);
@@ -247,22 +264,60 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
   return (
     <main className="auth-page" lang={language}>
-      <div className="auth-form-panel">
-        <header className="auth-topbar">
-          <Link to={PATHS.landing} className="auth-brand" aria-label={copy.brandLabel}>
-            <BrandLogo size="sm" theme="dark" />
+      {/* Top Navigation Bar */}
+      <header className="auth-header">
+        <Link to={PATHS.landing} className="auth-brand" aria-label={copy.brandLabel}>
+          <BrandLogo size="md" theme="light" />
+        </Link>
+
+        <div className="auth-header-right">
+          <Link to={PATHS.landing} className="auth-back-home">
+            <ArrowLeft size={16} aria-hidden="true" />
+            <span>{copy.home}</span>
           </Link>
-          <div className="auth-topbar-actions">
-            <div className="auth-language-switch" role="group" aria-label="Language / Ngôn ngữ">
-              <button type="button" lang="vi" aria-pressed={language === 'vi'} onClick={() => changeLanguage('vi')}>VI</button>
-              <button type="button" lang="en" aria-pressed={language === 'en'} onClick={() => changeLanguage('en')}>EN</button>
-            </div>
-            <Link to={PATHS.landing} className="auth-back-link">
-              <ArrowLeft size={17} aria-hidden="true" /> {copy.home}
-            </Link>
+
+          <div className="auth-lang-pill" role="group" aria-label="Language / Ngôn ngữ">
+            <button
+              type="button"
+              className={`auth-lang-btn ${language === 'vi' ? 'is-active' : ''}`}
+              aria-pressed={language === 'vi'}
+              onClick={() => changeLanguage('vi')}
+            >
+              VI
+            </button>
+            <button
+              type="button"
+              className={`auth-lang-btn ${language === 'en' ? 'is-active' : ''}`}
+              aria-pressed={language === 'en'}
+              onClick={() => changeLanguage('en')}
+            >
+              EN
+            </button>
           </div>
+        </div>
+      </header>
+
+      {/* Main 2-Column Section */}
+      <div className="auth-main">
+        {/* Left Column: Hero Tagline & Cultural Story */}
+        <section className="auth-hero" aria-labelledby="hero-title">
+          <h1 id="hero-title" className="auth-hero-title font-serif">
+            {copy.tagline1}
+            <br />
+            {copy.tagline2}
+          </h1>
+          <p className="auth-hero-subtitle">{copy.subtagline}</p>
+          <div className="auth-hero-badge">
+            <Leaf size={15} className="text-[#2E7D32]" aria-hidden="true" />
+            <span>{copy.cultureBadge}</span>
+          </div>
+        </section>
+
+        {/* Right Column: Floating Auth Card */}
+        <div className="auth-card-panel" role="region" aria-label={copy.accessLabel}>
+          {/* Segmented Tab Controls (Login / Register) */}
           {!isOtpStep && (
-            <div className="auth-tabs" role="tablist" aria-label={copy.accessLabel}>
+            <div className="auth-card-tabs" role="tablist" aria-label={copy.accessLabel}>
               <button
                 id="auth-login-tab"
                 type="button"
@@ -270,7 +325,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 aria-selected={authTab === 'login'}
                 aria-controls="auth-panel"
                 disabled={isLoading}
-                className={authTab === 'login' ? 'is-active' : ''}
+                className={`auth-tab-btn ${authTab === 'login' ? 'is-active' : ''}`}
                 onClick={() => changeTab('login')}
               >
                 {copy.login}
@@ -282,39 +337,124 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 aria-selected={authTab === 'register'}
                 aria-controls="auth-panel"
                 disabled={isLoading}
-                className={authTab === 'register' ? 'is-active' : ''}
+                className={`auth-tab-btn ${authTab === 'register' ? 'is-active' : ''}`}
                 onClick={() => changeTab('register')}
               >
                 {copy.register}
               </button>
             </div>
           )}
-        </header>
 
-        <section className="auth-content" aria-labelledby="auth-title">
-          <h1 id="auth-title" className={authTab === 'register' && !isOtpStep ? 'auth-title-register' : undefined}>
-            {isOtpStep
-              ? copy.verifyTitle
-              : authTab === 'login'
-                ? copy.loginTitle
-                : copy.registerTitle}
-          </h1>
-          <p className="auth-intro">
-            {isOtpStep
-              ? copy.verifyIntro(email)
-              : authTab === 'login'
-                ? copy.loginIntro
-                : copy.registerIntro}
-          </p>
+          {/* Card Header */}
+          <div className="auth-card-header">
+            <h2 id="auth-title" className="auth-card-title">
+              {isOtpStep
+                ? copy.verifyTitle
+                : authTab === 'login'
+                  ? copy.loginTitle
+                  : copy.registerTitle}
+            </h2>
+            <p className="auth-card-subtitle">
+              {isOtpStep
+                ? copy.verifyIntro(email)
+                : authTab === 'login'
+                  ? copy.loginIntro
+                  : copy.registerIntro}
+            </p>
+          </div>
 
           <div id="auth-panel" role="tabpanel" aria-labelledby={isOtpStep ? 'auth-title' : authTab === 'login' ? 'auth-login-tab' : 'auth-register-tab'}>
-            {!isOtpStep && (isDemoLoginEnabled || hasGoogleLogin) && (
-              <div className="auth-alternate">
+            {/* OTP Verification Flow */}
+            {isOtpStep ? (
+              <form onSubmit={handleVerifyOtp} className="auth-form-fields">
+                <div className="auth-otp-row">
+                  {otpDigits.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      ref={(el) => { otpInputRefs.current[idx] = el; }}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                      onPaste={idx === 0 ? handleOtpPaste : undefined}
+                      className="auth-otp-input"
+                      aria-label={copy.otpDigit(idx + 1)}
+                      disabled={isLoading}
+                      required
+                    />
+                  ))}
+                </div>
+
+                <div className="auth-otp-actions">
+                  <span>{copy.otpNotReceived}</span>
+                  <button
+                    type="button"
+                    className="auth-otp-resend"
+                    disabled={cooldown > 0 || isLoading}
+                    onClick={handleResendOtp}
+                  >
+                    {cooldown > 0 ? copy.resendIn(cooldown) : copy.resendOtp}
+                  </button>
+                </div>
+
+                {errorMessage && (
+                  <div className="auth-alert auth-alert-error" role="alert">
+                    <AlertCircle size={17} aria-hidden="true" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
+                {successMessage && (
+                  <div className="auth-alert auth-alert-success" role="status">
+                    <CheckCircle2 size={17} aria-hidden="true" />
+                    <span>{successMessage}</span>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="auth-submit-btn"
+                  disabled={isLoading || otpDigits.join('').length < 6}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+                      <span>{copy.verifying}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{copy.verifyComplete}</span>
+                      <ArrowRight size={17} aria-hidden="true" />
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  className="auth-otp-back"
+                  disabled={isLoading}
+                  onClick={() => {
+                    setRegisterStep('form');
+                    setErrorMessage(null);
+                    setSuccessMessage(null);
+                  }}
+                >
+                  <ArrowLeft size={15} aria-hidden="true" />
+                  <span>{copy.backToForm}</span>
+                </button>
+              </form>
+            ) : (
+              /* Standard Auth Flow (Login or Register) */
+              <div>
+                {/* Google Sign-in */}
                 {hasGoogleLogin && (
-                  <div className="auth-google">
+                  <div className="auth-google-wrapper">
                     {isLoading ? (
                       <div className="auth-google-loading">
-                        <Loader2 size={18} className="auth-spinner" aria-hidden="true" />
+                        <Loader2 size={18} className="animate-spin text-[#19382B]" aria-hidden="true" />
                         <span>{copy.googleLoading}</span>
                       </div>
                     ) : (
@@ -336,195 +476,166 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     )}
                   </div>
                 )}
-                {isDemoLoginEnabled && (
-                  <button type="button" className="auth-demo-button" disabled={isLoading} onClick={handleDemoLogin}>
-                    {isLoading && <Loader2 size={18} className="auth-spinner" aria-hidden="true" />}
-                    <span>{isLoading ? copy.demoLoading : copy.demo}</span>
-                  </button>
-                )}
-                <div className="auth-divider"><span>{copy.or}</span></div>
-              </div>
-            )}
-            {isOtpStep ? (
-              <form onSubmit={handleVerifyOtp} className="auth-otp-container">
-                <div className="auth-otp-inputs">
-                  {otpDigits.map((digit, idx) => (
-                    <input
-                      key={idx}
-                      ref={(el) => { otpInputRefs.current[idx] = el; }}
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleOtpChange(idx, e.target.value)}
-                      onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                      onPaste={idx === 0 ? handleOtpPaste : undefined}
-                      className="auth-otp-digit"
-                      aria-label={copy.otpDigit(idx + 1)}
-                      disabled={isLoading}
-                      required
-                    />
-                  ))}
+
+                {/* Divider */}
+                <div className="auth-card-divider" role="separator">
+                  <span>{authTab === 'login' ? copy.orLoginWithEmail : copy.orRegisterWithEmail}</span>
                 </div>
 
-                <div className="auth-otp-meta">
-                  <span>{copy.otpNotReceived}</span>
-                  <button
-                    type="button"
-                    className="auth-resend-btn"
-                    disabled={cooldown > 0 || isLoading}
-                    onClick={handleResendOtp}
-                  >
-                    {cooldown > 0 ? copy.resendIn(cooldown) : copy.resendOtp}
-                  </button>
-                </div>
-
-                {errorMessage && (
-                  <div className="auth-error" role="alert">
-                    <AlertCircle size={18} aria-hidden="true" />
-                    <span>{errorMessage}</span>
-                  </div>
-                )}
-
-                {successMessage && (
-                  <div className="auth-error" style={{ borderColor: 'var(--color-line)', background: 'var(--color-surface-muted)', color: 'var(--color-ink)' }} role="status">
-                    <CheckCircle2 size={18} aria-hidden="true" />
-                    <span>{successMessage}</span>
-                  </div>
-                )}
-
-                <button type="submit" className="auth-submit" disabled={isLoading || otpDigits.join('').length < 6}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 size={18} className="auth-spinner" aria-hidden="true" />
-                      <span>{copy.verifying}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>{copy.verifyComplete}</span>
-                      <ArrowUpRight size={18} aria-hidden="true" />
-                    </>
+                <form onSubmit={handleSubmit} className="auth-form-fields">
+                  {/* Full Name for Registration */}
+                  {authTab === 'register' && (
+                    <div className="auth-field-group">
+                      <label htmlFor="fullName" className="auth-field-label">
+                        {copy.fullName}
+                      </label>
+                      <div className="auth-input-container">
+                        <User size={18} className="auth-input-icon" aria-hidden="true" />
+                        <input
+                          id="fullName"
+                          type="text"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder={copy.fullNamePlaceholder}
+                          autoComplete="name"
+                          className="auth-text-input"
+                          required
+                        />
+                      </div>
+                    </div>
                   )}
-                </button>
 
-                <button
-                  type="button"
-                  className="auth-back-step-btn"
-                  disabled={isLoading}
-                  onClick={() => {
-                    setRegisterStep('form');
-                    setErrorMessage(null);
-                    setSuccessMessage(null);
-                  }}
-                >
-                  <ArrowLeft size={16} aria-hidden="true" />
-                  <span>{copy.backToForm}</span>
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleSubmit} className="auth-form">
-                {authTab === 'register' && (
-                  <div className="auth-field">
-                    <label htmlFor="fullName">{copy.fullName}</label>
-                    <input
-                      id="fullName"
-                      type="text"
-                      value={fullName}
-                      onChange={(event) => setFullName(event.target.value)}
-                      placeholder={copy.fullNamePlaceholder}
-                      autoComplete="name"
-                      required
-                    />
+                  {/* Email Input */}
+                  <div className="auth-field-group">
+                    <label htmlFor="email" className="auth-field-label">
+                      Email
+                    </label>
+                    <div className="auth-input-container">
+                      <Mail size={18} className="auth-input-icon" aria-hidden="true" />
+                      <input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="ban@example.com"
+                        autoComplete="email"
+                        className="auth-text-input"
+                        required
+                      />
+                    </div>
                   </div>
-                )}
 
-                <div className="auth-field">
-                  <label htmlFor="email">Email</label>
-                  <div className="auth-input-wrap">
-                    <Mail size={18} aria-hidden="true" />
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      placeholder="ban@example.com"
-                      autoComplete="email"
-                      required
-                    />
+                  {/* Password Input with show/hide toggle */}
+                  <div className="auth-field-group">
+                    <label htmlFor="password" className="auth-field-label">
+                      {copy.password}
+                    </label>
+                    <div className="auth-input-container">
+                      <Lock size={18} className="auth-input-icon" aria-hidden="true" />
+                      <input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder={copy.passwordPlaceholder}
+                        autoComplete={authTab === 'login' ? 'current-password' : 'new-password'}
+                        minLength={6}
+                        className="auth-text-input"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="auth-password-toggle"
+                        aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                      >
+                        {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                <div className="auth-field">
-                  <label htmlFor="password">{copy.password}</label>
-                  <div className="auth-input-wrap">
-                    <Lock size={18} aria-hidden="true" />
-                    <input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      placeholder={copy.passwordPlaceholder}
-                      autoComplete={authTab === 'login' ? 'current-password' : 'new-password'}
-                      minLength={6}
-                      required
-                    />
+                  {/* Extra Options: Remember Me & Forgot Password */}
+                  <div className="auth-extra-row">
+                    <label className="auth-remember-label">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="auth-remember-checkbox"
+                      />
+                      <span>{copy.remember}</span>
+                    </label>
+
+                    {authTab === 'login' && !isLocalAuthMode && (
+                      <button
+                        type="button"
+                        className="auth-forgot-link"
+                        onClick={() => setIsForgotPasswordOpen(true)}
+                      >
+                        {copy.forgotPassword}
+                      </button>
+                    )}
                   </div>
-                </div>
 
-                <div className="auth-options">
-                  <label className="auth-remember">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(event) => setRememberMe(event.target.checked)}
-                    />
-                    <span>{copy.remember}</span>
-                  </label>
-                  {!isLocalAuthMode && (
+                  {/* Error Alert */}
+                  {errorMessage && (
+                    <div className="auth-alert auth-alert-error" role="alert">
+                      <AlertCircle size={17} aria-hidden="true" />
+                      <span>{errorMessage}</span>
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
+                  <button type="submit" className="auth-submit-btn" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+                        <span>{copy.processing}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{authTab === 'login' ? copy.login : copy.createAccount}</span>
+                        <ArrowRight size={17} aria-hidden="true" />
+                      </>
+                    )}
+                  </button>
+
+                  {/* Demo Account Button */}
+                  {isDemoLoginEnabled && (
                     <button
                       type="button"
-                      className="auth-inline-link"
-                      style={{ visibility: authTab === 'login' ? 'visible' : 'hidden' }}
-                      tabIndex={authTab === 'login' ? 0 : -1}
-                      onClick={() => setIsForgotPasswordOpen(true)}
+                      className="auth-demo-btn"
+                      disabled={isLoading}
+                      onClick={handleDemoLogin}
                     >
-                      {copy.forgotPassword}
+                      {isLoading && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
+                      <span>{isLoading ? copy.demoLoading : copy.demo}</span>
                     </button>
                   )}
-                </div>
-
-                {errorMessage && (
-                  <div className="auth-error" role="alert">
-                    <AlertCircle size={18} aria-hidden="true" />
-                    <span>{errorMessage}</span>
-                  </div>
-                )}
-
-                <button type="submit" className="auth-submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 size={18} className="auth-spinner" aria-hidden="true" />
-                      <span>{copy.processing}</span>
-                    </>
-                  ) : authTab === 'login' ? (
-                    copy.login
-                  ) : (
-                    copy.createAccount
-                  )}
-                  {!isLoading && <ArrowUpRight size={18} aria-hidden="true" />}
-                </button>
-              </form>
+                </form>
+              </div>
             )}
           </div>
 
-          <p className="auth-guest-note">
-            {copy.guestPrefix} <Link to={PATHS.discovery}>{copy.explore}</Link>
-          </p>
-        </section>
-        <p className="auth-footer-note">{copy.footer}</p>
+          {/* Card Footer: Explore as guest */}
+          <div className="auth-card-footer">
+            <span>{copy.guestPrefix} </span>
+            <Link to={PATHS.discovery}>{copy.explore}</Link>
+          </div>
+        </div>
       </div>
 
+      {/* Page Bottom Footer: Quote with leaf icon */}
+      <footer className="auth-page-footer">
+        <div className="auth-footer-quote">
+          <span className="auth-quote-line" aria-hidden="true" />
+          <Leaf size={14} className="text-[#2E7D32]" aria-hidden="true" />
+          <span>{copy.footer}</span>
+          <span className="auth-quote-line" aria-hidden="true" />
+        </div>
+      </footer>
+
+      {/* Forgot Password Modal */}
       {isForgotPasswordOpen && (
         <ForgotPasswordModal
           isOpen={isForgotPasswordOpen}

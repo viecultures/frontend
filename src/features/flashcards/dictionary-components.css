@@ -107,6 +107,18 @@
 .vocab-library-page .vocab-notebook-card-action { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 36px; padding-top: 10px; border-top: 1px solid var(--vocab-line); font-size: 14px; font-weight: 600; color: var(--color-action); }
 .vocab-library-page .vocab-notebook-card:hover .vocab-notebook-card-action { color: var(--color-action-hover); }
 .vocab-library-page .vocab-saved-decks a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+.vocab-library-page .vocab-notebook-mastery { margin-bottom: 20px; padding: 14px 18px; background: var(--vocab-card); border: 1px solid var(--vocab-line); border-radius: var(--radius-xl); }
+.vocab-library-page .vocab-notebook-mastery-stats { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.vocab-library-page .vocab-notebook-stat { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--vocab-ink); font-weight: 500; }
+.vocab-library-page .vocab-notebook-stat b { font-weight: 700; font-variant-numeric: tabular-nums; }
+.vocab-library-page .vocab-notebook-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.vocab-library-page .vocab-notebook-dot.dot-again, .vocab-library-page .vocab-bar-again { background: var(--color-srs-again); }
+.vocab-library-page .vocab-notebook-dot.dot-hard, .vocab-library-page .vocab-bar-hard { background: var(--color-srs-hard); }
+.vocab-library-page .vocab-notebook-dot.dot-good, .vocab-library-page .vocab-bar-good { background: var(--color-srs-good); }
+.vocab-library-page .vocab-notebook-dot.dot-easy, .vocab-library-page .vocab-bar-easy { background: var(--color-srs-easy); }
+.vocab-library-page .vocab-notebook-dot.dot-unreviewed, .vocab-library-page .vocab-bar-unreviewed { background: var(--color-srs-unreviewed); }
+.vocab-library-page .vocab-notebook-distribution { display: flex; height: 6px; gap: 3px; margin-top: 10px; border-radius: 6px; overflow: hidden; background: var(--vocab-line); }
+.vocab-library-page .vocab-bar-empty { background: var(--vocab-line); }
 
 @media (max-width: 767px) {
   .vocab-library-page { gap: 26px; }

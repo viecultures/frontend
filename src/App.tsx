@@ -4,6 +4,7 @@ import { isLocalAuthMode } from '@/config/authConfig';
 
 import { SettingsModal } from './components/SettingsModal';
 import { PwaInstallBanner } from './components/pwa';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 // Layouts
 import { AppLayout } from '@/layouts/AppLayout';
@@ -152,7 +153,8 @@ export const App: React.FC = () => {
             </div>
           }
         >
-          <Routes>
+          <ErrorBoundary>
+            <Routes>
             {/* Root URL redirect to /vi */}
             <Route path="/" element={<Navigate to="/vi" replace />} />
 
@@ -238,7 +240,7 @@ export const App: React.FC = () => {
 
               {/* 4. Focus Full-screen Layout (No Navbar, No Footer) */}
               <Route element={<FocusLayout />}>
-                {/* Guest Only: Login */}
+                {/* Guest Only: Login & Register */}
                 <Route
                   path={toRel(PATHS.login)}
                   element={
@@ -247,6 +249,7 @@ export const App: React.FC = () => {
                     </GuestOnly>
                   }
                 />
+                <Route path="register" element={<RedirectWithLang to={`${PATHS.login}?tab=register`} />} />
 
                 {/* Auth Protected: Home Dashboard */}
                 <Route
@@ -278,6 +281,7 @@ export const App: React.FC = () => {
             {/* Fallback for un-prefixed routes (e.g. legacy /login -> /vi/login) */}
             <Route path="*" element={<UnprefixedFallbackRedirect />} />
           </Routes>
+        </ErrorBoundary>
         </React.Suspense>
 
         {/* Global Modals & Banners */}
