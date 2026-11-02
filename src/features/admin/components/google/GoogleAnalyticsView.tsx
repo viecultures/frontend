@@ -376,8 +376,8 @@ export const GoogleAnalyticsView: React.FC = () => {
               <svg viewBox="0 0 800 220" className="w-full h-56 sm:h-64 select-none">
                 <defs>
                   <linearGradient id="ga4Gradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1E4B43" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#1E4B43" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="var(--color-heritage-green)" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="var(--color-heritage-green)" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
@@ -406,7 +406,7 @@ export const GoogleAnalyticsView: React.FC = () => {
                   <path
                     d={svgPathData}
                     fill="none"
-                    stroke="#1E4B43"
+                    stroke="var(--color-heritage-green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -422,8 +422,8 @@ export const GoogleAnalyticsView: React.FC = () => {
                         cx={coord.x}
                         cy={coord.y}
                         r={isHovered ? 5 : 2.5}
-                        fill="#D9B76A"
-                        stroke="#1E4B43"
+                        fill="var(--color-antique-gold)"
+                        stroke="var(--color-heritage-green)"
                         strokeWidth="1.5"
                         className="transition-all duration-150"
                       />

@@ -814,30 +814,93 @@ export const MarketingManagementView: React.FC = () => {
         </div>
       )}
 
-      {/* ── TAB 2: Google Analytics & Search Console ────────────────────── */}
+      {/* ── TAB 2: Google Analytics & Search Console (Dedicated Navigation & Config) ── */}
       {activeTab === 'analytics' && (
         <div className="space-y-6">
-          <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-4">
+          <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-5">
             <div className="border-b border-antique-gold/20 pb-4">
+              <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold border border-emerald-300 dark:border-emerald-700 inline-flex items-center gap-1.5 mb-2">
+                <CheckCircle2 aria-hidden="true" className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Nâng cấp hệ thống giám sát độc lập</span>
+              </span>
               <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
                 <BarChart3 aria-hidden="true" className="w-5 h-5 text-antique-gold" />
-                <span>Cấu Hình Google Analytics 4 (GA4) & Search Console</span>
+                <span>Trung Tâm Phân Tích Google Analytics 4 & Google Search Console</span>
               </h3>
-              <p className="text-xs text-text-muted mt-0.5">
-                Các thông số kỹ thuật được cấu hình thực tế cho nền tảng VieCultures theo tài liệu tích hợp đối tác.
+              <p className="text-xs text-text-muted mt-1 leading-relaxed">
+                Để phục vụ việc phân tích chi tiết dữ liệu lưu lượng truy cập và chỉ số SEO tự nhiên, hệ thống đã phát triển thành hai trang quản trị độc lập với biểu đồ thời gian thực, bảng xếp hạng bài viết và báo cáo tương tác.
               </p>
             </div>
 
+            {/* 2 Quick Navigation Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Card 1: Google Analytics 4 */}
+              <div className="p-5 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 hover:border-antique-gold/60 transition-all space-y-3 flex flex-col justify-between group">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-antique-gold/20 flex items-center justify-center text-heritage-green dark:text-antique-gold">
+                      <BarChart3 aria-hidden="true" className="w-5 h-5" />
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-rice-paper dark:bg-white/10 text-[11px] font-mono font-semibold text-text-secondary border border-antique-gold/30">
+                      ID: 561849201
+                    </span>
+                  </div>
+                  <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-antique-bright">
+                    Google Analytics 4 (GA4)
+                  </h4>
+                  <p className="text-xs text-text-muted leading-relaxed">
+                    Theo dõi người dùng hoạt động, phiên học tập, lượt xem trang và nguồn chiến dịch UTM theo thời gian thực.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate(getLocalizedPath('/admin/analytics', currentLang))}
+                  className="w-full mt-2 py-2.5 px-4 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs group-hover:bg-heritage-green/90"
+                >
+                  <span>Mở bảng điều khiển GA4</span>
+                  <ExternalLink aria-hidden="true" className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Card 2: Google Search Console */}
+              <div className="p-5 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 hover:border-antique-gold/60 transition-all space-y-3 flex flex-col justify-between group">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-antique-gold/20 flex items-center justify-center text-heritage-green dark:text-antique-gold">
+                      <Globe aria-hidden="true" className="w-5 h-5" />
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-rice-paper dark:bg-white/10 text-[11px] font-mono font-semibold text-text-secondary border border-antique-gold/30 truncate max-w-[140px]" title="sc-domain:viecultures.app">
+                      sc-domain:viecultures.app
+                    </span>
+                  </div>
+                  <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-antique-bright">
+                    Google Search Console (GSC)
+                  </h4>
+                  <p className="text-xs text-text-muted leading-relaxed">
+                    Theo dõi lượt nhấp chuột, lượt hiển thị tìm kiếm tự nhiên, CTR trung bình và thứ hạng từ khóa văn hóa trên Google.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate(getLocalizedPath('/admin/search-console', currentLang))}
+                  className="w-full mt-2 py-2.5 px-4 rounded-xl bg-antique-gold hover:bg-antique-bright text-heritage-dark text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                >
+                  <span>Mở bảng điều khiển Search Console</span>
+                  <ExternalLink aria-hidden="true" className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
             {/* Config Specs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
               <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/25 hover:border-antique-gold/50 transition-all space-y-1.5 shadow-2xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Measurement ID</span>
+                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Property ID</span>
                   <button
                     type="button"
-                    onClick={() => handleCopySpec('G-CTMMCTEFPM', 'ga4_id', 'GA4 Measurement ID')}
+                    onClick={() => handleCopySpec('561849201', 'ga4_id', 'GA4 Property ID')}
                     className="p-1 rounded-lg hover:bg-antique-gold/20 text-text-muted hover:text-heritage-green dark:hover:text-antique-bright transition-colors cursor-pointer"
-                    title="Sao chép GA4 Measurement ID"
+                    title="Sao chép GA4 Property ID"
                   >
                     {copiedSpecKey === 'ga4_id' ? (
                       <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
@@ -847,19 +910,19 @@ export const MarketingManagementView: React.FC = () => {
                   </button>
                 </div>
                 <div className="font-mono text-base font-bold text-heritage-green dark:text-antique-bright select-all">
-                  G-CTMMCTEFPM
+                  561849201
                 </div>
-                <p className="text-[10px] text-text-secondary">Định danh luồng đo lường chính</p>
+                <p className="text-[10px] text-text-secondary">Định danh tài sản GA4</p>
               </div>
 
               <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/25 hover:border-antique-gold/50 transition-all space-y-1.5 shadow-2xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Stream ID</span>
+                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Measurement ID</span>
                   <button
                     type="button"
-                    onClick={() => handleCopySpec('16250918205', 'stream_id', 'GA4 Stream ID')}
+                    onClick={() => handleCopySpec('G-CTMMCTEFPM', 'stream_id', 'GA4 Measurement ID')}
                     className="p-1 rounded-lg hover:bg-antique-gold/20 text-text-muted hover:text-heritage-green dark:hover:text-antique-bright transition-colors cursor-pointer"
-                    title="Sao chép GA4 Stream ID"
+                    title="Sao chép GA4 Measurement ID"
                   >
                     {copiedSpecKey === 'stream_id' ? (
                       <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
@@ -869,9 +932,9 @@ export const MarketingManagementView: React.FC = () => {
                   </button>
                 </div>
                 <div className="font-mono text-base font-bold text-heritage-green dark:text-antique-bright select-all">
-                  16250918205
+                  G-CTMMCTEFPM
                 </div>
-                <p className="text-[10px] text-text-secondary">Mã định danh luồng dữ liệu web</p>
+                <p className="text-[10px] text-text-secondary">Định danh luồng web</p>
               </div>
 
               <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/25 hover:border-antique-gold/50 transition-all space-y-1.5 shadow-2xs">
@@ -901,7 +964,7 @@ export const MarketingManagementView: React.FC = () => {
                   <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GSC Site URL</span>
                   <button
                     type="button"
-                    onClick={() => handleCopySpec('https://viecultures.com', 'gsc_url', 'GSC Site URL')}
+                    onClick={() => handleCopySpec('sc-domain:viecultures.app', 'gsc_url', 'GSC Site URL')}
                     className="p-1 rounded-lg hover:bg-antique-gold/20 text-text-muted hover:text-heritage-green dark:hover:text-antique-bright transition-colors cursor-pointer"
                     title="Sao chép GSC Site URL"
                   >
@@ -912,8 +975,8 @@ export const MarketingManagementView: React.FC = () => {
                     )}
                   </button>
                 </div>
-                <div className="font-mono text-sm font-bold text-heritage-green dark:text-antique-bright truncate select-all" title="https://viecultures.com">
-                  https://viecultures.com
+                <div className="font-mono text-sm font-bold text-heritage-green dark:text-antique-bright truncate select-all" title="sc-domain:viecultures.app">
+                  sc-domain:viecultures.app
                 </div>
                 <p className="text-[10px] text-text-secondary">Tên miền Google Search Console</p>
               </div>
@@ -947,31 +1010,6 @@ export const MarketingManagementView: React.FC = () => {
               <pre className="p-3.5 rounded-xl bg-heritage-forest text-warm-ivory font-mono text-xs leading-relaxed overflow-x-auto border border-antique-gold/30 select-all">
                 {gtagSnippet}
               </pre>
-            </div>
-
-            {/* Service Account & Environment Credentials */}
-            <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-heritage-green dark:text-antique-bright flex items-center gap-1.5">
-                <ShieldCheck aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                <span>Cấu hình Service Account & Tệp biến môi trường (.env)</span>
-              </h4>
-
-              <div className="space-y-1.5 font-mono text-xs bg-rice-paper dark:bg-heritage-dark p-3 rounded-xl border border-antique-gold/20 select-all">
-                <div className="text-text-muted"># Google Search Console & GA4 Integration</div>
-                <div className="text-heritage-green dark:text-antique-bright font-bold">
-                  GOOGLE_APPLICATION_CREDENTIALS=&quot;./service-account.json&quot;
-                </div>
-                <div className="text-heritage-green dark:text-antique-bright font-bold">
-                  GA4_PROPERTY_ID=&quot;16250918205&quot;
-                </div>
-                <div className="text-heritage-green dark:text-antique-bright font-bold">
-                  GSC_SITE_URL=&quot;https://viecultures.com&quot;
-                </div>
-              </div>
-
-              <p className="text-[11px] text-text-secondary leading-relaxed">
-                Đường dẫn tệp khóa: <code className="font-mono bg-white/40 dark:bg-white/10 px-1 py-0.5 rounded">service-account.json</code>. Để tự động đồng bộ sitemap và chỉ mục bài viết, hãy thêm địa chỉ email của Google Service Account vào Google Search Console với quyền sở hữu (Owner/Full Access).
-              </p>
             </div>
           </div>
         </div>
