@@ -32,6 +32,7 @@ import {
   ArrowRight,
   CreditCard,
   Bookmark,
+  Globe,
 } from 'lucide-react';
 import type { ReadingPostItem, CefrLevel } from '../types/adminTypes';
 import { postAdminService, type PostFilterParams } from '../services/postAdminService';
@@ -44,6 +45,8 @@ import { VocabManagementView } from '../components/VocabManagementView';
 import { AdminActivityLogView } from '../components/AdminActivityLogView';
 import { MarketingManagementView } from '../components/MarketingManagementView';
 import { SubscriptionManagementView } from '../components/subscriptions/SubscriptionManagementView';
+import { GoogleAnalyticsView } from '../components/google/GoogleAnalyticsView';
+import { GoogleSearchConsoleView } from '../components/google/GoogleSearchConsoleView';
 import { PostPreviewModal } from '../components/PostPreviewModal';
 import { AdminDialog } from '../components/AdminDialog';
 import { AdminServiceConnections } from '../components/AdminServiceConnections';
@@ -62,9 +65,11 @@ export type AdminTab =
   | 'users'
   | 'system'
   | 'logs'
-  | 'system_stats';
+  | 'system_stats'
+  | 'analytics'
+  | 'search_console';
 
-const VALID_TABS: AdminTab[] = [
+const VALID_TABS: (AdminTab | 'search-console')[] = [
   'dashboard',
   'content',
   'journeys',
@@ -76,6 +81,9 @@ const VALID_TABS: AdminTab[] = [
   'system',
   'logs',
   'system_stats',
+  'analytics',
+  'search_console',
+  'search-console',
 ];
 
 export const AdminPage: React.FC = () => {
@@ -86,12 +94,19 @@ export const AdminPage: React.FC = () => {
   const currentLang = resolveLanguage(lang);
 
   const activeTab: AdminTab = useMemo(() => {
-    if (tab && (VALID_TABS as string[]).includes(tab)) {
-      return tab as AdminTab;
+    let rawTab = tab;
+    if (!rawTab) {
+      const match = location.pathname.match(/\/admin\/([a-zA-Z0-9_-]+)/);
+      if (match) rawTab = match[1];
     }
-    const match = location.pathname.match(/\/admin\/([a-zA-Z0-9_-]+)/);
-    if (match && (VALID_TABS as string[]).includes(match[1])) {
-      return match[1] as AdminTab;
+    if (rawTab === 'search-console' || rawTab === 'search_console') {
+      return 'search_console';
+    }
+    if (rawTab === 'analytics') {
+      return 'analytics';
+    }
+    if (rawTab && (VALID_TABS as string[]).includes(rawTab)) {
+      return rawTab as AdminTab;
     }
     return 'dashboard';
   }, [tab, location.pathname]);
@@ -423,6 +438,20 @@ export const AdminPage: React.FC = () => {
           title: 'Quản trị học viên & Phân quyền',
           subtitle: 'Quản lý phân quyền tài khoản và theo dõi tiến độ học tập trên toàn nền tảng',
           badge: totalUsersCount ? `${totalUsersCount.toLocaleString('en-US')} học viên` : 'Học viên CRM',
+        };
+      case 'analytics':
+        return {
+          icon: BarChart3,
+          title: 'Google Analytics 4 (GA4)',
+          subtitle: 'Giám sát tương tác học liệu di sản, phiên truy cập và độc giả thời gian thực',
+          badge: 'Property: 561849201',
+        };
+      case 'search_console':
+        return {
+          icon: Globe,
+          title: 'Google Search Console',
+          subtitle: 'Giám sát thứ hạng từ khóa văn hóa, lượt hiển thị và nhấp chuột trên Google Search',
+          badge: 'sc-domain:viecultures.app',
         };
       case 'system':
       case 'logs':
@@ -1385,6 +1414,12 @@ export const AdminPage: React.FC = () => {
 
         {/* ── TAB 4: MARKETING & ĐA KÊNH (MARKETING) ─────────────────────── */}
         {activeTab === 'marketing' && <MarketingManagementView />}
+
+        {/* ── TAB: GOOGLE ANALYTICS 4 (GA4) ───────────────────────────────── */}
+        {activeTab === 'analytics' && <GoogleAnalyticsView />}
+
+        {/* ── TAB: GOOGLE SEARCH CONSOLE ─────────────────────────────────── */}
+        {activeTab === 'search_console' && <GoogleSearchConsoleView />}
 
         {/* ── TAB: GÓI ĐĂNG KÝ & DUYỆT ĐƠN (SUBSCRIPTIONS) ──────────────── */}
         {activeTab === 'subscriptions' && <SubscriptionManagementView />}

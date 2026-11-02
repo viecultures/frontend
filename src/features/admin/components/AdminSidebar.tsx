@@ -19,6 +19,7 @@ import {
   Share2,
   CreditCard,
   Sliders,
+  Globe,
 } from 'lucide-react';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 
@@ -216,6 +217,19 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       hasSubItems: true,
     },
     {
+      id: 'analytics',
+      fallbackLabel: 'Google Analytics 4',
+      icon: BarChart3,
+      badge: 'GA4',
+    },
+    {
+      id: 'search_console',
+      aliases: ['search-console'],
+      fallbackLabel: 'Google Search Console',
+      icon: Globe,
+      badge: 'GSC',
+    },
+    {
       id: 'subscriptions',
       fallbackLabel: 'Gói đăng ký & Doanh thu',
       icon: CreditCard,
@@ -276,6 +290,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       return;
     }
 
+    if (item.id === 'search_console') {
+      navigate(getLocalizedPath('/admin/search-console', currentLang));
+      if (onNavigate) {
+        onNavigate();
+      }
+      return;
+    }
+
     navigate(getLocalizedPath(`/admin/${item.id}`, currentLang));
     if (onNavigate) {
       onNavigate();
@@ -306,6 +328,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const isItemActive = (item: NavItem): boolean => {
     if (activeTab === item.id) return true;
     if (item.aliases && item.aliases.includes(activeTab)) return true;
+    if (item.id === 'search_console' && (activeTab === 'search_console' || activeTab === 'search-console')) return true;
     return false;
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
+import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 import {
   Megaphone,
   Send,
@@ -61,6 +62,9 @@ type MarketingTabKey = 'utm' | 'analytics' | 'broadcast' | 'social';
 
 export const MarketingManagementView: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { lang } = useParams<{ lang?: string }>();
+  const currentLang = resolveLanguage(lang);
 
   // Active sub-tab synced with query string ?tab=...
   const activeTab: MarketingTabKey = useMemo(() => {
