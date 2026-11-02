@@ -54,7 +54,12 @@
     "lang_en": "English"
   },
   "footer": {
-    "tagline": "Học tiếng Anh qua những câu chuyện, địa danh và truyền thống Việt Nam.",
+    "tagline": "Học tiếng Anh qua món ăn và những câu chuyện văn hóa Việt Nam, từ nguyên liệu, cách nấu đến nếp sống quanh mâm cơm.",
+    "brand_home": "VieCultures — về trang giới thiệu",
+    "food_title": "Khám phá ẩm thực",
+    "all_stories": "Xem mọi câu chuyện văn hóa",
+    "learning_title": "Học tập",
+    "reading_library": "Thư viện bài đọc",
     "navigation_title": "Điều hướng",
     "topics_title": "Chủ đề",
     "contact_legal_title": "Liên hệ & Pháp lý",
@@ -127,5 +132,25 @@
     "success": "Thành công",
     "error": "Đã xảy ra lỗi",
     "empty": "Không có dữ liệu"
+  },
+  "errors": {
+    "not_found": {
+      "badge": "Lỗi 404 · Lạc bước hành trình",
+      "title": "Trang Không Tồn Tại",
+      "desc": "Con đường bạn vừa tìm có thể đã đổi hướng hoặc chưa được mở trên bản đồ di sản VieCultures. Hãy để chúng tôi dẫn bạn trở lại hành trình.",
+      "btn_home": "Về phòng học",
+      "btn_landing": "Về trang chủ",
+      "btn_explore": "Khám phá di sản",
+      "btn_login": "Đăng nhập",
+      "btn_back": "Quay lại trang trước"
+    },
+    "boundary": {
+      "badge": "Gián đoạn hiển thị",
+      "title": "Khoảnh Khắc Tạm Gián Đoạn",
+      "desc": "Hệ thống vừa gặp một gián đoạn nhỏ khi tải giao diện. Dữ liệu học tập và dấu mộc son của bạn luôn được bảo toàn.",
+      "btn_retry": "Tải lại trang",
+      "btn_home": "Về trang chủ",
+      "toggle_details": "Xem chi tiết kỹ thuật"
+    }
   }
 }

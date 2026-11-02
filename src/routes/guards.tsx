@@ -21,7 +21,8 @@ export const RequireAuth: React.FC<GuardProps> = ({ children }) => {
 
   if (!isLoggedIn) {
     const lang = getCurrentLanguage(location.pathname);
-    const redirect = encodeURIComponent(location.pathname + location.search);
+    const localizedCurrentPath = getLocalizedPath(location.pathname, lang);
+    const redirect = encodeURIComponent(localizedCurrentPath + location.search);
     const loginTarget = getLocalizedPath(PATHS.login, lang);
     return <Navigate to={`${loginTarget}?redirect=${redirect}`} replace />;
   }
@@ -47,7 +48,8 @@ export const RequireRole: React.FC<RequireRoleProps> = ({
   const lang = getCurrentLanguage(location.pathname);
 
   if (!isLoggedIn) {
-    const redirect = encodeURIComponent(location.pathname + location.search);
+    const localizedCurrentPath = getLocalizedPath(location.pathname, lang);
+    const redirect = encodeURIComponent(localizedCurrentPath + location.search);
     const loginTarget = getLocalizedPath(PATHS.login, lang);
     return <Navigate to={`${loginTarget}?redirect=${redirect}`} replace />;
   }
@@ -75,8 +77,15 @@ export const GuestOnly: React.FC<GuardProps> = ({ children }) => {
   const lang = getCurrentLanguage(location.pathname);
 
   if (isLoggedIn) {
-    const redirect = new URLSearchParams(location.search).get('redirect');
-    const destination = redirect?.startsWith('/') && !redirect.startsWith('//')
+    const rawRedirect = new URLSearchParams(location.search).get('redirect');
+    const redirect = rawRedirect ? decodeURIComponent(rawRedirect) : null;
+    const isSafeInternal = Boolean(
+      redirect &&
+      redirect.startsWith('/') &&
+      !redirect.startsWith('//') &&
+      !redirect.includes('/login')
+    );
+    const destination: string = isSafeInternal && redirect
       ? redirect
       : getLocalizedPath(PATHS.home, lang);
     return <Navigate to={destination} replace />;

@@ -200,6 +200,13 @@
   --color-home-lavender-dot-familiar: #805915;
   --color-home-lavender-dot-learning: #6F3494;
 
+  /* Spaced Repetition 4-Tier Memory Status (Gợi ý: cam đất, vàng đất, xanh dịu, xanh đậm) */
+  --color-srs-again: #C85A32;
+  --color-srs-hard: #B8860B;
+  --color-srs-good: #2D7D6F;
+  --color-srs-easy: #1E4B43;
+  --color-srs-unreviewed: #8C827A;
+
   /* Card 4: Weekly Progress (Xanh pastel) */
   --color-home-blue-bg: #E8F1F8;
   --color-home-blue-border: #C4D9EC;
@@ -263,6 +270,11 @@
   --color-home-lavender-dot-mastered: #62C59B;
   --color-home-lavender-dot-familiar: #E5B254;
   --color-home-lavender-dot-learning: #BD8DE0;
+  --color-srs-again: #E07A5F;
+  --color-srs-hard: #E5B254;
+  --color-srs-good: #5EB8A7;
+  --color-srs-easy: #4DB6AC;
+  --color-srs-unreviewed: #A8A099;
   --color-home-blue-bg: #14222E;
   --color-home-blue-border: #233C52;
   --color-home-blue-accent: #A8CEEB;

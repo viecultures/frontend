@@ -240,7 +240,7 @@ export const App: React.FC = () => {
 
               {/* 4. Focus Full-screen Layout (No Navbar, No Footer) */}
               <Route element={<FocusLayout />}>
-                {/* Guest Only: Login */}
+                {/* Guest Only: Login & Register */}
                 <Route
                   path={toRel(PATHS.login)}
                   element={
@@ -249,6 +249,7 @@ export const App: React.FC = () => {
                     </GuestOnly>
                   }
                 />
+                <Route path="register" element={<RedirectWithLang to={`${PATHS.login}?tab=register`} />} />
 
                 {/* Auth Protected: Home Dashboard */}
                 <Route

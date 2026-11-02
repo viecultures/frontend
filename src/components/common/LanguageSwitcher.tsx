@@ -6,7 +6,7 @@ export type SupportedLang = 'vi' | 'en';
 
 export interface LanguageSwitcherProps {
   className?: string;
-  variant?: 'compact' | 'standard';
+  variant?: 'compact' | 'standard' | 'menu';
 }
 
 export const resolveLocalizedPath = (
@@ -99,20 +99,20 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   return (
     <div
       role="group"
-      aria-label="Language selector"
-      className={`inline-flex items-center p-0.5 rounded-full border border-antique-gold/40 bg-surface-muted/90 backdrop-blur-xs shadow-xs text-xs font-sans select-none tracking-wider ${className}`}
+      aria-label="Language selector / Chọn ngôn ngữ"
+      className={`inline-flex items-center rounded-lg border border-[#D5CDBD] bg-white/65 backdrop-blur-sm p-[2.5px] gap-0.5 select-none shadow-xs ${className}`}
     >
       <button
         type="button"
         onClick={() => handleLanguageChange('vi')}
         aria-label="Chuyển sang Tiếng Việt"
         aria-pressed={currentLang === 'vi'}
-        className={`rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-antique-gold cursor-pointer ${
-          isCompact ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
+        className={`border-0 rounded-[5px] font-bold tracking-wide cursor-pointer transition-all duration-160 ${
+          isCompact ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-[11.5px]'
         } ${
           currentLang === 'vi'
-            ? 'bg-heritage-green text-warm-ivory font-semibold shadow-xs'
-            : 'text-ink-soft hover:text-ink hover:bg-antique-gold/15 font-medium'
+            ? 'bg-[#DFB76C] text-[#19382B] shadow-xs'
+            : 'bg-transparent text-[#52665F] hover:text-[#19382B]'
         }`}
       >
         VI
@@ -123,12 +123,12 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         onClick={() => handleLanguageChange('en')}
         aria-label="Switch to English"
         aria-pressed={currentLang === 'en'}
-        className={`rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-antique-gold cursor-pointer ${
-          isCompact ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
+        className={`border-0 rounded-[5px] font-bold tracking-wide cursor-pointer transition-all duration-160 ${
+          isCompact ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-[11.5px]'
         } ${
           currentLang === 'en'
-            ? 'bg-heritage-green text-warm-ivory font-semibold shadow-xs'
-            : 'text-ink-soft hover:text-ink hover:bg-antique-gold/15 font-medium'
+            ? 'bg-[#DFB76C] text-[#19382B] shadow-xs'
+            : 'bg-transparent text-[#52665F] hover:text-[#19382B]'
         }`}
       >
         EN
@@ -138,4 +138,3 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 };
 
 export default LanguageSwitcher;
-

@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from '@/components/Link';
 import { ArrowRight, BookOpen } from 'lucide-react';
+import { PATHS } from '@/routes/paths';
 
 export const DiscoveryHeroQuoteBanner: React.FC = () => {
   const { t } = useTranslation('discovery');
@@ -27,14 +28,14 @@ export const DiscoveryHeroQuoteBanner: React.FC = () => {
 
         <div className="mt-6 flex items-center justify-center gap-3 flex-wrap pt-2">
           <Link
-            href="/reader"
+            to={PATHS.reader}
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm transition-all focus-ring hover:scale-102"
           >
             <BookOpen className="w-3.5 h-3.5 text-antique-gold" />
             <span>{t('hero_quote.btn_bilingual_reader')}</span>
           </Link>
           <Link
-            href="/home"
+            to={PATHS.home}
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-heritage-green bg-warm-ivory hover:bg-rice-paper border border-antique-gold shadow-sm transition-all focus-ring hover:scale-102"
           >
             <span>{t('hero_quote.btn_back_study_room')}</span>

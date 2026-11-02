@@ -29,13 +29,7 @@ export function HomeDailyQuoteCard({
 
         {/* Card header */}
         <div className="home-daily-heading">
-          <div>
-            <h2 className="home-daily-title">{t('daily_quote.title', 'Daily Quote')}</h2>
-            <p className="home-daily-subtitle">
-              {t('daily_quote.created_by', 'Created by')}{' '}
-              <b>{creator}</b>
-            </p>
-          </div>
+          <h2 className="home-daily-title">{t('daily_quote.title', 'Daily Quote')}</h2>
           <button
             type="button"
             className="home-daily-expand-btn"
@@ -87,6 +81,7 @@ export function HomeDailyQuoteCard({
         imageUrl={imageUrl}
         quoteVi={quoteVi}
         author={author}
+        creator={creator}
       />
     </>
   );

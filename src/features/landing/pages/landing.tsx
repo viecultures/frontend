@@ -1,19 +1,16 @@
 import React from 'react';
+import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { LandingHeader } from '../components/LandingHeader';
 import { LandingHeroBanner } from '../components/LandingHeroBanner';
 import { CoverflowArticlesSection } from '../components/CoverflowArticlesSection';
-import { FourTopicsSection } from '../components/FourTopicsSection';
-import { VietnamHeritageMapSection } from '../components/VietnamHeritageMapSection';
 import { HeritageMethodologySection } from '../components/HeritageMethodologySection';
-import { InteractiveFlashcardDemoSection } from '../components/InteractiveFlashcardDemoSection';
-import { LandingFaqSection } from '../components/LandingFaqSection';
-import { ContactSection } from '../components/ContactSection';
-import { LandingConversionSection } from '../components/LandingConversionSection';
-import { LandingPhotoCredits } from '../components/LandingPhotoCredits';
 import { LandingPlansSection } from '../components/LandingPlansSection';
+import { ContactSection } from '../components/ContactSection';
+import { AiSpeakingRoomSection } from '../components/AiSpeakingRoomSection';
 import '../landing.css';
 import { useAppNavigate } from '@/routes/useAppNavigate';
+import VietnamHeritageMapSection from '../components/VietnamHeritageMapSection';
 
 interface LandingPageProps {
   onOpenDocs?: () => void;
@@ -77,12 +74,11 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
     const sectionIds = [
       'hero',
       'featured-articles',
-      'topics',
-      'ban-do-di-san',
       'methodology',
       'flashcard-demo',
+      'ban-do-di-san',
+      'ai-speaking-room',
       'plans',
-      'faq',
       'contact',
     ];
     const elements = sectionIds
@@ -98,8 +94,10 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
             const id = entry.target.id;
             // Map sub-sections to closest navbar item if needed
             let navTarget = id;
-            if (id === 'flashcard-demo' || id === 'faq') {
+            if (id === 'flashcard-demo') {
               navTarget = 'methodology';
+            } else if (id === 'ai-speaking-room') {
+              navTarget = 'ban-do-di-san';
             }
             setActiveSegment(navTarget);
           }
@@ -117,70 +115,48 @@ export const LandingPage: React.FC<LandingPageProps> = () => {
   }, []);
 
   const handleNavigate = useAppNavigate();
+  const reducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 90, damping: 30, restDelta: 0.001 });
+  const canAnimate = !reducedMotion;
 
   return (
     <ThemeProvider>
       <div className="landing-page w-full min-h-screen font-sans antialiased selection:bg-sky-mist selection:text-heritage-green flex flex-col justify-between">
+        {canAnimate && (
+          <motion.div
+            className="landing-scroll-progress"
+            style={{ scaleX: progress }}
+            aria-hidden="true"
+          />
+        )}
         {/* Site Header */}
         <LandingHeader
-          onNavigate={handleNavigate}
           onScrollToSegment={scrollToSegment}
           activeSegment={activeSegment}
         />
 
         {/* Semantic Main Element */}
         <main className="landing-content w-full overflow-x-hidden flex-1">
-          <div id="hero">
-            <LandingHeroBanner
-              onNavigate={handleNavigate}
-              onScrollToDemo={() => scrollToSegment('flashcard-demo')}
-            />
-          </div>
+          <div id="hero"><LandingHeroBanner /></div>
 
-          <div id="featured-articles">
-            <CoverflowArticlesSection onNavigate={handleNavigate} />
-          </div>
+          <CoverflowArticlesSection />
 
-          <div id="topics">
-            <FourTopicsSection onNavigate={handleNavigate} />
-          </div>
+          <HeritageMethodologySection
+            onNavigate={handleNavigate}
+            onPreviewFlashcards={() => scrollToSegment('flashcard-demo')}
+          />
 
-          <div id="ban-do-di-san">
-            <VietnamHeritageMapSection />
-          </div>
 
-          <div id="methodology">
-            <HeritageMethodologySection
-              onNavigate={handleNavigate}
-              onPreviewFlashcards={() => scrollToSegment('flashcard-demo')}
-            />
-          </div>
+          <VietnamHeritageMapSection />
 
-          <div id="flashcard-demo">
-            <InteractiveFlashcardDemoSection onNavigate={handleNavigate} />
-          </div>
+          <AiSpeakingRoomSection />
 
           <LandingPlansSection onNavigate={handleNavigate} />
 
-          <div id="faq">
-            <LandingFaqSection />
-          </div>
-
-          <div id="contact">
-            <ContactSection />
-          </div>
-
-          <div>
-            <LandingConversionSection onNavigate={handleNavigate} />
-          </div>
+          <ContactSection />
         </main>
 
-        {/* Photo credits & Site Footer */}
-        <div className="w-full bg-surface-feature/20 border-t border-line">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <LandingPhotoCredits />
-          </div>
-        </div>
       </div>
     </ThemeProvider>
   );

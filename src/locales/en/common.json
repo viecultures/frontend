@@ -54,7 +54,12 @@
     "lang_en": "English"
   },
   "footer": {
-    "tagline": "Learn English through the stories, places and traditions of Vietnam.",
+    "tagline": "Learn English through Vietnamese food and culture, from ingredients and cooking to the everyday stories shared around a meal.",
+    "brand_home": "VieCultures — back to the introduction",
+    "food_title": "Explore Vietnamese food",
+    "all_stories": "Explore all culture stories",
+    "learning_title": "Learn and practice",
+    "reading_library": "Reading library",
     "navigation_title": "Navigation",
     "topics_title": "Topics",
     "contact_legal_title": "Contact & Legal",
@@ -127,5 +132,25 @@
     "success": "Success",
     "error": "An error occurred",
     "empty": "No data available"
+  },
+  "errors": {
+    "not_found": {
+      "badge": "404 Error · Wandering Off Path",
+      "title": "Page Not Found",
+      "desc": "The path you are looking for may have moved or is not yet uncharted in the VieCultures heritage map. Let us guide you back to your learning journey.",
+      "btn_home": "Back to study room",
+      "btn_landing": "Back to home",
+      "btn_explore": "Explore heritage",
+      "btn_login": "Sign in",
+      "btn_back": "Go back"
+    },
+    "boundary": {
+      "badge": "Display pause",
+      "title": "A Momentary Pause",
+      "desc": "The application encountered a brief display interruption. Your learning history and seals remain completely safe.",
+      "btn_retry": "Reload page",
+      "btn_home": "Back to home",
+      "toggle_details": "View technical details"
+    }
   }
 }

@@ -9,6 +9,7 @@ interface DailyQuoteDialogProps {
   quoteVi?: string;
   author?: string;
   authorIntro?: string;
+  creator?: string;
 }
 
 const FAVORITES_STORAGE_KEY = 'viecultures_calendar_favorites';
@@ -63,6 +64,7 @@ export function DailyQuoteDialog({
   quoteVi = 'Không có gì quý hơn độc lập, tự do.',
   author = 'Hồ Chí Minh',
   authorIntro = 'Vietnamese revolutionary leader',
+  creator = 'VieCultures Daily',
 }: DailyQuoteDialogProps) {
   const { t, i18n } = useTranslation('home');
   const isVi = i18n.language === 'vi';
@@ -158,6 +160,13 @@ export function DailyQuoteDialog({
               <b>{author}</b>
               <span>{isVi ? 'Lãnh tụ cách mạng Việt Nam' : authorIntro}</span>
             </div>
+
+            {creator && (
+              <p className="home-dialog-curator">
+                {t('daily_quote.created_by', 'Created by')}{' '}
+                <b>{creator}</b>
+              </p>
+            )}
 
             <button
               type="button"

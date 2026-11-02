@@ -93,7 +93,12 @@ const handleExpiredTokenCleanup = () => {
   if (!isClearingExpiredSession) {
     isClearingExpiredSession = true;
     try {
-      clearAuthStorage();
+      removeAuthStorage();
+      if (typeof window !== 'undefined') {
+        queueMicrotask(() => {
+          window.dispatchEvent(new CustomEvent('auth:change'));
+        });
+      }
     } finally {
       isClearingExpiredSession = false;
     }
