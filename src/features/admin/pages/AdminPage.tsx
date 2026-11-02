@@ -102,8 +102,9 @@ export const AdminPage: React.FC = () => {
     if (rawTab === 'search-console' || rawTab === 'search_console') {
       return 'search_console';
     }
+    // Tạm thời ẩn /admin/analytics -> chuyển hướng logic sang dashboard
     if (rawTab === 'analytics') {
-      return 'analytics';
+      return 'dashboard';
     }
     if (rawTab && (VALID_TABS as string[]).includes(rawTab)) {
       return rawTab as AdminTab;
@@ -113,16 +114,32 @@ export const AdminPage: React.FC = () => {
 
   const activeContentSubTab = useMemo(() => {
     const params = new URLSearchParams(location.search);
-    return params.get('tab') || 'posts';
+    const subTab = params.get('tab');
+    if (subTab === 'journeys' || subTab === 'vocabularies') {
+      return subTab;
+    }
+    return 'posts';
   }, [location.search]);
 
   // When visiting /admin or /:lang/admin without subpath, redirect to /admin/dashboard
   useEffect(() => {
     const stripped = location.pathname.replace(/^\/(vi|en)(\/|$)/, '/');
-    if (stripped === '/admin' || stripped === '/admin/') {
+    if (stripped === '/admin' || stripped === '/admin/' || stripped === '/admin/analytics' || stripped === '/admin/analytics/') {
       navigate(getLocalizedPath('/admin/dashboard', currentLang), { replace: true });
     }
   }, [location.pathname, currentLang, navigate]);
+
+  // Redirect invalid content subtabs (such as ?tab=config) to ?tab=posts
+  useEffect(() => {
+    if (activeTab === 'content') {
+      const params = new URLSearchParams(location.search);
+      const rawSub = params.get('tab');
+      if (rawSub && !['posts', 'journeys', 'vocabularies'].includes(rawSub)) {
+        params.set('tab', 'posts');
+        navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+      }
+    }
+  }, [activeTab, location.pathname, location.search, navigate]);
 
   // Posts State
   const [posts, setPosts] = useState<ReadingPostItem[]>([]);

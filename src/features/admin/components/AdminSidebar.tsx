@@ -79,25 +79,39 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     if (activeTab === 'posts') return 'posts';
     if (activeTab === 'journeys') return 'journeys';
     if (activeTab === 'vocabularies') return 'vocabularies';
-    const params = new URLSearchParams(location.search);
-    return params.get('tab') || 'posts';
+    if (activeTab === 'content') {
+      const params = new URLSearchParams(location.search);
+      const tabParam = params.get('tab');
+      if (tabParam === 'journeys' || tabParam === 'vocabularies' || tabParam === 'posts') {
+        return tabParam;
+      }
+    }
+    return 'posts';
   }, [activeTab, location.search]);
 
   // Current sub-tab for marketing
   const activeMarketingSubTab = React.useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    const tab = params.get('tab');
-    if (tab === 'broadcast' || tab === 'utm') {
-      return tab;
+    if (activeTab === 'marketing') {
+      const params = new URLSearchParams(location.search);
+      const tab = params.get('tab');
+      if (tab === 'broadcast' || tab === 'utm') {
+        return tab;
+      }
     }
     return 'utm';
-  }, [location.search]);
+  }, [activeTab, location.search]);
 
   // Current sub-tab for subscriptions
   const activeSubscriptionSubTab = React.useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get('tab') || 'overview';
-  }, [location.search]);
+    if (activeTab === 'subscriptions') {
+      const params = new URLSearchParams(location.search);
+      const tab = params.get('tab');
+      if (tab === 'config' || tab === 'overview') {
+        return tab;
+      }
+    }
+    return 'overview';
+  }, [activeTab, location.search]);
 
   // Accordion open state for Content
   const [isContentOpen, setIsContentOpen] = useState<boolean>(
@@ -206,12 +220,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       icon: Megaphone,
       hasSubItems: true,
     },
+    /* Tạm thời ẩn tab Google Analytics 4 theo yêu cầu
     {
       id: 'analytics',
       fallbackLabel: 'Google Analytics 4',
       icon: BarChart3,
       badge: 'GA4',
     },
+    */
     {
       id: 'search_console',
       aliases: ['search-console'],
