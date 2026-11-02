@@ -2,13 +2,11 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate, useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Search,
   ExternalLink,
   ChevronRight,
   ShieldCheck,
   User as UserIcon,
   Menu,
-  X,
   LogOut,
   ChevronDown,
   Layers,
@@ -30,10 +28,8 @@ export const AdminTopbar: React.FC<AdminTopbarProps> = ({ onSearch, onToggleSide
   const currentLang = resolveLanguage(lang);
 
   const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
-  const [searchValue, setSearchValue] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   // Sync auth state when session changes
@@ -43,19 +39,6 @@ export const AdminTopbar: React.FC<AdminTopbarProps> = ({ onSearch, onToggleSide
     };
     window.addEventListener('auth:change', handleAuthChange);
     return () => window.removeEventListener('auth:change', handleAuthChange);
-  }, []);
-
-  // Global Ctrl + K / Cmd + K keyboard shortcut to focus search input
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-        searchInputRef.current?.select();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // Close dropdown menu on outside click or Escape
@@ -110,13 +93,6 @@ export const AdminTopbar: React.FC<AdminTopbarProps> = ({ onSearch, onToggleSide
     }
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (onSearch) {
-      onSearch(searchValue);
-    }
-  };
-
   const handleLogout = () => {
     clearAuthStorage();
     setIsDropdownOpen(false);
@@ -156,50 +132,6 @@ export const AdminTopbar: React.FC<AdminTopbarProps> = ({ onSearch, onToggleSide
           {getSubsystemLabel(currentTab)}
         </span>
       </nav>
-
-      {/* ── Center Area: Quick Search with Ctrl + K ────────────────────── */}
-      <div className="hidden md:flex items-center flex-1 max-w-sm mx-2 lg:mx-6">
-        <form onSubmit={handleSearchSubmit} className="relative w-full">
-          <label htmlFor="admin-topbar-search" className="sr-only">
-            Tìm kiếm nhanh trong CMS (Phím tắt: Ctrl + K)
-          </label>
-          <Search
-            aria-hidden="true"
-            className="w-3.5 h-3.5 text-text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-          />
-          <input
-            ref={searchInputRef}
-            id="admin-topbar-search"
-            type="text"
-            value={searchValue}
-            onChange={(e) => {
-              setSearchValue(e.target.value);
-              onSearch?.(e.target.value);
-            }}
-            placeholder="Tìm kiếm bài viết, tài khoản..."
-            className="w-full h-8 pl-8 pr-16 text-xs rounded-full bg-rice-paper/60 dark:bg-black/30 border border-[#E5DEC9] dark:border-antique-gold/30 focus:border-heritage-green focus:bg-white dark:focus:bg-black/50 focus:outline-none focus:ring-1 focus:ring-heritage-green dark:focus:border-antique-gold text-text-body dark:text-warm-ivory placeholder:text-text-muted transition-all"
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
-            {searchValue && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchValue('');
-                  onSearch?.('');
-                  searchInputRef.current?.focus();
-                }}
-                aria-label="Xoá truy vấn tìm kiếm"
-                className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-text-muted hover:text-text-body cursor-pointer mr-1"
-              >
-                <X aria-hidden="true" className="w-3 h-3" />
-              </button>
-            )}
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-white dark:bg-white/10 text-text-muted border border-[#E5DEC9] dark:border-white/10 shadow-2xs pointer-events-none select-none">
-              Ctrl K
-            </kbd>
-          </div>
-        </form>
-      </div>
 
       {/* ── Right Area: Learner Switch, i18n, Admin Profile Dropdown ──── */}
       <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">

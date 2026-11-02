@@ -33,6 +33,7 @@ import {
   CreditCard,
   Bookmark,
   Globe,
+  Cpu,
 } from 'lucide-react';
 import type { ReadingPostItem, CefrLevel } from '../types/adminTypes';
 import { postAdminService, type PostFilterParams } from '../services/postAdminService';
@@ -50,6 +51,7 @@ import { GoogleSearchConsoleView } from '../components/google/GoogleSearchConsol
 import { PostPreviewModal } from '../components/PostPreviewModal';
 import { AdminDialog } from '../components/AdminDialog';
 import { AdminServiceConnections } from '../components/AdminServiceConnections';
+import { AiConfigManagementView } from '../components/ai/AiConfigManagementView';
 import { adminTopicLabel, adminRegionLabel, adminReadTimeLabel } from '../admin-presentation';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 import '../admin-ui.css';
@@ -67,7 +69,9 @@ export type AdminTab =
   | 'logs'
   | 'system_stats'
   | 'analytics'
-  | 'search_console';
+  | 'search_console'
+  | 'ai_configs'
+  | 'ai';
 
 const VALID_TABS: (AdminTab | 'search-console')[] = [
   'dashboard',
@@ -84,6 +88,8 @@ const VALID_TABS: (AdminTab | 'search-console')[] = [
   'analytics',
   'search_console',
   'search-console',
+  'ai_configs',
+  'ai',
 ];
 
 export const AdminPage: React.FC = () => {
@@ -477,6 +483,14 @@ export const AdminPage: React.FC = () => {
           title: 'Nhật ký kiểm toán & Giám sát hệ thống',
           subtitle: 'Theo dõi thao tác quản trị, truy cập và kiểm toán thay đổi dữ liệu an ninh',
           badge: 'Kiểm toán',
+        };
+      case 'ai_configs':
+      case 'ai':
+        return {
+          icon: Cpu,
+          title: 'Cấu hình AI & Giám sát Chi phí',
+          subtitle: 'Quản lý API Key đa kênh (Gemini, Azure Speech), điều phối xoay vòng và theo dõi ngân sách thời gian thực',
+          badge: 'AI Metering',
         };
       default:
         return {
@@ -1467,6 +1481,11 @@ export const AdminPage: React.FC = () => {
             <AdminActivityLogView />
             <AdminServiceConnections />
           </div>
+        )}
+
+        {/* ── TAB 7: CẤU HÌNH AI & CHI PHÍ ─────────────────────────────────── */}
+        {(activeTab === 'ai_configs' || activeTab === 'ai') && (
+          <AiConfigManagementView />
         )}
 
         {/* ── Post Create / Edit Modal ──────────────────────────────────── */}

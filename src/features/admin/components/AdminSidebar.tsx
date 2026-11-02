@@ -9,14 +9,16 @@ import {
   Megaphone,
   Users,
   ShieldCheck,
-  Landmark,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Link,
   BarChart3,
   Mail,
   CreditCard,
   Sliders,
   Globe,
+  Cpu,
 } from 'lucide-react';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 
@@ -24,6 +26,8 @@ export interface AdminSidebarProps {
   postCount?: number;
   userCount?: number;
   onNavigate?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 interface ContentSubItem {
@@ -60,6 +64,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   postCount,
   userCount,
   onNavigate,
+  isCollapsed = false,
+  onToggleCollapse,
 }) => {
   const { t } = useTranslation('admin');
   const navigate = useNavigate();
@@ -113,21 +119,26 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     return 'overview';
   }, [activeTab, location.search]);
 
-  // Accordion open state for Content
-  const [isContentOpen, setIsContentOpen] = useState<boolean>(
-    activeTab === 'content' ||
+  // Exclusive Accordion state: only one parent menu section can be expanded at a time
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(() => {
+    if (
+      activeTab === 'content' ||
       activeTab === 'posts' ||
       activeTab === 'journeys' ||
       activeTab === 'vocabularies'
-  );
+    ) {
+      return 'content';
+    }
+    if (activeTab === 'marketing') return 'marketing';
+    if (activeTab === 'subscriptions') return 'subscriptions';
+    return null;
+  });
 
-  // Accordion open state for Marketing
-  const [isMarketingOpen, setIsMarketingOpen] = useState<boolean>(activeTab === 'marketing');
+  const isContentOpen = expandedMenu === 'content';
+  const isMarketingOpen = expandedMenu === 'marketing';
+  const isSubscriptionsOpen = expandedMenu === 'subscriptions';
 
-  // Accordion open state for Subscriptions
-  const [isSubscriptionsOpen, setIsSubscriptionsOpen] = useState<boolean>(activeTab === 'subscriptions');
-
-  // Auto-expand content accordion when navigated to content or child tabs
+  // Automatically sync exclusive expanded menu when navigating between tabs
   useEffect(() => {
     if (
       activeTab === 'content' ||
@@ -135,21 +146,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       activeTab === 'journeys' ||
       activeTab === 'vocabularies'
     ) {
-      setIsContentOpen(true);
-    }
-  }, [activeTab]);
-
-  // Auto-expand marketing accordion when navigated to marketing tab
-  useEffect(() => {
-    if (activeTab === 'marketing') {
-      setIsMarketingOpen(true);
-    }
-  }, [activeTab]);
-
-  // Auto-expand subscriptions accordion when navigated to subscriptions tab
-  useEffect(() => {
-    if (activeTab === 'subscriptions') {
-      setIsSubscriptionsOpen(true);
+      setExpandedMenu('content');
+    } else if (activeTab === 'marketing') {
+      setExpandedMenu('marketing');
+    } else if (activeTab === 'subscriptions') {
+      setExpandedMenu('subscriptions');
+    } else {
+      setExpandedMenu(null);
     }
   }, [activeTab]);
 
@@ -233,7 +236,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       aliases: ['search-console'],
       fallbackLabel: 'Google Search Console',
       icon: Globe,
-      badge: 'GSC',
     },
     {
       id: 'subscriptions',
@@ -253,21 +255,31 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       aliases: ['logs'],
       fallbackLabel: 'Hệ thống & Kiểm duyệt',
       icon: ShieldCheck,
-      badge: 'Kiểm toán',
+    },
+    {
+      id: 'ai_configs',
+      aliases: ['ai', 'ai-configs'],
+      fallbackLabel: 'Cấu hình AI & Chi phí',
+      icon: Cpu,
     },
   ];
 
   const handleTabClick = (item: NavItem) => {
     if (item.id === 'content') {
+      if (isCollapsed) {
+        navigate(`${getLocalizedPath('/admin/content', currentLang)}?tab=${activeContentSubTab}`);
+        if (onNavigate) onNavigate();
+        return;
+      }
       if (
         activeTab === 'content' ||
         activeTab === 'posts' ||
         activeTab === 'journeys' ||
         activeTab === 'vocabularies'
       ) {
-        setIsContentOpen((prev) => !prev);
+        setExpandedMenu((prev) => (prev === 'content' ? null : 'content'));
       } else {
-        setIsContentOpen(true);
+        setExpandedMenu('content');
         navigate(`${getLocalizedPath('/admin/content', currentLang)}?tab=${activeContentSubTab}`);
         if (onNavigate) onNavigate();
       }
@@ -275,10 +287,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     }
 
     if (item.id === 'marketing') {
+      if (isCollapsed) {
+        navigate(`${getLocalizedPath('/admin/marketing', currentLang)}?tab=${activeMarketingSubTab}`);
+        if (onNavigate) onNavigate();
+        return;
+      }
       if (activeTab === 'marketing') {
-        setIsMarketingOpen((prev) => !prev);
+        setExpandedMenu((prev) => (prev === 'marketing' ? null : 'marketing'));
       } else {
-        setIsMarketingOpen(true);
+        setExpandedMenu('marketing');
         navigate(`${getLocalizedPath('/admin/marketing', currentLang)}?tab=${activeMarketingSubTab}`);
         if (onNavigate) onNavigate();
       }
@@ -286,15 +303,23 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     }
 
     if (item.id === 'subscriptions') {
+      if (isCollapsed) {
+        navigate(`${getLocalizedPath('/admin/subscriptions', currentLang)}?tab=${activeSubscriptionSubTab}`);
+        if (onNavigate) onNavigate();
+        return;
+      }
       if (activeTab === 'subscriptions') {
-        setIsSubscriptionsOpen((prev) => !prev);
+        setExpandedMenu((prev) => (prev === 'subscriptions' ? null : 'subscriptions'));
       } else {
-        setIsSubscriptionsOpen(true);
+        setExpandedMenu('subscriptions');
         navigate(`${getLocalizedPath('/admin/subscriptions', currentLang)}?tab=${activeSubscriptionSubTab}`);
         if (onNavigate) onNavigate();
       }
       return;
     }
+
+    // Khi chọn các mục khác không có menu con: tự động thu gọn các mục lớn
+    setExpandedMenu(null);
 
     if (item.id === 'search_console') {
       navigate(getLocalizedPath('/admin/search-console', currentLang));
@@ -340,105 +365,111 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   return (
     <div
-      className="w-[260px] shrink-0 bg-warm-ivory dark:bg-[#0f2420] flex flex-col justify-between p-4 min-h-full select-none transition-colors"
+      className={`w-full shrink-0 bg-warm-ivory dark:bg-[#0f2420] flex flex-col justify-between min-h-full select-none transition-colors ${
+        isCollapsed ? 'p-2 items-center' : 'p-3.5 sm:p-4'
+      }`}
       role="navigation"
       aria-label="Thanh điều hướng quản trị phân hệ"
     >
-      <div className="space-y-5">
-        {/* ── Brand Identity Logo ───────────────────────────────────────── */}
-        <div className="px-2 pt-1 pb-2 border-b border-[#E5DEC9] dark:border-antique-gold/20 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-heritage-green text-antique-gold border border-antique-gold/40 flex items-center justify-center shrink-0 shadow-xs">
-            <Landmark aria-hidden="true" className="w-5 h-5 text-antique-gold" />
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="font-heading text-sm font-bold text-heritage-green dark:text-antique-bright tracking-tight truncate">
-                VieCultures
-              </span>
-              <span className="px-1.5 py-0.2 rounded bg-antique-gold/20 text-heritage-green dark:text-antique-bright text-[9px] font-bold uppercase tracking-wider border border-antique-gold/30">
-                Admin
-              </span>
-            </div>
-            <p className="text-[11px] text-text-muted leading-tight truncate">
-              Quản trị & Vận hành CMS
-            </p>
-          </div>
-        </div>
-
+      <div className={`w-full ${isCollapsed ? 'space-y-3' : 'space-y-4'}`}>
         {/* ── Navigation Tabs ───────────────────────────────────────────── */}
-        <div className="space-y-1">
-          <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-text-muted">
-            Phân hệ điều hành
-          </div>
-          <div className="flex flex-col gap-1">
+        <div className="space-y-1 w-full">
+          {!isCollapsed && (
+            <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+              Phân hệ điều hành
+            </div>
+          )}
+          <div className={`flex flex-col gap-1 w-full ${isCollapsed ? 'items-center' : ''}`}>
             {navItems.map((item) => {
               const active = isItemActive(item);
               const Icon = item.icon;
               const label = item.labelKey ? t(item.labelKey, item.fallbackLabel) : item.fallbackLabel;
 
               return (
-                <div key={item.id} className="space-y-1">
+                <div key={item.id} className={isCollapsed ? 'w-auto' : 'space-y-1 w-full'}>
                   <button
                     type="button"
                     aria-current={active ? 'page' : undefined}
                     onClick={() => handleTabClick(item)}
-                    className={`w-full px-3 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between cursor-pointer text-left group relative ${
+                    title={label}
+                    aria-label={label}
+                    className={`rounded-xl text-xs font-semibold transition-all flex items-center cursor-pointer relative group ${
+                      isCollapsed
+                        ? 'w-11 h-11 justify-center'
+                        : 'w-full px-3 py-2.5 justify-between text-left'
+                    } ${
                       active
                         ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
                         : 'text-text-secondary hover:text-heritage-green dark:hover:text-antique-bright hover:bg-antique-gold/10 dark:hover:bg-white/5'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
+                    <div className={`flex items-center min-w-0 ${isCollapsed ? 'justify-center' : 'gap-2.5'}`}>
                       {/* Active highlight dot */}
-                      {active ? (
-                        <span className="w-1.5 h-1.5 rounded-full bg-antique-gold shrink-0 animate-pulse" />
-                      ) : (
-                        <span className="w-1.5 h-1.5 rounded-full bg-transparent shrink-0" />
+                      {!isCollapsed && (
+                        active ? (
+                          <span className="w-1.5 h-1.5 rounded-full bg-antique-gold shrink-0 animate-pulse" />
+                        ) : (
+                          <span className="w-1.5 h-1.5 rounded-full bg-transparent shrink-0" />
+                        )
                       )}
 
                       <Icon
                         aria-hidden="true"
-                        className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+                        className={`shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+                          isCollapsed ? 'w-5 h-5' : 'w-4 h-4'
+                        } ${
                           active
                             ? 'text-antique-gold'
                             : 'text-text-muted group-hover:text-heritage-green dark:group-hover:text-antique-bright'
                         }`}
                       />
-                      <span className="truncate group-hover:translate-x-0.5 transition-transform duration-200">
-                        {label}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {item.badge !== undefined && (
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 transition-colors ${
-                            active
-                              ? 'bg-antique-gold text-heritage-green'
-                              : 'bg-rice-paper dark:bg-white/10 text-text-muted border border-[#E5DEC9] dark:border-white/10'
-                          }`}
-                        >
-                          {item.badge}
+                      {!isCollapsed && (
+                        <span className="truncate group-hover:translate-x-0.5 transition-transform duration-200">
+                          {label}
                         </span>
                       )}
-
-                      {item.hasSubItems && (
-                        <ChevronDown
-                          aria-hidden="true"
-                          className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                            (item.id === 'content' && isContentOpen) ||
-                            (item.id === 'marketing' && isMarketingOpen) ||
-                            (item.id === 'subscriptions' && isSubscriptionsOpen)
-                              ? 'rotate-180 text-antique-gold'
-                              : 'text-text-muted'
-                          }`}
-                        />
-                      )}
                     </div>
+
+                    {!isCollapsed && (
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {item.badge !== undefined && (
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 transition-colors ${
+                              active
+                                ? 'bg-antique-gold text-heritage-green'
+                                : 'bg-rice-paper dark:bg-white/10 text-text-muted border border-[#E5DEC9] dark:border-white/10'
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+
+                        {item.hasSubItems && (
+                          <ChevronDown
+                            aria-hidden="true"
+                            className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                              (item.id === 'content' && isContentOpen) ||
+                              (item.id === 'marketing' && isMarketingOpen) ||
+                              (item.id === 'subscriptions' && isSubscriptionsOpen)
+                                ? 'rotate-180 text-antique-gold'
+                                : 'text-text-muted'
+                            }`}
+                          />
+                        )}
+                      </div>
+                    )}
+
+                    {/* Indicator badge for icon-only mode */}
+                    {isCollapsed && item.badge !== undefined && (
+                      <span
+                        className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-antique-gold border border-white dark:border-[#0f2420]"
+                        aria-hidden="true"
+                      />
+                    )}
                   </button>
 
                   {/* Expandable Sub-items for Content */}
-                  {item.id === 'content' && item.hasSubItems && isContentOpen && (
+                  {!isCollapsed && item.id === 'content' && item.hasSubItems && isContentOpen && (
                     <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-antique-gold/30 ml-4 my-1">
                       {contentSubItems.map((sub) => {
                         const SubIcon = sub.icon;
@@ -481,7 +512,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   )}
 
                   {/* Expandable Sub-items for Marketing */}
-                  {item.id === 'marketing' && item.hasSubItems && isMarketingOpen && (
+                  {!isCollapsed && item.id === 'marketing' && item.hasSubItems && isMarketingOpen && (
                     <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-antique-gold/30 ml-4 my-1">
                       {marketingSubItems.map((sub) => {
                         const SubIcon = sub.icon;
@@ -519,7 +550,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   )}
 
                   {/* Expandable Sub-items for Subscriptions */}
-                  {item.id === 'subscriptions' && item.hasSubItems && isSubscriptionsOpen && (
+                  {!isCollapsed && item.id === 'subscriptions' && item.hasSubItems && isSubscriptionsOpen && (
                     <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-antique-gold/30 ml-4 my-1">
                       {subscriptionSubItems.map((sub) => {
                         const SubIcon = sub.icon;
@@ -558,6 +589,28 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </div>
         </div>
       </div>
+
+      {/* ── Toggle Collapse/Expand Button (Desktop) ─────────────────────────── */}
+      {onToggleCollapse && (
+        <div className={`pt-3 mt-4 border-t border-[#E5DEC9] dark:border-antique-gold/20 flex ${isCollapsed ? 'justify-center' : 'justify-end'}`}>
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            aria-label={isCollapsed ? 'Mở rộng menu' : 'Thu gọn menu còn mỗi icon'}
+            title={isCollapsed ? 'Mở rộng menu' : 'Thu gọn menu còn mỗi icon'}
+            className="p-2 rounded-xl text-text-muted hover:text-heritage-green dark:hover:text-warm-ivory hover:bg-antique-gold/15 transition-colors cursor-pointer flex items-center gap-2"
+          >
+            {isCollapsed ? (
+              <ChevronRight aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+            ) : (
+              <>
+                <span className="text-[11px] font-medium">Thu gọn</span>
+                <ChevronLeft aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
