@@ -682,146 +682,163 @@ export const AdminPage: React.FC = () => {
                   </div>
 
                   {/* 4 Funnel Stages */}
-                  <div className="space-y-4">
-                    {/* Stage 1: Khách truy cập web */}
-                    <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
-                            1
-                          </span>
-                          <div>
-                            <span className="font-bold text-text-body dark:text-warm-ivory">
-                              Khách truy cập web
-                            </span>
-                            <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
-                              (Lượng người xem trang chủ & khám phá)
-                            </span>
+                  {(() => {
+                    const realTotalPosts = overviewStats?.totalPosts ?? postStats.totalPosts ?? 0;
+                    const realPublishedPosts = overviewStats?.publishedPosts ?? postStats.publishedCount ?? 0;
+                    const realTotalReads = overviewStats?.totalReads ?? postStats.totalReads ?? 0;
+                    const realTotalUsers = overviewStats?.totalUsers ?? totalUsersCount ?? 0;
+                    const realActiveLearnersWeek = overviewStats?.activeLearnersWeek ?? 0;
+
+                    const publishedPct = realTotalPosts > 0 ? Math.round((realPublishedPosts / realTotalPosts) * 100) : 0;
+                    const userConvPct = realTotalReads > 0 ? Math.min(100, Math.round((realTotalUsers / realTotalReads) * 100)) : (realTotalUsers > 0 ? 100 : 0);
+                    const retentionPct = realTotalUsers > 0 ? Math.min(100, Math.round((realActiveLearnersWeek / realTotalUsers) * 100)) : 0;
+                    const overallActiveRate = realTotalUsers > 0 ? ((realActiveLearnersWeek / realTotalUsers) * 100).toFixed(1) : '0.0';
+
+                    return (
+                      <>
+                        <div className="space-y-4">
+                          {/* Chặng 1: Học liệu xuất bản */}
+                          <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
+                                  1
+                                </span>
+                                <div>
+                                  <span className="font-bold text-text-body dark:text-warm-ivory">
+                                    Học liệu đã xuất bản
+                                  </span>
+                                  <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
+                                    (Kho bài đọc sẵn sàng phục vụ học tập)
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 font-mono text-[11px]">
+                                <span className="font-bold text-heritage-green dark:text-antique-bright">
+                                  {realPublishedPosts.toLocaleString('en-US')} / {realTotalPosts.toLocaleString('en-US')}
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md bg-heritage-green/15 text-[10px] font-bold text-heritage-green dark:text-antique-bright border border-heritage-green/30">
+                                  {publishedPct}%
+                                </span>
+                              </div>
+                            </div>
+                            <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
+                              <div
+                                className="h-full bg-gradient-to-r from-heritage-green to-emerald-600 rounded-full transition-all duration-700 ease-out shadow-xs"
+                                style={{ width: `${publishedPct}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Chặng 2: Lượt đọc tích lũy */}
+                          <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
+                                  2
+                                </span>
+                                <div>
+                                  <span className="font-bold text-text-body dark:text-warm-ivory">
+                                    Lượt đọc tích lũy
+                                  </span>
+                                  <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
+                                    (Tổng lượt tương tác đọc bài di sản)
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 font-mono text-[11px]">
+                                <span className="font-bold text-heritage-green dark:text-antique-bright">
+                                  {realTotalReads.toLocaleString('en-US')}
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-[10px] font-bold text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
+                                  {realTotalReads > 0 ? '100%' : '0%'}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
+                              <div
+                                className="h-full bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full transition-all duration-700 ease-out shadow-xs"
+                                style={{ width: realTotalReads > 0 ? '100%' : '0%' }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Chặng 3: Đăng ký tài khoản */}
+                          <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
+                                  3
+                                </span>
+                                <div>
+                                  <span className="font-bold text-text-body dark:text-warm-ivory">
+                                    Đăng ký tài khoản học viên
+                                  </span>
+                                  <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
+                                    (Tổng hồ sơ xác thực trên hệ thống)
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 font-mono text-[11px]">
+                                <span className="font-bold text-heritage-green dark:text-antique-bright">
+                                  {realTotalUsers.toLocaleString('en-US')}
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md bg-antique-gold/20 text-[10px] font-bold text-heritage-green dark:text-antique-bright border border-antique-gold/30">
+                                  {userConvPct}%
+                                </span>
+                              </div>
+                            </div>
+                            <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
+                              <div
+                                className="h-full bg-gradient-to-r from-antique-gold to-amber-500 rounded-full transition-all duration-700 ease-out shadow-xs"
+                                style={{ width: `${userConvPct}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Chặng 4: Học viên hoạt động tuần */}
+                          <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
+                                  4
+                                </span>
+                                <div>
+                                  <span className="font-bold text-text-body dark:text-warm-ivory">
+                                    Học viên hoạt động tuần
+                                  </span>
+                                  <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
+                                    (Tương tác làm bài trong 7 ngày qua)
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 font-mono text-[11px]">
+                                <span className="font-bold text-heritage-green dark:text-antique-bright">
+                                  {realActiveLearnersWeek.toLocaleString('en-US')}
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-[10px] font-bold text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                                  {retentionPct}%
+                                </span>
+                              </div>
+                            </div>
+                            <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
+                              <div
+                                className="h-full bg-gradient-to-r from-amber-500 to-antique-gold rounded-full transition-all duration-700 ease-out shadow-xs"
+                                style={{ width: `${retentionPct}%` }}
+                              />
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 font-mono text-[11px]">
-                          <span className="font-bold text-heritage-green dark:text-antique-bright">
-                            10,450
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md bg-heritage-green/15 text-[10px] font-bold text-heritage-green dark:text-antique-bright border border-heritage-green/30">
-                            100%
-                          </span>
-                        </div>
-                      </div>
-                      <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
-                        <div
-                          className="h-full bg-gradient-to-r from-heritage-green to-emerald-600 rounded-full transition-all duration-700 ease-out shadow-xs"
-                          style={{ width: '100%' }}
-                        />
-                      </div>
-                    </div>
 
-                    {/* Stage 2: Đăng ký tài khoản */}
-                    <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
-                            2
-                          </span>
-                          <div>
-                            <span className="font-bold text-text-body dark:text-warm-ivory">
-                              Đăng ký tài khoản
-                            </span>
-                            <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
-                              (Tạo hồ sơ và xác thực người học)
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 font-mono text-[11px]">
-                          <span className="font-bold text-heritage-green dark:text-antique-bright">
-                            {(overviewStats?.totalUsers ?? totalUsersCount ?? 1250).toLocaleString('en-US')}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-[10px] font-bold text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
-                            42.5%
+                        <div className="p-3.5 rounded-2xl bg-warm-ivory/90 dark:bg-heritage-forest/60 border border-antique-gold/30 text-xs text-text-secondary flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-4 shadow-2xs">
+                          <span className="font-medium">Tỷ lệ học viên hoạt động trong tuần trên tổng số tài khoản:</span>
+                          <span className="font-bold font-mono text-sm text-heritage-green dark:text-antique-bright px-2.5 py-0.5 rounded-lg bg-antique-gold/20 border border-antique-gold/30 self-start sm:self-auto">
+                            {overallActiveRate}%
                           </span>
                         </div>
-                      </div>
-                      <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
-                        <div
-                          className="h-full bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full transition-all duration-700 ease-out shadow-xs"
-                          style={{ width: '42.5%' }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Stage 3: Hoàn thành bài đầu tiên */}
-                    <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
-                            3
-                          </span>
-                          <div>
-                            <span className="font-bold text-text-body dark:text-warm-ivory">
-                              Hoàn thành bài đầu tiên
-                            </span>
-                            <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
-                              (Luyện đọc & hoàn thành tương tác)
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 font-mono text-[11px]">
-                          <span className="font-bold text-heritage-green dark:text-antique-bright">
-                            {(overviewStats?.totalReads ? Math.min(overviewStats.totalReads, 520) : 520).toLocaleString('en-US')}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md bg-antique-gold/20 text-[10px] font-bold text-heritage-green dark:text-antique-bright border border-antique-gold/30">
-                            26.2%
-                          </span>
-                        </div>
-                      </div>
-                      <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
-                        <div
-                          className="h-full bg-gradient-to-r from-antique-gold to-amber-500 rounded-full transition-all duration-700 ease-out shadow-xs"
-                          style={{ width: '26.2%' }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Stage 4: Quay lại ngày 2 */}
-                    <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
-                            4
-                          </span>
-                          <div>
-                            <span className="font-bold text-text-body dark:text-warm-ivory">
-                              Quay lại ngày 2 (Giữ chân D2)
-                            </span>
-                            <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
-                              (Học viên tiếp tục lộ trình học)
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 font-mono text-[11px]">
-                          <span className="font-bold text-heritage-green dark:text-antique-bright">
-                            {(overviewStats?.activeLearnersWeek ?? 280).toLocaleString('en-US')}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-[10px] font-bold text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
-                            14.1%
-                          </span>
-                        </div>
-                      </div>
-                      <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
-                        <div
-                          className="h-full bg-gradient-to-r from-amber-500 to-antique-gold rounded-full transition-all duration-700 ease-out shadow-xs"
-                          style={{ width: '14.1%' }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-warm-ivory/90 dark:bg-heritage-forest/60 border border-antique-gold/30 text-xs text-text-secondary flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-4 shadow-2xs">
-                  <span className="font-medium">Tỷ lệ chuyển đổi tổng thể (Từ khách xem sang học viên D2):</span>
-                  <span className="font-bold font-mono text-sm text-heritage-green dark:text-antique-bright px-2.5 py-0.5 rounded-lg bg-antique-gold/20 border border-antique-gold/30 self-start sm:self-auto">
-                    14.1%
-                  </span>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 

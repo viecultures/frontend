@@ -10,13 +10,10 @@ import {
   Users,
   ShieldCheck,
   Landmark,
-  Server,
-  Activity,
   ChevronDown,
   Link,
   BarChart3,
   Mail,
-  Share2,
   CreditCard,
   Sliders,
   Globe,
@@ -37,7 +34,7 @@ interface ContentSubItem {
 }
 
 interface MarketingSubItem {
-  key: 'utm' | 'analytics' | 'broadcast' | 'social';
+  key: 'utm' | 'broadcast';
   label: string;
   icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
   badge?: string;
@@ -89,7 +86,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   // Current sub-tab for marketing
   const activeMarketingSubTab = React.useMemo(() => {
     const params = new URLSearchParams(location.search);
-    return params.get('tab') || 'utm';
+    const tab = params.get('tab');
+    if (tab === 'broadcast' || tab === 'utm') {
+      return tab;
+    }
+    return 'utm';
   }, [location.search]);
 
   // Current sub-tab for subscriptions
@@ -177,20 +178,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       icon: Link,
     },
     {
-      key: 'analytics',
-      label: 'Google Analytics & Search Console',
-      icon: BarChart3,
-    },
-    {
       key: 'broadcast',
       label: 'Email & Bản tin di sản',
       icon: Mail,
-    },
-    {
-      key: 'social',
-      label: 'Mạng xã hội & Ads (Sắp ra mắt)',
-      icon: Share2,
-      badge: 'Sớm',
     },
   ];
 
@@ -549,32 +539,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 </div>
               );
             })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Footer Telemetry & Server Status Card ──────────────────────── */}
-      <div className="pt-4 border-t border-[#E5DEC9] dark:border-antique-gold/20">
-        <div className="p-3 rounded-xl bg-rice-paper/60 dark:bg-white/5 border border-[#E5DEC9] dark:border-antique-gold/20 space-y-2">
-          <div className="flex items-center justify-between text-xs font-semibold text-text-body dark:text-warm-ivory">
-            <div className="flex items-center gap-1.5">
-              <Server aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold shrink-0" />
-              <span>Máy chủ API</span>
-            </div>
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold border border-emerald-300 dark:border-emerald-700">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Sẵn sàng
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between text-[11px] text-text-muted pt-1 border-t border-[#E5DEC9]/60 dark:border-white/10">
-            <span className="flex items-center gap-1">
-              <Activity aria-hidden="true" className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-              <span>CSDL: Bình thường</span>
-            </span>
-            <span className="font-mono text-[10px] font-bold text-text-muted">
-              99.9%
-            </span>
           </div>
         </div>
       </div>

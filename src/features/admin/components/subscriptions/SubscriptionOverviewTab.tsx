@@ -372,10 +372,14 @@ export const SubscriptionOverviewTab: React.FC = () => {
                   <td colSpan={7} className="py-12 text-center text-text-muted space-y-1">
                     <CreditCard className="w-8 h-8 mx-auto text-antique-gold/50 mb-2" aria-hidden="true" />
                     <p className="font-semibold text-heritage-green dark:text-warm-ivory">
-                      Không tìm thấy giao dịch nào phù hợp
+                      {searchQuery.trim() || statusFilter !== 'ALL'
+                        ? 'Không tìm thấy giao dịch nào phù hợp'
+                        : 'Chưa có giao dịch chuyển khoản nào'}
                     </p>
                     <p className="text-[11px]">
-                      Hãy thử đổi từ khóa tìm kiếm hoặc chọn bộ lọc trạng thái khác.
+                      {searchQuery.trim() || statusFilter !== 'ALL'
+                        ? 'Hãy thử đổi từ khóa tìm kiếm hoặc chọn bộ lọc trạng thái khác.'
+                        : 'Dữ liệu giao dịch sẽ tự động hiển thị tại đây khi có học viên thực hiện chuyển khoản.'}
                     </p>
                   </td>
                 </tr>
