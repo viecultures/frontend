@@ -577,10 +577,10 @@ export const AdminPage: React.FC = () => {
                     <div>
                       <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
                         <Filter aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                        <span>Phễu chuyển đổi học viên</span>
+                        <span>Phễu chuyển đổi học viên 4 chặng</span>
                       </h3>
                       <p className="text-xs text-text-muted mt-0.5">
-                        Đo lường các bước then chốt trong hành trình gắn kết văn hóa
+                        Theo dõi hiệu suất từng bước trong hành trình khám phá và gắn kết di sản
                       </p>
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/30">
@@ -591,110 +591,144 @@ export const AdminPage: React.FC = () => {
                   {/* 4 Funnel Stages */}
                   <div className="space-y-4">
                     {/* Stage 1: Khách truy cập web */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-heritage-green/10 text-heritage-green dark:text-antique-bright font-bold text-[10px] flex items-center justify-center border border-antique-gold/30">
+                          <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
                             1
                           </span>
-                          <span className="font-bold text-text-body dark:text-warm-ivory">
-                            Khách truy cập web
-                          </span>
+                          <div>
+                            <span className="font-bold text-text-body dark:text-warm-ivory">
+                              Khách truy cập web
+                            </span>
+                            <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
+                              (Lượng người xem trang chủ & khám phá)
+                            </span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2 font-mono text-[11px]">
                           <span className="font-bold text-heritage-green dark:text-antique-bright">
                             10,450
                           </span>
-                          <span className="px-1.5 py-0.2 rounded bg-antique-gold/20 text-[10px] font-bold text-heritage-green dark:text-antique-bright">
+                          <span className="px-2 py-0.5 rounded-md bg-heritage-green/15 text-[10px] font-bold text-heritage-green dark:text-antique-bright border border-heritage-green/30">
                             100%
                           </span>
                         </div>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
-                        <div className="h-full bg-heritage-green rounded-full" style={{ width: '100%' }} />
+                      <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
+                        <div
+                          className="h-full bg-gradient-to-r from-heritage-green to-emerald-600 rounded-full transition-all duration-700 ease-out shadow-xs"
+                          style={{ width: '100%' }}
+                        />
                       </div>
                     </div>
 
                     {/* Stage 2: Đăng ký tài khoản */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-heritage-green/10 text-heritage-green dark:text-antique-bright font-bold text-[10px] flex items-center justify-center border border-antique-gold/30">
+                          <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
                             2
                           </span>
-                          <span className="font-bold text-text-body dark:text-warm-ivory">
-                            Đăng ký tài khoản
-                          </span>
+                          <div>
+                            <span className="font-bold text-text-body dark:text-warm-ivory">
+                              Đăng ký tài khoản
+                            </span>
+                            <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
+                              (Tạo hồ sơ và xác thực người học)
+                            </span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2 font-mono text-[11px]">
                           <span className="font-bold text-heritage-green dark:text-antique-bright">
                             {(overviewStats?.totalUsers ?? totalUsersCount ?? 1250).toLocaleString('en-US')}
                           </span>
-                          <span className="px-1.5 py-0.2 rounded bg-antique-gold/20 text-[10px] font-bold text-heritage-green dark:text-antique-bright">
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-[10px] font-bold text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
                             42.5%
                           </span>
                         </div>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
-                        <div className="h-full bg-emerald-600 rounded-full" style={{ width: '42.5%' }} />
+                      <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full transition-all duration-700 ease-out shadow-xs"
+                          style={{ width: '42.5%' }}
+                        />
                       </div>
                     </div>
 
                     {/* Stage 3: Hoàn thành bài đầu tiên */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-heritage-green/10 text-heritage-green dark:text-antique-bright font-bold text-[10px] flex items-center justify-center border border-antique-gold/30">
+                          <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
                             3
                           </span>
-                          <span className="font-bold text-text-body dark:text-warm-ivory">
-                            Hoàn thành bài đầu tiên
-                          </span>
+                          <div>
+                            <span className="font-bold text-text-body dark:text-warm-ivory">
+                              Hoàn thành bài đầu tiên
+                            </span>
+                            <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
+                              (Luyện đọc & hoàn thành tương tác)
+                            </span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2 font-mono text-[11px]">
                           <span className="font-bold text-heritage-green dark:text-antique-bright">
                             {(overviewStats?.totalReads ? Math.min(overviewStats.totalReads, 520) : 520).toLocaleString('en-US')}
                           </span>
-                          <span className="px-1.5 py-0.2 rounded bg-antique-gold/20 text-[10px] font-bold text-heritage-green dark:text-antique-bright">
+                          <span className="px-2 py-0.5 rounded-md bg-antique-gold/20 text-[10px] font-bold text-heritage-green dark:text-antique-bright border border-antique-gold/30">
                             26.2%
                           </span>
                         </div>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
-                        <div className="h-full bg-antique-gold rounded-full" style={{ width: '26.2%' }} />
+                      <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
+                        <div
+                          className="h-full bg-gradient-to-r from-antique-gold to-amber-500 rounded-full transition-all duration-700 ease-out shadow-xs"
+                          style={{ width: '26.2%' }}
+                        />
                       </div>
                     </div>
 
                     {/* Stage 4: Quay lại ngày 2 */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 p-2 rounded-2xl bg-warm-ivory/60 dark:bg-heritage-forest/40 border border-antique-gold/20">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-heritage-green/10 text-heritage-green dark:text-antique-bright font-bold text-[10px] flex items-center justify-center border border-antique-gold/30">
+                          <span className="w-6 h-6 rounded-lg bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-bright font-bold text-xs flex items-center justify-center border border-antique-gold/30 shrink-0">
                             4
                           </span>
-                          <span className="font-bold text-text-body dark:text-warm-ivory">
-                            Quay lại ngày 2 (Giữ chân D2)
-                          </span>
+                          <div>
+                            <span className="font-bold text-text-body dark:text-warm-ivory">
+                              Quay lại ngày 2 (Giữ chân D2)
+                            </span>
+                            <span className="hidden sm:inline text-[11px] text-text-muted ml-1.5">
+                              (Học viên tiếp tục lộ trình học)
+                            </span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2 font-mono text-[11px]">
                           <span className="font-bold text-heritage-green dark:text-antique-bright">
                             {(overviewStats?.activeLearnersWeek ?? 280).toLocaleString('en-US')}
                           </span>
-                          <span className="px-1.5 py-0.2 rounded bg-antique-gold/20 text-[10px] font-bold text-heritage-green dark:text-antique-bright">
+                          <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-[10px] font-bold text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
                             14.1%
                           </span>
                         </div>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
-                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '14.1%' }} />
+                      <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/90 overflow-hidden border border-antique-gold/30 p-0.5 shadow-inner">
+                        <div
+                          className="h-full bg-gradient-to-r from-amber-500 to-antique-gold rounded-full transition-all duration-700 ease-out shadow-xs"
+                          style={{ width: '14.1%' }}
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-warm-ivory/80 dark:bg-heritage-dark/80 border border-antique-gold/20 text-[11px] text-text-secondary flex items-center justify-between mt-2">
-                  <span>Tỷ lệ chuyển đổi tổng thể (Từ khách sang học viên D2):</span>
-                  <span className="font-bold font-mono text-heritage-green dark:text-antique-bright">14.1%</span>
+                <div className="p-3.5 rounded-2xl bg-warm-ivory/90 dark:bg-heritage-forest/60 border border-antique-gold/30 text-xs text-text-secondary flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-4 shadow-2xs">
+                  <span className="font-medium">Tỷ lệ chuyển đổi tổng thể (Từ khách xem sang học viên D2):</span>
+                  <span className="font-bold font-mono text-sm text-heritage-green dark:text-antique-bright px-2.5 py-0.5 rounded-lg bg-antique-gold/20 border border-antique-gold/30 self-start sm:self-auto">
+                    14.1%
+                  </span>
                 </div>
               </div>
 
@@ -707,7 +741,10 @@ export const AdminPage: React.FC = () => {
                       <Layers aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                       <span>{t('stats.by_cefr_level', 'Phân bổ theo cấp độ CEFR')}</span>
                     </h3>
-                    <span className="text-[11px] text-text-muted">Nhấp vào thanh để lọc bài</span>
+                    <span className="text-[11px] text-text-muted flex items-center gap-1 font-medium">
+                      Nhấp vào thanh để lọc bài
+                      <ArrowRight aria-hidden="true" className="w-3 h-3 text-antique-gold" />
+                    </span>
                   </div>
                   <div className="space-y-2.5">
                     {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => {
@@ -722,21 +759,22 @@ export const AdminPage: React.FC = () => {
                           key={lvl}
                           type="button"
                           onClick={() => handleQuickFilterCefr(lvl)}
-                          className="w-full text-left p-1.5 -mx-1.5 rounded-xl hover:bg-antique-gold/10 transition-colors cursor-pointer group"
-                          title={`Nhấp để lọc bài viết cấp độ ${lvl} trong kho`}
+                          className="w-full text-left p-2 -mx-2 rounded-2xl border border-transparent hover:border-antique-gold/40 hover:bg-antique-gold/10 hover:shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-antique-gold/40"
+                          title={`Nhấp để lọc bài viết cấp độ ${lvl} trong kho bài viết`}
                         >
-                          <div className="flex items-center justify-between text-xs font-semibold mb-1">
+                          <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
                             <span className="text-text-body dark:text-warm-ivory group-hover:text-heritage-green dark:group-hover:text-antique-bright flex items-center gap-1.5">
                               <span className="w-6 font-bold">{lvl}</span>
                               <span className="text-[11px] text-text-muted">({t('filters.level_option', { level: lvl })})</span>
                             </span>
-                            <span className="text-text-secondary group-hover:text-heritage-green dark:group-hover:text-antique-bright">
-                              {count} bài ({pct}%) &rarr;
+                            <span className="inline-flex items-center gap-1 text-[11px] text-text-secondary group-hover:text-heritage-green dark:group-hover:text-antique-bright font-medium">
+                              <span>{count} bài ({pct}%)</span>
+                              <ArrowRight aria-hidden="true" className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform text-antique-gold" />
                             </span>
                           </div>
-                          <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
+                          <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20 p-0.5 shadow-inner">
                             <div
-                              className="h-full bg-antique-gold rounded-full transition-all duration-500 group-hover:brightness-110"
+                              className="h-full bg-gradient-to-r from-antique-gold to-amber-500 rounded-full transition-all duration-700 ease-out group-hover:brightness-110 shadow-xs"
                               style={{ width: `${pct}%` }}
                             />
                           </div>
@@ -753,7 +791,10 @@ export const AdminPage: React.FC = () => {
                       <MapPin aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                       <span>{t('stats.by_region', 'Phân bổ theo vùng miền')}</span>
                     </h3>
-                    <span className="text-[11px] text-text-muted">Nhấp vào thanh để lọc bài</span>
+                    <span className="text-[11px] text-text-muted flex items-center gap-1 font-medium">
+                      Nhấp vào thanh để lọc bài
+                      <ArrowRight aria-hidden="true" className="w-3 h-3 text-antique-gold" />
+                    </span>
                   </div>
                   {(() => {
                     const coverageMap = overviewStats?.regionCoverage || postStats.regionsCount;
@@ -773,20 +814,21 @@ export const AdminPage: React.FC = () => {
                               key={region}
                               type="button"
                               onClick={() => handleQuickFilterRegion(region)}
-                              className="w-full text-left p-1.5 -mx-1.5 rounded-xl hover:bg-antique-gold/10 transition-colors cursor-pointer group"
-                              title={`Nhấp để lọc bài viết vùng ${adminRegionLabel(region)} trong kho`}
+                              className="w-full text-left p-2 -mx-2 rounded-2xl border border-transparent hover:border-antique-gold/40 hover:bg-antique-gold/10 hover:shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-antique-gold/40"
+                              title={`Nhấp để lọc bài viết vùng ${adminRegionLabel(region)} trong kho bài viết`}
                             >
-                              <div className="flex items-center justify-between text-xs font-semibold mb-1">
+                              <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
                                 <span className="text-text-body dark:text-warm-ivory group-hover:text-heritage-green dark:group-hover:text-antique-bright">
                                   {adminRegionLabel(region)}
                                 </span>
-                                <span className="text-text-secondary group-hover:text-heritage-green dark:group-hover:text-antique-bright">
-                                  {count} bài ({pct}%) &rarr;
+                                <span className="inline-flex items-center gap-1 text-[11px] text-text-secondary group-hover:text-heritage-green dark:group-hover:text-antique-bright font-medium">
+                                  <span>{count} bài ({pct}%)</span>
+                                  <ArrowRight aria-hidden="true" className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform text-antique-gold" />
                                 </span>
                               </div>
-                              <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
+                              <div className="w-full h-2.5 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20 p-0.5 shadow-inner">
                                 <div
-                                  className="h-full bg-emerald-600 dark:bg-emerald-500 rounded-full transition-all duration-500 group-hover:brightness-110"
+                                  className="h-full bg-gradient-to-r from-heritage-green to-emerald-600 dark:from-emerald-600 dark:to-teal-500 rounded-full transition-all duration-700 ease-out group-hover:brightness-110 shadow-xs"
                                   style={{ width: `${pct}%` }}
                                 />
                               </div>
@@ -820,14 +862,18 @@ export const AdminPage: React.FC = () => {
               </div>
 
               {attentionPosts.length === 0 ? (
-                <div className="py-8 text-center rounded-2xl border border-dashed border-antique-gold/30 space-y-2">
-                  <CheckCircle2 aria-hidden="true" className="w-8 h-8 text-emerald-600 dark:text-emerald-400 mx-auto" />
-                  <p className="text-sm font-bold text-heritage-green dark:text-antique-bright">
-                    Tuyệt vời! Tất cả học liệu đều đã đạt chuẩn
-                  </p>
-                  <p className="text-xs text-text-muted">
-                    100% bài viết đã sẵn sàng với đầy đủ đoạn văn song ngữ, file audio phát âm và câu hỏi phản tư.
-                  </p>
+                <div className="p-8 sm:p-10 text-center rounded-3xl bg-gradient-to-b from-warm-ivory to-rice-paper/60 dark:from-heritage-dark/80 dark:to-heritage-forest/60 border border-antique-gold/30 space-y-3 shadow-xs">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center mx-auto shadow-sm">
+                    <CheckCircle2 aria-hidden="true" className="w-7 h-7" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-base font-heading font-bold text-heritage-green dark:text-antique-bright">
+                      Tuyệt vời! 100% Học liệu đã hoàn thiện và đạt chuẩn
+                    </p>
+                    <p className="text-xs text-text-muted max-w-lg mx-auto leading-relaxed">
+                      Tất cả bài viết trong kho đều đã sẵn sàng phục vụ học tập với đầy đủ đoạn văn song ngữ, file âm thanh AI chuẩn bản xứ và câu hỏi phản tư.
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -881,17 +927,17 @@ export const AdminPage: React.FC = () => {
                             <td className="px-4 py-3">
                               <div className="flex flex-wrap gap-1.5">
                                 {!hasParagraphs && (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-300">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 shadow-2xs">
                                     Thiếu đoạn văn
                                   </span>
                                 )}
                                 {!hasAudio && (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shadow-2xs">
                                     Thiếu Audio
                                   </span>
                                 )}
                                 {!hasQuiz && (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border border-purple-300">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-100 dark:bg-sky-950/50 text-sky-800 dark:text-sky-300 border border-sky-300 dark:border-sky-800 shadow-2xs">
                                     Thiếu Quiz
                                   </span>
                                 )}
@@ -906,19 +952,19 @@ export const AdminPage: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleOpenEdit(post)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-antique-gold text-heritage-dark hover:bg-antique-bright text-[11px] font-bold transition-all cursor-pointer shadow-xs"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-antique-gold via-amber-400 to-antique-gold hover:from-antique-bright hover:to-antique-gold text-heritage-dark text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md hover:scale-[1.03] active:scale-[0.97] border border-antique-gold/40"
                               >
-                                <Edit3 className="w-3 h-3" aria-hidden="true" />
+                                <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
                                 <span>Bổ sung ngay</span>
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => handleOpenPreview(post)}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-antique-gold/30 hover:bg-antique-gold/15 text-[11px] font-semibold text-text-secondary transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 px-2 py-1.5 rounded-xl border border-antique-gold/30 hover:bg-antique-gold/15 text-[11px] font-semibold text-text-secondary transition-colors cursor-pointer"
                                 title="Xem bài"
                               >
-                                <Eye className="w-3 h-3" aria-hidden="true" />
+                                <Eye className="w-3.5 h-3.5" aria-hidden="true" />
                               </button>
                             </td>
                           </tr>

@@ -104,13 +104,27 @@ export const MarketingManagementView: React.FC = () => {
   // Async States
   const [isSendingMail, setIsSendingMail] = useState<boolean>(false);
   const [isTestingSmtp, setIsTestingSmtp] = useState<boolean>(false);
+  const [smtpStatus, setSmtpStatus] = useState<'IDLE' | 'TESTING' | 'SUCCESS' | 'ERROR'>('IDLE');
   const [feedbackToast, setFeedbackToast] = useState<{
     type: 'success' | 'error';
     text: string;
   } | null>(null);
 
+  // Copy helper for specs with toast
+  const [copiedSpecKey, setCopiedSpecKey] = useState<string | null>(null);
+  const handleCopySpec = (text: string, specKey: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedSpecKey(specKey);
+    setFeedbackToast({
+      type: 'success',
+      text: `Đã sao chép ${label} (${text}) vào bộ nhớ tạm!`,
+    });
+    setTimeout(() => setCopiedSpecKey(null), 2500);
+  };
+
   // Analytics snippet copied state
   const [copiedGtag, setCopiedGtag] = useState<boolean>(false);
+  const [copiedPreview, setCopiedPreview] = useState<boolean>(false);
 
   // Load campaigns from localStorage on mount
   useEffect(() => {
@@ -327,16 +341,19 @@ export const MarketingManagementView: React.FC = () => {
     }
 
     setIsTestingSmtp(true);
+    setSmtpStatus('TESTING');
     setFeedbackToast(null);
 
     try {
       const res = await adminMailService.testConnection(toEmail.trim());
+      setSmtpStatus('SUCCESS');
       setFeedbackToast({
         type: 'success',
         text: res.message || `Đã gửi email kiểm tra tới ${toEmail}. Gmail SMTP kết nối thành công!`,
       });
     } catch (err: unknown) {
       console.error('Lỗi khi kiểm tra Gmail SMTP:', err);
+      setSmtpStatus('ERROR');
       const msg = err instanceof Error ? err.message : 'Kiểm tra kết nối Gmail SMTP thất bại';
       setFeedbackToast({
         type: 'error',
@@ -437,57 +454,38 @@ export const MarketingManagementView: React.FC = () => {
 
       {/* ── Sub-Tab Switcher Navigation ─────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-xs">
-        <button
-          type="button"
-          onClick={() => handleSelectTab('utm')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'utm'
-              ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-              : 'text-text-secondary hover:text-heritage-green hover:bg-antique-gold/10'
-          }`}
-        >
-          <Target className="w-4 h-4 text-antique-gold" aria-hidden="true" />
-          <span>1. Tạo link UTM (Nội bộ)</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleSelectTab('analytics')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'analytics'
-              ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-              : 'text-text-secondary hover:text-heritage-green hover:bg-antique-gold/10'
-          }`}
-        >
-          <BarChart3 className="w-4 h-4 text-antique-gold" aria-hidden="true" />
-          <span>2. Google Analytics & Search Console</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleSelectTab('broadcast')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'broadcast'
-              ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-              : 'text-text-secondary hover:text-heritage-green hover:bg-antique-gold/10'
-          }`}
-        >
-          <Mail className="w-4 h-4 text-antique-gold" aria-hidden="true" />
-          <span>3. Email & Bản tin di sản</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleSelectTab('social')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'social'
-              ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-              : 'text-text-secondary hover:text-heritage-green hover:bg-antique-gold/10'
-          }`}
-        >
-          <Share2 className="w-4 h-4 text-antique-gold" aria-hidden="true" />
-          <span>4. Mạng xã hội & Ads</span>
-        </button>
+        {[
+          { key: 'utm', label: '1. Tạo link UTM (Nội bộ)', icon: Target },
+          { key: 'analytics', label: '2. Google Analytics & Search Console', icon: BarChart3 },
+          { key: 'broadcast', label: '3. Email & Bản tin di sản', icon: Mail },
+          { key: 'social', label: '4. Mạng xã hội & Ads', icon: Share2 },
+        ].map((tabItem) => {
+          const isActive = activeTab === tabItem.key;
+          const TabIcon = tabItem.icon;
+          return (
+            <button
+              key={tabItem.key}
+              type="button"
+              onClick={() => handleSelectTab(tabItem.key as MarketingTabKey)}
+              className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                isActive
+                  ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/50'
+                  : 'text-text-secondary hover:text-heritage-green dark:hover:text-antique-bright hover:bg-antique-gold/15'
+              }`}
+            >
+              <TabIcon
+                className={`w-4 h-4 transition-colors ${
+                  isActive ? 'text-antique-gold' : 'text-text-muted'
+                }`}
+                aria-hidden="true"
+              />
+              <span>{tabItem.label}</span>
+              {isActive && (
+                <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-antique-gold rounded-full" />
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── TAB 1: Quick UTM Campaign Builder ───────────────────────────── */}
@@ -656,21 +654,43 @@ export const MarketingManagementView: React.FC = () => {
             </div>
 
             {/* Generated URL Box */}
-            <div className="p-4 rounded-2xl bg-heritage-forest/10 dark:bg-white/5 border border-antique-gold/30 space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-heritage-green dark:text-antique-bright">
-                <span>Liên kết chiến dịch đầy đủ (Generated URL):</span>
+            <div className="p-4 rounded-2xl bg-heritage-forest/10 dark:bg-white/5 border border-antique-gold/30 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-bold text-heritage-green dark:text-antique-bright">
+                <span className="flex items-center gap-1.5">
+                  <Target aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                  <span>Xem trước liên kết chiến dịch (Live UTM Preview):</span>
+                </span>
                 <span className="text-[11px] font-mono text-text-muted">Độ dài: {generatedUtmUrl.length} ký tự</span>
               </div>
-              <div className="p-3 rounded-xl bg-rice-paper dark:bg-heritage-dark font-mono text-xs text-heritage-green dark:text-antique-bright border border-antique-gold/20 break-all select-all">
+
+              {/* Parameter Badges */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2 py-0.5 rounded-md bg-heritage-green/10 dark:bg-white/10 text-heritage-green dark:text-antique-bright text-[11px] font-mono font-bold border border-antique-gold/30">
+                  utm_source: <span className="text-antique-gold">{CHANNEL_DEFAULTS[channel].source}</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-heritage-green/10 dark:bg-white/10 text-heritage-green dark:text-antique-bright text-[11px] font-mono font-bold border border-antique-gold/30">
+                  utm_medium: <span className="text-antique-gold">{CHANNEL_DEFAULTS[channel].medium}</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-antique-gold/20 text-heritage-green dark:text-antique-bright text-[11px] font-mono font-bold border border-antique-gold/30">
+                  utm_campaign: <span className="font-semibold">{campaignName.trim().toLowerCase().replace(/\s+/g, '-') || '(chưa nhập)'}</span>
+                </span>
+                {campaignContent.trim() && (
+                  <span className="px-2 py-0.5 rounded-md bg-antique-gold/15 text-heritage-green dark:text-antique-bright text-[11px] font-mono font-bold border border-antique-gold/30">
+                    utm_content: <span>{campaignContent.trim().toLowerCase().replace(/\s+/g, '-')}</span>
+                  </span>
+                )}
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-rice-paper dark:bg-heritage-dark font-mono text-xs text-heritage-green dark:text-antique-bright border border-antique-gold/30 break-all select-all leading-relaxed shadow-inner">
                 {generatedUtmUrl}
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 pt-1">
+              <div className="flex flex-wrap items-center gap-2.5 pt-1">
                 <button
                   type="submit"
-                  className="py-2 px-4 rounded-xl bg-heritage-green text-warm-ivory hover:bg-heritage-dark text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                  className="py-2.5 px-4 rounded-xl bg-heritage-green text-warm-ivory hover:bg-heritage-dark text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:scale-[1.01] active:scale-[0.98]"
                 >
-                  <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+                  <Plus className="w-4 h-4 text-antique-gold" aria-hidden="true" />
                   <span>Tạo và Lưu Liên Kết Chiến Dịch</span>
                 </button>
 
@@ -678,15 +698,26 @@ export const MarketingManagementView: React.FC = () => {
                   type="button"
                   onClick={() => {
                     navigator.clipboard.writeText(generatedUtmUrl);
+                    setCopiedPreview(true);
                     setFeedbackToast({
                       type: 'success',
-                      text: 'Đã chép liên kết chiến dịch vào bộ nhớ tạm!',
+                      text: 'Đã sao chép liên kết chiến dịch UTM vào bộ nhớ tạm!',
                     });
+                    setTimeout(() => setCopiedPreview(false), 2500);
                   }}
-                  className="py-2 px-4 rounded-xl bg-antique-gold/20 hover:bg-antique-gold/30 border border-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="py-2.5 px-4 rounded-xl bg-antique-gold/20 hover:bg-antique-gold/30 border border-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs hover:scale-[1.01] active:scale-[0.98]"
                 >
-                  <Copy className="w-3.5 h-3.5" aria-hidden="true" />
-                  <span>Chép 1-Click</span>
+                  {copiedPreview ? (
+                    <>
+                      <Check className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+                      <span>Đã chép liên kết</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 text-antique-gold" aria-hidden="true" />
+                      <span>Sao chép URL 1-Click</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -795,32 +826,88 @@ export const MarketingManagementView: React.FC = () => {
 
             {/* Config Specs Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-1">
-                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Measurement ID</span>
+              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/25 hover:border-antique-gold/50 transition-all space-y-1.5 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Measurement ID</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopySpec('G-CTMMCTEFPM', 'ga4_id', 'GA4 Measurement ID')}
+                    className="p-1 rounded-lg hover:bg-antique-gold/20 text-text-muted hover:text-heritage-green dark:hover:text-antique-bright transition-colors cursor-pointer"
+                    title="Sao chép GA4 Measurement ID"
+                  >
+                    {copiedSpecKey === 'ga4_id' ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
                 <div className="font-mono text-base font-bold text-heritage-green dark:text-antique-bright select-all">
                   G-CTMMCTEFPM
                 </div>
                 <p className="text-[10px] text-text-secondary">Định danh luồng đo lường chính</p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-1">
-                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Stream ID</span>
+              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/25 hover:border-antique-gold/50 transition-all space-y-1.5 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Stream ID</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopySpec('16250918205', 'stream_id', 'GA4 Stream ID')}
+                    className="p-1 rounded-lg hover:bg-antique-gold/20 text-text-muted hover:text-heritage-green dark:hover:text-antique-bright transition-colors cursor-pointer"
+                    title="Sao chép GA4 Stream ID"
+                  >
+                    {copiedSpecKey === 'stream_id' ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
                 <div className="font-mono text-base font-bold text-heritage-green dark:text-antique-bright select-all">
                   16250918205
                 </div>
                 <p className="text-[10px] text-text-secondary">Mã định danh luồng dữ liệu web</p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-1">
-                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Stream URL</span>
+              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/25 hover:border-antique-gold/50 transition-all space-y-1.5 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Stream URL</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopySpec('https://viecultures.app', 'stream_url', 'Stream URL')}
+                    className="p-1 rounded-lg hover:bg-antique-gold/20 text-text-muted hover:text-heritage-green dark:hover:text-antique-bright transition-colors cursor-pointer"
+                    title="Sao chép Stream URL"
+                  >
+                    {copiedSpecKey === 'stream_url' ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
                 <div className="font-mono text-sm font-bold text-heritage-green dark:text-antique-bright truncate select-all" title="https://viecultures.app">
                   https://viecultures.app
                 </div>
                 <p className="text-[10px] text-text-secondary">Tên luồng: VieCultures Web</p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-1">
-                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GSC Site URL</span>
+              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/25 hover:border-antique-gold/50 transition-all space-y-1.5 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GSC Site URL</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopySpec('https://viecultures.com', 'gsc_url', 'GSC Site URL')}
+                    className="p-1 rounded-lg hover:bg-antique-gold/20 text-text-muted hover:text-heritage-green dark:hover:text-antique-bright transition-colors cursor-pointer"
+                    title="Sao chép GSC Site URL"
+                  >
+                    {copiedSpecKey === 'gsc_url' ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
                 <div className="font-mono text-sm font-bold text-heritage-green dark:text-antique-bright truncate select-all" title="https://viecultures.com">
                   https://viecultures.com
                 </div>
@@ -900,15 +987,43 @@ export const MarketingManagementView: React.FC = () => {
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={handleTestSmtpConnection}
-              disabled={isTestingSmtp}
-              className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-antique-gold/15 hover:bg-antique-gold/25 border border-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
-            >
-              <Radio className={`w-3.5 h-3.5 ${isTestingSmtp ? 'animate-pulse text-rose-500' : 'text-antique-gold'}`} aria-hidden="true" />
-              <span>{isTestingSmtp ? 'Đang kiểm tra SMTP...' : 'Kiểm tra kết nối Gmail SMTP'}</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+              {/* SMTP Status Visual Badge */}
+              {smtpStatus === 'IDLE' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-warm-ivory dark:bg-white/5 border border-antique-gold/30 text-xs font-semibold text-text-muted">
+                  <Radio className="w-3.5 h-3.5 text-antique-gold" aria-hidden="true" />
+                  <span>Sẵn sàng kiểm tra SMTP</span>
+                </span>
+              )}
+              {smtpStatus === 'TESTING' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-xs font-bold text-amber-800 dark:text-amber-300">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-600" aria-hidden="true" />
+                  <span>Đang kết nối Gmail SMTP...</span>
+                </span>
+              )}
+              {smtpStatus === 'SUCCESS' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                  <span>Gmail SMTP: Đã xác thực</span>
+                </span>
+              )}
+              {smtpStatus === 'ERROR' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-100 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-700 text-xs font-bold text-rose-800 dark:text-rose-300">
+                  <AlertCircle className="w-3.5 h-3.5 text-rose-600" aria-hidden="true" />
+                  <span>Kết nối SMTP thất bại</span>
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={handleTestSmtpConnection}
+                disabled={isTestingSmtp}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-antique-gold/15 hover:bg-antique-gold/25 border border-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold transition-all cursor-pointer disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isTestingSmtp ? 'animate-spin text-rose-500' : 'text-antique-gold'}`} aria-hidden="true" />
+                <span>{isTestingSmtp ? 'Đang kiểm tra...' : 'Kiểm tra kết nối Gmail SMTP'}</span>
+              </button>
+            </div>
           </div>
 
           <form onSubmit={handleSendNotification} className="space-y-4">
