@@ -18,15 +18,15 @@ export function AdminServiceConnections() {
 
   const [backendHealth, setBackendHealth] = useState<ServiceHealth>({
     status: 'CHECKING',
-    message: 'Dang kiem tra...',
+    message: 'Đang kiểm tra...',
   });
   const [dbHealth, setDbHealth] = useState<ServiceHealth>({
     status: 'CHECKING',
-    message: 'Dang kiem tra...',
+    message: 'Đang kiểm tra...',
   });
   const [speechHealth, setSpeechHealth] = useState<ServiceHealth>({
     status: 'CHECKING',
-    message: 'Dang kiem tra...',
+    message: 'Đang kiểm tra...',
   });
 
   const checkConnections = useCallback(async () => {
@@ -44,20 +44,20 @@ export function AdminServiceConnections() {
         setBackendHealth({
           status: 'UP',
           latencyMs: latency,
-          message: `Ket noi tot (${latency}ms)`,
+          message: `Kết nối tốt (${latency}ms)`,
         });
       } else {
         setBackendHealth({
           status: 'DOWN',
           latencyMs: latency,
-          message: `Phan hoi loi HTTP ${res.status}`,
+          message: `Phản hồi lỗi HTTP ${res.status}`,
         });
       }
     } catch (err) {
-      console.error('Kiem tra Backend API that bai:', err);
+      console.error('Kiểm tra Backend API thất bại:', err);
       setBackendHealth({
         status: 'DOWN',
-        message: 'Khong the ket noi may chu',
+        message: 'Không thể kết nối máy chủ',
       });
     }
 
@@ -75,27 +75,27 @@ export function AdminServiceConnections() {
         setDbHealth({
           status: 'UP',
           latencyMs: latency,
-          message: `San sang (${latency}ms)`,
+          message: `Sẵn sàng (${latency}ms)`,
         });
       } else if (res.status === 401 || res.status === 403) {
-        // May chu phan hoi auth hop le -> Database / Backend hoat dong binh thuong
+        // Máy chủ phản hồi auth hợp lệ -> Database / Backend hoạt động bình thường
         setDbHealth({
           status: 'UP',
           latencyMs: latency,
-          message: `Truy van thanh cong (${latency}ms)`,
+          message: `Truy vấn thành công (${latency}ms)`,
         });
       } else {
         setDbHealth({
           status: 'DOWN',
           latencyMs: latency,
-          message: `Loi CSDL (HTTP ${res.status})`,
+          message: `Lỗi CSDL (HTTP ${res.status})`,
         });
       }
     } catch (err) {
-      console.error('Kiem tra Database that bai:', err);
+      console.error('Kiểm tra Cơ sở dữ liệu thất bại:', err);
       setDbHealth({
         status: 'DOWN',
-        message: 'Mat ket noi CSDL PostgreSQL',
+        message: 'Mất kết nối CSDL PostgreSQL',
       });
     }
 
@@ -111,20 +111,20 @@ export function AdminServiceConnections() {
         setSpeechHealth({
           status: 'UP',
           latencyMs: latency,
-          message: `San sang (${latency}ms)`,
+          message: `Sẵn sàng (${latency}ms)`,
         });
       } else {
         setSpeechHealth({
           status: 'DOWN',
           latencyMs: latency,
-          message: `Dich vu voice loi (HTTP ${res.status})`,
+          message: `Dịch vụ giọng nói lỗi (HTTP ${res.status})`,
         });
       }
     } catch (err) {
-      console.error('Kiem tra Speech Synthesis that bai:', err);
+      console.error('Kiểm tra giọng nói trí tuệ nhân tạo thất bại:', err);
       setSpeechHealth({
         status: 'DOWN',
-        message: 'Khong the ket noi Neural Voice',
+        message: 'Không thể kết nối Neural Voice',
       });
     }
 
@@ -141,7 +141,7 @@ export function AdminServiceConnections() {
       return (
         <span className="inline-flex items-center gap-1 text-[11px] font-medium text-text-muted">
           <RefreshCw className="size-3 animate-spin text-antique-gold" aria-hidden="true" />
-          <span>Dang kiem tra...</span>
+          <span>Đang kiểm tra...</span>
         </span>
       );
     }
@@ -169,13 +169,13 @@ export function AdminServiceConnections() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 id="admin-connections-title" className="text-lg font-heading font-bold text-ink">
-            Trang thai ket noi dich vu he thong
+            Trạng thái kết nối dịch vụ hệ thống
           </h2>
           <p className="text-xs text-ink-faint">
-            Kiem tra truc tiep API Backend, Co so du lieu va Dich vu giong noi tri tue nhan tao.
+            Kiểm tra trực tiếp API Backend, Cơ sở dữ liệu và Dịch vụ giọng nói trí tuệ nhân tạo.
             {lastChecked && (
               <span className="ml-2 font-mono text-[11px] text-text-secondary">
-                (Kiem tra luc: {lastChecked})
+                (Thời điểm kiểm tra: {lastChecked})
               </span>
             )}
           </p>
@@ -188,7 +188,7 @@ export function AdminServiceConnections() {
           className="inline-flex items-center gap-1.5 self-start sm:self-auto px-3.5 py-1.5 rounded-xl bg-antique-gold/15 hover:bg-antique-gold/25 border border-antique-gold/30 text-heritage-green dark:text-antique-bright text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
         >
           <RefreshCw className={`size-3.5 ${isChecking ? 'animate-spin' : ''}`} aria-hidden="true" />
-          <span>{isChecking ? 'Dang kiem tra...' : 'Kiem tra lai ket noi'}</span>
+          <span>{isChecking ? 'Đang kiểm tra...' : 'Kiểm tra lại kết nối'}</span>
         </button>
       </div>
 
@@ -199,7 +199,7 @@ export function AdminServiceConnections() {
             <Server className="size-5 shrink-0" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <h3 className="text-xs font-bold text-ink">Backend API</h3>
+            <h3 className="text-xs font-bold text-ink">Máy chủ API</h3>
             {renderStatusBadge(backendHealth)}
           </div>
         </div>
@@ -210,7 +210,7 @@ export function AdminServiceConnections() {
             <Database className="size-5 shrink-0" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <h3 className="text-xs font-bold text-ink">Co so du lieu</h3>
+            <h3 className="text-xs font-bold text-ink">Cơ sở dữ liệu</h3>
             {renderStatusBadge(dbHealth)}
           </div>
         </div>
@@ -221,7 +221,7 @@ export function AdminServiceConnections() {
             <Volume2 className="size-5 shrink-0" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <h3 className="text-xs font-bold text-ink">Giong noi Neural TTS</h3>
+            <h3 className="text-xs font-bold text-ink">Giọng nói Neural TTS</h3>
             {renderStatusBadge(speechHealth)}
           </div>
         </div>
@@ -232,9 +232,9 @@ export function AdminServiceConnections() {
             <ShieldCheck className="size-5 shrink-0" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <h3 className="text-xs font-bold text-ink">Quyen quan tri</h3>
+            <h3 className="text-xs font-bold text-ink">Quyền quản trị</h3>
             <p className="text-[11px] font-semibold text-text-secondary">
-              {isLocalAuthMode ? 'Che do Demo cuc bo' : 'Quan tri vien (ROLE_ADMIN)'}
+              {isLocalAuthMode ? 'Chế độ Demo cục bộ' : 'Quản trị viên (ROLE_ADMIN)'}
             </p>
           </div>
         </div>
@@ -242,3 +242,5 @@ export function AdminServiceConnections() {
     </section>
   );
 }
+
+export default AdminServiceConnections;

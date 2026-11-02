@@ -1,22 +1,27 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Megaphone,
   Send,
   Mail,
   Share2,
   CheckCircle2,
-  Clock,
   Target,
   AlertCircle,
   Copy,
   Check,
   Trash2,
-  ExternalLink,
   Plus,
   Radio,
   BookOpen,
   Compass,
   RefreshCw,
+  BarChart3,
+  Globe,
+  Code2,
+  ShieldCheck,
+  Zap,
+  ExternalLink,
 } from 'lucide-react';
 import { postAdminService } from '../services/postAdminService';
 import { journeyAdminService } from '../services/journeyAdminService';
@@ -52,7 +57,24 @@ const CHANNEL_DEFAULTS: Record<
   Zalo: { source: 'zalo', medium: 'chat' },
 };
 
+type MarketingTabKey = 'utm' | 'analytics' | 'broadcast' | 'social';
+
 export const MarketingManagementView: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Active sub-tab synced with query string ?tab=...
+  const activeTab: MarketingTabKey = useMemo(() => {
+    const raw = searchParams.get('tab');
+    if (raw === 'analytics' || raw === 'broadcast' || raw === 'social' || raw === 'utm') {
+      return raw;
+    }
+    return 'utm';
+  }, [searchParams]);
+
+  const handleSelectTab = (tab: MarketingTabKey) => {
+    setSearchParams({ tab });
+  };
+
   // Campaign Links stored in localStorage
   const [campaigns, setCampaigns] = useState<UtmCampaignItem[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -77,7 +99,7 @@ export const MarketingManagementView: React.FC = () => {
   const [newsletterHeadline, setNewsletterHeadline] = useState<string>('');
   const [newsletterContent, setNewsletterContent] = useState<string>('');
   const [actionUrl, setActionUrl] = useState<string>('');
-  const [actionText, setActionText] = useState<string>('Xem Chi Tiet');
+  const [actionText, setActionText] = useState<string>('Xem Chi Tiết');
 
   // Async States
   const [isSendingMail, setIsSendingMail] = useState<boolean>(false);
@@ -86,6 +108,9 @@ export const MarketingManagementView: React.FC = () => {
     type: 'success' | 'error';
     text: string;
   } | null>(null);
+
+  // Analytics snippet copied state
+  const [copiedGtag, setCopiedGtag] = useState<boolean>(false);
 
   // Load campaigns from localStorage on mount
   useEffect(() => {
@@ -98,7 +123,7 @@ export const MarketingManagementView: React.FC = () => {
         }
       }
     } catch (err) {
-      console.error('Loi khi doc danh sach chien dich tu localStorage:', err);
+      console.error('Lỗi khi đọc danh sách chiến dịch từ localStorage:', err);
     }
   }, []);
 
@@ -108,7 +133,7 @@ export const MarketingManagementView: React.FC = () => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     } catch (err) {
-      console.error('Loi khi luu danh sach chien dich vao localStorage:', err);
+      console.error('Lỗi khi lưu danh sách chiến dịch vào localStorage:', err);
     }
   };
 
@@ -127,7 +152,7 @@ export const MarketingManagementView: React.FC = () => {
         setSelectedTargetId(fetchedPosts[0].id);
       }
     } catch (err) {
-      console.error('Loi khi tai danh sach bai viet va hanh trinh:', err);
+      console.error('Lỗi khi tải danh sách bài viết và hành trình:', err);
     } finally {
       setIsLoadingContent(false);
     }
@@ -179,18 +204,18 @@ export const MarketingManagementView: React.FC = () => {
     if (!campaignName.trim()) {
       setFeedbackToast({
         type: 'error',
-        text: 'Vui long nhap ten chien dich (utm_campaign).',
+        text: 'Vui lòng nhập tên chiến dịch (utm_campaign).',
       });
       return;
     }
 
-    let targetTitle = 'Trang chuong trinh';
+    let targetTitle = 'Trang chương trình';
     if (targetType === 'POST') {
       const found = posts.find((p) => p.id === selectedTargetId);
-      if (found) targetTitle = found.titleEn || found.titleVi || 'Bai doc van hoa';
+      if (found) targetTitle = found.titleEn || found.titleVi || 'Bài đọc văn hóa';
     } else {
       const found = journeys.find((j) => j.id === selectedTargetId);
-      if (found) targetTitle = found.titleEn || found.titleVi || 'Hanh trinh hoc';
+      if (found) targetTitle = found.titleEn || found.titleVi || 'Hành trình học';
     }
 
     const { source, medium } = CHANNEL_DEFAULTS[channel];
@@ -221,7 +246,7 @@ export const MarketingManagementView: React.FC = () => {
     navigator.clipboard.writeText(generatedUtmUrl);
     setFeedbackToast({
       type: 'success',
-      text: 'Da tao va luu link chien dich thanh cong! Link da duoc chep vao bo nho tam.',
+      text: 'Đã tạo và lưu liên kết chiến dịch thành công! Liên kết đã được sao chép vào bộ nhớ tạm.',
     });
   };
 
@@ -231,7 +256,7 @@ export const MarketingManagementView: React.FC = () => {
     setCopiedId(id);
     setFeedbackToast({
       type: 'success',
-      text: 'Da sao chep link chien dich vao bo nho tam!',
+      text: 'Đã sao chép liên kết chiến dịch vào bộ nhớ tạm!',
     });
     setTimeout(() => setCopiedId(null), 2500);
   };
@@ -242,7 +267,7 @@ export const MarketingManagementView: React.FC = () => {
     saveCampaignsToStorage(updated);
     setFeedbackToast({
       type: 'success',
-      text: 'Da xoa link chien dich khoi danh sach.',
+      text: 'Đã xóa liên kết chiến dịch khỏi danh sách.',
     });
   };
 
@@ -252,7 +277,7 @@ export const MarketingManagementView: React.FC = () => {
     if (!toEmail.trim() || !newsletterSubject.trim() || !newsletterContent.trim()) {
       setFeedbackToast({
         type: 'error',
-        text: 'Vui long nhap email nguoi nhan, tieu de va noi dung ban tin.',
+        text: 'Vui lòng nhập địa chỉ email người nhận, tiêu đề và nội dung bản tin.',
       });
       return;
     }
@@ -268,20 +293,20 @@ export const MarketingManagementView: React.FC = () => {
         headline: newsletterHeadline.trim() || newsletterSubject.trim(),
         messageContent: `<p>${newsletterContent.trim().replace(/\n/g, '<br/>')}</p>`,
         actionUrl: actionUrl.trim() || undefined,
-        actionText: actionText.trim() || 'Xem Chi Tiet',
+        actionText: actionText.trim() || 'Xem Chi Tiết',
       });
 
       setFeedbackToast({
         type: 'success',
-        text: res.message || 'Da gui ban tin thong bao thanh cong!',
+        text: res.message || 'Đã gửi bản tin thông báo thành công!',
       });
       setNewsletterSubject('');
       setNewsletterHeadline('');
       setNewsletterContent('');
       setActionUrl('');
     } catch (err: unknown) {
-      console.error('Loi khi gui email thong bao:', err);
-      const msg = err instanceof Error ? err.message : 'Khong the gui email thong bao';
+      console.error('Lỗi khi gửi email thông báo:', err);
+      const msg = err instanceof Error ? err.message : 'Không thể gửi email thông báo';
       setFeedbackToast({
         type: 'error',
         text: msg,
@@ -296,7 +321,7 @@ export const MarketingManagementView: React.FC = () => {
     if (!toEmail.trim()) {
       setFeedbackToast({
         type: 'error',
-        text: 'Vui long nhap dia chi email nhan thu nghiem truoc khi kiem tra SMTP.',
+        text: 'Vui lòng nhập địa chỉ email nhận thử nghiệm trước khi kiểm tra SMTP.',
       });
       return;
     }
@@ -308,11 +333,11 @@ export const MarketingManagementView: React.FC = () => {
       const res = await adminMailService.testConnection(toEmail.trim());
       setFeedbackToast({
         type: 'success',
-        text: res.message || `Da gui email kiem tra toi ${toEmail}. Gmail SMTP ket noi thanh cong!`,
+        text: res.message || `Đã gửi email kiểm tra tới ${toEmail}. Gmail SMTP kết nối thành công!`,
       });
     } catch (err: unknown) {
-      console.error('Loi khi kiem tra Gmail SMTP:', err);
-      const msg = err instanceof Error ? err.message : 'Kiem tra ket noi Gmail SMTP that bai';
+      console.error('Lỗi khi kiểm tra Gmail SMTP:', err);
+      const msg = err instanceof Error ? err.message : 'Kiểm tra kết nối Gmail SMTP thất bại';
       setFeedbackToast({
         type: 'error',
         text: msg,
@@ -320,6 +345,26 @@ export const MarketingManagementView: React.FC = () => {
     } finally {
       setIsTestingSmtp(false);
     }
+  };
+
+  const gtagSnippet = `<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CTMMCTEFPM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-CTMMCTEFPM');
+</script>`;
+
+  const handleCopyGtag = () => {
+    navigator.clipboard.writeText(gtagSnippet);
+    setCopiedGtag(true);
+    setFeedbackToast({
+      type: 'success',
+      text: 'Đã sao chép đoạn mã Google Tag (gtag.js) vào bộ nhớ tạm!',
+    });
+    setTimeout(() => setCopiedGtag(false), 2500);
   };
 
   return (
@@ -347,7 +392,7 @@ export const MarketingManagementView: React.FC = () => {
             onClick={() => setFeedbackToast(null)}
             className="font-bold underline cursor-pointer"
           >
-            Dong
+            Đóng
           </button>
         </div>
       )}
@@ -356,476 +401,708 @@ export const MarketingManagementView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
           <div className="flex items-center justify-between text-text-muted text-xs">
-            <span>Link chien dich da tao</span>
+            <span>Liên kết chiến dịch đã tạo</span>
             <Megaphone aria-hidden="true" className="w-4 h-4 text-antique-gold" />
           </div>
           <div className="text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
             {campaigns.length}
           </div>
-          <p className="text-[11px] text-text-secondary">Luu tru an toan tren trinh duyet</p>
+          <p className="text-[11px] text-text-secondary">Lưu trữ an toàn trên trình duyệt</p>
         </div>
 
         <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
           <div className="flex items-center justify-between text-text-muted text-xs">
-            <span>Noi dung san sang qua API</span>
+            <span>Nội dung sẵn sàng qua API</span>
             <BookOpen aria-hidden="true" className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
             {posts.length + journeys.length}
           </div>
           <p className="text-[11px] text-text-secondary">
-            {posts.length} bai doc &bull; {journeys.length} hanh trinh
+            {posts.length} bài đọc &bull; {journeys.length} hành trình
           </p>
         </div>
 
         <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
           <div className="flex items-center justify-between text-text-muted text-xs">
-            <span>Kenh chien dich ho tro</span>
+            <span>Kênh phân phối hỗ trợ</span>
             <Share2 aria-hidden="true" className="w-4 h-4 text-antique-gold" />
           </div>
           <div className="text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
-            5 Kenh
+            5 Kênh
           </div>
           <p className="text-[11px] text-text-secondary">Facebook, TikTok, Google, Email, Zalo</p>
         </div>
       </div>
 
-      {/* ── Section 1: Quick UTM Campaign Builder ───────────────────────── */}
-      <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-antique-gold/20 pb-4">
-          <div>
-            <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
-              <Target aria-hidden="true" className="w-5 h-5 text-antique-gold" />
-              <span>Cong cu Tao Link Chien Dich (Quick UTM Builder)</span>
-            </h3>
-            <p className="text-xs text-text-muted mt-0.5">
-              Gan the UTM truc tiep vao bai doc hoac hanh trinh de do luong hieu qua qua Google Analytics va kenh tiep thi.
-            </p>
+      {/* ── Sub-Tab Switcher Navigation ─────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-xs">
+        <button
+          type="button"
+          onClick={() => handleSelectTab('utm')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'utm'
+              ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+              : 'text-text-secondary hover:text-heritage-green hover:bg-antique-gold/10'
+          }`}
+        >
+          <Target className="w-4 h-4 text-antique-gold" aria-hidden="true" />
+          <span>1. Tạo link UTM (Nội bộ)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSelectTab('analytics')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'analytics'
+              ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+              : 'text-text-secondary hover:text-heritage-green hover:bg-antique-gold/10'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4 text-antique-gold" aria-hidden="true" />
+          <span>2. Google Analytics & Search Console</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSelectTab('broadcast')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'broadcast'
+              ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+              : 'text-text-secondary hover:text-heritage-green hover:bg-antique-gold/10'
+          }`}
+        >
+          <Mail className="w-4 h-4 text-antique-gold" aria-hidden="true" />
+          <span>3. Email & Bản tin di sản</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSelectTab('social')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'social'
+              ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+              : 'text-text-secondary hover:text-heritage-green hover:bg-antique-gold/10'
+          }`}
+        >
+          <Share2 className="w-4 h-4 text-antique-gold" aria-hidden="true" />
+          <span>4. Mạng xã hội & Ads</span>
+        </button>
+      </div>
+
+      {/* ── TAB 1: Quick UTM Campaign Builder ───────────────────────────── */}
+      {activeTab === 'utm' && (
+        <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-antique-gold/20 pb-4">
+            <div>
+              <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
+                <Target aria-hidden="true" className="w-5 h-5 text-antique-gold" />
+                <span>Công cụ Tạo Liên Kết Chiến Dịch (Quick UTM Builder)</span>
+              </h3>
+              <p className="text-xs text-text-muted mt-0.5">
+                Gắn thẻ UTM trực tiếp vào bài đọc hoặc hành trình để đo lường chuyển đổi học viên đăng ký hoàn toàn miễn phí.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={loadContentData}
+              disabled={isLoadingContent}
+              className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-antique-gold/30 hover:bg-antique-gold/15 text-xs font-semibold text-text-secondary transition-colors cursor-pointer"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoadingContent ? 'animate-spin' : ''}`} aria-hidden="true" />
+              <span>Cập nhật danh mục</span>
+            </button>
           </div>
 
-          <button
-            type="button"
-            onClick={loadContentData}
-            disabled={isLoadingContent}
-            className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-antique-gold/30 hover:bg-antique-gold/15 text-xs font-semibold text-text-secondary transition-colors cursor-pointer"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingContent ? 'animate-spin' : ''}`} aria-hidden="true" />
-            <span>Cap nhat danh muc</span>
-          </button>
-        </div>
+          <form onSubmit={handleSaveCampaign} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Target Type */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Loại nội dung đích
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetType('POST');
+                      if (posts.length > 0) setSelectedTargetId(posts[0].id);
+                    }}
+                    className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      targetType === 'POST'
+                        ? 'bg-heritage-green text-warm-ivory border-heritage-green shadow-sm'
+                        : 'bg-warm-ivory dark:bg-heritage-dark/80 border-antique-gold/30 text-text-secondary'
+                    }`}
+                  >
+                    <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span>Bài đọc ({posts.length})</span>
+                  </button>
 
-        <form onSubmit={handleSaveCampaign} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Target Type */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Loai noi dung dich
-              </label>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTargetType('POST');
-                    if (posts.length > 0) setSelectedTargetId(posts[0].id);
-                  }}
-                  className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                    targetType === 'POST'
-                      ? 'bg-heritage-green text-warm-ivory border-heritage-green shadow-sm'
-                      : 'bg-warm-ivory dark:bg-heritage-dark/80 border-antique-gold/30 text-text-secondary'
-                  }`}
-                >
-                  <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
-                  <span>Bai doc ({posts.length})</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetType('JOURNEY');
+                      if (journeys.length > 0) setSelectedTargetId(journeys[0].id);
+                    }}
+                    className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      targetType === 'JOURNEY'
+                        ? 'bg-heritage-green text-warm-ivory border-heritage-green shadow-sm'
+                        : 'bg-warm-ivory dark:bg-heritage-dark/80 border-antique-gold/30 text-text-secondary'
+                    }`}
+                  >
+                    <Compass className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span>Hành trình ({journeys.length})</span>
+                  </button>
+                </div>
+              </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTargetType('JOURNEY');
-                    if (journeys.length > 0) setSelectedTargetId(journeys[0].id);
-                  }}
-                  className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                    targetType === 'JOURNEY'
-                      ? 'bg-heritage-green text-warm-ivory border-heritage-green shadow-sm'
-                      : 'bg-warm-ivory dark:bg-heritage-dark/80 border-antique-gold/30 text-text-secondary'
-                  }`}
-                >
-                  <Compass className="w-3.5 h-3.5" aria-hidden="true" />
-                  <span>Hanh trinh ({journeys.length})</span>
-                </button>
+              {/* Target Item Selection */}
+              <div className="space-y-1.5 md:col-span-2">
+                <label htmlFor="targetItemSelect" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Chọn bài viết hoặc hành trình từ cơ sở dữ liệu
+                </label>
+                {targetType === 'POST' ? (
+                  <select
+                    id="targetItemSelect"
+                    aria-label="Chọn bài viết từ cơ sở dữ liệu"
+                    value={selectedTargetId}
+                    onChange={(e) => setSelectedTargetId(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+                  >
+                    {posts.length === 0 ? (
+                      <option value="">Chưa có bài viết nào từ API</option>
+                    ) : (
+                      posts.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          [{p.level || 'B1'}] {p.titleEn} ({p.titleVi})
+                        </option>
+                      ))
+                    )}
+                  </select>
+                ) : (
+                  <select
+                    id="targetItemSelect"
+                    aria-label="Chọn hành trình từ cơ sở dữ liệu"
+                    value={selectedTargetId}
+                    onChange={(e) => setSelectedTargetId(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+                  >
+                    {journeys.length === 0 ? (
+                      <option value="">Chưa có hành trình nào từ API</option>
+                    ) : (
+                      journeys.map((j) => (
+                        <option key={j.id} value={j.id}>
+                          [{j.region || 'Toàn quốc'}] {j.titleEn} ({j.titleVi})
+                        </option>
+                      ))
+                    )}
+                  </select>
+                )}
               </div>
             </div>
 
-            {/* Target Item Selection */}
-            <div className="space-y-1.5 md:col-span-2">
-              <label htmlFor="targetItemSelect" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Chon bai viet hoac hanh trinh tu CSDL
-              </label>
-              {targetType === 'POST' ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Channel Selection */}
+              <div className="space-y-1.5">
+                <label htmlFor="campaignChannelSelect" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Kênh phân phối
+                </label>
                 <select
-                  id="targetItemSelect"
-                  aria-label="Chon bai viet tu co so du lieu"
-                  value={selectedTargetId}
-                  onChange={(e) => setSelectedTargetId(e.target.value)}
+                  id="campaignChannelSelect"
+                  aria-label="Kênh phân phối"
+                  value={channel}
+                  onChange={(e) => setChannel(e.target.value as UtmCampaignItem['channel'])}
                   className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
-                  {posts.length === 0 ? (
-                    <option value="">Chua co bai viet nao tu API</option>
-                  ) : (
-                    posts.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        [{p.level || 'B1'}] {p.titleEn} ({p.titleVi})
-                      </option>
-                    ))
-                  )}
+                  <option value="Facebook">Facebook (utm_source=facebook, medium=social)</option>
+                  <option value="TikTok">TikTok (utm_source=tiktok, medium=social_video)</option>
+                  <option value="Google">Google Search/Ads (utm_source=google, medium=cpc)</option>
+                  <option value="Email">Email Marketing (utm_source=newsletter, medium=email)</option>
+                  <option value="Zalo">Zalo OA/Chat (utm_source=zalo, medium=chat)</option>
                 </select>
-              ) : (
-                <select
-                  id="targetItemSelect"
-                  aria-label="Chon hanh trinh tu co so du lieu"
-                  value={selectedTargetId}
-                  onChange={(e) => setSelectedTargetId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+              </div>
+
+              {/* Campaign Name (utm_campaign) */}
+              <div className="space-y-1.5">
+                <label htmlFor="utmCampaignNameInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Tên chiến dịch (utm_campaign) *
+                </label>
+                <input
+                  id="utmCampaignNameInput"
+                  type="text"
+                  required
+                  value={campaignName}
+                  onChange={(e) => setCampaignName(e.target.value)}
+                  placeholder="ví dụ: di-san-mien-trung-2026"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                />
+              </div>
+
+              {/* Campaign Content (utm_content) */}
+              <div className="space-y-1.5">
+                <label htmlFor="utmCampaignContentInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Nội dung / Bài đăng (utm_content)
+                </label>
+                <input
+                  id="utmCampaignContentInput"
+                  type="text"
+                  value={campaignContent}
+                  onChange={(e) => setCampaignContent(e.target.value)}
+                  placeholder="ví dụ: carousel-post-1, hero-banner"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                />
+              </div>
+            </div>
+
+            {/* Generated URL Box */}
+            <div className="p-4 rounded-2xl bg-heritage-forest/10 dark:bg-white/5 border border-antique-gold/30 space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-heritage-green dark:text-antique-bright">
+                <span>Liên kết chiến dịch đầy đủ (Generated URL):</span>
+                <span className="text-[11px] font-mono text-text-muted">Độ dài: {generatedUtmUrl.length} ký tự</span>
+              </div>
+              <div className="p-3 rounded-xl bg-rice-paper dark:bg-heritage-dark font-mono text-xs text-heritage-green dark:text-antique-bright border border-antique-gold/20 break-all select-all">
+                {generatedUtmUrl}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="submit"
+                  className="py-2 px-4 rounded-xl bg-heritage-green text-warm-ivory hover:bg-heritage-dark text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                 >
-                  {journeys.length === 0 ? (
-                    <option value="">Chua co hanh trinh nao tu API</option>
-                  ) : (
-                    journeys.map((j) => (
-                      <option key={j.id} value={j.id}>
-                        [{j.region || 'Toan Quoc'}] {j.titleEn} ({j.titleVi})
-                      </option>
-                    ))
-                  )}
-                </select>
+                  <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Tạo và Lưu Liên Kết Chiến Dịch</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedUtmUrl);
+                    setFeedbackToast({
+                      type: 'success',
+                      text: 'Đã chép liên kết chiến dịch vào bộ nhớ tạm!',
+                    });
+                  }}
+                  className="py-2 px-4 rounded-xl bg-antique-gold/20 hover:bg-antique-gold/30 border border-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Chép 1-Click</span>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          {/* Saved Campaigns List */}
+          <div className="space-y-3 pt-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+                Danh sách liên kết chiến dịch đã tạo ({campaigns.length})
+              </h4>
+              {campaigns.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => saveCampaignsToStorage([])}
+                  className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
+                >
+                  Xóa toàn bộ
+                </button>
               )}
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Channel Selection */}
-            <div className="space-y-1.5">
-              <label htmlFor="campaignChannelSelect" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Kenh chien dich
-              </label>
-              <select
-                id="campaignChannelSelect"
-                aria-label="Kenh chien dich"
-                value={channel}
-                onChange={(e) => setChannel(e.target.value as UtmCampaignItem['channel'])}
-                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
-              >
-                <option value="Facebook">Facebook (utm_source=facebook, medium=social)</option>
-                <option value="TikTok">TikTok (utm_source=tiktok, medium=social_video)</option>
-                <option value="Google">Google Search/Ads (utm_source=google, medium=cpc)</option>
-                <option value="Email">Email Marketing (utm_source=newsletter, medium=email)</option>
-                <option value="Zalo">Zalo OA/Chat (utm_source=zalo, medium=chat)</option>
-              </select>
-            </div>
+            {campaigns.length === 0 ? (
+              <div className="p-8 text-center rounded-2xl border border-dashed border-antique-gold/30 space-y-1">
+                <Target className="w-8 h-8 text-antique-gold/40 mx-auto" aria-hidden="true" />
+                <p className="text-xs font-bold text-text-secondary">Chưa có liên kết chiến dịch nào được lưu</p>
+                <p className="text-[11px] text-text-muted">
+                  Điền thông tin ở biểu mẫu trên để tự động tạo liên kết UTM cho chiến dịch Marketing.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                {campaigns.map((camp) => (
+                  <div
+                    key={camp.id}
+                    className="p-3.5 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/25 hover:border-antique-gold/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                  >
+                    <div className="space-y-1 min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/30">
+                          {camp.channel}
+                        </span>
+                        <span className="font-bold text-heritage-green dark:text-warm-ivory">
+                          {camp.name}
+                        </span>
+                        <span className="text-[11px] text-text-muted font-mono">
+                          ({camp.targetType === 'POST' ? 'Bài đọc' : 'Hành trình'}: {camp.targetTitle})
+                        </span>
+                      </div>
+                      <div className="font-mono text-[11px] text-text-secondary truncate max-w-xl">
+                        {camp.fullUrl}
+                      </div>
+                    </div>
 
-            {/* Campaign Name (utm_campaign) */}
-            <div className="space-y-1.5">
-              <label htmlFor="utmCampaignNameInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Ten chien dich (utm_campaign) *
-              </label>
-              <input
-                id="utmCampaignNameInput"
-                type="text"
-                required
-                value={campaignName}
-                onChange={(e) => setCampaignName(e.target.value)}
-                placeholder="vi-du: di-san-mien-trung-2026"
-                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-              />
-            </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleCopyLink(camp.fullUrl, camp.id)}
+                        className="px-3 py-1.5 rounded-lg bg-antique-gold/15 hover:bg-antique-gold/25 text-heritage-green dark:text-antique-bright text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                        title="Chép liên kết"
+                      >
+                        {copiedId === camp.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                            <span>Đã chép</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                            <span>Chép liên kết</span>
+                          </>
+                        )}
+                      </button>
 
-            {/* Campaign Content (utm_content) */}
-            <div className="space-y-1.5">
-              <label htmlFor="utmCampaignContentInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Noi dung / Bai dang (utm_content)
-              </label>
-              <input
-                id="utmCampaignContentInput"
-                type="text"
-                value={campaignContent}
-                onChange={(e) => setCampaignContent(e.target.value)}
-                placeholder="vi-du: carousel-post-1, hero-banner"
-                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-              />
-            </div>
-          </div>
-
-          {/* Generated URL Box */}
-          <div className="p-4 rounded-2xl bg-heritage-forest/10 dark:bg-white/5 border border-antique-gold/30 space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-heritage-green dark:text-antique-bright">
-              <span>Link chien dich day du (Generated URL):</span>
-              <span className="text-[11px] font-mono text-text-muted">Do dai: {generatedUtmUrl.length} ky tu</span>
-            </div>
-            <div className="p-3 rounded-xl bg-rice-paper dark:bg-heritage-dark font-mono text-xs text-heritage-green dark:text-antique-bright border border-antique-gold/20 break-all select-all">
-              {generatedUtmUrl}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <button
-                type="submit"
-                className="py-2 px-4 rounded-xl bg-heritage-green text-warm-ivory hover:bg-heritage-dark text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
-              >
-                <Plus className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Tao va Luu Link Chien Dich</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(generatedUtmUrl);
-                  setFeedbackToast({
-                    type: 'success',
-                    text: 'Da chep link chien dich vao bo nho tam!',
-                  });
-                }}
-                className="py-2 px-4 rounded-xl bg-antique-gold/20 hover:bg-antique-gold/30 border border-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <Copy className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Chep 1-Click</span>
-              </button>
-            </div>
-          </div>
-        </form>
-
-        {/* Saved Campaigns List */}
-        <div className="space-y-3 pt-3">
-          <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
-              Danh sach link chien dich da tao ({campaigns.length})
-            </h4>
-            {campaigns.length > 0 && (
-              <button
-                type="button"
-                onClick={() => saveCampaignsToStorage([])}
-                className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
-              >
-                Xoa toan bo
-              </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCampaign(camp.id)}
+                        className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-rose-600 transition-colors cursor-pointer"
+                        title="Xóa liên kết"
+                        aria-label="Xóa liên kết"
+                      >
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
+        </div>
+      )}
 
-          {campaigns.length === 0 ? (
-            <div className="p-8 text-center rounded-2xl border border-dashed border-antique-gold/30 space-y-1">
-              <Target className="w-8 h-8 text-antique-gold/40 mx-auto" aria-hidden="true" />
-              <p className="text-xs font-bold text-text-secondary">Chua co link chien dich nao duoc luu</p>
-              <p className="text-[11px] text-text-muted">
-                Dien thong tin o bieu mau tren de tu dong tao link UTM cho chien dich marketing.
+      {/* ── TAB 2: Google Analytics & Search Console ────────────────────── */}
+      {activeTab === 'analytics' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-4">
+            <div className="border-b border-antique-gold/20 pb-4">
+              <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
+                <BarChart3 aria-hidden="true" className="w-5 h-5 text-antique-gold" />
+                <span>Cấu Hình Google Analytics 4 (GA4) & Search Console</span>
+              </h3>
+              <p className="text-xs text-text-muted mt-0.5">
+                Các thông số kỹ thuật được cấu hình thực tế cho nền tảng VieCultures theo tài liệu tích hợp đối tác.
               </p>
             </div>
-          ) : (
-            <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
-              {campaigns.map((camp) => (
-                <div
-                  key={camp.id}
-                  className="p-3.5 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/25 hover:border-antique-gold/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-                >
-                  <div className="space-y-1 min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/30">
-                        {camp.channel}
-                      </span>
-                      <span className="font-bold text-heritage-green dark:text-warm-ivory">
-                        {camp.name}
-                      </span>
-                      <span className="text-[11px] text-text-muted font-mono">
-                        ({camp.targetType === 'POST' ? 'Bai doc' : 'Hanh trinh'}: {camp.targetTitle})
-                      </span>
-                    </div>
-                    <div className="font-mono text-[11px] text-text-secondary truncate max-w-xl">
-                      {camp.fullUrl}
-                    </div>
-                  </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleCopyLink(camp.fullUrl, camp.id)}
-                      className="px-3 py-1.5 rounded-lg bg-antique-gold/15 hover:bg-antique-gold/25 text-heritage-green dark:text-antique-bright text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
-                      title="Chep link"
-                    >
-                      {copiedId === camp.id ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
-                          <span>Da chep</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" aria-hidden="true" />
-                          <span>Chep link</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteCampaign(camp.id)}
-                      className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-rose-600 transition-colors cursor-pointer"
-                      title="Xoa link"
-                      aria-label="Xoa link"
-                    >
-                      <Trash2 className="w-4 h-4" aria-hidden="true" />
-                    </button>
-                  </div>
+            {/* Config Specs Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-1">
+                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Measurement ID</span>
+                <div className="font-mono text-base font-bold text-heritage-green dark:text-antique-bright select-all">
+                  G-CTMMCTEFPM
                 </div>
-              ))}
+                <p className="text-[10px] text-text-secondary">Định danh luồng đo lường chính</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-1">
+                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GA4 Stream ID</span>
+                <div className="font-mono text-base font-bold text-heritage-green dark:text-antique-bright select-all">
+                  16250918205
+                </div>
+                <p className="text-[10px] text-text-secondary">Mã định danh luồng dữ liệu web</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-1">
+                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Stream URL</span>
+                <div className="font-mono text-sm font-bold text-heritage-green dark:text-antique-bright truncate select-all" title="https://viecultures.app">
+                  https://viecultures.app
+                </div>
+                <p className="text-[10px] text-text-secondary">Tên luồng: VieCultures Web</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-1">
+                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">GSC Site URL</span>
+                <div className="font-mono text-sm font-bold text-heritage-green dark:text-antique-bright truncate select-all" title="https://viecultures.com">
+                  https://viecultures.com
+                </div>
+                <p className="text-[10px] text-text-secondary">Tên miền Google Search Console</p>
+              </div>
             </div>
-          )}
+
+            {/* Google Tag Script Snippet */}
+            <div className="p-4 rounded-2xl bg-heritage-forest/10 dark:bg-white/5 border border-antique-gold/30 space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-heritage-green dark:text-antique-bright">
+                <div className="flex items-center gap-1.5">
+                  <Code2 aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                  <span>Mã nhúng thẻ Google Tag (gtag.js):</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyGtag}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-antique-gold/20 hover:bg-antique-gold/30 text-heritage-green dark:text-antique-bright text-[11px] font-bold transition-all cursor-pointer"
+                >
+                  {copiedGtag ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                      <span>Đã chép mã</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>Sao chép mã</span>
+                    </>
+                  )}
+                </button>
+              </div>
+              <pre className="p-3.5 rounded-xl bg-heritage-forest text-warm-ivory font-mono text-xs leading-relaxed overflow-x-auto border border-antique-gold/30 select-all">
+                {gtagSnippet}
+              </pre>
+            </div>
+
+            {/* Service Account & Environment Credentials */}
+            <div className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/20 space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-heritage-green dark:text-antique-bright flex items-center gap-1.5">
+                <ShieldCheck aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                <span>Cấu hình Service Account & Tệp biến môi trường (.env)</span>
+              </h4>
+
+              <div className="space-y-1.5 font-mono text-xs bg-rice-paper dark:bg-heritage-dark p-3 rounded-xl border border-antique-gold/20 select-all">
+                <div className="text-text-muted"># Google Search Console & GA4 Integration</div>
+                <div className="text-heritage-green dark:text-antique-bright font-bold">
+                  GOOGLE_APPLICATION_CREDENTIALS=&quot;./service-account.json&quot;
+                </div>
+                <div className="text-heritage-green dark:text-antique-bright font-bold">
+                  GA4_PROPERTY_ID=&quot;16250918205&quot;
+                </div>
+                <div className="text-heritage-green dark:text-antique-bright font-bold">
+                  GSC_SITE_URL=&quot;https://viecultures.com&quot;
+                </div>
+              </div>
+
+              <p className="text-[11px] text-text-secondary leading-relaxed">
+                Đường dẫn tệp khóa: <code className="font-mono bg-white/40 dark:bg-white/10 px-1 py-0.5 rounded">service-account.json</code>. Để tự động đồng bộ sitemap và chỉ mục bài viết, hãy thêm địa chỉ email của Google Service Account vào Google Search Console với quyền sở hữu (Owner/Full Access).
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* ── Section 2: Automated Notification & Newsletter Composer ───── */}
-      <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-antique-gold/20 pb-4">
-          <div>
-            <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
-              <Mail aria-hidden="true" className="w-5 h-5 text-antique-gold" />
-              <span>Gui Thong Bao & Ban Tin Van Hoa (Email Notification Engine)</span>
-            </h3>
-            <p className="text-xs text-text-muted mt-0.5">
-              Phat hanh email dinh ky voi template Warm Heritage tich hop qua he thong Gmail SMTP cua may chu backend.
-            </p>
+      {/* ── TAB 3: Email & Bản tin di sản ───────────────────────────────── */}
+      {activeTab === 'broadcast' && (
+        <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-antique-gold/20 pb-4">
+            <div>
+              <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
+                <Mail aria-hidden="true" className="w-5 h-5 text-antique-gold" />
+                <span>Gửi Thông Báo & Bản Tin Văn Hóa (Email Notification Engine)</span>
+              </h3>
+              <p className="text-xs text-text-muted mt-0.5">
+                Phát hành email định kỳ với template Warm Heritage tích hợp qua hệ thống Gmail SMTP của máy chủ backend.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleTestSmtpConnection}
+              disabled={isTestingSmtp}
+              className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-antique-gold/15 hover:bg-antique-gold/25 border border-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+            >
+              <Radio className={`w-3.5 h-3.5 ${isTestingSmtp ? 'animate-pulse text-rose-500' : 'text-antique-gold'}`} aria-hidden="true" />
+              <span>{isTestingSmtp ? 'Đang kiểm tra SMTP...' : 'Kiểm tra kết nối Gmail SMTP'}</span>
+            </button>
           </div>
 
-          <button
-            type="button"
-            onClick={handleTestSmtpConnection}
-            disabled={isTestingSmtp}
-            className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-antique-gold/15 hover:bg-antique-gold/25 border border-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
-          >
-            <Radio className={`w-3.5 h-3.5 ${isTestingSmtp ? 'animate-pulse text-rose-500' : 'text-antique-gold'}`} aria-hidden="true" />
-            <span>{isTestingSmtp ? 'Dang kiem tra SMTP...' : 'Kiem tra ket noi Gmail SMTP'}</span>
-          </button>
+          <form onSubmit={handleSendNotification} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Recipient Email */}
+              <div className="space-y-1.5">
+                <label htmlFor="recipientEmailInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Địa chỉ Email người nhận *
+                </label>
+                <input
+                  id="recipientEmailInput"
+                  type="email"
+                  required
+                  value={toEmail}
+                  onChange={(e) => setToEmail(e.target.value)}
+                  placeholder="ví dụ: hocvien@viecultures.com hoặc admin@viecultures.com"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                />
+              </div>
+
+              {/* Recipient Name */}
+              <div className="space-y-1.5">
+                <label htmlFor="recipientNameInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Tên người nhận
+                </label>
+                <input
+                  id="recipientNameInput"
+                  type="text"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  placeholder="ví dụ: Bạn Nguyễn Văn A"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Subject */}
+              <div className="space-y-1.5">
+                <label htmlFor="newsletterSubjectInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Tiêu đề thư (Subject) *
+                </label>
+                <input
+                  id="newsletterSubjectInput"
+                  type="text"
+                  required
+                  value={newsletterSubject}
+                  onChange={(e) => setNewsletterSubject(e.target.value)}
+                  placeholder="ví dụ: VieCultures - Khám phá bí ẩn ẩm thực cung đình Huế tuần này"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                />
+              </div>
+
+              {/* Headline */}
+              <div className="space-y-1.5">
+                <label htmlFor="newsletterHeadlineInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Tiêu đề lớn Warm Heritage (Headline)
+                </label>
+                <input
+                  id="newsletterHeadlineInput"
+                  type="text"
+                  value={newsletterHeadline}
+                  onChange={(e) => setNewsletterHeadline(e.target.value)}
+                  placeholder="ví dụ: Tinh Hoa Ẩm Thực Cung Đình Huế"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                />
+              </div>
+            </div>
+
+            {/* Content Body */}
+            <div className="space-y-1.5">
+              <label htmlFor="newsletterContentInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                Nội dung thông báo / Bản tin *
+              </label>
+              <textarea
+                id="newsletterContentInput"
+                rows={4}
+                required
+                value={newsletterContent}
+                onChange={(e) => setNewsletterContent(e.target.value)}
+                placeholder="Nhập nội dung thông điệp gửi tới học viên. Hệ thống sẽ tự động lồng ghép vào khung template Warm Heritage trang nhã..."
+                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold resize-none"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Action URL */}
+              <div className="space-y-1.5">
+                <label htmlFor="newsletterActionUrlInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Đường dẫn hành động (Action URL)
+                </label>
+                <input
+                  id="newsletterActionUrlInput"
+                  type="url"
+                  value={actionUrl}
+                  onChange={(e) => setActionUrl(e.target.value)}
+                  placeholder="ví dụ: https://viecultures.com/reading/post-101"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                />
+              </div>
+
+              {/* Action Text */}
+              <div className="space-y-1.5">
+                <label htmlFor="newsletterActionTextInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Nhãn nút bấm hành động (Action Text)
+                </label>
+                <input
+                  id="newsletterActionTextInput"
+                  type="text"
+                  value={actionText}
+                  onChange={(e) => setActionText(e.target.value)}
+                  placeholder="ví dụ: Khám Phá Ngay, Luyện Đọc Ngay"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSendingMail}
+              className="w-full py-3 px-4 rounded-xl bg-heritage-green text-warm-ivory hover:bg-heritage-dark text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md disabled:opacity-50"
+            >
+              <Send className={`w-4 h-4 ${isSendingMail ? 'animate-pulse' : ''}`} aria-hidden="true" />
+              <span>{isSendingMail ? 'Đang phát hành email qua Gmail SMTP...' : 'Phát Hành Thông Báo Email'}</span>
+            </button>
+          </form>
         </div>
+      )}
 
-        <form onSubmit={handleSendNotification} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Recipient Email */}
-            <div className="space-y-1.5">
-              <label htmlFor="recipientEmailInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Dia chi Email nguoi nhan *
-              </label>
-              <input
-                id="recipientEmailInput"
-                type="email"
-                required
-                value={toEmail}
-                onChange={(e) => setToEmail(e.target.value)}
-                placeholder="vi-du: hocvien@viecultures.com hoac admin@viecultures.com"
-                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-              />
+      {/* ── TAB 4: Mạng xã hội & Ads ───────────────────────────────────── */}
+      {activeTab === 'social' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-5">
+            <div className="border-b border-antique-gold/20 pb-4">
+              <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
+                <Share2 aria-hidden="true" className="w-5 h-5 text-antique-gold" />
+                <span>Mạng Xã Hội, Kênh Ads & Webhook Tự Động Hóa</span>
+              </h3>
+              <p className="text-xs text-text-muted mt-0.5">
+                Quy trình theo dõi chuyển đổi và tự động đồng bộ nội dung bài viết lên Facebook, TikTok và Google Ads theo note_third_party.md.
+              </p>
             </div>
 
-            {/* Recipient Name */}
-            <div className="space-y-1.5">
-              <label htmlFor="recipientNameInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Ten nguoi nhan
-              </label>
-              <input
-                id="recipientNameInput"
-                type="text"
-                value={recipientName}
-                onChange={(e) => setRecipientName(e.target.value)}
-                placeholder="vi-du: Ban Nguyen Van A"
-                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Subject */}
-            <div className="space-y-1.5">
-              <label htmlFor="newsletterSubjectInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Tieu de thu (Subject) *
-              </label>
-              <input
-                id="newsletterSubjectInput"
-                type="text"
-                required
-                value={newsletterSubject}
-                onChange={(e) => setNewsletterSubject(e.target.value)}
-                placeholder="vi-du: VieCultures - Kham pha bi an am thuc cung dinh Hue tuan nay"
-                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-              />
+            {/* Approach 1 Card */}
+            <div className="p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-800 space-y-2">
+              <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-xs">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                <span>Cách 1: Theo dõi chuyển đổi qua UTM nội bộ (Miễn phí - Đang kích hoạt)</span>
+              </div>
+              <p className="text-xs text-text-body dark:text-warm-ivory leading-relaxed">
+                Khi chạy quảng cáo trên Facebook / TikTok, quản trị viên chỉ cần gắn đuôi UTM bằng <strong>Quick UTM Builder (Tab 1)</strong>. Hệ thống tự động ghi nhận tham số <code className="font-mono bg-white/60 dark:bg-white/10 px-1 py-0.5 rounded text-[11px]">utm_source</code> và <code className="font-mono bg-white/60 dark:bg-white/10 px-1 py-0.5 rounded text-[11px]">utm_campaign</code> vào tài khoản học viên khi bấm đăng ký. Giúp đội ngũ nắm bắt chính xác nguồn học viên mà không tốn chi phí kết nối API phức tạp.
+              </p>
             </div>
 
-            {/* Headline */}
-            <div className="space-y-1.5">
-              <label htmlFor="newsletterHeadlineInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Tieu de lon Warm Heritage (Headline)
-              </label>
-              <input
-                id="newsletterHeadlineInput"
-                type="text"
-                value={newsletterHeadline}
-                onChange={(e) => setNewsletterHeadline(e.target.value)}
-                placeholder="vi-du: Tinh Hoa Am Thuc Cung Dinh Hue"
-                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-              />
+            {/* Approach 2 & Webhooks */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Webhook n8n / Make */}
+              <div className="p-5 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 space-y-3">
+                <div className="flex items-center gap-2 text-heritage-green dark:text-antique-bright font-bold text-xs">
+                  <Zap className="w-4 h-4 text-antique-gold" aria-hidden="true" />
+                  <span>Webhook Tự Động Hóa (n8n / Make)</span>
+                </div>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  Tự động đẩy thông báo khi có bài viết hoặc hành trình mới xuất bản tới các nhóm cộng đồng Facebook và TikTok video ngắn.
+                </p>
+                <div className="font-mono text-[11px] bg-rice-paper dark:bg-heritage-dark p-2.5 rounded-xl border border-antique-gold/20 select-all text-heritage-green dark:text-antique-bright">
+                  SOCIAL_CROSSPOST_WEBHOOK_URL=&quot;https://hook.eu1.make.com/xxxxxx&quot;
+                </div>
+                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/30">
+                  Sẵn sàng kết nối
+                </span>
+              </div>
+
+              {/* Meta Business & Google Ads */}
+              <div className="p-5 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 space-y-3">
+                <div className="flex items-center gap-2 text-heritage-green dark:text-antique-bright font-bold text-xs">
+                  <Globe className="w-4 h-4 text-antique-gold" aria-hidden="true" />
+                  <span>Cách 2: Chi phí quảng cáo (Meta Business & Google Ads)</span>
+                </div>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  Để theo dõi trực tiếp số tiền đã tiêu (Spend) trên CMS:
+                </p>
+                <ul className="text-[11px] text-text-muted space-y-1 list-disc list-inside">
+                  <li><strong>Meta for Developers:</strong> Tạo App loại Business &rarr; Cung cấp Ad Account ID & Access Token.</li>
+                  <li><strong>Google Ads:</strong> Đăng ký tài khoản quản lý MCC và xin Developer Token từ Google.</li>
+                </ul>
+                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-stone-200 dark:bg-white/10 text-stone-600 dark:text-stone-300 border border-stone-300">
+                  Kế hoạch giai đoạn sau
+                </span>
+              </div>
             </div>
           </div>
-
-          {/* Content Body */}
-          <div className="space-y-1.5">
-            <label htmlFor="newsletterContentInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-              Noi dung thong bao / Ban tin *
-            </label>
-            <textarea
-              id="newsletterContentInput"
-              rows={4}
-              required
-              value={newsletterContent}
-              onChange={(e) => setNewsletterContent(e.target.value)}
-              placeholder="Nhap noi dung thong diep gui toi hoc vien. He thong se tu dong long ghep vao khung template Warm Heritage trang nha..."
-              className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold resize-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Action URL */}
-            <div className="space-y-1.5">
-              <label htmlFor="newsletterActionUrlInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Duong dan hanh dong (Action URL)
-              </label>
-              <input
-                id="newsletterActionUrlInput"
-                type="url"
-                value={actionUrl}
-                onChange={(e) => setActionUrl(e.target.value)}
-                placeholder="vi-du: https://viecultures.com/reading/post-101"
-                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-              />
-            </div>
-
-            {/* Action Text */}
-            <div className="space-y-1.5">
-              <label htmlFor="newsletterActionTextInput" className="text-xs font-bold text-text-body dark:text-warm-ivory">
-                Nhan nut bam hanh dong (Action Text)
-              </label>
-              <input
-                id="newsletterActionTextInput"
-                type="text"
-                value={actionText}
-                onChange={(e) => setActionText(e.target.value)}
-                placeholder="vi-du: Kham Pha Ngay, Luyen Doc Ngay"
-                className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSendingMail}
-            className="w-full py-3 px-4 rounded-xl bg-heritage-green text-warm-ivory hover:bg-heritage-dark text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md disabled:opacity-50"
-          >
-            <Send className={`w-4 h-4 ${isSendingMail ? 'animate-pulse' : ''}`} aria-hidden="true" />
-            <span>{isSendingMail ? 'Dang phat hanh email qua Gmail SMTP...' : 'Phat Hanh Thong Bao Email'}</span>
-          </button>
-        </form>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

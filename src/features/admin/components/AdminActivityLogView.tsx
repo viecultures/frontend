@@ -63,8 +63,8 @@ export const AdminActivityLogView: React.FC = () => {
       setTotalPages(data.totalPages || 1);
       setTotalElements(data.totalElements || 0);
     } catch (err: unknown) {
-      console.error('Loi khi tai nhat ky hanh vi:', err);
-      const message = err instanceof Error ? err.message : 'Khong the ket noi may chu';
+      console.error('Lỗi khi tải nhật ký hành vi:', err);
+      const message = err instanceof Error ? err.message : 'Không thể kết nối máy chủ';
       setErrorMsg(message);
     } finally {
       setIsLoading(false);
@@ -77,7 +77,7 @@ export const AdminActivityLogView: React.FC = () => {
       const statsData = await adminActivityLogService.getStatsSummary();
       setStats(statsData);
     } catch (err) {
-      console.error('Loi khi tai thong ke nhat ky:', err);
+      console.error('Lỗi khi tải thống kê nhật ký:', err);
     }
   }, []);
 
@@ -118,7 +118,7 @@ export const AdminActivityLogView: React.FC = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Loi sao chep JSON:', err);
+      console.error('Lỗi sao chép JSON:', err);
     }
   };
 
@@ -169,46 +169,46 @@ export const AdminActivityLogView: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
           <div className="flex items-center justify-between text-text-muted text-xs font-semibold">
-            <span>Tong su kien ghi nhan</span>
+            <span>Tổng sự kiện ghi nhận</span>
             <Activity className="size-4 text-antique-gold" aria-hidden="true" />
           </div>
           <div className="text-2xl sm:text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
             {stats ? stats.totalLogs.toLocaleString() : totalElements.toLocaleString()}
           </div>
-          <p className="text-[11px] text-text-secondary">Tat ca nhat ky trong CSDL</p>
+          <p className="text-[11px] text-text-secondary">Tất cả nhật ký trong CSDL</p>
         </div>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
           <div className="flex items-center justify-between text-text-muted text-xs font-semibold">
-            <span>Su kien doc bai</span>
+            <span>Sự kiện đọc bài</span>
             <FileText className="size-4 text-emerald-600" aria-hidden="true" />
           </div>
           <div className="text-2xl sm:text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
             {stats?.categoryCounts?.READER ? stats.categoryCounts.READER.toLocaleString() : 0}
           </div>
-          <p className="text-[11px] text-text-secondary">Luot doc va tuong tac bai</p>
+          <p className="text-[11px] text-text-secondary">Lượt đọc và tương tác bài</p>
         </div>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
           <div className="flex items-center justify-between text-text-muted text-xs font-semibold">
-            <span>Tra cuu tu vung</span>
+            <span>Tra cứu từ vựng</span>
             <Layers className="size-4 text-amber-600" aria-hidden="true" />
           </div>
           <div className="text-2xl sm:text-3xl font-heading font-bold text-amber-700 dark:text-amber-400">
             {stats?.categoryCounts?.VOCABULARY ? stats.categoryCounts.VOCABULARY.toLocaleString() : 0}
           </div>
-          <p className="text-[11px] text-text-secondary">Luu tu vung vao so tay</p>
+          <p className="text-[11px] text-text-secondary">Lưu từ vựng vào sổ tay</p>
         </div>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
           <div className="flex items-center justify-between text-text-muted text-xs font-semibold">
-            <span>Kham pha van hoa</span>
+            <span>Khám phá văn hóa</span>
             <Filter className="size-4 text-purple-600" aria-hidden="true" />
           </div>
           <div className="text-2xl sm:text-3xl font-heading font-bold text-purple-700 dark:text-purple-400">
             {stats?.categoryCounts?.DISCOVERY ? stats.categoryCounts.DISCOVERY.toLocaleString() : 0}
           </div>
-          <p className="text-[11px] text-text-secondary">Ban do va dia diem</p>
+          <p className="text-[11px] text-text-secondary">Bản đồ và địa điểm</p>
         </div>
       </div>
 
@@ -225,7 +225,7 @@ export const AdminActivityLogView: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tim theo email, URL, IP hoac noi dung..."
+              placeholder="Tìm theo email, URL, IP hoặc nội dung..."
               className="w-full pl-10 pr-4 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
             />
           </form>
@@ -234,7 +234,7 @@ export const AdminActivityLogView: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
             {/* Category Select */}
             <select
-              aria-label="Loc theo nhom su kien"
+              aria-label="Lọc theo nhóm sự kiện"
               value={selectedCategory}
               onChange={(e) => {
                 setSelectedCategory(e.target.value);
@@ -242,17 +242,17 @@ export const AdminActivityLogView: React.FC = () => {
               }}
               className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
             >
-              <option value="">Tat ca nhom su kien</option>
-              <option value="READER">READER (Doc bai)</option>
-              <option value="VOCABULARY">VOCABULARY (Tu vung)</option>
-              <option value="DISCOVERY">DISCOVERY (Kham pha)</option>
-              <option value="AUTH">AUTH (Xac thuc)</option>
-              <option value="SYSTEM">SYSTEM (He thong)</option>
+              <option value="">Tất cả nhóm sự kiện</option>
+              <option value="READER">READER (Đọc bài)</option>
+              <option value="VOCABULARY">VOCABULARY (Từ vựng)</option>
+              <option value="DISCOVERY">DISCOVERY (Khám phá)</option>
+              <option value="AUTH">AUTH (Xác thực)</option>
+              <option value="SYSTEM">SYSTEM (Hệ thống)</option>
             </select>
 
             {/* Event Type Select */}
             <select
-              aria-label="Loc theo loai su kien"
+              aria-label="Lọc theo loại sự kiện"
               value={selectedEventType}
               onChange={(e) => {
                 setSelectedEventType(e.target.value);
@@ -260,7 +260,7 @@ export const AdminActivityLogView: React.FC = () => {
               }}
               className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
             >
-              <option value="">Moi loai hanh dong</option>
+              <option value="">Mọi loại hành động</option>
               <option value="ARTICLE_READ">ARTICLE_READ</option>
               <option value="ARTICLE_VIEW">ARTICLE_VIEW</option>
               <option value="VOCAB_LOOKUP">VOCAB_LOOKUP</option>
@@ -272,7 +272,7 @@ export const AdminActivityLogView: React.FC = () => {
 
             {/* Page Size */}
             <select
-              aria-label="So luong dong moi trang"
+              aria-label="Số lượng dòng mỗi trang"
               value={pageSize}
               onChange={(e) => {
                 setPageSize(Number(e.target.value));
@@ -280,9 +280,9 @@ export const AdminActivityLogView: React.FC = () => {
               }}
               className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
             >
-              <option value={10}>10 dong/trang</option>
-              <option value={20}>20 dong/trang</option>
-              <option value={50}>50 dong/trang</option>
+              <option value={10}>10 dòng/trang</option>
+              <option value={20}>20 dòng/trang</option>
+              <option value={50}>50 dòng/trang</option>
             </select>
 
             {/* Clear Filters */}
@@ -292,7 +292,7 @@ export const AdminActivityLogView: React.FC = () => {
                 onClick={handleClearFilters}
                 className="px-3 py-2 rounded-xl bg-white/40 dark:bg-white/10 hover:bg-white/60 text-xs font-bold text-text-muted cursor-pointer transition-colors"
               >
-                Xoa bo loc
+                Xóa bộ lọc
               </button>
             )}
 
@@ -305,8 +305,8 @@ export const AdminActivityLogView: React.FC = () => {
               }}
               disabled={isLoading}
               className="p-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory cursor-pointer transition-colors disabled:opacity-50"
-              title="Lam moi du lieu"
-              aria-label="Lam moi du lieu"
+              title="Làm mới dữ liệu"
+              aria-label="Làm mới dữ liệu"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
             </button>
@@ -317,10 +317,10 @@ export const AdminActivityLogView: React.FC = () => {
         <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-antique-gold/20 text-xs">
           <span className="font-semibold text-text-secondary flex items-center gap-1">
             <Calendar className="size-3.5 text-antique-gold" aria-hidden="true" />
-            <span>Khoang thoi gian:</span>
+            <span>Khoảng thời gian:</span>
           </span>
           <div className="flex items-center gap-2">
-            <label htmlFor="fromDateInput" className="text-text-muted text-[11px]">Tu ngay:</label>
+            <label htmlFor="fromDateInput" className="text-text-muted text-[11px]">Từ ngày:</label>
             <input
               id="fromDateInput"
               type="date"
@@ -333,7 +333,7 @@ export const AdminActivityLogView: React.FC = () => {
             />
           </div>
           <div className="flex items-center gap-2">
-            <label htmlFor="toDateInput" className="text-text-muted text-[11px]">Den ngay:</label>
+            <label htmlFor="toDateInput" className="text-text-muted text-[11px]">Đến ngày:</label>
             <input
               id="toDateInput"
               type="date"
@@ -360,7 +360,7 @@ export const AdminActivityLogView: React.FC = () => {
           </div>
           <button
             type="button"
-            aria-label="Dong thong bao loi"
+            aria-label="Đóng thông báo lỗi"
             onClick={() => setErrorMsg(null)}
             className="cursor-pointer"
           >
@@ -381,13 +381,13 @@ export const AdminActivityLogView: React.FC = () => {
             <table className="w-full text-left text-xs min-w-[700px]">
               <thead className="bg-heritage-green/10 dark:bg-white/5 border-b border-antique-gold/20 text-text-secondary font-bold uppercase tracking-wider text-[10px]">
                 <tr>
-                  <th className="py-3.5 px-4">Thoi gian</th>
-                  <th className="py-3.5 px-4">Loai su kien</th>
-                  <th className="py-3.5 px-4">Nhom</th>
-                  <th className="py-3.5 px-4">Nguoi dung / Email</th>
-                  <th className="py-3.5 px-4">Duong dan URL</th>
-                  <th className="py-3.5 px-4">Dia chi IP</th>
-                  <th className="py-3.5 px-4 text-right">Chi tiet</th>
+                  <th className="py-3.5 px-4">Thời gian</th>
+                  <th className="py-3.5 px-4">Loại sự kiện</th>
+                  <th className="py-3.5 px-4">Nhóm</th>
+                  <th className="py-3.5 px-4">Người dùng / Email</th>
+                  <th className="py-3.5 px-4">Đường dẫn URL</th>
+                  <th className="py-3.5 px-4">Địa chỉ IP</th>
+                  <th className="py-3.5 px-4 text-right">Chi tiết</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-antique-gold/15">
@@ -395,7 +395,7 @@ export const AdminActivityLogView: React.FC = () => {
                   <tr>
                     <td colSpan={7} className="py-16 text-center">
                       <div className="inline-block animate-spin w-7 h-7 border-3 border-antique-gold border-t-transparent rounded-full mb-2" />
-                      <p className="text-xs text-text-muted">Dang tai nhat ky he thong...</p>
+                      <p className="text-xs text-text-muted">Đang tải nhật ký hệ thống...</p>
                     </td>
                   </tr>
                 ) : logs.length === 0 ? (
@@ -403,17 +403,17 @@ export const AdminActivityLogView: React.FC = () => {
                     <td colSpan={7} className="py-16 text-center space-y-2">
                       <Activity className="w-10 h-10 text-antique-gold/40 mx-auto" aria-hidden="true" />
                       <p className="text-sm font-bold text-text-body dark:text-warm-ivory">
-                        Chua co ban ghi nhat ky nao
+                        Chưa có bản ghi nhật ký nào
                       </p>
                       <p className="text-xs text-text-muted max-w-sm mx-auto">
-                        He thong chua ghi nhan du lieu phu hop voi bo loc hien tai hoac chua co thao tac tu nguoi dung.
+                        Hệ thống chưa ghi nhận dữ liệu phù hợp với bộ lọc hiện tại hoặc chưa có thao tác từ người dùng.
                       </p>
                     </td>
                   </tr>
                 ) : (
                   logs.map((item) => {
                     const isSelected = selectedLog?.id === item.id;
-                    const actorDisplay = item.userEmail || item.userId || item.anonymousSessionId || 'Khach an danh';
+                    const actorDisplay = item.userEmail || item.userId || item.anonymousSessionId || 'Khách ẩn danh';
 
                     return (
                       <tr
@@ -464,7 +464,7 @@ export const AdminActivityLogView: React.FC = () => {
                             }}
                             className="px-2.5 py-1 rounded-lg bg-heritage-green/10 hover:bg-heritage-green text-heritage-dark hover:text-warm-ivory dark:text-warm-ivory text-[10px] font-bold transition-all cursor-pointer"
                           >
-                            {isSelected ? 'Dang xem' : 'Xem JSON'}
+                            {isSelected ? 'Đang xem' : 'Xem JSON'}
                           </button>
                         </td>
                       </tr>
@@ -478,7 +478,7 @@ export const AdminActivityLogView: React.FC = () => {
           {/* Pagination Footer */}
           <div className="p-4 border-t border-antique-gold/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-secondary">
             <div>
-              Hien thi{' '}
+              Hiển thị{' '}
               <span className="font-bold text-heritage-green dark:text-antique-bright">
                 {logs.length > 0 ? page * pageSize + 1 : 0}
               </span>{' '}
@@ -486,11 +486,11 @@ export const AdminActivityLogView: React.FC = () => {
               <span className="font-bold text-heritage-green dark:text-antique-bright">
                 {Math.min((page + 1) * pageSize, totalElements)}
               </span>{' '}
-              tren tong so{' '}
+              trên tổng số{' '}
               <span className="font-bold text-heritage-green dark:text-antique-bright">
                 {totalElements}
               </span>{' '}
-              ban ghi
+              bản ghi
             </div>
 
             <div className="flex items-center gap-1.5">
@@ -499,7 +499,7 @@ export const AdminActivityLogView: React.FC = () => {
                 disabled={page <= 0 || isLoading}
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 className="p-1.5 rounded-lg border border-antique-gold/30 hover:bg-antique-gold/15 transition-colors disabled:opacity-40 cursor-pointer"
-                aria-label="Trang truoc"
+                aria-label="Trang trước"
               >
                 <ChevronLeft className="w-4 h-4" aria-hidden="true" />
               </button>
@@ -511,7 +511,7 @@ export const AdminActivityLogView: React.FC = () => {
                 disabled={page >= totalPages - 1 || isLoading}
                 onClick={() => setPage((p) => p + 1)}
                 className="p-1.5 rounded-lg border border-antique-gold/30 hover:bg-antique-gold/15 transition-colors disabled:opacity-40 cursor-pointer"
-                aria-label="Trang tiep"
+                aria-label="Trang tiếp"
               >
                 <ChevronRight className="w-4 h-4" aria-hidden="true" />
               </button>
@@ -531,7 +531,7 @@ export const AdminActivityLogView: React.FC = () => {
               <div className="flex items-center justify-between border-b border-antique-gold/25 pb-3">
                 <div className="space-y-0.5">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-antique-gold">
-                    Chi tiet nhat ky hoat dong
+                    Chi tiết nhật ký hoạt động
                   </div>
                   <h4 className="font-heading font-bold text-sm text-text-body dark:text-warm-ivory">
                     {selectedLog.eventType}
@@ -546,12 +546,12 @@ export const AdminActivityLogView: React.FC = () => {
                     {copied ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
-                        <span>Da sao chep</span>
+                        <span>Đã sao chép</span>
                       </>
                     ) : (
                       <>
                         <Copy className="w-3.5 h-3.5" aria-hidden="true" />
-                        <span>Sao chep JSON</span>
+                        <span>Sao chép JSON</span>
                       </>
                     )}
                   </button>
@@ -559,24 +559,24 @@ export const AdminActivityLogView: React.FC = () => {
                     type="button"
                     onClick={() => setSelectedLog(null)}
                     className="px-2.5 py-1 rounded-lg bg-rose-100 dark:bg-rose-950/40 hover:bg-rose-200 text-rose-800 dark:text-rose-300 text-[11px] font-bold transition-all cursor-pointer"
-                    aria-label="Dong khung chi tiet"
+                    aria-label="Đóng khung chi tiết"
                   >
-                    Dong
+                    Đóng
                   </button>
                 </div>
               </div>
 
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                  <span className="text-text-muted">Ma dinh danh:</span>
+                  <span className="text-text-muted">Mã định danh:</span>
                   <span className="font-mono font-semibold">{selectedLog.id}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                  <span className="text-text-muted">Thoi gian:</span>
+                  <span className="text-text-muted">Thời gian:</span>
                   <span className="font-mono">{formatDate(selectedLog.createdAt)}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                  <span className="text-text-muted">Nhom su kien:</span>
+                  <span className="text-text-muted">Nhóm sự kiện:</span>
                   <span
                     className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getCategoryBadgeClass(
                       selectedLog.eventCategory
@@ -586,14 +586,14 @@ export const AdminActivityLogView: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                  <span className="text-text-muted">Email nguoi dung:</span>
+                  <span className="text-text-muted">Email người dùng:</span>
                   <span className="font-semibold text-heritage-green dark:text-antique-bright truncate max-w-[200px]">
-                    {selectedLog.userEmail || selectedLog.userId || 'Khach vang lai'}
+                    {selectedLog.userEmail || selectedLog.userId || 'Khách vãng lai'}
                   </span>
                 </div>
                 {selectedLog.path && (
                   <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                    <span className="text-text-muted">Duong dan URL:</span>
+                    <span className="text-text-muted">Đường dẫn URL:</span>
                     <span className="font-mono text-heritage-green dark:text-antique-bright truncate max-w-[200px]">
                       {selectedLog.path}
                     </span>
@@ -601,7 +601,7 @@ export const AdminActivityLogView: React.FC = () => {
                 )}
                 {selectedLog.ipAddress && (
                   <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                    <span className="text-text-muted">Dia chi IP:</span>
+                    <span className="text-text-muted">Địa chỉ IP:</span>
                     <span className="font-mono">{selectedLog.ipAddress}</span>
                   </div>
                 )}
@@ -617,12 +617,12 @@ export const AdminActivityLogView: React.FC = () => {
 
               <div className="space-y-1.5 pt-2">
                 <div className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
-                  Du lieu trong tai (Payload)
+                  Dữ liệu trọng tải (Payload)
                 </div>
                 <pre className="p-3.5 rounded-2xl bg-heritage-forest text-warm-ivory font-mono text-[11px] leading-relaxed overflow-x-auto max-h-72 border border-antique-gold/30">
                   {selectedLog.payload
                     ? JSON.stringify(parseJsonSafe(selectedLog.payload), null, 2)
-                    : '// Khong co du lieu payload'}
+                    : '// Không có dữ liệu payload'}
                 </pre>
               </div>
             </motion.div>

@@ -68,7 +68,7 @@ const getAuthHeaders = (): Record<string, string> => {
 
 export const adminActivityLogService = {
   /**
-   * Lay danh sach nhat ky hanh vi phan trang va loc
+   * Lấy danh sách nhật ký hành vi phân trang và lọc
    * GET /api/v1/admin/activity-logs
    */
   async getLogs(params?: ActivityLogFilterParams): Promise<ActivityLogPageResponse> {
@@ -94,7 +94,7 @@ export const adminActivityLogService = {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Loi tai nhat ky hoat dong (HTTP ${res.status})`);
+      throw new Error(err.message || `Lỗi tải nhật ký hoạt động (HTTP ${res.status})`);
     }
 
     const envelope: ApiResponseEnvelope<ActivityLogPageResponse> = await res.json();
@@ -102,7 +102,7 @@ export const adminActivityLogService = {
   },
 
   /**
-   * Lay thong ke tong quan nhat ky hoat dong
+   * Lấy thống kê tổng quan nhật ký hoạt động
    * GET /api/v1/admin/activity-logs/stats
    */
   async getStatsSummary(): Promise<ActivityStatsSummaryDto> {
@@ -114,7 +114,7 @@ export const adminActivityLogService = {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Loi tai thong ke nhat ky hoat dong (HTTP ${res.status})`);
+      throw new Error(err.message || `Lỗi tải thống kê nhật ký hoạt động (HTTP ${res.status})`);
     }
 
     const envelope: ApiResponseEnvelope<ActivityStatsSummaryDto> = await res.json();

@@ -30,7 +30,7 @@ const getMailHeaders = (): Record<string, string> => {
 
 export const adminMailService = {
   /**
-   * Gui email thong bao hoac ban tin van hoa theo template Warm Heritage
+   * Gửi email thông báo hoặc bản tin văn hóa theo template Warm Heritage
    * POST /api/v1/mail/send-notification
    */
   async sendNotification(payload: SendEmailNotificationPayload): Promise<MailActionResponse> {
@@ -43,14 +43,14 @@ export const adminMailService = {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Loi khi gui email (HTTP ${res.status})`);
+      throw new Error(err.message || `Lỗi khi gửi email thông báo (HTTP ${res.status})`);
     }
 
     return res.json();
   },
 
   /**
-   * Kiem tra ket noi Gmail SMTP Ping
+   * Kiểm tra kết nối Gmail SMTP Ping
    * POST /api/v1/mail/test-connection?toEmail=...
    */
   async testConnection(toEmail: string): Promise<MailActionResponse> {
@@ -62,7 +62,7 @@ export const adminMailService = {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Loi khi kiem tra ket noi SMTP (HTTP ${res.status})`);
+      throw new Error(err.message || `Lỗi khi kiểm tra kết nối SMTP (HTTP ${res.status})`);
     }
 
     return res.json();

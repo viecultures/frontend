@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -11,6 +11,11 @@ import {
   Landmark,
   Server,
   Activity,
+  ChevronDown,
+  Link,
+  BarChart3,
+  Mail,
+  Share2,
 } from 'lucide-react';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 
@@ -20,6 +25,13 @@ export interface AdminSidebarProps {
   onNavigate?: () => void;
 }
 
+interface MarketingSubItem {
+  key: 'utm' | 'analytics' | 'broadcast' | 'social';
+  label: string;
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+  badge?: string;
+}
+
 interface NavItem {
   id: string;
   aliases?: string[];
@@ -27,6 +39,7 @@ interface NavItem {
   fallbackLabel: string;
   icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
   badge?: string | number;
+  hasSubItems?: boolean;
 }
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({
@@ -46,6 +59,46 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     const match = location.pathname.match(/\/admin\/([a-zA-Z0-9_-]+)/);
     return match ? match[1] : 'dashboard';
   }, [tab, location.pathname]);
+
+  // Current sub-tab for marketing
+  const activeMarketingSubTab = React.useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('tab') || 'utm';
+  }, [location.search]);
+
+  // Accordion open state for Marketing
+  const [isMarketingOpen, setIsMarketingOpen] = useState<boolean>(activeTab === 'marketing');
+
+  // Auto-expand marketing accordion when navigated to marketing tab
+  useEffect(() => {
+    if (activeTab === 'marketing') {
+      setIsMarketingOpen(true);
+    }
+  }, [activeTab]);
+
+  const marketingSubItems: MarketingSubItem[] = [
+    {
+      key: 'utm',
+      label: 'Tạo link UTM (Nội bộ)',
+      icon: Link,
+    },
+    {
+      key: 'analytics',
+      label: 'Google Analytics & Search Console',
+      icon: BarChart3,
+    },
+    {
+      key: 'broadcast',
+      label: 'Email & Bản tin di sản',
+      icon: Mail,
+    },
+    {
+      key: 'social',
+      label: 'Mạng xã hội & Ads (Sắp ra mắt)',
+      icon: Share2,
+      badge: 'Sớm',
+    },
+  ];
 
   const navItems: NavItem[] = [
     {
@@ -71,6 +124,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       id: 'marketing',
       fallbackLabel: 'Marketing & Đa kênh',
       icon: Megaphone,
+      hasSubItems: true,
     },
     {
       id: 'users',
@@ -89,7 +143,25 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   ];
 
   const handleTabClick = (item: NavItem) => {
+    if (item.id === 'marketing') {
+      if (activeTab === 'marketing') {
+        setIsMarketingOpen((prev) => !prev);
+      } else {
+        setIsMarketingOpen(true);
+        navigate(`${getLocalizedPath('/admin/marketing', currentLang)}?tab=${activeMarketingSubTab}`);
+        if (onNavigate) onNavigate();
+      }
+      return;
+    }
+
     navigate(getLocalizedPath(`/admin/${item.id}`, currentLang));
+    if (onNavigate) {
+      onNavigate();
+    }
+  };
+
+  const handleMarketingSubClick = (subKey: string) => {
+    navigate(`${getLocalizedPath('/admin/marketing', currentLang)}?tab=${subKey}`);
     if (onNavigate) {
       onNavigate();
     }
@@ -128,7 +200,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </div>
         </div>
 
-        {/* ── 6 Navigation Tabs ─────────────────────────────────────────── */}
+        {/* ── Navigation Tabs ───────────────────────────────────────────── */}
         <div className="space-y-1">
           <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-text-muted">
             Phân hệ điều hành
@@ -140,50 +212,100 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               const label = item.labelKey ? t(item.labelKey, item.fallbackLabel) : item.fallbackLabel;
 
               return (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-current={active ? 'page' : undefined}
-                  onClick={() => handleTabClick(item)}
-                  className={`w-full px-3 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between cursor-pointer text-left group relative ${
-                    active
-                      ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-                      : 'text-text-secondary hover:text-heritage-green dark:hover:text-antique-bright hover:bg-antique-gold/10 dark:hover:bg-white/5'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    {/* Active highlight dot */}
-                    {active ? (
-                      <span className="w-1.5 h-1.5 rounded-full bg-antique-gold shrink-0 animate-pulse" />
-                    ) : (
-                      <span className="w-1.5 h-1.5 rounded-full bg-transparent shrink-0" />
-                    )}
+                <div key={item.id} className="space-y-1">
+                  <button
+                    type="button"
+                    aria-current={active ? 'page' : undefined}
+                    onClick={() => handleTabClick(item)}
+                    className={`w-full px-3 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between cursor-pointer text-left group relative ${
+                      active
+                        ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
+                        : 'text-text-secondary hover:text-heritage-green dark:hover:text-antique-bright hover:bg-antique-gold/10 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {/* Active highlight dot */}
+                      {active ? (
+                        <span className="w-1.5 h-1.5 rounded-full bg-antique-gold shrink-0 animate-pulse" />
+                      ) : (
+                        <span className="w-1.5 h-1.5 rounded-full bg-transparent shrink-0" />
+                      )}
 
-                    <Icon
-                      aria-hidden="true"
-                      className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-105 ${
-                        active
-                          ? 'text-antique-gold'
-                          : 'text-text-muted group-hover:text-heritage-green dark:group-hover:text-antique-bright'
-                      }`}
-                    />
-                    <span className="truncate group-hover:translate-x-0.5 transition-transform duration-200">
-                      {label}
-                    </span>
-                  </div>
+                      <Icon
+                        aria-hidden="true"
+                        className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+                          active
+                            ? 'text-antique-gold'
+                            : 'text-text-muted group-hover:text-heritage-green dark:group-hover:text-antique-bright'
+                        }`}
+                      />
+                      <span className="truncate group-hover:translate-x-0.5 transition-transform duration-200">
+                        {label}
+                      </span>
+                    </div>
 
-                  {item.badge !== undefined && (
-                    <span
-                      className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 transition-colors ${
-                        active
-                          ? 'bg-antique-gold text-heritage-green'
-                          : 'bg-rice-paper dark:bg-white/10 text-text-muted border border-[#E5DEC9] dark:border-white/10'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {item.badge !== undefined && (
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 transition-colors ${
+                            active
+                              ? 'bg-antique-gold text-heritage-green'
+                              : 'bg-rice-paper dark:bg-white/10 text-text-muted border border-[#E5DEC9] dark:border-white/10'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+
+                      {item.hasSubItems && (
+                        <ChevronDown
+                          aria-hidden="true"
+                          className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                            isMarketingOpen ? 'rotate-180 text-antique-gold' : 'text-text-muted'
+                          }`}
+                        />
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Expandable Sub-items for Marketing */}
+                  {item.hasSubItems && isMarketingOpen && (
+                    <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-antique-gold/30 ml-4 my-1">
+                      {marketingSubItems.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isSubActive = active && activeMarketingSubTab === sub.key;
+
+                        return (
+                          <button
+                            key={sub.key}
+                            type="button"
+                            onClick={() => handleMarketingSubClick(sub.key)}
+                            className={`w-full px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all flex items-center justify-between cursor-pointer text-left group ${
+                              isSubActive
+                                ? 'bg-antique-gold/25 font-bold text-heritage-green dark:text-antique-bright border border-antique-gold/40'
+                                : 'text-text-muted hover:text-heritage-green dark:hover:text-antique-bright hover:bg-antique-gold/10'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <SubIcon
+                                aria-hidden="true"
+                                className={`w-3.5 h-3.5 shrink-0 ${
+                                  isSubActive ? 'text-heritage-green dark:text-antique-bright' : 'text-text-muted group-hover:text-heritage-green'
+                                }`}
+                              />
+                              <span className="truncate">{sub.label}</span>
+                            </div>
+                            {sub.badge && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/30">
+                                {sub.badge}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>
