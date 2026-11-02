@@ -80,7 +80,7 @@ export const withQuery = (path: string, query: Record<string, QueryValue> = {}):
 
 export const paths = {
   login: (opts: { redirect?: string } = {}) => withQuery(PATHS.login, opts),
-  admin: (opts: { tab?: 'journeys' | 'posts' | 'users' | 'logs' | 'system_stats' } = {}) =>
+  admin: (opts: { tab?: 'content' | 'journeys' | 'posts' | 'vocabularies' | 'marketing' | 'subscriptions' | 'users' | 'logs' | 'system_stats' } = {}) =>
     opts.tab ? `${PATHS.admin}/${opts.tab}` : PATHS.admin,
 
   profile: (opts: { tab?: 'passport' | 'badges' | 'vocab' | 'subscription' } = {}) =>

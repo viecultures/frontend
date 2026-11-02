@@ -9,9 +9,33 @@
     "refresh_overview": "Refresh overview"
   },
   "tabs": {
+    "content": "Content Management",
     "posts": "Articles",
-    "users": "Users",
+    "journeys": "Learning Journeys",
+    "vocabularies": "Vocabulary & Terms",
+    "users": "Users CRM",
     "overview": "Overview"
+  },
+  "content_management": {
+    "title": "Content Management",
+    "subtitle": "Curate cultural reading articles, heritage learning journeys, and specialized vocabulary.",
+    "subtabs": {
+      "posts": "Articles",
+      "journeys": "Learning Journeys",
+      "vocabularies": "Vocabulary & Terms"
+    }
+  },
+  "vocabularies": {
+    "title": "System Vocabulary & Terms",
+    "subtitle": "Manage cultural terminology, bilingual definitions, pronunciations, and CEFR proficiency levels.",
+    "search_placeholder": "Search vocabulary or definitions...",
+    "all_levels": "All CEFR levels",
+    "total_vocab": "Total vocabulary items",
+    "cached_vocab": "Cached dictionary entries",
+    "audio_vocab": "Audio pronunciations available",
+    "cefr_coverage": "CEFR proficiency scale",
+    "empty_title": "No vocabulary items match your filters.",
+    "empty_desc": "Please adjust your search keywords or select a different CEFR proficiency level."
   },
   "stats": {
     "articles_in_view": "Articles in view",

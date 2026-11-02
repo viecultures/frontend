@@ -9,9 +9,33 @@
     "refresh_overview": "Làm mới tổng quan"
   },
   "tabs": {
-    "posts": "Bài viết",
-    "users": "Người dùng",
+    "content": "Quản lý nội dung",
+    "posts": "Kho Bài viết",
+    "journeys": "Lộ trình học",
+    "vocabularies": "Từ vựng & Thuật ngữ",
+    "users": "Học viên CRM",
     "overview": "Tổng quan"
+  },
+  "content_management": {
+    "title": "Quản lý nội dung",
+    "subtitle": "Biên tập bài đọc, thiết lập lộ trình học di sản và kho từ vựng văn hóa.",
+    "subtabs": {
+      "posts": "Kho Bài viết",
+      "journeys": "Lộ trình học",
+      "vocabularies": "Từ vựng & Thuật ngữ"
+    }
+  },
+  "vocabularies": {
+    "title": "Từ vựng & Thuật ngữ hệ thống",
+    "subtitle": "Quản lý từ vựng văn hóa, định nghĩa song ngữ, phát âm và mức độ đọc hiểu CEFR.",
+    "search_placeholder": "Tìm kiếm từ vựng hoặc định nghĩa...",
+    "all_levels": "Tất cả cấp độ CEFR",
+    "total_vocab": "Tổng số mục từ",
+    "cached_vocab": "Từ điển đã lưu bộ đệm",
+    "audio_vocab": "Có phát âm Audio",
+    "cefr_coverage": "Phân loại cấp độ CEFR",
+    "empty_title": "Không tìm thấy từ vựng phù hợp với bộ lọc.",
+    "empty_desc": "Vui lòng điều chỉnh từ khóa tìm kiếm hoặc lựa chọn cấp độ CEFR khác."
   },
   "stats": {
     "articles_in_view": "Bài viết hiển thị",

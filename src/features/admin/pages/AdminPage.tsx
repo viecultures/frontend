@@ -30,6 +30,8 @@ import {
   Filter,
   AlertTriangle,
   ArrowRight,
+  CreditCard,
+  Bookmark,
 } from 'lucide-react';
 import type { ReadingPostItem, CefrLevel } from '../types/adminTypes';
 import { postAdminService, type PostFilterParams } from '../services/postAdminService';
@@ -38,8 +40,10 @@ import { adminOverviewService, type AdminOverviewStats } from '../services/admin
 import { PostFormModal } from '../components/PostFormModal';
 import { UserManagementView } from '../components/UserManagementView';
 import { JourneyManagementView } from '../components/JourneyManagementView';
+import { VocabManagementView } from '../components/VocabManagementView';
 import { AdminActivityLogView } from '../components/AdminActivityLogView';
 import { MarketingManagementView } from '../components/MarketingManagementView';
+import { SubscriptionManagementView } from '../components/subscriptions/SubscriptionManagementView';
 import { PostPreviewModal } from '../components/PostPreviewModal';
 import { AdminDialog } from '../components/AdminDialog';
 import { AdminServiceConnections } from '../components/AdminServiceConnections';
@@ -49,9 +53,12 @@ import '../admin-ui.css';
 
 export type AdminTab =
   | 'dashboard'
+  | 'content'
   | 'journeys'
   | 'posts'
+  | 'vocabularies'
   | 'marketing'
+  | 'subscriptions'
   | 'users'
   | 'system'
   | 'logs'
@@ -59,9 +66,12 @@ export type AdminTab =
 
 const VALID_TABS: AdminTab[] = [
   'dashboard',
+  'content',
   'journeys',
   'posts',
+  'vocabularies',
   'marketing',
+  'subscriptions',
   'users',
   'system',
   'logs',
@@ -85,6 +95,11 @@ export const AdminPage: React.FC = () => {
     }
     return 'dashboard';
   }, [tab, location.pathname]);
+
+  const activeContentSubTab = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('tab') || 'posts';
+  }, [location.search]);
 
   // When visiting /admin or /:lang/admin without subpath, redirect to /admin/dashboard
   useEffect(() => {
@@ -172,10 +187,15 @@ export const AdminPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'posts' || activeTab === 'dashboard' || activeTab === 'system_stats') {
+    if (
+      activeTab === 'posts' ||
+      (activeTab === 'content' && activeContentSubTab === 'posts') ||
+      activeTab === 'dashboard' ||
+      activeTab === 'system_stats'
+    ) {
       fetchPosts();
     }
-  }, [activeTab, fetchPosts]);
+  }, [activeTab, activeContentSubTab, fetchPosts]);
 
   useEffect(() => {
     if (activeTab === 'dashboard' || activeTab === 'system_stats') {
@@ -339,6 +359,29 @@ export const AdminPage: React.FC = () => {
           subtitle: 'Giám sát chỉ số vận hành CMS, độ phủ văn hóa và tăng trưởng học viên',
           badge: 'Vận hành trực tiếp',
         };
+      case 'content':
+        if (activeContentSubTab === 'journeys') {
+          return {
+            icon: Compass,
+            title: 'Quản lý lộ trình học di sản',
+            subtitle: 'Thiết lập lộ trình học tập văn hóa từng bước và quản lý trạm di sản',
+            badge: 'Lộ trình di sản',
+          };
+        }
+        if (activeContentSubTab === 'vocabularies') {
+          return {
+            icon: Bookmark,
+            title: 'Từ vựng & Thuật ngữ hệ thống',
+            subtitle: 'Quản lý từ vựng văn hóa, định nghĩa song ngữ, phát âm và mức độ đọc hiểu CEFR',
+            badge: 'Từ vựng hệ thống',
+          };
+        }
+        return {
+          icon: BookOpen,
+          title: t('header.title', 'Kho Bài viết & Biên soạn học liệu'),
+          subtitle: t('header.subtitle', 'Biên tập bài đọc song ngữ, phân cấp CEFR và trích xuất từ vựng'),
+          badge: `${posts.length} bài viết`,
+        };
       case 'journeys':
         return {
           icon: Compass,
@@ -353,12 +396,26 @@ export const AdminPage: React.FC = () => {
           subtitle: t('header.subtitle', 'Biên tập bài đọc song ngữ, phân cấp CEFR và trích xuất từ vựng'),
           badge: `${posts.length} bài viết`,
         };
+      case 'vocabularies':
+        return {
+          icon: Bookmark,
+          title: 'Từ vựng & Thuật ngữ hệ thống',
+          subtitle: 'Quản lý từ vựng văn hóa, định nghĩa song ngữ, phát âm và mức độ đọc hiểu CEFR',
+          badge: 'Từ vựng hệ thống',
+        };
       case 'marketing':
         return {
           icon: Megaphone,
           title: 'Marketing & Đa kênh phân phối',
           subtitle: 'Chiến dịch truyền thông, email định kỳ và kích hoạt học viên đa nền tảng',
           badge: 'Đa kênh',
+        };
+      case 'subscriptions':
+        return {
+          icon: CreditCard,
+          title: 'Gói đăng ký & Doanh thu',
+          subtitle: 'Quản trị gói cước hội viên, phê duyệt đơn nạp chuyển khoản và giám sát doanh thu',
+          badge: 'Gói đăng ký',
         };
       case 'users':
         return {
@@ -383,7 +440,7 @@ export const AdminPage: React.FC = () => {
           badge: 'Quản trị viên',
         };
     }
-  }, [activeTab, posts.length, totalUsersCount, t]);
+  }, [activeTab, activeContentSubTab, posts.length, totalUsersCount, t]);
 
   const HeaderIcon = headerConfig.icon;
 
@@ -449,6 +506,13 @@ export const AdminPage: React.FC = () => {
                   <span>{t('header.new_article')}</span>
                 </button>
               </>
+            )}
+
+            {activeTab === 'subscriptions' && (
+              <div className="px-3 py-1.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5">
+                <CreditCard aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                <span className="hidden sm:inline">Phân hệ Doanh thu</span>
+              </div>
             )}
 
             {activeTab === 'users' && (
@@ -982,10 +1046,17 @@ export const AdminPage: React.FC = () => {
         )}
 
         {/* ── TAB 2: HÀNH TRÌNH HỌC (JOURNEYS) ─────────────────────────── */}
-        {activeTab === 'journeys' && <JourneyManagementView />}
+        {(activeTab === 'journeys' || (activeTab === 'content' && activeContentSubTab === 'journeys')) && (
+          <JourneyManagementView />
+        )}
+
+        {/* ── TAB: TỪ VỰNG HỆ THỐNG (VOCABULARIES) ──────────────────────── */}
+        {(activeTab === 'vocabularies' || (activeTab === 'content' && activeContentSubTab === 'vocabularies')) && (
+          <VocabManagementView />
+        )}
 
         {/* ── TAB 3: KHO BÀI VIẾT & HỌC LIỆU (POSTS) ─────────────────────── */}
-        {activeTab === 'posts' && (
+        {(activeTab === 'posts' || (activeTab === 'content' && activeContentSubTab === 'posts')) && (
           <div className="space-y-6">
             {/* Filter & Search Bar */}
             <div className="p-4 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
@@ -1309,8 +1380,14 @@ export const AdminPage: React.FC = () => {
           </div>
         )}
 
+        {/* ── TAB: QUẢN LÝ TỪ VỰNG (VOCABULARIES) ─────────────────────────── */}
+        {activeTab === 'vocabularies' && <VocabManagementView />}
+
         {/* ── TAB 4: MARKETING & ĐA KÊNH (MARKETING) ─────────────────────── */}
         {activeTab === 'marketing' && <MarketingManagementView />}
+
+        {/* ── TAB: GÓI ĐĂNG KÝ & DUYỆT ĐƠN (SUBSCRIPTIONS) ──────────────── */}
+        {activeTab === 'subscriptions' && <SubscriptionManagementView />}
 
         {/* ── TAB 5: HỌC VIÊN CRM (USERS) ─────────────────────────────────── */}
         {activeTab === 'users' && <UserManagementView />}

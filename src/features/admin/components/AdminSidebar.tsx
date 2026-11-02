@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Map,
   BookOpen,
+  Bookmark,
   Megaphone,
   Users,
   ShieldCheck,
@@ -16,6 +17,8 @@ import {
   BarChart3,
   Mail,
   Share2,
+  CreditCard,
+  Sliders,
 } from 'lucide-react';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 
@@ -25,11 +28,24 @@ export interface AdminSidebarProps {
   onNavigate?: () => void;
 }
 
+interface ContentSubItem {
+  key: 'posts' | 'journeys' | 'vocabularies';
+  label: string;
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+  badge?: string | number;
+}
+
 interface MarketingSubItem {
   key: 'utm' | 'analytics' | 'broadcast' | 'social';
   label: string;
   icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
   badge?: string;
+}
+
+interface SubscriptionSubItem {
+  key: 'overview' | 'config';
+  label: string;
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
 }
 
 interface NavItem {
@@ -60,14 +76,52 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     return match ? match[1] : 'dashboard';
   }, [tab, location.pathname]);
 
+  // Current sub-tab for content
+  const activeContentSubTab = React.useMemo(() => {
+    if (activeTab === 'posts') return 'posts';
+    if (activeTab === 'journeys') return 'journeys';
+    if (activeTab === 'vocabularies') return 'vocabularies';
+    const params = new URLSearchParams(location.search);
+    return params.get('tab') || 'posts';
+  }, [activeTab, location.search]);
+
   // Current sub-tab for marketing
   const activeMarketingSubTab = React.useMemo(() => {
     const params = new URLSearchParams(location.search);
     return params.get('tab') || 'utm';
   }, [location.search]);
 
+  // Current sub-tab for subscriptions
+  const activeSubscriptionSubTab = React.useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('tab') || 'overview';
+  }, [location.search]);
+
+  // Accordion open state for Content
+  const [isContentOpen, setIsContentOpen] = useState<boolean>(
+    activeTab === 'content' ||
+      activeTab === 'posts' ||
+      activeTab === 'journeys' ||
+      activeTab === 'vocabularies'
+  );
+
   // Accordion open state for Marketing
   const [isMarketingOpen, setIsMarketingOpen] = useState<boolean>(activeTab === 'marketing');
+
+  // Accordion open state for Subscriptions
+  const [isSubscriptionsOpen, setIsSubscriptionsOpen] = useState<boolean>(activeTab === 'subscriptions');
+
+  // Auto-expand content accordion when navigated to content or child tabs
+  useEffect(() => {
+    if (
+      activeTab === 'content' ||
+      activeTab === 'posts' ||
+      activeTab === 'journeys' ||
+      activeTab === 'vocabularies'
+    ) {
+      setIsContentOpen(true);
+    }
+  }, [activeTab]);
 
   // Auto-expand marketing accordion when navigated to marketing tab
   useEffect(() => {
@@ -75,6 +129,45 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       setIsMarketingOpen(true);
     }
   }, [activeTab]);
+
+  // Auto-expand subscriptions accordion when navigated to subscriptions tab
+  useEffect(() => {
+    if (activeTab === 'subscriptions') {
+      setIsSubscriptionsOpen(true);
+    }
+  }, [activeTab]);
+
+  const contentSubItems: ContentSubItem[] = [
+    {
+      key: 'posts',
+      label: 'Kho Bài viết',
+      icon: BookOpen,
+      badge: postCount !== undefined && postCount > 0 ? postCount : undefined,
+    },
+    {
+      key: 'journeys',
+      label: 'Lộ trình học',
+      icon: Map,
+    },
+    {
+      key: 'vocabularies',
+      label: 'Từ vựng & Thuật ngữ',
+      icon: Bookmark,
+    },
+  ];
+
+  const subscriptionSubItems: SubscriptionSubItem[] = [
+    {
+      key: 'overview',
+      label: 'Tổng quan & Duyệt đơn',
+      icon: BarChart3,
+    },
+    {
+      key: 'config',
+      label: 'Cấu hình gói cước',
+      icon: Sliders,
+    },
+  ];
 
   const marketingSubItems: MarketingSubItem[] = [
     {
@@ -109,21 +202,23 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       icon: LayoutDashboard,
     },
     {
-      id: 'journeys',
-      fallbackLabel: 'Hành trình học',
-      icon: Map,
-    },
-    {
-      id: 'posts',
-      labelKey: 'tabs.posts',
-      fallbackLabel: 'Kho Bài viết',
+      id: 'content',
+      aliases: ['posts', 'journeys', 'vocabularies'],
+      labelKey: 'tabs.content',
+      fallbackLabel: 'Quản lý nội dung',
       icon: BookOpen,
-      badge: postCount !== undefined && postCount > 0 ? postCount : undefined,
+      hasSubItems: true,
     },
     {
       id: 'marketing',
       fallbackLabel: 'Marketing & Đa kênh',
       icon: Megaphone,
+      hasSubItems: true,
+    },
+    {
+      id: 'subscriptions',
+      fallbackLabel: 'Gói đăng ký & Doanh thu',
+      icon: CreditCard,
       hasSubItems: true,
     },
     {
@@ -143,6 +238,22 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   ];
 
   const handleTabClick = (item: NavItem) => {
+    if (item.id === 'content') {
+      if (
+        activeTab === 'content' ||
+        activeTab === 'posts' ||
+        activeTab === 'journeys' ||
+        activeTab === 'vocabularies'
+      ) {
+        setIsContentOpen((prev) => !prev);
+      } else {
+        setIsContentOpen(true);
+        navigate(`${getLocalizedPath('/admin/content', currentLang)}?tab=${activeContentSubTab}`);
+        if (onNavigate) onNavigate();
+      }
+      return;
+    }
+
     if (item.id === 'marketing') {
       if (activeTab === 'marketing') {
         setIsMarketingOpen((prev) => !prev);
@@ -154,7 +265,25 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       return;
     }
 
+    if (item.id === 'subscriptions') {
+      if (activeTab === 'subscriptions') {
+        setIsSubscriptionsOpen((prev) => !prev);
+      } else {
+        setIsSubscriptionsOpen(true);
+        navigate(`${getLocalizedPath('/admin/subscriptions', currentLang)}?tab=${activeSubscriptionSubTab}`);
+        if (onNavigate) onNavigate();
+      }
+      return;
+    }
+
     navigate(getLocalizedPath(`/admin/${item.id}`, currentLang));
+    if (onNavigate) {
+      onNavigate();
+    }
+  };
+
+  const handleContentSubClick = (subKey: string) => {
+    navigate(`${getLocalizedPath('/admin/content', currentLang)}?tab=${subKey}`);
     if (onNavigate) {
       onNavigate();
     }
@@ -162,6 +291,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const handleMarketingSubClick = (subKey: string) => {
     navigate(`${getLocalizedPath('/admin/marketing', currentLang)}?tab=${subKey}`);
+    if (onNavigate) {
+      onNavigate();
+    }
+  };
+
+  const handleSubscriptionSubClick = (subKey: string) => {
+    navigate(`${getLocalizedPath('/admin/subscriptions', currentLang)}?tab=${subKey}`);
     if (onNavigate) {
       onNavigate();
     }
@@ -261,15 +397,62 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                         <ChevronDown
                           aria-hidden="true"
                           className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                            isMarketingOpen ? 'rotate-180 text-antique-gold' : 'text-text-muted'
+                            (item.id === 'content' && isContentOpen) ||
+                            (item.id === 'marketing' && isMarketingOpen) ||
+                            (item.id === 'subscriptions' && isSubscriptionsOpen)
+                              ? 'rotate-180 text-antique-gold'
+                              : 'text-text-muted'
                           }`}
                         />
                       )}
                     </div>
                   </button>
 
+                  {/* Expandable Sub-items for Content */}
+                  {item.id === 'content' && item.hasSubItems && isContentOpen && (
+                    <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-antique-gold/30 ml-4 my-1">
+                      {contentSubItems.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isSubActive =
+                          activeTab === 'content'
+                            ? activeContentSubTab === sub.key
+                            : activeTab === sub.key;
+
+                        return (
+                          <button
+                            key={sub.key}
+                            type="button"
+                            onClick={() => handleContentSubClick(sub.key)}
+                            className={`w-full px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all flex items-center justify-between cursor-pointer text-left group ${
+                              isSubActive
+                                ? 'bg-antique-gold/25 font-bold text-heritage-green dark:text-antique-bright border border-antique-gold/40'
+                                : 'text-text-muted hover:text-heritage-green dark:hover:text-antique-bright hover:bg-antique-gold/10'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <SubIcon
+                                aria-hidden="true"
+                                className={`w-3.5 h-3.5 shrink-0 ${
+                                  isSubActive
+                                    ? 'text-heritage-green dark:text-antique-bright'
+                                    : 'text-text-muted group-hover:text-heritage-green'
+                                }`}
+                              />
+                              <span className="truncate">{sub.label}</span>
+                            </div>
+                            {sub.badge !== undefined && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/30">
+                                {sub.badge}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
                   {/* Expandable Sub-items for Marketing */}
-                  {item.hasSubItems && isMarketingOpen && (
+                  {item.id === 'marketing' && item.hasSubItems && isMarketingOpen && (
                     <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-antique-gold/30 ml-4 my-1">
                       {marketingSubItems.map((sub) => {
                         const SubIcon = sub.icon;
@@ -300,6 +483,41 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                                 {sub.badge}
                               </span>
                             )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Expandable Sub-items for Subscriptions */}
+                  {item.id === 'subscriptions' && item.hasSubItems && isSubscriptionsOpen && (
+                    <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-antique-gold/30 ml-4 my-1">
+                      {subscriptionSubItems.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isSubActive = active && activeSubscriptionSubTab === sub.key;
+
+                        return (
+                          <button
+                            key={sub.key}
+                            type="button"
+                            onClick={() => handleSubscriptionSubClick(sub.key)}
+                            className={`w-full px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all flex items-center justify-between cursor-pointer text-left group ${
+                              isSubActive
+                                ? 'bg-antique-gold/25 font-bold text-heritage-green dark:text-antique-bright border border-antique-gold/40'
+                                : 'text-text-muted hover:text-heritage-green dark:hover:text-antique-bright hover:bg-antique-gold/10'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <SubIcon
+                                aria-hidden="true"
+                                className={`w-3.5 h-3.5 shrink-0 ${
+                                  isSubActive
+                                    ? 'text-heritage-green dark:text-antique-bright'
+                                    : 'text-text-muted group-hover:text-heritage-green'
+                                }`}
+                              />
+                              <span className="truncate">{sub.label}</span>
+                            </div>
                           </button>
                         );
                       })}
