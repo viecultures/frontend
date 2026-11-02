@@ -141,6 +141,7 @@ export interface AdminUserFilterParams {
   query?: string;
   role?: string;
   enabled?: boolean | string;
+  filterGroup?: string;
   page?: number;
   size?: number;
 }

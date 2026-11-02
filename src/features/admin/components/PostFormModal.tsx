@@ -1894,7 +1894,8 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               </span>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || paragraphs.length === 0}
+                title={paragraphs.length === 0 ? 'Cần thêm ít nhất một đoạn văn song ngữ trước khi xuất bản' : undefined}
                 className="px-6 py-2.5 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold hover:bg-heritage-dark transition-all flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
               >
                 {isSubmitting ? (

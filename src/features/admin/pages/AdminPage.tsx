@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, MotionConfig } from 'motion/react';
@@ -6,36 +6,37 @@ import {
   BookOpen,
   Plus,
   Search,
-  Filter,
   Trash2,
   Edit3,
   Eye,
   RefreshCw,
   MapPin,
   Layers,
-  FileSpreadsheet,
   CheckCircle2,
   AlertCircle,
   TrendingUp,
-  BookMarked,
   X,
-  Volume2,
   Users,
-  Activity,
   BarChart3,
-  Database,
-  Server,
   ShieldCheck,
-  CheckCircle,
   Compass,
+  LayoutDashboard,
+  Megaphone,
+  FileText,
+  Type,
+  Volume2,
+  HelpCircle,
+  Send,
 } from 'lucide-react';
 import type { ReadingPostItem, CefrLevel } from '../types/adminTypes';
 import { postAdminService, type PostFilterParams } from '../services/postAdminService';
 import { adminUserService } from '../services/adminUserService';
+import { adminOverviewService, type AdminOverviewStats } from '../services/adminOverviewService';
 import { PostFormModal } from '../components/PostFormModal';
 import { UserManagementView } from '../components/UserManagementView';
 import { JourneyManagementView } from '../components/JourneyManagementView';
 import { AdminActivityLogView } from '../components/AdminActivityLogView';
+import { MarketingManagementView } from '../components/MarketingManagementView';
 import { PostPreviewModal } from '../components/PostPreviewModal';
 import { AdminDialog } from '../components/AdminDialog';
 import { AdminServiceConnections } from '../components/AdminServiceConnections';
@@ -43,8 +44,26 @@ import { adminTopicLabel, adminRegionLabel, adminReadTimeLabel } from '../admin-
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 import '../admin-ui.css';
 
-export type AdminTab = 'journeys' | 'posts' | 'users' | 'logs' | 'system_stats';
-const VALID_TABS: AdminTab[] = ['journeys', 'posts', 'users', 'logs', 'system_stats'];
+export type AdminTab =
+  | 'dashboard'
+  | 'journeys'
+  | 'posts'
+  | 'marketing'
+  | 'users'
+  | 'system'
+  | 'logs'
+  | 'system_stats';
+
+const VALID_TABS: AdminTab[] = [
+  'dashboard',
+  'journeys',
+  'posts',
+  'marketing',
+  'users',
+  'system',
+  'logs',
+  'system_stats',
+];
 
 export const AdminPage: React.FC = () => {
   const { t } = useTranslation('admin');
@@ -61,22 +80,16 @@ export const AdminPage: React.FC = () => {
     if (match && (VALID_TABS as string[]).includes(match[1])) {
       return match[1] as AdminTab;
     }
-    return 'journeys';
+    return 'dashboard';
   }, [tab, location.pathname]);
 
-  // When visiting /admin or /:lang/admin without subpath, redirect to /admin/journeys
+  // When visiting /admin or /:lang/admin without subpath, redirect to /admin/dashboard
   useEffect(() => {
     const stripped = location.pathname.replace(/^\/(vi|en)(\/|$)/, '/');
     if (stripped === '/admin' || stripped === '/admin/') {
-      navigate(getLocalizedPath('/admin/journeys', currentLang), { replace: true });
+      navigate(getLocalizedPath('/admin/dashboard', currentLang), { replace: true });
     }
   }, [location.pathname, currentLang, navigate]);
-
-  const handleTabChange = (newTab: AdminTab) => {
-    if (newTab !== activeTab) {
-      navigate(getLocalizedPath(`/admin/${newTab}`, currentLang));
-    }
-  };
 
   // Posts State
   const [posts, setPosts] = useState<ReadingPostItem[]>([]);
@@ -91,6 +104,7 @@ export const AdminPage: React.FC = () => {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedTopic, setSelectedTopic] = useState<string>('');
   const [standaloneFilter, setStandaloneFilter] = useState<'all' | 'standalone' | 'journey'>('all');
+  const [postStatusFilter, setPostStatusFilter] = useState<'all' | 'published' | 'draft' | 'missing_materials'>('all');
 
   // Modals state for Posts
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -98,11 +112,29 @@ export const AdminPage: React.FC = () => {
   const [previewPost, setPreviewPost] = useState<ReadingPostItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // System Stats State
+  // System Overview State
+  const [overviewStats, setOverviewStats] = useState<AdminOverviewStats | null>(null);
+  const [isOverviewLoading, setIsOverviewLoading] = useState(false);
   const [totalUsersCount, setTotalUsersCount] = useState<number | null>(null);
 
+  // Fetch overview stats from backend
+  const fetchOverview = useCallback(async () => {
+    setIsOverviewLoading(true);
+    try {
+      const data = await adminOverviewService.getOverview();
+      setOverviewStats(data);
+      if (data.totalUsers !== undefined) {
+        setTotalUsersCount(data.totalUsers);
+      }
+    } catch (err: unknown) {
+      console.warn('Lỗi khi tải thống kê tổng quan:', err);
+    } finally {
+      setIsOverviewLoading(false);
+    }
+  }, []);
+
   // Fetch posts from API
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setIsLoading(true);
     setErrorMsg(null);
     try {
@@ -124,25 +156,30 @@ export const AdminPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, t]);
 
-  // Fetch system stats (total users)
-  const fetchTotalUsers = async () => {
+  // Fetch total users fallback if overview not called
+  const fetchTotalUsers = useCallback(async () => {
     try {
       const res = await adminUserService.getUsers({ size: 1 });
       setTotalUsersCount(res.totalElements || 0);
     } catch (e) {
       console.warn('Không thể lấy tổng số user cho thống kê:', e);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchPosts();
-  }, [selectedLevel, selectedRegion, selectedTopic, standaloneFilter]);
+    if (activeTab === 'posts') {
+      fetchPosts();
+    }
+  }, [activeTab, fetchPosts]);
 
   useEffect(() => {
+    if (activeTab === 'dashboard' || activeTab === 'system_stats') {
+      fetchOverview();
+    }
     fetchTotalUsers();
-  }, [activeTab]);
+  }, [activeTab, fetchOverview, fetchTotalUsers]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,7 +198,7 @@ export const AdminPage: React.FC = () => {
       const full = await postAdminService.getPostById(post.id);
       setEditingPost(full);
       setIsFormOpen(true);
-    } catch (err) {
+    } catch {
       setEditingPost(post);
       setIsFormOpen(true);
     }
@@ -172,7 +209,7 @@ export const AdminPage: React.FC = () => {
     try {
       const full = await postAdminService.getPostById(post.id);
       setPreviewPost(full);
-    } catch (err) {
+    } catch {
       setPreviewPost(post);
     }
   };
@@ -199,8 +236,8 @@ export const AdminPage: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
-  // Calculate stats
-  const stats = useMemo(() => {
+  // Calculate local stats from loaded posts
+  const postStats = useMemo(() => {
     const totalPosts = posts.length;
     const totalReads = posts.reduce((acc, p) => acc + (p.totalReads || 0), 0);
     const totalWords = posts.reduce((acc, p) => acc + (p.wordCount || 0), 0);
@@ -216,6 +253,31 @@ export const AdminPage: React.FC = () => {
 
     return { totalPosts, totalReads, totalWords, avgReads, levelsCount, regionsCount };
   }, [posts]);
+
+  // Filtered posts based on material readiness / publication status
+  const displayedPosts = useMemo(() => {
+    return posts.filter((post) => {
+      const hasParagraphs = Boolean(
+        (post.paragraphs && post.paragraphs.length > 0) ||
+        (post.wordCount && post.wordCount > 0)
+      );
+      const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
+      const hasVocab = Boolean(post.vocabularies && post.vocabularies.length > 0);
+      const quizQuestions = post.questions || [];
+      const hasQuiz = Array.isArray(quizQuestions) && quizQuestions.length > 0;
+
+      if (postStatusFilter === 'published') {
+        return hasParagraphs;
+      }
+      if (postStatusFilter === 'draft') {
+        return !hasParagraphs;
+      }
+      if (postStatusFilter === 'missing_materials') {
+        return !hasAudio || !hasVocab || !hasQuiz || !hasParagraphs;
+      }
+      return true;
+    });
+  }, [posts, postStatusFilter]);
 
   // Level Badge Color Helper
   const getLevelBadgeClass = (lvl?: CefrLevel) => {
@@ -234,318 +296,324 @@ export const AdminPage: React.FC = () => {
     }
   };
 
+  // Header Title and Action configuration
+  const headerConfig = useMemo(() => {
+    switch (activeTab) {
+      case 'dashboard':
+      case 'system_stats':
+        return {
+          icon: LayoutDashboard,
+          title: 'Tổng quan & Tăng trưởng hệ thống',
+          subtitle: 'Giám sát chỉ số vận hành CMS, độ phủ văn hóa và tăng trưởng học viên',
+          badge: 'Vận hành trực tiếp',
+        };
+      case 'journeys':
+        return {
+          icon: Compass,
+          title: 'Quản lý lộ trình học di sản',
+          subtitle: 'Thiết lập lộ trình học tập văn hóa từng bước và quản lý trạm di sản',
+          badge: 'Lộ trình di sản',
+        };
+      case 'posts':
+        return {
+          icon: BookOpen,
+          title: t('header.title', 'Kho Bài viết & Biên soạn học liệu'),
+          subtitle: t('header.subtitle', 'Biên tập bài đọc song ngữ, phân cấp CEFR và trích xuất từ vựng'),
+          badge: `${posts.length} bài viết`,
+        };
+      case 'marketing':
+        return {
+          icon: Megaphone,
+          title: 'Marketing & Đa kênh phân phối',
+          subtitle: 'Chiến dịch truyền thông, email định kỳ và kích hoạt học viên đa nền tảng',
+          badge: 'Đa kênh',
+        };
+      case 'users':
+        return {
+          icon: Users,
+          title: 'Quản trị học viên & Phân quyền',
+          subtitle: 'Quản lý phân quyền tài khoản và theo dõi tiến độ học tập trên toàn nền tảng',
+          badge: totalUsersCount ? `${totalUsersCount.toLocaleString('en-US')} học viên` : 'Học viên CRM',
+        };
+      case 'system':
+      case 'logs':
+        return {
+          icon: ShieldCheck,
+          title: 'Nhật ký kiểm toán & Giám sát hệ thống',
+          subtitle: 'Theo dõi thao tác quản trị, truy cập và kiểm toán thay đổi dữ liệu an ninh',
+          badge: 'Kiểm toán',
+        };
+      default:
+        return {
+          icon: LayoutDashboard,
+          title: 'Bảng điều khiển quản trị',
+          subtitle: 'Trung tâm điều hành VieCultures',
+          badge: 'Quản trị viên',
+        };
+    }
+  }, [activeTab, posts.length, totalUsersCount, t]);
+
+  const HeaderIcon = headerConfig.icon;
+
   return (
     <MotionConfig reducedMotion="user">
-    <div className="admin-ui min-h-screen bg-warm-ivory dark:bg-heritage-forest text-text-body dark:text-warm-ivory py-6 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-start">
-        {/* ── Left Column: Admin Sidebar (~240px - 260px) ───────────────── */}
-        <aside className="w-full lg:w-64 shrink-0 space-y-4 lg:sticky lg:top-24">
-          <div className="rounded-3xl bg-rice-paper/90 dark:bg-heritage-dark/80 border border-antique-gold/30 p-5 shadow-md space-y-6">
-            {/* Logo / Admin Title */}
-            <div className="space-y-1.5 border-b border-antique-gold/25 pb-4">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-antique-gold/20 text-antique-bright border border-antique-gold/30 text-[10px] font-bold uppercase tracking-wider">
-                VieCultures Admin
-              </div>
-              <h2 className="font-heading text-lg font-bold text-heritage-green dark:text-antique-bright">
-                Ban Quản Trị
-              </h2>
-              <p className="text-xs text-text-muted leading-relaxed">
-                Trung tâm điều hành và kiểm duyệt nội dung văn hóa
-              </p>
+      <div className="admin-ui w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* ── Compact Page Header (Height <= 68px) ────────────────────────── */}
+        <div className="admin-compact-header min-h-[56px] max-h-[68px] h-[64px] rounded-2xl bg-heritage-green text-warm-ivory px-4 sm:px-6 shadow-md border border-antique-gold/40 flex items-center justify-between gap-3 transition-all">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-antique-gold/20 border border-antique-gold/40 flex items-center justify-center shrink-0 text-antique-bright">
+              <HeaderIcon aria-hidden="true" className="w-4 h-4" />
             </div>
 
-            {/* Navigation */}
-            <nav className="flex flex-col gap-1.5" aria-label="Thanh điều hướng quản trị">
-              <button
-                type="button"
-                aria-pressed={activeTab === 'journeys'}
-                onClick={() => handleTabChange('journeys')}
-                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
-                  activeTab === 'journeys'
-                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
-                }`}
-              >
-                <span>Hành trình học</span>
-              </button>
-
-              <button
-                type="button"
-                aria-pressed={activeTab === 'posts'}
-                onClick={() => handleTabChange('posts')}
-                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
-                  activeTab === 'posts'
-                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
-                }`}
-              >
-                <span>{t('tabs.posts')}</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    activeTab === 'posts'
-                      ? 'bg-antique-gold text-heritage-dark'
-                      : 'bg-heritage-green/10 dark:bg-white/10 text-heritage-dark dark:text-warm-ivory'
-                  }`}
-                >
-                  {posts.length}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                aria-pressed={activeTab === 'users'}
-                onClick={() => handleTabChange('users')}
-                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
-                  activeTab === 'users'
-                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
-                }`}
-              >
-                <span>{t('tabs.users')}</span>
-                {totalUsersCount !== null && totalUsersCount > 0 && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      activeTab === 'users'
-                        ? 'bg-antique-gold text-heritage-dark'
-                        : 'bg-heritage-green/10 dark:bg-white/10 text-heritage-dark dark:text-warm-ivory'
-                    }`}
-                  >
-                    {totalUsersCount?.toLocaleString('en-US') ?? '—'}
-                  </span>
-                )}
-              </button>
-
-              <button
-                type="button"
-                aria-pressed={activeTab === 'logs'}
-                onClick={() => handleTabChange('logs')}
-                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
-                  activeTab === 'logs'
-                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
-                }`}
-              >
-                <span>Nhật ký hành vi</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    activeTab === 'logs'
-                      ? 'bg-antique-gold text-heritage-dark'
-                      : 'bg-heritage-green/10 dark:bg-white/10 text-heritage-dark dark:text-warm-ivory'
-                  }`}
-                >
-                  Kiểm toán
-                </span>
-              </button>
-
-              <button
-                type="button"
-                aria-pressed={activeTab === 'system_stats'}
-                onClick={() => handleTabChange('system_stats')}
-                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer text-left ${
-                  activeTab === 'system_stats'
-                    ? 'bg-heritage-green text-warm-ivory shadow-sm border border-antique-gold/40'
-                    : 'text-text-secondary hover:text-text-body hover:bg-warm-ivory/80 dark:hover:bg-white/5'
-                }`}
-              >
-                <span>{t('tabs.overview')}</span>
-              </button>
-            </nav>
-
-            {/* Trạng thái kết nối */}
-            <div className="pt-4 border-t border-antique-gold/25 space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-semibold text-text-secondary">
-                <span>Trạng thái kết nối</span>
-                <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Sẵn sàng
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="font-heading text-sm sm:text-base font-bold tracking-tight truncate">
+                  {headerConfig.title}
+                </h1>
+                <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-antique-gold/20 text-antique-bright text-[10px] font-bold border border-antique-gold/30 shrink-0">
+                  {headerConfig.badge}
                 </span>
               </div>
-              <p className="text-[10px] text-text-muted leading-tight">
-                Backend API & CSDL kết nối ổn định
+              <p className="text-[11px] text-warm-ivory/80 truncate hidden md:block">
+                {headerConfig.subtitle}
               </p>
             </div>
           </div>
-        </aside>
 
-        {/* ── Right Column: Main Content ──────────────────────────── */}
-        <div className="flex-1 min-w-0 w-full space-y-6">
-          {/* Sub-page Header Banner */}
-          <div className="relative overflow-hidden rounded-3xl bg-heritage-green text-warm-ivory p-6 sm:p-7 shadow-xl border border-antique-gold/40">
-            <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="space-y-1">
-                <div className="text-[11px] font-bold text-antique-bright uppercase tracking-wider">
-                  {activeTab === 'journeys' && 'Lộ trình di sản'}
-                  {activeTab === 'posts' && 'Biên tập & Phân cấp'}
-                  {activeTab === 'users' && 'Quản trị phân quyền'}
-                  {activeTab === 'logs' && 'Nhật ký bảo mật'}
-                  {activeTab === 'system_stats' && 'Giám sát hệ thống'}
+          {/* Contextual Actions in Header */}
+          <div className="flex items-center gap-2 shrink-0">
+            {(activeTab === 'dashboard' || activeTab === 'system_stats') && (
+              <button
+                type="button"
+                onClick={fetchOverview}
+                disabled={isOverviewLoading}
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                title="Tải lại thống kê tổng quan"
+              >
+                <RefreshCw aria-hidden="true" className={`w-3.5 h-3.5 ${isOverviewLoading ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">Tải lại chỉ số</span>
+              </button>
+            )}
+
+            {activeTab === 'posts' && (
+              <>
+                <button
+                  type="button"
+                  onClick={fetchPosts}
+                  disabled={isLoading}
+                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                  title={t('header.refresh_articles')}
+                >
+                  <RefreshCw aria-hidden="true" className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">{t('header.refresh_articles')}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleOpenCreate}
+                  className="px-3.5 py-1.5 rounded-xl bg-antique-gold text-heritage-dark hover:bg-antique-bright text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+                >
+                  <Plus aria-hidden="true" className="w-4 h-4" />
+                  <span>{t('header.new_article')}</span>
+                </button>
+              </>
+            )}
+
+            {activeTab === 'users' && (
+              <div className="px-3 py-1.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5">
+                <ShieldCheck aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                <span className="hidden sm:inline">{t('header.admin_access')}</span>
+              </div>
+            )}
+
+            {(activeTab === 'system' || activeTab === 'logs') && (
+              <div className="px-3 py-1.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5">
+                <ShieldCheck aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                <span className="hidden sm:inline">Kiểm toán an ninh</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Alerts & Toasts */}
+        {errorMsg && (
+          <div role="alert" className="p-4 rounded-2xl bg-rose-100 dark:bg-rose-900/30 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle aria-hidden="true" className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMsg(null)}
+              className="font-bold underline cursor-pointer"
+            >
+              Đóng
+            </button>
+          </div>
+        )}
+
+        {successToast && (
+          <div role="status" className="p-4 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 aria-hidden="true" className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+              <span>{successToast}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSuccessToast(null)}
+              className="font-bold underline cursor-pointer"
+            >
+              Đóng
+            </button>
+          </div>
+        )}
+
+        {/* ── TAB 1: TỔNG QUAN & TĂNG TRƯỞNG (DASHBOARD / SYSTEM_STATS) ────── */}
+        {(activeTab === 'dashboard' || activeTab === 'system_stats') && (
+          <div className="space-y-6">
+            {/* Top KPI Metric Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
+                <div className="flex items-center justify-between text-text-muted text-xs">
+                  <span>{t('stats.registered_users', 'Tổng số tài khoản')}</span>
+                  <Users aria-hidden="true" className="w-4 h-4 text-antique-gold" />
                 </div>
-                <h1 className="font-heading text-xl sm:text-2xl font-bold tracking-tight">
-                  {activeTab === 'journeys' && 'Quản lý hành trình học'}
-                  {activeTab === 'posts' && t('header.title')}
-                  {activeTab === 'users' && 'Quản lý người dùng'}
-                  {activeTab === 'logs' && 'Nhật ký hành vi'}
-                  {activeTab === 'system_stats' && 'Thống kê và trạng thái hệ thống'}
-                </h1>
-                <p className="text-xs sm:text-sm text-warm-ivory/80 max-w-xl font-light">
-                  {activeTab === 'journeys' && 'Thiết lập lộ trình học tập văn hóa từng bước và quản lý trạm di sản'}
-                  {activeTab === 'posts' && t('header.subtitle')}
-                  {activeTab === 'users' && 'Phân quyền vai trò và giám sát học viên trên toàn nền tảng'}
-                  {activeTab === 'logs' && 'Theo dõi thao tác quản trị, truy cập và kiểm toán thay đổi dữ liệu'}
-                  {activeTab === 'system_stats' && 'Giám sát hiệu năng và kết nối dịch vụ backend'}
+                <div className="text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
+                  {(overviewStats?.totalUsers ?? totalUsersCount)?.toLocaleString('en-US') ?? '—'}
+                </div>
+                <p className="text-[11px] text-text-secondary">{t('stats.users_desc', 'Tổng học viên đăng ký trên hệ thống')}</p>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
+                <div className="flex items-center justify-between text-text-muted text-xs">
+                  <span>Học viên hoạt động tuần</span>
+                  <TrendingUp aria-hidden="true" className="w-4 h-4 text-emerald-500" />
+                </div>
+                <div className="text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
+                  {overviewStats ? overviewStats.activeLearnersWeek.toLocaleString() : '—'}
+                </div>
+                <p className="text-[11px] text-text-secondary">Tương tác và làm bài trong 7 ngày qua</p>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
+                <div className="flex items-center justify-between text-text-muted text-xs">
+                  <span>{t('stats.articles_in_view', 'Kho bài viết di sản')}</span>
+                  <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                </div>
+                <div className="text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
+                  {overviewStats?.totalPosts ?? postStats.totalPosts}
+                </div>
+                <p className="text-[11px] text-text-secondary">
+                  {overviewStats ? `${overviewStats.publishedPosts} bài đã xuất bản` : t('stats.articles_desc')}
                 </p>
               </div>
 
-              {/* Quick Actions (Contextual based on active tab) */}
-              <div className="flex flex-wrap items-center gap-2.5">
-                {activeTab === 'posts' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={fetchPosts}
-                      disabled={isLoading}
-                      className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-bold text-warm-ivory flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
-                      title={t('header.refresh_articles')}
-                      aria-label={t('header.refresh_articles')}
-                    >
-                      <RefreshCw aria-hidden="true" className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                      <span>{t('header.refresh_articles')}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleOpenCreate}
-                      className="px-5 py-2.5 rounded-xl bg-antique-gold text-heritage-dark hover:bg-antique-bright text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer shadow-lg hover:shadow-xl"
-                    >
-                      <Plus aria-hidden="true" className="w-4 h-4" />
-                      <span>{t('header.new_article')}</span>
-                    </button>
-                  </>
-                )}
-
-                {activeTab === 'users' && (
-                  <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-2">
-                    <ShieldCheck aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                    <span>{t('header.admin_access')}</span>
-                  </div>
-                )}
-
-                {activeTab === 'logs' && (
-                  <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-2">
-                    <ShieldCheck aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                    <span>Kiểm toán tự động</span>
-                  </div>
-                )}
-
-                {activeTab === 'system_stats' && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      fetchPosts();
-                      fetchTotalUsers();
-                    }}
-                    className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-bold text-warm-ivory flex items-center gap-2 transition-all cursor-pointer"
-                  >
-                    <RefreshCw aria-hidden="true" className="w-4 h-4" />
-                    <span>{t('header.refresh_overview')}</span>
-                  </button>
-                )}
+              <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
+                <div className="flex items-center justify-between text-text-muted text-xs">
+                  <span>Lượt đọc tích lũy & Trung bình</span>
+                  <BarChart3 aria-hidden="true" className="w-4 h-4 text-amber-500" />
+                </div>
+                <div className="text-3xl font-heading font-bold text-amber-700 dark:text-antique-gold">
+                  {(overviewStats?.totalReads ?? postStats.totalReads).toLocaleString()}
+                </div>
+                <p className="text-[11px] text-text-secondary">
+                  Trung bình {overviewStats?.avgReadsPerPost ?? postStats.avgReads} lượt/bài
+                </p>
               </div>
             </div>
 
-            {/* Decorative Pattern Background */}
-            <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-antique-gold/10 to-transparent pointer-events-none" />
+            {/* Level and Region Distributions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* CEFR Level distribution */}
+              <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-4">
+                <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
+                  <Layers aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                  <span>{t('stats.by_cefr_level', 'Phân bổ theo cấp độ CEFR')}</span>
+                </h3>
+                <div className="space-y-3">
+                  {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => {
+                    const count = overviewStats?.cefrCoverage
+                      ? overviewStats.cefrCoverage[lvl] || 0
+                      : postStats.levelsCount[lvl] || 0;
+                    const total = overviewStats?.totalPosts || postStats.totalPosts || 1;
+                    const pct = Math.round((count / total) * 100);
+
+                    return (
+                      <div key={lvl} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs font-semibold">
+                          <span className="text-text-body dark:text-warm-ivory">
+                            {t('filters.level_option', { level: lvl })}
+                          </span>
+                          <span className="text-text-secondary">
+                            {count} bài ({pct}%)
+                          </span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
+                          <div
+                            className="h-full bg-antique-gold rounded-full transition-all duration-500"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Regional distribution */}
+              <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-4">
+                <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
+                  <MapPin aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                  <span>{t('stats.by_region', 'Phân bổ theo vùng miền')}</span>
+                </h3>
+                {(() => {
+                  const coverageMap = overviewStats?.regionCoverage || postStats.regionsCount;
+                  const entries = Object.entries(coverageMap).sort((a, b) => b[1] - a[1]);
+                  const total = overviewStats?.totalPosts || postStats.totalPosts || 1;
+
+                  if (entries.length === 0) {
+                    return <p className="text-xs text-text-muted">{t('stats.no_region_data', 'Chưa có dữ liệu vùng miền')}</p>;
+                  }
+
+                  return (
+                    <div className="space-y-3">
+                      {entries.slice(0, 6).map(([region, count]) => {
+                        const pct = Math.round((count / total) * 100);
+                        return (
+                          <div key={region} className="space-y-1">
+                            <div className="flex items-center justify-between text-xs font-semibold">
+                              <span className="text-text-body dark:text-warm-ivory">{adminRegionLabel(region)}</span>
+                              <span className="text-text-secondary">
+                                {count} bài ({pct}%)
+                              </span>
+                            </div>
+                            <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
+                              <div
+                                className="h-full bg-emerald-600 dark:bg-emerald-500 rounded-full transition-all duration-500"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* System Service Connections */}
+            <AdminServiceConnections />
           </div>
+        )}
 
-          {/* Error Message Toast */}
-          {errorMsg && (
-            <div className="p-4 rounded-2xl bg-rose-100 dark:bg-rose-900/40 border border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200 text-xs flex items-center justify-between">
-              <span>{errorMsg}</span>
-              <button
-                type="button"
-                onClick={() => setErrorMsg(null)}
-                className="font-bold underline cursor-pointer"
-              >
-                Đóng
-              </button>
-            </div>
-          )}
-
-          {/* Success Toast */}
-          {successToast && (
-            <div className="p-4 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-xs flex items-center justify-between">
-              <span>{successToast}</span>
-              <button
-                type="button"
-                onClick={() => setSuccessToast(null)}
-                className="font-bold underline cursor-pointer"
-              >
-                Đóng
-              </button>
-            </div>
-          )}
-
-        {/* ── TAB 0: HÀNH TRÌNH HỌC ─────────────────────────────────── */}
+        {/* ── TAB 2: HÀNH TRÌNH HỌC (JOURNEYS) ─────────────────────────── */}
         {activeTab === 'journeys' && <JourneyManagementView />}
 
-        {/* ── TAB 1: BÀI ĐỌC VĂN HÓA ────────────────────────────────────── */}
+        {/* ── TAB 3: KHO BÀI VIẾT & HỌC LIỆU (POSTS) ─────────────────────── */}
         {activeTab === 'posts' && (
           <div className="space-y-6">
-            {/* Stats Summary Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
-                <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>{t('stats.articles_in_view')}</span>
-                  <BookOpen aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                </div>
-                <div className="text-2xl sm:text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
-                  {stats.totalPosts}
-                </div>
-                <p className="text-[11px] text-text-secondary">{t('stats.articles_desc')}</p>
-              </div>
-
-              <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
-                <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>{t('stats.article_reads')}</span>
-                  <TrendingUp aria-hidden="true" className="w-4 h-4 text-emerald-500" />
-                </div>
-                <div className="text-2xl sm:text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
-                  {stats.totalReads.toLocaleString()}
-                </div>
-                <p className="text-[11px] text-text-secondary">{t('stats.reads_desc')}</p>
-              </div>
-
-              <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
-                <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>{t('stats.regions_represented')}</span>
-                  <MapPin aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                </div>
-                <div className="text-2xl sm:text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
-                  {Object.keys(stats.regionsCount).length}
-                </div>
-                <p className="text-[11px] text-text-secondary">{t('stats.regions_desc')}</p>
-              </div>
-
-              <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
-                <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>{t('stats.cefr_coverage')}</span>
-                  <Layers aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                </div>
-                <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => (
-                    <span
-                      key={lvl}
-                      className="px-2 py-0.5 rounded text-[10px] font-bold bg-heritage-green/10 dark:bg-white/10 text-heritage-dark dark:text-warm-ivory"
-                    >
-                      {lvl}: {stats.levelsCount[lvl] || 0}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-[11px] text-text-secondary">{t('stats.cefr_desc')}</p>
-              </div>
-            </div>
-
-            {/* Filter & Search Section */}
+            {/* Filter & Search Bar */}
             <div className="p-4 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
               <form onSubmit={handleSearchSubmit} className="admin-search relative w-full md:w-96" role="search">
                 <Search aria-hidden="true" className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
@@ -557,11 +625,13 @@ export const AdminPage: React.FC = () => {
                   placeholder={t('filters.search_placeholder')}
                   className="w-full pl-10 pr-4 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                 />
-                <button type="submit" className="rounded-xl bg-heritage-green px-3 text-warm-ivory">{t('filters.search_button')}</button>
+                <button type="submit" className="rounded-xl bg-heritage-green px-3 text-warm-ivory">
+                  {t('filters.search_button')}
+                </button>
               </form>
 
               <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-                                {/* Standalone / Journey Filter */}
+                {/* Standalone / Journey Filter */}
                 <select
                   aria-label="Hình thức bài đọc"
                   value={standaloneFilter}
@@ -572,6 +642,7 @@ export const AdminPage: React.FC = () => {
                   <option value="standalone">Chỉ bài độc lập</option>
                   <option value="journey">Thuộc hành trình học</option>
                 </select>
+
                 {/* Level Filter */}
                 <select
                   aria-label={t('filters.all_levels')}
@@ -595,21 +666,36 @@ export const AdminPage: React.FC = () => {
                   className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
                   <option value="">{t('filters.all_regions')}</option>
-                  {Object.keys(stats.regionsCount).map((r) => (
+                  {Object.keys(postStats.regionsCount).map((r) => (
                     <option key={r} value={r}>
-                      {adminRegionLabel(r)} ({stats.regionsCount[r]})
+                      {adminRegionLabel(r)} ({postStats.regionsCount[r]})
                     </option>
                   ))}
                 </select>
 
+                {/* Material Readiness / Post Status Filter */}
+                <select
+                  aria-label={t('posts_table.status_filter.label')}
+                  value={postStatusFilter}
+                  onChange={(e) => setPostStatusFilter(e.target.value as 'all' | 'published' | 'draft' | 'missing_materials')}
+                  className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+                >
+                  <option value="all">{t('posts_table.status_filter.all')}</option>
+                  <option value="published">{t('posts_table.status_filter.published')}</option>
+                  <option value="draft">{t('posts_table.status_filter.draft')}</option>
+                  <option value="missing_materials">{t('posts_table.status_filter.missing_materials')}</option>
+                </select>
+
                 {/* Reset Filter Button */}
-                {(selectedLevel || selectedRegion || searchQuery) && (
+                {(selectedLevel || selectedRegion || searchQuery || postStatusFilter !== 'all') && (
                   <button
+                    type="button"
                     onClick={() => {
                       setSelectedLevel('');
                       setSelectedRegion('');
                       setSelectedTopic('');
                       setSearchQuery('');
+                      setPostStatusFilter('all');
                     }}
                     className="px-3 py-2 rounded-xl bg-white/40 dark:bg-white/10 hover:bg-white/60 text-xs font-bold text-text-muted cursor-pointer transition-colors"
                   >
@@ -619,25 +705,6 @@ export const AdminPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Alerts */}
-            {errorMsg && (
-              <div role="alert" className="p-4 rounded-2xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 text-red-800 dark:text-red-200 text-xs flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertCircle aria-hidden="true" className="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
-                  <span>{errorMsg}</span>
-                </div>
-                <button aria-label="Dismiss error" onClick={() => setErrorMsg(null)} className="cursor-pointer">
-                  <X aria-hidden="true" className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-            {successToast && (
-              <div role="status" className="p-4 rounded-2xl bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-800 text-green-800 dark:text-green-200 text-xs flex items-center gap-2">
-                <CheckCircle2 aria-hidden="true" className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400" />
-                <span>{successToast}</span>
-              </div>
-            )}
-
             {/* Posts Table */}
             <div className="bg-rice-paper dark:bg-heritage-dark/60 rounded-3xl border border-antique-gold/30 shadow-md overflow-hidden">
               {isLoading ? (
@@ -645,16 +712,19 @@ export const AdminPage: React.FC = () => {
                   <div className="inline-block animate-spin w-8 h-8 border-3 border-antique-gold border-t-transparent rounded-full" />
                   <p className="text-xs text-text-muted">{t('posts_table.loading')}</p>
                 </div>
-              ) : posts.length === 0 ? (
+              ) : displayedPosts.length === 0 ? (
                 <div className="py-20 text-center space-y-4">
                   <BookOpen aria-hidden="true" className="w-12 h-12 text-antique-gold/40 mx-auto" />
                   <div className="space-y-1">
-                    <h3 className="font-heading text-lg font-bold">{!hasLoadedPosts ? t('posts_table.unavailable_title') : t('posts_table.empty_title')}</h3>
+                    <h3 className="font-heading text-lg font-bold">
+                      {!hasLoadedPosts ? t('posts_table.unavailable_title') : t('posts_table.empty_title')}
+                    </h3>
                     <p className="text-xs text-text-muted max-w-md mx-auto">
                       {!hasLoadedPosts ? t('posts_table.unavailable_desc') : t('posts_table.empty_desc')}
                     </p>
                   </div>
                   <button
+                    type="button"
                     onClick={!hasLoadedPosts ? fetchPosts : handleOpenCreate}
                     className="px-5 py-2.5 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold hover:bg-heritage-dark transition-colors cursor-pointer"
                   >
@@ -676,99 +746,187 @@ export const AdminPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-antique-gold/15">
-                      {posts.map((post) => (
-                        <tr
-                          key={post.id}
-                          className="hover:bg-warm-ivory/50 dark:hover:bg-white/5 transition-colors group"
-                        >
-                          <td className="px-5 py-4 max-w-sm">
-                            <div className="space-y-1">
-                              <div className="flex flex-wrap items-center gap-1.5">
-                                {post.journeyTitleEn ? (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/35">
-                                    <Compass aria-hidden="true" className="w-3 h-3 text-antique-gold" />
-                                    <span>Chặng {post.chapterOrder || 1}: {post.journeyTitleEn}</span>
-                                  </span>
-                                ) : (
-                                  <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 dark:bg-white/10 text-text-muted">
-                                    Độc lập
-                                  </span>
-                                )}
-                                {post.topicGroup && (
-                                  <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-antique-gold/20 text-heritage-dark dark:text-antique-bright border border-antique-gold/30">
-                                    {post.topicGroup}
-                                  </span>
-                                )}
+                      {displayedPosts.map((post) => {
+                        const hasParagraphs = Boolean(
+                          (post.paragraphs && post.paragraphs.length > 0) ||
+                          (post.wordCount && post.wordCount > 0)
+                        );
+                        const paragraphCount = post.paragraphs?.length || (post.wordCount ? Math.ceil(post.wordCount / 50) : 0);
+                        const vocabCount = post.vocabularies?.length || 0;
+                        const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
+                        const quizQuestions = post.questions || [];
+                        const quizCount = Array.isArray(quizQuestions) ? quizQuestions.length : 0;
+
+                        return (
+                          <tr
+                            key={post.id}
+                            className="hover:bg-warm-ivory/50 dark:hover:bg-white/5 transition-colors group"
+                          >
+                            <td className="px-5 py-4 max-w-sm">
+                              <div className="space-y-1">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  {post.journeyTitleEn ? (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/35">
+                                      <Compass aria-hidden="true" className="w-3 h-3 text-antique-gold" />
+                                      <span>Chặng {post.chapterOrder || 1}: {post.journeyTitleEn}</span>
+                                    </span>
+                                  ) : (
+                                    <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 dark:bg-white/10 text-text-muted">
+                                      Độc lập
+                                    </span>
+                                  )}
+                                  {post.topicGroup && (
+                                    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-antique-gold/20 text-heritage-dark dark:text-antique-bright border border-antique-gold/30">
+                                      {post.topicGroup}
+                                    </span>
+                                  )}
+                                </div>
+                                <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-warm-ivory line-clamp-1 group-hover:text-antique-gold transition-colors">
+                                  {post.titleEn}
+                                </h4>
+                                <p className="text-[11px] text-text-muted line-clamp-1 italic">
+                                  {post.titleVi}
+                                </p>
                               </div>
-                              <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-warm-ivory line-clamp-1 group-hover:text-antique-gold transition-colors">
-                                {post.titleEn}
-                              </h4>
-                              <p className="text-[11px] text-text-muted line-clamp-1 italic">
-                                {post.titleVi}
-                              </p>
-                            </div>
-                          </td>
+                            </td>
 
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/60 dark:bg-white/10 border border-antique-gold/20">
-                              <MapPin aria-hidden="true" className="w-3 h-3 text-antique-gold" />
-                              <span>{adminRegionLabel(post.region)}</span>
-                            </span>
-                          </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/60 dark:bg-white/10 border border-antique-gold/20">
+                                <MapPin aria-hidden="true" className="w-3 h-3 text-antique-gold" />
+                                <span>{adminRegionLabel(post.region)}</span>
+                              </span>
+                            </td>
 
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span
-                              className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${getLevelBadgeClass(
-                                post.level
-                              )}`}
-                            >
-                              {post.level}
-                            </span>
-                          </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <span
+                                className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${getLevelBadgeClass(
+                                  post.level
+                                )}`}
+                              >
+                                {post.level}
+                              </span>
+                            </td>
 
-                          <td className="px-4 py-4 whitespace-nowrap text-text-secondary text-[11px]">
-                            {adminTopicLabel(post.topic)}
-                          </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-text-secondary text-[11px]">
+                              {adminTopicLabel(post.topic)}
+                            </td>
 
-                          <td className="px-4 py-4 whitespace-nowrap text-[11px] space-y-0.5">
-                            <div className="font-semibold text-text-body dark:text-warm-ivory">
-                              {post.wordCount ? t('posts_table.words_count', { count: post.wordCount }) : adminReadTimeLabel(post.readTime) || '—'}
-                            </div>
-                            <div className="text-text-muted text-[10px]">
-                              {post.paragraphs?.length ? t('posts_table.paragraph_pairs', { count: post.paragraphs.length }) : t('posts_table.no_paragraphs')}
-                              {post.vocabularies?.length ? ` • ${t('posts_table.vocab_items', { count: post.vocabularies.length })}` : ''}
-                            </div>
-                          </td>
+                            {/* Readiness Pills (Bài đọc, Từ vựng, Audio TTS, Quiz) */}
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {/* Reading Pill */}
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
+                                    hasParagraphs
+                                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/60 ring-1 ring-emerald-500/10'
+                                      : 'bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700/60'
+                                  }`}
+                                  title={hasParagraphs ? t('posts_table.readiness.reading_ready', { count: paragraphCount }) : t('posts_table.readiness.reading_empty')}
+                                >
+                                  <FileText aria-hidden="true" className="w-3 h-3 shrink-0" />
+                                  <span>{hasParagraphs ? t('posts_table.readiness.reading_ready', { count: paragraphCount }) : t('posts_table.readiness.reading_empty')}</span>
+                                </span>
 
-                          <td className="px-4 py-4 whitespace-nowrap text-center font-bold text-text-body dark:text-warm-ivory">
-                            {post.totalReads || 0}
-                          </td>
+                                {/* Vocabulary Pill */}
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
+                                    vocabCount > 0
+                                      ? 'bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700/60 ring-1 ring-blue-500/10'
+                                      : 'bg-stone-100 dark:bg-stone-800/80 text-stone-500 border-stone-200 dark:border-stone-700'
+                                  }`}
+                                  title={t('posts_table.readiness.vocab_count', { count: vocabCount })}
+                                >
+                                  <Type aria-hidden="true" className="w-3 h-3 shrink-0" />
+                                  <span>{t('posts_table.readiness.vocab_count', { count: vocabCount })}</span>
+                                </span>
 
-                          <td className="px-5 py-4 whitespace-nowrap text-right space-x-1">
-                            <button
-                              onClick={() => handleOpenPreview(post)}
-                              className="p-1.5 rounded-lg text-heritage-green dark:text-antique-bright hover:bg-heritage-green/10 transition-colors cursor-pointer"
-                              title={t('posts_table.preview_action')} aria-label={t('posts_table.preview_action')}
-                            >
-                              <Eye aria-hidden="true" className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleOpenEdit(post)}
-                              className="p-1.5 rounded-lg text-antique-gold hover:bg-antique-gold/15 transition-colors cursor-pointer"
-                              title={t('posts_table.edit_action')} aria-label={t('posts_table.edit_action')}
-                            >
-                              <Edit3 aria-hidden="true" className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => setDeletingId(post.id)}
-                              className="p-1.5 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
-                              title={t('posts_table.delete_action')} aria-label={t('posts_table.delete_action')}
-                            >
-                              <Trash2 aria-hidden="true" className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                                {/* Audio TTS Pill */}
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
+                                    hasAudio
+                                      ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700/60 ring-1 ring-amber-500/10'
+                                      : 'bg-stone-100 dark:bg-stone-800/80 text-stone-400 border-stone-200 dark:border-stone-700'
+                                  }`}
+                                  title={hasAudio ? t('posts_table.readiness.audio_ready') : t('posts_table.readiness.audio_empty')}
+                                >
+                                  <Volume2 aria-hidden="true" className="w-3 h-3 shrink-0" />
+                                  <span>{hasAudio ? t('posts_table.readiness.audio_ready') : t('posts_table.readiness.audio_empty')}</span>
+                                </span>
+
+                                {/* Quiz Pill */}
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
+                                    quizCount > 0
+                                      ? 'bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-700/60 ring-1 ring-purple-500/10'
+                                      : 'bg-stone-100 dark:bg-stone-800/80 text-stone-400 border-stone-200 dark:border-stone-700'
+                                  }`}
+                                  title={t('posts_table.readiness.quiz_count', { count: quizCount })}
+                                >
+                                  <HelpCircle aria-hidden="true" className="w-3 h-3 shrink-0" />
+                                  <span>{t('posts_table.readiness.quiz_count', { count: quizCount })}</span>
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="px-4 py-4 whitespace-nowrap text-center font-bold text-text-body dark:text-warm-ivory">
+                              {post.totalReads || 0}
+                            </td>
+
+                            {/* Actions with Guardrail on Publish */}
+                            <td className="px-5 py-4 whitespace-nowrap text-right space-x-1.5">
+                              <button
+                                type="button"
+                                disabled={!hasParagraphs}
+                                onClick={() => {
+                                  setSuccessToast(`${t('posts_table.guardrails.published_badge')}: ${post.titleEn}`);
+                                  setTimeout(() => setSuccessToast(null), 3000);
+                                }}
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold border transition-all ${
+                                  !hasParagraphs
+                                    ? 'opacity-40 cursor-not-allowed bg-stone-100 dark:bg-stone-800 text-stone-500 border-stone-300'
+                                    : 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 hover:bg-emerald-200 cursor-pointer'
+                                }`}
+                                title={
+                                  !hasParagraphs
+                                    ? t('posts_table.guardrails.publish_locked')
+                                    : t('posts_table.guardrails.publish_action')
+                                }
+                              >
+                                <Send aria-hidden="true" className="w-3 h-3" />
+                                <span>{hasParagraphs ? t('posts_table.guardrails.published_badge') : t('posts_table.guardrails.draft_badge')}</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleOpenPreview(post)}
+                                className="p-1.5 rounded-lg text-heritage-green dark:text-antique-bright hover:bg-heritage-green/10 transition-colors cursor-pointer"
+                                title={t('posts_table.preview_action')}
+                                aria-label={t('posts_table.preview_action')}
+                              >
+                                <Eye aria-hidden="true" className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEdit(post)}
+                                className="p-1.5 rounded-lg text-antique-gold hover:bg-antique-gold/15 transition-colors cursor-pointer"
+                                title={t('posts_table.edit_action')}
+                                aria-label={t('posts_table.edit_action')}
+                              >
+                                <Edit3 aria-hidden="true" className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setDeletingId(post.id)}
+                                className="p-1.5 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
+                                title={t('posts_table.delete_action')}
+                                aria-label={t('posts_table.delete_action')}
+                              >
+                                <Trash2 aria-hidden="true" className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -777,138 +935,19 @@ export const AdminPage: React.FC = () => {
           </div>
         )}
 
-        {/* ── TAB 2: QUẢN LÝ NGƯỜI DÙNG ─────────────────────────────────── */}
+        {/* ── TAB 4: MARKETING & ĐA KÊNH (MARKETING) ─────────────────────── */}
+        {activeTab === 'marketing' && <MarketingManagementView />}
+
+        {/* ── TAB 5: HỌC VIÊN CRM (USERS) ─────────────────────────────────── */}
         {activeTab === 'users' && <UserManagementView />}
 
-        {/* ── TAB 3: NHẬT KÝ HÀNH VI ───────────────────────────────────── */}
-        {activeTab === 'logs' && <AdminActivityLogView />}
-
-        {/* ── TAB 4: THỐNG KÊ HỆ THỐNG ──────────────────────────────────── */}
-        {activeTab === 'system_stats' && (
+        {/* ── TAB 6: HỆ THỐNG & KIỂM DUYỆT (SYSTEM / LOGS) ───────────────── */}
+        {(activeTab === 'system' || activeTab === 'logs') && (
           <div className="space-y-6">
-            {/* Top KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-2">
-                <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>{t('stats.registered_users')}</span>
-                  <Users aria-hidden="true" className="w-5 h-5 text-antique-gold" />
-                </div>
-                <div className="text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
-                  {totalUsersCount?.toLocaleString('en-US') ?? '—'}
-                </div>
-                <p className="text-[11px] text-text-secondary">{t('stats.users_desc')}</p>
-              </div>
-
-              <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-2">
-                <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>{t('stats.articles_in_view')}</span>
-                  <BookOpen aria-hidden="true" className="w-5 h-5 text-emerald-500" />
-                </div>
-                <div className="text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
-                  {stats.totalPosts}
-                </div>
-                <p className="text-[11px] text-text-secondary">{t('stats.articles_desc')}</p>
-              </div>
-
-              <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-2">
-                <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>{t('stats.article_reads')}</span>
-                  <TrendingUp aria-hidden="true" className="w-5 h-5 text-amber-500" />
-                </div>
-                <div className="text-3xl font-heading font-bold text-amber-700 dark:text-antique-gold">
-                  {stats.totalReads.toLocaleString()}
-                </div>
-                <p className="text-[11px] text-text-secondary">{t('stats.reads_desc')}</p>
-              </div>
-
-              <div className="p-5 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-2">
-                <div className="flex items-center justify-between text-text-muted text-xs">
-                  <span>{t('stats.avg_reads')}</span>
-                  <Activity aria-hidden="true" className="w-5 h-5 text-rose-500" />
-                </div>
-                <div className="text-3xl font-heading font-bold text-rose-700 dark:text-rose-400">
-                  {stats.avgReads}
-                </div>
-                <p className="text-[11px] text-text-secondary">{t('stats.avg_reads_desc')}</p>
-              </div>
-            </div>
-
-            {/* Level and Region Distributions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* CEFR Level distribution */}
-              <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-4">
-                <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
-                  <Layers aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                  <span>{t('stats.by_cefr_level')}</span>
-                </h3>
-                <div className="space-y-3">
-                  {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => {
-                    const count = stats.levelsCount[lvl] || 0;
-                    const pct = stats.totalPosts > 0 ? Math.round((count / stats.totalPosts) * 100) : 0;
-
-                    return (
-                      <div key={lvl} className="space-y-1">
-                        <div className="flex items-center justify-between text-xs font-semibold">
-                          <span className="text-text-body dark:text-warm-ivory">{t('filters.level_option', { level: lvl })}</span>
-                          <span className="text-text-secondary">
-                            {t('stats.articles_count', { count, pct })}
-                          </span>
-                        </div>
-                        <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
-                          <div
-                            className="h-full bg-antique-gold rounded-full transition-all duration-500"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Regional distribution */}
-              <div className="p-6 rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-4">
-                <h3 className="font-heading font-bold text-base text-heritage-green dark:text-antique-bright flex items-center gap-2">
-                  <MapPin aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                  <span>{t('stats.by_region')}</span>
-                </h3>
-                {Object.keys(stats.regionsCount).length === 0 ? (
-                  <p className="text-xs text-text-muted">{t('stats.no_region_data')}</p>
-                ) : (
-                  <div className="space-y-3">
-                    {Object.entries(stats.regionsCount)
-                      .sort((a, b) => b[1] - a[1])
-                      .slice(0, 6)
-                      .map(([region, count]) => {
-                        const pct =
-                          stats.totalPosts > 0 ? Math.round((count / stats.totalPosts) * 100) : 0;
-                        return (
-                          <div key={region} className="space-y-1">
-                            <div className="flex items-center justify-between text-xs font-semibold">
-                              <span className="text-text-body dark:text-warm-ivory">{adminRegionLabel(region)}</span>
-                              <span className="text-text-secondary">
-                                {t('stats.articles_count', { count, pct })}
-                              </span>
-                            </div>
-                            <div className="w-full h-2 rounded-full bg-warm-ivory dark:bg-heritage-dark/80 overflow-hidden border border-antique-gold/20">
-                              <div
-                                className="h-full bg-emerald-600 dark:bg-emerald-500 rounded-full transition-all duration-500"
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                )}
-              </div>
-            </div>
-
+            <AdminActivityLogView />
             <AdminServiceConnections />
           </div>
         )}
-        </div>
-      </div>
 
         {/* ── Post Create / Edit Modal ──────────────────────────────────── */}
         <PostFormModal
@@ -946,12 +985,14 @@ export const AdminPage: React.FC = () => {
               </div>
               <div className="flex items-center justify-center gap-3 pt-2">
                 <button
+                  type="button"
                   onClick={() => setDeletingId(null)}
                   className="px-4 py-2.5 rounded-xl border border-antique-gold/30 text-xs font-bold hover:bg-white/10 transition-colors cursor-pointer"
                 >
                   {t('delete_dialog.cancel')}
                 </button>
                 <button
+                  type="button"
                   onClick={handleConfirmDelete}
                   className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-md"
                 >

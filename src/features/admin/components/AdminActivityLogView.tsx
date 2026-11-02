@@ -1,258 +1,165 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-
-export type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'AUDIT';
-
-export type LogEventType =
-  | 'AUTH_LOGIN'
-  | 'AUTH_LOGOUT'
-  | 'POST_CREATE'
-  | 'POST_UPDATE'
-  | 'POST_DELETE'
-  | 'USER_ROLE_CHANGE'
-  | 'JOURNEY_UPDATE'
-  | 'SYSTEM_CACHE_FLUSH'
-  | 'SYSTEM_SYNC';
-
-export interface ActivityActor {
-  id: string;
-  email: string;
-  role: string;
-  ipAddress?: string;
-}
-
-export interface ActivityLogItem {
-  id: string;
-  timestamp: string;
-  eventType: LogEventType;
-  level: LogLevel;
-  actor: ActivityActor;
-  action: string;
-  target?: string;
-  status: 'SUCCESS' | 'WARNING' | 'FAILED';
-  details: Record<string, unknown>;
-}
-
-const INITIAL_LOGS: ActivityLogItem[] = [
-  {
-    id: 'log-001',
-    timestamp: '2026-11-01T07:20:15Z',
-    eventType: 'POST_UPDATE',
-    level: 'AUDIT',
-    actor: {
-      id: 'usr-admin-01',
-      email: 'admin@viecultures.com',
-      role: 'ADMIN',
-      ipAddress: '192.168.1.10',
-    },
-    action: 'Cập nhật nội dung bài đọc',
-    target: 'reading-post-104',
-    status: 'SUCCESS',
-    details: {
-      postTitle: 'Nghệ thuật làm gốm Bát Tràng',
-      fieldChanged: 'level',
-      previousValue: 'B1',
-      newValue: 'B2',
-      updatedBy: 'admin@viecultures.com',
-    },
-  },
-  {
-    id: 'log-002',
-    timestamp: '2026-11-01T07:15:42Z',
-    eventType: 'USER_ROLE_CHANGE',
-    level: 'WARN',
-    actor: {
-      id: 'usr-admin-01',
-      email: 'admin@viecultures.com',
-      role: 'ADMIN',
-      ipAddress: '192.168.1.10',
-    },
-    action: 'Nâng cấp quyền tài khoản người dùng',
-    target: 'usr-test-88',
-    status: 'SUCCESS',
-    details: {
-      targetEmail: 'editor@viecultures.com',
-      previousRole: 'LEARNER',
-      assignedRole: 'STAFF',
-      grantedPermissions: ['POST_CREATE', 'POST_EDIT'],
-    },
-  },
-  {
-    id: 'log-003',
-    timestamp: '2026-11-01T06:58:10Z',
-    eventType: 'JOURNEY_UPDATE',
-    level: 'INFO',
-    actor: {
-      id: 'usr-staff-03',
-      email: 'content.lead@viecultures.com',
-      role: 'STAFF',
-      ipAddress: '192.168.1.14',
-    },
-    action: 'Cập nhật cấu trúc trạm hành trình',
-    target: 'journey-mien-bac',
-    status: 'SUCCESS',
-    details: {
-      journeyId: 'journey-north',
-      reorderedNodesCount: 8,
-      milestoneTitle: 'Chinh phục Đất Tổ Phú Thọ',
-    },
-  },
-  {
-    id: 'log-004',
-    timestamp: '2026-11-01T06:40:00Z',
-    eventType: 'SYSTEM_CACHE_FLUSH',
-    level: 'INFO',
-    actor: {
-      id: 'sys-cron',
-      email: 'system.daemon@viecultures.internal',
-      role: 'SYSTEM',
-    },
-    action: 'Xóa bộ nhớ đệm danh mục khám phá',
-    target: 'cache-discovery-tree',
-    status: 'SUCCESS',
-    details: {
-      cacheKeysCleared: 142,
-      durationMs: 48,
-      triggeredBy: 'SCHEDULED_JOB',
-    },
-  },
-  {
-    id: 'log-005',
-    timestamp: '2026-11-01T06:22:18Z',
-    eventType: 'POST_DELETE',
-    level: 'AUDIT',
-    actor: {
-      id: 'usr-admin-01',
-      email: 'admin@viecultures.com',
-      role: 'ADMIN',
-      ipAddress: '192.168.1.10',
-    },
-    action: 'Xóa bài viết nháp đã hủy',
-    target: 'reading-post-099',
-    status: 'SUCCESS',
-    details: {
-      postTitle: 'Bản thảo thử nghiệm di sản Ca trù',
-      reason: 'Trùng lặp nội dung với bài chính thức',
-    },
-  },
-  {
-    id: 'log-006',
-    timestamp: '2026-11-01T05:45:09Z',
-    eventType: 'AUTH_LOGIN',
-    level: 'WARN',
-    actor: {
-      id: 'usr-guest-99',
-      email: 'unknown.operator@external.net',
-      role: 'ANONYMOUS',
-      ipAddress: '203.113.152.8',
-    },
-    action: 'Đăng nhập trang quản trị thất bại',
-    target: 'auth-gateway',
-    status: 'FAILED',
-    details: {
-      failureReason: 'Mật khẩu không chính xác vượt quá 3 lần',
-      ipBlockedTemporary: false,
-    },
-  },
-  {
-    id: 'log-007',
-    timestamp: '2026-11-01T05:00:00Z',
-    eventType: 'SYSTEM_SYNC',
-    level: 'INFO',
-    actor: {
-      id: 'sys-sync',
-      email: 'sync.worker@viecultures.internal',
-      role: 'SYSTEM',
-    },
-    action: 'Đồng bộ điểm văn hóa từ dữ liệu gốc',
-    target: 'service-curator',
-    status: 'SUCCESS',
-    details: {
-      syncedRecords: 320,
-      validationPassed: true,
-    },
-  },
-];
+import {
+  Search,
+  RefreshCw,
+  AlertCircle,
+  Copy,
+  Check,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Activity,
+  Layers,
+  FileText,
+  Calendar,
+  Filter,
+} from 'lucide-react';
+import {
+  adminActivityLogService,
+  type ActivityLogItemDto,
+  type ActivityStatsSummaryDto,
+} from '../services/adminActivityLogService';
 
 export const AdminActivityLogView: React.FC = () => {
-  const [logs, setLogs] = useState<ActivityLogItem[]>(INITIAL_LOGS);
-  const [selectedLog, setSelectedLog] = useState<ActivityLogItem | null>(null);
+  const [logs, setLogs] = useState<ActivityLogItemDto[]>([]);
+  const [stats, setStats] = useState<ActivityStatsSummaryDto | null>(null);
+  const [selectedLog, setSelectedLog] = useState<ActivityLogItemDto | null>(null);
+
+  // Filters & Pagination State
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedEventType, setSelectedEventType] = useState<string>('ALL');
-  const [selectedLevel, setSelectedLevel] = useState<string>('ALL');
-  const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
-  const [copied, setCopied] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedEventType, setSelectedEventType] = useState<string>('');
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
+  const [page, setPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(20);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalElements, setTotalElements] = useState<number>(0);
 
-  const filteredLogs = useMemo(() => {
-    return logs.filter((log) => {
-      if (selectedEventType !== 'ALL' && log.eventType !== selectedEventType) {
-        return false;
-      }
-      if (selectedLevel !== 'ALL' && log.level !== selectedLevel) {
-        return false;
-      }
-      if (selectedStatus !== 'ALL' && log.status !== selectedStatus) {
-        return false;
-      }
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesAction = log.action.toLowerCase().includes(q);
-        const matchesActor = log.actor.email.toLowerCase().includes(q);
-        const matchesTarget = (log.target || '').toLowerCase().includes(q);
-        const matchesType = log.eventType.toLowerCase().includes(q);
-        return matchesAction || matchesActor || matchesTarget || matchesType;
-      }
-      return true;
-    });
-  }, [logs, selectedEventType, selectedLevel, selectedStatus, searchQuery]);
+  // Status State
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [copied, setCopied] = useState<boolean>(false);
 
-  const handleRefresh = () => {
+  // Fetch Logs
+  const fetchLogs = useCallback(async () => {
     setIsLoading(true);
+    setErrorMsg(null);
     try {
-      setTimeout(() => {
-        setLogs(INITIAL_LOGS);
-        setIsLoading(false);
-      }, 300);
-    } catch (err) {
-      console.error('Lỗi khi làm mới nhật ký hành vi:', err);
+      const data = await adminActivityLogService.getLogs({
+        search: searchQuery.trim() || undefined,
+        eventCategory: selectedCategory || undefined,
+        eventType: selectedEventType || undefined,
+        fromDate: fromDate || undefined,
+        toDate: toDate || undefined,
+        page,
+        size: pageSize,
+        sortBy: 'createdAt',
+        direction: 'DESC',
+      });
+
+      setLogs(data.content || []);
+      setTotalPages(data.totalPages || 1);
+      setTotalElements(data.totalElements || 0);
+    } catch (err: unknown) {
+      console.error('Loi khi tai nhat ky hanh vi:', err);
+      const message = err instanceof Error ? err.message : 'Khong the ket noi may chu';
+      setErrorMsg(message);
+    } finally {
       setIsLoading(false);
     }
+  }, [searchQuery, selectedCategory, selectedEventType, fromDate, toDate, page, pageSize]);
+
+  // Fetch Stats Summary
+  const fetchStats = useCallback(async () => {
+    try {
+      const statsData = await adminActivityLogService.getStatsSummary();
+      setStats(statsData);
+    } catch (err) {
+      console.error('Loi khi tai thong ke nhat ky:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(0);
+    fetchLogs();
   };
 
-  const handleCopyJson = (details: Record<string, unknown>) => {
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('');
+    setSelectedEventType('');
+    setFromDate('');
+    setToDate('');
+    setPage(0);
+  };
+
+  const handleCopyJson = (payloadStr?: string | null) => {
+    if (!payloadStr) return;
     try {
-      const formatted = JSON.stringify(details, null, 2);
+      let formatted = payloadStr;
+      try {
+        const parsed = JSON.parse(payloadStr);
+        formatted = JSON.stringify(parsed, null, 2);
+      } catch {
+        // payload is plain string
+      }
       navigator.clipboard.writeText(formatted);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Lỗi sao chép JSON:', err);
+      console.error('Loi sao chep JSON:', err);
     }
   };
 
-  const getLevelBadgeClass = (level: LogLevel) => {
-    switch (level) {
-      case 'AUDIT':
-        return 'bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 border-purple-300';
-      case 'WARN':
-        return 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 border-amber-300';
-      case 'ERROR':
-        return 'bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-300 border-rose-300';
-      case 'INFO':
+  const parseJsonSafe = (payloadStr?: string | null): unknown => {
+    if (!payloadStr) return null;
+    try {
+      return JSON.parse(payloadStr);
+    } catch {
+      return payloadStr;
+    }
+  };
+
+  const getCategoryBadgeClass = (category?: string) => {
+    switch (category?.toUpperCase()) {
+      case 'READER':
+        return 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300';
+      case 'VOCABULARY':
+        return 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300';
+      case 'DISCOVERY':
+        return 'bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-300';
+      case 'AUTH':
+        return 'bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300';
       default:
-        return 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 border-blue-300';
+        return 'bg-stone-100 dark:bg-white/10 text-stone-700 dark:text-stone-300 border-stone-300';
     }
   };
 
-  const getStatusBadgeClass = (status: 'SUCCESS' | 'WARNING' | 'FAILED') => {
-    switch (status) {
-      case 'SUCCESS':
-        return 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 border-emerald-300';
-      case 'WARNING':
-        return 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 border-amber-300';
-      case 'FAILED':
-        return 'bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-300 border-rose-300';
+  const formatDate = (isoString?: string) => {
+    if (!isoString) return '—';
+    try {
+      const d = new Date(isoString);
+      return d.toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+    } catch {
+      return isoString;
     }
   };
 
@@ -261,135 +168,252 @@ export const AdminActivityLogView: React.FC = () => {
       {/* ── Summary Counters ────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
-          <div className="text-text-muted text-xs font-semibold">Tổng bản ghi sự kiện</div>
+          <div className="flex items-center justify-between text-text-muted text-xs font-semibold">
+            <span>Tong su kien ghi nhan</span>
+            <Activity className="size-4 text-antique-gold" aria-hidden="true" />
+          </div>
           <div className="text-2xl sm:text-3xl font-heading font-bold text-heritage-green dark:text-antique-bright">
-            {logs.length}
+            {stats ? stats.totalLogs.toLocaleString() : totalElements.toLocaleString()}
           </div>
-          <p className="text-[11px] text-text-secondary">Hoạt động trong 24 giờ qua</p>
+          <p className="text-[11px] text-text-secondary">Tat ca nhat ky trong CSDL</p>
         </div>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
-          <div className="text-text-muted text-xs font-semibold">Kiểm toán can thiệp</div>
-          <div className="text-2xl sm:text-3xl font-heading font-bold text-purple-700 dark:text-purple-400">
-            {logs.filter((l) => l.level === 'AUDIT').length}
+          <div className="flex items-center justify-between text-text-muted text-xs font-semibold">
+            <span>Su kien doc bai</span>
+            <FileText className="size-4 text-emerald-600" aria-hidden="true" />
           </div>
-          <p className="text-[11px] text-text-secondary">Sửa đổi nội dung & phân quyền</p>
-        </div>
-
-        <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
-          <div className="text-text-muted text-xs font-semibold">Cảnh báo bảo mật</div>
-          <div className="text-2xl sm:text-3xl font-heading font-bold text-amber-700 dark:text-amber-400">
-            {logs.filter((l) => l.level === 'WARN').length}
-          </div>
-          <p className="text-[11px] text-text-secondary">Cần giám sát định kỳ</p>
-        </div>
-
-        <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
-          <div className="text-text-muted text-xs font-semibold">Tỷ lệ thành công</div>
           <div className="text-2xl sm:text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
-            {Math.round(
-              (logs.filter((l) => l.status === 'SUCCESS').length / (logs.length || 1)) * 100
-            )}
-            %
+            {stats?.categoryCounts?.READER ? stats.categoryCounts.READER.toLocaleString() : 0}
           </div>
-          <p className="text-[11px] text-text-secondary">Thao tác thực thi hợp lệ</p>
+          <p className="text-[11px] text-text-secondary">Luot doc va tuong tac bai</p>
+        </div>
+
+        <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
+          <div className="flex items-center justify-between text-text-muted text-xs font-semibold">
+            <span>Tra cuu tu vung</span>
+            <Layers className="size-4 text-amber-600" aria-hidden="true" />
+          </div>
+          <div className="text-2xl sm:text-3xl font-heading font-bold text-amber-700 dark:text-amber-400">
+            {stats?.categoryCounts?.VOCABULARY ? stats.categoryCounts.VOCABULARY.toLocaleString() : 0}
+          </div>
+          <p className="text-[11px] text-text-secondary">Luu tu vung vao so tay</p>
+        </div>
+
+        <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-1">
+          <div className="flex items-center justify-between text-text-muted text-xs font-semibold">
+            <span>Kham pha van hoa</span>
+            <Filter className="size-4 text-purple-600" aria-hidden="true" />
+          </div>
+          <div className="text-2xl sm:text-3xl font-heading font-bold text-purple-700 dark:text-purple-400">
+            {stats?.categoryCounts?.DISCOVERY ? stats.categoryCounts.DISCOVERY.toLocaleString() : 0}
+          </div>
+          <p className="text-[11px] text-text-secondary">Ban do va dia diem</p>
         </div>
       </div>
 
       {/* ── Filters Section ─────────────────────────────────────────── */}
-      <div className="p-4 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
-        <div className="relative w-full md:w-80">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm theo tác nhân, hành động hoặc mục tiêu..."
-            className="w-full px-3.5 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-          />
+      <div className="p-4 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm space-y-3">
+        <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
+          {/* Search Bar */}
+          <form onSubmit={handleSearchSubmit} className="relative w-full md:w-80" role="search">
+            <Search
+              aria-hidden="true"
+              className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted"
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tim theo email, URL, IP hoac noi dung..."
+              className="w-full pl-10 pr-4 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+            />
+          </form>
+
+          {/* Filter Dropdowns */}
+          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+            {/* Category Select */}
+            <select
+              aria-label="Loc theo nhom su kien"
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                setPage(0);
+              }}
+              className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+            >
+              <option value="">Tat ca nhom su kien</option>
+              <option value="READER">READER (Doc bai)</option>
+              <option value="VOCABULARY">VOCABULARY (Tu vung)</option>
+              <option value="DISCOVERY">DISCOVERY (Kham pha)</option>
+              <option value="AUTH">AUTH (Xac thuc)</option>
+              <option value="SYSTEM">SYSTEM (He thong)</option>
+            </select>
+
+            {/* Event Type Select */}
+            <select
+              aria-label="Loc theo loai su kien"
+              value={selectedEventType}
+              onChange={(e) => {
+                setSelectedEventType(e.target.value);
+                setPage(0);
+              }}
+              className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+            >
+              <option value="">Moi loai hanh dong</option>
+              <option value="ARTICLE_READ">ARTICLE_READ</option>
+              <option value="ARTICLE_VIEW">ARTICLE_VIEW</option>
+              <option value="VOCAB_LOOKUP">VOCAB_LOOKUP</option>
+              <option value="VOCAB_SAVE">VOCAB_SAVE</option>
+              <option value="PAGE_VIEW">PAGE_VIEW</option>
+              <option value="LOGIN_SUCCESS">LOGIN_SUCCESS</option>
+              <option value="LOGIN_FAILURE">LOGIN_FAILURE</option>
+            </select>
+
+            {/* Page Size */}
+            <select
+              aria-label="So luong dong moi trang"
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(0);
+              }}
+              className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+            >
+              <option value={10}>10 dong/trang</option>
+              <option value={20}>20 dong/trang</option>
+              <option value={50}>50 dong/trang</option>
+            </select>
+
+            {/* Clear Filters */}
+            {(searchQuery || selectedCategory || selectedEventType || fromDate || toDate) && (
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="px-3 py-2 rounded-xl bg-white/40 dark:bg-white/10 hover:bg-white/60 text-xs font-bold text-text-muted cursor-pointer transition-colors"
+              >
+                Xoa bo loc
+              </button>
+            )}
+
+            {/* Refresh */}
+            <button
+              type="button"
+              onClick={() => {
+                fetchLogs();
+                fetchStats();
+              }}
+              disabled={isLoading}
+              className="p-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory cursor-pointer transition-colors disabled:opacity-50"
+              title="Lam moi du lieu"
+              aria-label="Lam moi du lieu"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-          <select
-            value={selectedEventType}
-            onChange={(e) => setSelectedEventType(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
-          >
-            <option value="ALL">Tất cả loại sự kiện</option>
-            <option value="AUTH_LOGIN">AUTH_LOGIN</option>
-            <option value="POST_CREATE">POST_CREATE</option>
-            <option value="POST_UPDATE">POST_UPDATE</option>
-            <option value="POST_DELETE">POST_DELETE</option>
-            <option value="USER_ROLE_CHANGE">USER_ROLE_CHANGE</option>
-            <option value="JOURNEY_UPDATE">JOURNEY_UPDATE</option>
-            <option value="SYSTEM_CACHE_FLUSH">SYSTEM_CACHE_FLUSH</option>
-            <option value="SYSTEM_SYNC">SYSTEM_SYNC</option>
-          </select>
-
-          <select
-            value={selectedLevel}
-            onChange={(e) => setSelectedLevel(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
-          >
-            <option value="ALL">Mọi cấp độ</option>
-            <option value="INFO">INFO</option>
-            <option value="AUDIT">AUDIT</option>
-            <option value="WARN">WARN</option>
-            <option value="ERROR">ERROR</option>
-          </select>
-
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
-          >
-            <option value="ALL">Mọi trạng thái</option>
-            <option value="SUCCESS">Thành công</option>
-            <option value="WARNING">Cảnh báo</option>
-            <option value="FAILED">Thất bại</option>
-          </select>
-
-          <button
-            onClick={handleRefresh}
-            disabled={isLoading}
-            className="px-3.5 py-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory text-xs font-bold transition-all cursor-pointer shadow-sm disabled:opacity-50"
-          >
-            {isLoading ? 'Đang tải...' : 'Làm mới'}
-          </button>
+        {/* Date Range Row */}
+        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-antique-gold/20 text-xs">
+          <span className="font-semibold text-text-secondary flex items-center gap-1">
+            <Calendar className="size-3.5 text-antique-gold" aria-hidden="true" />
+            <span>Khoang thoi gian:</span>
+          </span>
+          <div className="flex items-center gap-2">
+            <label htmlFor="fromDateInput" className="text-text-muted text-[11px]">Tu ngay:</label>
+            <input
+              id="fromDateInput"
+              type="date"
+              value={fromDate}
+              onChange={(e) => {
+                setFromDate(e.target.value);
+                setPage(0);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory focus:outline-none"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="toDateInput" className="text-text-muted text-[11px]">Den ngay:</label>
+            <input
+              id="toDateInput"
+              type="date"
+              value={toDate}
+              onChange={(e) => {
+                setToDate(e.target.value);
+                setPage(0);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory focus:outline-none"
+            />
+          </div>
         </div>
       </div>
 
-      {/* ── Main Layout: Table and JSON Inspector ───────────────────── */}
+      {/* Error Alert */}
+      {errorMsg && (
+        <div
+          role="alert"
+          className="p-4 rounded-2xl bg-rose-100 dark:bg-rose-900/30 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-center justify-between"
+        >
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" aria-hidden="true" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            aria-label="Dong thong bao loi"
+            onClick={() => setErrorMsg(null)}
+            className="cursor-pointer"
+          >
+            <X className="w-4 h-4" aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
+      {/* ── Main Layout: Table & Inspector ─────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Table Column */}
-        <div className={`overflow-hidden rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm ${selectedLog ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
+        <div
+          className={`overflow-hidden rounded-3xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm ${
+            selectedLog ? 'lg:col-span-7' : 'lg:col-span-12'
+          }`}
+        >
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs min-w-[700px]">
               <thead className="bg-heritage-green/10 dark:bg-white/5 border-b border-antique-gold/20 text-text-secondary font-bold uppercase tracking-wider text-[10px]">
                 <tr>
-                  <th className="py-3.5 px-4">Thời gian</th>
-                  <th className="py-3.5 px-4">Sự kiện</th>
-                  <th className="py-3.5 px-4">Cấp độ</th>
-                  <th className="py-3.5 px-4">Tác nhân</th>
-                  <th className="py-3.5 px-4">Thao tác</th>
-                  <th className="py-3.5 px-4">Trạng thái</th>
-                  <th className="py-3.5 px-4 text-right">Chi tiết</th>
+                  <th className="py-3.5 px-4">Thoi gian</th>
+                  <th className="py-3.5 px-4">Loai su kien</th>
+                  <th className="py-3.5 px-4">Nhom</th>
+                  <th className="py-3.5 px-4">Nguoi dung / Email</th>
+                  <th className="py-3.5 px-4">Duong dan URL</th>
+                  <th className="py-3.5 px-4">Dia chi IP</th>
+                  <th className="py-3.5 px-4 text-right">Chi tiet</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-antique-gold/15">
-                {filteredLogs.length === 0 ? (
+                {isLoading ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-text-muted">
-                      Không tìm thấy bản ghi nhật ký phù hợp với bộ lọc hiện tại.
+                    <td colSpan={7} className="py-16 text-center">
+                      <div className="inline-block animate-spin w-7 h-7 border-3 border-antique-gold border-t-transparent rounded-full mb-2" />
+                      <p className="text-xs text-text-muted">Dang tai nhat ky he thong...</p>
+                    </td>
+                  </tr>
+                ) : logs.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-16 text-center space-y-2">
+                      <Activity className="w-10 h-10 text-antique-gold/40 mx-auto" aria-hidden="true" />
+                      <p className="text-sm font-bold text-text-body dark:text-warm-ivory">
+                        Chua co ban ghi nhat ky nao
+                      </p>
+                      <p className="text-xs text-text-muted max-w-sm mx-auto">
+                        He thong chua ghi nhan du lieu phu hop voi bo loc hien tai hoac chua co thao tac tu nguoi dung.
+                      </p>
                     </td>
                   </tr>
                 ) : (
-                  filteredLogs.map((item) => {
+                  logs.map((item) => {
                     const isSelected = selectedLog?.id === item.id;
-                    const dateFormatted = new Date(item.timestamp).toLocaleTimeString('vi-VN', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                    });
+                    const actorDisplay = item.userEmail || item.userId || item.anonymousSessionId || 'Khach an danh';
 
                     return (
                       <tr
@@ -401,37 +425,37 @@ export const AdminActivityLogView: React.FC = () => {
                             : 'hover:bg-warm-ivory/60 dark:hover:bg-white/5'
                         }`}
                       >
-                        <td className="py-3.5 px-4 font-mono text-[11px] text-text-secondary">
-                          {dateFormatted}
+                        <td className="py-3.5 px-4 font-mono text-[11px] text-text-secondary whitespace-nowrap">
+                          {formatDate(item.createdAt)}
                         </td>
-                        <td className="py-3.5 px-4 font-semibold font-mono text-[11px] text-heritage-green dark:text-antique-bright">
+                        <td className="py-3.5 px-4 font-mono font-semibold text-[11px] text-heritage-green dark:text-antique-bright whitespace-nowrap">
                           {item.eventType}
                         </td>
-                        <td className="py-3.5 px-4">
+                        <td className="py-3.5 px-4 whitespace-nowrap">
                           <span
-                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${getLevelBadgeClass(
-                              item.level
+                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${getCategoryBadgeClass(
+                              item.eventCategory
                             )}`}
                           >
-                            {item.level}
+                            {item.eventCategory}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 font-medium text-text-body dark:text-warm-ivory max-w-[140px] truncate" title={item.actor.email}>
-                          {item.actor.email}
+                        <td
+                          className="py-3.5 px-4 font-medium text-text-body dark:text-warm-ivory max-w-[140px] truncate"
+                          title={actorDisplay}
+                        >
+                          {actorDisplay}
                         </td>
-                        <td className="py-3.5 px-4 text-text-secondary max-w-[200px] truncate" title={item.action}>
-                          {item.action}
+                        <td
+                          className="py-3.5 px-4 font-mono text-text-secondary max-w-[180px] truncate"
+                          title={item.path || '—'}
+                        >
+                          {item.path || '—'}
                         </td>
-                        <td className="py-3.5 px-4">
-                          <span
-                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusBadgeClass(
-                              item.status
-                            )}`}
-                          >
-                            {item.status}
-                          </span>
+                        <td className="py-3.5 px-4 font-mono text-[11px] text-text-muted whitespace-nowrap">
+                          {item.ipAddress || '—'}
                         </td>
-                        <td className="py-3.5 px-4 text-right">
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
                           <button
                             type="button"
                             onClick={(e) => {
@@ -440,7 +464,7 @@ export const AdminActivityLogView: React.FC = () => {
                             }}
                             className="px-2.5 py-1 rounded-lg bg-heritage-green/10 hover:bg-heritage-green text-heritage-dark hover:text-warm-ivory dark:text-warm-ivory text-[10px] font-bold transition-all cursor-pointer"
                           >
-                            {isSelected ? 'Đang chọn' : 'Xem JSON'}
+                            {isSelected ? 'Dang xem' : 'Xem JSON'}
                           </button>
                         </td>
                       </tr>
@@ -449,6 +473,49 @@ export const AdminActivityLogView: React.FC = () => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination Footer */}
+          <div className="p-4 border-t border-antique-gold/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-secondary">
+            <div>
+              Hien thi{' '}
+              <span className="font-bold text-heritage-green dark:text-antique-bright">
+                {logs.length > 0 ? page * pageSize + 1 : 0}
+              </span>{' '}
+              -{' '}
+              <span className="font-bold text-heritage-green dark:text-antique-bright">
+                {Math.min((page + 1) * pageSize, totalElements)}
+              </span>{' '}
+              tren tong so{' '}
+              <span className="font-bold text-heritage-green dark:text-antique-bright">
+                {totalElements}
+              </span>{' '}
+              ban ghi
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                disabled={page <= 0 || isLoading}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                className="p-1.5 rounded-lg border border-antique-gold/30 hover:bg-antique-gold/15 transition-colors disabled:opacity-40 cursor-pointer"
+                aria-label="Trang truoc"
+              >
+                <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+              </button>
+              <span className="px-3 py-1 font-semibold text-xs">
+                {page + 1} / {Math.max(1, totalPages)}
+              </span>
+              <button
+                type="button"
+                disabled={page >= totalPages - 1 || isLoading}
+                onClick={() => setPage((p) => p + 1)}
+                className="p-1.5 rounded-lg border border-antique-gold/30 hover:bg-antique-gold/15 transition-colors disabled:opacity-40 cursor-pointer"
+                aria-label="Trang tiep"
+              >
+                <ChevronRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -464,7 +531,7 @@ export const AdminActivityLogView: React.FC = () => {
               <div className="flex items-center justify-between border-b border-antique-gold/25 pb-3">
                 <div className="space-y-0.5">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-antique-gold">
-                    Chi tiết bản ghi
+                    Chi tiet nhat ky hoat dong
                   </div>
                   <h4 className="font-heading font-bold text-sm text-text-body dark:text-warm-ivory">
                     {selectedLog.eventType}
@@ -472,63 +539,90 @@ export const AdminActivityLogView: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleCopyJson(selectedLog.details)}
-                    className="px-2.5 py-1 rounded-lg bg-antique-gold/20 hover:bg-antique-gold text-heritage-dark text-[11px] font-bold transition-all cursor-pointer"
+                    type="button"
+                    onClick={() => handleCopyJson(selectedLog.payload)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-antique-gold/20 hover:bg-antique-gold text-heritage-dark text-[11px] font-bold transition-all cursor-pointer"
                   >
-                    {copied ? 'Đã sao chép' : 'Sao chép JSON'}
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                        <span>Da sao chep</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                        <span>Sao chep JSON</span>
+                      </>
+                    )}
                   </button>
                   <button
+                    type="button"
                     onClick={() => setSelectedLog(null)}
-                    className="px-2.5 py-1 rounded-lg bg-red-100 hover:bg-red-200 text-red-800 text-[11px] font-bold transition-all cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg bg-rose-100 dark:bg-rose-950/40 hover:bg-rose-200 text-rose-800 dark:text-rose-300 text-[11px] font-bold transition-all cursor-pointer"
+                    aria-label="Dong khung chi tiet"
                   >
-                    Đóng
+                    Dong
                   </button>
                 </div>
               </div>
 
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                  <span className="text-text-muted">Mã bản ghi:</span>
+                  <span className="text-text-muted">Ma dinh danh:</span>
                   <span className="font-mono font-semibold">{selectedLog.id}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                  <span className="text-text-muted">Thời gian ghi nhận:</span>
-                  <span className="font-mono">{selectedLog.timestamp}</span>
+                  <span className="text-text-muted">Thoi gian:</span>
+                  <span className="font-mono">{formatDate(selectedLog.createdAt)}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                  <span className="text-text-muted">Tác nhân thực hiện:</span>
-                  <span className="font-semibold">{selectedLog.actor.email} ({selectedLog.actor.role})</span>
-                </div>
-                {selectedLog.actor.ipAddress && (
-                  <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                    <span className="text-text-muted">Địa chỉ IP:</span>
-                    <span className="font-mono">{selectedLog.actor.ipAddress}</span>
-                  </div>
-                )}
-                <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                  <span className="text-text-muted">Hành động:</span>
-                  <span>{selectedLog.action}</span>
-                </div>
-                {selectedLog.target && (
-                  <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                    <span className="text-text-muted">Mục tiêu tác động:</span>
-                    <span className="font-mono text-heritage-green dark:text-antique-bright">{selectedLog.target}</span>
-                  </div>
-                )}
-                <div className="flex justify-between py-1 border-b border-antique-gold/15">
-                  <span className="text-text-muted">Trạng thái:</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusBadgeClass(selectedLog.status)}`}>
-                    {selectedLog.status}
+                  <span className="text-text-muted">Nhom su kien:</span>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getCategoryBadgeClass(
+                      selectedLog.eventCategory
+                    )}`}
+                  >
+                    {selectedLog.eventCategory}
                   </span>
                 </div>
+                <div className="flex justify-between py-1 border-b border-antique-gold/15">
+                  <span className="text-text-muted">Email nguoi dung:</span>
+                  <span className="font-semibold text-heritage-green dark:text-antique-bright truncate max-w-[200px]">
+                    {selectedLog.userEmail || selectedLog.userId || 'Khach vang lai'}
+                  </span>
+                </div>
+                {selectedLog.path && (
+                  <div className="flex justify-between py-1 border-b border-antique-gold/15">
+                    <span className="text-text-muted">Duong dan URL:</span>
+                    <span className="font-mono text-heritage-green dark:text-antique-bright truncate max-w-[200px]">
+                      {selectedLog.path}
+                    </span>
+                  </div>
+                )}
+                {selectedLog.ipAddress && (
+                  <div className="flex justify-between py-1 border-b border-antique-gold/15">
+                    <span className="text-text-muted">Dia chi IP:</span>
+                    <span className="font-mono">{selectedLog.ipAddress}</span>
+                  </div>
+                )}
+                {selectedLog.userAgent && (
+                  <div className="flex flex-col gap-1 py-1 border-b border-antique-gold/15">
+                    <span className="text-text-muted">User Agent:</span>
+                    <span className="font-mono text-[10px] text-text-secondary truncate">
+                      {selectedLog.userAgent}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-1.5 pt-2">
                 <div className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
-                  Dữ liệu trọng tải (Payload JSON)
+                  Du lieu trong tai (Payload)
                 </div>
                 <pre className="p-3.5 rounded-2xl bg-heritage-forest text-warm-ivory font-mono text-[11px] leading-relaxed overflow-x-auto max-h-72 border border-antique-gold/30">
-                  {JSON.stringify(selectedLog.details, null, 2)}
+                  {selectedLog.payload
+                    ? JSON.stringify(parseJsonSafe(selectedLog.payload), null, 2)
+                    : '// Khong co du lieu payload'}
                 </pre>
               </div>
             </motion.div>

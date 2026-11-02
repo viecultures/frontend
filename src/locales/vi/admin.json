@@ -51,7 +51,7 @@
     "col_region": "Vùng miền",
     "col_level": "Cấp độ",
     "col_category": "Chuyên mục",
-    "col_content": "Nội dung",
+    "col_content": "Độ hoàn thiện học liệu",
     "col_reads": "Lượt đọc",
     "col_actions": "Thao tác",
     "words_count": "{{count}} từ",
@@ -60,7 +60,111 @@
     "vocab_items": "{{count}} từ vựng",
     "preview_action": "Xem trước",
     "edit_action": "Chỉnh sửa",
-    "delete_action": "Xóa"
+    "delete_action": "Xóa",
+    "status_filter": {
+      "label": "Trạng thái bài viết",
+      "all": "Tất cả trạng thái",
+      "published": "Đã xuất bản",
+      "draft": "Bản nháp",
+      "missing_materials": "Thiếu học liệu"
+    },
+    "readiness": {
+      "reading": "Bài đọc",
+      "reading_ready": "{{count}} đoạn",
+      "reading_empty": "Chưa có đoạn",
+      "vocab": "Từ vựng",
+      "vocab_count": "{{count}} từ",
+      "audio": "Audio TTS",
+      "audio_ready": "Đã có Audio",
+      "audio_empty": "Chưa có Audio",
+      "quiz": "Quiz",
+      "quiz_count": "{{count}} câu"
+    },
+    "guardrails": {
+      "publish_locked": "Cần thêm ít nhất một đoạn văn song ngữ trước khi xuất bản",
+      "publish_action": "Xuất bản",
+      "published_badge": "Đã xuất bản",
+      "draft_badge": "Bản nháp"
+    }
+  },
+  "users": {
+    "stats": {
+      "registered": "Học viên đăng ký",
+      "registered_desc": "Tài khoản học viên và quản trị viên",
+      "active_on_page": "Hoạt động trên trang này",
+      "active_on_page_desc": "Tài khoản đang có quyền truy cập",
+      "admins_on_page": "Quản trị viên trên trang này",
+      "admins_on_page_desc": "Tài khoản có quyền quản trị hệ thống"
+    },
+    "filter_groups": {
+      "all": "Tất cả học viên",
+      "recent_7d": "Mới đăng ký 7 ngày",
+      "inactive": "Chưa học bài nào",
+      "active": "Tích cực",
+      "admin": "Quản trị viên"
+    },
+    "filters": {
+      "search_placeholder": "Tìm kiếm theo tên hoặc địa chỉ email...",
+      "search_button": "Tìm kiếm",
+      "all_roles": "Tất cả vai trò",
+      "role_admin": "Quản trị viên",
+      "role_user": "Học viên",
+      "all_statuses": "Tất cả trạng thái",
+      "status_enabled": "Đang hoạt động",
+      "status_disabled": "Đã khóa",
+      "per_page": "{{count}} tài khoản / trang",
+      "clear_filters": "Xóa bộ lọc",
+      "refresh": "Làm mới",
+      "export_csv": "Xuất danh sách (CSV)",
+      "exporting_csv": "Đang xuất CSV..."
+    },
+    "columns": {
+      "user": "Học viên",
+      "role": "Vai trò",
+      "cefr": "Trình độ CEFR",
+      "saved_words": "Từ đã lưu",
+      "joined": "Ngày tham gia",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "status": {
+      "enabled": "Đang hoạt động",
+      "disabled": "Đã khóa",
+      "disable_account": "Khóa tài khoản",
+      "enable_account": "Kích hoạt tài khoản",
+      "cannot_disable_self": "Bạn không thể tự khóa tài khoản quản trị của chính mình",
+      "you": "Bạn"
+    },
+    "roles": {
+      "admin": "Quản trị viên",
+      "learner": "Học viên",
+      "change_role": "Đổi vai trò",
+      "not_set": "Chưa thiết lập"
+    },
+    "messages": {
+      "loading": "Đang tải danh sách học viên...",
+      "unavailable_title": "Không thể tải danh sách học viên",
+      "unavailable_desc": "Không thể kết nối đến máy chủ. Vui lòng thử lại sau.",
+      "empty_title": "Không tìm thấy học viên nào",
+      "empty_desc": "Không có tài khoản nào phù hợp với bộ lọc tìm kiếm hiện tại.",
+      "try_again": "Thử lại",
+      "export_success": "Đã xuất danh sách học viên ra tệp CSV thành công.",
+      "export_error": "Không thể xuất tệp CSV. Vui lòng thử lại."
+    },
+    "pagination": {
+      "page_info": "Trang {{current}} / {{total}} (Tổng cộng {{count}} học viên)",
+      "prev": "Trang trước",
+      "next": "Trang sau"
+    },
+    "role_modal": {
+      "title": "Cập nhật vai trò tài khoản",
+      "user_label": "Học viên",
+      "role_label": "Vai trò mới",
+      "admin_warning": "Cấp quyền Quản trị viên (ROLE_ADMIN) sẽ cho phép tài khoản này truy cập toàn bộ bảng điều khiển quản trị.",
+      "cancel": "Hủy bỏ",
+      "confirm": "Lưu thay đổi",
+      "updating": "Đang lưu..."
+    }
   },
   "preview_dialog": {
     "title": "Xem trước bài viết",
@@ -83,4 +187,3 @@
     "post_saved": "Đã lưu bài viết thành công."
   }
 }
-
