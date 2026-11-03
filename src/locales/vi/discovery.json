@@ -1,4 +1,4 @@
-{
+﻿{
   "page": {
     "title": "Những câu chuyện từ Việt Nam",
     "lead": "Khám phá các câu chuyện văn hóa Việt Nam với bài đọc song ngữ và âm thanh bản xứ.",
@@ -77,6 +77,8 @@
     "series_count": "{{count}} chuỗi bài",
     "upcoming_series": "Chuỗi bài sắp ra mắt",
     "coming_soon": "Sắp ra mắt",
+    "pagination_available_aria": "Phân trang chuỗi bài hiện có",
+    "pagination_upcoming_aria": "Phân trang chuỗi bài sắp ra mắt",
     "no_published_series": "Chưa có chuỗi bài nào được xuất bản trong vùng đầu tiên của bạn.",
     "choose_first_to_see": "Chọn vùng khởi đầu để xem các chuỗi bài đã xuất bản.",
     "explore_chapters": "Khám phá các chương",
