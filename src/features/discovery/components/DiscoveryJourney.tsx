@@ -26,6 +26,7 @@ import { paths } from '@/routes/paths';
 import { readLearningValue, writeLearningValue } from '@/services/learning/learningStorage';
 import { readFirstRegionChoice, saveFirstRegionChoice, type FirstRegion } from '@/services/learning/firstRegionChoice';
 import { JOURNEY_SERIES, type JourneySeries } from '../data/learningJourney';
+import { journeyApiService } from '../services/journeyApiService';
 
 const REGIONS = [
   { id: 'north', nameKey: 'journey.region_north', fallbackName: 'Northern Vietnam', number: "1" },
@@ -69,7 +70,7 @@ export function DiscoveryJourney() {
 
   const getRegionName = (item: (typeof REGIONS)[number]) => t(item.nameKey, item.fallbackName);
 
-  const upcomingSeries = [
+  const staticUpcomingPreviews = useMemo(() => [
     {
       id: 'central-preview',
       title: t('journey.region_central'),
@@ -88,7 +89,7 @@ export function DiscoveryJourney() {
         ? 'New reading series are being prepared for Southern Vietnam.'
         : 'Các chuỗi bài đọc mới đang được biên soạn cho khu vực Miền Nam.',
     },
-  ];
+  ], [isEn, t]);
 
   const getLocalizedProvinceName = (pName: string) => {
     return isEn ? toEnglishPlaceName(pName) : pName;
@@ -106,11 +107,67 @@ export function DiscoveryJourney() {
     }, { replace: true });
   }, [firstRegion, params, requestedPlace, setParams]);
 
+  const [allJourneys, setAllJourneys] = useState<JourneySeries[]>(JOURNEY_SERIES);
+  const [isJourneysLoading, setIsJourneysLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    setIsJourneysLoading(true);
+    journeyApiService.getJourneys().then(journeys => {
+      if (active && Array.isArray(journeys) && journeys.length > 0) {
+        setAllJourneys(journeys);
+      }
+    }).catch(err => {
+      console.warn('[DiscoveryJourney] Failed to load remote journeys, retaining mock data:', err);
+    }).finally(() => {
+      if (active) setIsJourneysLoading(false);
+    });
+    return () => { active = false; };
+  }, []);
+
+  const upcomingSeries = useMemo(() => {
+    const dynamicUpcoming = allJourneys
+      .filter(s => s.status === 'upcoming' || s.status === 'scheduled')
+      .map(s => {
+        const province = VIETNAM_34_PROVINCES.find(item => item.id === s.provinceId);
+        const placeName = province ? getLocalizedProvinceName(province.name) : (isEn ? 'Vietnam' : 'Việt Nam');
+        return {
+          id: s.id,
+          title: isEn ? s.title : (s.titleVi || s.title),
+          place: placeName,
+          imageUrl: s.imageUrl || '/images/landing/hue-citadel.webp',
+          description: s.description || (isEn
+            ? 'New reading series are being prepared for this destination.'
+            : 'Chuỗi bài đọc mới đang được biên soạn cho điểm đến này.'),
+        };
+      });
+
+    const result = [...dynamicUpcoming];
+    for (const preview of staticUpcomingPreviews) {
+      if (!result.some(item => item.id === preview.id)) {
+        result.push(preview);
+      }
+    }
+    return result;
+  }, [allJourneys, isEn, staticUpcomingPreviews]);
+
   const [unlockedPlaces, setUnlockedPlaces] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(JOURNEY_SERIES.map(series => [
       series.provinceId,
       readLearningValue<boolean>(`journey:unlocked:${series.provinceId}`) === true,
     ])));
+
+  useEffect(() => {
+    setUnlockedPlaces(prev => {
+      const next = { ...prev };
+      allJourneys.forEach(series => {
+        if (next[series.provinceId] === undefined) {
+          next[series.provinceId] = readLearningValue<boolean>(`journey:unlocked:${series.provinceId}`) === true;
+        }
+      });
+      return next;
+    });
+  }, [allJourneys]);
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
   // Floating Chapter Popover State
@@ -154,23 +211,33 @@ export function DiscoveryJourney() {
     if (hoverPopover?.pinned) document.querySelector<HTMLButtonElement>('.journey-hover-chapter-link')?.focus();
   }, [hoverPopover?.pinned, hoverPopover?.series.id]);
 
-  const availableSeries = JOURNEY_SERIES.filter(series =>
-    VIETNAM_34_PROVINCES.some(province => province.id === series.provinceId && province.region === firstRegion));
+  const availableSeries = useMemo(() => {
+    const published = allJourneys.filter(series => !series.status || series.status === 'published');
+    if (!firstRegion) {
+      return published;
+    }
+    return published.filter(series =>
+      VIETNAM_34_PROVINCES.some(province => province.id === series.provinceId && province.region === firstRegion)
+    );
+  }, [allJourneys, firstRegion]);
 
   // Nominated Series Slider State
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   const hasOwnSeries = selectedProvince
-    ? JOURNEY_SERIES.some(s => s.provinceId === selectedProvince.id)
+    ? allJourneys.some(s => (!s.status || s.status === 'published') && s.provinceId === selectedProvince.id)
     : true;
 
   const nominatedSlides = useMemo(() => {
+    const published = allJourneys.filter(s => !s.status || s.status === 'published');
     if (selectedProvince && hasOwnSeries) {
-      return JOURNEY_SERIES.filter(s => s.provinceId === selectedProvince.id);
+      return published.filter(s => s.provinceId === selectedProvince.id);
     }
-    if (firstRegion !== 'north') return JOURNEY_SERIES.filter(s => s.region === firstRegion);
+    if (firstRegion && firstRegion !== 'north') {
+      return published.filter(s => s.region === firstRegion);
+    }
     // Default regional nominated series for Northern Vietnam:
-    const northernSeries = JOURNEY_SERIES.filter(s =>
+    const candidateSeries = published.filter(s =>
       s.region === 'north' || ['ha-noi', 'hung-yen', 'ninh-binh'].includes(s.provinceId)
     );
     const preferredOrder = [
@@ -181,12 +248,12 @@ export function DiscoveryJourney() {
       'com-chay-ninh-binh',
       'ca-kho-vu-dai',
     ];
-    return [...northernSeries].sort((a, b) => {
+    return [...candidateSeries].sort((a, b) => {
       const idxA = preferredOrder.indexOf(a.id);
       const idxB = preferredOrder.indexOf(b.id);
       return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
     });
-  }, [selectedProvince, hasOwnSeries, firstRegion]);
+  }, [selectedProvince, hasOwnSeries, firstRegion, allJourneys]);
 
   useEffect(() => {
     setActiveSlideIndex(0);
@@ -355,7 +422,7 @@ export function DiscoveryJourney() {
   function renderNominatedSeriesCard(series: JourneySeries, isUnlocked: boolean) {
     const province = VIETNAM_34_PROVINCES.find(item => item.id === series.provinceId);
     const placeName = province ? getLocalizedProvinceName(province.name) : (isEn ? 'Hanoi' : 'Hà Nội');
-    const firstChapter = series.chapters[0];
+    const firstChapter = series.chapters && series.chapters.length > 0 ? series.chapters[0] : null;
 
     return (
       <article className={`journey-spotlight-card ${isUnlocked ? 'is-unlocked' : 'is-locked'}`}>
@@ -377,7 +444,7 @@ export function DiscoveryJourney() {
         </div>
         <div className="journey-spotlight-content">
           <span className="discovery-category">
-            {placeName} · {t('journey.stories_in_region', { count: series.chapters.length, defaultValue: `${series.chapters.length} câu chuyện` })} · B1
+            {placeName} · {t('journey.stories_in_region', { count: series.chapters ? series.chapters.length : 0, defaultValue: `${series.chapters ? series.chapters.length : 0} câu chuyện` })} · B1
           </span>
           <h3>{series.title}</h3>
           <p>{series.description}</p>
@@ -440,7 +507,7 @@ export function DiscoveryJourney() {
           </div>
           <div className="journey-series-copy">
             <span className="discovery-category">
-              {placeName} · {t('journey.stories_in_region', { count: series.chapters.length, defaultValue: `${series.chapters.length} câu chuyện` })}
+              {placeName} · {t('journey.stories_in_region', { count: series.chapters ? series.chapters.length : 0, defaultValue: `${series.chapters ? series.chapters.length : 0} câu chuyện` })}
             </span>
             <h4>{series.title}</h4>
             <p>{series.description}</p>
@@ -723,7 +790,8 @@ export function DiscoveryJourney() {
           </div>
 
           <ul className="journey-hover-chapter-list">
-            {hoverPopover.series.chapters.map(chapter => (
+            {hoverPopover.series.chapters && hoverPopover.series.chapters.length > 0 ? (
+              hoverPopover.series.chapters.map(chapter => (
               <li key={chapter.id}>
                 <button
                   type="button"
@@ -746,7 +814,12 @@ export function DiscoveryJourney() {
                   <ArrowRight size={15} aria-hidden="true" />
                 </button>
               </li>
-            ))}
+            ))
+            ) : (
+              <li className="p-4 text-center text-xs text-text-muted italic">
+                {t('journey.stories_on_the_way', { regionName: getLocalizedProvinceName(VIETNAM_34_PROVINCES.find(p => p.id === hoverPopover.series.provinceId)?.name || 'Việt Nam') })}
+              </li>
+            )}
           </ul>
         </div>
       )}

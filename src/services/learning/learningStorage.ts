@@ -3,6 +3,9 @@ import type { VocabItem } from '@/data/readerData';
 
 const PREFIX = 'viecultures_learning_v1:';
 
+export const PERSONAL_DECK_ID = 'personal-deck';
+export const PERSONAL_DECK_LEVEL = 'Level 1';
+
 export interface LearningSessionRecord {
   deckId: string;
   totalCards: number;
@@ -56,7 +59,11 @@ export function readSavedVocabulary(id: string, level: string): VocabItem[] {
 }
 
 export function saveVocabulary(id: string, level: string, words: VocabItem[]) {
-  return writeLearningValue('saved-vocabulary:' + articleKey(id, level), words);
+  const result = writeLearningValue('saved-vocabulary:' + articleKey(id, level), words);
+  if (result && typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('vie_vocab_updated'));
+  }
+  return result;
 }
 
 export function readReviewSession(key: string): LearningSessionRecord | null {
@@ -111,3 +118,52 @@ export function getAllSavedVocabularies(): VocabItem[] {
   }
 }
 
+export function savePersonalWord(input: {
+  word: string;
+  viMeaning: string;
+  contextSentence?: string;
+  pos?: string;
+}): boolean {
+  try {
+    const existingWords = readSavedVocabulary(PERSONAL_DECK_ID, PERSONAL_DECK_LEVEL);
+    const normalizedWord = input.word.trim();
+    const existingIndex = existingWords.findIndex(
+      (item) => item.word.toLowerCase() === normalizedWord.toLowerCase()
+    );
+
+    const newItem: VocabItem = {
+      id: existingIndex >= 0 ? existingWords[existingIndex].id : `custom_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      word: normalizedWord,
+      pos: input.pos || 'n.',
+      ipa: '',
+      viMeaning: input.viMeaning.trim(),
+      enDefinition: input.viMeaning.trim(),
+      contextSentence: input.contextSentence?.trim() || '',
+    };
+
+    let nextWords: VocabItem[];
+    if (existingIndex >= 0) {
+      nextWords = [...existingWords];
+      nextWords[existingIndex] = newItem;
+    } else {
+      nextWords = [newItem, ...existingWords];
+    }
+
+    const personalArticle: ReaderArticleData = {
+      id: PERSONAL_DECK_ID,
+      titleEn: 'My Personal Words',
+      titleVi: 'Sổ từ cá nhân của tôi',
+      topic: 'Personal',
+      level: PERSONAL_DECK_LEVEL,
+      vocabularies: nextWords,
+      paragraphs: [],
+      summary: 'Sổ tay lưu trữ các từ vựng do bạn tự thêm thủ công.',
+    };
+
+    cacheArticle(personalArticle, PERSONAL_DECK_LEVEL);
+    return saveVocabulary(PERSONAL_DECK_ID, PERSONAL_DECK_LEVEL, nextWords);
+  } catch (error) {
+    console.error('Failed to save personal word:', error);
+    return false;
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams, useLocation, useNavigate, Navigate, Outlet } from 'react-router-dom';
 import i18n, { SUPPORTED_LANGS, type SupportedLanguage } from '@/lib/i18n';
+import { PATHS } from '@/routes/paths';
 
 const isValidLanguage = (lang?: string): lang is SupportedLanguage => {
   return typeof lang === 'string' && (SUPPORTED_LANGS as readonly string[]).includes(lang);

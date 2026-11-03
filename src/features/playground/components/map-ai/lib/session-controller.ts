@@ -28,7 +28,7 @@ export interface SessionSnapshot extends AudioState {
 export interface SessionDependencies {
   client: Pick<GenAILiveClient, 'on' | 'off' | 'connect' | 'disconnect' | 'prefill' | 'send' | 'sendToolResponse' | 'endAudioInput' | 'startActivity' | 'endActivity' | 'sendRealtimeInput'>;
   audio: ConversationAudioPort;
-  configuration: () => { config: LiveConnectConfig; systemPrompt: string; model: string };
+  configuration: () => Promise<{ config: LiveConnectConfig; systemPrompt: string; model: string }> | { config: LiveConnectConfig; systemPrompt: string; model: string };
   toolPolicy: () => { allowMapTools: boolean; tutorMode: CulturalTutorMode };
   dispatchTool: (name: string, args: unknown, context: { allowMapTools: boolean; tutorMode: CulturalTutorMode; view?: ActiveView; isCurrent: () => boolean }) => Promise<string | object>;
   setLevel: (level: ProficiencyLevel) => void;
@@ -326,7 +326,7 @@ export class SessionController {
 
       if (reconnect) {
         try {
-          const configuration = this.deps.configuration();
+          const configuration = await this.deps.configuration();
           this.sessionPolicy = { ...this.deps.toolPolicy() };
           const ready = await this.deps.client.connect(configuration.config);
           if (!current()) return { status: 'cancelled' };
