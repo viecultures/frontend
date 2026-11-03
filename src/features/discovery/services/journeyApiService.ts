@@ -22,6 +22,8 @@ export interface BackendJourneyResponse {
   description?: string;
   imageUrl?: string;
   status: string;
+  scheduledPublishAt?: string;
+  createdAt?: string;
   chapters?: BackendChapterSummary[];
 }
 
@@ -37,11 +39,13 @@ export function mapBackendJourneyToSeries(item: BackendJourneyResponse): Journey
     id: item.id,
     title: item.titleEn,
     titleVi: item.titleVi,
-    theme: item.theme === 'places' ? 'places' : 'cuisine',
+    theme: (item.theme === 'places' || item.theme === 'cuisine' ? item.theme : 'cuisine') as 'cuisine' | 'places',
     provinceId: item.provinceId,
     region: item.region,
     description: item.description || '',
     imageUrl: item.imageUrl || '/images/landing/hero-pho.webp',
+    status: item.status || 'published',
+    scheduledPublishAt: item.scheduledPublishAt,
     chapters: (item.chapters || []).map(ch => ({
       id: ch.id,
       title: ch.titleEn,
@@ -57,12 +61,13 @@ export function mapBackendJourneyToSeries(item: BackendJourneyResponse): Journey
 export const journeyApiService = {
   async getJourneys(params?: JourneyFilterQuery): Promise<JourneySeries[]> {
     const searchParams = new URLSearchParams();
-    searchParams.append('status', params?.status || 'PUBLISHED');
+    if (params?.status) searchParams.append('status', params.status);
     if (params?.region) searchParams.append('region', params.region);
     if (params?.provinceId) searchParams.append('provinceId', params.provinceId);
     if (params?.theme) searchParams.append('theme', params.theme);
 
-    const url = `${API_BASE_URL}/api/journeys?${searchParams.toString()}`;
+    const queryString = searchParams.toString();
+    const url = `${API_BASE_URL}/api/journeys${queryString ? `?${queryString}` : ''}`;
 
     try {
       const controller = new AbortController();

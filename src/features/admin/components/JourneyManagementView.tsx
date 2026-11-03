@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   AlertCircle,
   ExternalLink,
+  Calendar,
+  Clock,
 } from 'lucide-react';
 import type { LearningJourneyItem } from '../types/adminTypes';
 import { journeyAdminService, type JourneyFilterParams } from '../services/journeyAdminService';
@@ -99,12 +101,37 @@ export const JourneyManagementView: React.FC = () => {
     return prov ? prov.name : provId;
   };
 
-  const getStatusBadge = (status?: string) => {
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '—';
+    try {
+      return new Date(dateStr).toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const getStatusBadge = (status?: string, scheduledAt?: string) => {
     switch (status) {
       case 'published':
         return (
           <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-300/40">
             Xuất bản
+          </span>
+        );
+      case 'scheduled':
+        return (
+          <span
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-300/40"
+            title={scheduledAt ? `Lên lịch xuất bản lúc: ${formatDate(scheduledAt)}` : 'Lên lịch xuất bản tự động'}
+          >
+            <Clock aria-hidden="true" className="w-3 h-3 text-purple-600 dark:text-purple-300" />
+            <span>Lên lịch{scheduledAt ? `: ${formatDate(scheduledAt)}` : ''}</span>
           </span>
         );
       case 'upcoming':
@@ -195,8 +222,9 @@ export const JourneyManagementView: React.FC = () => {
           >
             <option value="">Tất cả trạng thái</option>
             <option value="published">Xuất bản</option>
-            <option value="draft">Bản nháp</option>
+            <option value="scheduled">Lên lịch</option>
             <option value="upcoming">Sắp ra mắt</option>
+            <option value="draft">Bản nháp</option>
           </select>
 
           <button
@@ -241,6 +269,7 @@ export const JourneyManagementView: React.FC = () => {
                   <th className="px-4 py-3.5">Vùng & Tỉnh thành</th>
                   <th className="px-4 py-3.5">Chủ đề</th>
                   <th className="px-4 py-3.5 text-center">Số chặng</th>
+                  <th className="px-4 py-3.5">Ngày tạo</th>
                   <th className="px-4 py-3.5">Trạng thái</th>
                   <th className="px-5 py-3.5 text-right">Thao tác</th>
                 </tr>
@@ -303,7 +332,14 @@ export const JourneyManagementView: React.FC = () => {
                       </span>
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap">{getStatusBadge(j.status)}</td>
+                    <td className="px-4 py-4 whitespace-nowrap text-text-muted text-[11px] font-mono">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold/70 shrink-0" />
+                        <span>{formatDate(j.createdAt)}</span>
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-4 whitespace-nowrap">{getStatusBadge(j.status, j.scheduledPublishAt)}</td>
 
                     <td className="px-5 py-4 whitespace-nowrap text-right space-x-1.5">
                       <button

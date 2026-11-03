@@ -45,6 +45,7 @@ import { journeyAdminService } from '../services/journeyAdminService';
 import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 import { adminTopicLabel, adminRegionLabel } from '../admin-presentation';
 import { PostPreviewCanvas } from '../components/PostPreviewCanvas';
+import { HeritageImageUploader } from '../components/HeritageImageUploader';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 
 const REGION_OPTIONS = [
@@ -930,32 +931,28 @@ export const AdminPostEditorPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="block text-xs font-bold text-heritage-green dark:text-warm-ivory">
-                          URL Ảnh bìa (Cover Image)
-                        </label>
-                        <input
-                          type="url"
-                          value={imageUrl}
-                          onChange={(e) => setImageUrl(e.target.value)}
-                          placeholder="https://images.unsplash.com/..."
-                          className="w-full p-2 rounded-xl border border-antique-gold/30 bg-warm-ivory dark:bg-stone-800 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-                        />
-                      </div>
+                    <div>
+                      <HeritageImageUploader
+                        label="URL Ảnh bìa (Cover Image)"
+                        value={imageUrl}
+                        onChange={setImageUrl}
+                        folder="posts"
+                        helperText="Hỗ trợ JPG, PNG, WebP, AVIF, GIF dưới 5MB. Kéo thả hoặc dán ảnh (Ctrl+V)."
+                        aspectRatio="video"
+                      />
+                    </div>
 
-                      <div className="space-y-1">
-                        <label className="block text-xs font-bold text-heritage-green dark:text-warm-ivory">
-                          Thời gian đọc dự kiến
-                        </label>
-                        <input
-                          type="text"
-                          value={readTime}
-                          onChange={(e) => setReadTime(e.target.value)}
-                          placeholder="e.g. 3 phút"
-                          className="w-full p-2 rounded-xl border border-antique-gold/30 bg-warm-ivory dark:bg-stone-800 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-                        />
-                      </div>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-bold text-heritage-green dark:text-warm-ivory">
+                        Thời gian đọc dự kiến
+                      </label>
+                      <input
+                        type="text"
+                        value={readTime}
+                        onChange={(e) => setReadTime(e.target.value)}
+                        placeholder="e.g. 3 phút"
+                        className="w-full p-2 rounded-xl border border-antique-gold/30 bg-warm-ivory dark:bg-stone-800 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                      />
                     </div>
 
                     <div className="space-y-1">

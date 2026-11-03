@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   AlertCircle,
   ExternalLink,
+  Clock,
+  Calendar,
 } from 'lucide-react';
 import type {
   LearningJourneyPayload,
@@ -21,6 +23,7 @@ import type {
 import { journeyAdminService } from '../services/journeyAdminService';
 import { postAdminService } from '../services/postAdminService';
 import { AdminDialog } from './AdminDialog';
+import { HeritageImageUploader } from './HeritageImageUploader';
 import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 
 interface JourneyFormModalProps {
@@ -46,8 +49,9 @@ const REGION_OPTIONS = [
 
 const STATUS_OPTIONS = [
   { value: 'published', label: 'Đã xuất bản (Published)' },
-  { value: 'draft', label: 'Bản nháp (Draft)' },
+  { value: 'scheduled', label: 'Lên lịch xuất bản tự động (Scheduled)' },
   { value: 'upcoming', label: 'Sắp ra mắt (Upcoming)' },
+  { value: 'draft', label: 'Bản nháp (Draft)' },
 ];
 
 export const JourneyFormModal: React.FC<JourneyFormModalProps> = ({
@@ -67,6 +71,7 @@ export const JourneyFormModal: React.FC<JourneyFormModalProps> = ({
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [status, setStatus] = useState('published');
+  const [scheduledPublishAt, setScheduledPublishAt] = useState('');
 
   // Chapter posts selection
   const [allAvailablePosts, setAllAvailablePosts] = useState<ReadingPostItem[]>([]);
@@ -98,6 +103,21 @@ export const JourneyFormModal: React.FC<JourneyFormModalProps> = ({
       setDescription(initialData.description || '');
       setImageUrl(initialData.imageUrl || '');
       setStatus(initialData.status || 'published');
+      if (initialData.scheduledPublishAt) {
+        try {
+          const dt = new Date(initialData.scheduledPublishAt);
+          const yyyy = dt.getFullYear();
+          const mm = String(dt.getMonth() + 1).padStart(2, '0');
+          const dd = String(dt.getDate()).padStart(2, '0');
+          const hh = String(dt.getHours()).padStart(2, '0');
+          const min = String(dt.getMinutes()).padStart(2, '0');
+          setScheduledPublishAt(`${yyyy}-${mm}-${dd}T${hh}:${min}`);
+        } catch {
+          setScheduledPublishAt('');
+        }
+      } else {
+        setScheduledPublishAt('');
+      }
 
       if (initialData.chapters && initialData.chapters.length > 0) {
         setSelectedPostIds(initialData.chapters.map((c) => c.id));
@@ -114,6 +134,7 @@ export const JourneyFormModal: React.FC<JourneyFormModalProps> = ({
       setDescription('');
       setImageUrl('');
       setStatus('published');
+      setScheduledPublishAt('');
       setSelectedPostIds([]);
     }
     setErrorMsg(null);
@@ -159,10 +180,30 @@ export const JourneyFormModal: React.FC<JourneyFormModalProps> = ({
     setSelectedPostIds(nextList);
   };
 
+  const handleStatusChange = (newStatus: string) => {
+    setStatus(newStatus);
+    if (newStatus === 'scheduled' && !scheduledPublishAt) {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      tomorrow.setMinutes(0);
+      tomorrow.setSeconds(0);
+      const yyyy = tomorrow.getFullYear();
+      const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+      const dd = String(tomorrow.getDate()).padStart(2, '0');
+      const hh = String(tomorrow.getHours()).padStart(2, '0');
+      const min = String(tomorrow.getMinutes()).padStart(2, '0');
+      setScheduledPublishAt(`${yyyy}-${mm}-${dd}T${hh}:${min}`);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!titleEn.trim() || !titleVi.trim()) {
       setErrorMsg('Vui lòng nhập đầy đủ tiêu đề tiếng Anh và tiếng Việt.');
+      return;
+    }
+
+    if (status === 'scheduled' && !scheduledPublishAt) {
+      setErrorMsg('Vui lòng chọn thời gian lên lịch xuất bản tự động.');
       return;
     }
 
@@ -179,6 +220,7 @@ export const JourneyFormModal: React.FC<JourneyFormModalProps> = ({
       description: description.trim(),
       imageUrl: imageUrl.trim() || undefined,
       status,
+      scheduledPublishAt: status === 'scheduled' && scheduledPublishAt ? scheduledPublishAt : undefined,
       chapterPostIds: selectedPostIds,
     };
 
@@ -341,24 +383,15 @@ export const JourneyFormModal: React.FC<JourneyFormModalProps> = ({
             </select>
           </div>
 
-          <div className="space-y-1.5 md:col-span-2">
-            <label className="text-xs font-bold text-text-body dark:text-warm-ivory">
-              Ảnh bìa Hành trình (Image URL)
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://... hoặc /images/series/..."
-                className="flex-1 px-3.5 py-2.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/50 dark:bg-white/5 text-sm focus:outline-none focus:ring-2 focus:ring-antique-gold"
-              />
-              {imageUrl && (
-                <div className="w-11 h-10 rounded-xl overflow-hidden border border-antique-gold/30 shrink-0 bg-stone-200">
-                  <img src={imageUrl} alt="" className="w-full h-full object-cover" />
-                </div>
-              )}
-            </div>
+          <div className="md:col-span-2">
+            <HeritageImageUploader
+              label="Ảnh bìa Hành trình (Image URL)"
+              value={imageUrl}
+              onChange={setImageUrl}
+              folder="journeys"
+              helperText="Hỗ trợ JPG, PNG, WebP, AVIF, GIF dưới 5MB. Có thể kéo thả hoặc dán ảnh (Ctrl+V)."
+              aspectRatio="video"
+            />
           </div>
 
           <div className="space-y-1.5 md:col-span-2">
@@ -380,7 +413,7 @@ export const JourneyFormModal: React.FC<JourneyFormModalProps> = ({
             </label>
             <select
               value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              onChange={(e) => handleStatusChange(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/50 dark:bg-white/5 text-sm focus:outline-none focus:ring-2 focus:ring-antique-gold"
             >
               {STATUS_OPTIONS.map((opt) => (
@@ -390,6 +423,27 @@ export const JourneyFormModal: React.FC<JourneyFormModalProps> = ({
               ))}
             </select>
           </div>
+
+          {status === 'scheduled' && (
+            <div className="space-y-1.5 md:col-span-2 p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/30 border border-purple-300 dark:border-purple-800/60">
+              <label className="text-xs font-bold text-purple-900 dark:text-purple-200 flex items-center gap-1.5">
+                <Clock aria-hidden="true" className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <span>Thời gian tự động xuất bản (Scheduled Publish Time) *</span>
+              </label>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                <input
+                  type="datetime-local"
+                  value={scheduledPublishAt}
+                  onChange={(e) => setScheduledPublishAt(e.target.value)}
+                  className="px-3.5 py-2 rounded-xl border border-purple-300/60 bg-white dark:bg-stone-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-purple-400 text-text-body dark:text-warm-ivory"
+                  required={status === 'scheduled'}
+                />
+                <span className="text-[11px] text-text-muted">
+                  Hành trình sẽ được cron tự động chuyển sang "Đã xuất bản" khi đến giờ này.
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── Quản lý các Chặng bài đọc (Chapters Management) ─────────────── */}

@@ -46,6 +46,7 @@ import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 import { AdminDialog } from './AdminDialog';
 import { adminTopicLabel } from '../admin-presentation';
 import { PostPreviewCanvas } from './PostPreviewCanvas';
+import { HeritageImageUploader } from './HeritageImageUploader';
 
 interface PostFormModalProps {
   isOpen: boolean;
@@ -1053,18 +1054,14 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 </div>
 
                 {/* Image URL */}
-                <div>
-                  <label className="block text-xs font-bold text-text-body dark:text-warm-ivory mb-1">
-                    Cover image URL
-                  </label>
-                  <input aria-label="Cover image URL"
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/70 border border-antique-gold/40 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-                  />
-                </div>
+                <HeritageImageUploader
+                  label="Cover image URL"
+                  value={imageUrl}
+                  onChange={setImageUrl}
+                  folder="posts"
+                  helperText="Hỗ trợ JPG, PNG, WebP, AVIF, GIF dưới 5MB. Kéo thả hoặc dán ảnh (Ctrl+V)."
+                  aspectRatio="video"
+                />
 
                 {/* Audio URL */}
                 <div>

@@ -107,13 +107,15 @@ export interface LearningJourneyPayload {
   region: 'north' | 'central' | 'south' | string;
   description?: string;
   imageUrl?: string;
-  status?: 'published' | 'draft' | 'upcoming' | string;
+  status?: 'published' | 'draft' | 'upcoming' | 'scheduled' | string;
+  scheduledPublishAt?: string;
   chapterPostIds?: string[];
 }
 
 export interface LearningJourneyItem extends LearningJourneyPayload {
   id: string;
   createdAt?: string;
+  scheduledPublishAt?: string;
   chapters?: JourneyChapterSummary[];
 }
 

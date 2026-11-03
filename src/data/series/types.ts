@@ -2,7 +2,7 @@ import type { ReaderArticleData } from '@/features/reader/services/readerApiServ
 
 export type SeriesTheme = 'cuisine' | 'places' | 'crafts' | 'festivals' | 'history';
 export type SeriesRegion = 'north' | 'central' | 'south';
-export type SeriesStatus = 'published' | 'draft' | 'upcoming';
+export type SeriesStatus = 'published' | 'draft' | 'upcoming' | 'scheduled';
 
 export interface SeriesChapterMeta {
   id: string;
@@ -25,6 +25,7 @@ export interface SeriesMetadata {
   description: string;
   imageUrl: string;
   status: SeriesStatus;
+  scheduledPublishAt?: string;
   chapters: SeriesChapterMeta[];
 }
 
