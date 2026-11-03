@@ -1,4 +1,4 @@
-import { BookOpen, Landmark, UtensilsCrossed, Palette, Mountain, Feather, type LucideIcon } from "lucide-react";
+import { BookOpen, Landmark, UtensilsCrossed, Palette, Mountain, Feather, BookmarkCheck, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface DictionaryCategoryFilterProps {
@@ -7,7 +7,15 @@ interface DictionaryCategoryFilterProps {
   onSelectCategory: (category: string) => void;
 }
 
-const CATEGORY_ICONS: Record<string, LucideIcon> = { All: BookOpen, Heritage: Landmark, Cuisine: UtensilsCrossed, Crafts: Palette, Nature: Mountain, Folklore: Feather };
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  All: BookOpen,
+  MyVocab: BookmarkCheck,
+  Heritage: Landmark,
+  Cuisine: UtensilsCrossed,
+  Crafts: Palette,
+  Nature: Mountain,
+  Folklore: Feather,
+};
 
 export function DictionaryCategoryFilter({ categories, selectedCategory, onSelectCategory }: DictionaryCategoryFilterProps) {
   const { t } = useTranslation('flashcards');

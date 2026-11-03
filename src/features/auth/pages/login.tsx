@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { BrandLogo } from '@/components/BrandLogo';
-import { PATHS } from '@/routes/paths';
+import { PATHS, getLocalizedPath } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import { authService, backendAuthService, type AuthResult } from '@/services/authService';
 import { localAuthService } from '@/services/localAuthService';
@@ -42,11 +42,15 @@ const readAuthLanguage = (): AppLanguage => {
 };
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
+  const { lang: routeLang } = useParams<{ lang?: string }>();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const requestedTab = searchParams.get('tab') === 'register' || searchParams.get('mode') === 'register' ? 'register' : 'login';
 
-  const [language, setAuthLanguage] = useState<AppLanguage>(readAuthLanguage);
+  const [language, setAuthLanguage] = useState<AppLanguage>(() => {
+    if (routeLang === 'vi' || routeLang === 'en') return routeLang;
+    return readAuthLanguage();
+  });
   const [authTab, setAuthTab] = useState<'login' | 'register'>(requestedTab);
   const [registerStep, setRegisterStep] = useState<'form' | 'otp'>('form');
   const [email, setEmail] = useState('');
@@ -72,7 +76,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const hasGoogleLogin = !!googleClientId;
 
   const readableError = (error: unknown, fallback: string) =>
-    language === 'vi' && error instanceof Error ? error.message : fallback;
+    error instanceof Error ? error.message : fallback;
 
   useEffect(() => {
     if (languageSynced.current) return;
@@ -88,6 +92,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     } catch {
       // The current page still switches language when storage is unavailable.
     }
+    const currentPath = location.pathname.replace(/^\/(vi|en)(\/|$)/, '/');
+    const nextPath = '/' + nextLanguage + (currentPath === '/' ? '' : currentPath) + location.search + location.hash;
+    window.history.replaceState(null, '', nextPath);
     setErrorMessage(null);
     setSuccessMessage(null);
   };
@@ -108,9 +115,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     }
     const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
     if (redirectUrl?.startsWith('/') && !redirectUrl.startsWith('//')) {
-      window.location.href = redirectUrl;
+      window.location.href = getLocalizedPath(redirectUrl, language);
     } else {
-      navigate(PATHS.home);
+      navigate(getLocalizedPath(PATHS.home, language));
     }
   };
 
@@ -458,7 +465,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                         <span>{copy.googleLoading}</span>
                       </div>
                     ) : (
-                      <GoogleOAuthProvider key={language} clientId={googleClientId} locale={language}>
+                      <GoogleOAuthProvider clientId={googleClientId} locale={language}>
                         <GoogleLogin
                           onSuccess={(response) =>
                             response.credential
@@ -470,7 +477,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                           shape="rectangular"
                           size="large"
                           text="continue_with"
-                          width="100%"
+                          width="380"
                         />
                       </GoogleOAuthProvider>
                     )}
@@ -653,3 +660,4 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 };
 
 export default LoginPage;
+

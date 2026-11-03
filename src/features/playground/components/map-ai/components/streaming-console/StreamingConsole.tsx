@@ -32,6 +32,7 @@ import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 import { useSearchParams } from 'react-router-dom';
 import { companionService } from '@/services/companionService';
 import type { CompanionChatMessage } from '@/types/companion';
+import { getConversationSuggestions } from '../../lib/conversation-suggestions';
 
 
 export interface VieCultureArticleItem {
@@ -92,7 +93,7 @@ export default function StreamingConsole() {
   const { t } = useTranslation('playground');
   const {
     activeView, connected, sendMessage, changeLevel, connecting, ending,
-    isSending, isRestoringContext, isAwaitingResponse, resetConversation,
+    isSending, isRestoringContext, isAwaitingResponse, connectionError, ended, resetConversation,
   } = useLiveAPIContext();
   const active = activeView === 'chat';
   const busy = !active || connecting || ending || isSending || isRestoringContext;
@@ -218,6 +219,11 @@ export default function StreamingConsole() {
     { text: 'I have an idea to write. Help me express it clearly in English.', label: 'Write together' },
   ];
   const quickActions = tutorMode === 'open-conversation' ? freeTalkActions : conversationActions;
+  const followUps = React.useMemo(() => tutorMode === 'guided-lesson' ? []
+    : getConversationSuggestions(tutorMode, Boolean(readerContext || selectedArticle), turns),
+  [tutorMode, readerContext, selectedArticle, turns]);
+  const showFollowUps = active && !busy && !ended && !isAwaitingResponse && !isAwaitingFunctionResponse
+    && !connectionError && !(connected && tutorMode === 'free-conversation' && selectedStoryId !== sessionStoryIdRef.current);
   const imagePreviewAlt = t('playground.tray_controls.image_preview');
 
   const handleModeChange = (mode: typeof tutorMode) => {
@@ -465,19 +471,20 @@ export default function StreamingConsole() {
             )}
 
             {/* In-chat Suggested Follow-ups */}
-            <div className="pt-2 flex flex-wrap gap-1.5">
-              {quickActions.slice(0, 3).map((action, idx) => (
+            {showFollowUps && followUps.length > 0 && <div className="pt-2 flex flex-wrap gap-1.5">
+              {followUps.map(action => (
                 <button
-                  key={idx}
+                  type="button"
+                  key={action.id}
                   disabled={busy}
-                  onClick={() => handleSendPrompt(action.text)}
+                  onClick={() => void handleSendPrompt(action.text)}
                   className="ai-chat-suggestion px-2.5 py-1 rounded-full border text-xs transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <Compass className="w-3 h-3" />
-                  <span>{action.label}</span>
+                  <span>{t(`playground.workspace.follow_ups.${action.id}`)}</span>
                 </button>
               ))}
-            </div>
+            </div>}
           </>
         )}
       </div>

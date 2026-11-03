@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Plus, X } from 'lucide-react';
+import { savePersonalWord } from '@/services/learning/learningStorage';
 
 interface AddWordModalProps {
   isOpen: boolean;
@@ -21,12 +22,22 @@ export function AddWordModal({ isOpen, onClose, studyStyle = false, className = 
       alert(t('add_word_modal.validation_alert', 'Enter the English word and Vietnamese meaning.'));
       return;
     }
-    // Keep the existing quick-add behavior; persistence is outside this UI change.
-    alert(t('add_word_modal.success_alert', { word, meaning, defaultValue: `Added "${word}" (${meaning}) to your vocabulary library!` }));
-    setWord('');
-    setMeaning('');
-    setContext('');
-    onClose();
+
+    const saved = savePersonalWord({
+      word: word.trim(),
+      viMeaning: meaning.trim(),
+      contextSentence: context.trim(),
+    });
+
+    if (saved) {
+      alert(t('add_word_modal.success_alert', { word, meaning, defaultValue: `Added "${word}" (${meaning}) to your vocabulary library!` }));
+      setWord('');
+      setMeaning('');
+      setContext('');
+      onClose();
+    } else {
+      alert(t('add_word_modal.error_alert', 'Could not save vocabulary to storage. Please try again.'));
+    }
   };
 
   return (

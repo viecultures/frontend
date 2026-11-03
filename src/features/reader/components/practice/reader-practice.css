@@ -72,6 +72,158 @@
 .rp-workspace button.ink-underline { border: 0; border-bottom: 1px dotted var(--desk-gold); }
 .rp-workspace :is(button, input, textarea) { scroll-margin-top: calc(var(--reader-toolbar-offset, 74px) + 78px); }
 .reader-workspace-switch { font-size: 15px; text-decoration: underline; text-underline-offset: 4px; min-height: 44px; white-space: nowrap; color: var(--desk-ink); }
+
+/* Gộp Header Gọn: Back to reading · Tên bài · Level */
+.rp-compact-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-heritage-green) 12%, transparent);
+}
+.rp-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  color: var(--color-ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  min-height: auto;
+}
+.rp-back-link:hover {
+  color: var(--color-heritage-green);
+  background: color-mix(in srgb, var(--color-heritage-green) 6%, transparent);
+}
+.rp-header-sep {
+  color: var(--color-ink-soft);
+  opacity: 0.6;
+  font-weight: 700;
+}
+.rp-compact-story-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-heritage-green);
+  margin: 0;
+}
+.rp-compact-level-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--color-antique-gold) 65%, #000000);
+  background: color-mix(in srgb, var(--color-antique-gold) 20%, #FFFFFF);
+  border: 1px solid color-mix(in srgb, var(--color-antique-gold) 40%, transparent);
+  padding: 2px 10px;
+  border-radius: 999px;
+  margin-left: auto;
+}
+
+/* Breadcrumb & Header Card matching Heritage Mockup */
+.rp-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  margin-bottom: 8px;
+}
+.rp-breadcrumb a,
+.rp-breadcrumb button {
+  color: var(--color-ink-soft);
+  background: transparent;
+  border: none;
+  padding: 0;
+  min-height: auto;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.rp-breadcrumb a:hover,
+.rp-breadcrumb button:hover {
+  color: var(--color-heritage-green);
+  text-decoration: underline;
+}
+.rp-header-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+.rp-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.rp-title-row h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  color: var(--color-heritage-green);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.rp-level-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--color-antique-gold) 60%, #000000);
+  background: color-mix(in srgb, var(--color-antique-gold) 20%, #FFFFFF);
+  border: 1px solid color-mix(in srgb, var(--color-antique-gold) 35%, transparent);
+  padding: 3px 12px;
+  border-radius: 999px;
+}
+.rp-story-subtitle {
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  margin: 0;
+}
+
+/* Horizontal Centered Mode Tabs (Compact) */
+.rp-mode-tabs-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.rp-mode-tabs {
+  display: inline-flex;
+  background: color-mix(in srgb, var(--color-warm-ivory) 80%, #FFFFFF);
+  border: 1px solid color-mix(in srgb, var(--color-heritage-green) 15%, transparent);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-heritage-green) 4%, transparent);
+}
+.rp-mode-tab {
+  padding: 8px 24px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: auto;
+}
+.rp-mode-tab:hover {
+  background: color-mix(in srgb, var(--color-heritage-green) 6%, transparent);
+}
+.rp-mode-tab[aria-selected="true"] {
+  background: var(--color-heritage-green);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-heritage-green) 25%, transparent);
+}
+.rp-mode-tab[aria-selected="true"]:hover {
+  background: var(--color-heritage-dark);
+}
 @media (max-width: 1000px) { .rp-grid { grid-template-columns: minmax(0, 1.25fr) minmax(290px, 1fr); gap: 18px; } .rp-activity { padding: 20px; } }
 @media (max-width: 767px) {
   .rp-heading { flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }

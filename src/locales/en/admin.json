@@ -9,9 +9,33 @@
     "refresh_overview": "Refresh overview"
   },
   "tabs": {
+    "content": "Content Management",
     "posts": "Articles",
-    "users": "Users",
+    "journeys": "Learning Journeys",
+    "vocabularies": "Vocabulary & Terms",
+    "users": "Users CRM",
     "overview": "Overview"
+  },
+  "content_management": {
+    "title": "Content Management",
+    "subtitle": "Curate cultural reading articles, heritage learning journeys, and specialized vocabulary.",
+    "subtabs": {
+      "posts": "Articles",
+      "journeys": "Learning Journeys",
+      "vocabularies": "Vocabulary & Terms"
+    }
+  },
+  "vocabularies": {
+    "title": "System Vocabulary & Terms",
+    "subtitle": "Manage cultural terminology, bilingual definitions, pronunciations, and CEFR proficiency levels.",
+    "search_placeholder": "Search vocabulary or definitions...",
+    "all_levels": "All CEFR levels",
+    "total_vocab": "Total vocabulary items",
+    "cached_vocab": "Cached dictionary entries",
+    "audio_vocab": "Audio pronunciations available",
+    "cefr_coverage": "CEFR proficiency scale",
+    "empty_title": "No vocabulary items match your filters.",
+    "empty_desc": "Please adjust your search keywords or select a different CEFR proficiency level."
   },
   "stats": {
     "articles_in_view": "Articles in view",
@@ -51,7 +75,7 @@
     "col_region": "Region",
     "col_level": "Level",
     "col_category": "Category",
-    "col_content": "Content",
+    "col_content": "Material readiness",
     "col_reads": "Reads",
     "col_actions": "Actions",
     "words_count": "{{count}} words",
@@ -60,7 +84,111 @@
     "vocab_items": "{{count}} vocabulary items",
     "preview_action": "Preview article",
     "edit_action": "Edit article",
-    "delete_action": "Delete article"
+    "delete_action": "Delete article",
+    "status_filter": {
+      "label": "Article status",
+      "all": "All statuses",
+      "published": "Published",
+      "draft": "Draft",
+      "missing_materials": "Missing materials"
+    },
+    "readiness": {
+      "reading": "Reading",
+      "reading_ready": "{{count}} pairs",
+      "reading_empty": "No pairs",
+      "vocab": "Vocabulary",
+      "vocab_count": "{{count}} words",
+      "audio": "Audio TTS",
+      "audio_ready": "Audio ready",
+      "audio_empty": "No audio",
+      "quiz": "Quiz",
+      "quiz_count": "{{count}} quiz"
+    },
+    "guardrails": {
+      "publish_locked": "Must add at least one bilingual paragraph pair before publishing",
+      "publish_action": "Publish",
+      "published_badge": "Published",
+      "draft_badge": "Draft"
+    }
+  },
+  "users": {
+    "stats": {
+      "registered": "Registered users",
+      "registered_desc": "Learner and administrator accounts",
+      "active_on_page": "Enabled on this page",
+      "active_on_page_desc": "Accounts with active access",
+      "admins_on_page": "Administrators on this page",
+      "admins_on_page_desc": "Accounts with administrator access"
+    },
+    "filter_groups": {
+      "all": "All learners",
+      "recent_7d": "New registered (7 days)",
+      "inactive": "No study progress",
+      "active": "Active",
+      "admin": "Administrators"
+    },
+    "filters": {
+      "search_placeholder": "Search names or email addresses…",
+      "search_button": "Search",
+      "all_roles": "All roles",
+      "role_admin": "Administrator",
+      "role_user": "Learner",
+      "all_statuses": "All statuses",
+      "status_enabled": "Enabled",
+      "status_disabled": "Disabled",
+      "per_page": "{{count}} per page",
+      "clear_filters": "Clear filters",
+      "refresh": "Refresh",
+      "export_csv": "Export users (CSV)",
+      "exporting_csv": "Exporting CSV…"
+    },
+    "columns": {
+      "user": "Users",
+      "role": "Role",
+      "cefr": "CEFR level",
+      "saved_words": "Saved words",
+      "joined": "Joined",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "disable_account": "Disable account",
+      "enable_account": "Enable account",
+      "cannot_disable_self": "You cannot disable your own administrator account",
+      "you": "You"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "learner": "Learner",
+      "change_role": "Change role",
+      "not_set": "Not set"
+    },
+    "messages": {
+      "loading": "Loading users…",
+      "unavailable_title": "Users unavailable",
+      "unavailable_desc": "We could not load the user list. Please try again.",
+      "empty_title": "No users found",
+      "empty_desc": "No accounts match the current filters. Try a different search.",
+      "try_again": "Try again",
+      "export_success": "User list exported to CSV successfully.",
+      "export_error": "Unable to export CSV. Please try again."
+    },
+    "pagination": {
+      "page_info": "Page {{current}} / {{total}} (Total {{count}} users)",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "role_modal": {
+      "title": "Update account role",
+      "user_label": "User",
+      "role_label": "New role",
+      "admin_warning": "Granting administrator access gives this account full access to system management and content.",
+      "cancel": "Cancel",
+      "confirm": "Save changes",
+      "updating": "Saving…"
+    }
   },
   "preview_dialog": {
     "title": "Article preview",
@@ -83,4 +211,3 @@
     "post_saved": "Article saved."
   }
 }
-

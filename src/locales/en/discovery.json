@@ -1,4 +1,4 @@
-{
+﻿{
   "page": {
     "title": "Stories from Vietnam",
     "lead": "Explore available Vietnamese cultural stories with bilingual reading and audio.",
@@ -77,6 +77,8 @@
     "series_count": "{{count}} series",
     "upcoming_series": "Upcoming series",
     "coming_soon": "Coming soon",
+    "pagination_available_aria": "Available series pagination",
+    "pagination_upcoming_aria": "Upcoming series pagination",
     "no_published_series": "No published series in your first region yet.",
     "choose_first_to_see": "Choose a first region to see its published series.",
     "explore_chapters": "Explore chapters",

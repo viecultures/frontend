@@ -6,6 +6,7 @@ import { fileURLToPath, URL } from "node:url";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const port = env.VITE_PORT || env.PORT ? parseInt(env.VITE_PORT || env.PORT, 10) : undefined;
+  const backendTarget = env.VITE_API_BASE_URL || (env.VITE_BACKEND_PORT ? `http://localhost:${env.VITE_BACKEND_PORT}` : 'http://localhost:8080');
 
   return {
     base: process.env.VITE_BASE_PATH || "/",
@@ -17,6 +18,13 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       ...(port ? { port } : {}),
+      proxy: {
+        '/api': {
+          target: backendTarget,
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
     build: {
       chunkSizeWarningLimit: 800,

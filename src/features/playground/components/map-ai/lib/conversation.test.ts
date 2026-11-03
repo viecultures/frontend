@@ -16,7 +16,8 @@ test('conversation excludes guided instructions and retains current on-demand la
   assert.ok(!prompt.includes('MUST CALL loadLessonDiscussionPlan'));
   assert.ok(prompt.includes('asks to locate, explore or show a place'));
   assert.ok(prompt.includes('when focusing on a specific landmark'));
-  assert.ok(prompt.includes('Do not correct mistakes unless'));
+  assert.ok(prompt.includes('Do not correct language mistakes unless the learner explicitly asks'));
+  assert.ok(prompt.includes('TURN INTENT: Infer the purpose of each learner turn'));
   assert.ok(prompt.includes('ACTIVE LEVEL: Level 1'));
 });
 

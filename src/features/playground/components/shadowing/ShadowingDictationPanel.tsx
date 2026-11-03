@@ -1,48 +1,145 @@
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Check, Eye, Lightbulb, Play, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
-import { dictationApiService, generateHintScaffold } from '../../services/dictationService';
-import type { DictationCheckResult } from '../../services/dictationService';
+import { useState, useCallback } from 'react';
+import { Check } from 'lucide-react';
 import type { ShadowingLesson } from '../../types/shadowing';
-import { formatTime } from '../../lib/shadowing-lesson';
+import { LetterRevealBoard } from './LetterRevealBoard';
+import './dictation-reveal.css';
 
-interface Props { lesson: ShadowingLesson; ready: boolean; onSample(start: number, end: number): void; onStop(): void }
+interface Props {
+  lesson: ShadowingLesson;
+  ready: boolean;
+  onSample(start: number, end: number): void;
+  onStop(): void;
+}
+
 export function ShadowingDictationPanel({ lesson, ready, onSample, onStop }: Props) {
-  const { t } = useTranslation('playground');
-  const [index, setIndex] = useState(0), [text, setText] = useState(''), [hint, setHint] = useState(false), [answer, setAnswer] = useState(false);
-  const [result, setResult] = useState<DictationCheckResult | null>(null), [checking, setChecking] = useState(false), [query, setQuery] = useState('');
-  const [copyStatus, setCopyStatus] = useState('');
-  const generation = useRef(0);
+  const [index, setIndex] = useState(0);
+  const [speed, setSpeed] = useState(1);
+  const [completedPassages, setCompletedPassages] = useState<Set<number>>(new Set());
+
   const sentence = lesson.sentences[index] ?? lesson.sentences[0];
-  useEffect(() => { ++generation.current; setText(''); setHint(false); setAnswer(false); setResult(null); setChecking(false); return () => { ++generation.current; }; }, [sentence.id]);
-  const check = async () => {
-    const current = ++generation.current; setChecking(true);
-    const result = await dictationApiService.evaluateDictation(sentence.id, text, sentence.text);
-    if (generation.current === current) { setResult(result); setChecking(false); }
-  };
-  const copy = async () => {
-    try { await navigator.clipboard.writeText(lesson.sentences.map(s => `[${formatTime(s.start)}] ${s.text}`).join('\n')); setCopyStatus(t('playground.shadowing.dictation.copied_success')); }
-    catch { setCopyStatus(t('playground.shadowing.dictation.copy_failed')); }
-  };
-  const move = (next: number) => { onStop(); setIndex(next); };
-  const feedback = !result ? '' : result.accuracy >= 98 ? t('playground.shadowing.dictation.fb_perfect')
-    : result.accuracy >= 80 ? t('playground.shadowing.dictation.fb_high')
-    : result.accuracy >= 50 ? t('playground.shadowing.dictation.fb_medium') : t('playground.shadowing.dictation.fb_low');
-  return <section className="sh-panel sh-learning-panel" aria-label={t('playground.shadowing.screen.aria_dictation_practice')}>
-    <header className="sh-learning-heading"><span className="sh-eyebrow">{t('playground.shadowing.dictation.eyebrow')}</span><h3>{t('playground.shadowing.dictation.title')}</h3><p>{t('playground.shadowing.dictation.desc')}</p></header>
-    <div className="sh-step-caption"><span>{t('playground.shadowing.dictation.sentence_step', { current: index + 1, total: lesson.sentences.length })}</span><span className="sh-time">{formatTime(sentence.start)}–{formatTime(sentence.start + sentence.duration)}</span></div>
-    <div className="sh-dictation-prompt"><button className="sh-btn" disabled={!ready} onClick={() => onSample(sentence.start, sentence.start + sentence.duration)}><Play size={16} /> {t('playground.shadowing.dictation.listen_btn')}</button><p>{t('playground.shadowing.dictation.listen_hint')}</p></div>
-    <label className="sh-eyebrow" htmlFor="dictation-answer">{t('playground.shadowing.dictation.your_answer')}</label>
-    <textarea id="dictation-answer" className="sh-input sh-answer-input" rows={5} aria-label={t('playground.shadowing.dictation.answer_aria')} value={text} onChange={event => setText(event.target.value)} placeholder={t('playground.shadowing.dictation.answer_placeholder')} />
-    <div className="sh-row sh-between sh-dictation-actions"><div className="sh-row"><button className="sh-btn sh-quiet" aria-pressed={hint} onClick={() => setHint(value => !value)}><Lightbulb size={14} /> {t('playground.shadowing.dictation.hint_btn')}</button><button className="sh-btn sh-quiet" aria-pressed={answer} onClick={() => setAnswer(value => !value)}><Eye size={14} /> {t('playground.shadowing.dictation.answer_btn')}</button></div><button className="sh-btn sh-primary" disabled={!text.trim() || checking} onClick={check}><Check size={14} /> {checking ? t('playground.shadowing.dictation.checking_btn') : t('playground.shadowing.dictation.check_btn')}</button></div>
-    {hint && <div className="sh-notice" role="status"><span className="sh-eyebrow">{t('playground.shadowing.dictation.word_hint')}</span><p>{generateHintScaffold(sentence.text)}</p></div>}
-    {answer && <div className="sh-notice"><span className="sh-eyebrow">{t('playground.shadowing.dictation.original_sentence')}</span><p>{sentence.text}</p></div>}
-    {result && <div className="sh-notice sh-dictation-result" role="status"><h3>{t('playground.shadowing.dictation.word_match', { accuracy: result.accuracy })}</h3><p>{feedback}</p><p className="sh-diff">{result.diff.map((token, i) => <span key={i} className={`sh-diff-${token.status}`} title={token.status === 'correct' ? 'Matched' : `${token.status}${token.expected ? `: ${token.expected}` : ''}`}>{token.status === 'missing' ? `[Missing: ${token.expected ?? token.word}]` : token.word}{' '}</span>)}</p></div>}
-    <div className="sh-row sh-between sh-sentence-navigation"><button aria-label={t('playground.shadowing.dictation.prev_btn')} className="sh-btn sh-quiet" disabled={index === 0} onClick={() => move(index - 1)}><ChevronLeft size={14} /> {t('playground.shadowing.dictation.prev_btn')}</button><button aria-label={t('playground.shadowing.dictation.next_btn')} className="sh-btn sh-quiet" disabled={index === lesson.sentences.length - 1} onClick={() => move(index + 1)}>{t('playground.shadowing.dictation.next_btn')} <ChevronRight size={14} /></button></div>
-    <details className="sh-disclosure"><summary>{t('playground.shadowing.dictation.browse_transcript')} <span>{t('playground.shadowing.dictation.sentences_count', { count: lesson.sentences.length })}</span></summary><div className="sh-transcript-tools"><input className="sh-input" placeholder={t('playground.shadowing.dictation.search_placeholder')} aria-label={t('playground.shadowing.dictation.search_aria')} value={query} onChange={event => setQuery(event.target.value)} />
-      <div className="sh-sentence-list">{lesson.sentences.map((item, itemIndex) => item.text.toLowerCase().includes(query.toLowerCase()) && <button key={item.id} className={`sh-sentence ${item.id === sentence.id ? 'sh-selected' : ''}`} aria-current={item.id === sentence.id ? 'step' : undefined} onClick={() => move(itemIndex)}><span>{t('playground.shadowing.dictation.sentence_step', { current: itemIndex + 1, total: lesson.sentences.length })} · {formatTime(item.start)}</span><small>{answer ? item.text : t('playground.shadowing.dictation.unrevealed_sentence')}</small></button>)}</div>
-      {!lesson.sentences.some(item => item.text.toLowerCase().includes(query.toLowerCase())) && <p role="status">{t('playground.shadowing.dictation.no_matching')}</p>}
-      <button className="sh-btn sh-quiet" onClick={copy}><Copy size={14} /> {t('playground.shadowing.dictation.copy_btn')}</button>{copyStatus && <p role="status">{copyStatus}</p>}
-    </div></details>
-  </section>;
+
+  const move = useCallback((next: number) => {
+    onStop();
+    setIndex(next);
+  }, [onStop]);
+
+  const handlePlaySample = useCallback(() => {
+    if (!ready || !sentence) return;
+    onSample(sentence.start, sentence.start + sentence.duration);
+  }, [ready, sentence, onSample]);
+
+  const handleNextPassage = useCallback(() => {
+    // Mark current passage as completed in session
+    setCompletedPassages((prev) => new Set(prev).add(index));
+
+    if (index < lesson.sentences.length - 1) {
+      move(index + 1);
+    }
+  }, [index, lesson.sentences.length, move]);
+
+  const totalPassages = lesson.sentences.length;
+  const sessionProgress = totalPassages > 0
+    ? Math.round((completedPassages.size / totalPassages) * 100)
+    : 0;
+
+  return (
+    <section className="vc-dictation-workspace" aria-label="Luyện tập chép chính tả Dictation">
+      <div className="vc-dictation-columns">
+        {/* Main Practice Board (Left) */}
+        {sentence && (
+          <LetterRevealBoard
+            key={sentence.id}
+            sentenceId={sentence.id}
+            sentenceText={sentence.text}
+            passageIndex={index}
+            totalPassages={totalPassages}
+            onPlaySample={handlePlaySample}
+            onRepeatSample={handlePlaySample}
+            onNextPassage={handleNextPassage}
+            onSpeedChange={setSpeed}
+            currentSpeed={speed}
+          />
+        )}
+
+        {/* Sidebar Status & Passage Directory (Right) */}
+        <aside className="vc-dictation-sidebar">
+          {/* Session Overview Card */}
+          <div className="vc-dictation-side-card">
+            <div className="vc-dictation-side-heading">
+              <span>Your session</span>
+              <span>
+                {completedPassages.size} / {totalPassages} completed
+              </span>
+            </div>
+            <div className="vc-dictation-track-rail">
+              <div
+                className="vc-dictation-track-fill"
+                style={{ width: `${sessionProgress}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Passages List Card */}
+          <div className="vc-dictation-side-card">
+            <div className="vc-dictation-side-heading">
+              <span>Passages</span>
+            </div>
+            <div className="vc-dictation-passages-list">
+              {lesson.sentences.map((item, idx) => {
+                const isDone = completedPassages.has(idx);
+                const isCurrent = idx === index;
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`vc-dictation-passage-item ${isCurrent ? 'active' : ''}`}
+                    onClick={() => move(idx)}
+                    aria-current={isCurrent ? 'step' : undefined}
+                  >
+                    <div>
+                      <span className="vc-dictation-passage-num">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                      <span>
+                        {isDone ? 'Completed' : isCurrent ? 'Now practicing' : 'Not started'}
+                      </span>
+                    </div>
+
+                    {isDone ? (
+                      <span className="vc-dictation-passage-badge-status completed">
+                        <Check size={12} />
+                        <span>Completed</span>
+                      </span>
+                    ) : isCurrent ? (
+                      <span className="vc-dictation-passage-badge-status active">
+                        Now practicing
+                      </span>
+                    ) : (
+                      <span className="vc-dictation-passage-badge-status pending">
+                        Not started
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Mascot Encouragement Card */}
+          <div className="vc-dictation-mascot-card">
+            <img
+              src="/brand/viecultures-mascot-logo.png"
+              alt="Rùa Nón Lá VieCultures"
+              className="vc-dictation-mascot-img"
+            />
+            <div className="vc-dictation-mascot-bubble">
+              <div>Listen again.</div>
+              <div style={{ fontWeight: 400, opacity: 0.85 }}>You've got this.</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  );
 }
