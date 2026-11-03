@@ -8,6 +8,7 @@ import { useSettings, useTools } from './state';
 import { dispatchTool, type ToolContext } from './tools/tool-dispatcher';
 import { buildSessionConfiguration } from './session-config';
 import { ChatArticleDetail } from '../components/ChatArticleDetail';
+import i18n from '@/lib/i18n';
 
 const chat: ToolContext = { view: 'chat', tutorMode: 'free-conversation', allowMapTools: true };
 
@@ -44,7 +45,7 @@ test('article search keeps the panel closed, explicit article tool opens bilingu
   const markup = renderToStaticMarkup(createElement(ChatArticleDetail, { articleId, onShowMap: () => {} }));
   assert.ok(markup.includes('lang="en"'));
   assert.ok(markup.includes('lang="vi"'));
-  assert.ok(markup.includes('Bilingual introduction'));
+  assert.ok(markup.includes(i18n.t('playground:playground.chat_article.aria_bilingual_intro')));
   assert.ok(markup.includes('article=ha-long-bay'));
   useChatWorkspace.getState().closePanel();
   assert.equal(useChatWorkspace.getState().panel, null);

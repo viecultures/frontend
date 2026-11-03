@@ -6,11 +6,8 @@ import { buildResumeHistory } from './conversation-history';
 import { useLogStore } from './conversation-state';
 import { PROFICIENCY_LEVELS } from './prompt-scaffolder';
 import { useSettings, type CulturalTutorMode } from './state';
-import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 import { useChatWorkspace } from './chat-workspace';
-import { useMapStore } from './map-state';
 import { useImagePreviewStore } from './image-previews';
-import { companionService } from '@/services/companionService';
 
 export type ActiveView = 'chat' | 'immersive' | null;
 export type ActionResult = { status: 'ok' | 'busy' | 'inactive' | 'cancelled' | 'error'; message?: string; turnId?: string };
@@ -18,6 +15,7 @@ export type MessageSource = 'composer' | 'suggestion' | 'map';
 export type InputMode = 'voice' | 'text';
 export interface SessionSnapshot extends AudioState {
   connectionStatus: 'idle' | 'connecting' | 'connected' | 'ending' | 'error';
+  ended: boolean;
   activeView: ActiveView;
   connectionError: string | null;
   pendingPrompt: string;
@@ -40,7 +38,7 @@ interface Request { input: InputMode; text?: string; source?: MessageSource }
 /** Testable owner of one connection. UI only subscribes and invokes actions. */
 export class SessionController {
   private state: SessionSnapshot = {
-    connectionStatus: 'idle', activeView: null, connectionError: null, pendingPrompt: '',
+    connectionStatus: 'idle', ended: false, activeView: null, connectionError: null, pendingPrompt: '',
     isSending: false, isRestoringContext: false, isAwaitingResponse: false,
     recording: false, isPlaying: false, inputVolume: 0, volume: 0,
   };
@@ -211,7 +209,7 @@ export class SessionController {
     this.responseInFlight = false;
     this.sessionPolicy = null;
     this.liveConnected = false;
-    this.patch({ connectionStatus: 'idle', isSending: false, isRestoringContext: false,
+    this.patch({ connectionStatus: 'idle', ended: _reason === 'end', isSending: false, isRestoringContext: false,
       isAwaitingResponse: false, pendingPrompt: '', connectionError: null });
     this.deps.client.disconnect();
     this.deps.audio.dispose();
@@ -243,7 +241,7 @@ export class SessionController {
     const history = buildResumeHistory(useLogStore.getState().turns);
     const reconnect = !this.liveConnected;
     this.pendingRequest = request;
-    this.patch({ isSending: true, connectionError: null,
+    this.patch({ isSending: true, ended: false, connectionError: null,
       pendingPrompt: request.source ? request.text ?? '' : '',
       ...(reconnect ? { connectionStatus: 'connecting', isRestoringContext: history.length > 0 } : {}) });
     try {
@@ -252,94 +250,16 @@ export class SessionController {
       await unlocked;
       if (!current()) return { status: 'cancelled' };
 
-      // Route text prompts directly through Backend companionService
-      if (request.input === 'text' && request.text
-        && !(this.state.activeView === 'chat' && useSettings.getState().tutorMode === 'open-conversation')) {
-        const text = request.text;
-        console.log('[SessionController] Processing text turn via Backend companionService:', text);
-        this.onInterrupted();
-        this.patch({ isAwaitingResponse: true, connectionStatus: 'connected' });
-        this.responseInFlight = true;
-        if (request.source) useLogStore.getState().addTurn({ role: 'user', text, isFinal: true, source: request.source });
-
-        try {
-          this.deps.client.send({ text });
-        } catch (e) {
-          console.debug('[SessionController] Optional client.send notification error:', e);
-        }
-
-        try {
-          const turns = useLogStore.getState().turns;
-          const historyForCompanion = turns
-            .filter(t => t.role === 'user' || t.role === 'agent')
-            .slice(-6)
-            .map(t => ({
-              role: t.role === 'user' ? ('user' as const) : ('assistant' as const),
-              content: t.text,
-            }));
-
-          console.log('[SessionController] Calling companionService.sendMessage...', {
-            message: text,
-            historyCount: historyForCompanion.length,
-          });
-
-          const targetLessonId = this.state.activeView === 'chat'
-            ? useReaderHandoff.getState().context?.articleId || useMapStore.getState().selectedLandmarkId || undefined
-            : useSettings.getState().activeLessonId;
-
-          const companionRes = await companionService.sendMessage({
-            lessonId: targetLessonId,
-            message: text,
-            history: historyForCompanion,
-          });
-
-          console.log('[SessionController] Received backend reply:', companionRes.reply);
-
-          if (!current()) {
-            console.warn('[SessionController] Request was superseded or cancelled');
-            return { status: 'cancelled' };
-          }
-
-          this.responseInFlight = false;
-          useLogStore.getState().addTurn({
-            role: 'agent',
-            text: companionRes.reply,
-            isFinal: true,
-          });
-          this.patch({ isSending: false, isAwaitingResponse: false });
-          this.pendingRequest = null;
-          this.patch({ pendingPrompt: '' });
-          return { status: 'ok' };
-        } catch (beError) {
-          console.error('[SessionController] companionService.sendMessage error:', beError);
-          if (!current()) return { status: 'cancelled' };
-          const message = beError instanceof Error ? beError.message : 'Không thể kết nối đến máy chủ AI.';
-          this.fail(message);
-          useLogStore.getState().addTurn({
-            role: 'agent',
-            text: `Lỗi kết nối máy chủ AI: ${message}`,
-            isFinal: true,
-          });
-          return { status: 'error', message };
-        }
-      }
-
       if (reconnect) {
-        try {
-          const configuration = this.deps.configuration();
-          this.sessionPolicy = { ...this.deps.toolPolicy() };
-          const ready = await this.deps.client.connect(configuration.config);
-          if (!current()) return { status: 'cancelled' };
-          if (ready) {
-            this.liveConnected = true;
-            if (history.length) this.deps.client.prefill(history);
-            useLogStore.getState().recordConnection({ ...configuration, connectionId: crypto.randomUUID() });
-            this.patch({ connectionStatus: 'connected', isRestoringContext: false });
-          } else if (request.input === 'voice') throw new Error('Không thể kết nối phiên thoại AI.');
-        } catch (connError) {
-          if (request.input === 'voice') throw connError;
-          this.patch({ connectionStatus: 'connected', isRestoringContext: false });
-        }
+        const configuration = this.deps.configuration();
+        this.sessionPolicy = { ...this.deps.toolPolicy() };
+        const ready = await this.deps.client.connect(configuration.config);
+        if (!current()) return { status: 'cancelled' };
+        if (!ready) throw new Error('Không thể kết nối phiên AI.');
+        this.liveConnected = true;
+        if (history.length) this.deps.client.prefill(history);
+        useLogStore.getState().recordConnection({ ...configuration, connectionId: crypto.randomUUID() });
+        this.patch({ connectionStatus: 'connected', isRestoringContext: false });
       }
       const text = request.text ?? (history.length
         ? 'Continue our conversation naturally using the restored context. Do not greet again or answer old questions again. Ask one brief follow-up.'
@@ -547,7 +467,11 @@ export class SessionController {
     this.patch({ isAwaitingResponse: true });
     try {
       useLogStore.getState().beginAgentTurn();
-      this.deps.client.send({ text: 'End our conversation now. Briefly summarize topics and useful vocabulary. Include corrections only if the correction setting is end-of-session. Do not ask another question.' });
+      const correctionMode = useSettings.getState().correctionMode;
+      const correctionSummary = correctionMode === 'end-of-session'
+        ? 'Add at most two useful phrasing improvements grounded in what I actually said. If there are no clear examples, do not invent mistakes.'
+        : 'Do not add language corrections.';
+      this.deps.client.send({ text: `End our conversation now. Briefly summarize topics and useful vocabulary. ${correctionSummary} Do not score pronunciation from a transcript or ask another question.` });
     } catch (error) {
       this.fail(error instanceof Error ? error.message : 'Không thể tổng kết.');
     }
