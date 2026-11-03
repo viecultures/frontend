@@ -207,7 +207,19 @@
 .study-flip-scene { width: 100%; perspective: 1600px; }
 .study-flip-rotor { display: grid; width: 100%; transform-style: preserve-3d; transition: transform 520ms cubic-bezier(.25,.75,.25,1); }
 .study-flip-rotor.is-flipped { transform: rotateY(180deg); }
-.study-flip-face { grid-area: 1 / 1; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.study-flip-face { grid-area: 1 / 1; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 520ms cubic-bezier(.25,.75,.25,1), border-color 0.2s ease, box-shadow 0.2s ease; }
+.study-flip-face:hover { border-color: #b0c4af; box-shadow: 0 16px 36px rgba(35, 61, 43, 0.12); }
+.study-flip-face:active { transform: scale(0.995); }
+.study-flip-face.study-flip-back:active { transform: rotateY(180deg) scale(0.995); }
+.study-flip-hint-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #f0f4eb; color: #436052; font-size: 12px; font-weight: 500; transition: background 0.2s ease; }
+.study-flip-face:hover .study-flip-hint-badge { background: #e5ede0; color: #1d5144; }
+.study-shortcuts-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px 20px; max-width: 780px; margin: 22px auto 0; padding: 10px 18px; border-radius: 12px; background: #f4f6ee; border: 1px solid #dce3d4; color: #556c5f; font-size: 12px; }
+.study-shortcut-item { display: inline-flex; align-items: center; gap: 6px; }
+.study-shortcut-item kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; padding: 2px 6px; border: 1px solid #c7d2be; border-bottom-width: 2px; border-radius: 5px; background: #ffffff; color: #1e4539; font-family: inherit; font-size: 11px; font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04); }
+.dark .study-flip-hint-badge { background: #17332b; color: #a8beaf; }
+.dark .study-flip-face:hover .study-flip-hint-badge { background: #1d4036; color: #d1dfd5; }
+.dark .study-shortcuts-bar { background: #122822; border-color: #234438; color: #9cb5a7; }
+.dark .study-shortcut-item kbd { background: #1a3930; border-color: #2b5748; color: #e5ede3; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); }
 .study-flip-back { transform: rotateY(180deg); }
 .study-main-card { position: relative; isolation: isolate; display: flex; flex-direction: column; min-height: min(55vh, 510px); overflow: hidden; padding: clamp(18px, 3vw, 36px); border: 1px solid #d9dfcf; border-radius: 24px; background: #fffdf7; color: #203f35; box-shadow: 0 14px 30px #233d2b0c; }
 .study-botanical { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
