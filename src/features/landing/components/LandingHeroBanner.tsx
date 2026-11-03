@@ -26,7 +26,6 @@ export const LandingHeroBanner: React.FC = () => {
             transition={{ duration: 0.65, ease: EASE_CURVE }}
           >
             <p className="landing-intro-status">
-              <span className="landing-intro-eyebrow-line" aria-hidden="true" />
               {t('hero.eyebrow')}
             </p>
           </motion.div>
@@ -84,7 +83,6 @@ export const LandingHeroBanner: React.FC = () => {
             <BookOpen size={18} aria-hidden="true" />
             <span>{t('hero.image_label', { title: storyName })}</span>
           </div>
-          <div className="landing-intro-room-chip"><Mic2 size={17} aria-hidden="true" />{t('hero.room_chip')}</div>
         </motion.div>
       </div>
     </section>

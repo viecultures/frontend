@@ -206,7 +206,7 @@ export function DailyQuoteDialog({
 
             <blockquote className="home-quote-blockquote">
               “{quoteVi}”
-              <cite>— {author}</cite>
+              <cite>{author}</cite>
             </blockquote>
 
             <div className="home-english-quote">
@@ -341,15 +341,6 @@ export function DailyQuoteDialog({
                     </p>
                   </div>
                 </div>
-              )}
-
-              {!isExpanded && (
-                <p className="home-brief-draft-tag">
-                  {t(
-                    'daily_quote.brief_draft',
-                    'Editorial preview · historical source verification pending.'
-                  )}
-                </p>
               )}
             </div>
           </article>
