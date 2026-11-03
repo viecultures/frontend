@@ -73,7 +73,7 @@
       "expires_at": "Hạn hội viên đến: {{date}}",
       "free_desc": "Đọc truyện song ngữ và luyện tập flashcard cốt lõi.",
       "manage_membership": "Quản lý gói hội viên",
-      "explore_pro": "Nâng cấp Pro · 39k/tháng",
+      "explore_pro": "Nâng cấp Pro",
       "plan_includes": "Gói của bạn bao gồm",
       "bilingual_audio": "Đọc song ngữ và nghe giọng đọc 3 tốc độ (0.5x, 0.8x, 1x)",
       "core_flashcards": "Ôn tập từ vựng flashcard cốt lõi với lặp lại ngắt quãng",
@@ -145,7 +145,7 @@
     "header_card": {
       "target_label": "Mục tiêu: {{target}}",
       "joined_label": "Tham gia: {{date}}",
-      "explore_pro_cta": "Nâng cấp Pro · 39k/tháng"
+      "explore_pro_cta": "Nâng cấp Pro"
     },
     "vocab_view": {
       "search_aria": "Tìm kiếm từ vựng",

@@ -52,7 +52,7 @@ export const SubscriptionPlanModal: React.FC<SubscriptionPlanModalProps> = ({
   const [nameVi, setNameVi] = useState('');
   const [nameEn, setNameEn] = useState('');
   const [descriptionVi, setDescriptionVi] = useState('');
-  const [priceVnd, setPriceVnd] = useState<number>(99000);
+  const [priceVnd, setPriceVnd] = useState<number>(49000);
   const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('MONTHLY');
   const [isActive, setIsActive] = useState<boolean>(true);
@@ -98,7 +98,7 @@ export const SubscriptionPlanModal: React.FC<SubscriptionPlanModalProps> = ({
       setNameVi('');
       setNameEn('');
       setDescriptionVi('');
-      setPriceVnd(99000);
+      setPriceVnd(49000);
       setDiscountPercent(0);
       setBillingCycle('MONTHLY');
       setIsActive(true);
