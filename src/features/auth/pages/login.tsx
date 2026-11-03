@@ -76,7 +76,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const hasGoogleLogin = !!googleClientId;
 
   const readableError = (error: unknown, fallback: string) =>
-    language === 'vi' && error instanceof Error ? error.message : fallback;
+    error instanceof Error ? error.message : fallback;
 
   useEffect(() => {
     if (languageSynced.current) return;
@@ -465,7 +465,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                         <span>{copy.googleLoading}</span>
                       </div>
                     ) : (
-                      <GoogleOAuthProvider key={language} clientId={googleClientId} locale={language}>
+                      <GoogleOAuthProvider clientId={googleClientId} locale={language}>
                         <GoogleLogin
                           onSuccess={(response) =>
                             response.credential
@@ -477,7 +477,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                           shape="rectangular"
                           size="large"
                           text="continue_with"
-                          width="100%"
+                          width="380"
                         />
                       </GoogleOAuthProvider>
                     )}
@@ -660,3 +660,4 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 };
 
 export default LoginPage;
+
