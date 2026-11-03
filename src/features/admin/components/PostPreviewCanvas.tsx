@@ -21,6 +21,7 @@ import type {
   ParagraphPairDto,
   VocabItemDto,
   QuizQuestionDto,
+  QuizOptionDto,
   AudioTrackDto,
 } from '../types/adminTypes';
 import { adminTopicLabel, adminRegionLabel } from '../admin-presentation';
@@ -134,7 +135,7 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
                   setActiveVocabWord(matchedVocab);
                 }}
                 className="inline-block px-1 py-0.5 rounded bg-antique-gold/25 text-heritage-green dark:text-antique-bright font-semibold underline decoration-antique-gold/60 cursor-pointer hover:bg-antique-gold/40 transition-colors"
-                title={`${matchedVocab.word} (${matchedVocab.level || 'B1'}): ${matchedVocab.vietnameseMeaning || ''}`}
+                title={`${matchedVocab.word} (${matchedVocab.level || 'B1'}): ${matchedVocab.viMeaning || ''}`}
               >
                 {chunk}
               </span>
@@ -290,8 +291,8 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
               <span className="font-heading font-extrabold text-sm tracking-wide">
                 {activeVocabWord.word}
               </span>
-              {activeVocabWord.phonetic && (
-                <span className="text-xs font-mono opacity-80">/{activeVocabWord.phonetic}/</span>
+              {activeVocabWord.ipa && (
+                <span className="text-xs font-mono opacity-80">/{activeVocabWord.ipa}/</span>
               )}
               {activeVocabWord.level && (
                 <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-heritage-green text-warm-ivory">
@@ -300,11 +301,11 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
               )}
             </div>
             <div className="text-xs font-semibold">
-              {activeVocabWord.vietnameseMeaning || 'Chưa có nghĩa tiếng Việt.'}
+              {activeVocabWord.viMeaning || 'Chưa có nghĩa tiếng Việt.'}
             </div>
-            {activeVocabWord.englishDefinition && (
+            {(activeVocabWord.usageNote || activeVocabWord.contextSentence) && (
               <div className="text-[11px] opacity-90 italic">
-                {activeVocabWord.englishDefinition}
+                {activeVocabWord.usageNote || activeVocabWord.contextSentence}
               </div>
             )}
           </div>
@@ -423,7 +424,7 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
                         Audio Shadowing ({voiceTracks.length > 0 ? `${voiceTracks.length} giọng đọc` : 'Bản chuẩn'})
                       </div>
                       <div className="text-[10px] text-text-muted truncate">
-                        {shadowingAudioUrl || voiceTracks[0]?.audioUrl}
+                        {shadowingAudioUrl || voiceTracks[0]?.normalUrl || voiceTracks[0]?.slowUrl}
                       </div>
                     </div>
                   </div>
@@ -608,13 +609,13 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
                             {v.level || 'B1'}
                           </span>
                         </div>
-                        {v.phonetic && (
+                        {v.ipa && (
                           <div className="text-[10px] text-text-muted font-mono">
-                            /{v.phonetic}/
+                            /{v.ipa}/
                           </div>
                         )}
                         <div className="text-xs text-text-secondary font-medium">
-                          {v.vietnameseMeaning}
+                          {v.viMeaning}
                         </div>
                       </div>
                     ))}
@@ -647,13 +648,14 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
                             <span className="w-5 h-5 rounded-full bg-heritage-green text-warm-ivory flex items-center justify-center text-[10px] shrink-0 font-heading">
                               {qIdx + 1}
                             </span>
-                            <span>{q.questionText}</span>
+                            <span>{q.question}</span>
                           </div>
 
                           <div className="space-y-1.5 pl-7">
-                            {q.options?.map((opt, oIdx) => {
+                            {(Array.isArray(q.options) ? (q.options as QuizOptionDto[]) : []).map((opt: QuizOptionDto, oIdx: number) => {
+                              const optKey = opt.key || String.fromCharCode(65 + oIdx);
                               const isSelected = selectedOptIdx === oIdx;
-                              const isCorrect = opt.isCorrect;
+                              const isCorrect = q.correctKey === optKey;
 
                               let btnStyle =
                                 'bg-white/60 dark:bg-stone-800/60 border-antique-gold/20 text-text-body dark:text-warm-ivory hover:border-antique-gold';
@@ -678,9 +680,9 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
                                 >
                                   <span>
                                     <span className="font-bold mr-2">
-                                      {String.fromCharCode(65 + oIdx)}.
+                                      {optKey}.
                                     </span>
-                                    {opt.optionText}
+                                    {opt.text}
                                   </span>
                                   {isSelected &&
                                     (isCorrect ? (

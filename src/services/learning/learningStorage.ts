@@ -156,6 +156,7 @@ export function savePersonalWord(input: {
       topic: 'Personal',
       level: PERSONAL_DECK_LEVEL,
       vocabularies: nextWords,
+      vocabMap: Object.fromEntries(nextWords.map((w) => [w.word.toLowerCase(), w])),
       paragraphs: [],
       summary: 'Sổ tay lưu trữ các từ vựng do bạn tự thêm thủ công.',
     };
