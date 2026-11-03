@@ -85,10 +85,21 @@ export function StudyCard({ card, cards, mode, reverse, revealed, saved, cardSRS
   const clue = card.contextEn?.replace(new RegExp(card.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '_____');
 
   return <div className="study-card-stack" key={`${card.id}:${mode}:${reverse}`}>
-    {mode === 'flip' ? <div className="study-flip-scene"><div className={`study-flip-rotor${showAnswer ? ' is-flipped' : ''}`}>
-      <FlipFace card={card} reverse={reverse} back={false} hidden={showAnswer} saved={saved} isVi={isVi} onAudio={onAudio} onSave={onSave} onHint={() => setHint(value => !value)} onHide={onHide} onFlip={toggleFlip} />
-      <FlipFace card={card} reverse={reverse} back hidden={!showAnswer} saved={saved} isVi={isVi} onAudio={onAudio} onSave={onSave} onHint={() => setHint(value => !value)} onHide={onHide} onFlip={toggleFlip} />
-    </div></div> : <article className="study-main-card">
+    {mode === 'flip' ? (
+      <div className="study-flip-scene">
+        <div
+          className={`study-flip-rotor${showAnswer ? ' is-flipped' : ''}`}
+          onClick={(e) => {
+            const target = e.target as HTMLElement;
+            if (target.closest('button, a, input, textarea, select')) return;
+            toggleFlip();
+          }}
+        >
+          <FlipFace card={card} reverse={reverse} back={false} hidden={showAnswer} saved={saved} isVi={isVi} onAudio={onAudio} onSave={onSave} onHint={() => setHint(value => !value)} onHide={onHide} onFlip={toggleFlip} />
+          <FlipFace card={card} reverse={reverse} back hidden={!showAnswer} saved={saved} isVi={isVi} onAudio={onAudio} onSave={onSave} onHint={() => setHint(value => !value)} onHide={onHide} onFlip={toggleFlip} />
+        </div>
+      </div>
+    ) : <article className="study-main-card">
       <BotanicalBorder />
       <div className="study-card-top"><span>{mode === 'choice' ? (isVi ? 'CHỌN TỪ ĐÚNG' : 'CHOOSE THE WORD') : mode === 'type' ? (isVi ? 'NHỚ TỪ QUA NGỮ CẢNH' : 'RECALL FROM CONTEXT') : showAnswer ? (isVi ? 'Ý NGHĨA & CÁCH DÙNG' : 'MEANING & USE') : (isVi ? 'NHỚ LẠI TỪ VỰNG' : 'RECALL THE WORD')}</span><button type="button" className="study-save" onClick={onSave} aria-pressed={saved} aria-label={saved ? (isVi ? 'Bỏ lưu từ' : 'Remove saved word') : (isVi ? 'Lưu từ' : 'Save word')}><Star size={22} fill={saved ? 'currentColor' : 'none'} /></button></div>
       <div className="study-card-content">
@@ -140,9 +151,10 @@ function FlipFace({ card, reverse, back, hidden, saved, isVi, onAudio, onSave, o
 }) {
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    if (target.closest('button, a, input, textarea, select, [role="button"]')) {
+    if (target.closest('button, a, input, textarea, select')) {
       return;
     }
+    e.stopPropagation();
     onFlip();
   };
 
@@ -152,7 +164,7 @@ function FlipFace({ card, reverse, back, hidden, saved, isVi, onAudio, onSave, o
     role="button"
     tabIndex={hidden ? -1 : 0}
     onKeyDown={(e) => {
-      if ((e.key === 'Enter' || e.key === ' ') && !((e.target as HTMLElement).closest('button, a, input'))) {
+      if ((e.key === 'Enter' || e.key === ' ') && !((e.target as HTMLElement).closest('button, a, input, textarea, select'))) {
         e.preventDefault();
         onFlip();
       }
@@ -161,7 +173,6 @@ function FlipFace({ card, reverse, back, hidden, saved, isVi, onAudio, onSave, o
       ? (isVi ? `Ý nghĩa: ${reverse ? card.word : card.viMeaning}. Chạm thẻ hoặc nhấn Space để lật lại mặt trước.` : `Meaning: ${reverse ? card.word : card.viMeaning}. Click or Space to flip back.`)
       : (isVi ? `Từ vựng: ${reverse ? card.viMeaning : card.word}. Chạm thẻ hoặc nhấn Space để lật thẻ xem đáp án.` : `Word: ${reverse ? card.viMeaning : card.word}. Click or Space to flip card.`)}
     aria-hidden={hidden}
-    inert={hidden}
   >
     <BotanicalBorder />
     <div className="study-card-top">
