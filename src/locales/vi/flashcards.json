@@ -263,7 +263,8 @@
     "btn_cancel": "Hủy",
     "btn_save": "Lưu vào thư viện",
     "validation_alert": "Vui lòng nhập từ tiếng Anh và nghĩa tiếng Việt.",
-    "success_alert": "Đã thêm \"{{word}}\" ({{meaning}}) vào thư viện từ vựng của bạn!"
+    "success_alert": "Đã thêm \"{{word}}\" ({{meaning}}) vào thư viện từ vựng của bạn!",
+    "error_alert": "Không thể lưu từ vựng vào bộ nhớ. Vui lòng thử lại."
   },
   "categories": {
     "all": "Tất cả",

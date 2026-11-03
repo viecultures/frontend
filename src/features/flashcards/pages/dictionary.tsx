@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { ArrowUpRight, BookOpen, BookmarkCheck, SearchX } from "lucide-react";
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { useAppNavigate } from '@/routes/useAppNavigate';
@@ -31,12 +31,29 @@ export default function DictionaryPage() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [vocabVersion, setVocabVersion] = useState<number>(0);
 
   // Inspector Modal state
   const [inspectLesson, setInspectLesson] = useState<Lesson | null>(null);
 
-  const savedArticles = useMemo(() => listSavedArticles().filter(({ count }) => count > 0), []);
-  const savedWordCount = useMemo(() => savedArticles.reduce((count, entry) => count + entry.count, 0), [savedArticles]);
+  useEffect(() => {
+    const handleUpdate = () => setVocabVersion((v) => v + 1);
+    window.addEventListener('storage', handleUpdate);
+    window.addEventListener('vie_vocab_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('storage', handleUpdate);
+      window.removeEventListener('vie_vocab_updated', handleUpdate);
+    };
+  }, []);
+
+  const savedArticles = useMemo(
+    () => listSavedArticles().filter(({ count }) => count > 0),
+    [vocabVersion]
+  );
+  const savedWordCount = useMemo(
+    () => savedArticles.reduce((count, entry) => count + entry.count, 0),
+    [savedArticles]
+  );
   const isMyVocab = selectedCategory === "MyVocab";
 
   const categoryOptions = useMemo(() => [

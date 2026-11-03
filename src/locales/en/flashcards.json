@@ -259,7 +259,8 @@
     "btn_cancel": "Cancel",
     "btn_save": "Save to library",
     "validation_alert": "Enter the English word and Vietnamese meaning.",
-    "success_alert": "Added \"{{word}}\" ({{meaning}}) to your vocabulary library!"
+    "success_alert": "Added \"{{word}}\" ({{meaning}}) to your vocabulary library!",
+    "error_alert": "Could not save vocabulary to storage. Please try again."
   },
   "categories": {
     "all": "All",
