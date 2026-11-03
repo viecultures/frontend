@@ -1245,12 +1245,12 @@ export const AdminPostEditorPage: React.FC = () => {
                             <input
                               type="text"
                               placeholder="Nghĩa (VI)"
-                              value={v.vietnameseMeaning}
+                              value={v.viMeaning}
                               onChange={(e) => {
                                 const val = e.target.value;
                                 setVocabularies((prev) =>
                                   prev.map((item, i) =>
-                                    i === idx ? { ...item, vietnameseMeaning: val } : item
+                                    i === idx ? { ...item, viMeaning: val } : item
                                   )
                                 );
                               }}
@@ -1336,7 +1336,7 @@ export const AdminPostEditorPage: React.FC = () => {
                               <div className="text-xs font-bold text-heritage-green dark:text-antique-gold">
                                 {model.name}
                               </div>
-                              <div className="text-[10px] text-text-muted">{model.gender} · {model.accent}</div>
+                              <div className="text-[10px] text-text-muted">{model.gender} · {model.locale}</div>
                             </div>
                             <button
                               type="button"
@@ -1433,33 +1433,36 @@ export const AdminPostEditorPage: React.FC = () => {
                           <input
                             type="text"
                             placeholder="Nội dung câu hỏi..."
-                            value={q.questionText}
+                            value={q.question}
                             onChange={(e) => handleUpdateQuestionText(qIdx, e.target.value)}
                             className="w-full p-2 rounded-xl border border-antique-gold/30 bg-white dark:bg-stone-800 text-xs font-bold"
                           />
 
                           <div className="space-y-1.5">
-                            {q.options?.map((opt, oIdx) => (
+                            {(Array.isArray(q.options) ? (q.options as QuizOptionDto[]) : []).map((opt: QuizOptionDto, oIdx: number) => {
+                              const optKey = opt.key || String.fromCharCode(65 + oIdx);
+                              return (
                               <div key={oIdx} className="flex items-center gap-2">
-                                <span className="text-xs font-bold w-4">{String.fromCharCode(65 + oIdx)}.</span>
+                                <span className="text-xs font-bold w-4">{optKey}.</span>
                                 <input
                                   type="text"
-                                  placeholder={`Đáp án ${String.fromCharCode(65 + oIdx)}...`}
-                                  value={opt.optionText}
-                                  onChange={(e) => handleUpdateOptionText(qIdx, String.fromCharCode(65 + oIdx), e.target.value)}
+                                  placeholder={`Đáp án ${optKey}...`}
+                                  value={opt.text}
+                                  onChange={(e) => handleUpdateOptionText(qIdx, optKey, e.target.value)}
                                   className="flex-1 p-2 rounded-xl border border-antique-gold/30 bg-white dark:bg-stone-800 text-xs"
                                 />
                                 <label className="flex items-center gap-1 text-[11px] font-bold cursor-pointer">
                                   <input
                                     type="radio"
                                     name={`correct-${qIdx}`}
-                                    checked={opt.isCorrect}
-                                    onChange={() => handleUpdateCorrectKey(qIdx, String.fromCharCode(65 + oIdx))}
+                                    checked={q.correctKey === optKey}
+                                    onChange={() => handleUpdateCorrectKey(qIdx, optKey)}
                                   />
                                   <span>Đúng</span>
                                 </label>
                               </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       ))}
