@@ -118,7 +118,7 @@ function MapAiContent() {
         </div>
 
         {panel && (
-          <aside className={`map-panel chat-tool-panel flex flex-col relative overflow-hidden bg-[#090e1a] ${panel.type === 'reader' ? 'reader-reference-drawer' : ''}`} aria-label={panel.type === 'map' ? t('playground.workspace.map_title') : panel.type === 'reader' ? t('playground.reader_panel.aria_label') : t('playground.chat_article.aria_story_details')}>
+          <aside className={`map-panel chat-tool-panel flex flex-col relative overflow-hidden bg-[#fffaf0] border-l border-[#dfe5cf] ${panel.type === 'reader' ? 'reader-reference-drawer' : ''}`} aria-label={panel.type === 'map' ? t('playground.workspace.map_title') : panel.type === 'reader' ? t('playground.reader_panel.aria_label') : t('playground.chat_article.aria_story_details')}>
             <div className="chat-tool-panel-header">
               <h2>{panel.type === 'map' ? t('playground.workspace.map_title') : panel.type === 'reader' ? t('playground.workspace.reading_notes') : t('playground.workspace.story_details')}</h2>
               <button type="button" onClick={closePanel} aria-label={t('playground.immersive.close_aria')} title={t('playground.immersive.close_aria')}><X size={18} /></button>
@@ -169,10 +169,8 @@ function MapAiContent() {
 }
 
 export const VietnamMapAiScreen: React.FC = () => {
-  const { theme } = useSettings();
-
   return (
-    <div className={`map-ai-app ai-chat-ui ${theme === 'light' ? 'light-theme' : 'dark'} w-full h-full relative overflow-hidden`}>
+    <div className="map-ai-app ai-chat-ui light-theme w-full h-full relative overflow-hidden">
       <MapAiContent />
     </div>
   );

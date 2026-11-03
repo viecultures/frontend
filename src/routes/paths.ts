@@ -80,6 +80,11 @@ export const withQuery = (path: string, query: Record<string, QueryValue> = {}):
 
 export const paths = {
   login: (opts: { redirect?: string } = {}) => withQuery(PATHS.login, opts),
+  admin: (opts: { tab?: 'content' | 'journeys' | 'posts' | 'vocabularies' | 'marketing' | 'subscriptions' | 'users' | 'logs' | 'system_stats' | 'analytics' | 'search_console' | 'search-console' } = {}) => {
+    if (!opts.tab) return PATHS.admin;
+    const tabSlug = opts.tab === 'search_console' ? 'search-console' : opts.tab;
+    return `${PATHS.admin}/${tabSlug}`;
+  },
 
   profile: (opts: { tab?: 'passport' | 'badges' | 'vocab' | 'subscription' } = {}) =>
     withQuery(PATHS.profile, opts),

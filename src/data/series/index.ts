@@ -38,6 +38,8 @@ export type JourneySeries = {
   region?: string;
   description: string;
   imageUrl: string;
+  status?: string;
+  scheduledPublishAt?: string;
   chapters: JourneyChapter[];
 };
 
@@ -51,6 +53,8 @@ function toJourneySeries(metadata: SeriesMetadata): JourneySeries {
     region: metadata.region,
     description: metadata.description,
     imageUrl: metadata.imageUrl,
+    status: metadata.status,
+    scheduledPublishAt: metadata.scheduledPublishAt,
     chapters: metadata.chapters.map((chap: SeriesChapterMeta) => ({
       id: chap.id,
       title: chap.titleEn,

@@ -101,7 +101,10 @@
     "title": "Words saved from reading",
     "subtitle": "Your personal review list · Stored in this browser",
     "words_count": "{{count}} saved words",
-    "review_action": "Review saved words"
+    "review_action": "Review saved words",
+    "empty_title": "No saved words yet",
+    "empty_desc": "Save new words while reading articles to build your personal vocabulary list.",
+    "empty_explore": "Explore vocabulary"
   },
   "summary": {
     "aria_label": "Review summary",
@@ -256,7 +259,8 @@
     "btn_cancel": "Cancel",
     "btn_save": "Save to library",
     "validation_alert": "Enter the English word and Vietnamese meaning.",
-    "success_alert": "Added \"{{word}}\" ({{meaning}}) to your vocabulary library!"
+    "success_alert": "Added \"{{word}}\" ({{meaning}}) to your vocabulary library!",
+    "error_alert": "Could not save vocabulary to storage. Please try again."
   },
   "categories": {
     "all": "All",
@@ -264,6 +268,7 @@
     "Cuisine": "Food & coffee",
     "Crafts": "Arts & crafts",
     "Nature": "Nature & landscapes",
-    "Folklore": "Festivals & traditions"
+    "Folklore": "Festivals & traditions",
+    "MyVocab": "My vocabulary"
   }
 }

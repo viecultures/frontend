@@ -20,7 +20,7 @@ const getAuthHeaders = (): Record<string, string> => {
 
 export const adminUserService = {
   /**
-   * Lấy danh sách người dùng có phân trang, lọc theo role, trạng thái và tìm kiếm
+   * Lấy danh sách người dùng có phân trang, lọc theo role, trạng thái, phân nhóm marketing và tìm kiếm
    */
   async getUsers(params?: AdminUserFilterParams): Promise<PaginatedResponse<AdminUserItem>> {
     const searchParams = new URLSearchParams();
@@ -29,6 +29,7 @@ export const adminUserService = {
     if (params?.enabled !== undefined && params?.enabled !== '') {
       searchParams.append('enabled', String(params.enabled));
     }
+    if (params?.filterGroup) searchParams.append('filterGroup', params.filterGroup);
     if (params?.page !== undefined) searchParams.append('page', String(params.page));
     if (params?.size !== undefined) searchParams.append('size', String(params.size));
 
@@ -45,6 +46,32 @@ export const adminUserService = {
 
     const json: ApiResponseEnvelope<PaginatedResponse<AdminUserItem>> = await res.json();
     return json.data;
+  },
+
+  /**
+   * Xuất danh sách người dùng ra tệp CSV (UTF-8 có BOM)
+   */
+  async exportUsersCsv(params?: AdminUserFilterParams): Promise<Blob> {
+    const searchParams = new URLSearchParams();
+    if (params?.query) searchParams.append('query', params.query);
+    if (params?.role) searchParams.append('role', params.role);
+    if (params?.enabled !== undefined && params?.enabled !== '') {
+      searchParams.append('enabled', String(params.enabled));
+    }
+    if (params?.filterGroup) searchParams.append('filterGroup', params.filterGroup);
+
+    const url = `${API_BASE_URL}/api/v1/admin/users/export${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Lỗi khi xuất danh sách người dùng (HTTP ${res.status})`);
+    }
+
+    return await res.blob();
   },
 
   /**
