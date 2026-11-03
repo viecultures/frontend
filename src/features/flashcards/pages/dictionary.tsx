@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useRef } from "react";
+import { ArrowUpRight, BookOpen, BookmarkCheck, SearchX } from "lucide-react";
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { useAppNavigate } from '@/routes/useAppNavigate';
 import { listSavedArticles } from '@/services/learning/learningStorage';
 import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
@@ -18,19 +20,12 @@ import { VOCABULARY_CATEGORY_LABELS, VOCABULARY_PAGE_SIZE } from '../lib/vocabul
 import '../dictionary-components.css';
 
 export default function DictionaryPage() {
-  const { t } = useTranslation('flashcards');
+  const { t, i18n } = useTranslation('flashcards');
+  const isVi = i18n.language.toLowerCase().startsWith('vi');
   const navigate = useAppNavigate();
   const libraryRef = useRef<HTMLElement>(null);
   const savedDecksRef = useRef<HTMLDivElement>(null);
   const [sortOrder, setSortOrder] = useState("default");
-
-  const categoryOptions = useMemo(() => [
-    { label: `${t('categories.all', 'All')} (${LESSONS_DATA.length})`, value: "All" },
-    ...Object.entries(VOCABULARY_CATEGORY_LABELS).map(([value]) => ({
-      value,
-      label: t(`categories.${value}`, value),
-    })),
-  ], [t]);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -39,10 +34,26 @@ export default function DictionaryPage() {
 
   // Inspector Modal state
   const [inspectLesson, setInspectLesson] = useState<Lesson | null>(null);
-  const savedWordCount = listSavedArticles().reduce((count, entry) => count + entry.count, 0);
 
-  // Filtered Lessons
+  const savedArticles = useMemo(() => listSavedArticles().filter(({ count }) => count > 0), []);
+  const savedWordCount = useMemo(() => savedArticles.reduce((count, entry) => count + entry.count, 0), [savedArticles]);
+  const isMyVocab = selectedCategory === "MyVocab";
+
+  const categoryOptions = useMemo(() => [
+    { label: `${t('categories.all', 'All')} (${LESSONS_DATA.length})`, value: "All" },
+    {
+      value: "MyVocab",
+      label: `${t('categories.MyVocab', 'Từ vựng của tôi')}${savedWordCount > 0 ? ` (${savedWordCount})` : ''}`,
+    },
+    ...Object.entries(VOCABULARY_CATEGORY_LABELS).map(([value]) => ({
+      value,
+      label: t(`categories.${value}`, value),
+    })),
+  ], [t, savedWordCount]);
+
+  // Filtered Lessons (Catalog)
   const filteredLessons = useMemo(() => {
+    if (isMyVocab) return [];
     const lessons = LESSONS_DATA.filter((lesson) => {
       const matchCat =
         selectedCategory === "All" || lesson.category === selectedCategory;
@@ -57,15 +68,43 @@ export default function DictionaryPage() {
     if (sortOrder === "name") lessons.sort((a, b) => a.title.localeCompare(b.title, "en"));
     if (sortOrder === "newest") lessons.sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
     return lessons;
-  }, [selectedCategory, searchQuery, sortOrder]);
+  }, [isMyVocab, selectedCategory, searchQuery, sortOrder]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredLessons.length / VOCABULARY_PAGE_SIZE));
+  // Filtered Saved Articles (My Vocabulary)
+  const filteredSavedArticles = useMemo(() => {
+    if (!isMyVocab) return [];
+    const q = searchQuery.toLowerCase().trim();
+    const list = savedArticles.filter(({ article }) => {
+      if (!q) return true;
+      const titleEn = (article.titleEn || '').toLowerCase();
+      const titleVi = (article.titleVi || '').toLowerCase();
+      return titleEn.includes(q) || titleVi.includes(q);
+    });
+    if (sortOrder === "name") {
+      list.sort((a, b) => {
+        const titleA = isVi ? a.article.titleVi : (a.article.titleEn || a.article.titleVi);
+        const titleB = isVi ? b.article.titleVi : (b.article.titleEn || b.article.titleVi);
+        return titleA.localeCompare(titleB, isVi ? "vi" : "en");
+      });
+    }
+    return list;
+  }, [isMyVocab, searchQuery, savedArticles, sortOrder, isVi]);
+
+  const totalCount = isMyVocab ? filteredSavedArticles.length : filteredLessons.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / VOCABULARY_PAGE_SIZE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
 
   const paginatedLessons = useMemo(() => {
+    if (isMyVocab) return [];
     const startIndex = (safeCurrentPage - 1) * VOCABULARY_PAGE_SIZE;
     return filteredLessons.slice(startIndex, startIndex + VOCABULARY_PAGE_SIZE);
-  }, [filteredLessons, safeCurrentPage]);
+  }, [isMyVocab, filteredLessons, safeCurrentPage]);
+
+  const paginatedSavedArticles = useMemo(() => {
+    if (!isMyVocab) return [];
+    const startIndex = (safeCurrentPage - 1) * VOCABULARY_PAGE_SIZE;
+    return filteredSavedArticles.slice(startIndex, startIndex + VOCABULARY_PAGE_SIZE);
+  }, [isMyVocab, filteredSavedArticles, safeCurrentPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -110,19 +149,32 @@ export default function DictionaryPage() {
               setCurrentPage(1);
               libraryRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
             }}
-            onReviewSaved={() => savedDecksRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' })}
+            onReviewSaved={() => {
+              setSelectedCategory("MyVocab");
+              setCurrentPage(1);
+              libraryRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+            }}
             savedWordCount={savedWordCount}
           />
         </div>
 
-        {savedWordCount > 0 && <div ref={savedDecksRef} className="vocab-saved-decks"><SavedVocabularyDecks /></div>}
+        {!isMyVocab && savedWordCount > 0 && (
+          <div ref={savedDecksRef} className="vocab-saved-decks">
+            <SavedVocabularyDecks />
+          </div>
+        )}
 
         {/* Cultural vocabulary catalog */}
         <section ref={libraryRef} className="vocab-library-section" aria-labelledby="vocab-library-title">
           <div className="vocab-library-heading">
             <div>
               <p className="vocab-eyebrow">{t('dictionary.catalog_eyebrow', 'LEARN LANGUAGE THROUGH HERITAGE')}</p>
-              <h2 id="vocab-library-title">{t('dictionary.catalog_title', 'Vocabulary decks')} <span>{LESSONS_DATA.length}</span></h2>
+              <h2 id="vocab-library-title">
+                {isMyVocab
+                  ? t('categories.MyVocab', 'Từ vựng của tôi')
+                  : t('dictionary.catalog_title', 'Vocabulary decks')}{' '}
+                <span>{isMyVocab ? savedWordCount : LESSONS_DATA.length}</span>
+              </h2>
             </div>
             <label className="vocab-sort">
               <span>{t('dictionary.sort_label', 'Sort by:')}</span>
@@ -145,23 +197,82 @@ export default function DictionaryPage() {
           />
 
           <p className="vocab-results" role="status">
-            {searchQuery
-              ? t('dictionary.decks_found', { count: filteredLessons.length, query: searchQuery, defaultValue: `${filteredLessons.length} decks found for “${searchQuery}”` })
-              : t('dictionary.decks_to_explore', { count: filteredLessons.length, defaultValue: `${filteredLessons.length} decks to explore` })}
+            {isMyVocab
+              ? (searchQuery
+                  ? t('dictionary.decks_found', { count: filteredSavedArticles.length, query: searchQuery, defaultValue: `${filteredSavedArticles.length} decks found for “${searchQuery}”` })
+                  : t('saved_decks.words_count', { count: savedWordCount, defaultValue: `${savedWordCount} saved words` }))
+              : (searchQuery
+                  ? t('dictionary.decks_found', { count: filteredLessons.length, query: searchQuery, defaultValue: `${filteredLessons.length} decks found for “${searchQuery}”` })
+                  : t('dictionary.decks_to_explore', { count: filteredLessons.length, defaultValue: `${filteredLessons.length} decks to explore` }))}
           </p>
 
-          {/* Library Cards Grid */}
-          <DictionaryLibraryGrid
-            lessons={paginatedLessons}
-            onGoToStudy={handleGoToStudy}
-            onInspectLesson={setInspectLesson}
-          />
+          {/* Content Area */}
+          {isMyVocab ? (
+            savedArticles.length === 0 ? (
+              <div className="vocab-empty" role="status">
+                <BookmarkCheck size={36} aria-hidden="true" />
+                <h3>{t('saved_decks.empty_title', 'Chưa có từ vựng nào được lưu')}</h3>
+                <p>{t('saved_decks.empty_desc', 'Hãy lưu các từ vựng mới khi đọc bài để tạo sổ từ và ôn tập flashcard cá nhân.')}</p>
+                <button
+                  type="button"
+                  className="vocab-button vocab-button-gold mt-2 inline-flex items-center gap-2"
+                  onClick={() => {
+                    setSelectedCategory('All');
+                    setCurrentPage(1);
+                  }}
+                >
+                  <BookOpen size={16} aria-hidden="true" />
+                  <span>{t('saved_decks.empty_explore', 'Khám phá từ vựng')}</span>
+                </button>
+              </div>
+            ) : filteredSavedArticles.length === 0 ? (
+              <div className="vocab-empty" role="status">
+                <SearchX size={32} aria-hidden="true" />
+                <h3>{t('dictionary.no_matching_decks', 'No matching decks')}</h3>
+                <p>{t('dictionary.no_matching_decks_desc', 'Try another search or select All topics.')}</p>
+              </div>
+            ) : (
+              <div className="vocab-notebook-grid">
+                {paginatedSavedArticles.map(({ article, level, count }) => {
+                  const title = isVi ? article.titleVi : (article.titleEn || article.titleVi);
+                  return (
+                    <Link
+                      key={`${article.id}:${level}`}
+                      className="vocab-notebook-card"
+                      to={paths.flashcardStudy({ deck: article.id, level, saved: true })}
+                    >
+                      <span className="vocab-notebook-card-main">
+                        <span className="vocab-notebook-cover" aria-hidden="true">
+                          {article.imageUrl ? <img src={article.imageUrl} alt="" loading="lazy" /> : <BookOpen size={24} />}
+                        </span>
+                        <span className="vocab-notebook-card-copy">
+                          <span className="vocab-notebook-level">{level}</span>
+                          <strong>{title}</strong>
+                          <span>{t('saved_decks.words_count', { count, defaultValue: `${count} saved words` })}</span>
+                        </span>
+                      </span>
+                      <span className="vocab-notebook-card-action">
+                        {t('saved_decks.review_action', 'Review saved words')}
+                        <ArrowUpRight size={17} aria-hidden="true" />
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )
+          ) : (
+            <DictionaryLibraryGrid
+              lessons={paginatedLessons}
+              onGoToStudy={handleGoToStudy}
+              onInspectLesson={setInspectLesson}
+            />
+          )}
 
           {/* Pagination Controls */}
           <DictionaryPagination
             currentPage={safeCurrentPage}
             totalPages={totalPages}
-            totalDecks={filteredLessons.length}
+            totalDecks={totalCount}
             itemsPerPage={VOCABULARY_PAGE_SIZE}
             onPageChange={handlePageChange}
           />

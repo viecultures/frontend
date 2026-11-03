@@ -247,22 +247,14 @@ export const AdminPage: React.FC = () => {
     fetchPosts();
   };
 
-  // Open Create Modal
+  // Open Create Page
   const handleOpenCreate = () => {
-    setEditingPost(null);
-    setIsFormOpen(true);
+    navigate(getLocalizedPath('/admin/posts/new', currentLang));
   };
 
-  // Open Edit Modal
-  const handleOpenEdit = async (post: ReadingPostItem) => {
-    try {
-      const full = await postAdminService.getPostById(post.id);
-      setEditingPost(full);
-      setIsFormOpen(true);
-    } catch {
-      setEditingPost(post);
-      setIsFormOpen(true);
-    }
+  // Open Edit Page
+  const handleOpenEdit = (post: ReadingPostItem) => {
+    navigate(getLocalizedPath(`/admin/posts/${post.id}/edit`, currentLang));
   };
 
   // Open Preview Modal
@@ -544,7 +536,7 @@ export const AdminPage: React.FC = () => {
               </button>
             )}
 
-            {activeTab === 'posts' && (
+            {(activeTab === 'posts' || (activeTab === 'content' && activeContentSubTab === 'posts')) && (
               <>
                 <button
                   type="button"
@@ -1487,17 +1479,6 @@ export const AdminPage: React.FC = () => {
         {(activeTab === 'ai_configs' || activeTab === 'ai') && (
           <AiConfigManagementView />
         )}
-
-        {/* ── Post Create / Edit Modal ──────────────────────────────────── */}
-        <PostFormModal
-          isOpen={isFormOpen}
-          onClose={() => {
-            setIsFormOpen(false);
-            setEditingPost(null);
-          }}
-          onSuccess={handlePostSaved}
-          initialData={editingPost}
-        />
 
         {/* ── Preview Modal ─────────────────────────────────────────────── */}
         <PostPreviewModal post={previewPost} onClose={() => setPreviewPost(null)} />

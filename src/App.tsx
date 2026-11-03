@@ -33,7 +33,8 @@ const CommunityPage = React.lazy(() => import('@/features/community/pages/commun
 const CommunityContestPage = React.lazy(() => import('@/features/community/pages/community-contest'));
 const PlaygroundPage = React.lazy(() => import('@/features/playground/pages/playground'));
 const AiWorkspacePage = React.lazy(() => import('@/features/playground/pages/ai-workspace'));
-const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
+const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
+const AdminPostEditorPage = React.lazy(() => import('@/features/admin/pages/AdminPostEditorPage'));
 const PricingPage = React.lazy(() => import('@/features/subscription/pages/PricingPage'));
 const CheckoutPage = React.lazy(() => import('@/features/subscription/pages/CheckoutPage'));
 const ProfilePage = React.lazy(() => import('@/features/profile/pages/ProfilePage'));
@@ -264,18 +265,30 @@ export const App: React.FC = () => {
                 <Route path="mascot-demo" element={<MascotDemoPage />} />
               </Route>
 
-              {/* 5. Independent Admin Workspace Layout (No Learner Navbar/Footer) */}
-              <Route
-                element={
-                  <RequireRole role="ADMIN">
-                    <AdminLayout />
-                  </RequireRole>
-                }
-              >
-                <Route path={toRel(PATHS.admin)} element={<AdminPage />} />
-                <Route path={`${toRel(PATHS.admin)}/*`} element={<AdminPage />} />
-                <Route path={`${toRel(PATHS.admin)}/:tab`} element={<AdminPage />} />
-              </Route>
+              {/* 5. Fullscreen Admin Post Editor (No Learner/Admin Topbar or Sidebar) */}
+              <Route
+                element={
+                  <RequireRole role="ADMIN">
+                    <FocusLayout />
+                  </RequireRole>
+                }
+              >
+                <Route path={`${toRel(PATHS.admin)}/posts/new`} element={<AdminPostEditorPage />} />
+                <Route path={`${toRel(PATHS.admin)}/posts/:id/edit`} element={<AdminPostEditorPage />} />
+              </Route>
+
+              {/* 6. Standard Admin Workspace Layout (With AdminTopbar + AdminSidebar) */}
+              <Route
+                element={
+                  <RequireRole role="ADMIN">
+                    <AdminLayout />
+                  </RequireRole>
+                }
+              >
+                <Route path={toRel(PATHS.admin)} element={<AdminPage />} />
+                <Route path={`${toRel(PATHS.admin)}/*`} element={<AdminPage />} />
+                <Route path={`${toRel(PATHS.admin)}/:tab`} element={<AdminPage />} />
+              </Route>
             </Route>
 
             {/* Fallback for un-prefixed routes (e.g. legacy /login -> /vi/login) */}

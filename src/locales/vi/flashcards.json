@@ -101,7 +101,10 @@
     "title": "Từ đã lưu từ bài đọc",
     "subtitle": "Danh sách ôn tập của bạn · Lưu trên trình duyệt này",
     "words_count": "{{count}} từ đã lưu",
-    "review_action": "Ôn từ đã lưu"
+    "review_action": "Ôn từ đã lưu",
+    "empty_title": "Chưa có từ vựng nào được lưu",
+    "empty_desc": "Hãy lưu từ mới khi đọc bài để tạo sổ từ và ôn tập flashcard cá nhân.",
+    "empty_explore": "Khám phá từ vựng"
   },
   "summary": {
     "aria_label": "Tổng kết phiên ôn tập",
@@ -264,6 +267,7 @@
     "Cuisine": "Ẩm thực & cà phê",
     "Crafts": "Nghệ thuật & thủ công",
     "Nature": "Thiên nhiên & cảnh quan",
-    "Folklore": "Lễ hội & truyền thống"
+    "Folklore": "Lễ hội & truyền thống",
+    "MyVocab": "Từ vựng của tôi"
   }
 }

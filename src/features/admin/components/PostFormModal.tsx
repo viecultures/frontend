@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
@@ -22,6 +22,11 @@ import {
   Star,
   ExternalLink,
   Loader2,
+  Columns,
+  ChevronLeft,
+  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import type {
   ReadingPostPayload,
@@ -40,6 +45,7 @@ import { journeyAdminService } from '../services/journeyAdminService';
 import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 import { AdminDialog } from './AdminDialog';
 import { adminTopicLabel } from '../admin-presentation';
+import { PostPreviewCanvas } from './PostPreviewCanvas';
 
 interface PostFormModalProps {
   isOpen: boolean;
@@ -87,6 +93,58 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   initialData,
 }) => {
   const [activeTab, setActiveTab] = useState<'info' | 'bilingual' | 'vocab' | 'voices' | 'quiz' | 'tsv'>('info');
+  const [isSplitView, setIsSplitView] = useState<boolean>(true);
+  const [editorWidth, setEditorWidth] = useState<number>(540);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const lastExpandedWidthRef = useRef<number>(540);
+  const modalContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleCollapse = useCallback(() => {
+    setIsCollapsed((prev) => {
+      if (prev) {
+        setEditorWidth(lastExpandedWidthRef.current || 540);
+        return false;
+      } else {
+        lastExpandedWidthRef.current = editorWidth;
+        return true;
+      }
+    });
+  }, [editorWidth]);
+
+  const handleResizerPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      setIsDragging(true);
+      const startX = e.clientX;
+      const startWidth = isCollapsed ? 56 : editorWidth;
+
+      const onPointerMove = (moveEvent: PointerEvent) => {
+        const deltaX = moveEvent.clientX - startX;
+        const newWidth = startWidth + deltaX;
+
+        if (newWidth < 180) {
+          setIsCollapsed(true);
+        } else {
+          setIsCollapsed(false);
+          const maxAllowed = (modalContainerRef.current?.clientWidth || 1300) - 360;
+          const clamped = Math.max(320, Math.min(newWidth, maxAllowed));
+          setEditorWidth(clamped);
+          lastExpandedWidthRef.current = clamped;
+        }
+      };
+
+      const onPointerUp = () => {
+        setIsDragging(false);
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+      };
+
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+    },
+    [editorWidth, isCollapsed]
+  );
 
   // Form states
   const [journeyId, setJourneyId] = useState<string>('');
@@ -561,16 +619,17 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <AdminDialog title={initialData?.id ? 'Edit article' : 'New article'} onClose={() => { if (!isSubmitting) onClose(); }} wide>
+    <AdminDialog title={initialData?.id ? 'Edit article' : 'New article'} onClose={() => { if (!isSubmitting) onClose(); }} size={isSplitView ? 'studio' : 'wide'}>
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
         transition={{ duration: 0.2 }}
-        className="relative w-full max-w-5xl bg-rice-paper dark:bg-heritage-forest border border-antique-gold/40 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col"
+        ref={modalContainerRef}
+        className={`relative w-full ${isSplitView ? 'max-w-[98vw] 2xl:max-w-[1720px] h-[94vh]' : 'max-w-5xl max-h-[90vh]'} bg-rice-paper dark:bg-heritage-forest border border-antique-gold/40 rounded-3xl shadow-2xl overflow-hidden my-2 sm:my-4 flex flex-col transition-all duration-200 ${isDragging ? 'select-none cursor-col-resize' : ''}`}
       >
         {/* Header */}
-        <div className="px-6 py-5 bg-heritage-green text-warm-ivory border-b border-antique-gold/30 flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 bg-heritage-green text-warm-ivory border-b border-antique-gold/30 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-antique-gold/20 border border-antique-gold/40 flex items-center justify-center text-antique-gold">
               <BookOpen aria-hidden="true" className="w-5 h-5" />
@@ -584,13 +643,95 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
               </p>
             </div>
           </div>
-          <button aria-label="Close editor"
-            onClick={onClose}
-            className="p-2 rounded-xl text-warm-ivory/70 hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
-          >
-            <X aria-hidden="true" className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {isSplitView && (
+              <button
+                type="button"
+                onClick={toggleCollapse}
+                className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${isCollapsed ? 'bg-antique-gold text-heritage-dark border-antique-gold' : 'bg-white/10 hover:bg-white/20 border-antique-gold/30 text-warm-ivory'}`}
+                title={isCollapsed ? 'Mở rộng form nhập liệu' : 'Kéo qua trái hoặc bấm để thu gọn form'}
+              >
+                {isCollapsed ? (
+                  <>
+                    <PanelLeftOpen aria-hidden="true" className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Mở Form</span>
+                  </>
+                ) : (
+                  <>
+                    <PanelLeftClose aria-hidden="true" className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Thu gọn</span>
+                  </>
+                )}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setIsSplitView(!isSplitView)}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${isSplitView ? 'bg-antique-gold text-heritage-dark border-antique-gold' : 'bg-white/10 hover:bg-white/20 border-antique-gold/30 text-warm-ivory'}`}
+              title={isSplitView ? 'Chuyển sang chế độ 1 cột' : 'Mở rộng chế độ Split-View Canvas'}
+            >
+              <Columns aria-hidden="true" className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">
+                {isSplitView ? '2 cột' : '1 cột'}
+              </span>
+            </button>
+            <button aria-label="Close editor"
+              onClick={onClose}
+              className="p-2 rounded-xl text-warm-ivory/70 hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <X aria-hidden="true" className="w-5 h-5" />
+            </button>
+          </div>
         </div>
+
+        {/* Studio Workspace: Single or Split View */}
+        <div className={`flex-1 min-h-0 overflow-hidden flex ${isSplitView ? 'flex-row' : 'flex-col'}`}>
+          {/* Cột trái: Form nhập liệu & Điều khiển */}
+          {isSplitView && isCollapsed ? (
+            <div className="w-14 shrink-0 bg-rice-paper dark:bg-heritage-forest border-r border-antique-gold/30 flex flex-col items-center py-3 gap-2 z-10">
+              <button
+                type="button"
+                onClick={toggleCollapse}
+                className="p-2 rounded-xl bg-antique-gold/20 hover:bg-antique-gold/40 text-heritage-green dark:text-antique-gold transition-colors cursor-pointer"
+                title="Mở rộng cột soạn thảo"
+              >
+                <ChevronRight aria-hidden="true" className="w-4 h-4" />
+              </button>
+              <div className="w-8 h-px bg-antique-gold/20 my-1" />
+              {[
+                { id: 'info', icon: Layers, label: 'Thông tin' },
+                { id: 'bilingual', icon: BookOpen, label: 'Đoạn văn' },
+                { id: 'vocab', icon: Lightbulb, label: 'Từ vựng' },
+                { id: 'voices', icon: Radio, label: 'Giọng đọc' },
+                { id: 'quiz', icon: HelpCircle, label: 'Quiz' },
+                { id: 'tsv', icon: FileSpreadsheet, label: 'TSV' },
+              ].map((item) => {
+                const TabIcon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveTab(item.id as any);
+                      setIsCollapsed(false);
+                    }}
+                    className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === item.id
+                        ? 'bg-heritage-green text-warm-ivory shadow-xs'
+                        : 'text-text-muted hover:bg-antique-gold/20'
+                    }`}
+                    title={`${item.label} (Click để mở form)`}
+                  >
+                    <TabIcon aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div
+              style={isSplitView ? { width: `${editorWidth}px` } : undefined}
+              className={`${isSplitView ? 'shrink-0 border-r border-antique-gold/30' : 'w-full'} flex flex-col min-h-0 bg-rice-paper dark:bg-heritage-forest overflow-hidden`}
+            >
 
         {/* Navigation Tabs */}
         <div className="px-6 bg-warm-ivory/70 dark:bg-heritage-dark/50 border-b border-antique-gold/20 flex gap-2 overflow-x-auto shrink-0 py-2">
@@ -1078,6 +1219,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                   {paragraphs.map((p, idx) => (
                     <div
                       key={idx}
+                      id={`paragraph-pair-${idx}`}
                       className="p-4 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/60 border border-antique-gold/30 space-y-3"
                     >
                       <div className="flex items-center justify-between">
@@ -1908,7 +2050,77 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
             </div>
           </div>
         </form>
-      </motion.div>
-    </AdminDialog>
+      </div>
+      )}
+
+      {/* Resizer Splitter Handle */}
+      {isSplitView && (
+        <div
+          onPointerDown={handleResizerPointerDown}
+          className="w-2 hover:w-3 active:w-3 bg-antique-gold/25 hover:bg-antique-gold/70 active:bg-antique-gold cursor-col-resize flex items-center justify-center shrink-0 select-none z-10 transition-all group relative"
+          title="Kéo sang trái để thu gọn, kéo sang phải để mở rộng"
+        >
+          <div className="w-1 h-8 rounded-full bg-antique-gold/60 group-hover:bg-heritage-green transition-colors" />
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleCollapse();
+            }}
+            className="absolute -top-3 w-6 h-6 rounded-full bg-antique-gold text-heritage-dark shadow-md flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            title={isCollapsed ? 'Mở rộng cột trái' : 'Thu gọn cột trái'}
+          >
+            {isCollapsed ? (
+              <ChevronRight aria-hidden="true" className="w-3.5 h-3.5" />
+            ) : (
+              <ChevronLeft aria-hidden="true" className="w-3.5 h-3.5" />
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Cột phải: Live Preview Canvas */}
+      {isSplitView && (
+        <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden bg-warm-ivory/60 dark:bg-heritage-dark/70">
+          <PostPreviewCanvas
+            titleEn={titleEn}
+            titleVi={titleVi}
+            topic={topic}
+            region={region}
+            level={level}
+            readTime={readTime}
+            imageUrl={imageUrl}
+            shadowingAudioUrl={shadowingAudioUrl}
+            summary={summary}
+            journeyTitleEn={journeysList.find((j) => j.id === journeyId)?.titleEn}
+            chapterOrder={chapterOrder}
+            paragraphs={paragraphs}
+            vocabularies={vocabularies}
+            questions={questions}
+            voiceTracks={voiceTracks}
+            onFocusParagraphInForm={(idx) => {
+              setActiveTab('bilingual');
+              setTimeout(() => {
+                const el = document.getElementById(`paragraph-pair-${idx}`);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }, 50);
+            }}
+            onUpdateParagraph={(idx, enText, viText) => {
+              setParagraphs((prev) => {
+                const next = [...prev];
+                if (next[idx]) {
+                  next[idx] = { ...next[idx], enText, viText };
+                }
+                return next;
+              });
+            }}
+          />
+        </div>
+      )}
+    </div>
+  </motion.div>
+</AdminDialog>
   );
 };
