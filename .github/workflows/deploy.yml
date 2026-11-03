@@ -36,6 +36,8 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+        env:
+          VITE_BASE_PATH: /frontend/
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3

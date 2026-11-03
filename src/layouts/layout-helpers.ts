@@ -1,30 +1,31 @@
 /**
  * Helper to compute active view name for navigation highlighting based on pathname.
+ * Automatically normalizes localized route prefixes (e.g. /vi/... or /en/...).
  */
 export const getActiveView = (pathname: string): string => {
-  if (pathname === '/' || pathname === '/landing') return 'landing';
-  if (pathname.startsWith('/login')) return 'login';
-  if (pathname.startsWith('/home')) return 'home';
-  if (pathname.startsWith('/discovery')) return 'discovery';
-  if (pathname.startsWith('/reader') || pathname.startsWith('/bilingual-reader')) return 'reader';
-  if (pathname.startsWith('/dictionary') || pathname.startsWith('/flashcard-library')) return 'dictionary';
-  if (pathname.startsWith('/flashcard-study')) return 'flashcard-study';
-  if (pathname.startsWith('/community-2') || pathname.startsWith('/community-contest')) return 'community-contest';
-  if (pathname.startsWith('/community')) return 'community';
-  if (pathname.startsWith('/playground')) return 'playground';
-  if (pathname.startsWith('/ai-workspace')) return 'ai-workspace';
-  if (pathname.startsWith('/admin')) return 'admin';
-  if (pathname.startsWith('/pricing') || pathname.startsWith('/checkout') || pathname.startsWith('/subscription')) {
+  const clean = pathname.replace(/^\/(vi|en)(\/|$)/, '/');
+  if (clean === '/' || clean === '/landing') return 'landing';
+  if (clean.startsWith('/login')) return 'login';
+  if (clean.startsWith('/home')) return 'home';
+  if (clean.startsWith('/discovery')) return 'discovery';
+  if (clean.startsWith('/reader') || clean.startsWith('/bilingual-reader')) return 'reader';
+  if (clean.startsWith('/dictionary') || clean.startsWith('/flashcard-library')) return 'dictionary';
+  if (clean.startsWith('/flashcard-study') || clean.startsWith('/flashcards')) return 'flashcard-study';
+  if (clean.startsWith('/community-2') || clean.startsWith('/community-contest')) return 'community-contest';
+  if (clean.startsWith('/community')) return 'community';
+  if (clean.startsWith('/playground')) return 'playground';
+  if (clean.startsWith('/ai-workspace')) return 'ai-workspace';
+  if (clean.startsWith('/admin')) return 'admin';
+  if (clean.startsWith('/pricing') || clean.startsWith('/checkout') || clean.startsWith('/subscription')) {
     return 'pricing';
   }
   if (
-    pathname.startsWith('/profile') ||
-    pathname.startsWith('/account') ||
-    pathname.startsWith('/passport') ||
-    pathname.startsWith('/achievements')
+    clean.startsWith('/profile') ||
+    clean.startsWith('/account') ||
+    clean.startsWith('/passport') ||
+    clean.startsWith('/achievements')
   ) {
     return 'profile';
   }
   return 'landing';
 };
-

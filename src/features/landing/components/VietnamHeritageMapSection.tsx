@@ -185,7 +185,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
   return (
     <section
       id="ban-do-di-san"
-      className="landing-section relative py-10 sm:py-14 lg:py-16 px-4 sm:px-8 lg:px-12 bg-[#FAF7F0] text-ink transition-colors duration-300 overflow-hidden scroll-mt-24"
+      className="landing-section relative py-5 sm:py-7 lg:py-8 px-4 sm:px-8 lg:px-12 bg-[#FAF7F0] text-ink transition-colors duration-300 overflow-hidden scroll-mt-24"
       aria-labelledby="heritage-map-title"
     >
       {/* 1. Panoramic Watercolor Artwork Background */}

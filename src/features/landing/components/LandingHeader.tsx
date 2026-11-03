@@ -1,39 +1,41 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight, LogIn, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { BrandLogo } from '@/components/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { PATHS } from '@/routes/paths';
-import { useAppNavigate } from '@/routes/useAppNavigate';
-import { getStoredUser, getStoredToken } from '@/utils/auth-storage';
+import { getStoredUser, getStoredToken, type AppUser } from '@/utils/auth-storage';
 
 interface LandingHeaderProps {
-  onNavigate?: (view: string) => void;
   onScrollToSegment: (elementId: string) => void;
   activeSegment?: string;
 }
 
 export const LandingHeader: React.FC<LandingHeaderProps> = ({
-  onNavigate,
   onScrollToSegment,
   activeSegment = 'hero',
 }) => {
   const { t } = useTranslation(['landing', 'common']);
-  const appNavigate = useAppNavigate();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<AppUser | null>(() => getStoredUser());
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!getStoredUser() || !!getStoredToken());
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleAuthChange = () => {
       try {
-        setIsLoggedIn(!!getStoredUser() || !!getStoredToken());
+        const currentUser = getStoredUser();
+        const token = getStoredToken();
+        setUser(currentUser);
+        setIsLoggedIn(!!currentUser || !!token);
       } catch (error) {
         console.error('[LandingHeader] Failed to read auth state:', error);
       }
     };
+
     window.addEventListener('auth:change', handleAuthChange);
     return () => window.removeEventListener('auth:change', handleAuthChange);
   }, []);
@@ -47,12 +49,11 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   }, []);
 
   const navLinks = [
-    { name: t('navigation.discover', { defaultValue: 'Discover' }), segment: 'featured-articles' },
-    { name: t('navigation.topics', { defaultValue: 'Topics' }), segment: 'topics' },
-    { name: t('navigation.heritage_map', { defaultValue: 'Heritage Map' }), segment: 'ban-do-di-san' },
-    { name: t('navigation.how_it_works', { defaultValue: 'How It Works' }), segment: 'methodology' },
-    { name: t('navigation.plans', { defaultValue: 'Plans' }), segment: 'plans' },
-    { name: t('navigation.contact', { defaultValue: 'Contact' }), segment: 'contact' },
+    { name: t('navigation.discover', { defaultValue: 'Bài đọc' }), segment: 'featured-articles' },
+    { name: t('navigation.how_it_works', { defaultValue: 'Phương pháp' }), segment: 'methodology' },
+    { name: t('navigation.heritage_map', { defaultValue: 'Bản đồ di sản' }), segment: 'ban-do-di-san' },
+    { name: t('navigation.plans', { defaultValue: 'Gói học' }), segment: 'plans' },
+    { name: t('navigation.contact', { defaultValue: 'Liên hệ' }), segment: 'contact' },
   ];
 
   useEffect(() => {
@@ -66,19 +67,6 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
     window.addEventListener('keydown', closeOnEscape);
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [isMobileMenuOpen]);
-
-  const navigate = (view: string) => {
-    try {
-      setIsMobileMenuOpen(false);
-      if (onNavigate) {
-        onNavigate(view);
-      } else {
-        appNavigate(view);
-      }
-    } catch (error) {
-      console.error('[LandingHeader] Navigation error:', error);
-    }
-  };
 
   const scroll = (segment: string) => {
     try {
@@ -123,31 +111,32 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
           <LanguageSwitcher />
 
           {isLoggedIn ? (
-            <button
-              type="button"
+            <Link
+              to={PATHS.home}
               className="landing-login focus-ring"
-              onClick={() => navigate(PATHS.home)}
+              title={t('navigation.study_room', { defaultValue: 'Phòng học' })}
             >
-              {t('navigation.study_room', { defaultValue: 'Study Room' })}
-            </button>
+              <User size={16} aria-hidden="true" className="landing-login-icon" />
+              <span>{user?.name?.trim().split(' ')[0] || t('navigation.study_room', { defaultValue: 'Phòng học' })}</span>
+            </Link>
           ) : (
-            <button
-              type="button"
+            <Link
+              to={PATHS.login}
               className="landing-login focus-ring"
-              onClick={() => navigate(PATHS.login)}
+              title={t('navigation.sign_in', { defaultValue: 'Đăng nhập' })}
             >
-              {t('navigation.sign_in', { defaultValue: 'Sign In' })}
-            </button>
+              <LogIn size={16} aria-hidden="true" className="landing-login-icon" />
+              <span>{t('navigation.sign_in', { defaultValue: 'Đăng nhập' })}</span>
+            </Link>
           )}
 
-          <button
-            type="button"
+          <Link
+            to={PATHS.discovery}
             className="landing-button landing-button-primary landing-header-cta focus-ring"
-            onClick={() => navigate(PATHS.discovery)}
           >
-            {t('navigation.start_learning', { defaultValue: 'Start Learning' })}{' '}
+            {t('navigation.explore_stories', { defaultValue: 'Khám phá bài đọc' })}{' '}
             <ArrowRight size={16} aria-hidden="true" />
-          </button>
+          </Link>
 
           <button
             ref={menuButtonRef}
@@ -173,12 +162,6 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
           className="landing-mobile-nav landing-container"
           aria-label="Mobile navigation"
         >
-          <div className="flex items-center justify-between py-2 border-b border-line mb-1">
-            <span className="text-xs font-medium text-ink-soft">
-              {t('navigation.language', { defaultValue: 'Ngôn ngữ' })}
-            </span>
-            <LanguageSwitcher />
-          </div>
           {navLinks.map((link) => (
             <button
               key={link.segment}
@@ -190,25 +173,41 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               <ArrowRight size={16} aria-hidden="true" />
             </button>
           ))}
+
           {isLoggedIn ? (
-            <button type="button" onClick={() => navigate(PATHS.home)}>
-              {t('navigation.study_room', { defaultValue: 'Study Room' })}
+            <Link
+              to={PATHS.home}
+              className="landing-mobile-login focus-ring"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <span className="landing-mobile-login-label">
+                <User size={16} aria-hidden="true" />
+                <span>{user?.name || t('navigation.study_room', { defaultValue: 'Phòng học' })}</span>
+              </span>
               <ArrowRight size={16} aria-hidden="true" />
-            </button>
+            </Link>
           ) : (
-            <button type="button" onClick={() => navigate(PATHS.login)}>
-              {t('navigation.sign_in', { defaultValue: 'Sign In' })}
+            <Link
+              to={PATHS.login}
+              className="landing-mobile-login focus-ring"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <span className="landing-mobile-login-label">
+                <LogIn size={16} aria-hidden="true" />
+                <span>{t('navigation.sign_in', { defaultValue: 'Đăng nhập' })}</span>
+              </span>
               <ArrowRight size={16} aria-hidden="true" />
-            </button>
+            </Link>
           )}
-          <button
-            type="button"
+
+          <Link
+            to={PATHS.discovery}
             className="landing-button landing-button-primary mt-2"
-            onClick={() => navigate(PATHS.discovery)}
+            onClick={() => setIsMobileMenuOpen(false)}
           >
-            {t('navigation.start_learning', { defaultValue: 'Start Learning' })}{' '}
+            {t('navigation.explore_stories', { defaultValue: 'Khám phá bài đọc' })}{' '}
             <ArrowRight size={16} aria-hidden="true" />
-          </button>
+          </Link>
         </nav>
       )}
     </header>

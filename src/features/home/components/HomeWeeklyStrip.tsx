@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { ArrowUpRight, Check } from 'lucide-react';
+import { ArrowUpRight, Check, Flame, Target } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   localDateKey,
@@ -12,9 +12,18 @@ import { StudyCalendarDialog } from './StudyCalendarDialog';
 interface HomeWeeklyStripProps {
   account: string;
   calendarData?: StudyCalendar;
+  streakDays?: number;
+  completedGoals?: number;
+  totalGoals?: number;
 }
 
-export function HomeWeeklyStrip({ account, calendarData: propCalendarData }: HomeWeeklyStripProps) {
+export function HomeWeeklyStrip({
+  account,
+  calendarData: propCalendarData,
+  streakDays = 0,
+  completedGoals = 0,
+  totalGoals = 2,
+}: HomeWeeklyStripProps) {
   const { t, i18n } = useTranslation('home');
   const isVi = i18n.language === 'vi';
   const locale = isVi ? 'vi-VN' : 'en-GB';
@@ -92,6 +101,16 @@ export function HomeWeeklyStrip({ account, calendarData: propCalendarData }: Hom
     setIsCalendarOpen(true);
   };
 
+  const streakText = streakDays > 0
+    ? t('greeting.streak_days', { count: streakDays, defaultValue: `${streakDays}-day streak` })
+    : t('greeting.streak_first_day', 'Your first day');
+
+  const goalText = t('greeting.today_goals', {
+    done: completedGoals,
+    total: totalGoals,
+    defaultValue: `Today · ${completedGoals}/${totalGoals} goals`,
+  });
+
   const summaryText = weekTotalMinutes > 0
     ? (weekStoriesCount === 1
         ? t('weekly_strip.summary_singular', { minutes: weekTotalMinutes, defaultValue: `${weekTotalMinutes} min · 1 story this week` })
@@ -101,63 +120,79 @@ export function HomeWeeklyStrip({ account, calendarData: propCalendarData }: Hom
   return (
     <>
       <section className="home-week-strip" aria-label={t('weekly_strip.eyebrow', 'YOUR PROGRESS')}>
-        {/* Left summary */}
-        <div className="home-week-summary">
-          <span className="home-eyebrow">
-            {t('weekly_strip.eyebrow', 'YOUR PROGRESS')}
-          </span>
-          <h2 className="home-week-title">
-            {t('weekly_strip.title', 'A little, every day.')}
-          </h2>
-          <p className="home-week-totals">{summaryText}</p>
+        {/* Top row of cluster: Title & Streak + Goals Status Chips */}
+        <div className="home-week-strip-top">
+          <div className="home-week-summary">
+            <span className="home-eyebrow">
+              {t('weekly_strip.eyebrow', 'YOUR PROGRESS')}
+            </span>
+            <h2 className="home-week-title">
+              {t('weekly_strip.title', 'A little, every day.')}
+            </h2>
+          </div>
+
+          <div className="home-status-chips">
+            <span className="home-status-chip home-status-streak" title={streakText}>
+              <Flame size={14} className="home-chip-icon" aria-hidden="true" />
+              <span>{streakText}</span>
+            </span>
+            <span className="home-status-chip home-status-goal" title={goalText}>
+              <Target size={14} className="home-chip-icon" aria-hidden="true" />
+              <span>{goalText}</span>
+            </span>
+          </div>
         </div>
 
-        {/* Center 7-day strip */}
-        <div className="home-compact-week">
-          {weekDays.map((day, index) => {
-            const label = weekdayLabels[index];
-            const dateStr = day.date.toLocaleDateString(locale, {
-              day: 'numeric',
-              month: 'short',
-            });
+        {/* Bottom row of cluster: 7-day strip + week totals + view calendar */}
+        <div className="home-week-strip-bottom">
+          <div className="home-compact-week">
+            {weekDays.map((day, index) => {
+              const label = weekdayLabels[index];
+              const dateStr = day.date.toLocaleDateString(locale, {
+                day: 'numeric',
+                month: 'short',
+              });
 
-            return (
-              <div
-                key={day.key}
-                className={`home-compact-day ${day.isStudied ? 'is-studied' : ''} ${day.isToday ? 'is-today' : ''}`}
-              >
-                <span className="home-compact-day-label">{label}</span>
-                <button
-                  type="button"
-                  disabled={day.isFuture}
-                  onClick={() => handleOpenDay(day.date)}
-                  className="home-compact-day-btn"
-                  aria-label={`${dateStr}, ${day.isStudied ? 'studied' : 'no activity'}`}
-                  title={`${dateStr}: ${day.isStudied ? 'Studied' : 'No activity'}`}
+              return (
+                <div
+                  key={day.key}
+                  className={`home-compact-day ${day.isStudied ? 'is-studied' : ''} ${day.isToday ? 'is-today' : ''}`}
                 >
-                  {day.isStudied ? (
-                    <Check size={14} className="home-day-check-icon" aria-hidden="true" />
-                  ) : (
-                    <span>{day.dayNumber}</span>
-                  )}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+                  <span className="home-compact-day-label">{label}</span>
+                  <button
+                    type="button"
+                    disabled={day.isFuture}
+                    onClick={() => handleOpenDay(day.date)}
+                    className="home-compact-day-btn"
+                    aria-label={`${dateStr}, ${day.isStudied ? 'studied' : 'no activity'}`}
+                    title={`${dateStr}: ${day.isStudied ? 'Studied' : 'No activity'}`}
+                  >
+                    {day.isStudied ? (
+                      <Check size={14} className="home-day-check-icon" aria-hidden="true" />
+                    ) : (
+                      <span>{day.dayNumber}</span>
+                    )}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
 
-        {/* Right action button */}
-        <button
-          type="button"
-          className="home-calendar-open-btn"
-          onClick={() => {
-            setTargetDate(new Date());
-            setIsCalendarOpen(true);
-          }}
-        >
-          <span>{t('weekly_strip.view_calendar', 'View calendar')}</span>
-          <ArrowUpRight size={14} aria-hidden="true" />
-        </button>
+          <div className="home-week-actions">
+            <p className="home-week-totals">{summaryText}</p>
+            <button
+              type="button"
+              className="home-calendar-open-btn"
+              onClick={() => {
+                setTargetDate(new Date());
+                setIsCalendarOpen(true);
+              }}
+            >
+              <span>{t('weekly_strip.view_calendar', 'View calendar')}</span>
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* Month Study Calendar Dialog */}
@@ -171,3 +206,6 @@ export function HomeWeeklyStrip({ account, calendarData: propCalendarData }: Hom
     </>
   );
 }
+
+// Backward-compatibility export
+export const HomeProgressCluster = HomeWeeklyStrip;

@@ -158,6 +158,73 @@
   --color-reader-dark-bg:    #141C1A;  /* dark theme canvas bg            */
   --color-reader-dark-sheet: #1E2925;  /* dark theme article sheet bg     */
   --color-reader-text:       #2C3B37;  /* paper/light article text color  */
+
+  /* ── Home Pastel Cards Palette (Phase 1 — Color & Contrast Refinement) ── */
+  --color-home-bg: #FAF7F0;
+
+  /* Header Chips */
+  --color-home-streak-bg: #FDF4E1;
+  --color-home-streak-border: #F1DCAB;
+  --color-home-streak-ink: #7A520B;
+
+  --color-home-goal-bg: #F4F7F2;
+  --color-home-goal-border: #D8E2D5;
+  --color-home-goal-ink: #224838;
+
+  /* Card 1: Featured Lesson (Xanh lá sage) */
+  --color-home-sage-bg: #EAF1EB;
+  --color-home-sage-border: #C8DBCB;
+  --color-home-sage-accent: #205345;
+  --color-home-sage-title: #14372E;
+  --color-home-sage-text: #2D5246;
+  --color-home-sage-muted: #3D6356;
+  --color-home-sage-pill-bg: #F4F8F4;
+
+  /* Card 2: Daily Quote (Cam đào) */
+  --color-home-peach-bg: #FAF0E6;
+  --color-home-peach-border: #ECCDBB;
+  --color-home-peach-accent: #94462C;
+  --color-home-peach-title: #74321D;
+  --color-home-peach-text: #873F28;
+  --color-home-peach-link: #803720;
+  --color-home-peach-pill-bg: #F5E4D7;
+
+  /* Card 3: Vocabulary Collection (Tím lavender) */
+  --color-home-lavender-bg: #F1ECF8;
+  --color-home-lavender-border: #D8C7EB;
+  --color-home-lavender-accent: #5D377A;
+  --color-home-lavender-title: #421F5A;
+  --color-home-lavender-text: #593A70;
+  --color-home-lavender-link: #532C6F;
+  --color-home-lavender-dot-mastered: #1E5E43;
+  --color-home-lavender-dot-familiar: #805915;
+  --color-home-lavender-dot-learning: #6F3494;
+
+  /* Spaced Repetition 4-Tier Memory Status (Gợi ý: cam đất, vàng đất, xanh dịu, xanh đậm) */
+  --color-srs-again: #C85A32;
+  --color-srs-hard: #B8860B;
+  --color-srs-good: #2D7D6F;
+  --color-srs-easy: #1E4B43;
+  --color-srs-unreviewed: #8C827A;
+
+  /* Card 4: Weekly Progress (Xanh pastel) */
+  --color-home-blue-bg: #E8F1F8;
+  --color-home-blue-border: #C4D9EC;
+  --color-home-blue-accent: #1C5077;
+  --color-home-blue-title: #123855;
+  --color-home-blue-text: #214C6E;
+  --color-home-blue-link: #14446A;
+  --color-home-blue-day-bg: #D5E5F2;
+  --color-home-blue-day-text: #1B4668;
+  --color-home-blue-studied-bg: #C4E4D3;
+  --color-home-blue-studied-text: #154D34;
+
+  /* Section 5: Recommended Stories (Trắng ngà) */
+  --color-home-ivory-bg: #FDFBF7;
+  --color-home-ivory-border: #E8E1D3;
+  --color-home-ivory-title: #17382F;
+  --color-home-ivory-text: #36554C;
+  --color-home-ivory-tag-bg: #FAF7F0;
 }
 
 /* ── Dark Mode Surface & Ink overrides ─────────────────── */
@@ -173,6 +240,56 @@
   --color-on-feature: #BFE3EA;
   --color-shell: rgba(11, 26, 23, 0.85);
   --color-line: rgba(217, 183, 106, 0.2);
+  --color-home-bg: #0b1a17;
+  --color-home-streak-bg: #35260E;
+  --color-home-streak-border: #5C4318;
+  --color-home-streak-ink: #F9E0A2;
+  --color-home-goal-bg: #142E24;
+  --color-home-goal-border: #224E3D;
+  --color-home-goal-ink: #D0E9DE;
+  --color-home-sage-bg: #142822;
+  --color-home-sage-border: #25473D;
+  --color-home-sage-accent: #A5D6C6;
+  --color-home-sage-title: #FBF7EE;
+  --color-home-sage-text: #C4DFD6;
+  --color-home-sage-muted: #95BDB0;
+  --color-home-sage-pill-bg: #1A342C;
+  --color-home-peach-bg: #2C1B14;
+  --color-home-peach-border: #4D2F22;
+  --color-home-peach-accent: #F5B89F;
+  --color-home-peach-title: #FBF7EE;
+  --color-home-peach-text: #E5BFB0;
+  --color-home-peach-link: #F7C0A8;
+  --color-home-peach-pill-bg: #3A231A;
+  --color-home-lavender-bg: #22182B;
+  --color-home-lavender-border: #3E2C4E;
+  --color-home-lavender-accent: #D4BCEB;
+  --color-home-lavender-title: #FBF7EE;
+  --color-home-lavender-text: #CEBDE0;
+  --color-home-lavender-link: #D9C3F0;
+  --color-home-lavender-dot-mastered: #62C59B;
+  --color-home-lavender-dot-familiar: #E5B254;
+  --color-home-lavender-dot-learning: #BD8DE0;
+  --color-srs-again: #E07A5F;
+  --color-srs-hard: #E5B254;
+  --color-srs-good: #5EB8A7;
+  --color-srs-easy: #4DB6AC;
+  --color-srs-unreviewed: #A8A099;
+  --color-home-blue-bg: #14222E;
+  --color-home-blue-border: #233C52;
+  --color-home-blue-accent: #A8CEEB;
+  --color-home-blue-title: #FBF7EE;
+  --color-home-blue-text: #B9D5EC;
+  --color-home-blue-link: #BCDDF7;
+  --color-home-blue-day-bg: #1B2F40;
+  --color-home-blue-day-text: #D0E5F7;
+  --color-home-blue-studied-bg: #1B4532;
+  --color-home-blue-studied-text: #8AE0B7;
+  --color-home-ivory-bg: #16241F;
+  --color-home-ivory-border: #2A4239;
+  --color-home-ivory-title: #FBF7EE;
+  --color-home-ivory-text: #C4DFD6;
+  --color-home-ivory-tag-bg: #1E332C;
 
   --color-ink: #FBF7EE;
   --color-ink-soft: #d0deda;

@@ -58,8 +58,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="vc-navbar">
       <div className="vc-navbar-inner">
         <Link
-          to={getLocalizedPath(PATHS.home, currentLang)}
-          aria-label={t('navbar.study_room_label', 'VieCultures study room')}
+          to={isLoggedIn ? getLocalizedPath(PATHS.home, currentLang) : getLocalizedPath(PATHS.landing, currentLang)}
+          aria-label={isLoggedIn ? t('navbar.study_room_label', 'VieCultures study room') : 'VieCultures'}
           className="vc-navbar-brand"
         >
           <BrandLogo size="md" theme="light" />

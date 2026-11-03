@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
   const port = env.VITE_PORT || env.PORT ? parseInt(env.VITE_PORT || env.PORT, 10) : undefined;
 
   return {
-    base: "./",
+    base: process.env.VITE_BASE_PATH || "/",
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

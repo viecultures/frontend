@@ -149,6 +149,34 @@ export function calculateNextSRS(
 }
 
 /**
+ * Formats interval into natural Vietnamese representation:
+ * "Dưới 1 phút", "1 ngày", "2 ngày", "3 ngày", "12 giờ", v.v.
+ */
+export function formatIntervalVi(intervalText: string | number): string {
+  if (typeof intervalText === 'number') {
+    if (intervalText === 0) return 'Dưới 1 phút';
+    return `${intervalText} ngày`;
+  }
+  const text = intervalText.trim();
+  if (text === '< 1m' || text === '< 1 phút' || text === '<1m' || text === '0d' || text === '0') {
+    return 'Dưới 1 phút';
+  }
+  if (text.endsWith('h')) {
+    const hours = parseInt(text, 10);
+    return `${hours} giờ`;
+  }
+  if (text.endsWith('d')) {
+    const days = parseInt(text, 10);
+    return `${days} ngày`;
+  }
+  const parsed = parseInt(text, 10);
+  if (!isNaN(parsed)) {
+    return `${parsed} ngày`;
+  }
+  return text;
+}
+
+/**
  * Pre-computes the display intervals for the 4 Anki rating buttons.
  */
 export function getRatingIntervals(current?: CardSRSState): Record<AnkiRating, RatingIntervalInfo> {
@@ -182,42 +210,42 @@ export function getRatingIntervals(current?: CardSRSState): Record<AnkiRating, R
     again: {
       rating: 'again',
       shortcut: '1',
-      labelVi: 'Quên',
+      labelVi: 'Quên mất',
       labelEn: 'Again',
-      intervalTextVi: '< 1 phút',
+      intervalTextVi: 'Dưới 1 phút',
       intervalTextEn: '< 1m',
-      descriptionVi: 'Ôn lại ngay trong phiên này',
-      descriptionEn: 'Repeat soon in this session',
+      descriptionVi: 'Chưa nhớ ra, cần xem lại.',
+      descriptionEn: 'Could not recall, need to review.',
     },
     hard: {
       rating: 'hard',
       shortcut: '2',
-      labelVi: 'Khó',
+      labelVi: 'Khó nhớ',
       labelEn: 'Hard',
-      intervalTextVi: hardText,
+      intervalTextVi: formatIntervalVi(hardText),
       intervalTextEn: hardText,
-      descriptionVi: 'Nhớ ngập ngừng, cần ôn sớm',
-      descriptionEn: 'Hesitant recall, review soon',
+      descriptionVi: 'Nhớ ra nhưng còn chật vật.',
+      descriptionEn: 'Hesitant recall, review soon.',
     },
     good: {
       rating: 'good',
       shortcut: '3',
-      labelVi: 'Tốt',
+      labelVi: 'Nhớ rồi',
       labelEn: 'Good',
-      intervalTextVi: goodText,
+      intervalTextVi: formatIntervalVi(goodText),
       intervalTextEn: goodText,
-      descriptionVi: 'Nhớ vừa sức, giãn cách chuẩn',
-      descriptionEn: 'Standard interval progression',
+      descriptionVi: 'Nhớ được mà không cần gợi ý.',
+      descriptionEn: 'Standard interval progression.',
     },
     easy: {
       rating: 'easy',
       shortcut: '4',
-      labelVi: 'Dễ',
+      labelVi: 'Thuộc làu',
       labelEn: 'Easy',
-      intervalTextVi: easyText,
+      intervalTextVi: formatIntervalVi(easyText),
       intervalTextEn: easyText,
-      descriptionVi: 'Nhớ chắc ngay lập tức',
-      descriptionEn: 'Instant effortless recall',
+      descriptionVi: 'Nhớ ngay, không cần nghĩ lâu.',
+      descriptionEn: 'Instant effortless recall.',
     },
   };
 }
