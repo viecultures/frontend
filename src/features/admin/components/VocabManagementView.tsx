@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import {
   BookOpen,
@@ -40,8 +41,10 @@ export const VocabManagementView: React.FC = () => {
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
   // Filters & Pagination State
-  const [searchInput, setSearchInput] = useState<string>('');
-  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+  const [searchInput, setSearchInput] = useState<string>(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>(initialSearch);
   const [selectedLevel, setSelectedLevel] = useState<string>('ALL');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const pageSize = 10;
@@ -65,6 +68,16 @@ export const VocabManagementView: React.FC = () => {
 
     return () => clearTimeout(handler);
   }, [searchInput]);
+
+  // Sync when search query in URL changes
+  useEffect(() => {
+    const querySearch = searchParams.get('search');
+    if (querySearch !== null && querySearch !== searchInput) {
+      setSearchInput(querySearch);
+      setDebouncedSearch(querySearch);
+      setCurrentPage(0);
+    }
+  }, [searchParams]);
 
   // Cleanup audio instance
   useEffect(() => {

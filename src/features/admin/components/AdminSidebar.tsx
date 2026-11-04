@@ -19,6 +19,7 @@ import {
   Sliders,
   Globe,
   Cpu,
+  History,
 } from 'lucide-react';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 
@@ -251,10 +252,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       badge: userCount !== undefined && userCount > 0 ? userCount.toLocaleString('en-US') : undefined,
     },
     {
-      id: 'system',
-      aliases: ['logs'],
-      fallbackLabel: 'Hệ thống & Kiểm duyệt',
-      icon: ShieldCheck,
+      id: 'history',
+      aliases: ['logs', 'system'],
+      fallbackLabel: 'Nhật ký & Lịch sử',
+      icon: History,
     },
     {
       id: 'ai_configs',

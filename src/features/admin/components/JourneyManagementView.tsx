@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import {
   Compass,
@@ -9,18 +10,22 @@ import {
   Trash2,
   MapPin,
   Layers,
+  LayoutTemplate,
   CheckCircle2,
   AlertCircle,
   ExternalLink,
   Calendar,
   Clock,
 } from 'lucide-react';
-import type { LearningJourneyItem } from '../types/adminTypes';
+import type { LearningJourneyItem, ReadingPostItem } from '../types/adminTypes';
 import { journeyAdminService, type JourneyFilterParams } from '../services/journeyAdminService';
+import { postAdminService } from '../services/postAdminService';
 import { JourneyFormModal } from './JourneyFormModal';
+import { JourneyCanvasModal } from './JourneyCanvasModal';
 import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 
 export const JourneyManagementView: React.FC = () => {
+  const navigate = useNavigate();
   const [journeys, setJourneys] = useState<LearningJourneyItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -36,6 +41,29 @@ export const JourneyManagementView: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingJourney, setEditingJourney] = useState<LearningJourneyItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Whiteboard Canvas State
+  const [canvasJourney, setCanvasJourney] = useState<LearningJourneyItem | null>(null);
+  const [canvasPosts, setCanvasPosts] = useState<ReadingPostItem[]>([]);
+  const [isLoadingCanvasPosts, setIsLoadingCanvasPosts] = useState(false);
+
+  const handleOpenCanvas = async (journey: LearningJourneyItem) => {
+    setCanvasJourney(journey);
+    setIsLoadingCanvasPosts(true);
+    try {
+      const posts = await postAdminService.getPosts({ journeyId: journey.id });
+      setCanvasPosts(posts);
+    } catch (err: unknown) {
+      console.error('Lỗi tải bài viết cho Whiteboard Canvas:', err);
+      setCanvasPosts([]);
+    } finally {
+      setIsLoadingCanvasPosts(false);
+    }
+  };
+
+  const handleViewJourneyPosts = (journeyId: string) => {
+    navigate(`/admin/content?tab=posts&journeyId=${encodeURIComponent(journeyId)}`);
+  };
 
   const fetchJourneys = async () => {
     setIsLoading(true);
@@ -326,10 +354,15 @@ export const JourneyManagementView: React.FC = () => {
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap text-center">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-antique-gold/15 text-heritage-green dark:text-antique-bright border border-antique-gold/30">
+                      <button
+                        type="button"
+                        onClick={() => handleViewJourneyPosts(j.id)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-antique-gold/15 hover:bg-antique-gold/30 text-heritage-green dark:text-antique-bright border border-antique-gold/30 transition-colors cursor-pointer"
+                        title="Xem danh sách bài viết thuộc lộ trình này"
+                      >
                         <Layers aria-hidden="true" className="w-3 h-3 text-antique-gold" />
                         <span>{j.chapters?.length || 0} chặng</span>
-                      </span>
+                      </button>
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap text-text-muted text-[11px] font-mono">
@@ -343,6 +376,15 @@ export const JourneyManagementView: React.FC = () => {
 
                     <td className="px-5 py-4 whitespace-nowrap text-right space-x-1.5">
                       <button
+                        type="button"
+                        onClick={() => handleOpenCanvas(j)}
+                        className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
+                        title="Mở Whiteboard / Toàn cảnh lộ trình"
+                      >
+                        <LayoutTemplate aria-hidden="true" className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => handleOpenEdit(j)}
                         className="p-1.5 rounded-lg text-antique-gold hover:bg-antique-gold/15 transition-colors cursor-pointer"
                         title="Chỉnh sửa hành trình"
@@ -350,6 +392,7 @@ export const JourneyManagementView: React.FC = () => {
                         <Edit3 aria-hidden="true" className="w-4 h-4" />
                       </button>
                       <button
+                        type="button"
                         onClick={() => setDeletingId(j.id)}
                         className="p-1.5 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
                         title="Xóa hành trình"
@@ -406,6 +449,31 @@ export const JourneyManagementView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Journey Whiteboard / Canvas Modal */}
+      <JourneyCanvasModal
+        isOpen={Boolean(canvasJourney)}
+        journey={canvasJourney}
+        posts={canvasPosts}
+        isLoadingPosts={isLoadingCanvasPosts}
+        onClose={() => setCanvasJourney(null)}
+        onSelectPost={(post) => {
+          setCanvasJourney(null);
+          navigate(`/admin/content?tab=posts&journeyId=${encodeURIComponent(post.journeyId || canvasJourney?.id || '')}`);
+        }}
+        onViewVocab={(post) => {
+          setCanvasJourney(null);
+          navigate(`/admin/content?tab=posts&journeyId=${encodeURIComponent(post.journeyId || canvasJourney?.id || '')}`);
+        }}
+        onEditJourney={(j) => {
+          setCanvasJourney(null);
+          handleOpenEdit(j);
+        }}
+        onAddChapter={(j) => {
+          setCanvasJourney(null);
+          navigate(`/admin/content?tab=posts&journeyId=${encodeURIComponent(j.id)}`);
+        }}
+      />
     </div>
   );
 };
