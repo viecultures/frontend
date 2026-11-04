@@ -6,16 +6,8 @@ import {
   BookOpen,
   Layers,
   Sparkles,
-  Edit3,
-  ExternalLink,
-  X,
-  Check,
-  Type,
   Sun,
   Moon,
-  ListOrdered,
-  Eye,
-  SlidersHorizontal,
 } from 'lucide-react';
 import '@/features/reader/reader-design.css';
 import '@/features/reader/reader-components.css';
@@ -42,7 +34,6 @@ import {
 
 export type CanvasViewportMode = 'desktop' | 'tablet' | 'mobile';
 export type CanvasDisplayMode = 'reader' | 'card';
-export type AdminPreviewMode = 'learner' | 'quick-edit';
 
 export interface PostPreviewCanvasProps {
   titleEn: string;
@@ -80,28 +71,19 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
   vocabularies,
   questions,
   voiceTracks,
-  onFocusParagraphInForm,
-  onUpdateParagraph,
 }) => {
   // ── 1. Viewport & Display State ───────────────────────────────────────────
   const [viewport, setViewport] = useState<CanvasViewportMode>('desktop');
   const [displayMode, setDisplayMode] = useState<CanvasDisplayMode>('reader');
-  const [adminMode, setAdminMode] = useState<AdminPreviewMode>('learner');
   const [fontSize, setFontSize] = useState<number>(17);
   const [themeMode, setThemeMode] = useState<'paper' | 'dark'>('paper');
 
-  // ── 2. Quick Edit Admin State ─────────────────────────────────────────────
-  const [isInspectorOpen, setIsInspectorOpen] = useState<boolean>(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [draftEn, setDraftEn] = useState<string>('');
-  const [draftVi, setDraftVi] = useState<string>('');
-
-  // ── 3. Interactive Quiz Local State ───────────────────────────────────────
+  // ── 2. Interactive Quiz Local State ───────────────────────────────────────
   const [q1Answer, setQ1Answer] = useState<string>('');
   const [q2Answer, setQ2Answer] = useState<string>('');
   const [quizSubmitted, setQuizSubmitted] = useState<boolean>(false);
 
-  // ── 4. Audio Playback State & Handlers ────────────────────────────────────
+  // ── 3. Audio Playback State & Handlers ────────────────────────────────────
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
@@ -240,27 +222,7 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
   // Kho từ vựng đã lưu phục vụ InPlaceDictionaryPopup
   const savedVocabulary = useSavedVocabulary('preview-draft', readerLevel);
 
-  // ── 6. Inline Edit Handlers ───────────────────────────────────────────────
-  const startInlineEdit = (index: number, p: ParagraphPairDto) => {
-    setEditingIndex(index);
-    setDraftEn(p.enText || '');
-    setDraftVi(p.viText || '');
-  };
-
-  const cancelInlineEdit = () => {
-    setEditingIndex(null);
-    setDraftEn('');
-    setDraftVi('');
-  };
-
-  const saveInlineEdit = () => {
-    if (editingIndex !== null && onUpdateParagraph) {
-      onUpdateParagraph(editingIndex, draftEn, draftVi);
-    }
-    setEditingIndex(null);
-  };
-
-  // ── 7. Viewport Width Classes ─────────────────────────────────────────────
+  // ── 6. Viewport Width Classes ─────────────────────────────────────────────
   const viewportWidthClass = {
     desktop: 'w-full max-w-[1380px]',
     tablet: 'w-full max-w-[768px]',
@@ -358,48 +320,11 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
             </button>
           </div>
 
-          {/* Cụm phải: Admin Mode Toggle & Font/Theme Controls */}
+          {/* Cụm phải: Font & Theme Controls */}
           <div className="flex items-center gap-2">
-            {/* Chế độ Admin Toggle: Học viên vs Biên tập nhanh */}
-            {displayMode === 'reader' && (
-              <div className="flex items-center gap-1 bg-white/70 dark:bg-white/10 p-1 rounded-xl border border-antique-gold/30 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setAdminMode('learner')}
-                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                    adminMode === 'learner'
-                      ? 'bg-heritage-green text-warm-ivory shadow-xs'
-                      : 'text-text-muted hover:text-heritage-green'
-                  }`}
-                  title="Chế độ học viên: 100% giao diện thực tế của người học"
-                >
-                  <Eye aria-hidden="true" className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">Trải nghiệm học viên</span>
-                  <span className="md:hidden">Học viên</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAdminMode('quick-edit');
-                    setIsInspectorOpen(true);
-                  }}
-                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                    adminMode === 'quick-edit'
-                      ? 'bg-antique-gold text-heritage-dark shadow-xs'
-                      : 'text-text-muted hover:text-heritage-green'
-                  }`}
-                  title="Chế độ biên tập: Hiện thanh công cụ sửa nhanh đoạn văn và trỏ vào form"
-                >
-                  <Edit3 aria-hidden="true" className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">Chế độ biên tập</span>
-                  <span className="md:hidden">Sửa nhanh</span>
-                </button>
-              </div>
-            )}
-
             {/* Điều khiển cỡ chữ & giao diện */}
             {displayMode === 'reader' && (
-              <div className="hidden lg:flex items-center gap-1 bg-white/70 dark:bg-white/10 p-1 rounded-xl border border-antique-gold/30">
+              <div className="flex items-center gap-1 bg-white/70 dark:bg-white/10 p-1 rounded-xl border border-antique-gold/30">
                 <button
                   type="button"
                   onClick={() => setFontSize((f) => Math.max(14, f - 1))}
@@ -516,6 +441,7 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
               <div
                 className="reader-desk w-full flex-1 flex flex-col items-center min-h-[600px]"
                 data-desk-theme={themeMode}
+                data-canvas-viewport={viewport}
               >
                 <section className="reader-desk-canvas w-full">
                   <div className="reader-desk-content">
@@ -628,165 +554,6 @@ export const PostPreviewCanvas: React.FC<PostPreviewCanvasProps> = ({
             )}
           </div>
         </div>
-
-        {/* ── Bảng điều khiển Biên tập viên (Quick Edit Inspector) ──────────── */}
-        {adminMode === 'quick-edit' && displayMode === 'reader' && (
-          <aside className="border-t border-antique-gold/30 bg-warm-ivory dark:bg-heritage-dark shadow-2xl z-20 shrink-0">
-            <div className="px-4 py-2 flex items-center justify-between border-b border-antique-gold/20">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal
-                  aria-hidden="true"
-                  className="w-4 h-4 text-antique-gold"
-                />
-                <span className="text-xs font-bold text-heritage-green dark:text-antique-bright">
-                  Bảng công cụ Biên tập nhanh ({paragraphs.length} đoạn văn)
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsInspectorOpen(!isInspectorOpen)}
-                className="text-xs font-bold text-antique-gold hover:underline cursor-pointer"
-              >
-                {isInspectorOpen ? 'Thu gọn' : 'Mở rộng'}
-              </button>
-            </div>
-
-            {isInspectorOpen && (
-              <div className="max-h-56 overflow-y-auto p-3 space-y-2">
-                {paragraphs.length === 0 ? (
-                  <div className="text-xs text-text-muted italic text-center py-3">
-                    Chưa có đoạn văn nào trong bài viết.
-                  </div>
-                ) : (
-                  paragraphs.map((p, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 rounded-xl bg-white dark:bg-stone-800 border border-antique-gold/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:border-antique-gold/60 transition-colors"
-                    >
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-heritage-green text-warm-ivory text-[10px] font-bold flex items-center justify-center shrink-0">
-                            {idx + 1}
-                          </span>
-                          <span className="text-xs font-serif font-bold text-text-body dark:text-warm-ivory truncate">
-                            {p.enText || '(Đoạn tiếng Anh trống)'}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-text-muted italic truncate pl-7">
-                          {p.viText || '(Chưa có bản dịch tiếng Việt)'}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
-                        {onFocusParagraphInForm && (
-                          <button
-                            type="button"
-                            onClick={() => onFocusParagraphInForm(idx)}
-                            className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 text-[11px] font-bold text-text-body dark:text-warm-ivory flex items-center gap-1 cursor-pointer transition-colors"
-                            title="Chuyển tới đoạn văn này ở biểu mẫu biên soạn"
-                          >
-                            <ExternalLink
-                              aria-hidden="true"
-                              className="w-3 h-3 text-antique-gold"
-                            />
-                            <span>Trỏ vào Form</span>
-                          </button>
-                        )}
-                        {onUpdateParagraph && (
-                          <button
-                            type="button"
-                            onClick={() => startInlineEdit(idx, p)}
-                            className="px-2.5 py-1 rounded-lg bg-antique-gold/20 hover:bg-antique-gold/40 text-[11px] font-bold text-heritage-dark dark:text-antique-bright flex items-center gap-1 cursor-pointer transition-colors"
-                            title="Sửa nhanh đoạn văn này ngay trên Canvas"
-                          >
-                            <Edit3 aria-hidden="true" className="w-3 h-3" />
-                            <span>Sửa nhanh</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-          </aside>
-        )}
-
-        {/* ── Dialog Sửa Nhanh Đoạn Văn (Quick Edit Modal) ─────────────────── */}
-        {editingIndex !== null && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="w-full max-w-xl rounded-2xl bg-warm-ivory dark:bg-stone-900 border border-antique-gold/40 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-              <div className="px-5 py-3.5 bg-heritage-green text-warm-ivory flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Edit3
-                    aria-hidden="true"
-                    className="w-4 h-4 text-antique-gold"
-                  />
-                  <h3 className="font-heading font-bold text-sm">
-                    Sửa nhanh Đoạn {editingIndex + 1}
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={cancelInlineEdit}
-                  className="p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer text-warm-ivory"
-                  aria-label="Đóng hộp thoại"
-                >
-                  <X aria-hidden="true" className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="p-5 space-y-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-heritage-green dark:text-antique-gold uppercase tracking-wider">
-                    Tiếng Anh (Original EN)
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={draftEn}
-                    onChange={(e) => setDraftEn(e.target.value)}
-                    className="w-full p-3 rounded-xl border border-antique-gold/40 bg-white dark:bg-stone-800 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold leading-relaxed"
-                    placeholder="Nhập nội dung tiếng Anh..."
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-heritage-green dark:text-antique-gold uppercase tracking-wider">
-                    Tiếng Việt (Translation VI)
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={draftVi}
-                    onChange={(e) => setDraftVi(e.target.value)}
-                    className="w-full p-3 rounded-xl border border-antique-gold/40 bg-white dark:bg-stone-800 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold leading-relaxed"
-                    placeholder="Nhập bản dịch tiếng Việt..."
-                  />
-                </div>
-              </div>
-
-              <div className="px-5 py-3 bg-stone-100 dark:bg-stone-800/60 border-t border-antique-gold/20 flex items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={cancelInlineEdit}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-text-muted hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                >
-                  Hủy bỏ
-                </button>
-                <button
-                  type="button"
-                  onClick={saveInlineEdit}
-                  className="px-4 py-2 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold hover:bg-heritage-dark transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
-                >
-                  <Check
-                    aria-hidden="true"
-                    className="w-3.5 h-3.5 text-antique-gold"
-                  />
-                  <span>Lưu vào bài viết</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </SavedVocabularyContext.Provider>
   );

@@ -1,31 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'motion/react';
 import {
   Compass,
   Plus,
   Search,
   RefreshCw,
-  Edit3,
-  Trash2,
   MapPin,
   Layers,
-  LayoutTemplate,
   CheckCircle2,
   AlertCircle,
-  ExternalLink,
   Calendar,
   Clock,
+  Eye,
 } from 'lucide-react';
-import type { LearningJourneyItem, ReadingPostItem } from '../types/adminTypes';
+import type { LearningJourneyItem } from '../types/adminTypes';
 import { journeyAdminService, type JourneyFilterParams } from '../services/journeyAdminService';
-import { postAdminService } from '../services/postAdminService';
 import { JourneyFormModal } from './JourneyFormModal';
-import { JourneyCanvasModal } from './JourneyCanvasModal';
 import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
+import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 
 export const JourneyManagementView: React.FC = () => {
   const navigate = useNavigate();
+  const { i18n } = useTranslation('admin');
+  const currentLang = resolveLanguage(i18n.language);
+
   const [journeys, setJourneys] = useState<LearningJourneyItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -37,32 +37,12 @@ export const JourneyManagementView: React.FC = () => {
   const [selectedTheme, setSelectedTheme] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  // Modals
+  // Create Modal
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingJourney, setEditingJourney] = useState<LearningJourneyItem | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Whiteboard Canvas State
-  const [canvasJourney, setCanvasJourney] = useState<LearningJourneyItem | null>(null);
-  const [canvasPosts, setCanvasPosts] = useState<ReadingPostItem[]>([]);
-  const [isLoadingCanvasPosts, setIsLoadingCanvasPosts] = useState(false);
-
-  const handleOpenCanvas = async (journey: LearningJourneyItem) => {
-    setCanvasJourney(journey);
-    setIsLoadingCanvasPosts(true);
-    try {
-      const posts = await postAdminService.getPosts({ journeyId: journey.id });
-      setCanvasPosts(posts);
-    } catch (err: unknown) {
-      console.error('Lỗi tải bài viết cho Whiteboard Canvas:', err);
-      setCanvasPosts([]);
-    } finally {
-      setIsLoadingCanvasPosts(false);
-    }
-  };
-
-  const handleViewJourneyPosts = (journeyId: string) => {
-    navigate(`/admin/content?tab=posts&journeyId=${encodeURIComponent(journeyId)}`);
+  const handleViewJourneyDetail = (journeyId: string) => {
+    navigate(getLocalizedPath(`/admin/journeys/${encodeURIComponent(journeyId)}`, currentLang));
   };
 
   const fetchJourneys = async () => {
@@ -97,25 +77,6 @@ export const JourneyManagementView: React.FC = () => {
   const handleOpenCreate = () => {
     setEditingJourney(null);
     setIsFormOpen(true);
-  };
-
-  const handleOpenEdit = (item: LearningJourneyItem) => {
-    setEditingJourney(item);
-    setIsFormOpen(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await journeyAdminService.deleteJourney(id);
-      setJourneys((prev) => prev.filter((j) => j.id !== id));
-      setSuccessToast('Đã xóa hành trình học thành công.');
-      setTimeout(() => setSuccessToast(null), 3000);
-    } catch (err: unknown) {
-      console.error('Lỗi xóa hành trình học:', err);
-      setErrorMsg((err instanceof Error ? err.message : '') || 'Lỗi khi xóa hành trình.');
-    } finally {
-      setDeletingId(null);
-    }
   };
 
   const handleSaved = (saved: LearningJourneyItem) => {
@@ -356,9 +317,9 @@ export const JourneyManagementView: React.FC = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-center">
                       <button
                         type="button"
-                        onClick={() => handleViewJourneyPosts(j.id)}
+                        onClick={() => handleViewJourneyDetail(j.id)}
                         className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-antique-gold/15 hover:bg-antique-gold/30 text-heritage-green dark:text-antique-bright border border-antique-gold/30 transition-colors cursor-pointer"
-                        title="Xem danh sách bài viết thuộc lộ trình này"
+                        title="Xem chi tiết toàn cảnh lộ trình"
                       >
                         <Layers aria-hidden="true" className="w-3 h-3 text-antique-gold" />
                         <span>{j.chapters?.length || 0} chặng</span>
@@ -374,30 +335,16 @@ export const JourneyManagementView: React.FC = () => {
 
                     <td className="px-4 py-4 whitespace-nowrap">{getStatusBadge(j.status, j.scheduledPublishAt)}</td>
 
-                    <td className="px-5 py-4 whitespace-nowrap text-right space-x-1.5">
+                    {/* Thao tác: BỎ nút Sửa và Xóa theo yêu cầu. Chỉ giữ nút Xem chi tiết. Nút Xóa và Sửa chuyển vào trong trang xem. */}
+                    <td className="px-5 py-4 whitespace-nowrap text-right">
                       <button
                         type="button"
-                        onClick={() => handleOpenCanvas(j)}
-                        className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
-                        title="Mở Whiteboard / Toàn cảnh lộ trình"
+                        onClick={() => handleViewJourneyDetail(j.id)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-antique-gold/20 hover:bg-antique-gold/35 text-heritage-green dark:text-antique-bright font-bold text-xs transition-colors cursor-pointer shadow-2xs"
+                        title="Xem chi tiết và tiến trình lộ trình"
                       >
-                        <LayoutTemplate aria-hidden="true" className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEdit(j)}
-                        className="p-1.5 rounded-lg text-antique-gold hover:bg-antique-gold/15 transition-colors cursor-pointer"
-                        title="Chỉnh sửa hành trình"
-                      >
-                        <Edit3 aria-hidden="true" className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeletingId(j.id)}
-                        className="p-1.5 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
-                        title="Xóa hành trình"
-                      >
-                        <Trash2 aria-hidden="true" className="w-4 h-4" />
+                        <Eye aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                        <span>Xem chi tiết</span>
                       </button>
                     </td>
                   </tr>
@@ -408,7 +355,7 @@ export const JourneyManagementView: React.FC = () => {
         )}
       </div>
 
-      {/* Form Modal */}
+      {/* Create Journey Form Modal */}
       <JourneyFormModal
         isOpen={isFormOpen}
         onClose={() => {
@@ -418,62 +365,8 @@ export const JourneyManagementView: React.FC = () => {
         onSuccess={handleSaved}
         initialData={editingJourney}
       />
-
-      {/* Delete Confirmation Dialog */}
-      {deletingId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="w-full max-w-md bg-rice-paper dark:bg-heritage-dark border border-antique-gold/40 rounded-3xl p-6 shadow-2xl space-y-4">
-            <h3 className="font-heading font-bold text-base text-heritage-green dark:text-warm-ivory">
-              Xác nhận xóa hành trình học
-            </h3>
-            <p className="text-xs text-text-muted leading-relaxed">
-              Bạn có chắc chắn muốn xóa hành trình này không? Các bài đọc bên trong sẽ được giữ lại
-              và chuyển thành bài đọc độc lập (standalone).
-            </p>
-            <div className="flex justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setDeletingId(null)}
-                className="px-4 py-2 rounded-xl border border-antique-gold/30 text-xs font-semibold hover:bg-antique-gold/10"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDelete(deletingId)}
-                className="px-4 py-2 rounded-xl bg-red-600 text-white text-xs font-bold hover:bg-red-700 shadow-md"
-              >
-                Xác nhận xóa
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Journey Whiteboard / Canvas Modal */}
-      <JourneyCanvasModal
-        isOpen={Boolean(canvasJourney)}
-        journey={canvasJourney}
-        posts={canvasPosts}
-        isLoadingPosts={isLoadingCanvasPosts}
-        onClose={() => setCanvasJourney(null)}
-        onSelectPost={(post) => {
-          setCanvasJourney(null);
-          navigate(`/admin/content?tab=posts&journeyId=${encodeURIComponent(post.journeyId || canvasJourney?.id || '')}`);
-        }}
-        onViewVocab={(post) => {
-          setCanvasJourney(null);
-          navigate(`/admin/content?tab=posts&journeyId=${encodeURIComponent(post.journeyId || canvasJourney?.id || '')}`);
-        }}
-        onEditJourney={(j) => {
-          setCanvasJourney(null);
-          handleOpenEdit(j);
-        }}
-        onAddChapter={(j) => {
-          setCanvasJourney(null);
-          navigate(`/admin/content?tab=posts&journeyId=${encodeURIComponent(j.id)}`);
-        }}
-      />
     </div>
   );
 };
+
+export default JourneyManagementView;

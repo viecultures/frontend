@@ -36,6 +36,7 @@ const AiWorkspacePage = React.lazy(() => import('@/features/playground/pages/ai-
 const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
 const AdminPostEditorPage = React.lazy(() => import('@/features/admin/pages/AdminPostEditorPage'));
 const AdminLearnerDetailPage = React.lazy(() => import('@/features/admin/pages/AdminLearnerDetailPage'));
+const AdminJourneyDetailPage = React.lazy(() => import('@/features/admin/pages/AdminJourneyDetailPage'));
 const PricingPage = React.lazy(() => import('@/features/subscription/pages/PricingPage'));
 const CheckoutPage = React.lazy(() => import('@/features/subscription/pages/CheckoutPage'));
 const ProfilePage = React.lazy(() => import('@/features/profile/pages/ProfilePage'));
@@ -287,6 +288,7 @@ export const App: React.FC = () => {
                 }
               >
                 <Route path={`${toRel(PATHS.admin)}/users/:id`} element={<AdminLearnerDetailPage />} />
+                <Route path={`${toRel(PATHS.admin)}/journeys/:id`} element={<AdminJourneyDetailPage />} />
                 <Route path={toRel(PATHS.admin)} element={<AdminPage />} />
                 <Route path={`${toRel(PATHS.admin)}/*`} element={<AdminPage />} />
                 <Route path={`${toRel(PATHS.admin)}/:tab`} element={<AdminPage />} />

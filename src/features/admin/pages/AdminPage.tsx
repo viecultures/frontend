@@ -347,8 +347,8 @@ export const AdminPage: React.FC = () => {
         (post.wordCount && post.wordCount > 0)
       );
       const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
-      const quizQuestions = post.questions || [];
-      const hasQuiz = Array.isArray(quizQuestions) && quizQuestions.length > 0;
+      const quizCount = post.questionCount ?? (Array.isArray(post.questions) ? post.questions.length : 0);
+      const hasQuiz = quizCount > 0;
       return !hasParagraphs || !hasAudio || !hasQuiz;
     });
   }, [posts]);
@@ -1050,8 +1050,8 @@ export const AdminPage: React.FC = () => {
                           (post.wordCount && post.wordCount > 0)
                         );
                         const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
-                        const quizQuestions = post.questions || [];
-                        const hasQuiz = Array.isArray(quizQuestions) && quizQuestions.length > 0;
+                        const quizCount = post.questionCount ?? (Array.isArray(post.questions) ? post.questions.length : 0);
+                        const hasQuiz = quizCount > 0;
 
                         return (
                           <tr key={post.id} className="hover:bg-warm-ivory/60 dark:hover:bg-white/5 transition-colors">
@@ -1314,8 +1314,7 @@ export const AdminPage: React.FC = () => {
                         const paragraphCount = post.paragraphs?.length || (post.wordCount ? Math.ceil(post.wordCount / 50) : 0);
                         const vocabCount = post.vocabCount ?? post.vocabularies?.length ?? 0;
                         const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
-                        const quizQuestions = post.questions || [];
-                        const quizCount = Array.isArray(quizQuestions) ? quizQuestions.length : 0;
+                        const quizCount = post.questionCount ?? (Array.isArray(post.questions) ? post.questions.length : 0);
 
                         return (
                           <tr
