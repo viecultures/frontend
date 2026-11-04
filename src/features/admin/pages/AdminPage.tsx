@@ -486,7 +486,7 @@ export const AdminPage: React.FC = () => {
           icon: Globe,
           title: 'Google Search Console',
           subtitle: 'Giám sát thứ hạng từ khóa văn hóa, lượt hiển thị và nhấp chuột trên Google Search',
-          badge: 'sc-domain:viecultures.app',
+          badge: '',
         };
       case 'history':
       case 'system':
@@ -532,9 +532,11 @@ export const AdminPage: React.FC = () => {
                 <h1 className="font-heading text-sm sm:text-base font-bold tracking-tight truncate">
                   {headerConfig.title}
                 </h1>
-                <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-antique-gold/20 text-antique-bright text-[10px] font-bold border border-antique-gold/30 shrink-0">
-                  {headerConfig.badge}
-                </span>
+                {headerConfig.badge ? (
+                  <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-antique-gold/20 text-antique-bright text-[10px] font-bold border border-antique-gold/30 shrink-0">
+                    {headerConfig.badge}
+                  </span>
+                ) : null}
               </div>
               <p className="text-[11px] text-warm-ivory/80 truncate hidden md:block">
                 {headerConfig.subtitle}

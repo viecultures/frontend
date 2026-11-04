@@ -3,6 +3,8 @@ import type {
   AdminUserFilterParams,
   PaginatedResponse,
   ApiResponseEnvelope,
+  LearnerDetailItem,
+  LearnerActivityLogItem,
 } from '../types/adminTypes';
 import { getStoredToken } from '@/utils/auth-storage';
 import { API_BASE_URL } from '@/config/apiConfig';
@@ -127,6 +129,42 @@ export const adminUserService = {
     }
 
     const json: ApiResponseEnvelope<AdminUserItem> = await res.json();
+    return json.data;
+  },
+
+  /**
+   * Lấy chi tiết thông tin hồ sơ học viên, tiến độ học tập và giao dịch
+   */
+  async getLearnerDetails(id: string): Promise<LearnerDetailItem> {
+    const res = await fetch(`${API_BASE_URL}/api/v1/admin/users/${id}/details`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Không thể tải thông tin chi tiết học viên (HTTP ${res.status})`);
+    }
+
+    const json: ApiResponseEnvelope<LearnerDetailItem> = await res.json();
+    return json.data;
+  },
+
+  /**
+   * Lấy nhật ký duyệt trang và hoạt động của học viên có phân trang
+   */
+  async getLearnerActivityLogs(id: string, page = 0, size = 15): Promise<PaginatedResponse<LearnerActivityLogItem>> {
+    const res = await fetch(`${API_BASE_URL}/api/v1/admin/users/${id}/activity-logs?page=${page}&size=${size}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Không thể tải nhật ký hoạt động của học viên (HTTP ${res.status})`);
+    }
+
+    const json: ApiResponseEnvelope<PaginatedResponse<LearnerActivityLogItem>> = await res.json();
     return json.data;
   },
 };
