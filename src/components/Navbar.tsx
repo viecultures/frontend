@@ -82,7 +82,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
         <div className="vc-navbar-actions">
           <LanguageSwitcher variant="compact" />
-          {onOpenSettings && (
+          {/* {onOpenSettings && (
             <button
               type="button"
               className="vc-navbar-icon"
@@ -92,7 +92,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Settings size={19} />
             </button>
-          )}
+          )} */}
+
           {isLoggedIn ? (
             <div className="vc-navbar-profile">
               <button

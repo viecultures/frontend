@@ -2,84 +2,109 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-interface DiscoveryPaginationProps {
+export interface DiscoveryPaginationProps {
   currentPage: number;
   totalPages: number;
-  totalLessons: number;
+  totalItems?: number;
+  totalLessons?: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
+  ariaLabel?: string;
+  summaryText?: string;
+  itemLabel?: string;
+  showSinglePage?: boolean;
+}
+
+export function getDiscoveryPageNumbers(currentPage: number, totalPages: number): (number | 'ellipsis')[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, 5, 'ellipsis', totalPages];
+  }
+  if (currentPage >= totalPages - 3) {
+    return [1, 'ellipsis', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+  }
+  return [1, 'ellipsis', currentPage - 1, currentPage, currentPage + 1, 'ellipsis', totalPages];
 }
 
 export const DiscoveryPagination: React.FC<DiscoveryPaginationProps> = ({
   currentPage,
   totalPages,
+  totalItems,
   totalLessons,
   itemsPerPage,
   onPageChange,
+  ariaLabel,
+  summaryText,
+  itemLabel,
+  showSinglePage = false,
 }) => {
-  const { t } = useTranslation('discovery');
+  const { t, i18n } = useTranslation('discovery');
+  const isEn = i18n.language === 'en';
 
-  if (totalLessons === 0 || totalPages <= 1) return null;
+  const count = totalItems ?? totalLessons ?? 0;
+  if (count === 0 || (totalPages <= 1 && !showSinglePage)) return null;
 
   const startIdx = (currentPage - 1) * itemsPerPage + 1;
-  const endIdx = Math.min(currentPage * itemsPerPage, totalLessons);
+  const endIdx = Math.min(currentPage * itemsPerPage, count);
+  const pages = getDiscoveryPageNumbers(currentPage, totalPages);
 
-  const handlePageSelect = (page: number) => {
-    onPageChange(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const defaultSummary = isEn
+    ? `Showing ${startIdx}–${endIdx} of ${count} ${itemLabel || 'series'}`
+    : `Hiển thị ${startIdx}–${endIdx} trên ${count} ${itemLabel || 'chuỗi bài'}`;
 
   return (
-    <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-rice-paper/80 border border-heritage-green/12">
-      <div className="text-xs font-semibold text-text-secondary">
-        {t('pagination.showing_summary', {
-          start: startIdx,
-          end: endIdx,
-          total: totalLessons,
-        })}
+    <nav className="journey-pagination" aria-label={ariaLabel || t('journey.pagination_aria', { defaultValue: 'Series pagination' })}>
+      <div className="journey-pagination-info" role="status">
+        {summaryText || defaultSummary}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="journey-pagination-controls">
         <button
           type="button"
-          onClick={() => handlePageSelect(Math.max(1, currentPage - 1))}
-          disabled={currentPage === 1}
-          className="p-2 rounded-xl bg-warm-ivory border border-heritage-green/14 text-heritage-green disabled:opacity-40 disabled:cursor-not-allowed hover:bg-mist-cloud transition-all shadow-xs cursor-pointer"
-          title={t('pagination.prev_page')}
-          aria-label={t('pagination.prev_page')}
+          onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+          disabled={currentPage <= 1}
+          className="journey-pagination-button journey-pagination-prev"
+          title={t('pagination.prev_page', { defaultValue: 'Previous page' })}
+          aria-label={t('pagination.prev_page', { defaultValue: 'Previous page' })}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
 
-        <div className="flex items-center gap-1">
-          {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
-            <button
-              key={page}
-              type="button"
-              onClick={() => handlePageSelect(page)}
-              className={`w-8 h-8 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-                currentPage === page
-                  ? 'bg-heritage-green text-warm-ivory shadow-xs border border-antique-gold/50 scale-105'
-                  : 'bg-warm-ivory text-text-body hover:bg-mist-cloud border border-heritage-green/10'
-              }`}
-            >
-              {page}
-            </button>
-          ))}
+        <div className="journey-pagination-pages">
+          {pages.map((item, idx) =>
+            item === 'ellipsis' ? (
+              <span key={`ellipsis-${idx}`} className="journey-pagination-ellipsis" aria-hidden="true">
+                …
+              </span>
+            ) : (
+              <button
+                key={item}
+                type="button"
+                onClick={() => onPageChange(item)}
+                aria-current={currentPage === item ? 'page' : undefined}
+                aria-label={t('pagination.page_number', { page: item, defaultValue: isEn ? `Page ${item}` : `Trang ${item}` })}
+                className="journey-pagination-button"
+              >
+                {item}
+              </button>
+            )
+          )}
         </div>
 
         <button
           type="button"
-          onClick={() => handlePageSelect(Math.min(totalPages, currentPage + 1))}
-          disabled={currentPage === totalPages}
-          className="p-2 rounded-xl bg-warm-ivory border border-heritage-green/14 text-heritage-green disabled:opacity-40 disabled:cursor-not-allowed hover:bg-mist-cloud transition-all shadow-xs cursor-pointer"
-          title={t('pagination.next_page')}
-          aria-label={t('pagination.next_page')}
+          onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+          disabled={currentPage >= totalPages}
+          className="journey-pagination-button journey-pagination-next"
+          title={t('pagination.next_page', { defaultValue: 'Next page' })}
+          aria-label={t('pagination.next_page', { defaultValue: 'Next page' })}
         >
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
-    </div>
+    </nav>
   );
 };
 

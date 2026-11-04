@@ -1,4 +1,4 @@
-.journey-page {
+﻿.journey-page {
   --journey-map-north: var(--color-map-north);
   --journey-map-central: var(--color-map-central);
   --journey-map-south: var(--color-map-south);
@@ -180,6 +180,19 @@
 .journey-skill-speaking { display: grid; gap: 10px; margin-top: 8px; padding-top: 18px; border-top: 1px solid var(--color-line); }
 .journey-skill-speaking h3 { font-size: 18px; font-weight: 700; }
 .journey-skill-speaking > p { margin: -6px 0 2px; color: var(--color-ink-soft); font-size: 13px; }
+
+/* ── Journey Library Pagination ────────────────────── */
+.journey-pagination { display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 16px; margin-top: 32px; padding: 14px 20px; background: var(--color-surface-raised); border: 1px solid var(--color-line); border-radius: var(--radius-2xl); box-shadow: 0 1px 3px color-mix(in srgb, var(--color-ink) 5%, transparent); }
+@media (min-width: 640px) { .journey-pagination { flex-direction: row; } }
+.journey-pagination-info { font-size: 13px; color: var(--color-ink-soft); font-weight: 500; }
+.journey-pagination-info strong { color: var(--color-action); font-weight: 700; }
+.journey-pagination-controls { display: flex; align-items: center; gap: 6px; }
+.journey-pagination-pages { display: flex; align-items: center; gap: 4px; }
+.journey-pagination-button { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; min-height: 38px; padding: 0 10px; font-size: 13px; font-weight: 600; border-radius: var(--radius-inner); background: var(--color-surface); color: var(--color-ink); border: 1px solid var(--color-line); transition: background .18s ease, border-color .18s ease, color .18s ease, transform .12s ease; cursor: pointer; }
+.journey-pagination-button:hover:not(:disabled) { background: var(--color-surface-muted); border-color: var(--color-line); }
+.journey-pagination-button:disabled { opacity: .35; cursor: not-allowed; }
+.journey-pagination-button[aria-current="page"] { background: var(--color-action); color: var(--color-on-action); border-color: var(--color-antique-gold); font-weight: 700; box-shadow: 0 2px 8px color-mix(in srgb, var(--color-action) 25%, transparent); }
+.journey-pagination-ellipsis { display: inline-flex; align-items: center; justify-content: center; width: 28px; min-height: 38px; font-size: 13px; color: var(--color-ink-faint); }
 
 @media (min-width: 901px) {
   .journey-rail { display: flex; flex-direction: column; }

@@ -334,43 +334,84 @@ export const FlashcardsPage: React.FC = () => {
     });
   };
 
-  // Keyboard navigation: Anki standard
-  // Front: Space -> Flip
-  // Back: Space -> Good (3); 1 -> Again; 2 -> Hard; 3 -> Good; 4 -> Easy
+  // Keyboard navigation: Anki standard + Hotkeys
+  // Front: Space / Enter / ArrowUp / ArrowDown / F -> Flip
+  // Back: Space / Enter / ArrowUp / ArrowDown / F -> Flip back
+  // Back: 1 -> Again; 2 -> Hard; 3 -> Good; 4 -> Easy
+  // Any: A / R -> Play Audio; S -> Save word
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (
         isComplete ||
         !cards.length ||
         (e.target instanceof HTMLElement &&
-          e.target.closest('input, textarea, select, button, [contenteditable="true"]'))
+          e.target.closest('input, textarea, select, [contenteditable="true"]'))
       ) {
         return;
       }
 
-      if (e.code === 'Space' && studyMode === 'flip') {
+      const activeEl = document.activeElement;
+      const isButtonFocused = activeEl instanceof HTMLElement && activeEl.tagName === 'BUTTON';
+
+      // 1. Flip card: Space, Enter, ArrowUp, ArrowDown, F
+      if (
+        (e.code === 'Space' || e.key === ' ' || e.key === 'Enter' || e.key === 'f' || e.key === 'F' || e.key === 'ArrowUp' || e.key === 'ArrowDown') &&
+        studyMode === 'flip'
+      ) {
         e.preventDefault();
-        setIsFlipped(value => !value);
-      } else if (isFlipped) {
-        if (e.key === '1') {
+        if (isButtonFocused) activeEl.blur();
+        setIsFlipped((value) => !value);
+        return;
+      }
+
+      // 2. Anki 4-Level Evaluation (when flipped / back is showing)
+      if (isFlipped) {
+        if (e.key === '1' || e.code === 'Numpad1') {
           e.preventDefault();
+          if (isButtonFocused) activeEl.blur();
           void handleRate('again');
-        } else if (e.key === '2') {
-          e.preventDefault();
-          void handleRate('hard');
-        } else if (e.key === '3') {
-          e.preventDefault();
-          void handleRate('good');
-        } else if (e.key === '4') {
-          e.preventDefault();
-          void handleRate('easy');
+          return;
         }
+        if (e.key === '2' || e.code === 'Numpad2') {
+          e.preventDefault();
+          if (isButtonFocused) activeEl.blur();
+          void handleRate('hard');
+          return;
+        }
+        if (e.key === '3' || e.code === 'Numpad3') {
+          e.preventDefault();
+          if (isButtonFocused) activeEl.blur();
+          void handleRate('good');
+          return;
+        }
+        if (e.key === '4' || e.code === 'Numpad4') {
+          e.preventDefault();
+          if (isButtonFocused) activeEl.blur();
+          void handleRate('easy');
+          return;
+        }
+      }
+
+      // 3. Audio pronunciation: A or R
+      if (e.key === 'a' || e.key === 'A' || e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        if (currentCard?.word) {
+          playAudio(currentCard.word);
+        }
+        return;
+      }
+
+      // 4. Save / Bookmark word: S
+      if (e.key === 's' || e.key === 'S') {
+        e.preventDefault();
+        handleToggleSave();
+        return;
       }
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isComplete, cards.length, isFlipped, currentCard, studyMode]);
+  }, [isComplete, cards.length, isFlipped, currentCard, studyMode, playAudio, handleToggleSave]);
 
   // Loading state
   if (isLoadingDeck) {

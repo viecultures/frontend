@@ -34,14 +34,16 @@ export type CulturalTutorMode = 'guided-lesson' | 'free-conversation' | 'open-co
 export type CorrectionMode = 'off' | 'after-turn' | 'end-of-session';
 export type MapContextMode = 'off' | 'on-demand' | 'always';
 export type VoiceInteractionMode = 'natural' | 'push-to-talk';
-export const AI_PLAYBACK_RATES = [0.85, 1, 1.15] as const;
-export type AiPlaybackRate = typeof AI_PLAYBACK_RATES[number];
+export const AI_SPEAKING_PACES = ['slow', 'normal', 'fast'] as const;
+export type AiSpeakingPace = typeof AI_SPEAKING_PACES[number];
 
-function readPlaybackRate(): AiPlaybackRate {
+function readSpeakingPace(): AiSpeakingPace {
   try {
-    const saved = Number(localStorage.getItem('map_ai_playback_rate'));
-    return AI_PLAYBACK_RATES.find(rate => rate === saved) ?? 1;
-  } catch { return 1; }
+    const saved = localStorage.getItem('map_ai_speaking_pace');
+    if (AI_SPEAKING_PACES.includes(saved as AiSpeakingPace)) return saved as AiSpeakingPace;
+    const previousRate = localStorage.getItem('map_ai_playback_rate');
+    return previousRate === '0.85' ? 'slow' : previousRate === '1.15' ? 'fast' : 'normal';
+  } catch { return 'normal'; }
 }
 
 /**
@@ -58,7 +60,7 @@ export const useSettings = create<{
   correctionMode: CorrectionMode;
   mapContextMode: MapContextMode;
   voiceInteractionMode: VoiceInteractionMode;
-  aiPlaybackRate: AiPlaybackRate;
+  aiSpeakingPace: AiSpeakingPace;
   customGeminiApiKey: string;
   theme: 'dark' | 'light';
   setSystemPrompt: (prompt: string) => void;
@@ -71,7 +73,7 @@ export const useSettings = create<{
   setCorrectionMode: (mode: CorrectionMode) => void;
   setMapContextMode: (mode: MapContextMode) => void;
   setVoiceInteractionMode: (mode: VoiceInteractionMode) => void;
-  setAiPlaybackRate: (rate: AiPlaybackRate) => void;
+  setAiSpeakingPace: (pace: AiSpeakingPace) => void;
   setCustomGeminiApiKey: (key: string) => void;
   setTheme: (theme: 'dark' | 'light') => void;
 }>(set => ({
@@ -85,7 +87,7 @@ export const useSettings = create<{
   correctionMode: readPreference('correction', ['off', 'after-turn', 'end-of-session'] as const, 'off'),
   mapContextMode: 'on-demand',
   voiceInteractionMode: readPreference('voice_interaction', ['natural', 'push-to-talk'] as const, 'natural'),
-  aiPlaybackRate: readPlaybackRate(),
+  aiSpeakingPace: readSpeakingPace(),
   customGeminiApiKey:
     typeof window !== 'undefined'
       ? localStorage.getItem('custom_gemini_api_key') || ''
@@ -104,7 +106,7 @@ export const useSettings = create<{
   setCorrectionMode: correctionMode => { savePreference('correction', correctionMode); set({ correctionMode }); },
   setMapContextMode: mapContextMode => set({ mapContextMode }),
   setVoiceInteractionMode: voiceInteractionMode => { savePreference('voice_interaction', voiceInteractionMode); set({ voiceInteractionMode }); },
-  setAiPlaybackRate: aiPlaybackRate => { savePreference('playback_rate', String(aiPlaybackRate)); set({ aiPlaybackRate }); },
+  setAiSpeakingPace: aiSpeakingPace => { savePreference('speaking_pace', aiSpeakingPace); set({ aiSpeakingPace }); },
   setCustomGeminiApiKey: customGeminiApiKey => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('custom_gemini_api_key', customGeminiApiKey);

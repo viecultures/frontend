@@ -3,7 +3,7 @@
     "eyebrow": "SẴN SÀNG HỌC THÊM ĐIỀU MỚI",
     "welcome_back": "Chào {{name}}, mừng bạn quay lại!",
     "welcome": "Chào {{name}}, chúc một buổi học đầy cảm hứng.",
-    "tagline": "Khắc chữ ghi lời, Lưu giữ văn hóa.",
+    "tagline": "Khắc ghi ngôn từ, gìn giữ văn hoá.",
     "default_user": "Người học",
     "streak_days": "{{count}} ngày liên tiếp",
     "streak_first_day": "Ngày đầu tiên",
@@ -15,7 +15,7 @@
     "background": "Hình nền",
     "default_scenery": "Góc nhỏ Việt Nam của riêng bạn.",
     "about": "Về VieCultures",
-    "copyright": "© 2026 VieCultures · Khắc chữ ghi lời, Lưu giữ văn hóa."
+    "copyright": "© 2026 VieCultures · Khắc ghi ngôn từ, gìn giữ văn hoá."
   },
   "skip_content": "Bỏ qua đến nội dung học",
   "storage_error": "Không thể lưu kế hoạch học tập. Vui lòng kiểm tra quyền lưu trữ trình duyệt.",

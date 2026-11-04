@@ -67,9 +67,26 @@ function FlashcardStudyPlayer({ deck, level, savedOnly }: FlashcardStudyPlayerPr
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (session.mode !== 'flip' || session.complete || !cards.length ||
-        (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, [role="button"], [contenteditable="true"]'))) return;
-      if (event.code === 'Space') { event.preventDefault(); setIsFlipped(value => !value); }
-      if (event.key === '1' || event.key === '2') { event.preventDefault(); rate(event.key === '2'); }
+        (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"]'))) return;
+      const activeEl = document.activeElement;
+      const isButtonFocused = activeEl instanceof HTMLElement && activeEl.tagName === 'BUTTON';
+      if (event.code === 'Space' || event.key === ' ' || event.key === 'Enter' || event.key === 'f' || event.key === 'F') {
+        event.preventDefault();
+        if (isButtonFocused) activeEl.blur();
+        setIsFlipped(value => !value);
+        return;
+      }
+      if (event.key === '1' || event.key === '2' || event.code === 'Numpad1' || event.code === 'Numpad2') {
+        event.preventDefault();
+        if (isButtonFocused) activeEl.blur();
+        rate(event.key === '2' || event.code === 'Numpad2');
+        return;
+      }
+      if (event.key === 'a' || event.key === 'A') {
+        event.preventDefault();
+        playAudio();
+        return;
+      }
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
         event.preventDefault(); clearAnswer();
         const direction = event.key === 'ArrowLeft' ? -1 : 1;

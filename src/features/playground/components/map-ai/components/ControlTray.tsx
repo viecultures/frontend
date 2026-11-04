@@ -19,7 +19,7 @@ import {
   ImagePlus,
   RotateCcw,
 } from 'lucide-react';
-import { AI_PLAYBACK_RATES, useLogStore, useUI, useSettings } from '../lib/state';
+import { AI_SPEAKING_PACES, useLogStore, useUI, useSettings } from '../lib/state';
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 import { useImagePreviewStore } from '../lib/image-previews';
@@ -51,8 +51,8 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   const { speakerMuted, toggleSidebar, isSidebarOpen } = useUI();
   const voiceInteractionMode = useSettings(state => state.voiceInteractionMode);
   const tutorMode = useSettings(state => state.tutorMode);
-  const aiPlaybackRate = useSettings(state => state.aiPlaybackRate);
-  const setAiPlaybackRate = useSettings(state => state.setAiPlaybackRate);
+  const aiSpeakingPace = useSettings(state => state.aiSpeakingPace);
+  const setAiSpeakingPace = useSettings(state => state.setAiSpeakingPace);
   const pushToTalk = voiceInteractionMode === 'push-to-talk';
   const heldKey = useRef(false);
   const [textPrompt, setTextPrompt] = useState('');
@@ -95,6 +95,11 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   } = useLiveAPIContext();
   const active = activeView === 'chat';
   const busy = connecting || ending || isSending || isRestoringContext;
+  const speakingPaceLocked = connected || busy;
+  const speakingPaceLabel = t(`playground.tray_controls.speaking_pace_${aiSpeakingPace}`);
+  const speakingPaceTitle = t(speakingPaceLocked
+    ? 'playground.tray_controls.speaking_pace_locked'
+    : 'playground.tray_controls.speaking_pace_title', { pace: speakingPaceLabel });
   const muted = !recording;
   const hasHistory = turns.some(turn => turn.role !== 'system');
   useEffect(() => {
@@ -298,15 +303,17 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
         </button>
         <button
           type="button"
-          className="action-button ai-playback-rate-button"
+          className="action-button ai-speaking-pace-button"
+          aria-disabled={speakingPaceLocked}
           onClick={() => {
-            const index = AI_PLAYBACK_RATES.indexOf(aiPlaybackRate);
-            setAiPlaybackRate(AI_PLAYBACK_RATES[(index + 1) % AI_PLAYBACK_RATES.length]);
+            if (speakingPaceLocked) return;
+            const index = AI_SPEAKING_PACES.indexOf(aiSpeakingPace);
+            setAiSpeakingPace(AI_SPEAKING_PACES[(index + 1) % AI_SPEAKING_PACES.length]);
           }}
-          title={t('playground.tray_controls.playback_rate_title', { rate: aiPlaybackRate })}
-          aria-label={t('playground.tray_controls.playback_rate_title', { rate: aiPlaybackRate })}
+          title={speakingPaceTitle}
+          aria-label={speakingPaceTitle}
         >
-          {aiPlaybackRate}×
+          {speakingPaceLabel}
         </button>
         <button
           className={cn('action-button mic-button', {
