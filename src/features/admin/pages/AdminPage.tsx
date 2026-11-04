@@ -43,6 +43,7 @@ import { PostFormModal } from '../components/PostFormModal';
 import { UserManagementView } from '../components/UserManagementView';
 import { JourneyManagementView } from '../components/JourneyManagementView';
 import { VocabManagementView } from '../components/VocabManagementView';
+import { PostVocabDrawer } from '../components/PostVocabDrawer';
 import { AdminActivityLogView } from '../components/AdminActivityLogView';
 import { MarketingManagementView } from '../components/MarketingManagementView';
 import { SubscriptionManagementView } from '../components/subscriptions/SubscriptionManagementView';
@@ -168,6 +169,15 @@ export const AdminPage: React.FC = () => {
   const [previewPost, setPreviewPost] = useState<ReadingPostItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Active Journey filter from URL parameter (?journeyId=...)
+  const activeJourneyFilter = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('journeyId') || '';
+  }, [location.search]);
+
+  // Quick Vocab Drawer state
+  const [vocabDrawerPost, setVocabDrawerPost] = useState<ReadingPostItem | null>(null);
+
   // System Overview State
   const [overviewStats, setOverviewStats] = useState<AdminOverviewStats | null>(null);
   const [isOverviewLoading, setIsOverviewLoading] = useState(false);
@@ -201,6 +211,7 @@ export const AdminPage: React.FC = () => {
       if (selectedTopic) params.topic = selectedTopic;
       if (standaloneFilter === 'standalone') params.standalone = true;
       if (standaloneFilter === 'journey') params.standalone = false;
+      if (activeJourneyFilter) params.journeyId = activeJourneyFilter;
 
       const data = await postAdminService.getPosts(params);
       setPosts(data);
@@ -212,7 +223,7 @@ export const AdminPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, t]);
+  }, [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, activeJourneyFilter, t]);
 
   // Fetch total users fallback if overview not called
   const fetchTotalUsers = useCallback(async () => {
@@ -339,6 +350,9 @@ export const AdminPage: React.FC = () => {
   // Filtered posts based on material readiness / publication status
   const displayedPosts = useMemo(() => {
     return posts.filter((post) => {
+      if (activeJourneyFilter && post.journeyId !== activeJourneyFilter) {
+        return false;
+      }
       const hasParagraphs = Boolean(
         (post.paragraphs && post.paragraphs.length > 0) ||
         (post.wordCount && post.wordCount > 0)
@@ -359,7 +373,7 @@ export const AdminPage: React.FC = () => {
       }
       return true;
     });
-  }, [posts, postStatusFilter]);
+  }, [posts, postStatusFilter, activeJourneyFilter]);
 
   // Level Badge Color Helper
   const getLevelBadgeClass = (lvl?: CefrLevel) => {
@@ -1219,6 +1233,29 @@ export const AdminPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Active Journey Filter Banner */}
+            {activeJourneyFilter && (
+              <div className="p-3.5 rounded-2xl bg-antique-gold/15 border border-antique-gold/40 flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 text-heritage-green dark:text-antique-bright font-medium">
+                  <Compass aria-hidden="true" className="w-4 h-4 text-antique-gold shrink-0" />
+                  <span>
+                    Đang lọc các bài viết thuộc lộ trình: <strong className="font-mono font-bold text-antique-gold">#{activeJourneyFilter}</strong>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const p = new URLSearchParams(location.search);
+                    p.delete('journeyId');
+                    navigate(`${location.pathname}?${p.toString()}`);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-rice-paper dark:bg-heritage-dark border border-antique-gold/30 hover:bg-white dark:hover:bg-white/10 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Xóa bộ lọc lộ trình
+                </button>
+              </div>
+            )}
+
             {/* Posts Table */}
             <div className="bg-rice-paper dark:bg-heritage-dark/60 rounded-3xl border border-antique-gold/30 shadow-md overflow-hidden">
               {isLoading ? (
@@ -1280,10 +1317,20 @@ export const AdminPage: React.FC = () => {
                               <div className="space-y-1">
                                 <div className="flex flex-wrap items-center gap-1.5">
                                   {post.journeyTitleEn ? (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/35">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const p = new URLSearchParams(location.search);
+                                        p.set('tab', 'posts');
+                                        if (post.journeyId) p.set('journeyId', post.journeyId);
+                                        navigate(`${location.pathname}?${p.toString()}`);
+                                      }}
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 hover:bg-antique-gold/35 text-heritage-green dark:text-antique-bright border border-antique-gold/35 transition-colors cursor-pointer"
+                                      title="Lọc các bài thuộc hành trình này"
+                                    >
                                       <Compass aria-hidden="true" className="w-3 h-3 text-antique-gold" />
                                       <span>Chặng {post.chapterOrder || 1}: {post.journeyTitleEn}</span>
-                                    </span>
+                                    </button>
                                   ) : (
                                     <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 dark:bg-white/10 text-text-muted">
                                       Độc lập
@@ -1329,30 +1376,19 @@ export const AdminPage: React.FC = () => {
                             <td className="px-4 py-4 whitespace-nowrap">
                               <div className="flex flex-wrap items-center gap-1.5">
                                 {/* Reading Pill */}
-                                <span
-                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
-                                    hasParagraphs
-                                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/60 ring-1 ring-emerald-500/10'
-                                      : 'bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700/60'
-                                  }`}
-                                  title={hasParagraphs ? t('posts_table.readiness.reading_ready', { count: paragraphCount }) : t('posts_table.readiness.reading_empty')}
-                                >
-                                  <FileText aria-hidden="true" className="w-3 h-3 shrink-0" />
-                                  <span>{hasParagraphs ? t('posts_table.readiness.reading_ready', { count: paragraphCount }) : t('posts_table.readiness.reading_empty')}</span>
-                                </span>
-
-                                {/* Vocabulary Pill */}
-                                <span
-                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
+                                <button
+                                  type="button"
+                                  onClick={() => setVocabDrawerPost(post)}
+                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs cursor-pointer ${
                                     vocabCount > 0
-                                      ? 'bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700/60 ring-1 ring-blue-500/10'
-                                      : 'bg-stone-100 dark:bg-stone-800/80 text-stone-500 border-stone-200 dark:border-stone-700'
+                                      ? 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700/60 ring-1 ring-blue-500/10'
+                                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-700 text-stone-500 border-stone-200 dark:border-stone-700'
                                   }`}
-                                  title={t('posts_table.readiness.vocab_count', { count: vocabCount })}
+                                  title="Xem nhanh từ vựng của bài đọc"
                                 >
                                   <Type aria-hidden="true" className="w-3 h-3 shrink-0" />
                                   <span>{t('posts_table.readiness.vocab_count', { count: vocabCount })}</span>
-                                </span>
+                                </button>
 
                                 {/* Audio TTS Pill */}
                                 <span
@@ -1482,6 +1518,21 @@ export const AdminPage: React.FC = () => {
 
         {/* ── Preview Modal ─────────────────────────────────────────────── */}
         <PostPreviewModal post={previewPost} onClose={() => setPreviewPost(null)} />
+
+        {/* Post Vocab Drawer */}
+        <PostVocabDrawer
+          isOpen={Boolean(vocabDrawerPost)}
+          post={vocabDrawerPost}
+          onClose={() => setVocabDrawerPost(null)}
+          onNavigateToVocabTab={(word) => {
+            setVocabDrawerPost(null);
+            navigate(`/admin/content?tab=vocabularies&search=${encodeURIComponent(word)}`);
+          }}
+          onEditPost={(p) => {
+            setVocabDrawerPost(null);
+            handleOpenEdit(p);
+          }}
+        />
 
         {/* ── Delete Confirmation Dialog ─────────────────────────────────── */}
         {deletingId && (
