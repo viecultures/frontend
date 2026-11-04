@@ -28,6 +28,7 @@ export interface AudioTrackDto {
   slowUrl: string;    // Phiên bản chậm (-15%)
   fastUrl?: string;   // alias fallback
   createdAt?: string;
+  vocabCount?: number;
 }
 
 export interface VoiceModelItem {
@@ -85,6 +86,7 @@ export interface ReadingPostItem extends ReadingPostPayload {
   totalReads?: number;
   likesCount?: number;
   createdAt?: string;
+  vocabCount?: number;
 }
 
 export interface JourneyChapterSummary {

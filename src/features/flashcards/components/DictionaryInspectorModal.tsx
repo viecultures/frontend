@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { X, Volume2, ArrowRight } from "lucide-react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
@@ -11,6 +12,17 @@ interface DictionaryInspectorModalProps {
   onGoToStudy: (lessonId: string) => void;
 }
 
+interface PreviewCardItem {
+  id: string;
+  word: string;
+  ipa?: string;
+  pos?: string;
+  viMeaning: string;
+  viDefinition?: string;
+  contextSentence?: string;
+  audioUrl?: string;
+}
+
 export function DictionaryInspectorModal({
   lesson,
   onClose,
@@ -19,9 +31,42 @@ export function DictionaryInspectorModal({
 }: DictionaryInspectorModalProps) {
   const { t } = useTranslation('flashcards');
 
+  const previewCards: PreviewCardItem[] = useMemo(() => {
+    if (!lesson) return [];
+    if (lesson.isFromDatabase && lesson.dbVocabularies && lesson.dbVocabularies.length > 0) {
+      return lesson.dbVocabularies.map((v, idx) => ({
+        id: v.id || `${lesson.id}-db-${idx}`,
+        word: v.word,
+        ipa: v.ipa || '',
+        pos: v.pos || (v.word.includes(' ') ? 'phrase' : 'word'),
+        viMeaning: v.viMeaning,
+        viDefinition: v.usageNote || v.viMeaning,
+        contextSentence: v.contextSentence || '',
+        audioUrl: v.audioUrl,
+      }));
+    }
+    const deckData = getDeckData(lesson);
+    return deckData.cards.map((card) => ({
+      id: card.id,
+      word: card.word,
+      ipa: card.ipa,
+      pos: card.pos,
+      viMeaning: card.viMeaning,
+      viDefinition: card.viDefinition,
+      contextSentence: card.contextEn,
+    }));
+  }, [lesson]);
+
   if (!lesson) return null;
 
-  const deckData = getDeckData(lesson);
+  const handleAudio = (card: PreviewCardItem) => {
+    if (card.audioUrl) {
+      const audio = new Audio(card.audioUrl);
+      audio.play().catch(() => onPlayAudio(card.word));
+    } else {
+      onPlayAudio(card.word);
+    }
+  };
 
   return (
     <Dialog open={!!lesson} onClose={onClose} className="dictionary-dialog fixed inset-0 z-[60] bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
@@ -45,44 +90,61 @@ export function DictionaryInspectorModal({
         </div>
 
         <div className="space-y-3">
-          {deckData.cards.map((card, idx) => (
-            <div
-              key={card.id}
-              className="p-4 rounded-2xl bg-surface-muted border border-line flex items-start justify-between gap-4"
-            >
-              <div className="dictionary-preview-copy space-y-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="dictionary-preview-word font-bold text-sm text-ink">
-                    {idx + 1}. {card.word}
-                  </span>
-                  <span className="text-xs font-mono text-ink-faint">
-                    {card.ipa}
-                  </span>
-                  <span className="text-[10px] font-bold bg-surface-sunken text-ink px-2 py-0.5 rounded">
-                    {card.pos}
-                  </span>
-                </div>
-                <div className="text-xs font-bold text-ink">
-                  {t('inspector.meaning_label', { meaning: card.viMeaning, defaultValue: `Meaning: ${card.viMeaning}` })}
-                </div>
-                <div className="text-xs text-ink-soft">
-                  {t('inspector.definition_label', { definition: card.viDefinition, defaultValue: `Definition: ${card.viDefinition}` })}
-                </div>
-                <div className="text-xs italic text-ink-faint">
-                  "{card.contextEn}"
-                </div>
-              </div>
-
-              <button
-                onClick={() => onPlayAudio(card.word)}
-                className="p-2.5 rounded-full bg-heritage-green text-white hover:bg-heritage-dark cursor-pointer shrink-0 shadow-xs"
-                title={t('inspector.play_audio', 'Play pronunciation')}
-                aria-label={t('inspector.pronounce_word', { word: card.word, defaultValue: `Pronounce ${card.word}` })}
-              >
-                <Volume2 className="w-4 h-4 text-antique-gold" />
-              </button>
+          {previewCards.length === 0 ? (
+            <div className="p-6 text-center text-ink-soft bg-surface-muted rounded-2xl border border-line">
+              <p>{t('inspector.no_words', 'Chưa có từ vựng nào trong danh sách xem trước.')}</p>
             </div>
-          ))}
+          ) : (
+            previewCards.map((card, idx) => (
+              <div
+                key={card.id}
+                className="p-4 rounded-2xl bg-surface-muted border border-line flex items-start justify-between gap-4"
+              >
+                <div className="dictionary-preview-copy space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="dictionary-preview-word font-bold text-sm text-ink">
+                      {idx + 1}. {card.word}
+                    </span>
+                    {card.ipa && (
+                      <span className="text-xs font-mono text-ink-faint">
+                        {card.ipa}
+                      </span>
+                    )}
+                    {card.pos && (
+                      <span className="text-[10px] font-bold bg-surface-sunken text-ink px-2 py-0.5 rounded">
+                        {card.pos}
+                      </span>
+                    )}
+                  </div>
+                  {card.viMeaning && (
+                    <div className="text-xs font-bold text-ink">
+                      {t('inspector.meaning_label', { meaning: card.viMeaning, defaultValue: `Meaning: ${card.viMeaning}` })}
+                    </div>
+                  )}
+                  {card.viDefinition && card.viDefinition !== card.viMeaning && (
+                    <div className="text-xs text-ink-soft">
+                      {t('inspector.definition_label', { definition: card.viDefinition, defaultValue: `Definition: ${card.viDefinition}` })}
+                    </div>
+                  )}
+                  {card.contextSentence && (
+                    <div className="text-xs italic text-ink-faint">
+                      "{card.contextSentence}"
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleAudio(card)}
+                  className="p-2.5 rounded-full bg-heritage-green text-white hover:bg-heritage-dark cursor-pointer shrink-0 shadow-xs"
+                  title={t('inspector.play_audio', 'Play pronunciation')}
+                  aria-label={t('inspector.pronounce_word', { word: card.word, defaultValue: `Pronounce ${card.word}` })}
+                >
+                  <Volume2 className="w-4 h-4 text-antique-gold" />
+                </button>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="pt-2 flex justify-end gap-2">

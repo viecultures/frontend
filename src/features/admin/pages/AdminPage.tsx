@@ -34,6 +34,7 @@ import {
   Bookmark,
   Globe,
   Cpu,
+  History,
 } from 'lucide-react';
 import type { ReadingPostItem, CefrLevel } from '../types/adminTypes';
 import { postAdminService, type PostFilterParams } from '../services/postAdminService';
@@ -66,6 +67,7 @@ export type AdminTab =
   | 'marketing'
   | 'subscriptions'
   | 'users'
+  | 'history'
   | 'system'
   | 'logs'
   | 'system_stats'
@@ -83,6 +85,7 @@ const VALID_TABS: (AdminTab | 'search-console')[] = [
   'marketing',
   'subscriptions',
   'users',
+  'history',
   'system',
   'logs',
   'system_stats',
@@ -112,6 +115,9 @@ export const AdminPage: React.FC = () => {
     // Tạm thời ẩn /admin/analytics -> chuyển hướng logic sang dashboard
     if (rawTab === 'analytics') {
       return 'dashboard';
+    }
+    if (rawTab === 'history' || rawTab === 'logs' || rawTab === 'system') {
+      return 'history';
     }
     if (rawTab && (VALID_TABS as string[]).includes(rawTab)) {
       return rawTab as AdminTab;
@@ -358,7 +364,7 @@ export const AdminPage: React.FC = () => {
         (post.wordCount && post.wordCount > 0)
       );
       const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
-      const hasVocab = Boolean(post.vocabularies && post.vocabularies.length > 0);
+      const hasVocab = Boolean((post.vocabCount && post.vocabCount > 0) || (post.vocabularies && post.vocabularies.length > 0));
       const quizQuestions = post.questions || [];
       const hasQuiz = Array.isArray(quizQuestions) && quizQuestions.length > 0;
 
@@ -482,10 +488,11 @@ export const AdminPage: React.FC = () => {
           subtitle: 'Giám sát thứ hạng từ khóa văn hóa, lượt hiển thị và nhấp chuột trên Google Search',
           badge: 'sc-domain:viecultures.app',
         };
+      case 'history':
       case 'system':
       case 'logs':
         return {
-          icon: ShieldCheck,
+          icon: History,
           title: 'Nhật ký kiểm toán & Giám sát hệ thống',
           subtitle: 'Theo dõi thao tác quản trị, truy cập và kiểm toán thay đổi dữ liệu an ninh',
           badge: 'Kiểm toán',
@@ -588,10 +595,10 @@ export const AdminPage: React.FC = () => {
               </div>
             )}
 
-            {(activeTab === 'system' || activeTab === 'logs') && (
+            {(activeTab === 'history' || activeTab === 'system' || activeTab === 'logs') && (
               <div className="px-3 py-1.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5">
-                <ShieldCheck aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
-                <span className="hidden sm:inline">Kiểm toán an ninh</span>
+                <History aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                <span className="hidden sm:inline">Nhật ký & Lịch sử</span>
               </div>
             )}
           </div>
@@ -1303,7 +1310,7 @@ export const AdminPage: React.FC = () => {
                           (post.wordCount && post.wordCount > 0)
                         );
                         const paragraphCount = post.paragraphs?.length || (post.wordCount ? Math.ceil(post.wordCount / 50) : 0);
-                        const vocabCount = post.vocabularies?.length || 0;
+                        const vocabCount = post.vocabCount ?? post.vocabularies?.length ?? 0;
                         const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
                         const quizQuestions = post.questions || [];
                         const quizCount = Array.isArray(quizQuestions) ? quizQuestions.length : 0;
@@ -1378,7 +1385,18 @@ export const AdminPage: React.FC = () => {
                                 {/* Reading Pill */}
                                 <button
                                   type="button"
-                                  onClick={() => setVocabDrawerPost(post)}
+                                  onClick={async () => {
+                                    if (!post.vocabularies || post.vocabularies.length === 0) {
+                                      try {
+                                        const fullPost = await postAdminService.getPostById(post.id);
+                                        setVocabDrawerPost(fullPost || post);
+                                      } catch {
+                                        setVocabDrawerPost(post);
+                                      }
+                                    } else {
+                                      setVocabDrawerPost(post);
+                                    }
+                                  }}
                                   className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs cursor-pointer ${
                                     vocabCount > 0
                                       ? 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700/60 ring-1 ring-blue-500/10'
@@ -1503,12 +1521,9 @@ export const AdminPage: React.FC = () => {
         {/* ── TAB 5: HỌC VIÊN CRM (USERS) ─────────────────────────────────── */}
         {activeTab === 'users' && <UserManagementView />}
 
-        {/* ── TAB 6: HỆ THỐNG & KIỂM DUYỆT (SYSTEM / LOGS) ───────────────── */}
-        {(activeTab === 'system' || activeTab === 'logs') && (
-          <div className="space-y-6">
-            <AdminActivityLogView />
-            <AdminServiceConnections />
-          </div>
+        {/* ── TAB 6: NHẬT KÝ KIỂM TOÁN & LỊCH SỬ (HISTORY / LOGS / SYSTEM) ──────── */}
+        {(activeTab === 'history' || activeTab === 'system' || activeTab === 'logs') && (
+          <AdminActivityLogView />
         )}
 
         {/* ── TAB 7: CẤU HÌNH AI & CHI PHÍ ─────────────────────────────────── */}
@@ -1524,9 +1539,11 @@ export const AdminPage: React.FC = () => {
           isOpen={Boolean(vocabDrawerPost)}
           post={vocabDrawerPost}
           onClose={() => setVocabDrawerPost(null)}
-          onNavigateToVocabTab={(word) => {
+          onNavigateToVocabTab={(word, postId) => {
             setVocabDrawerPost(null);
-            navigate(`/admin/content?tab=vocabularies&search=${encodeURIComponent(word)}`);
+            const searchParam = word ? '&search=' + encodeURIComponent(word) : '';
+            const postParam = postId ? '&postId=' + encodeURIComponent(postId) : '';
+            navigate('/admin/content?tab=vocabularies' + searchParam + postParam);
           }}
           onEditPost={(p) => {
             setVocabDrawerPost(null);

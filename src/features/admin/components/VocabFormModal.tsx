@@ -9,10 +9,11 @@ import {
   AlertCircle,
   CheckCircle2,
   RefreshCw,
-  HelpCircle,
+  FileText,
 } from 'lucide-react';
 import type { AdminVocabItem, VocabFormData } from '../types/adminVocabTypes';
 import { vocabAdminService } from '../services/vocabAdminService';
+import { postAdminService } from '../services/postAdminService';
 
 interface VocabFormModalProps {
   isOpen: boolean;
@@ -52,6 +53,12 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
   const [contextSentence, setContextSentence] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
   const [level, setLevel] = useState<string>('B1');
+  const [postId, setPostId] = useState<string>('');
+  const [usageNote, setUsageNote] = useState<string>('');
+
+  // Post options state
+  const [postOptions, setPostOptions] = useState<Array<{ id: string; titleEn: string; titleVi: string }>>([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState<boolean>(false);
 
   // UI / Action states
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,6 +73,40 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
   // Audio player ref
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Load post options for dropdown selection
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let isCancelled = false;
+    setIsLoadingPosts(true);
+
+    postAdminService
+      .getPosts()
+      .then((res) => {
+        if (!isCancelled && Array.isArray(res)) {
+          setPostOptions(
+            res.map((p) => ({
+              id: p.id,
+              titleEn: p.titleEn,
+              titleVi: p.titleVi,
+            }))
+          );
+        }
+      })
+      .catch((err: unknown) => {
+        console.warn('Lỗi khi tải danh sách bài viết trong biểu mẫu từ vựng:', err);
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsLoadingPosts(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isOpen]);
+
   // Populate data when opening modal or editing
   useEffect(() => {
     if (initialData) {
@@ -77,6 +118,8 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
       setContextSentence(initialData.contextSentence || '');
       setAudioUrl(initialData.audioUrl || '');
       setLevel(initialData.level || 'B1');
+      setPostId(initialData.postId || '');
+      setUsageNote(initialData.usageNote || '');
     } else {
       setWord('');
       setPos('noun');
@@ -86,6 +129,8 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
       setContextSentence('');
       setAudioUrl('');
       setLevel('B1');
+      setPostId('');
+      setUsageNote('');
     }
     setErrorMessage(null);
     setAiSuccessMessage(null);
@@ -162,6 +207,9 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
       }
       if (enriched.audioUrl) setAudioUrl(enriched.audioUrl);
       if (enriched.level) setLevel(enriched.level.toUpperCase());
+      if (enriched.usageNote && !usageNote.trim()) {
+        setUsageNote(enriched.usageNote);
+      }
 
       setAiSuccessMessage(`Đã điền tự động dữ liệu từ vựng cho "${trimmedWord}" thành công.`);
       setValidationErrors((prev) => {
@@ -219,6 +267,8 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
       contextSentence: contextSentence.trim(),
       audioUrl: audioUrl.trim(),
       level: level.trim().toUpperCase(),
+      postId: postId.trim() ? postId.trim() : undefined,
+      usageNote: usageNote.trim() ? usageNote.trim() : undefined,
     };
 
     try {
@@ -280,7 +330,7 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
                   {isEdit ? 'Chỉnh sửa từ vựng di sản' : 'Thêm từ vựng mới vào kho lưu trữ'}
                 </h3>
                 <p className="text-xs text-text-muted">
-                  Quản lý từ vựng văn hóa, phiên âm quốc tế IPA và ví dụ ngữ cảnh thực tế.
+                  Quản lý từ vựng văn hóa, liên kết bài viết, phiên âm quốc tế IPA và ví dụ thực tế.
                 </p>
               </div>
             </div>
@@ -367,7 +417,37 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
               )}
             </div>
 
-            {/* Hàng 2: Loại từ, Phiên âm IPA, Cấp độ CEFR */}
+            {/* Hàng 2: Bài viết liên kết (Post Selection) */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="vocab-post-select"
+                className="block text-xs font-bold text-text-secondary uppercase tracking-wider"
+              >
+                Bài viết liên kết (Reading Post)
+              </label>
+              <div className="relative">
+                <select
+                  id="vocab-post-select"
+                  value={postId}
+                  onChange={(e) => setPostId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:ring-2 focus:ring-antique-gold cursor-pointer"
+                >
+                  <option value="">-- Chung / Không gán bài viết cụ thể --</option>
+                  {postOptions.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.titleEn} {p.titleVi ? `(${p.titleVi})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-[11px] text-text-muted">
+                {isLoadingPosts
+                  ? 'Đang tải danh sách bài viết...'
+                  : 'Liên kết từ vựng này với một bài đọc cụ thể để xuất hiện trong ngăn kéo từ vựng của bài.'}
+              </p>
+            </div>
+
+            {/* Hàng 3: Loại từ, Phiên âm IPA, Cấp độ CEFR */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* Loại từ (POS) */}
               <div className="space-y-1.5">
@@ -432,7 +512,7 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
               </div>
             </div>
 
-            {/* Hàng 3: Nghĩa tiếng Việt */}
+            {/* Hàng 4: Nghĩa tiếng Việt */}
             <div className="space-y-1.5">
               <label
                 htmlFor="vocab-vimeaning-input"
@@ -468,7 +548,7 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
               )}
             </div>
 
-            {/* Hàng 4: Định nghĩa tiếng Anh */}
+            {/* Hàng 5: Định nghĩa tiếng Anh */}
             <div className="space-y-1.5">
               <label
                 htmlFor="vocab-endef-input"
@@ -486,7 +566,7 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
               />
             </div>
 
-            {/* Hàng 5: Câu ngữ cảnh văn hóa */}
+            {/* Hàng 6: Câu ngữ cảnh văn hóa */}
             <div className="space-y-1.5">
               <label
                 htmlFor="vocab-context-input"
@@ -504,7 +584,25 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
               />
             </div>
 
-            {/* Hàng 6: URL âm thanh phát âm & Nút Nghe thử */}
+            {/* Hàng 7: Ghi chú cách dùng / Lưu ý văn hóa */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="vocab-usage-note"
+                className="block text-xs font-bold text-text-secondary uppercase tracking-wider"
+              >
+                Ghi chú cách dùng & Lưu ý văn hóa (Usage Note)
+              </label>
+              <textarea
+                id="vocab-usage-note"
+                rows={2}
+                value={usageNote}
+                onChange={(e) => setUsageNote(e.target.value)}
+                placeholder="Ví dụ: Thường được kết hợp với áo dài trong các dịp lễ hội truyền thống hoặc miêu tả vẻ đẹp đời thường..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 text-xs text-text-body dark:text-warm-ivory focus:outline-none focus:ring-2 focus:ring-antique-gold"
+              />
+            </div>
+
+            {/* Hàng 8: URL âm thanh phát âm & Nút Nghe thử */}
             <div className="space-y-1.5">
               <label
                 htmlFor="vocab-audio-input"
@@ -582,3 +680,5 @@ export const VocabFormModal: React.FC<VocabFormModalProps> = ({
     </AnimatePresence>
   );
 };
+
+export default VocabFormModal;
