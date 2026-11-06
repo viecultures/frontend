@@ -366,23 +366,7 @@ export default function DictionaryPage() {
             <div>
               <div className="flex items-center gap-2">
                 <p className="vocab-eyebrow">{t('dictionary.catalog_eyebrow', 'LEARN LANGUAGE THROUGH HERITAGE')}</p>
-                {isApiConnected ? (
-                  <span
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300"
-                    title={t('dictionary.api_connected_desc', 'Dữ liệu trực tiếp từ cơ sở dữ liệu')}
-                  >
-                    <Wifi size={12} className="text-emerald-600" />
-                    <span>Database</span>
-                  </span>
-                ) : (
-                  <span
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-100/80 text-amber-800 border border-amber-300"
-                    title={t('dictionary.offline_fallback_desc', 'Đang sử dụng dữ liệu di sản mẫu dự phòng')}
-                  >
-                    <WifiOff size={12} className="text-amber-600" />
-                    <span>Fallback</span>
-                  </span>
-                )}
+                
               </div>
               <h2 id="vocab-library-title">
                 {isMyVocab

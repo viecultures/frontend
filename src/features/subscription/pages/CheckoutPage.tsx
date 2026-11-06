@@ -475,7 +475,7 @@ export const CheckoutPage: React.FC = () => {
                     className="w-full px-3 py-1.5 rounded-xl border border-blue-300 dark:border-blue-700 bg-white dark:bg-[#111A18] text-xs text-stone-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
-  
+              )}
 
               {/* Price Details */}
               <div className="space-y-2 py-2">
@@ -615,9 +615,8 @@ export const CheckoutPage: React.FC = () => {
                           <QrCode className="w-28 h-28 text-heritage-green animate-pulse" />
                           <span className="text-[10px] text-stone-500 font-mono">{t('checkout.gateway.loading_qr')}</span>
                         </div>
-          
+                      )}
                     </>
-
                   ) : (
                     <div className="flex flex-col items-center justify-center p-4 text-center space-y-2">
                       <AlertCircle className="w-10 h-10 text-rose-500" />
@@ -631,7 +630,7 @@ export const CheckoutPage: React.FC = () => {
                         <span>{t('checkout.gateway.generate_new_qr')}</span>
                       </button>
                     </div>
-      
+                  )}
 
                   {timeLeft > 0 && qrLoaded && (
                     <div className="absolute inset-0 bg-heritage-green/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
@@ -639,7 +638,7 @@ export const CheckoutPage: React.FC = () => {
                         {t('checkout.gateway.scan_hint')}
                       </span>
                     </div>
-      
+                  )}
                 </div>
 
                 {/* Account Details with Copy Buttons */}
@@ -663,7 +662,7 @@ export const CheckoutPage: React.FC = () => {
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
-            
+                        )}
                       </button>
                     </div>
                   </div>
@@ -687,7 +686,7 @@ export const CheckoutPage: React.FC = () => {
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
-            
+                        )}
                       </button>
                     </div>
                   </div>
@@ -708,7 +707,7 @@ export const CheckoutPage: React.FC = () => {
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
-            
+                        )}
                       </button>
                     </div>
                   </div>
@@ -720,7 +719,7 @@ export const CheckoutPage: React.FC = () => {
                     <RefreshCw className="w-4 h-4 animate-spin text-amber-700" />
                     <span className="font-medium">{processingMessage}</span>
                   </div>
-    
+                )}
 
                 {/* Primary Demo Simulation Button (Required for Testing) */}
                 <div className="pt-2 space-y-2.5">
