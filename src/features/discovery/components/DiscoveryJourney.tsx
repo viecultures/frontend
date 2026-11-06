@@ -299,7 +299,7 @@ export function DiscoveryJourney() {
   const [selectedTopic, setSelectedTopic] = useState("All");
   const [selectedCefr, setSelectedCefr] = useState("All");
   const articlesLibraryRef = useRef<HTMLDivElement>(null);
-  const [allLessons, setAllLessons] = useState<Lesson[]>([]);
+  const [allLessons, setAllLessons] = useState<Lesson[]>(() => LESSONS_DATA);
   const [isArticlesLoading, setIsArticlesLoading] = useState(false);
   const [bookmarks, setBookmarks] = useState<Record<string, boolean>>(() =>
     readLearningValue<Record<string, boolean>>("discovery:bookmarks") || {}
@@ -317,7 +317,7 @@ export function DiscoveryJourney() {
     let active = true;
     setIsArticlesLoading(true);
     readerApiService
-      .getCatalog({ standalone: true })
+      .getCatalog()
       .then((catalogData) => {
         if (!active) return;
         if (catalogData && catalogData.items && catalogData.items.length > 0) {
@@ -373,32 +373,32 @@ export function DiscoveryJourney() {
     });
   };
 
-  // Journey keys to exclude from standalone section
-  const journeyKeys = useMemo(() => {
+  // Top journey series keys to exclude from "Other Readings" section below (avoid duplicate articles shown on top roadmap)
+  const topJourneyKeys = useMemo(() => {
     const keys = new Set<string>();
-    for (const s of allJourneys) {
+    for (const s of availableSeries) {
       if (s.id) keys.add(s.id.toLowerCase().trim());
       for (const c of s.chapters || []) {
         if (c.id) keys.add(c.id.toLowerCase().trim());
       }
     }
     return keys;
-  }, [allJourneys]);
+  }, [availableSeries]);
 
-  // Only retain standalone articles (not part of any journey)
+  // Retain reading articles that are not already presented on the top learning roadmap
   const standaloneLessons = useMemo(() => {
     return allLessons.filter((lesson) => {
-      if ((lesson as any).journeyId) return false;
-      if ((lesson as any).isStandalone === false) return false;
+      const lJourneyId = ((lesson as any).journeyId || "").toLowerCase().trim();
+      if (lJourneyId && topJourneyKeys.has(lJourneyId)) return false;
 
       const id = (lesson.id || "").toLowerCase().trim();
-      if (journeyKeys.has(id)) return false;
-      for (const key of journeyKeys) {
+      if (topJourneyKeys.has(id)) return false;
+      for (const key of topJourneyKeys) {
         if (id.startsWith(key + "-") || id === key) return false;
       }
       return true;
     });
-  }, [allLessons, journeyKeys]);
+  }, [allLessons, topJourneyKeys]);
 
   const filteredArticles = useMemo(() => {
     let list = standaloneLessons;
@@ -1354,7 +1354,7 @@ export function DiscoveryJourney() {
           </div>
 
           <DiscoveryArticleGrid
-            isLoading={isArticlesLoading}
+            isLoading={isArticlesLoading && allLessons.length === 0}
             lessons={pagedArticles}
             viewMode="grid"
             bookmarks={bookmarks}

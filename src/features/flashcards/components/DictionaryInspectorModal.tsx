@@ -1,9 +1,10 @@
-import { useMemo } from "react";
-import { X, Volume2, ArrowRight } from "lucide-react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { X, Volume2, ArrowRight, Loader2 } from "lucide-react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import type { Lesson } from "@/data/discoveryData";
 import { getDeckData } from "@/data/flashcardsData";
+import { readerApiService } from "@/features/reader/services/readerApiService";
 
 interface DictionaryInspectorModalProps {
   lesson: Lesson | null;
@@ -30,10 +31,86 @@ export function DictionaryInspectorModal({
   onGoToStudy,
 }: DictionaryInspectorModalProps) {
   const { t } = useTranslation('flashcards');
+  const [lazyCards, setLazyCards] = useState<PreviewCardItem[]>([]);
+  const [isLoadingVocabs, setIsLoadingVocabs] = useState<boolean>(false);
+  const vocabCacheRef = useRef<Map<string, PreviewCardItem[]>>(new Map());
+
+  const hasDirectVocabs = Boolean(
+    lesson && (
+      (lesson.dbVocabularies && lesson.dbVocabularies.length > 0) ||
+      getDeckData(lesson).cards.length > 0
+    )
+  );
+
+  useEffect(() => {
+    if (!lesson) {
+      setLazyCards([]);
+      setIsLoadingVocabs(false);
+      return;
+    }
+
+    if (hasDirectVocabs) {
+      setIsLoadingVocabs(false);
+      return;
+    }
+
+    if (vocabCacheRef.current.has(lesson.id)) {
+      setLazyCards(vocabCacheRef.current.get(lesson.id)!);
+      setIsLoadingVocabs(false);
+      return;
+    }
+
+    let isSubscribed = true;
+    const controller = new AbortController();
+
+    async function fetchVocabs() {
+      setIsLoadingVocabs(true);
+      try {
+        const post = await readerApiService.getPostById(lesson!.id, controller.signal);
+        if (!isSubscribed) return;
+
+        if (post && post.vocabularies && Array.isArray(post.vocabularies) && post.vocabularies.length > 0) {
+          const mappedCards: PreviewCardItem[] = post.vocabularies.map((v, idx) => ({
+            id: v.id || `${lesson!.id}-db-${idx}`,
+            word: v.word,
+            ipa: v.ipa || '',
+            pos: v.pos || (v.word.includes(' ') ? 'phrase' : 'word'),
+            viMeaning: v.viMeaning,
+            viDefinition: v.usageNote || v.viMeaning,
+            contextSentence: v.contextSentence || '',
+            audioUrl: v.audioUrl,
+          }));
+
+          vocabCacheRef.current.set(lesson!.id, mappedCards);
+          setLazyCards(mappedCards);
+        } else {
+          setLazyCards([]);
+        }
+      } catch (err: unknown) {
+        if (!isSubscribed) return;
+        if ((err as Error)?.name !== 'AbortError') {
+          console.warn('[DictionaryInspectorModal] Không thể tải chi tiết từ vựng bài học:', err);
+        }
+        setLazyCards([]);
+      } finally {
+        if (isSubscribed) {
+          setIsLoadingVocabs(false);
+        }
+      }
+    }
+
+    fetchVocabs();
+
+    return () => {
+      isSubscribed = false;
+      controller.abort();
+    };
+  }, [lesson, hasDirectVocabs]);
 
   const previewCards: PreviewCardItem[] = useMemo(() => {
     if (!lesson) return [];
-    if (lesson.isFromDatabase && lesson.dbVocabularies && lesson.dbVocabularies.length > 0) {
+
+    if (lesson.dbVocabularies && lesson.dbVocabularies.length > 0) {
       return lesson.dbVocabularies.map((v, idx) => ({
         id: v.id || `${lesson.id}-db-${idx}`,
         word: v.word,
@@ -45,17 +122,22 @@ export function DictionaryInspectorModal({
         audioUrl: v.audioUrl,
       }));
     }
-    const deckData = getDeckData(lesson);
-    return deckData.cards.map((card) => ({
-      id: card.id,
-      word: card.word,
-      ipa: card.ipa,
-      pos: card.pos,
-      viMeaning: card.viMeaning,
-      viDefinition: card.viDefinition,
-      contextSentence: card.contextEn,
-    }));
-  }, [lesson]);
+
+    const mockDeck = getDeckData(lesson);
+    if (mockDeck.cards.length > 0) {
+      return mockDeck.cards.map((card) => ({
+        id: card.id,
+        word: card.word,
+        ipa: card.ipa,
+        pos: card.pos,
+        viMeaning: card.viMeaning,
+        viDefinition: card.viDefinition,
+        contextSentence: card.contextEn,
+      }));
+    }
+
+    return lazyCards;
+  }, [lesson, lazyCards]);
 
   if (!lesson) return null;
 
@@ -90,8 +172,26 @@ export function DictionaryInspectorModal({
         </div>
 
         <div className="space-y-3">
-          {previewCards.length === 0 ? (
-            <div className="p-6 text-center text-ink-soft bg-surface-muted rounded-2xl border border-line">
+          {isLoadingVocabs ? (
+            <div className="space-y-3" role="status" aria-busy="true">
+              <div className="flex items-center justify-center gap-2 py-3 text-ink-soft text-xs font-medium bg-surface-muted rounded-2xl border border-line">
+                <Loader2 className="w-4 h-4 animate-spin text-antique-gold shrink-0" aria-hidden="true" />
+                <span>{t('inspector.loading_words', 'Đang tải danh sách từ vựng chi tiết...')}</span>
+              </div>
+              {Array.from({ length: 3 }).map((_, idx) => (
+                <div key={idx} className="p-4 rounded-2xl bg-surface-muted border border-line space-y-2.5">
+                  <div className="flex items-center gap-2">
+                    <div className="h-5 w-28 rounded-md vocab-shimmer" />
+                    <div className="h-4 w-16 rounded-md vocab-shimmer" />
+                    <div className="h-4 w-12 rounded-md vocab-shimmer" />
+                  </div>
+                  <div className="h-4 w-3/4 rounded-md vocab-shimmer" />
+                  <div className="h-3 w-1/2 rounded-md vocab-shimmer" />
+                </div>
+              ))}
+            </div>
+          ) : previewCards.length === 0 ? (
+            <div className="p-6 text-center text-ink-soft bg-surface-muted rounded-2xl border border-line" role="status">
               <p>{t('inspector.no_words', 'Chưa có từ vựng nào trong danh sách xem trước.')}</p>
             </div>
           ) : (

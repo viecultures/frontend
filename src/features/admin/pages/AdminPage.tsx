@@ -35,6 +35,8 @@ import {
   Globe,
   Cpu,
   History,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import type { ReadingPostItem, CefrLevel } from '../types/adminTypes';
 import { postAdminService, type PostFilterParams } from '../services/postAdminService';
@@ -169,6 +171,12 @@ export const AdminPage: React.FC = () => {
   const [standaloneFilter, setStandaloneFilter] = useState<'all' | 'standalone' | 'journey'>('all');
   const [postStatusFilter, setPostStatusFilter] = useState<'all' | 'published' | 'draft' | 'missing_materials'>('all');
 
+  // Active Journey filter from URL parameter (?journeyId=...)
+  const activeJourneyFilter = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('journeyId') || '';
+  }, [location.search]);
+
   // Pagination for Posts
   const [postCurrentPage, setPostCurrentPage] = useState(0);
   const [postPageSize, setPostPageSize] = useState(10);
@@ -183,12 +191,6 @@ export const AdminPage: React.FC = () => {
   const [editingPost, setEditingPost] = useState<ReadingPostItem | null>(null);
   const [previewPost, setPreviewPost] = useState<ReadingPostItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  // Active Journey filter from URL parameter (?journeyId=...)
-  const activeJourneyFilter = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get('journeyId') || '';
-  }, [location.search]);
 
   // Quick Vocab Drawer state
   const [vocabDrawerPost, setVocabDrawerPost] = useState<ReadingPostItem | null>(null);
@@ -389,6 +391,14 @@ export const AdminPage: React.FC = () => {
       return true;
     });
   }, [posts, postStatusFilter, activeJourneyFilter]);
+
+  // Pagination calculations for Posts
+  const totalPostPages = Math.max(1, Math.ceil(displayedPosts.length / postPageSize));
+  const safePostPage = Math.min(postCurrentPage, totalPostPages - 1);
+  const pagedPosts = useMemo(() => {
+    const start = safePostPage * postPageSize;
+    return displayedPosts.slice(start, start + postPageSize);
+  }, [displayedPosts, safePostPage, postPageSize]);
 
   // Level Badge Color Helper
   const getLevelBadgeClass = (lvl?: CefrLevel) => {

@@ -45,9 +45,9 @@ import { AdminDialog } from '../AdminDialog';
 type AiSubTab = 'GEMINI' | 'AZURE' | 'COST';
 
 const DEFAULT_GEMINI_MODELS = [
-  { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash (Khuyên dùng - Nhanh & Tối ưu chi phí)', desc: 'Thế hệ mới nhất, tốc độ phản hồi cực nhanh, độ chính xác cao.' },
-  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash (Tiêu chuẩn ổn định)', desc: 'Mô hình đa phương thức cân bằng hoàn hảo giữa tốc độ và chi phí.' },
-  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro (Lập luận sâu / Chuyên sâu)', desc: 'Mô hình mạnh nhất cho ngữ cảnh văn hóa phức tạp.' },
+  { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash (Khuyên dùng - Nhanh & Tối ưu chi phí)', desc: 'Thế hệ mới nhất, tốc độ phản hồi cực nhanh, đa phương thức tối ưu.' },
+  { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash (Tiêu chuẩn cân bằng)', desc: 'Mô hình đa phương thức cân bằng hoàn hảo giữa tốc độ và chi phí.' },
+  { id: 'gemini-3.1-pro-preview', name: 'Gemini 3.1 Pro Preview (Lập luận sâu)', desc: 'Mô hình mạnh nhất cho ngữ cảnh văn hóa phức tạp.' },
   { id: 'gemini-3.5-transcribe', name: 'Gemini 3.5 Transcribe (Khuyên dùng cho Gemini STT - Tối ưu nhận diện tiếng Việt)', desc: 'Chuyên dụng cho xử lý âm thanh tiếng Việt, nhận diện giọng nói và lọc từ đệm hai bước.' },
   { id: 'gemini-flash-latest', name: 'Gemini Flash Latest (Bản mới nhất)', desc: 'Tự động cập nhật alias mới nhất từ Google AI Studio.' },
 ];
@@ -78,12 +78,12 @@ export const AiConfigManagementView: React.FC = () => {
 
   // System AI Settings State
   const [aiSettings, setAiSettings] = useState<SystemAiSettingsDto>({
-    geminiChatModel: 'gemini-2.0-flash',
-    geminiTranslateModel: 'gemini-1.5-flash',
+    geminiChatModel: 'gemini-3.8-flash',
+    geminiTranslateModel: 'gemini-3.5-flash',
     geminiSttModel: 'gemini-3.5-transcribe',
     azureSpeechRegion: 'southeastasia',
     activeTtsProvider: 'azure',
-    availableGeminiModels: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-3.5-transcribe', 'gemini-flash-latest'],
+    availableGeminiModels: ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.1-pro-preview', 'gemini-3.5-transcribe', 'gemini-flash-latest'],
     availableAzureRegions: DEFAULT_AZURE_REGIONS,
   });
   const [isSavingSettings, setIsSavingSettings] = useState<boolean>(false);
@@ -111,7 +111,7 @@ export const AiConfigManagementView: React.FC = () => {
   const [modalServiceType, setModalServiceType] = useState<AiServiceType>('CHAT');
   const [modalKeyLabel, setModalKeyLabel] = useState<string>('');
   const [modalRawKey, setModalRawKey] = useState<string>('');
-  const [modalModelName, setModalModelName] = useState<string>('gemini-2.0-flash');
+  const [modalModelName, setModalModelName] = useState<string>('gemini-3.8-flash');
   const [modalRegion, setModalRegion] = useState<string>('southeastasia');
   const [modalPriority, setModalPriority] = useState<number>(1);
   const [modalActive, setModalActive] = useState<boolean>(true);
@@ -264,7 +264,7 @@ export const AiConfigManagementView: React.FC = () => {
     setModalServiceType(provider === 'GEMINI' ? 'CHAT' : 'TTS');
     setModalKeyLabel('');
     setModalRawKey('');
-    setModalModelName(aiSettings.geminiChatModel || 'gemini-2.0-flash');
+    setModalModelName(aiSettings.geminiChatModel || 'gemini-3.8-flash');
     setModalRegion(aiSettings.azureSpeechRegion || 'southeastasia');
     setModalPriority(1);
     setModalActive(true);
