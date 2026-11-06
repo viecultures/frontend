@@ -3,11 +3,13 @@ import { ArrowRight, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { paths, PATHS } from '@/routes/paths';
 import type { ReadingBookmark } from '../lib/studyRoomStorage';
+import { getSeriesArticle } from '@/data/series/seriesRegistry';
 
 interface HomeContinueCardProps { bookmark?: ReadingBookmark; }
 
-export function HomeContinueCard({ bookmark }: HomeContinueCardProps) {
+export function HomeContinueCard({ bookmark: storedBookmark }: HomeContinueCardProps) {
   const { t } = useTranslation('home');
+  const bookmark = storedBookmark && getSeriesArticle(storedBookmark.id) ? storedBookmark : undefined;
   const position = Math.round((bookmark?.position || 0) * 100);
 
   return <section className="home-room-continue home-room-panel" aria-labelledby="home-continue-title">
@@ -22,7 +24,7 @@ export function HomeContinueCard({ bookmark }: HomeContinueCardProps) {
       <p>
         {bookmark
           ? t('continue_card.saved_desc', 'Return to your story, with your reading position remembered.')
-          : t('continue_card.new_desc', 'Start with the traditions of Tet. Read in English, explore the Vietnamese translation and save words along the way.')}
+          : t('continue_card.new_desc', 'Start with Hanoi pho. Read in English, explore the Vietnamese translation and save words along the way.')}
       </p>
       <div className="home-room-story-meta">
         <span>{bookmark?.level || 'Level 1'}</span>
@@ -36,7 +38,7 @@ export function HomeContinueCard({ bookmark }: HomeContinueCardProps) {
         <progress value={position} max={100} aria-label={t('continue_card.reading_position', 'Reading position')} />
       </div>}
       <div className="home-room-continue-actions">
-        <Link className="home-room-primary" to={paths.reader({ postId: bookmark?.id || 'tet-holiday', level: bookmark?.level || 'Level 1' })}>
+        <Link className="home-room-primary" to={paths.reader({ postId: bookmark?.id || 'pho-hanoi-history', level: bookmark?.level || 'Level 1' })}>
           {bookmark ? t('continue_card.btn_continue', 'Continue reading') : t('continue_card.btn_start', 'Start your first story')}
           <ArrowRight size={17} aria-hidden="true" />
         </Link>
@@ -46,8 +48,8 @@ export function HomeContinueCard({ bookmark }: HomeContinueCardProps) {
       </div>
     </div>
     <div className="home-room-continue-image">
-      <img src={bookmark?.image || '/images/landing/hoi-an-lanterns.webp'} alt="" />
-      <span>{bookmark?.topic || t('continue_card.default_topic', 'Traditions & everyday life')}</span>
+      <img src={bookmark?.image || '/images/series/pho-hanoi.webp'} alt="" />
+      <span>{bookmark?.topic || t('continue_card.default_topic', 'Vietnamese cuisine')}</span>
     </div>
   </section>;
 }

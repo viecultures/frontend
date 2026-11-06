@@ -17,7 +17,7 @@ export const BUN_CHA_SERIES_METADATA: SeriesMetadata = {
     {
       id: 'bun-cha-grilling-secrets',
       order: 1,
-      titleEn: 'Bún Chả 01: The Grilling Secrets of Traditional Bún Chả',
+      titleEn: "Bun Cha – A Taste of Hanoi's Cultural Life",
       titleVi: 'Bún Chả 01: Bí Quyết Nướng Than Hoa Của Món Bún Chả Truyền Thống',
       summary: 'Explore the grilling art over natural charcoal, bamboo sticks technique, and warm dipping sauce balance.',
       summaryVi: 'Khám phá nghệ thuật nướng than hoa, kẹp que tre truyền thống và sự cân bằng chuẩn xác của bát nước chấm ấm nóng.',
@@ -50,7 +50,7 @@ export const BUN_CHA_SERIES_METADATA: SeriesMetadata = {
 const chapters = [
   {
     id: 'bun-cha-grilling-secrets',
-    titleEn: 'Bún Chả 01: The Grilling Secrets of Traditional Bún Chả',
+    titleEn: "Bun Cha – A Taste of Hanoi's Cultural Life",
     titleVi: 'Bún Chả 01: Bí Quyết Nướng Than Hoa Của Món Bún Chả Truyền Thống',
     summary: 'Explore the grilling art over natural charcoal, bamboo sticks technique, and warm dipping sauce balance.',
     summaryVi: 'Khám phá nghệ thuật nướng than hoa, kẹp que tre truyền thống và sự cân bằng chuẩn xác của bát nước chấm ấm nóng.',

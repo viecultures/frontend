@@ -6,8 +6,6 @@ import { CHA_CA_SERIES } from './mock/chaCaSeries';
 import { CA_KHO_VU_DAI_SERIES } from './mock/caKhoVuDaiSeries';
 import { COM_CHAY_SERIES } from './mock/comChaySeries';
 import { BANH_CAY_SERIES } from './mock/banhCaySeries';
-import { HUE_SERIES } from './mock/hueCitadelSeries';
-import { SAIGON_BANH_MI_SERIES } from './mock/saigonBanhMiSeries';
 
 /**
  * Master Registry of all Article Series (Mock Data Hub)
@@ -19,8 +17,6 @@ export const ALL_SERIES: ArticleSeries[] = [
   CA_KHO_VU_DAI_SERIES,
   COM_CHAY_SERIES,
   BANH_CAY_SERIES,
-  HUE_SERIES,
-  SAIGON_BANH_MI_SERIES,
 ];
 
 export const ALL_SERIES_METADATA: SeriesMetadata[] = ALL_SERIES.map(series => series.metadata);

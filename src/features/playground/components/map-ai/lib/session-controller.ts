@@ -265,7 +265,9 @@ export class SessionController {
         ? 'Continue our conversation naturally using the restored context. Do not greet again or answer old questions again. Ask one brief follow-up.'
         : this.state.activeView === 'chat' && useSettings.getState().tutorMode === 'open-conversation'
           ? 'Start a friendly open conversation. Let me choose the topic.'
-          : 'Start a friendly conversation about Vietnam. Ask me what I would like to talk about.');
+          : this.state.activeView === 'chat'
+            ? 'Start Story Practice. If an article is selected, ask me one short question about it. If none is selected, help me choose a VieCultures article to discuss.'
+            : 'Start a friendly conversation about Vietnam. Ask me what I would like to talk about.');
       if (request.text || (reconnect && !(request.input === 'voice' && this.manualVoiceMode()))) {
         this.onInterrupted();
         this.patch({ isAwaitingResponse: true });

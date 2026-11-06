@@ -33,6 +33,7 @@ import {
 import type { FirstRegion } from "@/services/learning/firstRegionChoice";
 import { JOURNEY_SERIES, type JourneySeries } from "../data/learningJourney";
 import { journeyApiService } from "../services/journeyApiService";
+import { getPublicCuisineSeries, toPublicJourney } from '@/features/reader/services/publicCuisineService';
 import { DiscoveryPagination } from "./DiscoveryPagination";
 
 const SERIES_PAGE_SIZE = 6;
@@ -77,6 +78,7 @@ interface SelectedChapter {
   id: string;
   title: string;
   seriesTitle: string;
+  level: 'Level 1' | 'Level 2' | 'Level 3';
 }
 
 export function DiscoveryJourney() {
@@ -108,108 +110,7 @@ export function DiscoveryJourney() {
   const getRegionName = (item: (typeof REGIONS)[number]) =>
     t(item.nameKey, item.fallbackName);
 
-  const staticUpcomingPreviews = useMemo(
-    () => [
-      {
-        id: "hue-citadel-preview",
-        title: isEn ? "Imperial Citadel of Hue" : "Đại nội Kinh thành Huế",
-        place: isEn ? "Hue" : "Huế",
-        imageUrl: "/images/landing/hue-citadel.webp",
-        description: isEn
-          ? "Walk through the ancient royal capital on the banks of the Perfume River."
-          : "Khám phá cố đô cổ kính bên dòng sông Hương và di sản kiến trúc cung đình triều Nguyễn.",
-      },
-      {
-        id: "south-preview",
-        title: isEn
-          ? "Bánh Mì: Street Culture in Saigon"
-          : "Bánh Mì & Văn hóa đường phố Sài Gòn",
-        place: isEn ? "Ho Chi Minh City" : "TP. Hồ Chí Minh",
-        imageUrl: "/images/landing/banh-mi.webp",
-        description: isEn
-          ? "Follow the journey of the iconic Vietnamese baguette from local ovens to global street food."
-          : "Hành trình ổ bánh mì giòn xốp từ nét giao thoa văn hóa đến biểu tượng ẩm thực đường phố.",
-      },
-      {
-        id: "hoi-an-preview",
-        title: isEn
-          ? "Hội An: The River of Lanterns"
-          : "Hội An: Dòng sông hoa đăng",
-        place: isEn ? "Quang Nam" : "Quảng Nam",
-        imageUrl: "/images/landing/hoi-an-lanterns.webp",
-        description: isEn
-          ? "Discover timber merchant houses, quiet canals, and century-old lantern craft along the Thu Bồn river."
-          : "Chiêm ngưỡng những nếp nhà gỗ trăm tuổi, kênh rạch thanh bình và nghề làm đèn lồng thủ công.",
-      },
-      {
-        id: "mu-cang-chai-preview",
-        title: isEn
-          ? "Mù Cang Chải: Steps to the Clouds"
-          : "Mù Cang Chải: Bậc thang lên mây",
-        place: isEn ? "Yen Bai" : "Yên Bái",
-        imageUrl: "/images/landing/mu-cang-chai.webp",
-        description: isEn
-          ? "Marvel at emerald and golden rice terraces sculpted across highlands by ethnic minority farmers."
-          : "Kỳ quan ruộng bậc thang uốn lượn qua các sườn đồi Tây Bắc được tạo nên bởi bàn tay người Mông.",
-      },
-      {
-        id: "bat-trang-preview",
-        title: isEn
-          ? "Bát Tràng: 700 Years of Kilns"
-          : "Bát Tràng: 700 năm gốm sứ",
-        place: isEn ? "Hanoi" : "Hà Nội",
-        imageUrl: "/images/landing/bat-trang.webp",
-        description: isEn
-          ? "Learn the timeless craftsmanship of shaping white clay, glaze artistry, and wood-fired pottery kilns."
-          : "Tìm hiểu nghệ thuật nhào nặn đất sét trắng, kỹ thuật tráng men và ngọn lửa lò gốm truyền thống.",
-      },
-      {
-        id: "dong-ho-preview",
-        title: isEn
-          ? "Đông Hồ: Woodblock Folk Paintings"
-          : "Tranh dân gian Đông Hồ",
-        place: isEn ? "Bac Ninh" : "Bắc Ninh",
-        imageUrl: "/images/landing/dong-ho.webp",
-        description: isEn
-          ? "Experience natural colors on Điệp scallop paper depicting folklore, prosperity, and lunar celebrations."
-          : "Khám phá sắc màu tự nhiên trên giấy điệp óng ánh khắc họa nét đẹp đời sống và lời chúc bình an.",
-      },
-      {
-        id: "da-lat-preview",
-        title: isEn
-          ? "Đà Lạt: The Pine Mist & Flower Highlands"
-          : "Đà Lạt: Thành phố ngàn hoa và sương mờ",
-        place: isEn ? "Lam Dong" : "Lâm Đồng",
-        imageUrl: "/images/map-thumb/da-lat.jpg",
-        description: isEn
-          ? "Explore highland French villas, fragrant pine valleys, and morning flower markets in temperate Lam Dong."
-          : "Chiêm ngưỡng dinh thự cổ giữa đồi thông, thung lũng sương sớm và văn hóa canh tác hoa cao nguyên.",
-      },
-      {
-        id: "da-nang-preview",
-        title: isEn
-          ? "Đà Nẵng: Bridges of the Han River"
-          : "Đà Nẵng: Thành phố của những cây cầu",
-        place: isEn ? "Da Nang" : "Đà Nẵng",
-        imageUrl: "/images/map-thumb/da-nang.jpg",
-        description: isEn
-          ? "Trace modern coastal life, marble mountains, and iconic bridges crossing the lively Han River."
-          : "Khám phá nhịp sống duyên hải năng động, quần thể Ngũ Hành Sơn và vẻ đẹp đôi bờ sông Hàn về đêm.",
-      },
-      {
-        id: "saigon-heritage-preview",
-        title: isEn
-          ? "Saigon Chợ Lớn: Century-Old Shophouses"
-          : "Chợ Lớn: Di sản phố cổ trăm năm Sài Gòn",
-        place: isEn ? "Ho Chi Minh City" : "TP. Hồ Chí Minh",
-        imageUrl: "/images/calendar/heritage-saigon.webp",
-        description: isEn
-          ? "Discover vibrant herbal shops, incense-filled guild halls, and heritage architecture in historic District 5."
-          : "Khám phá phố thuốc bắc truyền thống, hội quán cổ kính và kiến trúc giao thoa độc đáo tại Quận 5.",
-      },
-    ],
-    [isEn],
-  );
+  const staticUpcomingPreviews: Array<{ id: string; title: string; place: string; imageUrl: string; description: string }> = [];
 
   const getLocalizedProvinceName = (pName: string) => {
     return isEn ? toEnglishPlaceName(pName) : pName;
@@ -248,8 +149,19 @@ export function DiscoveryJourney() {
 
   useEffect(() => {
     let active = true;
-    journeyApiService.getJourneys().then((journeys) => {
-      if (active) setAllJourneys(journeys);
+    Promise.all([
+      journeyApiService.getJourneys({ status: 'published' }),
+      getPublicCuisineSeries().catch(() => []),
+    ]).then(([journeys, publicCuisine]) => {
+      if (!active) return;
+      const publicMap = new Map(publicCuisine.map(series => [series.id, toPublicJourney(series)]));
+      const merged = journeys.map(journey => publicMap.get(journey.id) || journey);
+      for (const [id, journey] of publicMap) {
+        if (!merged.some(j => j.id === id)) {
+          merged.push(journey);
+        }
+      }
+      setAllJourneys(merged);
     });
     return () => { active = false; };
   }, []);
@@ -602,6 +514,7 @@ export function DiscoveryJourney() {
       id: chapter.id,
       title: chapter.title,
       seriesTitle: series.title,
+      level: chapter.preferredLevel || 'Level 2',
     });
   }
 
@@ -1062,7 +975,7 @@ export function DiscoveryJourney() {
             showSinglePage={true}
           />
         </div>
-        <div
+        {upcomingSeries.length > 0 && <div
           ref={upcomingLibraryRef}
           className="journey-library-group"
           id="journey-upcoming-series"
@@ -1124,7 +1037,7 @@ export function DiscoveryJourney() {
             itemLabel={isEn ? "upcoming series" : "chuỗi bài sắp ra mắt"}
             showSinglePage={true}
           />
-        </div>
+        </div>}
       </section>
 
       {/* Floating chapter popover for hovered series */}
@@ -1157,7 +1070,7 @@ export function DiscoveryJourney() {
                   count: hoverPopover.series.chapters.length,
                 })}
               </span>
-              <h4>{hoverPopover.series.title}</h4>
+              <h4>{isEn ? hoverPopover.series.title : (hoverPopover.series.titleVi || hoverPopover.series.title)}</h4>
             </div>
             <button
               type="button"
@@ -1182,7 +1095,7 @@ export function DiscoveryJourney() {
                     {String(chapter.order).padStart(2, "0")}
                   </span>
                   <div className="journey-hover-chapter-info">
-                    <strong>{chapter.title}</strong>
+                    <strong>{isEn ? (chapter.title || chapter.titleVi) : (chapter.titleVi || chapter.title)}</strong>
                     <small>
                       {chapter.readTime
                         ? isEn
@@ -1235,7 +1148,7 @@ export function DiscoveryJourney() {
               <Link
                 to={paths.reader({
                   story: selectedChapter.id,
-                  level: "Level 2",
+                  level: selectedChapter.level,
                 })}
               >
                 <BookOpen size={24} aria-hidden="true" />
@@ -1248,7 +1161,7 @@ export function DiscoveryJourney() {
               <Link
                 to={paths.reader({
                   story: selectedChapter.id,
-                  level: "Level 2",
+                  level: selectedChapter.level,
                   mode: "practice",
                   practice: "dictation",
                 })}
@@ -1269,7 +1182,7 @@ export function DiscoveryJourney() {
                 <Link
                   to={paths.reader({
                     story: selectedChapter.id,
-                    level: "Level 2",
+                    level: selectedChapter.level,
                     mode: "practice",
                     practice: "shadowing",
                   })}
@@ -1284,7 +1197,7 @@ export function DiscoveryJourney() {
                 <Link
                   to={paths.aiWorkspace({
                     story: selectedChapter.id,
-                    level: "Level 2",
+                    level: selectedChapter.level,
                   })}
                 >
                   <Bot size={24} aria-hidden="true" />
