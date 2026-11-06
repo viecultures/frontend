@@ -11,3 +11,4 @@ export { VoiceCustomizerModal } from "./VoiceCustomizerModal";
 export { ReaderDictationSection } from "./ReaderDictationSection";
 export { ReaderQuickFlashcards } from "./ReaderQuickFlashcards";
 export { LessonCompletionFlowModal } from "./LessonCompletionFlowModal";
+export { ReaderSeriesNavigation } from "./ReaderSeriesNavigation";

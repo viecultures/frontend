@@ -12,6 +12,7 @@ import {
   ReaderVocabDrawer,
   ReaderRecommendedSection,
   VoiceCustomizerModal,
+  ReaderSeriesNavigation,
 } from "../components";
 import { useCompanionArticleContext } from "@/features/companion/useCompanionArticleContext";
 import { Footer } from "@/components/Footer";
@@ -510,6 +511,15 @@ export default function ReaderPage() {
               onChangeMode={handlePracticeModeChange}
               onBackToReading={() => handleModeChange('bilingual')}
               fullAudioUrl={articleData.shadowingAudioUrl}
+            />
+          )}
+
+          {/* Series Chapter Navigation (Bottom of article flow) */}
+          {readingMode === 'bilingual' && articleData && (
+            <ReaderSeriesNavigation
+              articleId={articleData.id || targetId}
+              selectedLevel={selectedLevel}
+              themeMode={themeMode}
             />
           )}
 
