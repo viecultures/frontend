@@ -11,6 +11,12 @@ export interface AdminVocabItem {
   audioUrl?: string;
   level: string;
   searchCount: number;
+  postId?: string;
+  postTitleEn?: string;
+  postTitleVi?: string;
+  journeyId?: string;
+  journeyTitleEn?: string;
+  usageNote?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -18,6 +24,7 @@ export interface AdminVocabItem {
 export interface VocabFilterParams {
   search?: string;
   level?: string;
+  postId?: string;
   page?: number;
   size?: number;
 }
@@ -31,6 +38,8 @@ export interface VocabFormData {
   contextSentence?: string;
   audioUrl?: string;
   level: string;
+  postId?: string;
+  usageNote?: string;
 }
 
 export interface PageResponse<T> {

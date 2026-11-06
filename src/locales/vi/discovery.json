@@ -1,4 +1,4 @@
-﻿{
+{
   "page": {
     "title": "Những câu chuyện từ Việt Nam",
     "lead": "Khám phá các câu chuyện văn hóa Việt Nam với bài đọc song ngữ và âm thanh bản xứ.",
@@ -83,6 +83,9 @@
     "choose_first_to_see": "Chọn vùng khởi đầu để xem các chuỗi bài đã xuất bản.",
     "explore_chapters": "Khám phá các chương",
     "chapters_count": "{{count}} CHƯƠNG",
+    "stories_in_region": "{{count}} câu chuyện",
+    "stories_in_region_one": "1 câu chuyện",
+    "stories_in_region_other": "{{count}} câu chuyện",
     "close_chapter_list": "Đóng danh sách chương",
     "start_reading_ch1": "Bắt đầu đọc (Chương 1)",
     "unlock_place": "Mở khóa {{placeName}}",
@@ -97,7 +100,10 @@
     "skill_shadowing_title": "Luyện nói nhại (Shadowing)",
     "skill_shadowing_desc": "Lắng nghe, lặp lại và ghi âm giọng nói của bạn.",
     "skill_ai_title": "Hội thoại với AI",
-    "skill_ai_desc": "Thảo luận về câu chuyện này cùng trợ lý AI. Hỗ trợ cả nhập văn bản."
+    "skill_ai_desc": "Thảo luận về câu chuyện này cùng trợ lý AI. Hỗ trợ cả nhập văn bản.",
+    "other_articles": "Các bài đọc khác",
+    "articles_count": "{{count}} bài đọc",
+    "pagination_articles_aria": "Phân trang các bài đọc khác"
   },
   "editorial": {
     "min_read": "{{count}} phút đọc",

@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Users,
   Search,
   ShieldCheck,
-  ShieldAlert,
   UserCheck,
   RefreshCw,
-  Edit2,
   CheckCircle2,
   AlertCircle,
   X,
@@ -20,17 +18,21 @@ import {
   Unlock,
   Download,
   Filter,
+  Eye,
 } from 'lucide-react';
 import type { AdminUserItem, CefrLevel } from '../types/adminTypes';
 import { adminUserService } from '../services/adminUserService';
 import { getStoredUser, getStoredToken, parseJwt } from '@/utils/auth-storage';
-import { AdminDialog } from './AdminDialog';
 import { isLocalAuthMode } from '@/config/authConfig';
+import { getLocalizedPath } from '@/routes/paths';
 
 type FilterGroup = 'all' | 'recent_7d' | 'inactive' | 'active' | 'admin';
 
 export const UserManagementView: React.FC = () => {
   const { t } = useTranslation('admin');
+  const navigate = useNavigate();
+  const { lang } = useParams<{ lang?: string }>();
+
   const [users, setUsers] = useState<AdminUserItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasLoadedUsers, setHasLoadedUsers] = useState(false);
@@ -59,11 +61,6 @@ export const UserManagementView: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
-
-  // Role change modal state
-  const [roleModalUser, setRoleModalUser] = useState<AdminUserItem | null>(null);
-  const [newRole, setNewRole] = useState<string>('ROLE_USER');
-  const [isUpdatingRole, setIsUpdatingRole] = useState(false);
 
   // Status updating map
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
@@ -205,29 +202,9 @@ export const UserManagementView: React.FC = () => {
     }
   };
 
-  // Open role modal
-  const handleOpenRoleModal = (user: AdminUserItem) => {
-    setRoleModalUser(user);
-    setNewRole(user.role || 'ROLE_USER');
-  };
-
-  // Confirm role update
-  const handleConfirmRoleChange = async () => {
-    if (!roleModalUser) return;
-    setIsUpdatingRole(true);
-    try {
-      const updated = await adminUserService.updateUserRole(roleModalUser.id, newRole);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === roleModalUser.id ? { ...u, role: updated.role } : u))
-      );
-      setSuccessToast(`${roleModalUser.name}: ${t('users.role_modal.confirm')}`);
-      setTimeout(() => setSuccessToast(null), 3000);
-      setRoleModalUser(null);
-    } catch (err: unknown) {
-      setErrorMsg((err instanceof Error ? err.message : '') || t('users.messages.unavailable_desc'));
-    } finally {
-      setIsUpdatingRole(false);
-    }
+  // Navigate to detailed learner page
+  const handleNavigateToDetail = (userId: string) => {
+    navigate(getLocalizedPath(`/admin/users/${userId}`, lang));
   };
 
   // Format date helper
@@ -304,12 +281,12 @@ export const UserManagementView: React.FC = () => {
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-text-muted text-xs">{t('users.stats.active_on_page')}</span>
-            <div className="text-2xl sm:text-3xl font-heading font-bold text-emerald-700 dark:text-emerald-400">
-              {hasLoadedUsers ? `${summaryStats.activeInPage} / ${users.length}` : '—'}
+            <div className="text-2xl sm:text-3xl font-heading font-bold text-emerald-600 dark:text-emerald-400">
+              {hasLoadedUsers ? summaryStats.activeInPage : '—'}
             </div>
             <p className="text-[11px] text-text-secondary">{t('users.stats.active_on_page_desc')}</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
             <UserCheck aria-hidden="true" className="w-6 h-6" />
           </div>
         </div>
@@ -317,65 +294,67 @@ export const UserManagementView: React.FC = () => {
         <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-text-muted text-xs">{t('users.stats.admins_on_page')}</span>
-            <div className="text-2xl sm:text-3xl font-heading font-bold text-antique-gold dark:text-antique-bright">
+            <div className="text-2xl sm:text-3xl font-heading font-bold text-amber-600 dark:text-amber-400">
               {hasLoadedUsers ? summaryStats.adminInPage : '—'}
             </div>
             <p className="text-[11px] text-text-secondary">{t('users.stats.admins_on_page_desc')}</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 flex items-center justify-center text-amber-700 dark:text-antique-gold">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
             <ShieldCheck aria-hidden="true" className="w-6 h-6" />
           </div>
         </div>
       </div>
 
-      {/* ── Marketing Segment Filter Pills ────────────────────────────── */}
-      <div className="p-3 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
-        <span className="text-xs font-bold text-text-secondary px-2 flex items-center gap-1.5 shrink-0">
-          <Filter aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
-          <span>{t('header.title', 'Phân nhóm')}:</span>
-        </span>
-        <div className="flex items-center gap-2 shrink-0">
-          {marketingTabs.map((mt) => {
-            const isActive = filterGroup === mt.key;
-            return (
-              <button
-                key={mt.key}
-                type="button"
-                onClick={() => {
-                  setFilterGroup(mt.key);
-                  setCurrentPage(0);
-                }}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                  isActive
-                    ? 'bg-heritage-green text-warm-ivory shadow-md ring-2 ring-heritage-green/20 scale-[1.02]'
-                    : 'bg-warm-ivory/80 dark:bg-heritage-dark/80 text-text-secondary hover:text-heritage-green hover:bg-warm-ivory border border-antique-gold/20'
-                }`}
-              >
-                {mt.label}
-              </button>
-            );
-          })}
-        </div>
+      {/* ── Marketing Segment Tabs ────────────────────────────────────── */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-antique-gold/20">
+        <Filter aria-hidden="true" className="w-4 h-4 text-text-muted shrink-0 mr-1" />
+        {marketingTabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => {
+              setFilterGroup(tab.key);
+              setCurrentPage(0);
+            }}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              filterGroup === tab.key
+                ? 'bg-heritage-green text-warm-ivory shadow-sm'
+                : 'bg-rice-paper dark:bg-white/5 text-text-secondary hover:text-text-body border border-antique-gold/20'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* ── Search & Filters Bar ───────────────────────────────────────── */}
-      <div className="p-4 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
-        <form onSubmit={handleSearchSubmit} className="admin-search relative w-full md:w-80" role="search">
-          <Search aria-hidden="true" className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+      {/* ── Search & Filter Controls ──────────────────────────────────── */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        {/* Search Bar */}
+        <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-md">
+          <Search aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
-            aria-label={t('users.filters.search_placeholder')}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('users.filters.search_placeholder')}
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+            className="w-full pl-10 pr-4 py-2 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory placeholder:text-text-muted focus:outline-none focus:border-antique-gold transition-colors"
           />
-          <button type="submit" className="rounded-xl bg-heritage-green px-3 text-warm-ivory text-xs font-bold">
-            {t('users.filters.search_button')}
-          </button>
+          {searchQuery && (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => {
+                setSearchQuery('');
+                setCurrentPage(0);
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-body cursor-pointer"
+            >
+              <X aria-hidden="true" className="w-3.5 h-3.5" />
+            </button>
+          )}
         </form>
 
-        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+        {/* Filter Dropdowns & Actions */}
+        <div className="flex items-center gap-2 flex-wrap justify-end">
           {/* Role Filter */}
           <select
             aria-label={t('users.filters.all_roles')}
@@ -580,17 +559,14 @@ export const UserManagementView: React.FC = () => {
                         </div>
                       </td>
 
-                      {/* Role */}
+                      {/* Role (Read-only Badge) */}
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => handleOpenRoleModal(user)}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all cursor-pointer ${
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border select-none ${
                             isAdmin
-                              ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border-amber-300 hover:ring-2 hover:ring-amber-400'
-                              : 'bg-rice-paper dark:bg-white/5 text-text-body dark:text-warm-ivory border-antique-gold/30 hover:border-antique-gold'
+                              ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border-amber-300/80 shadow-xs'
+                              : 'bg-rice-paper dark:bg-white/5 text-text-body dark:text-warm-ivory border-antique-gold/30'
                           }`}
-                          title={t('users.roles.change_role')}
-                          aria-label={t('users.roles.change_role')}
                         >
                           {isAdmin ? (
                             <ShieldCheck aria-hidden="true" className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
@@ -598,8 +574,7 @@ export const UserManagementView: React.FC = () => {
                             <Users aria-hidden="true" className="w-3.5 h-3.5 text-text-muted" />
                           )}
                           <span>{isAdmin ? t('users.roles.admin') : t('users.roles.learner')}</span>
-                          <Edit2 aria-hidden="true" className="w-2.5 h-2.5 opacity-60 ml-0.5" />
-                        </button>
+                        </span>
                       </td>
 
                       {/* CEFR English Level */}
@@ -670,10 +645,14 @@ export const UserManagementView: React.FC = () => {
                       {/* Actions Sticky Column */}
                       <td className="sticky right-0 z-10 px-5 py-4 whitespace-nowrap text-right space-x-1 bg-rice-paper dark:bg-heritage-dark group-hover:bg-warm-ivory dark:group-hover:bg-stone-900 border-l border-antique-gold/20 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.08)]">
                         <button
-                          onClick={() => handleOpenRoleModal(user)}
-                          className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-antique-gold/15 text-heritage-green dark:text-antique-bright hover:bg-antique-gold/30 transition-colors cursor-pointer"
+                          type="button"
+                          onClick={() => handleNavigateToDetail(user.id)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-antique-gold/15 text-heritage-green dark:text-antique-bright hover:bg-antique-gold/30 dark:hover:bg-antique-gold/25 transition-colors cursor-pointer border border-antique-gold/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-antique-gold"
+                          title="Theo dõi / Chi tiết học viên"
+                          aria-label="Theo dõi / Chi tiết học viên"
                         >
-                          {t('users.roles.change_role')}
+                          <Eye aria-hidden="true" className="w-3.5 h-3.5" />
+                          <span>{t('users.actions.view_detail', 'Theo dõi / Chi tiết')}</span>
                         </button>
                       </td>
                     </tr>
@@ -715,164 +694,6 @@ export const UserManagementView: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* ── Modal Đổi Role (Role Modal) ─────────────────────────────── */}
-      <AnimatePresence>
-        {roleModalUser && (
-          <AdminDialog title={t('users.role_modal.title')} onClose={() => { if (!isUpdatingRole) setRoleModalUser(null); }}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-rice-paper dark:bg-heritage-forest border border-antique-gold/40 rounded-3xl p-6 shadow-2xl space-y-5"
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-antique-gold/20 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-antique-gold/20 text-antique-gold">
-                    <ShieldCheck aria-hidden="true" className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-heading font-bold text-base text-heritage-green dark:text-warm-ivory">
-                      {t('users.role_modal.title')}
-                    </h3>
-                    <p className="text-[11px] text-text-muted">{t('header.subtitle')}</p>
-                  </div>
-                </div>
-                <button
-                  aria-label={t('role_modal.cancel', 'Close')}
-                  onClick={() => setRoleModalUser(null)}
-                  className="p-1.5 rounded-xl hover:bg-white/10 text-text-muted cursor-pointer"
-                >
-                  <X aria-hidden="true" className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* User details */}
-              <div className="p-3.5 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/60 border border-antique-gold/20 text-xs space-y-1">
-                <div className="font-bold text-heritage-green dark:text-warm-ivory">
-                  {roleModalUser.name}
-                </div>
-                <div className="text-text-muted text-[11px]">{roleModalUser.email}</div>
-                <div className="text-[11px] text-text-secondary pt-1">
-                  {t('users.columns.role')}:{' '}
-                  <span className="font-bold text-antique-gold">
-                    {roleModalUser.role || 'ROLE_USER'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Role selection radio cards */}
-              <div className="space-y-2.5">
-                <label className="text-xs font-bold text-text-secondary">{t('users.role_modal.role_label')}:</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    aria-pressed={newRole === 'ROLE_USER'}
-                    onClick={() => setNewRole('ROLE_USER')}
-                    className={`p-3.5 rounded-2xl border text-left cursor-pointer transition-all ${
-                      newRole === 'ROLE_USER'
-                        ? 'border-antique-gold bg-antique-gold/15 ring-2 ring-antique-gold/30'
-                        : 'border-antique-gold/20 bg-warm-ivory dark:bg-heritage-dark/40 hover:border-antique-gold/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <Users aria-hidden="true" className="w-4 h-4 text-heritage-green dark:text-warm-ivory" />
-                      {newRole === 'ROLE_USER' && (
-                        <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-                      )}
-                    </div>
-                    <div className="font-heading font-bold text-xs text-text-body dark:text-warm-ivory">
-                      {t('users.roles.learner')}
-                    </div>
-                    <div className="text-[10px] text-text-muted">ROLE_USER</div>
-                  </button>
-
-                  <button
-                    type="button"
-                    aria-pressed={newRole === 'ROLE_ADMIN'}
-                    onClick={() => setNewRole('ROLE_ADMIN')}
-                    className={`p-3.5 rounded-2xl border text-left cursor-pointer transition-all ${
-                      newRole === 'ROLE_ADMIN'
-                        ? 'border-amber-400 bg-amber-100/40 dark:bg-amber-900/30 ring-2 ring-amber-400/40'
-                        : 'border-antique-gold/20 bg-warm-ivory dark:bg-heritage-dark/40 hover:border-antique-gold/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <ShieldCheck aria-hidden="true" className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      {newRole === 'ROLE_ADMIN' && (
-                        <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      )}
-                    </div>
-                    <div className="font-heading font-bold text-xs text-text-body dark:text-warm-ivory">
-                      {t('users.roles.admin')}
-                    </div>
-                    <div className="text-[10px] text-text-muted">ROLE_ADMIN</div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Warning notice when self-demoting */}
-              {roleModalUser && currentAdminEmail && roleModalUser.email?.toLowerCase() === currentAdminEmail && newRole !== 'ROLE_ADMIN' && (
-                <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 text-[11px] text-red-800 dark:text-red-300 flex items-start gap-2">
-                  <AlertCircle aria-hidden="true" className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
-                  <span>
-                    {t('users.status.cannot_disable_self')}
-                  </span>
-                </div>
-              )}
-
-              {/* Warning notice when promoting */}
-              {newRole === 'ROLE_ADMIN' && (
-                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
-                  <ShieldAlert aria-hidden="true" className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
-                  <span>
-                    {t('users.role_modal.admin_warning')}
-                  </span>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setRoleModalUser(null)}
-                  disabled={isUpdatingRole}
-                  className="px-4 py-2 rounded-xl border border-antique-gold/30 text-xs font-bold hover:bg-white/10 transition-colors cursor-pointer"
-                >
-                  {t('users.role_modal.cancel')}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmRoleChange}
-                  disabled={
-                    isUpdatingRole ||
-                    Boolean(
-                      roleModalUser &&
-                        currentAdminEmail &&
-                        roleModalUser.email?.toLowerCase() === currentAdminEmail &&
-                        newRole !== 'ROLE_ADMIN'
-                    )
-                  }
-                  className="px-5 py-2 rounded-xl bg-antique-gold hover:bg-antique-bright text-heritage-dark text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isUpdatingRole ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-heritage-dark border-t-transparent rounded-full animate-spin" />
-                      <span>{t('users.role_modal.updating')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 aria-hidden="true" className="w-3.5 h-3.5" />
-                      <span>{t('users.role_modal.confirm')}</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </AdminDialog>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

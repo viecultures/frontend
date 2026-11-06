@@ -80,12 +80,17 @@
     "all_caught_up": "Đã ôn hết từ hôm nay",
     "all_caught_up_desc": "Tất cả từ vựng đều đã được củng cố theo chu kỳ.",
     "about_minutes": "Khoảng {{count}} phút",
-    "about_minute": "Khoảng 1 phút"
+    "about_minute": "Khoảng 1 phút",
+    "rating_unreviewed": "Chưa ôn",
+    "memory_stats_aria": "Thống kê trí nhớ: {{again}} Quên mất, {{hard}} Khó nhớ, {{good}} Nhớ rồi, {{easy}} Thuộc làu",
+    "distribution_aria": "Phân bổ trí nhớ: {{again}} Quên mất, {{hard}} Khó nhớ, {{good}} Nhớ rồi, {{easy}} Thuộc làu{{unreviewed}}"
   },
   "daily_quote": {
     "eyebrow_heritage": "DI SẢN VIECULTURES",
     "eyebrow_story": "CÂU CHUYỆN PHÍA SAU CÂU CHỮ",
-    "title": "Quote of the day",
+    "title": "Câu trích dẫn mỗi ngày",
+    "caption_artwork": "Tranh minh họa lịch",
+    "english_translation_note": "Bản dịch tiếng Anh cho tài liệu học tập",
     "created_by": "Biên soạn bởi",
     "creator_name": "VieCultures Daily",
     "expand_title": "Xem cỡ lớn",
@@ -132,7 +137,9 @@
     "legend": "Mức thời gian học",
     "less": "Ít",
     "more": "Nhiều",
-    "color_note": "Màu đậm hơn thể hiện thời gian học nhiều hơn."
+    "color_note": "Màu đậm hơn thể hiện thời gian học nhiều hơn.",
+    "studied_status": "đã học",
+    "no_activity_status": "chưa học"
   },
   "recommendations": {
     "eyebrow": "ĐỂ TRÍ TÒ MÒ DẪN LỐI",

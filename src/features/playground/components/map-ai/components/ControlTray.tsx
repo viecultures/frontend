@@ -4,7 +4,7 @@
  */
 
 import cn from 'classnames';
-import React, { memo, useEffect, useRef, useState, type FormEvent, type Ref } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState, type FormEvent, type Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   SlidersHorizontal,
@@ -14,6 +14,7 @@ import {
   VolumeX,
   Mic,
   MicOff,
+  Sparkles,
   Keyboard,
   Send,
   ImagePlus,
@@ -23,6 +24,9 @@ import { AI_SPEAKING_PACES, useLogStore, useUI, useSettings } from '../lib/state
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 import { useImagePreviewStore } from '../lib/image-previews';
+import { TwoPassVoiceDetector } from '../lib/two-pass-vad';
+import { twoPassSttService, type TwoPassSttData } from '../services/twoPassSttService';
+import { TwoPassSpeechVisualizer, type TwoPassVisualizerState } from './TwoPassSpeechVisualizer';
 
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -47,7 +51,7 @@ export type ControlTrayProps = {
 };
 
 export function ControlTray({ trayRef }: ControlTrayProps) {
-  const { t } = useTranslation('playground');
+  const { t, i18n } = useTranslation('playground');
   const { speakerMuted, toggleSidebar, isSidebarOpen } = useUI();
   const voiceInteractionMode = useSettings(state => state.voiceInteractionMode);
   const tutorMode = useSettings(state => state.tutorMode);
@@ -63,6 +67,18 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   const connectButtonRef = useRef<HTMLButtonElement>(null);
   const isMobile = useMediaQuery('(max-width: 768px), (orientation: landscape) and (max-height: 768px)');
   const [isTextEntryVisible, setIsTextEntryVisible] = useState(false);
+
+  // Smart Two-Pass STT states
+  const vadDetectorRef = useRef<TwoPassVoiceDetector | null>(null);
+  const [twoPassActive, setTwoPassActive] = useState(false);
+  const [twoPassState, setTwoPassState] = useState<TwoPassVisualizerState>('idle');
+  const [twoPassVolume, setTwoPassVolume] = useState(0);
+  const [twoPassError, setTwoPassError] = useState<string | undefined>(undefined);
+  const [twoPassResult, setTwoPassResult] = useState<TwoPassSttData | null>(null);
+  const [smartCleanup, setSmartCleanup] = useState<boolean>(true);
+  const smartCleanupRef = useRef(smartCleanup);
+  smartCleanupRef.current = smartCleanup;
+
   useEffect(() => {
     const { draft, draftMode } = useReaderHandoff.getState();
     if (draft) {
@@ -102,20 +118,133 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     : 'playground.tray_controls.speaking_pace_title', { pace: speakingPaceLabel });
   const muted = !recording;
   const hasHistory = turns.some(turn => turn.role !== 'system');
+
   useEffect(() => {
     if (imageStatus?.kind !== 'success') return;
     const timer = window.setTimeout(() => setImageStatus(current => current === imageStatus ? null : current), 4000);
     return () => window.clearTimeout(timer);
   }, [imageStatus]);
+
+  const stopTwoPassVad = useCallback(() => {
+    if (vadDetectorRef.current) {
+      vadDetectorRef.current.stop(false);
+    }
+    setTwoPassVolume(0);
+  }, []);
+
+  const handleStopTwoPassRecording = useCallback(() => {
+    if (vadDetectorRef.current) {
+      vadDetectorRef.current.stop(true);
+    }
+    setTwoPassVolume(0);
+  }, []);
+
+  const startTwoPassVad = useCallback(async () => {
+    setTwoPassError(undefined);
+    setTwoPassState('listening');
+    setTwoPassActive(true);
+    setIsTextEntryVisible(true);
+
+    const callbacks = {
+      onSpeechStart: () => {
+        setTwoPassState('listening');
+      },
+      onVolumeChange: (vol: number) => {
+        setTwoPassVolume(vol);
+      },
+      onSpeechEnd: async (wavBlob: Blob) => {
+        setTwoPassState('refining');
+        setTwoPassVolume(0);
+
+        try {
+          const res = await twoPassSttService.transcribeTwoPass(wavBlob, {
+            language: i18n.language || 'vi',
+            promptContext: 'Vietnam culture, geography and travel companion',
+            smartCleanup: smartCleanupRef.current,
+          });
+
+          if (res.success && res.data) {
+            if (!res.data.cleanedText.trim()) {
+              setTwoPassState('empty');
+            } else {
+              setTwoPassResult(res.data);
+              setTextPrompt(res.data.cleanedText);
+              setIsTextEntryVisible(true);
+              setTwoPassState('idle');
+            }
+          } else {
+            setTwoPassState('error');
+            setTwoPassError(res.message || t('playground.two_pass_stt.state_error_desc'));
+          }
+        } catch (err) {
+          setTwoPassState('error');
+          setTwoPassError(err instanceof Error ? err.message : String(err));
+        }
+      },
+      onError: (err: Error) => {
+        setTwoPassState('error');
+        setTwoPassError(err.message);
+      },
+    };
+
+    if (!vadDetectorRef.current) {
+      vadDetectorRef.current = new TwoPassVoiceDetector(callbacks, {
+        silenceThresholdMs: 800,
+      });
+    } else {
+      vadDetectorRef.current.setCallbacks(callbacks);
+    }
+
+    try {
+      await vadDetectorRef.current.start();
+    } catch (err) {
+      setTwoPassState('error');
+      setTwoPassError(err instanceof Error ? err.message : String(err));
+    }
+  }, [i18n.language, t]);
+
+  useEffect(() => {
+    return () => {
+      if (vadDetectorRef.current) {
+        vadDetectorRef.current.dispose();
+        vadDetectorRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleToggleTwoPass = () => {
+    if (twoPassActive || twoPassState === 'listening') {
+      stopTwoPassVad();
+      setTwoPassActive(false);
+      setTwoPassState('idle');
+    } else {
+      void startTwoPassVad();
+    }
+  };
+
+  const handleTwoPassRetry = () => {
+    stopTwoPassVad();
+    setTwoPassResult(null);
+    setTwoPassError(undefined);
+    void startTwoPassVad();
+  };
+
   const handleMicClick = () => {
     if (pushToTalk) return;
     if (!active || busy) return;
     if (!connected) {
-      if (hasHistory) {
-        void resumeConversation({ input: 'voice' });
-      } else {
-        void startConversation({ input: 'voice' });
-      }
+      const p = hasHistory
+        ? resumeConversation({ input: 'voice' })
+        : startConversation({ input: 'voice' });
+      p.then(result => {
+        if (result?.status === 'error') {
+          console.error('[ControlTray] Voice start failed:', result.message);
+        } else if (result?.status === 'cancelled') {
+          console.warn('[ControlTray] Voice start cancelled:', result.message);
+        }
+      }).catch(err => {
+        console.error('[ControlTray] Voice start rejected:', err);
+      });
       return;
     }
     void setMicrophoneEnabled(!recording);
@@ -159,15 +288,26 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     const currentPrompt = textPrompt;
     const result = await sendMessage({ text: currentPrompt, source: 'composer' });
     console.log('[ControlTray] sendMessage result:', result);
-    if (result.status === 'ok') setTextPrompt(value => value === currentPrompt ? '' : value);
+    if (result.status === 'ok') {
+      setTextPrompt(value => value === currentPrompt ? '' : value);
+      setTwoPassResult(null);
+    } else if (result.status === 'error') {
+      console.error('[ControlTray] sendMessage failed with error:', result.message);
+    } else if (result.status === 'cancelled') {
+      console.warn('[ControlTray] sendMessage was cancelled:', result.message);
+    }
   };
 
   const handleRetry = async () => {
     if (!active || busy) return;
     const retriedPrompt = pendingPrompt;
+    console.log('[ControlTray] handleRetry triggered with prompt:', retriedPrompt);
     const result = await retry();
+    console.log('[ControlTray] retry result:', result);
     if (result.status === 'ok' && retriedPrompt) {
       setTextPrompt(value => value.trim() === retriedPrompt.trim() ? '' : value);
+    } else if (result.status === 'error') {
+      console.error('[ControlTray] retry failed:', result.message);
     }
   };
 
@@ -228,6 +368,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     resetConversation();
     setTextPrompt('');
     setImageStatus(null);
+    setTwoPassResult(null);
   };
 
   const micButtonTitle = pushToTalk ? t('playground.tray.hold_to_talk') : muted ? t('playground.tray.mic_on_title') : t('playground.tray.mic_off_title');
@@ -260,6 +401,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           </>}
         </div>
       </div>
+
       <nav className={cn('actions-nav', { 'text-entry-visible-landscape': isLandscape && isTextEntryVisible })}>
         <button
           className={cn('action-button')}
@@ -285,7 +427,6 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           >
             {connected || connecting || ending ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
           </button>
-
         </div>
         <button
           type="button"
@@ -316,9 +457,9 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           {speakingPaceLabel}
         </button>
         <button
-          className={cn('action-button mic-button', {
-            'mic-on': !muted,
-            'mic-off': muted,
+          className={cn('action-button mic-button relative', {
+            'mic-on ring-2 ring-red-400': !muted || twoPassState === 'listening',
+            'mic-off': muted && twoPassState !== 'listening',
           })}
           disabled={busy && !pushToTalk}
           onClick={handleMicClick}
@@ -334,8 +475,43 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           title={micButtonTitle}
           aria-label={micButtonTitle}
         >
-          {!muted ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+          {!muted ? (
+            <div className="relative flex items-center justify-center">
+              <Mic className="w-5 h-5 text-red-500 animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+            </div>
+          ) : twoPassState === 'listening' ? (
+            <div className="relative flex items-center justify-center">
+              <Mic className="w-5 h-5 text-red-500 animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+            </div>
+          ) : (
+            <MicOff className="w-5 h-5" />
+          )}
         </button>
+
+        {/* Smart Two-Pass STT Button */}
+        <button
+          type="button"
+          className={cn('action-button two-pass-toggle-button relative', {
+            'two-pass-active text-amber-600 bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-700': twoPassActive || twoPassState === 'listening' || twoPassState === 'refining',
+          })}
+          disabled={busy}
+          onClick={handleToggleTwoPass}
+          title={t('playground.two_pass_stt.toggle_button_title', 'Smart Two-Pass STT (Tự động lọc từ thừa)')}
+          aria-label={t('playground.two_pass_stt.toggle_button_title', 'Smart Two-Pass STT (Tự động lọc từ thừa)')}
+          aria-pressed={twoPassActive}
+        >
+          {twoPassState === 'listening' ? (
+            <div className="relative flex items-center justify-center">
+              <Mic className="w-5 h-5 text-red-500 animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+            </div>
+          ) : (
+            <Sparkles className="w-5 h-5" />
+          )}
+        </button>
+
         <button
           className={cn('action-button keyboard-toggle-button')}
           onClick={() => setIsTextEntryVisible(!isTextEntryVisible)}
@@ -360,6 +536,46 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           </button>
         </>}
       </nav>
+
+      {/* Two-Pass Speech Visualizer & Learning Card */}
+      {(twoPassActive || twoPassResult !== null || twoPassState !== 'idle') && (
+        <TwoPassSpeechVisualizer
+          state={twoPassState}
+          volume={twoPassVolume}
+          smartCleanup={smartCleanup}
+          onToggleSmartCleanup={setSmartCleanup}
+          errorMessage={twoPassError}
+          resultData={twoPassResult}
+          onRetry={handleTwoPassRetry}
+          onStopListening={handleStopTwoPassRecording}
+          onApplyPrompt={(text) => {
+            setTextPrompt(text);
+            setIsTextEntryVisible(true);
+          }}
+          onDirectSend={async (text) => {
+            if (!active || busy || !text.trim()) return;
+            setTextPrompt(text);
+            const result = await sendMessage({ text, source: 'composer' });
+            if (result.status === 'ok') {
+              setTextPrompt('');
+              setTwoPassResult(null);
+            }
+          }}
+          onDismissResult={() => {
+            setTwoPassResult(null);
+            if (twoPassState !== 'listening' && twoPassState !== 'refining') {
+              setTwoPassActive(false);
+              setTwoPassState('idle');
+            }
+          }}
+          onCancelListening={() => {
+            stopTwoPassVad();
+            setTwoPassActive(false);
+            setTwoPassState('idle');
+          }}
+        />
+      )}
+
       {(!isMobile || isTextEntryVisible) && (
         <form className="prompt-form" onSubmit={handleTextSubmit}>
           <textarea

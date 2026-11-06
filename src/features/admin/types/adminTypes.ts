@@ -28,6 +28,8 @@ export interface AudioTrackDto {
   slowUrl: string;    // Phiên bản chậm (-15%)
   fastUrl?: string;   // alias fallback
   createdAt?: string;
+  vocabCount?: number;
+  questionCount?: number;
 }
 
 export interface VoiceModelItem {
@@ -85,6 +87,8 @@ export interface ReadingPostItem extends ReadingPostPayload {
   totalReads?: number;
   likesCount?: number;
   createdAt?: string;
+  vocabCount?: number;
+  questionCount?: number;
 }
 
 export interface JourneyChapterSummary {
@@ -173,4 +177,59 @@ export interface ApiResponseEnvelope<T> {
   message?: string;
   errorCode?: string;
   timestamp?: string;
+}
+
+
+export interface LearnerCompletedLesson {
+  readingPostId: string;
+  titleEn: string;
+  titleVi: string;
+  sealedAt: string;
+  wordsLearnedCount: number;
+}
+
+export interface LearnerSubscriptionTransaction {
+  id: string;
+  transactionCode: string;
+  planCode: string;
+  planName: string;
+  amountVnd: number;
+  status: string;
+  createdAt: string;
+  approvedAt?: string;
+}
+
+export interface LearnerDetailItem {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  role: string;
+  authProvider?: string;
+  enabled: boolean;
+  englishLevel?: CefrLevel;
+  createdAt?: string;
+  currentPlanCode?: string;
+  currentPlanName?: string;
+  subscriptionStatus?: string;
+  subscriptionExpiry?: string;
+  transactions?: LearnerSubscriptionTransaction[];
+  streakDays?: number;
+  lastActiveDate?: string;
+  totalSealedLessons?: number;
+  totalWordsLearned?: number;
+  learningVocabCount?: number;
+  masteredVocabCount?: number;
+  completedLessons?: LearnerCompletedLesson[];
+}
+
+export interface LearnerActivityLogItem {
+  id: string;
+  path?: string;
+  eventType: string;
+  eventCategory?: string;
+  payload?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
 }

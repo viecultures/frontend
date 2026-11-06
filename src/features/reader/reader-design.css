@@ -124,6 +124,136 @@
 @media (max-width: 380px) { .reader-site-links { gap: 4px; } .reader-site-links > a, .reader-nav-current { font-size: 9px; letter-spacing: .1px; } }
 @media (prefers-reduced-motion: reduce) { .reader-desk *, .reader-desk *::before, .reader-desk *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 
+/* ── Canvas Viewport Simulation Overrides (Admin Post Preview Canvas) ── */
+.reader-desk[data-canvas-viewport='mobile'] .reader-margin-note,
+.reader-desk[data-canvas-viewport='tablet'] .reader-margin-note {
+  display: none !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-desk-canvas {
+  padding: 0 10px 24px !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-bilingual-sheets {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-book-spine {
+  display: none !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-language-sheet {
+  padding: 18px 14px 22px !important;
+  border-radius: 12px !important;
+  max-height: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-article-title,
+.reader-desk[data-canvas-viewport='mobile'] [data-article-language='vi'] .reader-article-title {
+  font-size: 22px !important;
+  line-height: 1.25 !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-article-summary {
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-bilingual-sheets .reader-article-intro {
+  min-height: 0 !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-sheet-banner {
+  aspect-ratio: 1.8 !important;
+  margin-bottom: 14px !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-article-body {
+  line-height: 1.6 !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-scroll-tools {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-practice-surface {
+  grid-template-columns: minmax(0, 1fr) !important;
+  padding: 20px 14px !important;
+  gap: 20px !important;
+}
+
+.reader-desk[data-canvas-viewport='mobile'] .reader-practice-questions {
+  grid-column: span 1 / span 1 !important;
+  border-right: none !important;
+  padding-right: 0 !important;
+}
+
+/* Tablet Viewport Simulation (768px) */
+.reader-desk[data-canvas-viewport='tablet'] .reader-desk-canvas {
+  padding: 0 16px 32px !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-bilingual-sheets {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 22px !important;
+  width: 100% !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-book-spine {
+  display: none !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-language-sheet {
+  padding: 24px 22px 28px !important;
+  border-radius: 14px !important;
+  max-height: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-article-title,
+.reader-desk[data-canvas-viewport='tablet'] [data-article-language='vi'] .reader-article-title {
+  font-size: 26px !important;
+  line-height: 1.25 !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-article-summary {
+  font-size: 16px !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-bilingual-sheets .reader-article-intro {
+  min-height: 0 !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-sheet-banner {
+  aspect-ratio: 2.1 !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-article-body {
+  line-height: 1.65 !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-practice-surface {
+  grid-template-columns: minmax(0, 1fr) !important;
+  padding: 30px 22px !important;
+  gap: 26px !important;
+}
+
+.reader-desk[data-canvas-viewport='tablet'] .reader-practice-questions {
+  grid-column: span 1 / span 1 !important;
+  border-right: none !important;
+  padding-right: 0 !important;
+}
 
 /* ── Reader Series Bottom Navigation Card (Phuong an 1) ─────────────── */
 .reader-series-bottom-card {

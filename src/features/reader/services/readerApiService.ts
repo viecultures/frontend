@@ -25,6 +25,8 @@ export interface CatalogLevelDetail {
 export interface CatalogLesson {
   id: string;
   topicGroup?: string;
+  journeyId?: string;
+  isStandalone?: boolean;
   titleEn: string;
   titleVi: string;
   category: "Heritage" | "Cuisine" | "Crafts" | "Nature" | "Folklore";
@@ -69,6 +71,8 @@ export interface QuizQuestionItem {
 export interface ReaderArticleData {
   id: string;
   topicGroup?: string;
+  journeyId?: string;
+  isStandalone?: boolean;
   titleEn: string;
   titleVi: string;
   topic: string;
@@ -96,12 +100,14 @@ export interface ReaderArticleData {
 
 export const readerApiService = {
   // ─── 1. Fetch Post Detail by ID ──────────────────────────────────────────
-  async getPostById(id: string): Promise<ReadingPostItem | null> {
+  async getPostById(id: string, signal?: AbortSignal): Promise<ReadingPostItem | null> {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/posts/${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(8000) });
+      const activeSignal = signal || AbortSignal.timeout(8000);
+      const res = await fetch(`${API_BASE_URL}/api/posts/${encodeURIComponent(id)}`, { signal: activeSignal });
       if (!res.ok) return null;
       return await res.json();
-    } catch (err) {
+    } catch (err: unknown) {
+      if ((err as Error)?.name === 'AbortError') return null;
       console.warn(`[Reader API] Lỗi khi tải bài viết ID ${id}:`, err);
       return null;
     }
@@ -118,7 +124,8 @@ export const readerApiService = {
       if (!res.ok) return null;
       const list: ReadingPostItem[] = await res.json();
       return list && list.length > 0 ? list[0] : null;
-    } catch (err) {
+    } catch (err: unknown) {
+      if ((err as Error)?.name === 'AbortError') return null;
       console.warn(`[Reader API] Lỗi khi tìm bài theo topicGroup & level:`, err);
       return null;
     }
@@ -130,7 +137,8 @@ export const readerApiService = {
       const res = await fetch(`${API_BASE_URL}/api/posts`);
       if (!res.ok) return [];
       return await res.json();
-    } catch (err) {
+    } catch (err: unknown) {
+      if ((err as Error)?.name === 'AbortError') return [];
       console.warn('[Reader API] Lỗi khi tải danh sách bài viết:', err);
       return [];
     }
@@ -223,8 +231,10 @@ export const readerApiService = {
     query?: string;
     region?: string;
     sortBy?: string;
+    standalone?: boolean;
     page?: number;
     size?: number;
+    signal?: AbortSignal;
   }): Promise<CatalogResponseData | null> {
     try {
       const sp = new URLSearchParams();
@@ -233,14 +243,43 @@ export const readerApiService = {
       if (params?.query) sp.set('query', params.query);
       if (params?.region) sp.set('region', params.region);
       if (params?.sortBy) sp.set('sortBy', params.sortBy);
+      if (params?.standalone !== undefined) sp.set('standalone', String(params.standalone));
       if (params?.page !== undefined) sp.set('page', String(params.page));
       if (params?.size !== undefined) sp.set('size', String(params.size));
 
-      const res = await fetch(`${API_BASE_URL}/api/posts/catalog?${sp.toString()}`);
-      if (!res.ok) return null;
+      const timeoutSignal = AbortSignal.timeout(12000);
+      const activeSignal = params?.signal
+        ? (typeof AbortSignal.any === 'function'
+            ? AbortSignal.any([params.signal, timeoutSignal])
+            : params.signal)
+        : timeoutSignal;
+
+      const res = await fetch(`${API_BASE_URL}/api/posts/catalog?${sp.toString()}`, {
+        signal: activeSignal,
+      });
+      if (!res.ok) {
+        let errorDetails = '';
+        try {
+          errorDetails = await res.text();
+        } catch {
+          errorDetails = '';
+        }
+        console.warn(
+          `[Reader API] Lỗi khi tải danh mục catalog: HTTP ${res.status} ${res.statusText}${
+            errorDetails ? ` - Chi tiết: ${errorDetails}` : ''
+          }`
+        );
+        return null;
+      }
       return await res.json();
-    } catch (err) {
-      console.warn('[Reader API] Lỗi khi tải danh mục catalog:', err);
+    } catch (err: unknown) {
+      const errObj = err as Error | undefined;
+      if (errObj?.name === 'AbortError') {
+        console.warn('[Reader API] Yêu cầu tải danh mục catalog đã bị hủy hoặc quá thời gian chờ (12000ms)');
+        return null;
+      }
+      const message = errObj?.message || String(err);
+      console.warn(`[Reader API] Lỗi khi tải danh mục catalog: ${message}`, err);
       return null;
     }
   },
@@ -325,6 +364,8 @@ export const readerApiService = {
       imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80',
       featured: item.featured ?? false,
       isFromDatabase: true,
+      journeyId: item.journeyId,
+      isStandalone: item.isStandalone ?? !item.journeyId,
       dateAdded: item.createdAt || new Date().toISOString(),
     };
   },

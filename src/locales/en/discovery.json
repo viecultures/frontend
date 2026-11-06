@@ -1,4 +1,4 @@
-﻿{
+{
   "page": {
     "title": "Stories from Vietnam",
     "lead": "Explore available Vietnamese cultural stories with bilingual reading and audio.",
@@ -83,6 +83,9 @@
     "choose_first_to_see": "Choose a first region to see its published series.",
     "explore_chapters": "Explore chapters",
     "chapters_count": "{{count}} CHAPTERS",
+    "stories_in_region": "{{count}} stories",
+    "stories_in_region_one": "1 story",
+    "stories_in_region_other": "{{count}} stories",
     "close_chapter_list": "Close chapter list",
     "start_reading_ch1": "Start reading (Chapter 1)",
     "unlock_place": "Unlock {{placeName}}",
@@ -97,7 +100,10 @@
     "skill_shadowing_title": "Shadowing",
     "skill_shadowing_desc": "Listen, repeat and record your voice.",
     "skill_ai_title": "AI conversation",
-    "skill_ai_desc": "Talk about this story with an AI agent. Typing is also available."
+    "skill_ai_desc": "Talk about this story with an AI agent. Typing is also available.",
+    "other_articles": "Other Readings",
+    "articles_count": "{{count}} articles",
+    "pagination_articles_aria": "Other readings pagination"
   },
   "editorial": {
     "min_read": "{{count}} min read",

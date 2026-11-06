@@ -15,6 +15,13 @@ export function VocabularyDeckCard({ lesson, onGoToStudy, onInspectLesson }: Voc
   const handlePreview = () => onInspectLesson(lesson);
   const handleStudy = () => onGoToStudy(lesson.id);
 
+  const cardCount =
+    lesson.dbVocabularies && lesson.dbVocabularies.length > 0
+      ? lesson.dbVocabularies.length
+      : typeof lesson.vocabCount === 'number' && lesson.vocabCount > 0
+        ? lesson.vocabCount
+        : resolveDeckCards(lesson.id).length;
+
   return (
     <article className="vocab-deck">
       <button
@@ -29,7 +36,7 @@ export function VocabularyDeckCard({ lesson, onGoToStudy, onInspectLesson }: Voc
       <div className="vocab-deck-body">
         <p className="vocab-deck-meta">
           <Layers size={14} />
-          {t('deck_card.vocab_cards_count', { count: resolveDeckCards(lesson.id).length, defaultValue: `${resolveDeckCards(lesson.id).length} vocabulary cards` })}
+          {t('deck_card.vocab_cards_count', { count: cardCount, defaultValue: `${cardCount} vocabulary cards` })}
           <span>{t('deck_card.lang_pair', 'EN / VI')}</span>
         </p>
         <h3><button onClick={handlePreview}>{lesson.title}</button></h3>

@@ -34,6 +34,9 @@ import {
   Bookmark,
   Globe,
   Cpu,
+  History,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import type { ReadingPostItem, CefrLevel } from '../types/adminTypes';
 import { postAdminService, type PostFilterParams } from '../services/postAdminService';
@@ -43,6 +46,7 @@ import { PostFormModal } from '../components/PostFormModal';
 import { UserManagementView } from '../components/UserManagementView';
 import { JourneyManagementView } from '../components/JourneyManagementView';
 import { VocabManagementView } from '../components/VocabManagementView';
+import { PostVocabDrawer } from '../components/PostVocabDrawer';
 import { AdminActivityLogView } from '../components/AdminActivityLogView';
 import { MarketingManagementView } from '../components/MarketingManagementView';
 import { SubscriptionManagementView } from '../components/subscriptions/SubscriptionManagementView';
@@ -65,6 +69,7 @@ export type AdminTab =
   | 'marketing'
   | 'subscriptions'
   | 'users'
+  | 'history'
   | 'system'
   | 'logs'
   | 'system_stats'
@@ -82,6 +87,7 @@ const VALID_TABS: (AdminTab | 'search-console')[] = [
   'marketing',
   'subscriptions',
   'users',
+  'history',
   'system',
   'logs',
   'system_stats',
@@ -111,6 +117,9 @@ export const AdminPage: React.FC = () => {
     // Tạm thời ẩn /admin/analytics -> chuyển hướng logic sang dashboard
     if (rawTab === 'analytics') {
       return 'dashboard';
+    }
+    if (rawTab === 'history' || rawTab === 'logs' || rawTab === 'system') {
+      return 'history';
     }
     if (rawTab && (VALID_TABS as string[]).includes(rawTab)) {
       return rawTab as AdminTab;
@@ -162,11 +171,29 @@ export const AdminPage: React.FC = () => {
   const [standaloneFilter, setStandaloneFilter] = useState<'all' | 'standalone' | 'journey'>('all');
   const [postStatusFilter, setPostStatusFilter] = useState<'all' | 'published' | 'draft' | 'missing_materials'>('all');
 
+  // Active Journey filter from URL parameter (?journeyId=...)
+  const activeJourneyFilter = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('journeyId') || '';
+  }, [location.search]);
+
+  // Pagination for Posts
+  const [postCurrentPage, setPostCurrentPage] = useState(0);
+  const [postPageSize, setPostPageSize] = useState(10);
+
+  // Reset pagination on filter change
+  useEffect(() => {
+    setPostCurrentPage(0);
+  }, [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, postStatusFilter, activeJourneyFilter]);
+
   // Modals state for Posts
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<ReadingPostItem | null>(null);
   const [previewPost, setPreviewPost] = useState<ReadingPostItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Quick Vocab Drawer state
+  const [vocabDrawerPost, setVocabDrawerPost] = useState<ReadingPostItem | null>(null);
 
   // System Overview State
   const [overviewStats, setOverviewStats] = useState<AdminOverviewStats | null>(null);
@@ -201,6 +228,7 @@ export const AdminPage: React.FC = () => {
       if (selectedTopic) params.topic = selectedTopic;
       if (standaloneFilter === 'standalone') params.standalone = true;
       if (standaloneFilter === 'journey') params.standalone = false;
+      if (activeJourneyFilter) params.journeyId = activeJourneyFilter;
 
       const data = await postAdminService.getPosts(params);
       setPosts(data);
@@ -212,7 +240,7 @@ export const AdminPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, t]);
+  }, [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, activeJourneyFilter, t]);
 
   // Fetch total users fallback if overview not called
   const fetchTotalUsers = useCallback(async () => {
@@ -330,8 +358,8 @@ export const AdminPage: React.FC = () => {
         (post.wordCount && post.wordCount > 0)
       );
       const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
-      const quizQuestions = post.questions || [];
-      const hasQuiz = Array.isArray(quizQuestions) && quizQuestions.length > 0;
+      const quizCount = post.questionCount ?? (Array.isArray(post.questions) ? post.questions.length : 0);
+      const hasQuiz = quizCount > 0;
       return !hasParagraphs || !hasAudio || !hasQuiz;
     });
   }, [posts]);
@@ -339,12 +367,15 @@ export const AdminPage: React.FC = () => {
   // Filtered posts based on material readiness / publication status
   const displayedPosts = useMemo(() => {
     return posts.filter((post) => {
+      if (activeJourneyFilter && post.journeyId !== activeJourneyFilter) {
+        return false;
+      }
       const hasParagraphs = Boolean(
         (post.paragraphs && post.paragraphs.length > 0) ||
         (post.wordCount && post.wordCount > 0)
       );
       const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
-      const hasVocab = Boolean(post.vocabularies && post.vocabularies.length > 0);
+      const hasVocab = Boolean((post.vocabCount && post.vocabCount > 0) || (post.vocabularies && post.vocabularies.length > 0));
       const quizQuestions = post.questions || [];
       const hasQuiz = Array.isArray(quizQuestions) && quizQuestions.length > 0;
 
@@ -359,7 +390,15 @@ export const AdminPage: React.FC = () => {
       }
       return true;
     });
-  }, [posts, postStatusFilter]);
+  }, [posts, postStatusFilter, activeJourneyFilter]);
+
+  // Pagination calculations for Posts
+  const totalPostPages = Math.max(1, Math.ceil(displayedPosts.length / postPageSize));
+  const safePostPage = Math.min(postCurrentPage, totalPostPages - 1);
+  const pagedPosts = useMemo(() => {
+    const start = safePostPage * postPageSize;
+    return displayedPosts.slice(start, start + postPageSize);
+  }, [displayedPosts, safePostPage, postPageSize]);
 
   // Level Badge Color Helper
   const getLevelBadgeClass = (lvl?: CefrLevel) => {
@@ -466,12 +505,13 @@ export const AdminPage: React.FC = () => {
           icon: Globe,
           title: 'Google Search Console',
           subtitle: 'Giám sát thứ hạng từ khóa văn hóa, lượt hiển thị và nhấp chuột trên Google Search',
-          badge: 'sc-domain:viecultures.app',
+          badge: '',
         };
+      case 'history':
       case 'system':
       case 'logs':
         return {
-          icon: ShieldCheck,
+          icon: History,
           title: 'Nhật ký kiểm toán & Giám sát hệ thống',
           subtitle: 'Theo dõi thao tác quản trị, truy cập và kiểm toán thay đổi dữ liệu an ninh',
           badge: 'Kiểm toán',
@@ -511,9 +551,11 @@ export const AdminPage: React.FC = () => {
                 <h1 className="font-heading text-sm sm:text-base font-bold tracking-tight truncate">
                   {headerConfig.title}
                 </h1>
-                <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-antique-gold/20 text-antique-bright text-[10px] font-bold border border-antique-gold/30 shrink-0">
-                  {headerConfig.badge}
-                </span>
+                {headerConfig.badge ? (
+                  <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-antique-gold/20 text-antique-bright text-[10px] font-bold border border-antique-gold/30 shrink-0">
+                    {headerConfig.badge}
+                  </span>
+                ) : null}
               </div>
               <p className="text-[11px] text-warm-ivory/80 truncate hidden md:block">
                 {headerConfig.subtitle}
@@ -581,10 +623,10 @@ export const AdminPage: React.FC = () => {
               </div>
             )}
 
-            {(activeTab === 'system' || activeTab === 'logs') && (
+            {(activeTab === 'history' || activeTab === 'system' || activeTab === 'logs') && (
               <div className="px-3 py-1.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5">
-                <ShieldCheck aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
-                <span className="hidden sm:inline">Kiểm toán an ninh</span>
+                <History aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
+                <span className="hidden sm:inline">Nhật ký & Lịch sử</span>
               </div>
             )}
           </div>
@@ -1034,8 +1076,8 @@ export const AdminPage: React.FC = () => {
                           (post.wordCount && post.wordCount > 0)
                         );
                         const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
-                        const quizQuestions = post.questions || [];
-                        const hasQuiz = Array.isArray(quizQuestions) && quizQuestions.length > 0;
+                        const quizCount = post.questionCount ?? (Array.isArray(post.questions) ? post.questions.length : 0);
+                        const hasQuiz = quizCount > 0;
 
                         return (
                           <tr key={post.id} className="hover:bg-warm-ivory/60 dark:hover:bg-white/5 transition-colors">
@@ -1114,6 +1156,8 @@ export const AdminPage: React.FC = () => {
                   </table>
                 </div>
               )}
+
+
             </div>
 
             {/* Row 4: System Service Connections */}
@@ -1226,6 +1270,29 @@ export const AdminPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Active Journey Filter Banner */}
+            {activeJourneyFilter && (
+              <div className="p-3.5 rounded-2xl bg-antique-gold/15 border border-antique-gold/40 flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 text-heritage-green dark:text-antique-bright font-medium">
+                  <Compass aria-hidden="true" className="w-4 h-4 text-antique-gold shrink-0" />
+                  <span>
+                    Đang lọc các bài viết thuộc lộ trình: <strong className="font-mono font-bold text-antique-gold">#{activeJourneyFilter}</strong>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const p = new URLSearchParams(location.search);
+                    p.delete('journeyId');
+                    navigate(`${location.pathname}?${p.toString()}`);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-rice-paper dark:bg-heritage-dark border border-antique-gold/30 hover:bg-white dark:hover:bg-white/10 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Xóa bộ lọc lộ trình
+                </button>
+              </div>
+            )}
+
             {/* Posts Table */}
             <div className="bg-rice-paper dark:bg-heritage-dark/60 rounded-3xl border border-antique-gold/30 shadow-md overflow-hidden">
               {isLoading ? (
@@ -1267,16 +1334,15 @@ export const AdminPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-antique-gold/15">
-                      {displayedPosts.map((post) => {
+                      {pagedPosts.map((post) => {
                         const hasParagraphs = Boolean(
                           (post.paragraphs && post.paragraphs.length > 0) ||
                           (post.wordCount && post.wordCount > 0)
                         );
                         const paragraphCount = post.paragraphs?.length || (post.wordCount ? Math.ceil(post.wordCount / 50) : 0);
-                        const vocabCount = post.vocabularies?.length || 0;
+                        const vocabCount = post.vocabCount ?? post.vocabularies?.length ?? 0;
                         const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
-                        const quizQuestions = post.questions || [];
-                        const quizCount = Array.isArray(quizQuestions) ? quizQuestions.length : 0;
+                        const quizCount = post.questionCount ?? (Array.isArray(post.questions) ? post.questions.length : 0);
 
                         return (
                           <tr
@@ -1287,10 +1353,20 @@ export const AdminPage: React.FC = () => {
                               <div className="space-y-1">
                                 <div className="flex flex-wrap items-center gap-1.5">
                                   {post.journeyTitleEn ? (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/35">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const p = new URLSearchParams(location.search);
+                                        p.set('tab', 'posts');
+                                        if (post.journeyId) p.set('journeyId', post.journeyId);
+                                        navigate(`${location.pathname}?${p.toString()}`);
+                                      }}
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 hover:bg-antique-gold/35 text-heritage-green dark:text-antique-bright border border-antique-gold/35 transition-colors cursor-pointer"
+                                      title="Lọc các bài thuộc hành trình này"
+                                    >
                                       <Compass aria-hidden="true" className="w-3 h-3 text-antique-gold" />
                                       <span>Chặng {post.chapterOrder || 1}: {post.journeyTitleEn}</span>
-                                    </span>
+                                    </button>
                                   ) : (
                                     <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 dark:bg-white/10 text-text-muted">
                                       Độc lập
@@ -1336,30 +1412,30 @@ export const AdminPage: React.FC = () => {
                             <td className="px-4 py-4 whitespace-nowrap">
                               <div className="flex flex-wrap items-center gap-1.5">
                                 {/* Reading Pill */}
-                                <span
-                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
-                                    hasParagraphs
-                                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/60 ring-1 ring-emerald-500/10'
-                                      : 'bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700/60'
-                                  }`}
-                                  title={hasParagraphs ? t('posts_table.readiness.reading_ready', { count: paragraphCount }) : t('posts_table.readiness.reading_empty')}
-                                >
-                                  <FileText aria-hidden="true" className="w-3 h-3 shrink-0" />
-                                  <span>{hasParagraphs ? t('posts_table.readiness.reading_ready', { count: paragraphCount }) : t('posts_table.readiness.reading_empty')}</span>
-                                </span>
-
-                                {/* Vocabulary Pill */}
-                                <span
-                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    if (!post.vocabularies || post.vocabularies.length === 0) {
+                                      try {
+                                        const fullPost = await postAdminService.getPostById(post.id);
+                                        setVocabDrawerPost(fullPost || post);
+                                      } catch {
+                                        setVocabDrawerPost(post);
+                                      }
+                                    } else {
+                                      setVocabDrawerPost(post);
+                                    }
+                                  }}
+                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs cursor-pointer ${
                                     vocabCount > 0
-                                      ? 'bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700/60 ring-1 ring-blue-500/10'
-                                      : 'bg-stone-100 dark:bg-stone-800/80 text-stone-500 border-stone-200 dark:border-stone-700'
+                                      ? 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700/60 ring-1 ring-blue-500/10'
+                                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-700 text-stone-500 border-stone-200 dark:border-stone-700'
                                   }`}
-                                  title={t('posts_table.readiness.vocab_count', { count: vocabCount })}
+                                  title="Xem nhanh từ vựng của bài đọc"
                                 >
                                   <Type aria-hidden="true" className="w-3 h-3 shrink-0" />
                                   <span>{t('posts_table.readiness.vocab_count', { count: vocabCount })}</span>
-                                </span>
+                                </button>
 
                                 {/* Audio TTS Pill */}
                                 <span
@@ -1452,6 +1528,70 @@ export const AdminPage: React.FC = () => {
                   </table>
                 </div>
               )}
+
+              {/* Pagination Controls */}
+              {!isLoading && displayedPosts.length > 0 && (
+                <div className="px-6 py-4 border-t border-antique-gold/20 bg-warm-ivory/50 dark:bg-heritage-forest/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                  <div className="text-text-muted flex items-center gap-3">
+                    <span>
+                      {t('posts_table.pagination.display_info', {
+                        from: safePostPage * postPageSize + 1,
+                        to: Math.min((safePostPage + 1) * postPageSize, displayedPosts.length),
+                        total: displayedPosts.length,
+                        defaultValue: `Hiển thị ${safePostPage * postPageSize + 1}–${Math.min((safePostPage + 1) * postPageSize, displayedPosts.length)} trên tổng số ${displayedPosts.length} bài viết`,
+                      })}
+                    </span>
+                    <div className="flex items-center gap-1.5 ml-2">
+                      <span className="text-[11px] text-text-muted">{t('posts_table.pagination.per_page', { defaultValue: 'Mỗi trang' })}:</span>
+                      <select
+                        aria-label={t('posts_table.pagination.per_page', { defaultValue: 'Mỗi trang' })}
+                        value={postPageSize}
+                        onChange={(e) => {
+                          setPostPageSize(Number(e.target.value));
+                          setPostCurrentPage(0);
+                        }}
+                        className="px-2 py-1 rounded-lg bg-warm-ivory dark:bg-heritage-dark border border-antique-gold/30 text-xs font-semibold focus:outline-none focus:border-antique-gold cursor-pointer"
+                      >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPostCurrentPage((p) => Math.max(0, p - 1))}
+                      disabled={safePostPage === 0}
+                      className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 hover:bg-antique-gold/20 text-text-body dark:text-warm-ivory font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-antique-gold"
+                      aria-label={t('posts_table.pagination.prev', { defaultValue: 'Trang trước' })}
+                    >
+                      <ChevronLeft aria-hidden="true" className="w-4 h-4" />
+                      <span>{t('posts_table.pagination.prev', { defaultValue: 'Trước' })}</span>
+                    </button>
+
+                    <div className="px-3 py-1.5 rounded-xl font-bold text-heritage-green dark:text-antique-bright">
+                      {t('posts_table.pagination.page_info', {
+                        current: safePostPage + 1,
+                        total: totalPostPages,
+                        defaultValue: `Trang ${safePostPage + 1} / ${totalPostPages}`,
+                      })}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setPostCurrentPage((p) => Math.min(totalPostPages - 1, p + 1))}
+                      disabled={safePostPage + 1 >= totalPostPages}
+                      className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 hover:bg-antique-gold/20 text-text-body dark:text-warm-ivory font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-antique-gold"
+                      aria-label={t('posts_table.pagination.next', { defaultValue: 'Trang sau' })}
+                    >
+                      <span>{t('posts_table.pagination.next', { defaultValue: 'Sau' })}</span>
+                      <ChevronRight aria-hidden="true" className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1474,12 +1614,9 @@ export const AdminPage: React.FC = () => {
         {/* ── TAB 5: HỌC VIÊN CRM (USERS) ─────────────────────────────────── */}
         {activeTab === 'users' && <UserManagementView />}
 
-        {/* ── TAB 6: HỆ THỐNG & KIỂM DUYỆT (SYSTEM / LOGS) ───────────────── */}
-        {(activeTab === 'system' || activeTab === 'logs') && (
-          <div className="space-y-6">
-            <AdminActivityLogView />
-            <AdminServiceConnections />
-          </div>
+        {/* ── TAB 6: NHẬT KÝ KIỂM TOÁN & LỊCH SỬ (HISTORY / LOGS / SYSTEM) ──────── */}
+        {(activeTab === 'history' || activeTab === 'system' || activeTab === 'logs') && (
+          <AdminActivityLogView />
         )}
 
         {/* ── TAB 7: CẤU HÌNH AI & CHI PHÍ ─────────────────────────────────── */}
@@ -1489,6 +1626,23 @@ export const AdminPage: React.FC = () => {
 
         {/* ── Preview Modal ─────────────────────────────────────────────── */}
         <PostPreviewModal post={previewPost} onClose={() => setPreviewPost(null)} />
+
+        {/* Post Vocab Drawer */}
+        <PostVocabDrawer
+          isOpen={Boolean(vocabDrawerPost)}
+          post={vocabDrawerPost}
+          onClose={() => setVocabDrawerPost(null)}
+          onNavigateToVocabTab={(word, postId) => {
+            setVocabDrawerPost(null);
+            const searchParam = word ? '&search=' + encodeURIComponent(word) : '';
+            const postParam = postId ? '&postId=' + encodeURIComponent(postId) : '';
+            navigate('/admin/content?tab=vocabularies' + searchParam + postParam);
+          }}
+          onEditPost={(p) => {
+            setVocabDrawerPost(null);
+            handleOpenEdit(p);
+          }}
+        />
 
         {/* ── Delete Confirmation Dialog ─────────────────────────────────── */}
         {deletingId && (

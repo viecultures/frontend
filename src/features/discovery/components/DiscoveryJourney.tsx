@@ -14,6 +14,7 @@ import {
   Headphones,
   LockKeyhole,
   MapPin,
+  Search,
   Mic2,
   X,
 } from "lucide-react";
@@ -35,8 +36,13 @@ import { JOURNEY_SERIES, type JourneySeries } from "../data/learningJourney";
 import { journeyApiService } from "../services/journeyApiService";
 import { getPublicCuisineSeries, toPublicJourney } from '@/features/reader/services/publicCuisineService';
 import { DiscoveryPagination } from "./DiscoveryPagination";
+import { DiscoveryArticleGrid } from "./DiscoveryArticleGrid";
+import { readerApiService } from "@/features/reader/services/readerApiService";
+import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
+import { mergeCatalog } from "../lib/catalog";
 
 const SERIES_PAGE_SIZE = 6;
+const ARTICLES_PAGE_SIZE = 6;
 
 const REGIONS = [
   {
@@ -150,17 +156,39 @@ export function DiscoveryJourney() {
   useEffect(() => {
     let active = true;
     Promise.all([
-      journeyApiService.getJourneys({ status: 'published' }),
+      journeyApiService.getJourneys(),
       getPublicCuisineSeries().catch(() => []),
-    ]).then(([journeys, publicCuisine]) => {
+    ]).then(([backendJourneys, publicCuisine]) => {
       if (!active) return;
-      const publicMap = new Map(publicCuisine.map(series => [series.id, toPublicJourney(series)]));
-      const merged = journeys.map(journey => publicMap.get(journey.id) || journey);
-      for (const [id, journey] of publicMap) {
-        if (!merged.some(j => j.id === id)) {
-          merged.push(journey);
+      const backendMap = new Map((backendJourneys || []).map((j) => [j.id, j]));
+      const publicMap = new Map(publicCuisine.map((series) => [series.id, toPublicJourney(series)]));
+      
+      const merged: JourneySeries[] = [];
+      const handledIds = new Set<string>();
+
+      // 1. Database is the source of truth
+      for (const [id, dbJourney] of backendMap) {
+        handledIds.add(id);
+        if (dbJourney.status === 'draft' || dbJourney.status === 'archived') {
+          continue;
+        }
+        const mock = publicMap.get(id);
+        if (mock && (!dbJourney.chapters || dbJourney.chapters.length === 0)) {
+          merged.push({ ...mock, ...dbJourney, chapters: mock.chapters });
+        } else {
+          merged.push(dbJourney);
         }
       }
+
+      // 2. Fallback to mock only if not in database
+      for (const [id, mockJourney] of publicMap) {
+        if (!handledIds.has(id)) {
+          if (mockJourney.status !== 'draft' && mockJourney.status !== 'archived') {
+            merged.push(mockJourney);
+          }
+        }
+      }
+
       setAllJourneys(merged);
     });
     return () => { active = false; };
@@ -264,6 +292,112 @@ export function DiscoveryJourney() {
   const availableLibraryRef = useRef<HTMLDivElement>(null);
   const upcomingLibraryRef = useRef<HTMLDivElement>(null);
 
+  // Standalone Articles State, Filters & Pagination
+  const [articlesPage, setArticlesPage] = useState(1);
+  const [articlesPageSize, setArticlesPageSize] = useState(9);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState("All");
+  const [selectedCefr, setSelectedCefr] = useState("All");
+  const articlesLibraryRef = useRef<HTMLDivElement>(null);
+  const [serverCatalog, setServerCatalog] = useState<{
+    items: Lesson[];
+    totalElements: number;
+    totalPages: number;
+  } | null>(null);
+  const [isArticlesLoading, setIsArticlesLoading] = useState(false);
+  const [articlesError, setArticlesError] = useState<string | null>(null);
+  const [articlesRetryTrigger, setArticlesRetryTrigger] = useState(0);
+  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>(() =>
+    readLearningValue<Record<string, boolean>>("discovery:bookmarks") || {}
+  );
+
+  const toggleBookmark = (id: string) => {
+    setBookmarks((previous) => {
+      const next = { ...previous, [id]: !previous[id] };
+      writeLearningValue("discovery:bookmarks", next);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    let active = true;
+    setIsArticlesLoading(true);
+    setArticlesError(null);
+
+    const isSearching = searchQuery.trim().length > 0;
+    const delay = isSearching ? 250 : 0;
+
+    const timer = setTimeout(() => {
+      readerApiService
+        .getCatalog({
+          page: articlesPage - 1,
+          size: articlesPageSize,
+          topic: selectedTopic !== "All" ? selectedTopic : undefined,
+          level: selectedCefr !== "All" ? selectedCefr : undefined,
+          query: searchQuery.trim() || undefined,
+          region: selectedProvince?.name || undefined,
+          standalone: true,
+        })
+        .then((catalogData) => {
+          if (!active) return;
+          if (catalogData && Array.isArray(catalogData.items)) {
+            const mapped = catalogData.items.map(readerApiService.mapCatalogLessonToDiscoveryLesson);
+            setServerCatalog({
+              items: mapped,
+              totalElements: catalogData.totalElements,
+              totalPages: Math.max(1, catalogData.totalPages),
+            });
+            setArticlesError(null);
+          } else {
+            setServerCatalog(null);
+            if (!LESSONS_DATA || LESSONS_DATA.length === 0) {
+              setArticlesError(
+                isEn
+                  ? "Unable to load reading stories. Please check your internet connection."
+                  : "Không thể tải danh sách bài đọc. Vui lòng kiểm tra kết nối mạng."
+              );
+            }
+          }
+        })
+        .catch((err: unknown) => {
+          if (!active) return;
+          console.warn("Could not load catalog lessons for discovery:", err);
+          setServerCatalog(null);
+          if (!LESSONS_DATA || LESSONS_DATA.length === 0) {
+            setArticlesError(
+              isEn
+                ? "Unable to load reading stories. Please check your internet connection."
+                : "Không thể tải danh sách bài đọc. Vui lòng kiểm tra kết nối mạng."
+            );
+          }
+        })
+        .finally(() => {
+          if (active) {
+            setIsArticlesLoading(false);
+          }
+        });
+    }, delay);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [
+    articlesPage,
+    articlesPageSize,
+    searchQuery,
+    selectedTopic,
+    selectedCefr,
+    selectedProvince,
+    articlesRetryTrigger,
+    isEn,
+  ]);
+
+  // Reset articles page on filter changes
+  useEffect(() => {
+    setArticlesPage(1);
+  }, [searchQuery, selectedTopic, selectedCefr, selectedProvince, articlesPageSize]);
+
   useEffect(() => {
     setAvailablePage(1);
   }, [firstRegion, selectedProvince]);
@@ -294,6 +428,117 @@ export function DiscoveryJourney() {
       behavior: reduceMotion ? "instant" : "smooth",
       block: "nearest",
     });
+  };
+
+  // Top journey series keys to exclude from "Other Readings" section below (avoid duplicate articles shown on top roadmap)
+  const topJourneyKeys = useMemo(() => {
+    const keys = new Set<string>();
+    for (const s of availableSeries) {
+      if (s.id) keys.add(s.id.toLowerCase().trim());
+      for (const c of s.chapters || []) {
+        if (c.id) keys.add(c.id.toLowerCase().trim());
+      }
+    }
+    return keys;
+  }, [availableSeries]);
+
+  // Fallback: Retain reading articles that are not already presented on the top learning roadmap
+  const fallbackStandaloneLessons = useMemo(() => {
+    return LESSONS_DATA.filter((lesson) => {
+      const lJourneyId = (
+        'journeyId' in lesson ? ((lesson as { journeyId?: string }).journeyId || '') : ''
+      ).toLowerCase().trim();
+      if (lJourneyId && topJourneyKeys.has(lJourneyId)) return false;
+
+      const id = (lesson.id || "").toLowerCase().trim();
+      if (topJourneyKeys.has(id)) return false;
+      for (const key of topJourneyKeys) {
+        if (id.startsWith(key + "-") || id === key) return false;
+      }
+      return true;
+    });
+  }, [topJourneyKeys]);
+
+  const fallbackFilteredArticles = useMemo(() => {
+    let list = fallbackStandaloneLessons;
+
+    if (selectedProvince) {
+      const provinceMatches = list.filter((l) => l.provinceId === selectedProvince.id);
+      if (provinceMatches.length > 0) {
+        list = provinceMatches;
+      }
+    }
+
+    if (selectedTopic !== "All") {
+      list = list.filter((l) => l.category === selectedTopic);
+    }
+
+    if (selectedCefr !== "All") {
+      list = list.filter((l) =>
+        l.availableLevels ? l.availableLevels.includes(selectedCefr as 'Level 1' | 'Level 2' | 'Level 3') : true
+      );
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/gi, "d")
+        .toLowerCase()
+        .trim();
+
+      list = list.filter((l) => {
+        const combined = `${l.title || ""} ${l.vietnameseTitle || ""} ${l.summary || ""} ${l.category || ""} ${l.categoryVi || ""}`
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/đ/gi, "d")
+          .toLowerCase();
+        return combined.includes(q);
+      });
+    }
+
+    return list;
+  }, [fallbackStandaloneLessons, selectedProvince, selectedTopic, selectedCefr, searchQuery]);
+
+  const isUsingServerData = serverCatalog !== null;
+
+  const totalArticlesItems = isUsingServerData
+    ? serverCatalog.totalElements
+    : fallbackFilteredArticles.length;
+
+  const totalArticlesPages = Math.max(
+    1,
+    isUsingServerData
+      ? serverCatalog.totalPages
+      : Math.ceil(fallbackFilteredArticles.length / articlesPageSize)
+  );
+
+  const safeArticlesPage = Math.min(articlesPage, totalArticlesPages);
+
+  const pagedArticles = useMemo(() => {
+    if (serverCatalog) {
+      return serverCatalog.items;
+    }
+    const startIndex = (safeArticlesPage - 1) * articlesPageSize;
+    return fallbackFilteredArticles.slice(startIndex, startIndex + articlesPageSize);
+  }, [serverCatalog, fallbackFilteredArticles, safeArticlesPage, articlesPageSize]);
+
+  // Backward compatibility alias for any reference expecting filteredArticles
+  const filteredArticles = isUsingServerData ? serverCatalog.items : fallbackFilteredArticles;
+
+  // Smooth scroll that avoids aggressive viewport jumping
+  const handleArticlesPageChange = (page: number) => {
+    setArticlesPage(page);
+    if (articlesLibraryRef.current) {
+      const rect = articlesLibraryRef.current.getBoundingClientRect();
+      if (rect.top < -60) {
+        const targetY = window.scrollY + rect.top - 80;
+        window.scrollTo({
+          top: Math.max(0, targetY),
+          behavior: reduceMotion ? "instant" : "smooth",
+        });
+      }
+    }
   };
 
   const handleUpcomingPageChange = (page: number) => {
@@ -562,7 +807,9 @@ export function DiscoveryJourney() {
             {placeName} ·{" "}
             {t("journey.stories_in_region", {
               count: series.chapters.length,
-              defaultValue: `${series.chapters.length} câu chuyện`,
+              defaultValue: isEn
+                ? `${series.chapters.length} ${series.chapters.length === 1 ? "story" : "stories"}`
+                : `${series.chapters.length} câu chuyện`,
             })}{" "}
             · B1
           </span>
@@ -645,7 +892,9 @@ export function DiscoveryJourney() {
               {placeName} ·{" "}
               {t("journey.stories_in_region", {
                 count: series.chapters.length,
-                defaultValue: `${series.chapters.length} câu chuyện`,
+                defaultValue: isEn
+                ? `${series.chapters.length} ${series.chapters.length === 1 ? "story" : "stories"}`
+                : `${series.chapters.length} câu chuyện`,
               })}
             </span>
             <h4>{isEn ? series.title : (series.titleVi || series.title)}</h4>
@@ -1038,6 +1287,182 @@ export function DiscoveryJourney() {
             showSinglePage={true}
           />
         </div>}
+
+        {/* Section: Các bài đọc khác (Standalone Readings) */}
+        <div
+          ref={articlesLibraryRef}
+          className="journey-library-group"
+          id="journey-other-articles"
+        >
+          <div className="journey-library-section-heading">
+            <div>
+              <h2>{isEn ? "Standalone Readings" : "Các bài đọc khác"}</h2>
+              <small className="journey-library-subheading">
+                {selectedProvince
+                  ? (isEn
+                      ? `Standalone cultural stories from ${getLocalizedProvinceName(selectedProvince.name)}`
+                      : `Bài đọc độc lập khám phá văn hóa tại ${getLocalizedProvinceName(selectedProvince.name)}`)
+                  : (isEn
+                      ? "Independent cultural readings not part of the structured series above."
+                      : "Các bài đọc văn hóa song ngữ độc lập, không thuộc lộ trình học phía trên.")}
+              </small>
+            </div>
+            <span className="font-semibold text-text-secondary">
+              {isEn ? `${totalArticlesItems} articles` : `${totalArticlesItems} bài đọc`}
+            </span>
+          </div>
+
+          {/* Search & Filter Toolbar */}
+          <div className="mb-6 p-4 rounded-3xl bg-rice-paper/70 dark:bg-heritage-dark/60 border border-heritage-green/15 dark:border-antique-gold/25 shadow-xs space-y-4">
+            {/* Top Row: Search Input & Per-page selector */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="relative flex-1">
+                <Search aria-hidden="true" className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={isEn ? "Search readings by dish, location, heritage..." : "Tìm kiếm bài đọc theo tên món ăn, địa danh, di sản..."}
+                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-warm-ivory dark:bg-heritage-dark border border-heritage-green/20 dark:border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold focus:ring-2 focus:ring-antique-gold/30 transition-all placeholder:text-text-muted/70"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-heritage-green cursor-pointer"
+                    aria-label={isEn ? "Clear search" : "Xóa tìm kiếm"}
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Items per page selector */}
+              <div className="flex items-center gap-2 justify-end text-xs text-text-muted shrink-0">
+                <span>{isEn ? "Per page:" : "Mỗi trang:"}</span>
+                <div className="inline-flex rounded-xl bg-warm-ivory dark:bg-heritage-dark border border-heritage-green/20 dark:border-antique-gold/30 p-0.5">
+                  {[9, 12, 18].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => setArticlesPageSize(size)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        articlesPageSize === size
+                          ? "bg-heritage-green text-warm-ivory shadow-xs"
+                          : "text-text-secondary hover:text-heritage-green"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Row: Topic Tabs & CEFR Level Pills */}
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-1 border-t border-heritage-green/10 dark:border-white/10">
+              {/* Topic Filter Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                {[
+                  { id: 'All', labelVi: 'Tất cả', labelEn: 'All' },
+                  { id: 'Cuisine', labelVi: 'Ẩm thực', labelEn: 'Cuisine' },
+                  { id: 'Heritage', labelVi: 'Di sản', labelEn: 'Heritage' },
+                  { id: 'Crafts', labelVi: 'Làng nghề', labelEn: 'Crafts' },
+                  { id: 'Nature', labelVi: 'Danh thắng', labelEn: 'Nature' },
+                  { id: 'Folklore', labelVi: 'Lễ hội', labelEn: 'Folklore' },
+                ].map((topic) => {
+                  const active = selectedTopic === topic.id;
+                  return (
+                    <button
+                      key={topic.id}
+                      type="button"
+                      onClick={() => setSelectedTopic(topic.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                        active
+                          ? "bg-heritage-green text-warm-ivory font-bold shadow-xs scale-102"
+                          : "bg-warm-ivory/80 dark:bg-white/5 text-text-secondary hover:bg-warm-ivory hover:text-heritage-green border border-heritage-green/10"
+                      }`}
+                    >
+                      {isEn ? topic.labelEn : topic.labelVi}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Level Filter Pills & Reset */}
+              <div className="flex items-center gap-2 justify-between lg:justify-end shrink-0">
+                <div className="flex items-center gap-1">
+                  {['All', 'Level 1', 'Level 2', 'Level 3'].map((lvl) => {
+                    const active = selectedCefr === lvl;
+                    return (
+                      <button
+                        key={lvl}
+                        type="button"
+                        onClick={() => setSelectedCefr(lvl)}
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                          active
+                            ? "bg-antique-gold text-heritage-dark shadow-xs ring-1 ring-antique-gold"
+                            : "bg-warm-ivory/60 dark:bg-white/5 text-text-muted hover:text-text-body border border-heritage-green/10"
+                        }`}
+                      >
+                        {lvl === 'All' ? (isEn ? 'All Levels' : 'Mọi cấp độ') : lvl}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {(searchQuery || selectedTopic !== 'All' || selectedCefr !== 'All') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedTopic('All');
+                      setSelectedCefr('All');
+                    }}
+                    className="text-xs text-red-600 hover:text-red-700 underline font-semibold ml-1 cursor-pointer"
+                  >
+                    {isEn ? "Reset" : "Xóa lọc"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <DiscoveryArticleGrid
+            isLoading={isArticlesLoading}
+            lessons={pagedArticles}
+            viewMode="grid"
+            bookmarks={bookmarks}
+            onToggleBookmark={toggleBookmark}
+            onlyBookmarked={false}
+            onResetAllFilters={() => {
+              setSearchQuery("");
+              setSelectedTopic("All");
+              setSelectedCefr("All");
+              if (selectedProvince) {
+                setParams((prev) => {
+                  const next = new URLSearchParams(prev);
+                  next.delete("place");
+                  return next;
+                });
+              }
+            }}
+            selectedCefr={selectedCefr}
+            errorMessage={articlesError}
+            onRetry={() => setArticlesRetryTrigger((prev) => prev + 1)}
+          />
+
+          <DiscoveryPagination
+            currentPage={safeArticlesPage}
+            totalPages={totalArticlesPages}
+            totalItems={totalArticlesItems}
+            itemsPerPage={articlesPageSize}
+            onPageChange={handleArticlesPageChange}
+            ariaLabel={isEn ? "Standalone readings pagination" : "Phân trang các bài đọc khác"}
+            itemLabel={isEn ? "readings" : "bài đọc"}
+            showSinglePage={true}
+          />
+        </div>
       </section>
 
       {/* Floating chapter popover for hovered series */}
@@ -1112,7 +1537,7 @@ export function DiscoveryJourney() {
               ))
             ) : (
               <li className="p-4 text-center text-xs text-text-muted italic">
-                {t('journey.stories_on_the_way', { regionName: getLocalizedProvinceName(VIETNAM_34_PROVINCES.find(p => p.id === hoverPopover.series.provinceId)?.name || 'Việt Nam') })}
+                {t('journey.stories_on_the_way', { regionName: getLocalizedProvinceName(VIETNAM_34_PROVINCES.find(p => p.id === hoverPopover.series.provinceId)?.name || (isEn ? 'Vietnam' : 'Việt Nam')) })}
               </li>
             )}
           </ul>

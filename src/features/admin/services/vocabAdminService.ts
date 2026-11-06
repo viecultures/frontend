@@ -31,7 +31,7 @@ const getAuthHeaders = (): Record<string, string> => {
 
 export const vocabAdminService = {
   /**
-   * Lay danh sach tu vung co phan trang va bo loc (Search, CEFR Level).
+   * Lay danh sach tu vung co phan trang va bo loc (Search, CEFR Level, Post ID).
    * Goi GET /api/admin/vocabularies voi co che du phong sang /api/vocabularies neu endpoint quan tri chua co.
    */
   async fetchVocabularies(params: VocabFilterParams = {}): Promise<PageResponse<AdminVocabItem>> {
@@ -44,6 +44,9 @@ export const vocabAdminService = {
     }
     if (params.level && params.level !== 'ALL') {
       searchParams.append('level', params.level);
+    }
+    if (params.postId) {
+      searchParams.append('postId', params.postId);
     }
     searchParams.append('page', String(page));
     searchParams.append('size', String(size));
@@ -120,6 +123,10 @@ export const vocabAdminService = {
 
     if (level) {
       filtered = filtered.filter((item) => (item.level || '').toUpperCase() === level.toUpperCase());
+    }
+
+    if (params.postId) {
+      filtered = filtered.filter((item) => item.postId === params.postId);
     }
 
     const totalElements = filtered.length;
@@ -225,6 +232,12 @@ export const vocabAdminService = {
       audioUrl: data.audioUrl || '',
       level: data.level || 'B1',
       searchCount: data.searchCount || 0,
+      postId: data.postId,
+      postTitleEn: data.postTitleEn,
+      postTitleVi: data.postTitleVi,
+      journeyId: data.journeyId,
+      journeyTitleEn: data.journeyTitleEn,
+      usageNote: data.usageNote,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };

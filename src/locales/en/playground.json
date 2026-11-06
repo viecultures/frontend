@@ -613,6 +613,31 @@
         "open_video_dialog_title": "Open a video",
         "open_video_dialog_desc": "Your current lesson stays available until you apply a new transcript. Starting a different video clears the current recordings."
       }
+    },
+    "two_pass_stt": {
+      "title": "Smart Two-Pass STT",
+      "toggle_button_title": "Smart Two-Pass STT (Automatic filler word removal)",
+      "state_listening": "Listening to your voice...",
+      "state_listening_desc": "Speak naturally, AI automatically removes filler words when you pause for 0.8s",
+      "state_refining": "AI Two-Pass Refinement in progress...",
+      "state_refining_desc": "Pass 1: Speech-to-Text → Pass 2: Gemini Contextual & Disfluency Removal",
+      "state_empty_title": "No speech detected",
+      "state_empty_desc": "Audio input was too short or volume was too low. Please speak closer to the microphone.",
+      "state_error_title": "Voice Processing Error",
+      "state_error_desc": "Failed to send audio to server or microphone permission was denied.",
+      "optimizing": "Optimizing cultural context",
+      "cancel": "Cancel",
+      "retry": "Try Again",
+      "close": "Close",
+      "learning_card_title": "2-Pass AI Speech Analysis",
+      "confidence_title": "Recognition confidence",
+      "latency_title": "Processing latency",
+      "raw_label": "Raw Speech (Pass 1 STT):",
+      "raw_hint": "Filler words and disfluencies detected and crossed out",
+      "cleaned_label": "AI Refined Text (Pass 2):",
+      "filler_removed": "Filler removed",
+      "apply_button": "Apply to Prompt",
+      "send_button": "Send to Chat"
     }
   }
 }

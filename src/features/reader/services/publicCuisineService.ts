@@ -15,12 +15,12 @@ let pending: Promise<PublicSeries[]> | null = null;
 
 export function getPublicCuisineSeries(): Promise<PublicSeries[]> {
   if (!pending) {
-    pending = fetch(`${API_BASE_URL}/api/cuisine-series`, { signal: AbortSignal.timeout(8000) })
+    pending = fetch(`${API_BASE_URL}/api/cuisine-series`, { signal: AbortSignal.timeout(3000) })
       .then(response => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) return publishedSnapshot as PublicSeries[];
         return response.json() as Promise<PublicSeries[]>;
       })
-      .then(series => series.length ? series : publishedSnapshot as PublicSeries[])
+      .then(series => (series && series.length) ? series : (publishedSnapshot as PublicSeries[]))
       .catch(() => publishedSnapshot as PublicSeries[]);
   }
   return pending;

@@ -14,10 +14,7 @@ import {
   AlertTriangle,
   FileText,
   ExternalLink,
-  Copy,
-  Check,
   ArrowUpDown,
-  Info,
 } from 'lucide-react';
 import {
   adminGoogleService,
@@ -27,7 +24,6 @@ import {
   type GoogleSearchConsolePage,
 } from '../../services/adminGoogleService';
 
-const SERVICE_ACCOUNT_EMAIL = 'admin-cms@braided-turbine-513501-i9.iam.gserviceaccount.com';
 
 type SortField = 'name' | 'clicks' | 'impressions' | 'ctr' | 'position';
 type SortDirection = 'asc' | 'desc';
@@ -40,7 +36,6 @@ export const GoogleSearchConsoleView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'queries' | 'pages'>('queries');
   const [chartMetric, setChartMetric] = useState<'clicks' | 'impressions'>('clicks');
   const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null);
-  const [copiedEmail, setCopiedEmail] = useState<boolean>(false);
 
   // Search & Sorting state for Queries and Pages
   const [searchFilter, setSearchFilter] = useState<string>('');
@@ -68,17 +63,6 @@ export const GoogleSearchConsoleView: React.FC = () => {
   useEffect(() => {
     fetchData(range);
   }, [range, fetchData]);
-
-  const handleCopyEmail = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(SERVICE_ACCOUNT_EMAIL);
-      setCopiedEmail(true);
-      setTimeout(() => setCopiedEmail(false), 2500);
-    } catch {
-      // Fallback if clipboard API is restricted
-      setCopiedEmail(false);
-    }
-  }, []);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -248,11 +232,6 @@ export const GoogleSearchConsoleView: React.FC = () => {
             </span>
           )}
 
-          {/* Property badge */}
-          <span className="px-2.5 py-1 rounded-xl bg-rice-paper dark:bg-white/10 text-heritage-green dark:text-antique-bright font-mono font-medium border border-antique-gold/30">
-            {data?.siteUrl || 'sc-domain:viecultures.app'}
-          </span>
-
           {/* Date range if available */}
           {data?.startDate && data?.endDate && (
             <span className="text-text-muted hidden md:inline">
@@ -292,71 +271,6 @@ export const GoogleSearchConsoleView: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* ── Google Integration Notice & Setup Guide (When !isLive) ─────── */}
-      {!isLoading && data && !isLive && (
-        <div className="p-5 rounded-3xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700/60 shadow-xs space-y-3.5">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-amber-200/60 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 flex items-center justify-center shrink-0 mt-0.5">
-              <Info aria-hidden="true" className="w-4 h-4" />
-            </div>
-            <div className="space-y-1 flex-1">
-              <h3 className="font-heading font-bold text-sm text-amber-900 dark:text-amber-200">
-                Chưa nhận được phản hồi dữ liệu từ Google Search Console API
-              </h3>
-              <p className="text-xs text-amber-800/90 dark:text-amber-300/80 leading-relaxed">
-                {data.statusMessage ||
-                  'Hệ thống đang hiển thị khung dữ liệu mẫu vì tài khoản Service Account chưa được cấp quyền truy cập hoặc tên miền đang chờ Google index.'}
-              </p>
-            </div>
-          </div>
-
-          {/* Quick 3-Step Setup Guidance */}
-          <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-heritage-dark/60 border border-amber-200/80 dark:border-amber-800/40 space-y-2.5">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <span className="text-xs font-bold text-heritage-green dark:text-antique-bright">
-                Các bước kích hoạt dữ liệu thực tế từ Google Search Console:
-              </span>
-              <a
-                href="https://search.google.com/search-console"
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs font-semibold text-heritage-green dark:text-antique-gold hover:underline inline-flex items-center gap-1"
-              >
-                <span>Mở Google Search Console</span>
-                <ExternalLink aria-hidden="true" className="w-3 h-3" />
-              </a>
-            </div>
-
-            <ol className="text-xs text-text-secondary space-y-1.5 list-decimal list-inside">
-              <li>
-                Truy cập thuộc tính tên miền <code className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 font-mono text-[11px]">{data.siteUrl || 'sc-domain:viecultures.app'}</code> trong Google Search Console.
-              </li>
-              <li>
-                Vào mục <strong>Cài đặt (Settings) &gt; Người dùng và quyền (Users and permissions) &gt; Thêm người dùng</strong>.
-              </li>
-              <li className="flex flex-wrap items-center gap-1.5">
-                <span>Thêm địa chỉ email Service Account với quyền <strong>Chủ sở hữu (Owner)</strong> hoặc <strong>Đầy đủ (Full)</strong>:</span>
-                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-rice-paper dark:bg-white/10 border border-antique-gold/40 text-[11px] font-mono">
-                  <span>{SERVICE_ACCOUNT_EMAIL}</span>
-                  <button
-                    type="button"
-                    onClick={handleCopyEmail}
-                    className="p-1 hover:text-heritage-green transition-colors cursor-pointer"
-                    title="Sao chép email Service Account"
-                  >
-                    {copiedEmail ? (
-                      <Check aria-hidden="true" className="w-3 h-3 text-emerald-600" />
-                    ) : (
-                      <Copy aria-hidden="true" className="w-3 h-3" />
-                    )}
-                  </button>
-                </div>
-              </li>
-            </ol>
-          </div>
-        </div>
-      )}
 
       {/* ── 5-State: Loading Skeleton ───────────────────────────────────── */}
       {isLoading && (

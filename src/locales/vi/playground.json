@@ -613,6 +613,31 @@
         "open_video_dialog_title": "Mở video",
         "open_video_dialog_desc": "Bài học hiện tại sẽ giữ nguyên cho đến khi bạn áp dụng transcript mới. Mở video khác sẽ xóa các bản thu hiện tại."
       }
+    },
+    "two_pass_stt": {
+      "title": "Smart Two-Pass STT",
+      "toggle_button_title": "Smart Two-Pass STT (Luyện nói tự lọc từ thừa)",
+      "state_listening": "Đang lắng nghe giọng nói...",
+      "state_listening_desc": "Nói tự nhiên, hệ thống tự động lọc từ đệm khi bạn dừng nói 0.8s",
+      "state_refining": "AI Two-Pass Refinement đang xử lý...",
+      "state_refining_desc": "Pass 1: Speech-to-Text → Pass 2: Gemini Contextual & Disfluency Removal",
+      "state_empty_title": "Chưa nhận diện được giọng nói",
+      "state_empty_desc": "Âm thanh thu được quá ngắn hoặc âm lượng nhỏ. Vui lòng nói to và rõ hơn.",
+      "state_error_title": "Lỗi xử lý giọng nói",
+      "state_error_desc": "Không thể gửi âm thanh đến máy chủ hoặc micro bị từ chối quyền truy cập.",
+      "optimizing": "Đang tối ưu ngữ cảnh văn hóa",
+      "cancel": "Hủy",
+      "retry": "Nói lại",
+      "close": "Đóng",
+      "learning_card_title": "Phân tích Giọng nói 2-Pass AI",
+      "confidence_title": "Độ tin cậy nhận diện",
+      "latency_title": "Độ trễ xử lý",
+      "raw_label": "Lời nói gốc (Pass 1 STT):",
+      "raw_hint": "Các từ đệm, ngập ngừng được phát hiện và đánh dấu gạch ngang",
+      "cleaned_label": "Bản tinh chỉnh AI (Pass 2):",
+      "filler_removed": "Đã lọc từ đệm",
+      "apply_button": "Áp dụng vào câu hỏi",
+      "send_button": "Gửi vào hội thoại"
     }
   }
 }

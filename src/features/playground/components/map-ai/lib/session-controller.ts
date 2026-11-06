@@ -151,10 +151,12 @@ export class SessionController {
     this.patch({ isAwaitingResponse: false });
   };
   private onError = (error: ErrorEvent) => {
+    console.error('[SessionController] Client error event:', error?.message || error);
     if (this.state.connectionStatus === 'idle') return;
     this.fail(error.message || 'Không thể kết nối. Hãy thử lại.');
   };
   private onClose = (_event: CloseEvent) => {
+    console.warn('[SessionController] Client close event. code:', _event?.code, 'reason:', _event?.reason);
     if (this.state.connectionStatus !== 'idle') this.fail('Kết nối đã đóng. Bạn có thể tiếp tục từ lịch sử.');
   };
   private onToolCancellation = (event: LiveServerToolCallCancellation) => {
@@ -248,13 +250,19 @@ export class SessionController {
       // Executes inside the initiating UI gesture, before any network await.
       const unlocked = this.deps.audio.unlock();
       await unlocked;
-      if (!current()) return { status: 'cancelled' };
+        if (!current()) {
+          console.warn('[SessionController] Generation changed during run(). status:', this.state.connectionStatus, 'error:', this.state.connectionError);
+          return { status: this.state.connectionStatus === 'error' ? 'error' : 'cancelled', message: this.state.connectionError ?? undefined };
+        }
 
       if (reconnect) {
         const configuration = await this.deps.configuration();
         this.sessionPolicy = { ...this.deps.toolPolicy() };
         const ready = await this.deps.client.connect(configuration.config);
-        if (!current()) return { status: 'cancelled' };
+          if (!current()) {
+          console.warn('[SessionController] Generation changed during run(). status:', this.state.connectionStatus, 'error:', this.state.connectionError);
+          return { status: this.state.connectionStatus === 'error' ? 'error' : 'cancelled', message: this.state.connectionError ?? undefined };
+        }
         if (!ready) throw new Error('Không thể kết nối phiên AI.');
         this.liveConnected = true;
         if (history.length) this.deps.client.prefill(history);

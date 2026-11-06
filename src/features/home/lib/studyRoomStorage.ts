@@ -4,6 +4,7 @@ export interface ReadingBookmark {
   id: string;
   level: string;
   title: string;
+  titleVi?: string;
   image: string;
   topic: string;
   position: number;

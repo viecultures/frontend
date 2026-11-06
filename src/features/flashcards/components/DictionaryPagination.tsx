@@ -8,6 +8,7 @@ export interface DictionaryPaginationProps {
   totalDecks: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
+  isLoading?: boolean;
 }
 
 export function getPageNumbers(currentPage: number, totalPages: number): (number | 'ellipsis')[] {
@@ -29,8 +30,22 @@ export const DictionaryPagination: React.FC<DictionaryPaginationProps> = ({
   totalDecks,
   itemsPerPage,
   onPageChange,
+  isLoading = false,
 }) => {
   const { t } = useTranslation('flashcards');
+
+  if (isLoading) {
+    return (
+      <nav className="vocab-pagination" aria-label={t('pagination.aria_label', 'Vocabulary pagination')} aria-busy="true">
+        <div className="h-4 w-44 rounded-md vocab-shimmer" />
+        <div className="vocab-pagination-controls">
+          <div className="h-9 w-9 rounded-xl vocab-shimmer" />
+          <div className="h-9 w-20 rounded-xl vocab-shimmer" />
+          <div className="h-9 w-9 rounded-xl vocab-shimmer" />
+        </div>
+      </nav>
+    );
+  }
 
   if (totalDecks === 0 || totalPages <= 1) return null;
 

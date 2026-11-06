@@ -143,7 +143,13 @@ export function HomeVocabularySummary() {
       <div
         className="home-srs-groups"
         role="group"
-        aria-label={`Thống kê trí nhớ: ${againCount} Quên mất, ${hardCount} Khó nhớ, ${goodCount} Nhớ rồi, ${easyCount} Thuộc làu`}
+        aria-label={t('vocabulary_card.memory_stats_aria', {
+          again: againCount,
+          hard: hardCount,
+          good: goodCount,
+          easy: easyCount,
+          defaultValue: `Thống kê trí nhớ: ${againCount} Quên mất, ${hardCount} Khó nhớ, ${goodCount} Nhớ rồi, ${easyCount} Thuộc làu`,
+        })}
       >
         <div className="home-srs-group home-srs-again" title={t('vocabulary_card.rating_again_desc', 'Chưa nhớ ra, cần xem lại.')}>
           <span className="home-srs-dot dot-again" aria-hidden="true" />
@@ -178,7 +184,14 @@ export function HomeVocabularySummary() {
       <div
         className="home-srs-distribution"
         role="img"
-        aria-label={`Phân bổ trí nhớ: ${againCount} Quên mất, ${hardCount} Khó nhớ, ${goodCount} Nhớ rồi, ${easyCount} Thuộc làu${unreviewedCount > 0 ? `, ${unreviewedCount} Chưa ôn` : ''}`}
+        aria-label={t('vocabulary_card.distribution_aria', {
+          again: againCount,
+          hard: hardCount,
+          good: goodCount,
+          easy: easyCount,
+          unreviewed: unreviewedCount > 0 ? `, ${unreviewedCount} ${t('vocabulary_card.rating_unreviewed', 'Chưa ôn')}` : '',
+          defaultValue: `Phân bổ trí nhớ: ${againCount} Quên mất, ${hardCount} Khó nhớ, ${goodCount} Nhớ rồi, ${easyCount} Thuộc làu${unreviewedCount > 0 ? `, ${unreviewedCount} Chưa ôn` : ''}`,
+        })}
       >
         {totalSaved > 0 ? (
           <>

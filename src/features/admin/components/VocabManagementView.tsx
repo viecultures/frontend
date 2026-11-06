@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import {
   BookOpen,
@@ -15,10 +16,12 @@ import {
   ChevronRight,
   TrendingUp,
   X,
-  HelpCircle,
+  Compass,
+  FileText,
 } from 'lucide-react';
 import type { AdminVocabItem, PageResponse } from '../types/adminVocabTypes';
 import { vocabAdminService } from '../services/vocabAdminService';
+import { postAdminService } from '../services/postAdminService';
 import { VocabFormModal } from './VocabFormModal';
 import { AdminDialog } from './AdminDialog';
 
@@ -34,15 +37,24 @@ export const VocabManagementView: React.FC = () => {
     size: 10,
   });
 
+  // Post options state for filtering
+  const [postOptions, setPostOptions] = useState<Array<{ id: string; titleEn: string; titleVi: string }>>([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState<boolean>(false);
+
   // 5-State Indicators
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
   // Filters & Pagination State
-  const [searchInput, setSearchInput] = useState<string>('');
-  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+  const initialPostId = searchParams.get('postId') || 'ALL';
+
+  const [searchInput, setSearchInput] = useState<string>(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>(initialSearch);
   const [selectedLevel, setSelectedLevel] = useState<string>('ALL');
+  const [selectedPostId, setSelectedPostId] = useState<string>(initialPostId);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const pageSize = 10;
 
@@ -56,6 +68,38 @@ export const VocabManagementView: React.FC = () => {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const audioInstanceRef = useRef<HTMLAudioElement | null>(null);
 
+  // Load post options for filter dropdown
+  useEffect(() => {
+    let isCancelled = false;
+    setIsLoadingPosts(true);
+
+    postAdminService
+      .getPosts()
+      .then((res) => {
+        if (!isCancelled && Array.isArray(res)) {
+          setPostOptions(
+            res.map((p) => ({
+              id: p.id,
+              titleEn: p.titleEn,
+              titleVi: p.titleVi,
+            }))
+          );
+        }
+      })
+      .catch((err: unknown) => {
+        console.warn('Lỗi tải danh sách bài viết cho bộ lọc:', err);
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsLoadingPosts(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
   // Debounce search input by 350ms
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -65,6 +109,22 @@ export const VocabManagementView: React.FC = () => {
 
     return () => clearTimeout(handler);
   }, [searchInput]);
+
+  // Sync when search query or postId in URL changes
+  useEffect(() => {
+    const querySearch = searchParams.get('search');
+    if (querySearch !== null && querySearch !== searchInput) {
+      setSearchInput(querySearch);
+      setDebouncedSearch(querySearch);
+      setCurrentPage(0);
+    }
+
+    const queryPostId = searchParams.get('postId');
+    if (queryPostId !== null && queryPostId !== selectedPostId) {
+      setSelectedPostId(queryPostId || 'ALL');
+      setCurrentPage(0);
+    }
+  }, [searchParams]);
 
   // Cleanup audio instance
   useEffect(() => {
@@ -85,6 +145,7 @@ export const VocabManagementView: React.FC = () => {
       const res = await vocabAdminService.fetchVocabularies({
         search: debouncedSearch || undefined,
         level: selectedLevel !== 'ALL' ? selectedLevel : undefined,
+        postId: selectedPostId !== 'ALL' ? selectedPostId : undefined,
         page: currentPage,
         size: pageSize,
       });
@@ -99,7 +160,7 @@ export const VocabManagementView: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [debouncedSearch, selectedLevel, currentPage]);
+  }, [debouncedSearch, selectedLevel, selectedPostId, currentPage]);
 
   useEffect(() => {
     loadVocabularies();
@@ -202,7 +263,9 @@ export const VocabManagementView: React.FC = () => {
     }
   };
 
-  const hasFilterActive = Boolean(searchInput.trim() || selectedLevel !== 'ALL');
+  const hasFilterActive = Boolean(
+    searchInput.trim() || selectedLevel !== 'ALL' || selectedPostId !== 'ALL'
+  );
 
   return (
     <div className="space-y-6">
@@ -216,7 +279,7 @@ export const VocabManagementView: React.FC = () => {
           <button
             type="button"
             onClick={() => setSuccessToast(null)}
-            className="p-1 text-emerald-600 hover:text-emerald-800 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/40"
+            className="p-1 text-emerald-600 hover:text-emerald-800 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/40 cursor-pointer"
             aria-label="Đóng thông báo"
           >
             <X aria-hidden="true" className="w-3.5 h-3.5" />
@@ -259,8 +322,13 @@ export const VocabManagementView: React.FC = () => {
           {searchInput && (
             <button
               type="button"
-              onClick={() => setSearchInput('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-body p-1"
+              onClick={() => {
+                setSearchInput('');
+                const nextParams = new URLSearchParams(searchParams);
+                nextParams.delete('search');
+                setSearchParams(nextParams, { replace: true });
+              }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-body p-1 cursor-pointer"
               aria-label="Xóa từ khóa tìm kiếm"
             >
               <X aria-hidden="true" className="w-3.5 h-3.5" />
@@ -270,6 +338,39 @@ export const VocabManagementView: React.FC = () => {
 
         {/* Filters and CTA Buttons */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Post Filter Select */}
+          <div className="flex items-center gap-1.5 min-w-[200px] max-w-xs">
+            <label htmlFor="vocab-filter-post" className="sr-only">
+              Lọc theo bài viết
+            </label>
+            <select
+              id="vocab-filter-post"
+              value={selectedPostId}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSelectedPostId(val);
+                setCurrentPage(0);
+                const nextParams = new URLSearchParams(searchParams);
+                if (val === 'ALL') {
+                  nextParams.delete('postId');
+                } else {
+                  nextParams.set('postId', val);
+                }
+                setSearchParams(nextParams, { replace: true });
+              }}
+              className="w-full px-3 py-2.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 text-xs font-bold text-text-body dark:text-warm-ivory focus:outline-none focus-visible:ring-2 focus-visible:ring-antique-gold cursor-pointer truncate"
+            >
+              <option value="ALL">
+                {isLoadingPosts ? 'Đang tải bài viết...' : `Tất cả bài viết (${postOptions.length})`}
+              </option>
+              {postOptions.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.titleEn}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* CEFR Level Select */}
           <div className="flex items-center gap-1.5">
             <label htmlFor="vocab-filter-level" className="sr-only">
@@ -300,7 +401,12 @@ export const VocabManagementView: React.FC = () => {
               onClick={() => {
                 setSearchInput('');
                 setSelectedLevel('ALL');
+                setSelectedPostId('ALL');
                 setCurrentPage(0);
+                const nextParams = new URLSearchParams(searchParams);
+                nextParams.delete('search');
+                nextParams.delete('postId');
+                setSearchParams(nextParams, { replace: true });
               }}
               className="px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 text-xs font-bold text-text-muted hover:text-text-body transition-colors cursor-pointer"
             >
@@ -359,6 +465,7 @@ export const VocabManagementView: React.FC = () => {
                     <div className="h-3 w-3/4 bg-antique-gold/15 rounded-md" />
                   </div>
                   <div className="flex items-center gap-3">
+                    <div className="h-7 w-24 bg-antique-gold/20 rounded-full" />
                     <div className="h-7 w-12 bg-antique-gold/20 rounded-full" />
                     <div className="h-7 w-7 bg-antique-gold/20 rounded-lg" />
                     <div className="h-7 w-7 bg-antique-gold/20 rounded-lg" />
@@ -381,7 +488,7 @@ export const VocabManagementView: React.FC = () => {
               </h3>
               <p className="text-xs text-text-muted max-w-md mx-auto">
                 {hasFilterActive
-                  ? 'Hãy thử thay đổi từ khóa tìm kiếm hoặc đặt lại bộ lọc cấp độ CEFR.'
+                  ? 'Hãy thử thay đổi từ khóa tìm kiếm hoặc đặt lại bộ lọc bài viết, cấp độ CEFR.'
                   : 'Bắt đầu làm phong phú kho tàng ngôn ngữ bằng cách thêm các từ vựng di sản đầu tiên.'}
               </p>
             </div>
@@ -392,7 +499,12 @@ export const VocabManagementView: React.FC = () => {
                   onClick={() => {
                     setSearchInput('');
                     setSelectedLevel('ALL');
+                    setSelectedPostId('ALL');
                     setCurrentPage(0);
+                    const nextParams = new URLSearchParams(searchParams);
+                    nextParams.delete('search');
+                    nextParams.delete('postId');
+                    setSearchParams(nextParams, { replace: true });
                   }}
                   className="px-5 py-2.5 rounded-xl bg-antique-gold/25 hover:bg-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold transition-colors cursor-pointer"
                 >
@@ -412,12 +524,13 @@ export const VocabManagementView: React.FC = () => {
         ) : (
           /* ── 5-State: Default Table ────────────────────────────────────── */
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs min-w-[760px]">
+            <table className="w-full text-left text-xs min-w-[880px]">
               <thead className="bg-warm-ivory/80 dark:bg-heritage-forest/60 border-b border-antique-gold/25 text-heritage-green dark:text-antique-bright uppercase tracking-wider text-[10px] font-bold">
                 <tr>
                   <th className="px-5 py-4">Từ vựng & Loại từ</th>
                   <th className="px-4 py-4">Phiên âm IPA</th>
                   <th className="px-4 py-4">Nghĩa tiếng Việt & Ngữ cảnh</th>
+                  <th className="px-4 py-4">Bài viết & Lộ trình</th>
                   <th className="px-3 py-4 text-center">Cấp độ</th>
                   <th className="px-3 py-4 text-center">Lượt tra</th>
                   <th className="px-3 py-4 text-center">Âm thanh</th>
@@ -462,7 +575,7 @@ export const VocabManagementView: React.FC = () => {
                       </td>
 
                       {/* Cột 3: Nghĩa tiếng Việt & Câu ngữ cảnh */}
-                      <td className="px-4 py-4 align-top max-w-sm">
+                      <td className="px-4 py-4 align-top max-w-xs">
                         <div className="space-y-1">
                           <p className="font-semibold text-text-body dark:text-warm-ivory text-xs line-clamp-2">
                             {item.viMeaning}
@@ -472,10 +585,49 @@ export const VocabManagementView: React.FC = () => {
                               "{item.contextSentence}"
                             </p>
                           )}
+                          {item.usageNote && (
+                            <p className="text-[10px] text-text-muted pt-0.5">
+                              <span className="font-bold text-heritage-green dark:text-antique-gold mr-1">Lưu ý:</span>
+                              {item.usageNote}
+                            </p>
+                          )}
                         </div>
                       </td>
 
-                      {/* Cột 4: Level Badge */}
+                      {/* Cột 4: Bài viết & Lộ trình */}
+                      <td className="px-4 py-4 align-top max-w-[200px]">
+                        {item.postId ? (
+                          <div className="space-y-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedPostId(item.postId!);
+                                setCurrentPage(0);
+                                const nextParams = new URLSearchParams(searchParams);
+                                nextParams.set('postId', item.postId!);
+                                setSearchParams(nextParams, { replace: true });
+                              }}
+                              className="text-left font-semibold text-xs text-heritage-green dark:text-antique-bright hover:underline line-clamp-2 cursor-pointer transition-colors block"
+                              title="Bấm để lọc các từ vựng thuộc bài viết này"
+                            >
+                              {item.postTitleEn || item.postTitleVi || 'Chi tiết bài viết'}
+                            </button>
+
+                            {item.journeyTitleEn && (
+                              <div className="flex items-center gap-1 text-[10px] text-text-muted line-clamp-1">
+                                <Compass aria-hidden="true" className="w-3 h-3 text-antique-gold shrink-0" />
+                                <span className="truncate">{item.journeyTitleEn}</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-stone-100 text-stone-600 border border-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:border-stone-700">
+                            Chung / Chưa gán
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Cột 5: Level Badge */}
                       <td className="px-3 py-4 align-top text-center whitespace-nowrap">
                         <span
                           className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border shadow-xs ${getLevelBadgeClass(
@@ -486,7 +638,7 @@ export const VocabManagementView: React.FC = () => {
                         </span>
                       </td>
 
-                      {/* Cột 5: Lượt tra cứu */}
+                      {/* Cột 6: Lượt tra cứu */}
                       <td className="px-3 py-4 align-top text-center whitespace-nowrap">
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-text-secondary">
                           <TrendingUp aria-hidden="true" className="w-3 h-3 text-antique-gold" />
@@ -494,7 +646,7 @@ export const VocabManagementView: React.FC = () => {
                         </span>
                       </td>
 
-                      {/* Cột 6: Nút Audio */}
+                      {/* Cột 7: Nút Audio */}
                       <td className="px-3 py-4 align-top text-center whitespace-nowrap">
                         {item.audioUrl ? (
                           <button
@@ -519,7 +671,7 @@ export const VocabManagementView: React.FC = () => {
                         )}
                       </td>
 
-                      {/* Cột 7: Thao tác Edit / Delete */}
+                      {/* Cột 8: Thao tác Edit / Delete */}
                       <td className="px-5 py-4 align-top text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
@@ -662,3 +814,5 @@ export const VocabManagementView: React.FC = () => {
     </div>
   );
 };
+
+export default VocabManagementView;

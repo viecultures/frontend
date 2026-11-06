@@ -1,3 +1,5 @@
+import type { Level } from '@/types';
+import type { VocabItemDto } from '@/features/admin/types/adminTypes';
 import { ALL_SERIES } from './series';
 
 // Catalog Lesson Interface
@@ -27,9 +29,12 @@ export interface Lesson {
   imageUrl?: string;
   featured?: boolean;
   isFromDatabase?: boolean;
+  journeyId?: string;
+  isStandalone?: boolean;
   dateAdded: string;
   provinceId?: string;
   isNational?: boolean;
+  dbVocabularies?: VocabItemDto[];
 }
 
 export const DEFAULT_AVAILABLE_LEVELS: LevelType[] = ['Level 1', 'Level 2', 'Level 3'];
