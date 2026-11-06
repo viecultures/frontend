@@ -40,10 +40,15 @@
   "listen_section_title": "Lắng nghe & luyện phát âm",
   "audio_unavailable": "Chưa có bản ghi âm cho bài viết này. Bạn vẫn có thể tiếp tục đọc và ôn tập từ vựng.",
   "series_nav": {
-    "story_count": "Câu chuyện {{current}} trên {{total}}",
+    "series_label": "CHUỖI BÀI VĂN HÓA",
+    "story_count": "Bài {{current}} / {{total}}",
     "previous_story": "Bài trước",
     "view_series": "Xem chuỗi bài",
-    "next_story": "Bài tiếp theo"
+    "next_story": "Bài tiếp theo",
+    "read_next": "Đọc tiếp bài này",
+    "first_story_hint": "Bạn đang ở bài đầu tiên của chuỗi bài",
+    "series_completed": "Bạn đã hoàn thành chuỗi bài này!",
+    "explore_more_series": "Khám phá các chuỗi bài khác"
   },
   "vocab_drawer": {
     "article_vocabulary": "Từ vựng bài đọc",

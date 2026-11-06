@@ -40,10 +40,15 @@
   "listen_section_title": "Listen & practice pronunciation",
   "audio_unavailable": "Audio is not available for this article yet. You can continue reading and reviewing vocabulary.",
   "series_nav": {
+    "series_label": "CULTURAL SERIES",
     "story_count": "Story {{current}} of {{total}}",
     "previous_story": "Previous story",
     "view_series": "View series",
-    "next_story": "Next story"
+    "next_story": "Next story",
+    "read_next": "Read this story",
+    "first_story_hint": "You are at the first story of this series",
+    "series_completed": "You completed this series!",
+    "explore_more_series": "Explore other series"
   },
   "vocab_drawer": {
     "article_vocabulary": "Article vocabulary",
