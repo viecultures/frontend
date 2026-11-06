@@ -150,17 +150,39 @@ export function DiscoveryJourney() {
   useEffect(() => {
     let active = true;
     Promise.all([
-      journeyApiService.getJourneys({ status: 'published' }),
+      journeyApiService.getJourneys(),
       getPublicCuisineSeries().catch(() => []),
-    ]).then(([journeys, publicCuisine]) => {
+    ]).then(([backendJourneys, publicCuisine]) => {
       if (!active) return;
-      const publicMap = new Map(publicCuisine.map(series => [series.id, toPublicJourney(series)]));
-      const merged = journeys.map(journey => publicMap.get(journey.id) || journey);
-      for (const [id, journey] of publicMap) {
-        if (!merged.some(j => j.id === id)) {
-          merged.push(journey);
+      const backendMap = new Map((backendJourneys || []).map((j) => [j.id, j]));
+      const publicMap = new Map(publicCuisine.map((series) => [series.id, toPublicJourney(series)]));
+      
+      const merged: JourneySeries[] = [];
+      const handledIds = new Set<string>();
+
+      // 1. Database is the source of truth
+      for (const [id, dbJourney] of backendMap) {
+        handledIds.add(id);
+        if (dbJourney.status === 'draft' || dbJourney.status === 'archived') {
+          continue;
+        }
+        const mock = publicMap.get(id);
+        if (mock && (!dbJourney.chapters || dbJourney.chapters.length === 0)) {
+          merged.push({ ...mock, ...dbJourney, chapters: mock.chapters });
+        } else {
+          merged.push(dbJourney);
         }
       }
+
+      // 2. Fallback to mock only if not in database
+      for (const [id, mockJourney] of publicMap) {
+        if (!handledIds.has(id)) {
+          if (mockJourney.status !== 'draft' && mockJourney.status !== 'archived') {
+            merged.push(mockJourney);
+          }
+        }
+      }
+
       setAllJourneys(merged);
     });
     return () => { active = false; };

@@ -253,6 +253,7 @@
   grid-column: span 1 / span 1 !important;
   border-right: none !important;
   padding-right: 0 !important;
+}
 
 /* ── Reader Series Bottom Navigation Card (Phuong an 1) ─────────────── */
 .reader-series-bottom-card {
