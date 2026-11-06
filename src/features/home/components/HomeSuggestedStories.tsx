@@ -1,8 +1,7 @@
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { ArrowUpRight, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LESSONS_DATA } from '@/data/discoveryData';
-import { ENGLISH_EDITORIAL, LOCAL_EDITORIAL, TOPIC_LABELS } from '@/features/discovery/lib/editorial';
+import { FEATURED_HOME_STORIES } from '../data/recommendationData';
 import { PATHS, paths } from '@/routes/paths';
 
 interface HomeSuggestedStoriesProps {
@@ -14,13 +13,9 @@ export function HomeSuggestedStories({ currentId }: HomeSuggestedStoriesProps) {
   const isVi = i18n.language === 'vi';
 
   // Pick 3 high-quality cultural stories excluding current article
-  const stories = ['imperial-hue', 'hoi-an-lanterns', 'dong-ho-paintings', 'bat-trang-pottery']
-    .filter((id) => id !== currentId)
-    .slice(0, 3)
-    .flatMap((id) => {
-      const lesson = LESSONS_DATA.find((item) => item.id === id);
-      return lesson ? [lesson] : [];
-    });
+  const stories = FEATURED_HOME_STORIES
+    .filter((item) => item.id !== currentId)
+    .slice(0, 3);
 
   return (
     <section className="home-recommendations" aria-labelledby="home-stories-title">
@@ -41,22 +36,19 @@ export function HomeSuggestedStories({ currentId }: HomeSuggestedStoriesProps) {
 
       <div className="home-stories-grid">
         {stories.map((story) => {
-          const title = isVi
-            ? story.vietnameseTitle || story.title
-            : ENGLISH_EDITORIAL[story.id]?.title || story.title;
-          const readTimeMinutes = parseInt(story.levelDetails['Level 1'].readTime, 10) || 4;
-          const topicLabel = TOPIC_LABELS[story.category] || story.category;
-          const imageUrl = LOCAL_EDITORIAL[story.id]?.image || story.imageUrl;
+          const title = isVi ? story.titleVi : story.titleEn;
+          const topicLabel = isVi ? story.categoryVi : story.category;
+          const readTimeMinutes = parseInt(story.readTime, 10) || 3;
 
           return (
             <Link
               key={story.id}
               className="home-story-card"
-              to={paths.reader({ postId: story.id, level: 'Level 1' })}
+              to={paths.reader({ postId: story.id, level: story.preferredLevel })}
             >
               <div className="home-story-thumbnail">
                 <img
-                  src={imageUrl}
+                  src={story.imageUrl}
                   alt={title}
                   className="home-story-thumbnail-img"
                   loading="lazy"
@@ -66,7 +58,7 @@ export function HomeSuggestedStories({ currentId }: HomeSuggestedStoriesProps) {
               <div className="home-story-body">
                 <h3 className="home-story-title">{title}</h3>
                 <small className="home-story-meta">
-                  <span>Level 1</span>
+                  <span>{story.preferredLevel}</span>
                   <span>·</span>
                   <span className="home-story-readtime">
                     <Clock size={11} aria-hidden="true" />

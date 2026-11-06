@@ -73,7 +73,7 @@
       "expires_at": "Membership until: {{date}}",
       "free_desc": "Bilingual stories and core flashcard practice.",
       "manage_membership": "Manage membership",
-      "explore_pro": "Explore Pro · 39k/month",
+      "explore_pro": "Upgrade to Pro",
       "plan_includes": "Your plan includes",
       "bilingual_audio": "Bilingual reading and audio at three speeds (0.5x, 0.8x, 1x)",
       "core_flashcards": "Core vocabulary flashcards with spaced repetition",
@@ -145,7 +145,7 @@
     "header_card": {
       "target_label": "Target: {{target}}",
       "joined_label": "Joined: {{date}}",
-      "explore_pro_cta": "Explore Pro · 39k/month"
+      "explore_pro_cta": "Upgrade to Pro"
     },
     "vocab_view": {
       "search_aria": "Search vocabulary",

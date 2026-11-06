@@ -8,14 +8,37 @@ import { getPublishedSeries } from '@/data/series';
 import type { SeriesMetadata } from '@/data/series/types';
 import { PATHS, paths } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
+import { getPublicCuisineSeries, toPublicSeriesMetadata } from '@/features/reader/services/publicCuisineService';
+import { journeyApiService } from '@/features/discovery/services/journeyApiService';
+import type { JourneySeries } from '@/data/series';
 import '../food-landing.css';
 
-const cuisineSeries = getPublishedSeries().filter((series) => series.theme === 'cuisine');
-const featuredSeries = cuisineSeries.find((series) => series.id === 'pho') ?? cuisineSeries[0];
-const otherSeries = cuisineSeries.filter((series) => series.id !== featuredSeries?.id);
+const initialCuisineSeries = getPublishedSeries().filter((series) => series.theme === 'cuisine');
+
+const fromBackendJourney = (journey: JourneySeries): SeriesMetadata => ({
+  id: journey.id,
+  title: journey.title,
+  titleVi: journey.titleVi || journey.title,
+  theme: 'cuisine',
+  provinceId: journey.provinceId,
+  region: journey.region as SeriesMetadata['region'],
+  description: journey.description,
+  imageUrl: journey.imageUrl,
+  status: 'published',
+  chapters: journey.chapters.map(chapter => ({
+    id: chapter.id,
+    order: chapter.order,
+    titleEn: chapter.title,
+    titleVi: chapter.titleVi || chapter.title,
+    summary: chapter.summary,
+    summaryVi: chapter.summaryVi || chapter.summary,
+    readTime: chapter.readTime,
+    cefrLevel: chapter.preferredLevel,
+  })),
+});
 
 const firstChapterPath = (series: SeriesMetadata | undefined) =>
-  series?.chapters[0] ? paths.reader({ story: series.chapters[0].id }) : PATHS.discovery;
+  series?.chapters[0] ? paths.reader({ story: series.chapters[0].id, level: series.chapters[0].cefrLevel || 'Level 2' }) : PATHS.discovery;
 
 const LEARNING_STEPS = [
   { icon: BookOpen, number: '01', title: 'Taste the story', copy: 'Follow a dish from its ingredients to the people and places behind it.' },
@@ -48,9 +71,25 @@ const FoodLandingPage: React.FC = () => {
   const reducedMotion = useReducedMotion();
   const [motionOn, setMotionOn] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cuisineSeries, setCuisineSeries] = useState<SeriesMetadata[]>(initialCuisineSeries);
+  const featuredSeries = cuisineSeries.find((series) => series.id === 'pho') ?? cuisineSeries[0];
+  const otherSeries = cuisineSeries.filter((series) => series.id !== featuredSeries?.id);
   const canAnimate = !reducedMotion && motionOn;
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 90, damping: 30, restDelta: 0.001 });
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([getPublicCuisineSeries(), journeyApiService.getJourneys({ status: 'published' })]).then(([seriesList, backendJourneys]) => {
+      if (!active) return;
+      const allowed = new Set([...initialCuisineSeries.map(item => item.id), ...seriesList.map(item => item.id)]);
+      const fromBackend = backendJourneys.filter(item => allowed.has(item.id) && item.chapters.length > 0).map(fromBackendJourney);
+      const fallback = [...initialCuisineSeries, ...seriesList.map(toPublicSeriesMetadata)]
+        .filter(item => !fromBackend.some(backend => backend.id === item.id));
+      setCuisineSeries([...fromBackend, ...fallback]);
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -140,7 +179,7 @@ const FoodLandingPage: React.FC = () => {
             <Reveal enabled={canAnimate} className="food-section-heading food-heading-row"><div><span className="food-eyebrow">02 / THE STORIES ON OUR TABLE</span><h2 id="food-stories-title">Find a dish, <em>stay for the story</em></h2></div><p>Each series opens one familiar food through three connected chapters.</p></Reveal>
             {featuredSeries && <Reveal enabled={canAnimate} className="food-featured-story"><div className="food-featured-image"><img src={featuredSeries.imageUrl} alt="Illustrated bowl of phở in Hanoi" width="1024" height="576" loading="lazy" /></div><div className="food-featured-copy"><span className="food-card-kicker">FEATURED SERIES · {featuredSeries.chapters.length} CHAPTERS</span><h3>{featuredSeries.titleVi}</h3><p>{featuredSeries.description}</p><button type="button" className="food-text-link" onClick={() => openStory(featuredSeries)}>Read the first chapter <ArrowRight size={18} aria-hidden="true" /></button></div></Reveal>}
             <div className="food-series-grid">
-              {otherSeries.map((series, index) => <Reveal key={series.id} enabled={canAnimate} delay={(index % 3) * 0.12} className="food-series-card"><button type="button" onClick={() => openStory(series)} aria-label={`Read ${series.titleVi}`}><span className="food-series-image"><img src={series.imageUrl} alt="" width="1024" height="576" loading="lazy" /><span className="food-series-arrow"><ArrowRight size={20} aria-hidden="true" /></span></span><span className="food-card-kicker">{series.chapters.length} CHAPTERS · {series.region === 'north' ? 'NORTHERN VIETNAM' : 'SOUTHERN VIETNAM'}</span><strong>{series.titleVi}</strong><small>{series.title}</small></button></Reveal>)}
+              {otherSeries.map((series, index) => <Reveal key={series.id} enabled={canAnimate} delay={(index % 3) * 0.12} className="food-series-card"><button type="button" onClick={() => openStory(series)} aria-label={`Read ${series.titleVi}`}><span className="food-series-image">{series.imageUrl ? <img src={series.imageUrl} alt="" width="1024" height="576" loading="lazy" /> : <BookOpen size={52} aria-hidden="true" />}<span className="food-series-arrow"><ArrowRight size={20} aria-hidden="true" /></span></span><span className="food-card-kicker">{series.chapters.length} CHAPTERS · {series.region === 'north' ? 'NORTHERN VIETNAM' : 'SOUTHERN VIETNAM'}</span><strong>{series.titleVi}</strong><small>{series.title}</small></button></Reveal>)}
             </div>
             <Reveal enabled={canAnimate} className="food-more-stories"><p>Curious beyond food? The full collection has stories across Vietnamese culture.</p><Link to={PATHS.discovery} className="food-text-link">Explore all stories <ArrowRight size={18} aria-hidden="true" /></Link></Reveal>
           </div>

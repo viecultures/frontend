@@ -34,6 +34,7 @@ const CommunityContestPage = React.lazy(() => import('@/features/community/pages
 const PlaygroundPage = React.lazy(() => import('@/features/playground/pages/playground'));
 const AiWorkspacePage = React.lazy(() => import('@/features/playground/pages/ai-workspace'));
 const AdminPage = React.lazy(() => import('@/features/admin/pages/AdminPage'));
+const CuisineDraftPreviewPage = React.lazy(() => import('@/features/admin/pages/CuisineDraftPreviewPage'));
 const AdminPostEditorPage = React.lazy(() => import('@/features/admin/pages/AdminPostEditorPage'));
 const PricingPage = React.lazy(() => import('@/features/subscription/pages/PricingPage'));
 const CheckoutPage = React.lazy(() => import('@/features/subscription/pages/CheckoutPage'));
@@ -286,6 +287,7 @@ export const App: React.FC = () => {
                 }
               >
                 <Route path={toRel(PATHS.admin)} element={<AdminPage />} />
+                <Route path={`${toRel(PATHS.admin)}/cuisine-drafts`} element={<CuisineDraftPreviewPage />} />
                 <Route path={`${toRel(PATHS.admin)}/*`} element={<AdminPage />} />
                 <Route path={`${toRel(PATHS.admin)}/:tab`} element={<AdminPage />} />
               </Route>

@@ -20,7 +20,7 @@
   "skip_content": "Bỏ qua đến nội dung học",
   "storage_error": "Không thể lưu kế hoạch học tập. Vui lòng kiểm tra quyền lưu trữ trình duyệt.",
   "continue_card": {
-    "eyebrow_saved": "BÀI BẠN ĐANG HỌC",
+    "eyebrow_saved": "BÀI BẠN ĐANG ĐỌC",
     "eyebrow_new": "CHƯƠNG ĐẦU TIÊN CỦA BẠN",
     "default_title": "Những bí mật nho nhỏ của bún chả Hà Nội.",
     "default_desc": "Bếp than thơm, rau xanh mát và một câu chuyện đáng để đọc chậm.",
@@ -85,7 +85,7 @@
   "daily_quote": {
     "eyebrow_heritage": "DI SẢN VIECULTURES",
     "eyebrow_story": "CÂU CHUYỆN PHÍA SAU CÂU CHỮ",
-    "title": "Daily Quote",
+    "title": "Quote of the day",
     "created_by": "Biên soạn bởi",
     "creator_name": "VieCultures Daily",
     "expand_title": "Xem cỡ lớn",

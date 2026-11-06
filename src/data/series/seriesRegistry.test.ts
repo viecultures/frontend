@@ -14,13 +14,11 @@ import {
   CA_KHO_VU_DAI_SERIES_METADATA,
   COM_CHAY_SERIES_METADATA,
   BANH_CAY_SERIES_METADATA,
-  HUE_SERIES_METADATA,
-  SAIGON_BANH_MI_METADATA,
 } from './index';
 
 describe('Article Series Mock Data Hub', () => {
   it('registers all series with valid metadata and non-empty chapters', () => {
-    assert.ok(ALL_SERIES.length >= 8, 'At least 8 series registered');
+    assert.equal(ALL_SERIES.length, 6, 'Only the six retained public series are registered');
     for (const series of ALL_SERIES) {
       assert.ok(series.metadata.id, 'Series must have id');
       assert.ok(series.metadata.title, 'Series must have title');
@@ -55,14 +53,6 @@ describe('Article Series Mock Data Hub', () => {
     assert.ok(banhCay);
     assert.equal(banhCay.metadata.id, BANH_CAY_SERIES_METADATA.id);
 
-    const hue = getSeriesById('hue-citadel');
-    assert.ok(hue);
-    assert.equal(hue.metadata.id, HUE_SERIES_METADATA.id);
-
-    const banhMi = getSeriesById('saigon-banh-mi');
-    assert.ok(banhMi);
-    assert.equal(banhMi.metadata.id, SAIGON_BANH_MI_METADATA.id);
-
     assert.equal(getSeriesById('non-existent'), undefined);
   });
 
@@ -79,11 +69,6 @@ describe('Article Series Mock Data Hub', () => {
     const hungYenSeries = getSeriesByProvince('hung-yen');
     assert.ok(hungYenSeries.some(s => s.id === 'banh-cay-thai-binh'));
 
-    const hueSeries = getSeriesByProvince('thua-thien-hue');
-    assert.ok(hueSeries.some(s => s.id === 'hue-citadel'));
-
-    const saigonSeries = getSeriesByProvince('ho-chi-minh');
-    assert.ok(saigonSeries.some(s => s.id === 'saigon-banh-mi'));
   });
 
   it('resolves article by chapter ID across all registered series', () => {
@@ -95,7 +80,7 @@ describe('Article Series Mock Data Hub', () => {
 
     const bunChaArticle = getSeriesArticle('bun-cha-grilling-secrets');
     assert.ok(bunChaArticle);
-    assert.equal(bunChaArticle.titleEn, 'Bún Chả 01: The Grilling Secrets of Traditional Bún Chả');
+    assert.equal(bunChaArticle.titleEn, "Bun Cha – A Taste of Hanoi's Cultural Life");
     assert.equal(bunChaArticle.vocabularies.length, 10);
 
     const chaCaArticle = getSeriesArticle('cha-ca-legend-history');
@@ -118,14 +103,6 @@ describe('Article Series Mock Data Hub', () => {
     assert.equal(banhCayArticle.titleEn, 'Bánh Cáy 01: The Royal Gift from Làng Nguyễn');
     assert.equal(banhCayArticle.vocabularies.length, 10);
 
-    const hueArticle = getSeriesArticle('hue-citadel-gate');
-    assert.ok(hueArticle);
-    assert.equal(hueArticle.titleEn, 'Hue 01: The Meridian Gate');
-
-    const banhMiArticle = getSeriesArticle('banh-mi-crust');
-    assert.ok(banhMiArticle);
-    assert.equal(banhMiArticle.titleEn, 'Bánh Mì 01: The Crispy Crust');
-
     assert.equal(getSeriesArticle('unknown-chapter'), null);
   });
 
@@ -138,18 +115,18 @@ describe('Article Series Mock Data Hub', () => {
     assert.equal(navFirst.nextChapter?.id, 'pho-hanoi-flavour');
     assert.equal(navFirst.totalChapters, 3);
 
-    // Middle chapter in Hue series
-    const navMiddle = getSeriesNavigation('hue-citadel-forbidden-city');
+    // Middle chapter in Bun Cha series
+    const navMiddle = getSeriesNavigation('bun-cha-lunchtime-culture');
     assert.ok(navMiddle);
     assert.equal(navMiddle.chapterIndex, 1);
-    assert.equal(navMiddle.previousChapter?.id, 'hue-citadel-gate');
-    assert.equal(navMiddle.nextChapter?.id, 'hue-citadel-music');
+    assert.equal(navMiddle.previousChapter?.id, 'bun-cha-grilling-secrets');
+    assert.equal(navMiddle.nextChapter?.id, 'bun-cha-elegant-taste');
 
-    // Last chapter in Banh Mi series
-    const navLast = getSeriesNavigation('banh-mi-sidewalk');
+    // Last chapter in Banh Cay series
+    const navLast = getSeriesNavigation('banh-cay-tea-pairing');
     assert.ok(navLast);
     assert.equal(navLast.chapterIndex, 2);
-    assert.equal(navLast.previousChapter?.id, 'banh-mi-fillings');
+    assert.equal(navLast.previousChapter?.id, 'banh-cay-natural-craft');
     assert.equal(navLast.nextChapter, null);
 
     assert.equal(getSeriesNavigation('non-existent'), null);

@@ -68,7 +68,7 @@ test('resume unlocks synchronously, waits for setup, then prefills before one ne
   log.addTurn({ role: 'agent', text: 'Huế has a historic citadel.', isFinal: true });
   const pending = f.controller.resumeConversation({ input: 'voice' });
   assert.deepEqual(f.calls, ['unlock']);
-  await Promise.resolve();
+  await new Promise<void>(resolve => setImmediate(resolve));
   assert.deepEqual(f.calls, ['unlock', 'connect']);
   assert.equal(f.controller.getSnapshot().isRestoringContext, true);
   setup.resolve(true);

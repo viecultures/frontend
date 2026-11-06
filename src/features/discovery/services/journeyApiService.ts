@@ -43,7 +43,7 @@ export function mapBackendJourneyToSeries(item: BackendJourneyResponse): Journey
     provinceId: item.provinceId,
     region: item.region,
     description: item.description || '',
-    imageUrl: item.imageUrl || '/images/landing/hero-pho.webp',
+    imageUrl: item.imageUrl || '',
     status: item.status || 'published',
     scheduledPublishAt: item.scheduledPublishAt,
     chapters: (item.chapters || []).map(ch => ({
@@ -54,6 +54,7 @@ export function mapBackendJourneyToSeries(item: BackendJourneyResponse): Journey
       summaryVi: ch.titleVi || '',
       order: ch.chapterOrder,
       readTime: ch.readTime || '5 min',
+      preferredLevel: ch.level === 'A1' || ch.level === 'A2' ? 'Level 1' : ch.level === 'C1' || ch.level === 'C2' ? 'Level 3' : 'Level 2',
     })),
   };
 }

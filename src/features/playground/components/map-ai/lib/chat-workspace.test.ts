@@ -98,3 +98,14 @@ test('new tool declarations and panel instructions are scoped to chat sessions',
   assert.ok(!buildSessionConfiguration({ ...settings, mapContextMode: 'off' }, tools, 'chat')
     .config.tools?.some(tool => 'functionDeclarations' in tool && tool.functionDeclarations?.some(item => item.name === 'openMap')));
 });
+
+test('selected story reference reinforces article focus in Story Practice only', () => {
+  const settings = useSettings.getState();
+  const tools = useTools.getState().tools;
+  const reference = { articleId: 'pho-hanoi', title: 'Phở Hà Nội', summary: 'A story about phở.', source: 'reader' as const };
+  const story = buildSessionConfiguration({ ...settings, tutorMode: 'free-conversation' }, tools, 'chat', reference).systemPrompt;
+  const freeTalk = buildSessionConfiguration({ ...settings, tutorMode: 'open-conversation' }, tools, 'chat', reference).systemPrompt;
+  assert.ok(story.includes('Keep Story Practice focused on this article'));
+  assert.ok(story.includes('Phở Hà Nội'));
+  assert.ok(!freeTalk.includes('SELECTED STORY REFERENCE'));
+});
