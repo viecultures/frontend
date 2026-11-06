@@ -34,6 +34,7 @@ export interface TranscribeOptions {
   language?: string; // 'vi' | 'en' | 'auto'
   promptContext?: string; // Cultural or map context for Gemini Pass 2
   signal?: AbortSignal;
+  smartCleanup?: boolean; // When true: AI conversational mode; when false: raw pronunciation training mode
 }
 
 /**
@@ -51,6 +52,7 @@ export async function transcribeTwoPass(
 
   const formData = new FormData();
   formData.append('file', audioBlob, 'audio_speech.wav');
+  formData.append('smartCleanup', String(options.smartCleanup ?? true));
 
   if (options.language) {
     formData.append('language', options.language);
@@ -109,8 +111,23 @@ export async function transcribeTwoPass(
   }
 }
 
+/**
+ * Transcribe audio with smart cleanup option
+ * @param file Audio Blob (WAV format)
+ * @param smartCleanup When true: filter out fillers & false starts; when false: keep 100% raw phonetics
+ * @param options Additional transcribe options
+ */
+export async function transcribeAudio(
+  file: Blob,
+  smartCleanup: boolean = true,
+  options: TranscribeOptions = {}
+): Promise<TwoPassSttResponse> {
+  return transcribeTwoPass(file, { ...options, smartCleanup });
+}
+
 export const twoPassSttService = {
   transcribeTwoPass,
+  transcribeAudio,
 };
 
 export default twoPassSttService;

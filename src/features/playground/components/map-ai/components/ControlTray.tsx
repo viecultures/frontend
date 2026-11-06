@@ -75,6 +75,9 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   const [twoPassVolume, setTwoPassVolume] = useState(0);
   const [twoPassError, setTwoPassError] = useState<string | undefined>(undefined);
   const [twoPassResult, setTwoPassResult] = useState<TwoPassSttData | null>(null);
+  const [smartCleanup, setSmartCleanup] = useState<boolean>(true);
+  const smartCleanupRef = useRef(smartCleanup);
+  smartCleanupRef.current = smartCleanup;
 
   useEffect(() => {
     const { draft, draftMode } = useReaderHandoff.getState();
@@ -124,7 +127,14 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
 
   const stopTwoPassVad = useCallback(() => {
     if (vadDetectorRef.current) {
-      vadDetectorRef.current.stop();
+      vadDetectorRef.current.stop(false);
+    }
+    setTwoPassVolume(0);
+  }, []);
+
+  const handleStopTwoPassRecording = useCallback(() => {
+    if (vadDetectorRef.current) {
+      vadDetectorRef.current.stop(true);
     }
     setTwoPassVolume(0);
   }, []);
@@ -150,6 +160,7 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           const res = await twoPassSttService.transcribeTwoPass(wavBlob, {
             language: i18n.language || 'vi',
             promptContext: 'Vietnam culture, geography and travel companion',
+            smartCleanup: smartCleanupRef.current,
           });
 
           if (res.success && res.data) {
@@ -431,9 +442,9 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           {speakingPaceLabel}
         </button>
         <button
-          className={cn('action-button mic-button', {
-            'mic-on': !muted,
-            'mic-off': muted,
+          className={cn('action-button mic-button relative', {
+            'mic-on ring-2 ring-red-400': !muted || twoPassState === 'listening',
+            'mic-off': muted && twoPassState !== 'listening',
           })}
           disabled={busy && !pushToTalk}
           onClick={handleMicClick}
@@ -449,13 +460,25 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           title={micButtonTitle}
           aria-label={micButtonTitle}
         >
-          {!muted ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+          {!muted ? (
+            <div className="relative flex items-center justify-center">
+              <Mic className="w-5 h-5 text-red-500 animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+            </div>
+          ) : twoPassState === 'listening' ? (
+            <div className="relative flex items-center justify-center">
+              <Mic className="w-5 h-5 text-red-500 animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+            </div>
+          ) : (
+            <MicOff className="w-5 h-5" />
+          )}
         </button>
 
         {/* Smart Two-Pass STT Button */}
         <button
           type="button"
-          className={cn('action-button two-pass-toggle-button', {
+          className={cn('action-button two-pass-toggle-button relative', {
             'two-pass-active text-amber-600 bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-700': twoPassActive || twoPassState === 'listening' || twoPassState === 'refining',
           })}
           disabled={busy}
@@ -464,7 +487,14 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           aria-label={t('playground.two_pass_stt.toggle_button_title', 'Smart Two-Pass STT (Tự động lọc từ thừa)')}
           aria-pressed={twoPassActive}
         >
-          <Sparkles className="w-5 h-5" />
+          {twoPassState === 'listening' ? (
+            <div className="relative flex items-center justify-center">
+              <Mic className="w-5 h-5 text-red-500 animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+            </div>
+          ) : (
+            <Sparkles className="w-5 h-5" />
+          )}
         </button>
 
         <button
@@ -497,9 +527,12 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
         <TwoPassSpeechVisualizer
           state={twoPassState}
           volume={twoPassVolume}
+          smartCleanup={smartCleanup}
+          onToggleSmartCleanup={setSmartCleanup}
           errorMessage={twoPassError}
           resultData={twoPassResult}
           onRetry={handleTwoPassRetry}
+          onStopListening={handleStopTwoPassRecording}
           onApplyPrompt={(text) => {
             setTextPrompt(text);
             setIsTextEntryVisible(true);

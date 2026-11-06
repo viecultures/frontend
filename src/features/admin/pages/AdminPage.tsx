@@ -169,6 +169,15 @@ export const AdminPage: React.FC = () => {
   const [standaloneFilter, setStandaloneFilter] = useState<'all' | 'standalone' | 'journey'>('all');
   const [postStatusFilter, setPostStatusFilter] = useState<'all' | 'published' | 'draft' | 'missing_materials'>('all');
 
+  // Pagination for Posts
+  const [postCurrentPage, setPostCurrentPage] = useState(0);
+  const [postPageSize, setPostPageSize] = useState(10);
+
+  // Reset pagination on filter change
+  useEffect(() => {
+    setPostCurrentPage(0);
+  }, [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, postStatusFilter, activeJourneyFilter]);
+
   // Modals state for Posts
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<ReadingPostItem | null>(null);
@@ -1137,6 +1146,8 @@ export const AdminPage: React.FC = () => {
                   </table>
                 </div>
               )}
+
+
             </div>
 
             {/* Row 4: System Service Connections */}
@@ -1313,7 +1324,7 @@ export const AdminPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-antique-gold/15">
-                      {displayedPosts.map((post) => {
+                      {pagedPosts.map((post) => {
                         const hasParagraphs = Boolean(
                           (post.paragraphs && post.paragraphs.length > 0) ||
                           (post.wordCount && post.wordCount > 0)
@@ -1505,6 +1516,70 @@ export const AdminPage: React.FC = () => {
                       })}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {/* Pagination Controls */}
+              {!isLoading && displayedPosts.length > 0 && (
+                <div className="px-6 py-4 border-t border-antique-gold/20 bg-warm-ivory/50 dark:bg-heritage-forest/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                  <div className="text-text-muted flex items-center gap-3">
+                    <span>
+                      {t('posts_table.pagination.display_info', {
+                        from: safePostPage * postPageSize + 1,
+                        to: Math.min((safePostPage + 1) * postPageSize, displayedPosts.length),
+                        total: displayedPosts.length,
+                        defaultValue: `Hiển thị ${safePostPage * postPageSize + 1}–${Math.min((safePostPage + 1) * postPageSize, displayedPosts.length)} trên tổng số ${displayedPosts.length} bài viết`,
+                      })}
+                    </span>
+                    <div className="flex items-center gap-1.5 ml-2">
+                      <span className="text-[11px] text-text-muted">{t('posts_table.pagination.per_page', { defaultValue: 'Mỗi trang' })}:</span>
+                      <select
+                        aria-label={t('posts_table.pagination.per_page', { defaultValue: 'Mỗi trang' })}
+                        value={postPageSize}
+                        onChange={(e) => {
+                          setPostPageSize(Number(e.target.value));
+                          setPostCurrentPage(0);
+                        }}
+                        className="px-2 py-1 rounded-lg bg-warm-ivory dark:bg-heritage-dark border border-antique-gold/30 text-xs font-semibold focus:outline-none focus:border-antique-gold cursor-pointer"
+                      >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPostCurrentPage((p) => Math.max(0, p - 1))}
+                      disabled={safePostPage === 0}
+                      className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 hover:bg-antique-gold/20 text-text-body dark:text-warm-ivory font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-antique-gold"
+                      aria-label={t('posts_table.pagination.prev', { defaultValue: 'Trang trước' })}
+                    >
+                      <ChevronLeft aria-hidden="true" className="w-4 h-4" />
+                      <span>{t('posts_table.pagination.prev', { defaultValue: 'Trước' })}</span>
+                    </button>
+
+                    <div className="px-3 py-1.5 rounded-xl font-bold text-heritage-green dark:text-antique-bright">
+                      {t('posts_table.pagination.page_info', {
+                        current: safePostPage + 1,
+                        total: totalPostPages,
+                        defaultValue: `Trang ${safePostPage + 1} / ${totalPostPages}`,
+                      })}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setPostCurrentPage((p) => Math.min(totalPostPages - 1, p + 1))}
+                      disabled={safePostPage + 1 >= totalPostPages}
+                      className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 hover:bg-antique-gold/20 text-text-body dark:text-warm-ivory font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-antique-gold"
+                      aria-label={t('posts_table.pagination.next', { defaultValue: 'Trang sau' })}
+                    >
+                      <span>{t('posts_table.pagination.next', { defaultValue: 'Sau' })}</span>
+                      <ChevronRight aria-hidden="true" className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

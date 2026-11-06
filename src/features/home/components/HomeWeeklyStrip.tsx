@@ -164,8 +164,8 @@ export function HomeWeeklyStrip({
                     disabled={day.isFuture}
                     onClick={() => handleOpenDay(day.date)}
                     className="home-compact-day-btn"
-                    aria-label={`${dateStr}, ${day.isStudied ? 'studied' : 'no activity'}`}
-                    title={`${dateStr}: ${day.isStudied ? 'Studied' : 'No activity'}`}
+                    aria-label={`${dateStr}, ${day.isStudied ? t('study_calendar.studied_status', isVi ? 'đã học' : 'studied') : t('study_calendar.no_activity_status', isVi ? 'chưa học' : 'no activity')}`}
+                    title={`${dateStr}: ${day.isStudied ? (isVi ? 'Đã học' : 'Studied') : (isVi ? 'Chưa học' : 'No activity')}`}
                   >
                     {day.isStudied ? (
                       <Check size={14} className="home-day-check-icon" aria-hidden="true" />

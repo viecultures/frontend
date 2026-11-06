@@ -109,6 +109,13 @@
       "publish_action": "Publish",
       "published_badge": "Published",
       "draft_badge": "Draft"
+    },
+    "pagination": {
+      "display_info": "Showing {{from}}–{{to}} of {{total}} articles",
+      "per_page": "Per page",
+      "prev": "Previous",
+      "next": "Next",
+      "page_info": "Page {{current}} / {{total}}"
     }
   },
   "users": {

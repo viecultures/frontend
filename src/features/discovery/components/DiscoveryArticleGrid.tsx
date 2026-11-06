@@ -41,7 +41,28 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
   onResetAllFilters,
   selectedCefr = 'All',
 }) => {
-  const { t } = useTranslation('discovery');
+  const { t, i18n } = useTranslation('discovery');
+  const isVi = i18n.language === 'vi';
+
+  const getCategoryLabel = (category?: string, categoryVi?: string) => {
+    if (isVi) return categoryVi || category || 'Di sản văn hóa';
+    const enMap: Record<string, string> = {
+      Heritage: 'History & Heritage',
+      Cuisine: 'Food & Cuisine',
+      Crafts: 'Arts & Crafts',
+      Nature: 'Nature & Landscapes',
+      Folklore: 'Traditions & Folklore',
+    };
+    return (category && enMap[category]) || category || categoryVi || 'Cultural Heritage';
+  };
+
+  const formatReadTime = (rawTime?: string) => {
+    if (!rawTime) return isVi ? '4 phút đọc' : '4 min read';
+    if (isVi) {
+      return rawTime.replace(/mins?\s*read/i, 'phút đọc').replace(/minutes?\s*read/i, 'phút đọc');
+    }
+    return rawTime.replace(/phút\s*đọc/i, 'min read');
+  };
 
   if (isLoading) {
     return (
@@ -60,19 +81,19 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
           <Layers className="w-8 h-8 text-antique-gold" />
         </div>
         <h3 className="font-serif text-xl font-bold text-heritage-green">
-          {t('article_grid.empty_title')}
+          {t('article_grid.empty_title', { defaultValue: isVi ? 'Chưa tìm thấy bài đọc phù hợp' : 'No matching stories found' })}
         </h3>
         <p className="text-sm text-text-body mt-2 max-w-md mx-auto leading-relaxed">
           {onlyBookmarked
-            ? t('article_grid.empty_saved_desc')
-            : t('article_grid.empty_general_desc')}
+            ? t('article_grid.empty_saved_desc', { defaultValue: isVi ? 'Chưa có bài viết nào được lưu' : 'No saved stories yet' })
+            : t('article_grid.empty_general_desc', { defaultValue: isVi ? 'Thử chọn chủ đề khác hoặc xóa bộ lọc tìm kiếm.' : 'Try choosing another topic or resetting your search filters.' })}
         </p>
         <button
           type="button"
           onClick={onResetAllFilters}
           className="mt-6 px-6 py-2.5 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm transition-all focus-ring cursor-pointer hover:scale-102 active:scale-98"
         >
-          {t('article_grid.reset_filters_btn')}
+          {t('article_grid.reset_filters_btn', { defaultValue: isVi ? 'Xóa bộ lọc' : 'Reset filters' })}
         </button>
       </div>
     );
@@ -87,6 +108,13 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
           const activeLevel: LevelType =
             selectedCefr !== 'All' ? (selectedCefr as LevelType) : lesson.cefrLevel;
 
+          const primaryTitle = isVi
+            ? (lesson.vietnameseTitle || lesson.title)
+            : (lesson.title || lesson.vietnameseTitle);
+          const secondaryTitle = isVi
+            ? lesson.title
+            : lesson.vietnameseTitle;
+
           return (
             <article
               key={lesson.id}
@@ -97,7 +125,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                 {lesson.imageUrl ? (
                   <img
                     src={lesson.imageUrl}
-                    alt={lesson.title}
+                    alt={primaryTitle}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
@@ -111,23 +139,23 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
 
                 {/* Top Overlay: Category badge & Bookmark */}
                 <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-heritage-green/90 text-warm-ivory border border-white/20 backdrop-blur-md shadow-xs">
-                      {lesson.categoryVi}
+                      {getCategoryLabel(lesson.category, lesson.categoryVi)}
                     </span>
                     {lesson.isFromDatabase && (
                       <span className="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-emerald-600/90 text-warm-ivory border border-white/25 backdrop-blur-md shadow-xs flex items-center gap-1">
                         <BookOpen className="w-2.5 h-2.5 text-antique-gold" />
-                        <span>{t('article_grid.database_badge')}</span>
+                        <span>{isVi ? 'Bài đọc' : 'Article'}</span>
                       </span>
                     )}
                   </div>
                   <button
                     type="button"
                     onClick={() => onToggleBookmark(lesson.id)}
-                    className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-warm-ivory backdrop-blur-md transition-all cursor-pointer shadow-xs"
-                    aria-label={t('article_grid.save_lesson_aria')}
-                    title={isBookmarked ? t('article_grid.saved_status_title') : t('article_grid.save_lesson_title')}
+                    className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-warm-ivory backdrop-blur-md transition-all cursor-pointer shadow-xs shrink-0"
+                    aria-label={isBookmarked ? (isVi ? 'Đã lưu' : 'Saved') : (isVi ? 'Lưu bài đọc' : 'Save story')}
+                    title={isBookmarked ? (isVi ? 'Đã lưu bài đọc' : 'Story saved') : (isVi ? 'Lưu để đọc sau' : 'Save for later')}
                   >
                     {isBookmarked ? (
                       <BookmarkCheck className="w-4 h-4 text-antique-gold fill-antique-gold" />
@@ -147,11 +175,11 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                     className="block group/link focus-ring rounded-lg"
                   >
                     <h3 className="font-serif text-xl font-bold text-heritage-green leading-snug group-hover/link:text-antique-rich transition-colors ink-underline line-clamp-2 h-[3.25rem] flex items-start">
-                      {lesson.title}
+                      {primaryTitle}
                     </h3>
                   </Link>
                   <p className="text-xs text-text-secondary font-medium italic line-clamp-1 h-[1.15rem] truncate">
-                    {lesson.vietnameseTitle}
+                    {secondaryTitle}
                   </p>
                   <p className="text-xs text-text-body mt-2 line-clamp-3 h-[3.6rem] leading-relaxed">
                     {currentStats.cefrLevel && lesson.levelDetails?.[currentStats.cefrLevel]?.summary
@@ -164,7 +192,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                 <div className="mt-4 pt-1 space-y-3">
                   {/* 3 Level Pills Selector & Reading Time */}
                   <div className="flex items-center justify-between text-[11px] font-bold tracking-wider">
-                    <div className="flex items-center gap-1.5" title={t('article_grid.choose_reading_level')}>
+                    <div className="flex items-center gap-1.5" title={isVi ? 'Chọn cấp độ đọc' : 'Choose reading level'}>
                       {ALL_LEVELS.map((lvl) => {
                         const isSelected = selectedCefr === lvl;
                         return (
@@ -178,7 +206,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                                 ? getCefrBadgeStyle(lvl) + ' shadow-sm ring-2 ring-antique-gold/70 scale-105'
                                 : 'bg-rice-paper text-text-secondary/70 border-heritage-green/15 opacity-55 hover:opacity-100 hover:text-heritage-green'
                             }`}
-                            title={t('article_grid.read_with_level', { level: lvl })}
+                            title={isVi ? `Đọc với cấp độ ${lvl}` : `Read with ${lvl}`}
                           >
                             {lvl}
                           </Link>
@@ -187,7 +215,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                     </div>
                     <span className="flex items-center gap-1 text-text-secondary font-medium text-xs shrink-0">
                       <Clock className="w-3.5 h-3.5 text-antique-gold shrink-0" />
-                      <span>{currentStats.readTime}</span>
+                      <span>{formatReadTime(currentStats.readTime)}</span>
                     </span>
                   </div>
 
@@ -195,13 +223,13 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   <div className="flex items-center justify-between text-xs pt-1">
                     <span className="font-semibold text-text-secondary flex items-center gap-1.5">
                       <BookOpen className="w-3.5 h-3.5 text-heritage-green" />
-                      <span>{t('article_grid.heritage_vocab_count', { count: currentStats.vocabCount })}</span>
+                      <span>{isVi ? `${currentStats.vocabCount} từ vựng` : `${currentStats.vocabCount} cultural terms`}</span>
                     </span>
                     <Link
                       href={paths.reader({ story: lesson.id, level: activeLevel })}
                       className="font-bold text-heritage-green group-hover:text-antique-rich inline-flex items-center gap-1 transition-colors focus-ring rounded"
                     >
-                      <span>{t('article_grid.read_article')}</span>
+                      <span>{isVi ? 'Bắt đầu đọc' : 'Read story'}</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform text-antique-gold" />
                     </Link>
                   </div>
@@ -223,6 +251,13 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
         const activeLevel: LevelType =
           selectedCefr !== 'All' ? (selectedCefr as LevelType) : lesson.cefrLevel;
 
+        const primaryTitle = isVi
+          ? (lesson.vietnameseTitle || lesson.title)
+          : (lesson.title || lesson.vietnameseTitle);
+        const secondaryTitle = isVi
+          ? lesson.title
+          : lesson.vietnameseTitle;
+
         return (
           <article
             key={lesson.id}
@@ -235,7 +270,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                 {lesson.imageUrl ? (
                   <img
                     src={lesson.imageUrl}
-                    alt={lesson.title}
+                    alt={primaryTitle}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     loading="lazy"
                   />
@@ -245,7 +280,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <div className="flex items-center gap-1" title={t('article_grid.choose_reading_level')}>
+                  <div className="flex items-center gap-1" title={isVi ? 'Chọn cấp độ đọc' : 'Choose reading level'}>
                     {ALL_LEVELS.map((lvl) => {
                       const isSelected = selectedCefr === lvl;
                       return (
@@ -259,7 +294,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                               ? getCefrBadgeStyle(lvl) + ' shadow-sm ring-2 ring-antique-gold/70'
                               : 'bg-rice-paper text-text-secondary/70 border-heritage-green/15 opacity-55 hover:opacity-100 hover:text-heritage-green'
                           }`}
-                          title={t('article_grid.read_with_level', { level: lvl })}
+                          title={isVi ? `Đọc với cấp độ ${lvl}` : `Read with ${lvl}`}
                         >
                           {lvl}
                         </Link>
@@ -267,12 +302,12 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                     })}
                   </div>
                   <span className="text-[11px] font-bold text-heritage-green bg-heritage-green/10 px-2 py-0.5 rounded border border-heritage-green/15">
-                    {lesson.categoryVi}
+                    {getCategoryLabel(lesson.category, lesson.categoryVi)}
                   </span>
                   {lesson.isFromDatabase && (
                     <span className="text-[10px] font-bold text-warm-ivory bg-emerald-600 px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
                       <BookOpen className="w-2.5 h-2.5 text-antique-gold" />
-                      <span>{t('article_grid.database_badge')}</span>
+                      <span>{isVi ? 'Bài đọc' : 'Article'}</span>
                     </span>
                   )}
                 </div>
@@ -281,11 +316,11 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   className="block group/title focus-ring rounded"
                 >
                   <h3 className="font-serif text-lg font-bold text-heritage-green group-hover/title:text-antique-rich transition-colors leading-snug ink-underline">
-                    {lesson.title}
+                    {primaryTitle}
                   </h3>
                 </Link>
                 <p className="text-xs text-text-secondary italic">
-                  {lesson.vietnameseTitle}
+                  {secondaryTitle}
                 </p>
               </div>
             </div>
@@ -294,11 +329,11 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
               <div className="flex items-center gap-3 text-text-secondary">
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-antique-gold shrink-0" />
-                  <span>{currentStats.readTime}</span>
+                  <span>{formatReadTime(currentStats.readTime)}</span>
                 </span>
                 <span className="flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5 text-heritage-green shrink-0" />
-                  <span>{t('article_grid.vocab_count', { count: currentStats.vocabCount })}</span>
+                  <span>{isVi ? `${currentStats.vocabCount} từ vựng` : `${currentStats.vocabCount} cultural terms`}</span>
                 </span>
               </div>
 
@@ -307,8 +342,8 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   type="button"
                   onClick={() => onToggleBookmark(lesson.id)}
                   className="p-2 rounded-xl bg-rice-paper hover:bg-mist-cloud text-heritage-green transition-colors cursor-pointer"
-                  aria-label={t('article_grid.save_lesson_aria')}
-                  title={isBookmarked ? t('article_grid.saved_status_title') : t('article_grid.save_lesson_title')}
+                  aria-label={isBookmarked ? (isVi ? 'Đã lưu' : 'Saved') : (isVi ? 'Lưu bài đọc' : 'Save story')}
+                  title={isBookmarked ? (isVi ? 'Đã lưu bài đọc' : 'Story saved') : (isVi ? 'Lưu để đọc sau' : 'Save for later')}
                 >
                   {isBookmarked ? (
                     <BookmarkCheck className="w-4 h-4 fill-antique-gold text-antique-gold" />
@@ -320,7 +355,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                   href={paths.reader({ story: lesson.id, level: activeLevel })}
                   className="px-4 py-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory font-bold inline-flex items-center gap-1.5 transition-all shadow-xs focus-ring hover:scale-102"
                 >
-                  <span>{t('article_grid.read_article')}</span>
+                  <span>{isVi ? 'Bắt đầu đọc' : 'Read story'}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-antique-gold" />
                 </Link>
               </div>

@@ -26,6 +26,7 @@ import {
   Radio,
   Save,
   Check,
+  Mic,
 } from 'lucide-react';
 import type {
   AiProvider,
@@ -47,6 +48,7 @@ const DEFAULT_GEMINI_MODELS = [
   { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash (Khuyên dùng - Nhanh & Tối ưu chi phí)', desc: 'Thế hệ mới nhất, tốc độ phản hồi cực nhanh, độ chính xác cao.' },
   { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash (Tiêu chuẩn ổn định)', desc: 'Mô hình đa phương thức cân bằng hoàn hảo giữa tốc độ và chi phí.' },
   { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro (Lập luận sâu / Chuyên sâu)', desc: 'Mô hình mạnh nhất cho ngữ cảnh văn hóa phức tạp.' },
+  { id: 'gemini-3.5-transcribe', name: 'Gemini 3.5 Transcribe (Khuyên dùng cho Gemini STT - Tối ưu nhận diện tiếng Việt)', desc: 'Chuyên dụng cho xử lý âm thanh tiếng Việt, nhận diện giọng nói và lọc từ đệm hai bước.' },
   { id: 'gemini-flash-latest', name: 'Gemini Flash Latest (Bản mới nhất)', desc: 'Tự động cập nhật alias mới nhất từ Google AI Studio.' },
 ];
 
@@ -78,9 +80,10 @@ export const AiConfigManagementView: React.FC = () => {
   const [aiSettings, setAiSettings] = useState<SystemAiSettingsDto>({
     geminiChatModel: 'gemini-2.0-flash',
     geminiTranslateModel: 'gemini-1.5-flash',
+    geminiSttModel: 'gemini-3.5-transcribe',
     azureSpeechRegion: 'southeastasia',
     activeTtsProvider: 'azure',
-    availableGeminiModels: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-flash-latest'],
+    availableGeminiModels: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-3.5-transcribe', 'gemini-flash-latest'],
     availableAzureRegions: DEFAULT_AZURE_REGIONS,
   });
   const [isSavingSettings, setIsSavingSettings] = useState<boolean>(false);
@@ -98,6 +101,7 @@ export const AiConfigManagementView: React.FC = () => {
 
   // Toggle & Delete states
   const [togglingKeyId, setTogglingKeyId] = useState<string | null>(null);
+  const [testingKeyId, setTestingKeyId] = useState<string | null>(null);
   const [deletingKey, setDeletingKey] = useState<AiServiceConfigDto | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
@@ -231,6 +235,30 @@ export const AiConfigManagementView: React.FC = () => {
   };
 
   // Open Modal for specific Provider
+  // Test Existing Key from table
+  const handleTestExistingKey = async (config: AiServiceConfigDto) => {
+    setTestingKeyId(config.id);
+    try {
+      const result = await adminAiConfigService.testKey({
+        configId: config.id,
+        provider: config.provider,
+        serviceType: config.serviceType,
+        modelName: config.modelName || undefined,
+        region: config.region || undefined,
+      });
+      if (result.success) {
+        setSuccessToast(`Khóa [${config.keyLabel}] kết nối thành công (${result.latencyMs ?? 0}ms): ${result.message}`);
+      } else {
+        setErrorMessage(`Kiểm tra khóa [${config.keyLabel}] thất bại: ${result.message}`);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Kiểm tra kết nối khóa thất bại';
+      setErrorMessage(msg);
+    } finally {
+      setTestingKeyId(null);
+    }
+  };
+
   const handleOpenAddModal = (provider: AiProvider) => {
     setModalProvider(provider);
     setModalServiceType(provider === 'GEMINI' ? 'CHAT' : 'TTS');
@@ -463,6 +491,7 @@ export const AiConfigManagementView: React.FC = () => {
                 onClick={() => handleSaveSettings({
                   geminiChatModel: aiSettings.geminiChatModel,
                   geminiTranslateModel: aiSettings.geminiTranslateModel,
+                  geminiSttModel: aiSettings.geminiSttModel || 'gemini-3.5-transcribe',
                 })}
                 disabled={isSavingSettings}
                 className="min-h-[44px] px-5 py-2 rounded-xl bg-heritage-green hover:bg-heritage-green/90 text-warm-ivory text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
@@ -472,7 +501,7 @@ export const AiConfigManagementView: React.FC = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
               {/* Field 1: Chat Model */}
               <div className="space-y-2">
                 <label htmlFor="gemini-chat-model" className="block text-xs font-bold text-text-body dark:text-warm-ivory">
@@ -514,6 +543,28 @@ export const AiConfigManagementView: React.FC = () => {
                 </select>
                 <p className="text-[11px] text-text-muted">
                   Đang dùng: <span className="font-mono text-antique-gold font-bold">{aiSettings.geminiTranslateModel}</span>. Tối ưu độ trung thực ngữ cảnh và thành ngữ Việt.
+                </p>
+              </div>
+
+              {/* Field 3: STT Model */}
+              <div className="space-y-2">
+                <label htmlFor="gemini-stt-model" className="block text-xs font-bold text-text-body dark:text-warm-ivory">
+                  Mô hình cho Speech-to-Text (Ghi âm &amp; Nhận diện):
+                </label>
+                <select
+                  id="gemini-stt-model"
+                  value={aiSettings.geminiSttModel || 'gemini-3.5-transcribe'}
+                  onChange={(e) => setAiSettings((prev) => ({ ...prev, geminiSttModel: e.target.value }))}
+                  className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-white dark:bg-heritage-dark/80 border border-antique-gold/30 text-text-body dark:text-warm-ivory text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-antique-gold/50 cursor-pointer"
+                >
+                  {DEFAULT_GEMINI_MODELS.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-text-muted">
+                  Đang dùng: <span className="font-mono text-antique-gold font-bold">{aiSettings.geminiSttModel || 'gemini-3.5-transcribe'}</span>. Khuyên dùng <span className="font-mono font-bold">gemini-3.5-transcribe</span> cho STT tiếng Việt.
                 </p>
               </div>
             </div>
@@ -587,7 +638,7 @@ export const AiConfigManagementView: React.FC = () => {
                         </td>
                         <td className="py-3 px-3">
                           <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-400/30">
-                            {k.serviceType === 'CHAT' ? 'Companion Chat' : k.serviceType === 'TRANSLATE' ? 'Dịch thuật' : 'TTS Voice'}
+                            {k.serviceType === 'CHAT' ? 'Companion Chat' : k.serviceType === 'TRANSLATE' ? 'Dịch thuật' : k.serviceType === 'STT' ? 'Speech-to-Text' : 'TTS Voice'}
                           </span>
                         </td>
                         <td className="py-3 px-3 font-mono text-[11px] text-text-secondary dark:text-warm-ivory/80">
@@ -627,6 +678,20 @@ export const AiConfigManagementView: React.FC = () => {
                           </button>
                         </td>
                         <td className="py-3 px-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleTestExistingKey(k)}
+                            disabled={testingKeyId === k.id}
+                            className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-xl text-antique-gold hover:bg-antique-gold/15 transition-colors cursor-pointer disabled:opacity-40"
+                            aria-label={`Kiểm tra kết nối khóa ${k.keyLabel}`}
+                            title="Kiểm tra kết nối"
+                          >
+                            {testingKeyId === k.id ? (
+                              <RefreshCw aria-hidden="true" className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Zap aria-hidden="true" className="w-4 h-4" />
+                            )}
+                          </button>
                           <button
                             type="button"
                             onClick={() => setDeletingKey(k)}
@@ -833,6 +898,20 @@ export const AiConfigManagementView: React.FC = () => {
                         <td className="py-3 px-3 text-right">
                           <button
                             type="button"
+                            onClick={() => handleTestExistingKey(k)}
+                            disabled={testingKeyId === k.id}
+                            className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-xl text-antique-gold hover:bg-antique-gold/15 transition-colors cursor-pointer disabled:opacity-40"
+                            aria-label={`Kiểm tra kết nối khóa ${k.keyLabel}`}
+                            title="Kiểm tra kết nối"
+                          >
+                            {testingKeyId === k.id ? (
+                              <RefreshCw aria-hidden="true" className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Zap aria-hidden="true" className="w-4 h-4" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => setDeletingKey(k)}
                             className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
                             aria-label={`Xóa khóa ${k.keyLabel}`}
@@ -908,7 +987,7 @@ export const AiConfigManagementView: React.FC = () => {
               <Layers aria-hidden="true" className="w-4 h-4 text-antique-gold" />
               Phân bổ Chi phí & Hạn ngạch theo Nghiệp vụ
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-4 rounded-2xl bg-white/50 dark:bg-heritage-dark/50 border border-antique-gold/15 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-bold text-text-body dark:text-warm-ivory">
                   <MessageSquare aria-hidden="true" className="w-4 h-4 text-blue-500" />
@@ -945,6 +1024,19 @@ export const AiConfigManagementView: React.FC = () => {
                 </div>
                 <p className="text-[11px] text-text-muted">
                   {(metrics?.breakdownByService?.find((s) => s.serviceType === 'TTS')?.calls ?? 0).toLocaleString('en-US')} tệp audio tạo mới
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/50 dark:bg-heritage-dark/50 border border-antique-gold/15 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-text-body dark:text-warm-ivory">
+                  <Mic aria-hidden="true" className="w-4 h-4 text-purple-500" />
+                  <span>Speech-to-Text (Gemini STT)</span>
+                </div>
+                <div className="text-lg font-bold font-heading text-text-body dark:text-warm-ivory">
+                  ${(metrics?.breakdownByService?.find((s) => s.serviceType === 'STT')?.costUsd ?? 0).toFixed(4)}
+                </div>
+                <p className="text-[11px] text-text-muted">
+                  {(metrics?.breakdownByService?.find((s) => s.serviceType === 'STT')?.calls ?? 0).toLocaleString('en-US')} lượt ghi âm &amp; nhận diện
                 </p>
               </div>
             </div>
@@ -1110,12 +1202,19 @@ export const AiConfigManagementView: React.FC = () => {
                   <select
                     id="modal-gemini-service"
                     value={modalServiceType}
-                    onChange={(e) => setModalServiceType(e.target.value as AiServiceType)}
+                    onChange={(e) => {
+                      const val = e.target.value as AiServiceType;
+                      setModalServiceType(val);
+                      if (val === 'STT') {
+                        setModalModelName('gemini-3.5-transcribe');
+                      }
+                    }}
                     className="w-full min-h-[44px] px-3 py-2 rounded-xl bg-white dark:bg-heritage-dark border border-antique-gold/30 text-xs font-semibold text-text-body dark:text-warm-ivory cursor-pointer"
                   >
                     <option value="CHAT">Companion Chat</option>
                     <option value="TRANSLATE">Dịch thuật song ngữ</option>
                     <option value="TTS">Giọng đọc Gemini TTS</option>
+                    <option value="STT">Speech-to-Text (Ghi âm &amp; Nhận diện)</option>
                   </select>
                 </div>
 

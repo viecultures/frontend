@@ -256,15 +256,20 @@ export class TwoPassVoiceDetector {
   }
 
   /**
-   * Stop listening and pause audio processing
+   * Stop listening and pause audio processing.
+   * If forceEmitSpeech is true, any recorded audio buffer is processed and emitted immediately.
    */
-  public stop(): void {
+  public stop(forceEmitSpeech = false): void {
     this.isRunning = false;
 
-    if (this.isSpeaking && this.recordedChunks.length > 0) {
-      const duration = Date.now() - this.speechStartTime;
-      this.finalizeSpeech(duration);
+    if ((this.isSpeaking || forceEmitSpeech) && this.recordedChunks.length > 0) {
+      const duration = Date.now() - (this.speechStartTime || Date.now());
+      this.finalizeSpeech(Math.max(duration, this.minSpeechDurationMs));
     }
+
+    this.isSpeaking = false;
+    this.recordedChunks = [];
+    this.preRollBuffer = [];
 
     if (this.mediaStream) {
       this.mediaStream.getTracks().forEach(track => {

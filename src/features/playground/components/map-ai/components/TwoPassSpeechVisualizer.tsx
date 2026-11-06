@@ -19,6 +19,8 @@ import {
   ShieldCheck,
   Send,
   Wand2,
+  Square,
+  Settings2,
 } from 'lucide-react';
 import type { TwoPassSttData } from '../services/twoPassSttService';
 
@@ -27,6 +29,8 @@ export type TwoPassVisualizerState = 'idle' | 'listening' | 'refining' | 'empty'
 export interface TwoPassSpeechVisualizerProps {
   state: TwoPassVisualizerState;
   volume: number; // 0.0 to 1.0
+  smartCleanup: boolean;
+  onToggleSmartCleanup: (enabled: boolean) => void;
   errorMessage?: string;
   resultData?: TwoPassSttData | null;
   onRetry?: () => void;
@@ -34,6 +38,7 @@ export interface TwoPassSpeechVisualizerProps {
   onDirectSend?: (text: string) => void;
   onDismissResult?: () => void;
   onCancelListening?: () => void;
+  onStopListening?: () => void;
 }
 
 const EQUALIZER_MULTIPLIERS = [
@@ -43,6 +48,8 @@ const EQUALIZER_MULTIPLIERS = [
 export const TwoPassSpeechVisualizer: React.FC<TwoPassSpeechVisualizerProps> = memo(({
   state,
   volume,
+  smartCleanup,
+  onToggleSmartCleanup,
   errorMessage,
   resultData,
   onRetry,
@@ -50,6 +57,7 @@ export const TwoPassSpeechVisualizer: React.FC<TwoPassSpeechVisualizerProps> = m
   onDirectSend,
   onDismissResult,
   onCancelListening,
+  onStopListening,
 }) => {
   const { t } = useTranslation('playground');
 
@@ -96,6 +104,44 @@ export const TwoPassSpeechVisualizer: React.FC<TwoPassSpeechVisualizerProps> = m
       role="region"
       aria-label={t('playground.two_pass_stt.title', 'Smart Two-Pass STT')}
     >
+      {/* AI Smart Cleanup Toggle Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 mb-2 bg-stone-50/90 dark:bg-stone-900/80 border border-stone-200 dark:border-stone-800 rounded-xl text-xs">
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={smartCleanup}
+            onClick={() => onToggleSmartCleanup(!smartCleanup)}
+            className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+              smartCleanup ? 'bg-amber-600' : 'bg-stone-300 dark:bg-stone-700'
+            }`}
+            aria-label="Toggle AI Smart Cleanup"
+          >
+            <span
+              aria-hidden="true"
+              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                smartCleanup ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
+          <div className="flex flex-col text-left">
+            <span className="font-semibold text-stone-800 dark:text-stone-200">
+              AI Smart Cleanup: {smartCleanup ? 'BẬT (Hội thoại thông minh)' : 'TẮT (Luyện phát âm)'}
+            </span>
+            <span className="text-[11px] text-stone-500 dark:text-stone-400">
+              {smartCleanup
+                ? 'Chế độ hội thoại thông minh (tự động loại bỏ từ đệm, sửa câu vấp).'
+                : 'Chế độ luyện phát âm (giữ nguyên 100% âm thô để phát hiện lỗi).'}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-[11px] text-stone-500 dark:text-stone-400">
+          <Clock className="w-3.5 h-3.5 text-stone-400" />
+          <span>VAD tự động ngắt sau 800ms im lặng</span>
+        </div>
+      </div>
+
       {/* 1. STATE: Active Listening */}
       {state === 'listening' && (
         <div
@@ -104,19 +150,19 @@ export const TwoPassSpeechVisualizer: React.FC<TwoPassSpeechVisualizerProps> = m
           aria-live="polite"
         >
           <div className="flex items-center gap-3">
-            <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-red-500 text-white shrink-0 shadow-md">
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white shrink-0 shadow-md">
               <Mic className="w-5 h-5 animate-pulse" />
-              <span className="absolute -inset-1 rounded-full bg-red-400/30 animate-ping pointer-events-none" />
+              <span className="absolute -inset-1 rounded-full bg-red-400/40 animate-ping pointer-events-none" />
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-600 rounded-full border-2 border-white dark:border-stone-900 animate-pulse" />
             </div>
             <div>
               <p className="text-sm font-semibold text-red-900 dark:text-red-200">
-                {t('playground.two_pass_stt.state_listening', 'Đang lắng nghe giọng nói...')}
+                {t('playground.two_pass_stt.state_listening', 'Đang thu âm giọng nói...')}
               </p>
               <p className="text-xs text-red-700/80 dark:text-red-300/80">
-                {t(
-                  'playground.two_pass_stt.state_listening_desc',
-                  'Nói tự nhiên, hệ thống tự động lọc từ đệm khi bạn dừng nói 0.8s'
-                )}
+                {smartCleanup
+                  ? 'Chế độ hội thoại: AI sẽ tự động lọc từ đệm, sửa câu vấp sau 800ms im lặng.'
+                  : 'Chế độ luyện phát âm: Giữ nguyên 100% âm thô để phát hiện lỗi.'}
               </p>
             </div>
           </div>
@@ -135,14 +181,29 @@ export const TwoPassSpeechVisualizer: React.FC<TwoPassSpeechVisualizerProps> = m
             })}
           </div>
 
-          <button
-            type="button"
-            onClick={onCancelListening}
-            className="text-xs px-3 py-1.5 min-h-[44px] sm:min-h-0 rounded-lg text-red-800 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800 transition-colors focus:ring-2 focus:ring-red-400 focus:outline-none"
-            aria-label={t('playground.two_pass_stt.cancel', 'Hủy')}
-          >
-            {t('playground.two_pass_stt.cancel', 'Hủy')}
-          </button>
+          <div className="flex items-center gap-2">
+            {onStopListening && (
+              <button
+                type="button"
+                onClick={onStopListening}
+                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] sm:min-h-0 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors focus:ring-2 focus:ring-red-400 focus:outline-none cursor-pointer"
+                aria-label={t('playground.two_pass_stt.stop_recording', 'Dừng thu âm')}
+                title="Bấm để dừng chủ động hoặc để VAD tự ngắt sau 800ms im lặng"
+              >
+                <Square className="w-3.5 h-3.5 fill-current" />
+                <span>{t('playground.two_pass_stt.stop_recording', 'Dừng thu âm')}</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onCancelListening}
+              className="text-xs px-3 py-1.5 min-h-[44px] sm:min-h-0 rounded-xl text-red-800 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800 transition-colors focus:ring-2 focus:ring-red-400 focus:outline-none cursor-pointer"
+              aria-label={t('playground.two_pass_stt.cancel', 'Hủy')}
+            >
+              {t('playground.two_pass_stt.cancel', 'Hủy')}
+            </button>
+          </div>
         </div>
       )}
 
@@ -306,6 +367,17 @@ export const TwoPassSpeechVisualizer: React.FC<TwoPassSpeechVisualizerProps> = m
               >
                 <Clock className="w-3 h-3" />
                 {resultData.totalLatencyMs}ms (P1: {resultData.pass1LatencyMs}ms | P2: {resultData.pass2LatencyMs}ms)
+              </span>
+
+              <span
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold ${
+                  smartCleanup
+                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                    : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-800'
+                }`}
+              >
+                <Sparkles className="w-3 h-3" />
+                {smartCleanup ? 'Smart Cleanup' : 'Raw Audio'}
               </span>
 
               {onDismissResult && (

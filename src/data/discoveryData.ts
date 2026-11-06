@@ -29,6 +29,8 @@ export interface Lesson {
   imageUrl?: string;
   featured?: boolean;
   isFromDatabase?: boolean;
+  journeyId?: string;
+  isStandalone?: boolean;
   dateAdded: string;
   provinceId?: string;
   isNational?: boolean;

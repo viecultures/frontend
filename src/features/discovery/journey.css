@@ -93,6 +93,7 @@
 .journey-library-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
 .journey-library-section-heading h2 { font-size: 24px; font-weight: 600; line-height: 1.4; }
 .journey-library-section-heading > span { flex-shrink: 0; color: var(--color-ink-faint); font-size: 14px; }
+.journey-library-subheading { display: block; margin-top: 4px; font-size: 13px; color: var(--color-ink-faint); font-weight: 400; }
 .journey-series-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 24px; margin: 0; padding: 0; list-style: none; }
 .journey-series-grid > li { display: flex; }
 .journey-series-tile { display: flex; flex-direction: column; width: 100%; min-height: 465px; padding: 0; overflow: hidden; border: 1px solid var(--color-line); border-radius: var(--radius-2xl); background: var(--color-surface-raised); color: var(--color-ink); text-align: left; text-decoration: none; }

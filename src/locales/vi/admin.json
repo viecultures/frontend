@@ -109,6 +109,13 @@
       "publish_action": "Xuất bản",
       "published_badge": "Đã xuất bản",
       "draft_badge": "Bản nháp"
+    },
+    "pagination": {
+      "display_info": "Hiển thị {{from}}–{{to}} trên tổng số {{total}} bài viết",
+      "per_page": "Mỗi trang",
+      "prev": "Trước",
+      "next": "Sau",
+      "page_info": "Trang {{current}} / {{total}}"
     }
   },
   "users": {

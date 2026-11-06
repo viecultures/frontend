@@ -10,7 +10,8 @@ interface HomeContinueReadingCardProps {
 }
 
 export function HomeContinueReadingCard({ bookmark }: HomeContinueReadingCardProps) {
-  const { t } = useTranslation('home');
+  const { t, i18n } = useTranslation('home');
+  const isVi = i18n.language === 'vi';
   const [imageError, setImageError] = useState(false);
 
   const hasHistory = Boolean(bookmark && bookmark.id);
@@ -18,7 +19,7 @@ export function HomeContinueReadingCard({ bookmark }: HomeContinueReadingCardPro
   const isCompleted = position >= 100;
 
   const title = hasHistory
-    ? bookmark!.title
+    ? (isVi && bookmark!.titleVi ? bookmark!.titleVi : bookmark!.title)
     : t('continue_card.default_title', 'The little secrets of Hà Nội’s bún chả.');
 
   const description = hasHistory

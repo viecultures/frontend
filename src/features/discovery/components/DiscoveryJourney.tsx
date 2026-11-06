@@ -14,6 +14,7 @@ import {
   Headphones,
   LockKeyhole,
   MapPin,
+  Search,
   Mic2,
   X,
 } from "lucide-react";
@@ -35,8 +36,13 @@ import { JOURNEY_SERIES, type JourneySeries } from "../data/learningJourney";
 import { journeyApiService } from "../services/journeyApiService";
 import { getPublicCuisineSeries, toPublicJourney } from '@/features/reader/services/publicCuisineService';
 import { DiscoveryPagination } from "./DiscoveryPagination";
+import { DiscoveryArticleGrid } from "./DiscoveryArticleGrid";
+import { readerApiService } from "@/features/reader/services/readerApiService";
+import { LESSONS_DATA, type Lesson } from "@/data/discoveryData";
+import { mergeCatalog } from "../lib/catalog";
 
 const SERIES_PAGE_SIZE = 6;
+const ARTICLES_PAGE_SIZE = 6;
 
 const REGIONS = [
   {
@@ -286,6 +292,55 @@ export function DiscoveryJourney() {
   const availableLibraryRef = useRef<HTMLDivElement>(null);
   const upcomingLibraryRef = useRef<HTMLDivElement>(null);
 
+  // Standalone Articles State, Filters & Pagination
+  const [articlesPage, setArticlesPage] = useState(1);
+  const [articlesPageSize, setArticlesPageSize] = useState(9);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState("All");
+  const [selectedCefr, setSelectedCefr] = useState("All");
+  const articlesLibraryRef = useRef<HTMLDivElement>(null);
+  const [allLessons, setAllLessons] = useState<Lesson[]>([]);
+  const [isArticlesLoading, setIsArticlesLoading] = useState(false);
+  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>(() =>
+    readLearningValue<Record<string, boolean>>("discovery:bookmarks") || {}
+  );
+
+  const toggleBookmark = (id: string) => {
+    setBookmarks((previous) => {
+      const next = { ...previous, [id]: !previous[id] };
+      writeLearningValue("discovery:bookmarks", next);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    let active = true;
+    setIsArticlesLoading(true);
+    readerApiService
+      .getCatalog({ standalone: true })
+      .then((catalogData) => {
+        if (!active) return;
+        if (catalogData && catalogData.items && catalogData.items.length > 0) {
+          const mapped = catalogData.items.map(readerApiService.mapCatalogLessonToDiscoveryLesson);
+          setAllLessons(mapped);
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not load catalog lessons for discovery:", err);
+      })
+      .finally(() => {
+        if (active) setIsArticlesLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Reset articles page on filter changes
+  useEffect(() => {
+    setArticlesPage(1);
+  }, [searchQuery, selectedTopic, selectedCefr, selectedProvince, articlesPageSize]);
+
   useEffect(() => {
     setAvailablePage(1);
   }, [firstRegion, selectedProvince]);
@@ -316,6 +371,99 @@ export function DiscoveryJourney() {
       behavior: reduceMotion ? "instant" : "smooth",
       block: "nearest",
     });
+  };
+
+  // Journey keys to exclude from standalone section
+  const journeyKeys = useMemo(() => {
+    const keys = new Set<string>();
+    for (const s of allJourneys) {
+      if (s.id) keys.add(s.id.toLowerCase().trim());
+      for (const c of s.chapters || []) {
+        if (c.id) keys.add(c.id.toLowerCase().trim());
+      }
+    }
+    return keys;
+  }, [allJourneys]);
+
+  // Only retain standalone articles (not part of any journey)
+  const standaloneLessons = useMemo(() => {
+    return allLessons.filter((lesson) => {
+      if ((lesson as any).journeyId) return false;
+      if ((lesson as any).isStandalone === false) return false;
+
+      const id = (lesson.id || "").toLowerCase().trim();
+      if (journeyKeys.has(id)) return false;
+      for (const key of journeyKeys) {
+        if (id.startsWith(key + "-") || id === key) return false;
+      }
+      return true;
+    });
+  }, [allLessons, journeyKeys]);
+
+  const filteredArticles = useMemo(() => {
+    let list = standaloneLessons;
+
+    if (selectedProvince) {
+      const provinceMatches = list.filter((l) => l.provinceId === selectedProvince.id);
+      if (provinceMatches.length > 0) {
+        list = provinceMatches;
+      }
+    }
+
+    if (selectedTopic !== "All") {
+      list = list.filter((l) => l.category === selectedTopic);
+    }
+
+    if (selectedCefr !== "All") {
+      list = list.filter((l) =>
+        l.availableLevels ? l.availableLevels.includes(selectedCefr as any) : true
+      );
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/gi, "d")
+        .toLowerCase()
+        .trim();
+
+      list = list.filter((l) => {
+        const combined = `${l.title || ""} ${l.vietnameseTitle || ""} ${l.summary || ""} ${l.category || ""} ${l.categoryVi || ""}`
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/đ/gi, "d")
+          .toLowerCase();
+        return combined.includes(q);
+      });
+    }
+
+    return list;
+  }, [standaloneLessons, selectedProvince, selectedTopic, selectedCefr, searchQuery]);
+
+  const totalArticlesPages = Math.max(
+    1,
+    Math.ceil(filteredArticles.length / articlesPageSize),
+  );
+  const safeArticlesPage = Math.min(articlesPage, totalArticlesPages);
+  const pagedArticles = useMemo(() => {
+    const startIndex = (safeArticlesPage - 1) * articlesPageSize;
+    return filteredArticles.slice(startIndex, startIndex + articlesPageSize);
+  }, [filteredArticles, safeArticlesPage, articlesPageSize]);
+
+  // Smooth scroll that avoids aggressive viewport jumping
+  const handleArticlesPageChange = (page: number) => {
+    setArticlesPage(page);
+    if (articlesLibraryRef.current) {
+      const rect = articlesLibraryRef.current.getBoundingClientRect();
+      if (rect.top < -60) {
+        const targetY = window.scrollY + rect.top - 80;
+        window.scrollTo({
+          top: Math.max(0, targetY),
+          behavior: reduceMotion ? "instant" : "smooth",
+        });
+      }
+    }
   };
 
   const handleUpcomingPageChange = (page: number) => {
@@ -584,7 +732,9 @@ export function DiscoveryJourney() {
             {placeName} ·{" "}
             {t("journey.stories_in_region", {
               count: series.chapters.length,
-              defaultValue: `${series.chapters.length} câu chuyện`,
+              defaultValue: isEn
+                ? `${series.chapters.length} ${series.chapters.length === 1 ? "story" : "stories"}`
+                : `${series.chapters.length} câu chuyện`,
             })}{" "}
             · B1
           </span>
@@ -667,7 +817,9 @@ export function DiscoveryJourney() {
               {placeName} ·{" "}
               {t("journey.stories_in_region", {
                 count: series.chapters.length,
-                defaultValue: `${series.chapters.length} câu chuyện`,
+                defaultValue: isEn
+                ? `${series.chapters.length} ${series.chapters.length === 1 ? "story" : "stories"}`
+                : `${series.chapters.length} câu chuyện`,
               })}
             </span>
             <h4>{isEn ? series.title : (series.titleVi || series.title)}</h4>
@@ -1060,6 +1212,180 @@ export function DiscoveryJourney() {
             showSinglePage={true}
           />
         </div>}
+
+        {/* Section: Các bài đọc khác (Standalone Readings) */}
+        <div
+          ref={articlesLibraryRef}
+          className="journey-library-group"
+          id="journey-other-articles"
+        >
+          <div className="journey-library-section-heading">
+            <div>
+              <h2>{isEn ? "Standalone Readings" : "Các bài đọc khác"}</h2>
+              <small className="journey-library-subheading">
+                {selectedProvince
+                  ? (isEn
+                      ? `Standalone cultural stories from ${getLocalizedProvinceName(selectedProvince.name)}`
+                      : `Bài đọc độc lập khám phá văn hóa tại ${getLocalizedProvinceName(selectedProvince.name)}`)
+                  : (isEn
+                      ? "Independent cultural readings not part of the structured series above."
+                      : "Các bài đọc văn hóa song ngữ độc lập, không thuộc lộ trình học phía trên.")}
+              </small>
+            </div>
+            <span className="font-semibold text-text-secondary">
+              {isEn ? `${filteredArticles.length} articles` : `${filteredArticles.length} bài đọc`}
+            </span>
+          </div>
+
+          {/* Search & Filter Toolbar */}
+          <div className="mb-6 p-4 rounded-3xl bg-rice-paper/70 dark:bg-heritage-dark/60 border border-heritage-green/15 dark:border-antique-gold/25 shadow-xs space-y-4">
+            {/* Top Row: Search Input & Per-page selector */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="relative flex-1">
+                <Search aria-hidden="true" className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={isEn ? "Search readings by dish, location, heritage..." : "Tìm kiếm bài đọc theo tên món ăn, địa danh, di sản..."}
+                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-warm-ivory dark:bg-heritage-dark border border-heritage-green/20 dark:border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold focus:ring-2 focus:ring-antique-gold/30 transition-all placeholder:text-text-muted/70"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-heritage-green cursor-pointer"
+                    aria-label={isEn ? "Clear search" : "Xóa tìm kiếm"}
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Items per page selector */}
+              <div className="flex items-center gap-2 justify-end text-xs text-text-muted shrink-0">
+                <span>{isEn ? "Per page:" : "Mỗi trang:"}</span>
+                <div className="inline-flex rounded-xl bg-warm-ivory dark:bg-heritage-dark border border-heritage-green/20 dark:border-antique-gold/30 p-0.5">
+                  {[9, 12, 18].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => setArticlesPageSize(size)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        articlesPageSize === size
+                          ? "bg-heritage-green text-warm-ivory shadow-xs"
+                          : "text-text-secondary hover:text-heritage-green"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Row: Topic Tabs & CEFR Level Pills */}
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-1 border-t border-heritage-green/10 dark:border-white/10">
+              {/* Topic Filter Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                {[
+                  { id: 'All', labelVi: 'Tất cả', labelEn: 'All' },
+                  { id: 'Cuisine', labelVi: 'Ẩm thực', labelEn: 'Cuisine' },
+                  { id: 'Heritage', labelVi: 'Di sản', labelEn: 'Heritage' },
+                  { id: 'Crafts', labelVi: 'Làng nghề', labelEn: 'Crafts' },
+                  { id: 'Nature', labelVi: 'Danh thắng', labelEn: 'Nature' },
+                  { id: 'Folklore', labelVi: 'Lễ hội', labelEn: 'Folklore' },
+                ].map((topic) => {
+                  const active = selectedTopic === topic.id;
+                  return (
+                    <button
+                      key={topic.id}
+                      type="button"
+                      onClick={() => setSelectedTopic(topic.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                        active
+                          ? "bg-heritage-green text-warm-ivory font-bold shadow-xs scale-102"
+                          : "bg-warm-ivory/80 dark:bg-white/5 text-text-secondary hover:bg-warm-ivory hover:text-heritage-green border border-heritage-green/10"
+                      }`}
+                    >
+                      {isEn ? topic.labelEn : topic.labelVi}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Level Filter Pills & Reset */}
+              <div className="flex items-center gap-2 justify-between lg:justify-end shrink-0">
+                <div className="flex items-center gap-1">
+                  {['All', 'Level 1', 'Level 2', 'Level 3'].map((lvl) => {
+                    const active = selectedCefr === lvl;
+                    return (
+                      <button
+                        key={lvl}
+                        type="button"
+                        onClick={() => setSelectedCefr(lvl)}
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                          active
+                            ? "bg-antique-gold text-heritage-dark shadow-xs ring-1 ring-antique-gold"
+                            : "bg-warm-ivory/60 dark:bg-white/5 text-text-muted hover:text-text-body border border-heritage-green/10"
+                        }`}
+                      >
+                        {lvl === 'All' ? (isEn ? 'All Levels' : 'Mọi cấp độ') : lvl}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {(searchQuery || selectedTopic !== 'All' || selectedCefr !== 'All') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedTopic('All');
+                      setSelectedCefr('All');
+                    }}
+                    className="text-xs text-red-600 hover:text-red-700 underline font-semibold ml-1 cursor-pointer"
+                  >
+                    {isEn ? "Reset" : "Xóa lọc"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <DiscoveryArticleGrid
+            isLoading={isArticlesLoading}
+            lessons={pagedArticles}
+            viewMode="grid"
+            bookmarks={bookmarks}
+            onToggleBookmark={toggleBookmark}
+            onlyBookmarked={false}
+            onResetAllFilters={() => {
+              setSearchQuery("");
+              setSelectedTopic("All");
+              setSelectedCefr("All");
+              if (selectedProvince) {
+                setParams((prev) => {
+                  const next = new URLSearchParams(prev);
+                  next.delete("place");
+                  return next;
+                });
+              }
+            }}
+            selectedCefr={selectedCefr}
+          />
+
+          <DiscoveryPagination
+            currentPage={safeArticlesPage}
+            totalPages={totalArticlesPages}
+            totalItems={filteredArticles.length}
+            itemsPerPage={articlesPageSize}
+            onPageChange={handleArticlesPageChange}
+            ariaLabel={isEn ? "Standalone readings pagination" : "Phân trang các bài đọc khác"}
+            itemLabel={isEn ? "readings" : "bài đọc"}
+            showSinglePage={true}
+          />
+        </div>
       </section>
 
       {/* Floating chapter popover for hovered series */}
@@ -1134,7 +1460,7 @@ export function DiscoveryJourney() {
               ))
             ) : (
               <li className="p-4 text-center text-xs text-text-muted italic">
-                {t('journey.stories_on_the_way', { regionName: getLocalizedProvinceName(VIETNAM_34_PROVINCES.find(p => p.id === hoverPopover.series.provinceId)?.name || 'Việt Nam') })}
+                {t('journey.stories_on_the_way', { regionName: getLocalizedProvinceName(VIETNAM_34_PROVINCES.find(p => p.id === hoverPopover.series.provinceId)?.name || (isEn ? 'Vietnam' : 'Việt Nam')) })}
               </li>
             )}
           </ul>

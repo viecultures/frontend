@@ -1,6 +1,6 @@
 export type AiProvider = 'GEMINI' | 'AZURE';
 
-export type AiServiceType = 'CHAT' | 'TTS' | 'TRANSLATE';
+export type AiServiceType = 'CHAT' | 'TTS' | 'TRANSLATE' | 'STT';
 
 export type AiKeyStatus = 'HEALTHY' | 'RATE_LIMITED' | 'EXHAUSTED';
 
@@ -108,6 +108,7 @@ export interface AzureRegionOption {
 export interface SystemAiSettingsDto {
   geminiChatModel: string;
   geminiTranslateModel: string;
+  geminiSttModel?: string;
   azureSpeechRegion: string;
   activeTtsProvider: string;
   availableGeminiModels: string[];
@@ -117,6 +118,7 @@ export interface SystemAiSettingsDto {
 export interface UpdateSystemAiSettingsPayload {
   geminiChatModel?: string;
   geminiTranslateModel?: string;
+  geminiSttModel?: string;
   azureSpeechRegion?: string;
   activeTtsProvider?: string;
 }

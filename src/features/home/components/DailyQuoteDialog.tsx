@@ -211,7 +211,14 @@ export function DailyQuoteDialog({
 
             <div className="home-english-quote">
               <p>“Nothing is more precious than independence and freedom.”</p>
-              <small>English translation for this learning preview</small>
+              <small>
+                {t(
+                  'daily_quote.english_translation_note',
+                  isVi
+                    ? 'Bản dịch tiếng Anh cho tài liệu học tập'
+                    : 'English translation for this learning preview'
+                )}
+              </small>
             </div>
 
             {/* Collapsed 20-second summary */}

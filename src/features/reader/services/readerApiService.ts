@@ -223,6 +223,7 @@ export const readerApiService = {
     query?: string;
     region?: string;
     sortBy?: string;
+    standalone?: boolean;
     page?: number;
     size?: number;
   }): Promise<CatalogResponseData | null> {
@@ -233,6 +234,7 @@ export const readerApiService = {
       if (params?.query) sp.set('query', params.query);
       if (params?.region) sp.set('region', params.region);
       if (params?.sortBy) sp.set('sortBy', params.sortBy);
+      if (params?.standalone !== undefined) sp.set('standalone', String(params.standalone));
       if (params?.page !== undefined) sp.set('page', String(params.page));
       if (params?.size !== undefined) sp.set('size', String(params.size));
 
@@ -325,6 +327,8 @@ export const readerApiService = {
       imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80',
       featured: item.featured ?? false,
       isFromDatabase: true,
+      journeyId: item.journeyId,
+      isStandalone: item.isStandalone ?? !item.journeyId,
       dateAdded: item.createdAt || new Date().toISOString(),
     };
   },

@@ -20,7 +20,7 @@ export function useReadingBookmark(
     let timer: ReturnType<typeof setTimeout> | undefined;
     let interacted = false;
     const persist = () => saveReadingBookmark(account, {
-      id: article.id, level, title: article.titleEn,
+      id: article.id, level, title: article.titleEn, titleVi: article.titleVi,
       image: article.imageUrl || '/images/landing/hoi-an-lanterns.webp',
       topic: article.topic, position, updatedAt: Date.now(),
     });
