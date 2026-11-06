@@ -5,7 +5,6 @@ import { LESSONS_DATA, type Lesson, type LevelDetail } from '@/data/discoveryDat
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { resolveDeckCards } from '@/data/flashcardsData';
 import { API_BASE_URL } from '@/config/apiConfig';
-import { getDefaultReaderArticle } from '../data/defaultReaderArticle';
 import { getSeriesArticle } from '@/data/series';
 
 export function readerLevelFor(level: string): 'Level 1' | 'Level 2' | 'Level 3' {
@@ -339,10 +338,6 @@ export const readerApiService = {
 
     const normalize = (s: string) => s.toLowerCase().trim().replace(/[-_\s]+/g, '');
     const normTarget = normalize(id);
-    if (normTarget === 'tetholiday' || normTarget === 'tetfestivities') {
-      return getDefaultReaderArticle(requestedLevel);
-    }
-
     // 1. Check in LESSONS_DATA
     const lesson = LESSONS_DATA.find((l) => normalize(l.id) === normTarget);
     if (lesson) {

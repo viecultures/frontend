@@ -1,16 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildPracticeSegments, checkDictation, practiceModeFrom } from './readerPractice';
-import { getDefaultReaderArticle } from '../data/defaultReaderArticle';
+import { PHO_SERIES_ARTICLES } from '@/data/series';
 
-const base = getDefaultReaderArticle('Level 2');
+const base = PHO_SERIES_ARTICLES[0];
 
 test('practice comes from the same complete bilingual article and its questions', () => {
-  assert.equal(base.paragraphs.length, 5);
+  assert.equal(base.paragraphs.length, 4);
   assert.ok(base.paragraphs.every(p => p.enText && p.viText));
   assert.equal(base.questions?.length, 2);
   assert.ok(base.questions?.every(q => q.question && q.options.some(o => o.key === q.correctKey)));
-  assert.equal(buildPracticeSegments(base)[0].text, 'Tết Nguyên Đán, often called simply Tết, is described as the most important and sacred holiday in Vietnamese culture.');
+  assert.equal(buildPracticeSegments(base)[0].text, 'Cooking a great bowl of phở is not just about tradition, but also about food science.');
 });
 
 test('sentence segmentation preserves abbreviations and skips empty paragraphs', () => {

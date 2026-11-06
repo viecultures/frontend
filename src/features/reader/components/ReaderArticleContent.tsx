@@ -26,12 +26,12 @@ export function ReaderArticleContent({
   const translated = language === 'vi';
   const isDark = themeMode === 'dark';
   const title = translated
-    ? articleData?.titleVi || 'Tết: Sự đổi mới, lòng tưởng nhớ và hương vị các vùng miền'
-    : articleData?.titleEn || 'Tết: Renewal, Remembrance and Regional Flavours';
+    ? articleData?.titleVi || 'Phở Hà Nội'
+    : articleData?.titleEn || 'Hanoi Pho';
   const summary = (translated ? articleData?.summaryVi || articleData?.summary : articleData?.summary) || (translated
-    ? 'Khám phá văn hóa về sự đổi mới, lòng triân tổ tiên và phong vị ẩm thực ba miền'
-    : 'A cultural exploration of renewal, ancestral gratitude, and rich regional culinary traditions');
-  const image = articleData?.imageUrl || '/images/landing/hoi-an-lanterns.webp';
+    ? 'Khám phá câu chuyện ẩm thực Hà Nội.'
+    : 'Explore Hanoi cuisine and its stories.');
+  const image = articleData?.imageUrl || '/images/series/pho-hanoi.webp';
   const vocabulary = [...(articleData?.vocabularies || [])].sort((a, b) => b.word.length - a.word.length);
   const escapedWords = vocabulary.map(v => v.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).filter(Boolean);
   const vocabularyPattern = escapedWords.length ? new RegExp(`\\b(${escapedWords.join('|')})\\b`, 'gi') : null;

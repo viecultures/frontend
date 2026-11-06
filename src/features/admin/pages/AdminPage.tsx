@@ -563,6 +563,13 @@ export const AdminPage: React.FC = () => {
               <>
                 <button
                   type="button"
+                  onClick={() => navigate(getLocalizedPath('/admin/cuisine-drafts', currentLang))}
+                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-semibold text-warm-ivory cursor-pointer"
+                >
+                  Xem nháp EXE101
+                </button>
+                <button
+                  type="button"
                   onClick={fetchPosts}
                   disabled={isLoading}
                   className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"

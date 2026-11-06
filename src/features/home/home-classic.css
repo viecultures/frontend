@@ -43,8 +43,8 @@
 /* ── Typography & Micro-elements ────────────────────────────────────── */
 .home-eyebrow {
   display: block;
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 800;
   letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--color-antique-gold);
@@ -87,7 +87,7 @@
   margin: 0;
   font-family: var(--font-serif);
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.5px;
   color: var(--color-ink);
@@ -163,13 +163,14 @@
 
 .home-hero-copy .home-eyebrow {
   color: var(--color-home-sage-accent);
+  font-weight: 800;
 }
 
 .home-hero-title {
   margin: 11px 0 8px;
   font-family: var(--font-serif);
   font-size: 26px;
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.4px;
   color: var(--color-home-sage-title);
@@ -293,6 +294,7 @@
 
 .home-vocab-top .home-eyebrow {
   color: var(--color-home-lavender-accent);
+  font-weight: 800;
 }
 
 .home-vocab-title {
@@ -525,7 +527,7 @@
   margin: 0;
   font-family: var(--font-serif);
   font-size: 20px;
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.2;
   color: var(--color-home-peach-title);
 }

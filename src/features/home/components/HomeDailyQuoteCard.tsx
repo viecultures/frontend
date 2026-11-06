@@ -21,7 +21,7 @@ export function HomeDailyQuoteCard({
 
   return (
     <>
-      <section className="home-daily-quote-card" aria-label={t('daily_quote.title', 'Daily Quote')}>
+      <section className="home-daily-quote-card" aria-label={t('daily_quote.title', 'Quote of the day')}>
         {/* Binder rings on top edge */}
         <span className="home-binder b1" aria-hidden="true" />
         <span className="home-binder b2" aria-hidden="true" />
@@ -29,7 +29,7 @@ export function HomeDailyQuoteCard({
 
         {/* Card header */}
         <div className="home-daily-heading">
-          <h2 className="home-daily-title">{t('daily_quote.title', 'Daily Quote')}</h2>
+          <h2 className="home-daily-title">{t('daily_quote.title', 'Quote of the day')}</h2>
           <button
             type="button"
             className="home-daily-expand-btn"

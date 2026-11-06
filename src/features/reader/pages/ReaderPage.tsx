@@ -12,6 +12,7 @@ import {
   ReaderVocabDrawer,
   ReaderRecommendedSection,
   VoiceCustomizerModal,
+  ReaderSeriesNavigation,
 } from "../components";
 import { useCompanionArticleContext } from "@/features/companion/useCompanionArticleContext";
 import { Footer } from "@/components/Footer";
@@ -22,6 +23,8 @@ import {
 } from "@/data/readerData";
 import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
 import { readerApiService, readerLevelFor } from "../services/readerApiService";
+import { getPublicCuisineArticle } from '../services/publicCuisineService';
+import { getSeriesArticle } from '@/data/series';
 import type { ReaderArticleData } from "../services/readerApiService";
 import { getStoredUser, clearAuthStorage, getIsProUser, type AppUser } from "@/utils/auth-storage";
 
@@ -77,7 +80,7 @@ export default function ReaderPage() {
   // Resolved article shared by Reading and Practice; null while loading.
   const [articleData, setArticleData] = useState<ReaderArticleData | null>(null);
 
-  const targetId = searchParams.get('postId') || searchParams.get('id') || searchParams.get('story') || searchParams.get('article') || 'tet-holiday';
+  const targetId = searchParams.get('postId') || searchParams.get('id') || searchParams.get('story') || searchParams.get('article') || 'pho-hanoi-history';
   const requestedKey = articleKey(targetId, selectedLevel);
   const [loadedKey, setLoadedKey] = useState('');
   const [articleError, setArticleError] = useState(false);
@@ -90,10 +93,16 @@ export default function ReaderPage() {
     setArticleData(null);
     setArticleError(false);
     const load = async () => {
-      if (targetId === 'tet-holiday') {
-        const article = readerApiService.getLocalArticle(targetId, selectedLevel);
-        if (article) cacheArticle(article, selectedLevel);
-        if (active) { setArticleData(article); setArticleError(!article); setLoadedKey(requestedKey); }
+      const publishedCuisine = await getPublicCuisineArticle(targetId, selectedLevel).catch(() => null);
+      if (!active) return;
+      if (publishedCuisine) {
+        cacheArticle(publishedCuisine, selectedLevel);
+        setArticleData(publishedCuisine);
+        setLoadedKey(requestedKey);
+        return;
+      }
+      if (!getSeriesArticle(targetId)) {
+        if (active) { setArticleError(true); setLoadedKey(requestedKey); }
         return;
       }
       const post = await readerApiService.getPostById(targetId);
@@ -119,8 +128,8 @@ export default function ReaderPage() {
   useEffect(() => {
     if (articleData) {
       useCompanionArticleContext.getState().setArticleContext({
-        articleId: articleData.id || targetId || 'tet-holiday',
-        articleTitle: articleData.titleEn || 'Tet: Renewal, Remembrance & Regional Flavours',
+        articleId: articleData.id || targetId,
+        articleTitle: articleData.titleEn || 'Phở Hà Nội',
         articleSummary: articleData.summary || articleData.paragraphs?.[0]?.enText,
         level: selectedLevel,
         vocabulary: articleData.vocabularies || Object.values(VOCAB_DATABASE),
@@ -178,6 +187,14 @@ export default function ReaderPage() {
     const request = ++levelRequest.current;
     setLevelError('');
     let nextId = targetId;
+    if (!getSeriesArticle(targetId)) {
+      const available = await getPublicCuisineArticle(targetId, newLevel).catch(() => null);
+      if (request !== levelRequest.current) return;
+      if (!available) {
+        setLevelError(t('level_error_no_content', 'This article has no content at the selected level.'));
+        return;
+      }
+    }
     if (articleData?.cefrLevel && /^[ABC][12]$/.test(articleData.cefrLevel) && !articleData.topicGroup && newLevel !== selectedLevel) {
       setLevelError(t('level_error_unavailable', 'This article is not available at the selected level.'));
       return;
@@ -240,15 +257,12 @@ export default function ReaderPage() {
   const currentSentenceEn =
     articleData && articleData.paragraphs.length > 0 && articleData.paragraphs[0].enText
       ? articleData.paragraphs[0].enText.split(". ")[0] + "."
-      : "Tết Nguyên Đán, often called simply Tết, is described as the most important and sacred holiday in Vietnamese culture.";
+      : "";
 
   const currentVoice: GeminiVoice =
     GEMINI_VOICES.find((v) => v.id === selectedVoiceId) || GEMINI_VOICES[0];
   const currentAudioUrl =
-    loadedKey !== requestedKey || articleError ? '' : articleData && articleData.id !== 'tet-holiday' ? (articleData.shadowingAudioUrl || '') :
-    (audioScope === "full"
-      ? currentVoice.fullAudioUrl
-      : currentVoice.sentenceAudioUrl);
+    loadedKey !== requestedKey || articleError ? '' : (articleData?.shadowingAudioUrl || '');
 
   // Initialize and update Audio element when voice or scope changes
   useEffect(() => {
@@ -440,7 +454,7 @@ export default function ReaderPage() {
           {/* Always-visible listening and pronunciation controls. */}
           {readingMode === 'bilingual' && <section id="reader-audio" className="reader-audio-section" aria-labelledby="reader-audio-title">
           <h2 id="reader-audio-title" className="mb-3 font-sans text-lg font-semibold text-ink">{t('listen_section_title', 'Listen & practice pronunciation')}</h2>
-          {articleData && articleData.id !== 'tet-holiday' && !articleData.shadowingAudioUrl ? <p role="status">{t('audio_unavailable', 'Audio is not available for this article yet. You can continue reading and reviewing vocabulary.')}</p> : <AudioShadowingBar
+          {articleData && !articleData.shadowingAudioUrl ? <p role="status">{t('audio_unavailable', 'Audio is not available for this article yet. You can continue reading and reviewing vocabulary.')}</p> : <AudioShadowingBar
             articleTitle={articleData?.titleEn}
             onStartShadowing={() => handleStartPractice('shadowing')}
             isPlaying={isPlaying}
@@ -496,7 +510,16 @@ export default function ReaderPage() {
               mode={practiceMode}
               onChangeMode={handlePracticeModeChange}
               onBackToReading={() => handleModeChange('bilingual')}
-              fullAudioUrl={articleData.id === 'tet-holiday' ? currentVoice.fullAudioUrl : articleData.shadowingAudioUrl}
+              fullAudioUrl={articleData.shadowingAudioUrl}
+            />
+          )}
+
+          {/* Series Chapter Navigation (Bottom of article flow) */}
+          {readingMode === 'bilingual' && articleData && (
+            <ReaderSeriesNavigation
+              articleId={articleData.id || targetId}
+              selectedLevel={selectedLevel}
+              themeMode={themeMode}
             />
           )}
 
@@ -551,8 +574,8 @@ export default function ReaderPage() {
       <MocSonSealModal
         isOpen={isSealModalOpen}
         onClose={() => setIsSealModalOpen(false)}
-        articleId={articleData?.id || targetId || 'tet-holiday'}
-        articleTitle={articleData?.titleVi || articleData?.titleEn || 'Tết Cổ Truyền: Đổi Mới, Nhớ Về Cội Nguồn'}
+        articleId={articleData?.id || targetId}
+        articleTitle={articleData?.titleVi || articleData?.titleEn || 'Phở Hà Nội'}
         wordsLearnedCount={articleData?.vocabularies?.length || 4}
         source="reader"
       />

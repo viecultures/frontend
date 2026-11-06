@@ -17,7 +17,7 @@ export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onRevi
   return (
     <section className="vocab-actions" aria-label={t('dictionary.quick_actions_aria', 'Start learning vocabulary')}>
       <article className="vocab-featured">
-        <DeckCoverIllustration category="Heritage" className="vocab-featured-image" />
+        <DeckCoverIllustration category="Cuisine" className="vocab-featured-image" />
         <div className="vocab-featured-content">
           <span className="vocab-featured-label">
             <BookOpen size={14} />
@@ -25,9 +25,9 @@ export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onRevi
           </span>
           <h2>
             {t('dictionary.featured_title_prefix', 'A little English,')}<br />
-            {t('dictionary.featured_title_emphasis', 'a glimpse of imperial Hue.')}
+            {t('dictionary.featured_title_emphasis', 'a taste of Hanoi pho.')}
           </h2>
-          <p>{t('dictionary.featured_desc', 'Explore Hue’s royal architecture, one flashcard at a time.')}</p>
+          <p>{t('dictionary.featured_desc', 'Explore Hanoi pho, one flashcard at a time.')}</p>
           <div className="vocab-featured-footer">
             <button className="vocab-button vocab-button-gold" onClick={onGoToRecent}>
               {t('dictionary.start_learning', 'Start learning')}
@@ -35,7 +35,7 @@ export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onRevi
             </button>
             <span>
               <BookOpen size={15} />
-              {t('deck_card.vocab_cards_count', { count: resolveDeckCards("imperial-hue").length, defaultValue: `${resolveDeckCards("imperial-hue").length} vocabulary cards` })}
+              {t('deck_card.vocab_cards_count', { count: resolveDeckCards("pho-hanoi-history").length, defaultValue: `${resolveDeckCards("pho-hanoi-history").length} vocabulary cards` })}
             </span>
           </div>
         </div>
@@ -45,7 +45,7 @@ export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onRevi
           <span className="vocab-tile-icon"><Compass size={22} /></span>
           <span className="vocab-tile-copy">
             <strong>{t('dictionary.explore_decks', 'Explore the decks')}</strong>
-            <span>{t('dictionary.explore_decks_subtitle', { count: LESSONS_DATA.length, defaultValue: `${LESSONS_DATA.length} decks · 5 cultural topics` })}</span>
+            <span>{t('dictionary.explore_decks_subtitle', { count: LESSONS_DATA.length, defaultValue: `${LESSONS_DATA.length} cuisine decks` })}</span>
           </span>
           <ArrowRight size={18} />
         </button>

@@ -60,15 +60,25 @@ test('setup cancellation returns failure and closes the pending session', async 
   assert.equal(closed, true);
 });
 
-test('Sesame flow and pedagogical profanity boundary are present in free conversation', () => {
+test('Story Practice stays on the selected article while Free Talk remains open', () => {
   const prompt = buildCulturalTutorPrompt(SYSTEM_INSTRUCTIONS, {
     mode: 'free-conversation',
     correctionMode: 'off',
     mapContextMode: 'on-demand',
     level: 'Level 3',
   });
-  assert.ok(prompt.includes('Sesame Flow'));
-  assert.ok(prompt.includes('NEVER interrogate the learner or mechanically end turns with formulaic questions'));
+  const freeTalk = buildCulturalTutorPrompt(SYSTEM_INSTRUCTIONS, {
+    mode: 'open-conversation',
+    correctionMode: 'off',
+    mapContextMode: 'on-demand',
+    level: 'Level 3',
+  });
+  assert.ok(prompt.includes('Keep this mode focused on that article'));
+  assert.ok(prompt.includes('If no article is selected, help the learner choose or find one'));
+  assert.ok(prompt.includes('If the learner asks about an unrelated topic'));
+  assert.ok(prompt.includes('1–2 short spoken sentences'));
+  assert.ok(freeTalk.includes('Talk naturally about any topic the learner chooses'));
+  assert.ok(!freeTalk.includes('Keep this mode focused on that article'));
   assert.ok(prompt.includes('PEDAGOGICAL & LANGUAGE BOUNDARY'));
   assert.ok(prompt.includes('LEVEL 3 (B2–C1 - ADVANCED & CULTURAL AMBASSADOR)'));
   assert.ok(prompt.includes('IN-DEPTH STORYTELLING'));
