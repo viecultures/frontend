@@ -299,8 +299,14 @@ export function DiscoveryJourney() {
   const [selectedTopic, setSelectedTopic] = useState("All");
   const [selectedCefr, setSelectedCefr] = useState("All");
   const articlesLibraryRef = useRef<HTMLDivElement>(null);
-  const [allLessons, setAllLessons] = useState<Lesson[]>(() => LESSONS_DATA);
+  const [serverCatalog, setServerCatalog] = useState<{
+    items: Lesson[];
+    totalElements: number;
+    totalPages: number;
+  } | null>(null);
   const [isArticlesLoading, setIsArticlesLoading] = useState(false);
+  const [articlesError, setArticlesError] = useState<string | null>(null);
+  const [articlesRetryTrigger, setArticlesRetryTrigger] = useState(0);
   const [bookmarks, setBookmarks] = useState<Record<string, boolean>>(() =>
     readLearningValue<Record<string, boolean>>("discovery:bookmarks") || {}
   );
@@ -316,25 +322,76 @@ export function DiscoveryJourney() {
   useEffect(() => {
     let active = true;
     setIsArticlesLoading(true);
-    readerApiService
-      .getCatalog()
-      .then((catalogData) => {
-        if (!active) return;
-        if (catalogData && catalogData.items && catalogData.items.length > 0) {
-          const mapped = catalogData.items.map(readerApiService.mapCatalogLessonToDiscoveryLesson);
-          setAllLessons(mapped);
-        }
-      })
-      .catch((err) => {
-        console.warn("Could not load catalog lessons for discovery:", err);
-      })
-      .finally(() => {
-        if (active) setIsArticlesLoading(false);
-      });
+    setArticlesError(null);
+
+    const isSearching = searchQuery.trim().length > 0;
+    const delay = isSearching ? 250 : 0;
+
+    const timer = setTimeout(() => {
+      readerApiService
+        .getCatalog({
+          page: articlesPage - 1,
+          size: articlesPageSize,
+          topic: selectedTopic !== "All" ? selectedTopic : undefined,
+          level: selectedCefr !== "All" ? selectedCefr : undefined,
+          query: searchQuery.trim() || undefined,
+          region: selectedProvince?.name || undefined,
+          standalone: true,
+        })
+        .then((catalogData) => {
+          if (!active) return;
+          if (catalogData && Array.isArray(catalogData.items)) {
+            const mapped = catalogData.items.map(readerApiService.mapCatalogLessonToDiscoveryLesson);
+            setServerCatalog({
+              items: mapped,
+              totalElements: catalogData.totalElements,
+              totalPages: Math.max(1, catalogData.totalPages),
+            });
+            setArticlesError(null);
+          } else {
+            setServerCatalog(null);
+            if (!LESSONS_DATA || LESSONS_DATA.length === 0) {
+              setArticlesError(
+                isEn
+                  ? "Unable to load reading stories. Please check your internet connection."
+                  : "Không thể tải danh sách bài đọc. Vui lòng kiểm tra kết nối mạng."
+              );
+            }
+          }
+        })
+        .catch((err: unknown) => {
+          if (!active) return;
+          console.warn("Could not load catalog lessons for discovery:", err);
+          setServerCatalog(null);
+          if (!LESSONS_DATA || LESSONS_DATA.length === 0) {
+            setArticlesError(
+              isEn
+                ? "Unable to load reading stories. Please check your internet connection."
+                : "Không thể tải danh sách bài đọc. Vui lòng kiểm tra kết nối mạng."
+            );
+          }
+        })
+        .finally(() => {
+          if (active) {
+            setIsArticlesLoading(false);
+          }
+        });
+    }, delay);
+
     return () => {
       active = false;
+      clearTimeout(timer);
     };
-  }, []);
+  }, [
+    articlesPage,
+    articlesPageSize,
+    searchQuery,
+    selectedTopic,
+    selectedCefr,
+    selectedProvince,
+    articlesRetryTrigger,
+    isEn,
+  ]);
 
   // Reset articles page on filter changes
   useEffect(() => {
@@ -385,10 +442,12 @@ export function DiscoveryJourney() {
     return keys;
   }, [availableSeries]);
 
-  // Retain reading articles that are not already presented on the top learning roadmap
-  const standaloneLessons = useMemo(() => {
-    return allLessons.filter((lesson) => {
-      const lJourneyId = ((lesson as any).journeyId || "").toLowerCase().trim();
+  // Fallback: Retain reading articles that are not already presented on the top learning roadmap
+  const fallbackStandaloneLessons = useMemo(() => {
+    return LESSONS_DATA.filter((lesson) => {
+      const lJourneyId = (
+        'journeyId' in lesson ? ((lesson as { journeyId?: string }).journeyId || '') : ''
+      ).toLowerCase().trim();
       if (lJourneyId && topJourneyKeys.has(lJourneyId)) return false;
 
       const id = (lesson.id || "").toLowerCase().trim();
@@ -398,10 +457,10 @@ export function DiscoveryJourney() {
       }
       return true;
     });
-  }, [allLessons, topJourneyKeys]);
+  }, [topJourneyKeys]);
 
-  const filteredArticles = useMemo(() => {
-    let list = standaloneLessons;
+  const fallbackFilteredArticles = useMemo(() => {
+    let list = fallbackStandaloneLessons;
 
     if (selectedProvince) {
       const provinceMatches = list.filter((l) => l.provinceId === selectedProvince.id);
@@ -416,7 +475,7 @@ export function DiscoveryJourney() {
 
     if (selectedCefr !== "All") {
       list = list.filter((l) =>
-        l.availableLevels ? l.availableLevels.includes(selectedCefr as any) : true
+        l.availableLevels ? l.availableLevels.includes(selectedCefr as 'Level 1' | 'Level 2' | 'Level 3') : true
       );
     }
 
@@ -439,17 +498,33 @@ export function DiscoveryJourney() {
     }
 
     return list;
-  }, [standaloneLessons, selectedProvince, selectedTopic, selectedCefr, searchQuery]);
+  }, [fallbackStandaloneLessons, selectedProvince, selectedTopic, selectedCefr, searchQuery]);
+
+  const isUsingServerData = serverCatalog !== null;
+
+  const totalArticlesItems = isUsingServerData
+    ? serverCatalog.totalElements
+    : fallbackFilteredArticles.length;
 
   const totalArticlesPages = Math.max(
     1,
-    Math.ceil(filteredArticles.length / articlesPageSize),
+    isUsingServerData
+      ? serverCatalog.totalPages
+      : Math.ceil(fallbackFilteredArticles.length / articlesPageSize)
   );
+
   const safeArticlesPage = Math.min(articlesPage, totalArticlesPages);
+
   const pagedArticles = useMemo(() => {
+    if (serverCatalog) {
+      return serverCatalog.items;
+    }
     const startIndex = (safeArticlesPage - 1) * articlesPageSize;
-    return filteredArticles.slice(startIndex, startIndex + articlesPageSize);
-  }, [filteredArticles, safeArticlesPage, articlesPageSize]);
+    return fallbackFilteredArticles.slice(startIndex, startIndex + articlesPageSize);
+  }, [serverCatalog, fallbackFilteredArticles, safeArticlesPage, articlesPageSize]);
+
+  // Backward compatibility alias for any reference expecting filteredArticles
+  const filteredArticles = isUsingServerData ? serverCatalog.items : fallbackFilteredArticles;
 
   // Smooth scroll that avoids aggressive viewport jumping
   const handleArticlesPageChange = (page: number) => {
@@ -1233,7 +1308,7 @@ export function DiscoveryJourney() {
               </small>
             </div>
             <span className="font-semibold text-text-secondary">
-              {isEn ? `${filteredArticles.length} articles` : `${filteredArticles.length} bài đọc`}
+              {isEn ? `${totalArticlesItems} articles` : `${totalArticlesItems} bài đọc`}
             </span>
           </div>
 
@@ -1354,7 +1429,7 @@ export function DiscoveryJourney() {
           </div>
 
           <DiscoveryArticleGrid
-            isLoading={isArticlesLoading && allLessons.length === 0}
+            isLoading={isArticlesLoading}
             lessons={pagedArticles}
             viewMode="grid"
             bookmarks={bookmarks}
@@ -1373,12 +1448,14 @@ export function DiscoveryJourney() {
               }
             }}
             selectedCefr={selectedCefr}
+            errorMessage={articlesError}
+            onRetry={() => setArticlesRetryTrigger((prev) => prev + 1)}
           />
 
           <DiscoveryPagination
             currentPage={safeArticlesPage}
             totalPages={totalArticlesPages}
-            totalItems={filteredArticles.length}
+            totalItems={totalArticlesItems}
             itemsPerPage={articlesPageSize}
             onPageChange={handleArticlesPageChange}
             ariaLabel={isEn ? "Standalone readings pagination" : "Phân trang các bài đọc khác"}

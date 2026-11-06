@@ -24,16 +24,19 @@ export function useLiveApi({ apiKey, activeView }: { apiKey: string; activeView:
         let effectiveKey = apiKey || getCachedLiveApiKey() || '';
         if (!effectiveKey && getStoredToken()) {
           try {
+            console.log('[useLiveApi] Đang tải API key phiên Live từ server...');
             effectiveKey = await fetchLiveSessionCredentials();
+            console.log('[useLiveApi] Tải key phiên Live từ server thành công.');
           } catch (fetchErr) {
-            console.warn('[useLiveApi] fetchLiveSessionCredentials error:', fetchErr);
+            console.error('[useLiveApi] fetchLiveSessionCredentials thất bại:', fetchErr);
           }
         }
         if (!effectiveKey) {
+          console.error('[useLiveApi] Không có Gemini API key nào khả dụng từ settings, cache hoặc database!');
           if (!getStoredToken()) {
             throw new Error('Vui lòng đăng nhập để bắt đầu trò chuyện bằng giọng nói.');
           }
-          throw new Error('Không thể kết nối máy chủ thoại của hệ thống. Vui lòng kiểm tra lại kết nối hoặc thử lại sau.');
+          throw new Error('Không thể kết nối máy chủ thoại: Chưa tìm thấy API key khả dụng trong cơ sở dữ liệu. Vui lòng kiểm tra lại cấu hình AI trong trang Quản trị.');
         }
         client.setApiKey(effectiveKey);
         const settings = useSettings.getState();

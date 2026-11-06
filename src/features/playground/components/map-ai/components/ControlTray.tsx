@@ -233,11 +233,18 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     if (pushToTalk) return;
     if (!active || busy) return;
     if (!connected) {
-      if (hasHistory) {
-        void resumeConversation({ input: 'voice' });
-      } else {
-        void startConversation({ input: 'voice' });
-      }
+      const p = hasHistory
+        ? resumeConversation({ input: 'voice' })
+        : startConversation({ input: 'voice' });
+      p.then(result => {
+        if (result?.status === 'error') {
+          console.error('[ControlTray] Voice start failed:', result.message);
+        } else if (result?.status === 'cancelled') {
+          console.warn('[ControlTray] Voice start cancelled:', result.message);
+        }
+      }).catch(err => {
+        console.error('[ControlTray] Voice start rejected:', err);
+      });
       return;
     }
     void setMicrophoneEnabled(!recording);
@@ -284,15 +291,23 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     if (result.status === 'ok') {
       setTextPrompt(value => value === currentPrompt ? '' : value);
       setTwoPassResult(null);
+    } else if (result.status === 'error') {
+      console.error('[ControlTray] sendMessage failed with error:', result.message);
+    } else if (result.status === 'cancelled') {
+      console.warn('[ControlTray] sendMessage was cancelled:', result.message);
     }
   };
 
   const handleRetry = async () => {
     if (!active || busy) return;
     const retriedPrompt = pendingPrompt;
+    console.log('[ControlTray] handleRetry triggered with prompt:', retriedPrompt);
     const result = await retry();
+    console.log('[ControlTray] retry result:', result);
     if (result.status === 'ok' && retriedPrompt) {
       setTextPrompt(value => value.trim() === retriedPrompt.trim() ? '' : value);
+    } else if (result.status === 'error') {
+      console.error('[ControlTray] retry failed:', result.message);
     }
   };
 

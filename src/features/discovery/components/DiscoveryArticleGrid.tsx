@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from '@/components/Link';
 import {
+  AlertCircle,
   BookOpen,
   Clock,
   Bookmark,
@@ -27,6 +28,8 @@ interface DiscoveryArticleGridProps {
   onlyBookmarked: boolean;
   onResetAllFilters: () => void;
   selectedCefr?: string;
+  errorMessage?: string | null;
+  onRetry?: () => void;
 }
 
 const ALL_LEVELS: LevelType[] = ['Level 1', 'Level 2', 'Level 3'];
@@ -40,6 +43,8 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
   onlyBookmarked,
   onResetAllFilters,
   selectedCefr = 'All',
+  errorMessage = null,
+  onRetry,
 }) => {
   const { t, i18n } = useTranslation('discovery');
   const isVi = i18n.language === 'vi';
@@ -74,6 +79,35 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
     );
   }
 
+  if (errorMessage && lessons.length === 0) {
+    return (
+      <div
+        role="alert"
+        aria-live="assertive"
+        className="py-16 text-center rounded-3xl bg-red-500/5 border border-dashed border-red-500/30 p-8"
+      >
+        <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-950/40 flex items-center justify-center mx-auto mb-4 text-red-600 shadow-xs">
+          <AlertCircle className="w-8 h-8" />
+        </div>
+        <h3 className="font-serif text-xl font-bold text-heritage-green">
+          {t('article_grid.error_title', { defaultValue: isVi ? 'Không thể tải bài đọc' : 'Unable to load stories' })}
+        </h3>
+        <p className="text-sm text-text-body mt-2 max-w-md mx-auto leading-relaxed">
+          {errorMessage}
+        </p>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-6 px-6 py-2.5 rounded-full text-xs font-bold text-warm-ivory bg-heritage-green hover:bg-heritage-dark shadow-sm transition-all focus-ring cursor-pointer hover:scale-102 active:scale-98"
+          >
+            {t('article_grid.retry_btn', { defaultValue: isVi ? 'Thử lại' : 'Try again' })}
+          </button>
+        )}
+      </div>
+    );
+  }
+
   if (lessons.length === 0) {
     return (
       <div className="py-16 text-center rounded-3xl bg-rice-paper/60 border border-dashed border-heritage-green/25 p-8">
@@ -99,10 +133,33 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
     );
   }
 
+  const errorBanner = errorMessage ? (
+    <div
+      role="alert"
+      className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs font-medium"
+    >
+      <div className="flex items-center gap-2">
+        <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+        <span>{errorMessage}</span>
+      </div>
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="px-4 py-1.5 rounded-lg bg-heritage-green text-warm-ivory font-bold hover:bg-heritage-dark transition-all shrink-0 cursor-pointer"
+        >
+          {t('article_grid.retry_btn', { defaultValue: isVi ? 'Thử lại' : 'Try again' })}
+        </button>
+      )}
+    </div>
+  ) : null;
+
   if (viewMode === 'grid') {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        {lessons.map((lesson) => {
+      <div>
+        {errorBanner}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {lessons.map((lesson) => {
           const isBookmarked = !!bookmarks[lesson.id];
           const currentStats = getLessonStatsForLevel(lesson, selectedCefr);
           const activeLevel: LevelType =
@@ -238,14 +295,17 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
             </article>
           );
         })}
+        </div>
       </div>
     );
   }
 
   /* List View Layout */
   return (
-    <div className="space-y-4">
-      {lessons.map((lesson) => {
+    <div>
+      {errorBanner}
+      <div className="space-y-4">
+        {lessons.map((lesson) => {
         const isBookmarked = !!bookmarks[lesson.id];
         const currentStats = getLessonStatsForLevel(lesson, selectedCefr);
         const activeLevel: LevelType =
@@ -363,6 +423,7 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
           </article>
         );
       })}
+      </div>
     </div>
   );
 };

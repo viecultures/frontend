@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+﻿import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useAppNavigate } from '@/routes/useAppNavigate';
@@ -21,7 +21,19 @@ import {
 import { setIsProUser, getStoredUser, getIsProUser } from '@/utils/auth-storage';
 import { PATHS } from '@/routes/paths';
 
-export type CheckoutPlanKey = 'monthly' | 'quarterly' | 'yearly' | 'student' | 'student_yearly';
+import { subscriptionService } from '../services/subscriptionService';
+import type { SubscriptionPlanItem } from '@/features/admin/types/adminSubscriptionTypes';
+
+export type CheckoutPlanKey =
+  | 'monthly'
+  | 'quarterly'
+  | 'yearly'
+  | 'student'
+  | 'student_yearly'
+  | 'starter'
+  | 'pro'
+  | 'lifetime'
+  | string;
 
 export const CheckoutPage: React.FC = () => {
   const { t } = useTranslation('subscription');
@@ -29,7 +41,25 @@ export const CheckoutPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentUser = getStoredUser();
 
-  const validPlans: CheckoutPlanKey[] = ['monthly', 'quarterly', 'yearly', 'student', 'student_yearly'];
+  const validPlans: CheckoutPlanKey[] = [
+    'monthly',
+    'quarterly',
+    'yearly',
+    'student',
+    'student_yearly',
+    'starter',
+    'pro',
+    'lifetime',
+  ];
+  const [dbPlans, setDbPlans] = useState<SubscriptionPlanItem[]>([]);
+
+  useEffect(() => {
+    subscriptionService.getActivePlans().then((plans) => {
+      if (Array.isArray(plans) && plans.length > 0) {
+        setDbPlans(plans);
+      }
+    });
+  }, []);
   const initialPlan = (searchParams.get('plan') as CheckoutPlanKey) || 'yearly';
   const [selectedPlan, setSelectedPlan] = useState<CheckoutPlanKey>(
     validPlans.includes(initialPlan) ? initialPlan : 'yearly'
@@ -114,6 +144,29 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const planConfig = useMemo(() => {
+    const dbMatch = dbPlans.find(
+      (p) => p.code.toLowerCase() === selectedPlan.toLowerCase()
+    );
+    if (dbMatch) {
+      const effectivePrice = subscriptionService.calculateEffectivePrice(
+        dbMatch.priceVnd,
+        dbMatch.discountPercent
+      );
+      const discountVnd = dbMatch.priceVnd - effectivePrice;
+      const cycleText = subscriptionService.getBillingCycleLabel(dbMatch.billingCycle, true);
+      return {
+        name: dbMatch.nameVi,
+        cycle: `Chu kỳ thanh toán: ${cycleText}`,
+        listPrice: subscriptionService.formatVnd(dbMatch.priceVnd),
+        discount:
+          dbMatch.discountPercent > 0
+            ? `-${subscriptionService.formatVnd(discountVnd)} (Tiết kiệm ${dbMatch.discountPercent}%)`
+            : '0 VNĐ',
+        total: subscriptionService.formatVnd(effectivePrice),
+        amount: effectivePrice,
+        periodText: cycleText.replace('/ ', ''),
+      };
+    }
     switch (selectedPlan) {
       case 'monthly':
         return {
@@ -166,7 +219,7 @@ export const CheckoutPage: React.FC = () => {
           periodText: '1 năm',
         };
     }
-  }, [selectedPlan]);
+  }, [selectedPlan, dbPlans]);
 
   const handleSimulateInstantTransfer = () => {
     setIsProcessing(true);
@@ -233,6 +286,30 @@ export const CheckoutPage: React.FC = () => {
         {/* Plan Switcher Pills */}
         {!paymentSuccess && (
           <div className="flex flex-wrap items-center justify-center gap-2">
+            {dbPlans.length > 0 ? (
+              dbPlans
+                .filter((p) => p.priceVnd > 0)
+                .map((plan) => {
+                  const isSelected = selectedPlan.toLowerCase() === plan.code.toLowerCase();
+                  return (
+                    <button
+                      key={plan.id}
+                      type="button"
+                      onClick={() => handleSelectPlan(plan.code.toLowerCase())}
+                      className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                        isSelected
+                          ? plan.isPopularBadge
+                            ? 'bg-[#9E2A2B] text-white shadow-md ring-2 ring-antique-gold'
+                            : 'bg-heritage-green text-white shadow-md'
+                          : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-300'
+                      }`}
+                    >
+                      {plan.nameVi}
+                    </button>
+                  );
+                })
+            ) : (
+              <>
             <button
               type="button"
               onClick={() => handleSelectPlan('monthly')}
@@ -288,6 +365,8 @@ export const CheckoutPage: React.FC = () => {
             >
               <span>{t('checkout.plan_tabs.student_yearly')}</span>
             </button>
+              </>
+            )}
           </div>
         )}
 
@@ -396,7 +475,7 @@ export const CheckoutPage: React.FC = () => {
                     className="w-full px-3 py-1.5 rounded-xl border border-blue-300 dark:border-blue-700 bg-white dark:bg-[#111A18] text-xs text-stone-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
-              )}
+  
 
               {/* Price Details */}
               <div className="space-y-2 py-2">
@@ -536,8 +615,9 @@ export const CheckoutPage: React.FC = () => {
                           <QrCode className="w-28 h-28 text-heritage-green animate-pulse" />
                           <span className="text-[10px] text-stone-500 font-mono">{t('checkout.gateway.loading_qr')}</span>
                         </div>
-                      )}
+          
                     </>
+
                   ) : (
                     <div className="flex flex-col items-center justify-center p-4 text-center space-y-2">
                       <AlertCircle className="w-10 h-10 text-rose-500" />
@@ -551,7 +631,7 @@ export const CheckoutPage: React.FC = () => {
                         <span>{t('checkout.gateway.generate_new_qr')}</span>
                       </button>
                     </div>
-                  )}
+      
 
                   {timeLeft > 0 && qrLoaded && (
                     <div className="absolute inset-0 bg-heritage-green/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
@@ -559,7 +639,7 @@ export const CheckoutPage: React.FC = () => {
                         {t('checkout.gateway.scan_hint')}
                       </span>
                     </div>
-                  )}
+      
                 </div>
 
                 {/* Account Details with Copy Buttons */}
@@ -583,7 +663,7 @@ export const CheckoutPage: React.FC = () => {
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
-                        )}
+            
                       </button>
                     </div>
                   </div>
@@ -607,7 +687,7 @@ export const CheckoutPage: React.FC = () => {
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
-                        )}
+            
                       </button>
                     </div>
                   </div>
@@ -628,7 +708,7 @@ export const CheckoutPage: React.FC = () => {
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
-                        )}
+            
                       </button>
                     </div>
                   </div>
@@ -640,7 +720,7 @@ export const CheckoutPage: React.FC = () => {
                     <RefreshCw className="w-4 h-4 animate-spin text-amber-700" />
                     <span className="font-medium">{processingMessage}</span>
                   </div>
-                )}
+    
 
                 {/* Primary Demo Simulation Button (Required for Testing) */}
                 <div className="pt-2 space-y-2.5">

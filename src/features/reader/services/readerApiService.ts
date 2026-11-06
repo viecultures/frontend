@@ -247,15 +247,39 @@ export const readerApiService = {
       if (params?.page !== undefined) sp.set('page', String(params.page));
       if (params?.size !== undefined) sp.set('size', String(params.size));
 
-      const activeSignal = params?.signal || AbortSignal.timeout(6000);
+      const timeoutSignal = AbortSignal.timeout(12000);
+      const activeSignal = params?.signal
+        ? (typeof AbortSignal.any === 'function'
+            ? AbortSignal.any([params.signal, timeoutSignal])
+            : params.signal)
+        : timeoutSignal;
+
       const res = await fetch(`${API_BASE_URL}/api/posts/catalog?${sp.toString()}`, {
         signal: activeSignal,
       });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        let errorDetails = '';
+        try {
+          errorDetails = await res.text();
+        } catch {
+          errorDetails = '';
+        }
+        console.warn(
+          `[Reader API] Lỗi khi tải danh mục catalog: HTTP ${res.status} ${res.statusText}${
+            errorDetails ? ` - Chi tiết: ${errorDetails}` : ''
+          }`
+        );
+        return null;
+      }
       return await res.json();
     } catch (err: unknown) {
-      if ((err as Error)?.name === 'AbortError') return null;
-      console.warn('[Reader API] Lỗi khi tải danh mục catalog:', err);
+      const errObj = err as Error | undefined;
+      if (errObj?.name === 'AbortError') {
+        console.warn('[Reader API] Yêu cầu tải danh mục catalog đã bị hủy hoặc quá thời gian chờ (12000ms)');
+        return null;
+      }
+      const message = errObj?.message || String(err);
+      console.warn(`[Reader API] Lỗi khi tải danh mục catalog: ${message}`, err);
       return null;
     }
   },

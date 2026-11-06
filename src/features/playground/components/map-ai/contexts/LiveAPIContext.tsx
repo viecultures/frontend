@@ -42,12 +42,16 @@ export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
   useEffect(() => {
     let isMounted = true;
     if (!customGeminiApiKey && !serverApiKey && getStoredToken()) {
+      console.log('[LiveAPIProvider] Đang khởi tạo lấy API key từ backend...');
       fetchLiveSessionCredentials()
         .then(key => {
-          if (isMounted) setServerApiKey(key);
+          if (isMounted) {
+            console.log('[LiveAPIProvider] Đã nhận live session key thành công từ server');
+            setServerApiKey(key);
+          }
         })
         .catch(err => {
-          console.warn('[LiveAPIProvider] Không thể lấy live session key từ backend:', err?.message || err);
+          console.error('[LiveAPIProvider] Không thể lấy live session key từ backend:', err?.message || err);
         });
     }
     return () => {
