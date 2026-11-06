@@ -80,7 +80,7 @@ describe('Article Series Mock Data Hub', () => {
 
     const bunChaArticle = getSeriesArticle('bun-cha-grilling-secrets');
     assert.ok(bunChaArticle);
-    assert.equal(bunChaArticle.titleEn, 'Bun Cha – A Taste of Hanoi's Cultural Life');
+    assert.equal(bunChaArticle.titleEn, "Bun Cha – A Taste of Hanoi's Cultural Life");
     assert.equal(bunChaArticle.vocabularies.length, 10);
 
     const chaCaArticle = getSeriesArticle('cha-ca-legend-history');
