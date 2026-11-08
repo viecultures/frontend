@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Maximize2, ArrowUpRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ArrowUpRight, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { DailyQuoteDialog } from './DailyQuoteDialog';
+import { formatLunarString } from '@/utils/lunarCalendar';
+import { getDailyQuoteForDate, type DailyQuoteItem } from '../data/dailyQuotesNovember';
 
 interface HomeDailyQuoteCardProps {
+  quote?: DailyQuoteItem;
   imageUrl?: string;
   quoteVi?: string;
   author?: string;
@@ -11,81 +14,140 @@ interface HomeDailyQuoteCardProps {
 }
 
 export function HomeDailyQuoteCard({
-  imageUrl = '/images/calendar/heritage-hagiang-a4.jpg',
-  quoteVi = 'Không có gì quý hơn độc lập, tự do.',
-  author = 'Hồ Chí Minh',
-  creator = 'VieCultures Daily',
-}: HomeDailyQuoteCardProps) {
-  const { t } = useTranslation('home');
+  quote,
+  imageUrl,
+  quoteVi,
+  author,
+  creator,
+}: HomeDailyQuoteCardProps = {}) {
+  const { t, i18n } = useTranslation('home');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
+
+  const isToday = selectedDate.toDateString() === new Date().toDateString();
+
+  const goToPrevDay = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedDate((prev) => {
+      const next = new Date(prev);
+      next.setDate(next.getDate() - 1);
+      return next;
+    });
+  };
+
+  const goToNextDay = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedDate((prev) => {
+      const next = new Date(prev);
+      next.setDate(next.getDate() + 1);
+      return next;
+    });
+  };
+
+  const goToToday = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedDate(new Date());
+  };
+
+  // Lấy câu danh ngôn tự động cho ngày đang chọn
+  const activeQuote = quote ?? getDailyQuoteForDate(selectedDate);
+
+  const finalImageUrl = imageUrl ?? activeQuote.artworkUrl;
+  const finalQuoteVi = quoteVi ?? activeQuote.quoteVi;
+  const finalAuthor = author ?? activeQuote.author;
+  const finalCreator = creator ?? activeQuote.creator;
+  const locationLabel = activeQuote.locationName;
+
+  const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US';
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(selectedDate);
+  const monthYear = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(selectedDate);
+  const solarDay = String(selectedDate.getDate()).padStart(2, '0');
+  const lunarStr = formatLunarString(selectedDate);
 
   return (
     <>
-      <section className="home-daily-quote-card" aria-label={t('daily_quote.title', 'Quote of the day')}>
-        {/* Binder rings on top edge */}
+      <section className="home-daily-quote-card" aria-label={t('daily_quote.title')}>
         <span className="home-binder b1" aria-hidden="true" />
-        <span className="home-binder b2" aria-hidden="true" />
         <span className="home-binder b3" aria-hidden="true" />
-
-        {/* Card header */}
-        <div className="home-daily-heading">
-          <h2 className="home-daily-title">{t('daily_quote.title', 'Quote of the day')}</h2>
-          <button
-            type="button"
-            className="home-daily-expand-btn"
-            onClick={() => setIsDialogOpen(true)}
-            aria-label={t('daily_quote.expand_title', 'View larger')}
-            title={t('daily_quote.expand_title', 'View larger')}
-          >
-            <Maximize2 size={14} aria-hidden="true" />
-          </button>
-        </div>
-
-        {/* Illustrated artwork button */}
         <button
           type="button"
-          className="home-daily-image-btn"
+          className="home-calendar-open-surface"
           onClick={() => setIsDialogOpen(true)}
-          aria-label={`${t('daily_quote.explore_story', 'Explore the story behind')}: ${quoteVi}`}
+          aria-label={t('daily_quote.expand_title')}
         >
-          <div className="home-daily-image-container">
-            <img
-              src={imageUrl}
-              alt={`${author} - ${quoteVi}`}
-              className="home-daily-image-asset"
-              loading="lazy"
-            />
-          </div>
-        </button>
-
-        {/* Card footer */}
-        <div className="home-daily-bottom">
-          <button
-            type="button"
-            className="home-daily-explore-link"
-            onClick={() => setIsDialogOpen(true)}
-          >
-            <span>{t('daily_quote.explore_story', 'Explore the story behind')}</span>
-            <ArrowUpRight size={12} aria-hidden="true" />
-          </button>
-          <span className="home-daily-page-pill">
-            {t('daily_quote.page_index', { current: '01', total: '01', defaultValue: '01 / 01' })}
+          <span
+            className="home-calendar-scenery"
+            style={{
+              backgroundImage: `linear-gradient(to bottom, color-mix(in srgb, var(--color-warm-ivory) 72%, transparent), transparent 48%), url('${finalImageUrl}')`,
+            }}
+            aria-hidden="true"
+          />
+          <span className="home-calendar-top">
+            <span className="home-calendar-date">
+              <span className="home-calendar-weekday-row">
+                <button
+                  type="button"
+                  className="home-calendar-nav-arrow"
+                  onClick={goToPrevDay}
+                  aria-label={t('daily_quote.prev_day', 'Ngày trước')}
+                  title={t('daily_quote.prev_day', 'Ngày trước')}
+                >
+                  <ChevronLeft size={14} aria-hidden="true" />
+                </button>
+                <span className="home-calendar-weekday">{weekday}</span>
+                <button
+                  type="button"
+                  className="home-calendar-nav-arrow"
+                  onClick={goToNextDay}
+                  aria-label={t('daily_quote.next_day', 'Ngày sau')}
+                  title={t('daily_quote.next_day', 'Ngày sau')}
+                >
+                  <ChevronRight size={14} aria-hidden="true" />
+                </button>
+              </span>
+              {!isToday && (
+                <button
+                  type="button"
+                  className="home-calendar-today-pill"
+                  onClick={goToToday}
+                  aria-label={t('daily_quote.back_to_today', 'Về hôm nay')}
+                  title={t('daily_quote.back_to_today', 'Về hôm nay')}
+                >
+                  {t('daily_quote.today', 'Hôm nay')}
+                </button>
+              )}
+              <strong>{solarDay}</strong>
+              <span>{monthYear}</span>
+            </span>
+            <span className="home-calendar-details">
+              <span>{t('quick.lunar')}: {lunarStr}</span>
+              <span><MapPin size={16} aria-hidden="true" />{locationLabel}</span>
+            </span>
           </span>
-        </div>
+          <span className="home-calendar-quote">
+            <span>“{finalQuoteVi}”</span>
+            <cite>— {finalAuthor} —</cite>
+          </span>
+          <span className="home-calendar-expand">
+            <ArrowUpRight size={19} aria-hidden="true" />
+          </span>
+        </button>
       </section>
-
-      {/* Heritage Quote Dialog */}
       <DailyQuoteDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        imageUrl={imageUrl}
-        quoteVi={quoteVi}
-        author={author}
-        creator={creator}
+        quote={activeQuote}
+        onPrevDay={goToPrevDay}
+        onNextDay={goToNextDay}
+        isToday={isToday}
+        onToday={goToToday}
+        imageUrl={finalImageUrl}
+        quoteVi={finalQuoteVi}
+        author={finalAuthor}
+        creator={finalCreator}
       />
     </>
   );
 }
 
-// Backward-compatibility export
 export const HomeCalendarCard = HomeDailyQuoteCard;

@@ -4,6 +4,7 @@ import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { Navbar } from '@/components/Navbar';
 import { HomeGreetingHeader } from '../components/HomeGreetingHeader';
 import { HomeContinueReadingCard } from '../components/HomeContinueReadingCard';
+import { HomeFeaturedLessonCard } from '../components/HomeFeaturedLessonCard';
 import { HomeVocabularySummary } from '../components/HomeVocabularySummary';
 import { HomeDailyQuoteCard } from '../components/HomeDailyQuoteCard';
 import { HomeWeeklyStrip } from '../components/HomeWeeklyStrip';
@@ -141,13 +142,13 @@ export function HomePage({ isLoggedIn = false, user, onLogout }: HomePageProps) 
 
         {/* 2. Core 2-Column Study Grid: Học gì tiếp + Còn gì cần ôn + Điểm nghỉ thị giác */}
         <div className="home-quick-start">
-          {/* Left Col Row 1: Continue Reading Hero Card (Học gì tiếp - Nổi bật nhất) */}
-          <HomeContinueReadingCard bookmark={currentBookmark} />
-
-          {/* Left Col Row 2: Streamlined Vocabulary Review Card (Còn gì cần ôn) */}
-          <HomeVocabularySummary />
-
-          {/* Right Col: Daily Quote Card (Điểm nghỉ thị giác - Spans Rows 1 & 2) */}
+          <div className="home-learning-column">
+            <HomeFeaturedLessonCard />
+            <div className="home-quick-actions">
+              <HomeContinueReadingCard bookmark={currentBookmark} />
+              <HomeVocabularySummary />
+            </div>
+          </div>
           <HomeDailyQuoteCard />
         </div>
 

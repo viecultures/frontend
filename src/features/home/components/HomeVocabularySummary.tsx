@@ -126,11 +126,8 @@ export function HomeVocabularySummary() {
       {/* Top row: Title + Total count and Notebook link */}
       <div className="home-vocab-top">
         <div>
-          <span className="home-eyebrow">
-            {t('vocabulary_card.eyebrow', 'GÓC TỪ VỰNG')}
-          </span>
           <h2 className="home-vocab-title">
-            <b>{totalSaved}</b> <span>{t('vocabulary_card.words_collected', 'từ đã lưu')}</span>
+            <BookMarked size={21} aria-hidden="true" /> <span>{t('quick.vocab_title')}</span>
           </h2>
         </div>
         <Link className="home-notebook-link" to={PATHS.dictionary}>

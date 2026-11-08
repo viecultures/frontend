@@ -1,4 +1,19 @@
 {
+  "featured": {
+    "label": "FEATURED LESSON",
+    "description": "Explore a Vietnamese cultural story through English.",
+    "read": "Explore lesson",
+    "choose": "Choose a featured lesson",
+    "slide": "View lesson {{count}}"
+  },
+  "quick": {
+    "greeting_subtitle": "Ready to explore another Vietnamese story today?",
+    "continue_title": "Continue learning",
+    "start_hint": "Start your first story",
+    "vocab_title": "Vocabulary review",
+    "lunar": "Lunar date",
+    "scenery_location": "Mù Cang Chải scenery"
+  },
   "greeting": {
     "eyebrow": "READY WHEN YOU ARE",
     "welcome_back": "Good to see you, {{name}}.",
@@ -114,6 +129,7 @@
     "summary": "{{minutes}} min · {{stories}} stories this week",
     "summary_singular": "{{minutes}} min · 1 story this week",
     "summary_empty": "0 min · Start your learning rhythm today",
+    "summary_days": "{{minutes}} min · {{days}} reading days this week",
     "view_calendar": "View calendar"
   },
   "study_calendar": {

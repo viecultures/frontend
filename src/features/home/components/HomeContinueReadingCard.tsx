@@ -1,98 +1,32 @@
-import { useState } from 'react';
-import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
-import { ArrowRight, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ArrowRight, BookOpen } from 'lucide-react';
+import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { paths } from '@/routes/paths';
+import { FEATURED_HOME_STORIES } from '../data/recommendationData';
 import type { ReadingBookmark } from '../lib/studyRoomStorage';
 
-interface HomeContinueReadingCardProps {
-  bookmark?: ReadingBookmark;
-}
+interface HomeContinueReadingCardProps { bookmark?: ReadingBookmark; }
 
 export function HomeContinueReadingCard({ bookmark }: HomeContinueReadingCardProps) {
-  const { t } = useTranslation('home');
-  const [imageError, setImageError] = useState(false);
+  const { t, i18n } = useTranslation('home');
+  const firstStory = FEATURED_HOME_STORIES[0];
+  const storyId = bookmark?.id || firstStory?.id;
+  const level = bookmark?.level || firstStory?.preferredLevel || 'Level 1';
+  const title = bookmark?.title || (firstStory ? (i18n.language.startsWith('vi') ? firstStory.titleVi : firstStory.titleEn) : t('continue_card.default_title'));
+  const image = bookmark?.image || firstStory?.imageUrl;
+  const position = bookmark ? Math.min(100, Math.max(0, Math.round(bookmark.position * 100))) : 0;
 
-  const hasHistory = Boolean(bookmark && bookmark.id);
-  const position = Math.min(100, Math.max(0, Math.round((bookmark?.position || 0) * 100)));
-  const isCompleted = position >= 100;
-
-  const title = hasHistory
-    ? bookmark!.title
-    : t('continue_card.default_title', 'The little secrets of Hà Nội’s bún chả.');
-
-  const description = hasHistory
-    ? (bookmark!.topic || t('continue_card.saved_desc', 'Return to your story, with your reading position remembered.'))
-    : t('continue_card.default_desc', 'Smoky grills, fresh herbs, and a story worth slowing down for.');
-
-  const level = bookmark?.level || 'Level 1';
-  const readMinutes = 5; // standard estimate for current chapter
-  const topicLabel = bookmark?.topic || t('continue_card.default_topic', 'HÀ NỘI · FOOD & CULTURE');
-  const imageUrl = bookmark?.image || '/images/landing/bun-cha.webp';
-
-  const readerUrl = paths.reader({
-    postId: bookmark?.id || 'bun-cha',
-    level,
-  });
-
-  return (
-    <section className="home-hero-card" aria-labelledby="home-continue-title">
-      <div className="home-hero-copy">
-        <span className="home-eyebrow">
-          {hasHistory
-            ? t('continue_card.eyebrow_saved', 'CONTINUE YOUR STORY')
-            : t('continue_card.eyebrow_new', 'YOUR FIRST CHAPTER')}
-        </span>
-
-        <h2 id="home-continue-title" className="home-hero-title">
-          {title}
-        </h2>
-
-        <p className="home-hero-desc">{description}</p>
-
-        <div className="home-hero-meta">
-          <span className="home-hero-level">{level}</span>
-          <span className="home-hero-time">{t('continue_card.read_time', { count: readMinutes, defaultValue: `${readMinutes} min read` })}</span>
-          <span className="home-hero-percent">
-            {t('continue_card.read_percent', { count: position, defaultValue: `· ${position}% read` })}
-          </span>
-        </div>
-
-        <div className="home-hero-progress-track" role="progressbar" aria-valuenow={position} aria-valuemin={0} aria-valuemax={100} aria-label={t('continue_card.reading_position', 'Reading position')}>
-          <div className="home-hero-progress-fill" style={{ width: `${position}%` }} />
-        </div>
-
-        <Link className="home-primary-btn" to={readerUrl}>
-          <span>
-            {isCompleted
-              ? t('continue_card.btn_read_again', 'Read the story again')
-              : hasHistory
-                ? t('continue_card.btn_continue', 'Continue reading')
-                : t('continue_card.btn_start', 'Start your first story')}
-          </span>
-          <ArrowRight size={15} aria-hidden="true" />
-        </Link>
+  return <section className="home-continue-card" aria-labelledby="home-continue-title">
+    <h2 id="home-continue-title"><BookOpen size={21} aria-hidden="true" />{t('quick.continue_title')}</h2>
+    <div className="home-continue-body">
+      {image && <img src={image} alt="" loading="lazy" />}
+      <div className="home-continue-details">
+        <p>{title}</p>
+        {bookmark ? <div className="home-continue-progress"><div className="home-continue-track" role="progressbar" aria-label={t('continue_card.reading_position')} aria-valuenow={position} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${position}%` }} /></div><span>{position}%</span></div> : <span className="home-continue-empty">{t('quick.start_hint')}</span>}
       </div>
-
-      <div className="home-hero-art">
-        {imageError ? (
-          <div className="home-hero-art-placeholder">
-            <BookOpen size={48} className="home-placeholder-icon" aria-hidden="true" />
-          </div>
-        ) : (
-          <img
-            src={imageUrl}
-            alt={title}
-            className="home-hero-art-img"
-            onError={() => setImageError(true)}
-            loading="eager"
-          />
-        )}
-        <span className="home-hero-art-tag">{topicLabel}</span>
-      </div>
-    </section>
-  );
+      {storyId && <Link to={paths.reader({ postId: storyId, level })} className="home-continue-action" aria-label={bookmark ? t('continue_card.btn_continue') : t('continue_card.btn_start')}><ArrowRight size={18} aria-hidden="true" /></Link>}
+    </div>
+  </section>;
 }
 
-// Backward-compatibility export
 export const HomeContinueCard = HomeContinueReadingCard;

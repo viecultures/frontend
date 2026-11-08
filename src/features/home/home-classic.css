@@ -970,10 +970,44 @@
 
 /* ── Heritage Daily Quote Dialog ────────────────────────────────────── */
 .home-heritage-dialog {
-  max-width: 840px;
+  position: relative;
+  width: 100%;
+  max-width: 860px;
   max-height: 88vh;
-  padding: 26px 28px;
+  padding: 24px 28px 28px;
+  border-radius: 20px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--color-heritage-forest) 28%, transparent);
   overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.home-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.home-dialog-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-dialog-location-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--color-heritage-green) 12%, transparent);
+  color: var(--color-heritage-forest);
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .home-heritage-popup {
@@ -989,7 +1023,9 @@
 
 .home-heritage-art-frame {
   width: 100%;
-  aspect-ratio: 724 / 1024;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-heritage-forest) 10%, transparent);
   background: var(--color-surface-muted);
   border: 1px solid var(--color-line);
   border-radius: 12px;
@@ -1731,3 +1767,58 @@
     width: 100%;
   }
 }
+
+/* Desktop learning dashboard, 2026-11-06 */
+.home-page-container { background: var(--color-home-bg); }
+.home-shell { width: min(100% - 48px, 1520px); max-width: 1520px; padding: 18px 0 32px; }
+.home-greeting-row { position: relative; display: flex; align-items: center; gap: 24px; min-height: 110px; margin-bottom: 12px; }
+/* Match the 1fr calendar column in the 1.6fr / 1fr grid below. */
+.home-greeting-row::after { content: ''; position: absolute; right: 0; bottom: -30px; width: calc(38.4615% - 9.23px); aspect-ratio: 4.8; background: url('/assets/profile/mountain-decoration.svg') right bottom / contain no-repeat; opacity: .48; pointer-events: none; }
+.home-greeting-mascot { width: 116px; height: 116px; object-fit: contain; flex: none; }
+.home-greeting-copy { position: relative; z-index: 1; }
+.home-greeting-title { color: var(--color-heritage-green); font-family: var(--font-sans); font-size: clamp(29px, 2.7vw, 40px); font-weight: 750; line-height: 1.15; }
+.home-greeting-copy p { margin: 5px 0 0; font-size: 17px; color: var(--color-ink-soft); }
+.home-quick-start { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); grid-template-rows: auto; align-items: stretch; gap: 24px; }
+.home-learning-column { display: grid; grid-template-rows: minmax(280px, 1fr) auto; gap: 12px; min-width: 0; }
+.home-featured { position: relative; min-height: 285px; overflow: hidden; border-radius: 21px; background: var(--color-heritage-forest); color: var(--color-warm-ivory); box-shadow: var(--shadow-panel); }
+.home-featured-image { position: absolute; inset: 0 0 0 auto; width: 58%; height: 100%; object-fit: cover; transition: opacity 0.4s ease; }
+.home-featured-shade { position: absolute; inset: 0; background: linear-gradient(100deg, var(--color-heritage-forest) 0%, var(--color-heritage-green) 43%, transparent 75%); }
+.home-featured-content { position: relative; z-index: 1; display: flex; align-items: flex-start; flex-direction: column; justify-content: center; width: 56%; height: 100%; padding: 20px 24px 20px 34px; box-sizing: border-box; }
+.home-featured-badge { display: inline-flex; align-items: center; gap: 7px; padding: 7px 15px; border-radius: 99px; background: var(--color-antique-rich); color: var(--color-heritage-forest); font-size: 13px; font-weight: 750; }
+.home-featured h2 { margin: 9px 0 4px; color: var(--color-warm-ivory); font-family: var(--font-sans); font-size: clamp(25px, 2vw, 32px); font-weight: 750; line-height: 1.12; }
+.home-featured p { margin: 0 0 9px; color: var(--color-warm-ivory); font-size: 14px; line-height: 1.4; }
+.home-featured-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }.home-featured-meta span { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; background: color-mix(in srgb, var(--color-warm-ivory) 25%, transparent); color: var(--color-warm-ivory); font-size: 11px; }
+.home-featured-cta { display: inline-flex; align-items: center; gap: 16px; min-height: 38px; padding: 5px 16px; border-radius: 99px; background: var(--color-antique-rich); color: var(--color-heritage-forest); font-size: 14px; font-weight: 750; text-decoration: none; }
+.home-featured-cta:hover { background: var(--color-antique-bright); }.home-featured-dots { position: absolute; z-index: 2; right: 25px; bottom: 20px; display: flex; gap: 7px; }.home-featured-dots button { width: 12px; height: 12px; padding: 0; border: 1px solid var(--color-warm-ivory); border-radius: 50%; background: transparent; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; }.home-featured-dots button.is-active { background: var(--color-warm-ivory); transform: scale(1.15); }
+.home-quick-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.home-continue-card, .home-quick-actions .home-vocab-card { min-width: 0; min-height: 122px; padding: 12px 16px; border-radius: 18px; border: 1px solid var(--color-home-sage-border); background: var(--color-home-sage-bg); box-shadow: var(--shadow-panel); }
+.home-continue-card h2, .home-quick-actions .home-vocab-title { display: flex; align-items: center; gap: 8px; margin: 0 0 9px; font-family: var(--font-sans); font-size: 17px; font-weight: 750; color: var(--color-heritage-green); }
+.home-continue-body { display: flex; align-items: center; gap: 12px; min-width: 0; }.home-continue-body > img { width: 98px; height: 68px; flex: none; object-fit: cover; border-radius: 9px; }.home-continue-details { flex: 1; min-width: 0; }.home-continue-details p { margin: 0 0 7px; font-size: 13px; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }.home-continue-empty { font-size: 11px; color: var(--color-ink-soft); }
+.home-continue-progress { display: flex; align-items: center; gap: 8px; font-size: 11px; }.home-continue-track { width: 100%; height: 7px; border-radius: 9px; overflow: hidden; background: var(--color-home-sage-border); }.home-continue-track span { display: block; height: 100%; background: var(--color-action); }.home-continue-action { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 50%; background: var(--color-action); color: var(--color-on-action); }
+.home-quick-actions .home-vocab-card { grid-column: auto; grid-row: auto; justify-content: flex-start; gap: 0; background: var(--color-home-lavender-bg); border-color: var(--color-home-lavender-border); }.home-quick-actions .home-vocab-title { color: var(--color-home-lavender-title); }.home-quick-actions .home-vocab-top { align-items: flex-start; }.home-quick-actions .home-notebook-link, .home-quick-actions .home-srs-groups, .home-quick-actions .home-srs-unreviewed-line, .home-quick-actions .home-srs-distribution { display: none; }.home-quick-actions .home-srs-due-row { margin: 0; padding: 0; border: 0; gap: 8px; }.home-quick-actions .home-srs-due-text { font-size: 12px; }.home-quick-actions .home-srs-due-hint { font-size: 11px; }.home-quick-actions .home-vocab-action-btn { min-height: 36px; padding: 7px 10px; font-size: 11px; }
+.home-daily-quote-card { grid-column: 2; grid-row: 1; min-height: 419px; padding: 0; border: 6px solid var(--color-surface-raised); border-radius: 23px; background: var(--color-home-peach-bg); box-shadow: 0 8px 22px color-mix(in srgb, var(--color-heritage-forest) 16%, transparent); }
+.home-calendar-open-surface { position: relative; display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; min-height: 407px; padding: 24px 24px 16px; border: 0; border-radius: 17px; overflow: hidden; background: var(--color-home-peach-bg); text-align: left; cursor: pointer; }
+.home-calendar-scenery { position: absolute; inset: 0; background: linear-gradient(to bottom, color-mix(in srgb, var(--color-warm-ivory) 72%, transparent), transparent 48%), url('/images/landing/mu-cang-chai.webp') center 42% / cover; }.home-calendar-top, .home-calendar-quote, .home-calendar-expand { position: relative; z-index: 1; }
+.home-calendar-top { display: flex; align-items: center; gap: 24px; }.home-calendar-date { display: grid; justify-items: center; min-width: 34%; color: var(--color-heritage-forest); }.home-calendar-weekday { padding: 4px 14px; border-radius: 99px; background: var(--color-heritage-green); color: var(--color-warm-ivory); font-size: 13px; font-weight: 700; }.home-calendar-date strong { font-family: var(--font-serif); font-size: clamp(68px, 6vw, 90px); font-weight: 700; line-height: 1; }.home-calendar-date > span:last-child { font-size: 15px; font-weight: 700; text-transform: capitalize; }
+.home-calendar-details { display: grid; gap: 10px; padding-left: 20px; border-left: 1px solid var(--color-heritage-green); color: var(--color-heritage-forest); font-size: 12px; font-weight: 600; }.home-calendar-details span { display: flex; align-items: center; gap: 5px; }
+.home-calendar-quote { display: grid; align-self: stretch; justify-items: center; gap: 6px; margin: 0 -24px -16px; padding: 18px 40px 20px; min-height: 110px; background: color-mix(in srgb, var(--color-warm-ivory) 91%, transparent); color: var(--color-heritage-forest); text-align: center; }.home-calendar-quote > span { font-family: var(--font-serif); font-size: clamp(20px, 1.8vw, 27px); font-style: italic; font-weight: 700; line-height: 1.15; }.home-calendar-quote cite { font-size: 12px; font-style: italic; }.home-calendar-expand { position: absolute; right: 16px; bottom: 13px; display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--color-home-peach-border); border-radius: 50%; background: var(--color-warm-ivory); color: var(--color-heritage-green); }
+.home-calendar-weekday-row { display: flex; align-items: center; gap: 8px; position: relative; z-index: 2; margin-bottom: 2px; }
+.home-calendar-nav-arrow { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--color-home-peach-border); background: color-mix(in srgb, var(--color-warm-ivory) 88%, transparent); color: var(--color-heritage-forest); cursor: pointer; padding: 0; transition: transform 0.15s ease, background 0.15s ease; }
+.home-calendar-nav-arrow:hover { transform: scale(1.12); background: var(--color-warm-ivory); color: var(--color-action); }
+.home-calendar-today-pill { margin-top: 4px; padding: 2px 10px; border-radius: 99px; border: 1px solid var(--color-home-peach-border); background: var(--color-warm-ivory); color: var(--color-action); font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.15s ease; }
+.home-calendar-today-pill:hover { background: color-mix(in srgb, var(--color-action) 12%, var(--color-warm-ivory)); }
+.home-dialog-nav-bar { display: flex; align-items: center; gap: 4px; background: var(--color-surface-raised); border: 1px solid var(--color-line); border-radius: 99px; padding: 3px 6px; }
+.home-dialog-nav-btn { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 0; background: transparent; color: var(--color-ink); cursor: pointer; transition: background 0.15s ease, color 0.15s ease; }
+.home-dialog-nav-btn:hover { background: var(--color-surface-muted); color: var(--color-action); }
+.home-dialog-today-btn { border: 0; background: var(--color-action); color: var(--color-on-action); border-radius: 99px; padding: 3px 10px; font-size: 11px; font-weight: 600; cursor: pointer; }
+.home-daily-quote-card .home-binder { z-index: 2; top: -20px; width: 13px; height: 38px; background: var(--color-heritage-green); border: 2px solid var(--color-warm-ivory); }.home-daily-quote-card .home-binder.b1 { left: 13%; }.home-daily-quote-card .home-binder.b3 { right: 13%; }
+.home-week-strip { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.1fr) minmax(0, 1fr); gap: 8px 26px; align-items: center; margin-top: 12px; padding: 14px 28px; border-color: var(--color-home-sage-border); border-radius: 20px; background: var(--color-home-sage-bg); }
+.home-week-strip-top, .home-week-strip-bottom { display: contents; }.home-week-summary { grid-column: 1; grid-row: 1 / 3; }.home-week-summary .home-eyebrow { color: var(--color-heritage-green); font-size: 15px; letter-spacing: 0; }.home-week-title { margin-top: 2px; color: var(--color-heritage-green); font-family: var(--font-sans); font-size: clamp(22px, 2vw, 29px); font-weight: 750; }.home-compact-week { grid-column: 2; grid-row: 1 / 3; justify-content: space-around; gap: 5px; }.home-compact-day-label { font-size: 11px; }.home-compact-day-btn { width: 37px; height: 37px; background: var(--color-home-goal-bg); }.home-status-chips { grid-column: 3; grid-row: 1; justify-content: space-between; gap: 6px; }.home-status-chip { font-size: 11px; }.home-week-actions { grid-column: 3; grid-row: 2; display: flex; justify-content: space-between; margin: 0; gap: 8px; }.home-week-totals, .home-calendar-open-btn { font-size: 11px; }
+.home-recommendations { margin-top: 18px; }.home-section-head { margin-bottom: 12px; }.home-section-title { font-family: var(--font-sans); color: var(--color-heritage-green); font-size: 24px; font-weight: 750; }.home-section-head .home-eyebrow { display: none; }.home-text-link { font-size: 13px; }.home-stories-grid { gap: 14px; }.home-story-card { grid-template-columns: 41% 1fr; min-height: 112px; border-radius: 17px; }.home-story-thumbnail { min-height: 112px; }.home-story-body { padding: 12px 16px; }.home-story-title { font-family: var(--font-sans); font-size: 15px; font-weight: 700; }.home-story-meta { font-size: 11px; }.home-thumb-tag { font-size: 9px; border-radius: 99px; padding: 3px 6px; }
+.home-page-container :is(button, a):focus-visible { outline: 2px solid var(--color-antique-gold); outline-offset: 3px; }
+@media (max-width: 1100px) { .home-greeting-row::after { display: none; } }
+@media (max-width: 1100px) { .home-quick-start { grid-template-columns: minmax(0, 1.4fr) minmax(340px, 1fr); gap: 16px; }.home-featured-content { width: 62%; padding-left: 20px; }.home-featured h2 { font-size: 25px; }.home-quick-actions { grid-template-columns: 1fr; }.home-daily-quote-card { min-height: 540px; }.home-calendar-open-surface { min-height: 528px; }.home-week-strip { grid-template-columns: 1fr 1fr; }.home-week-summary { grid-column: 1; grid-row: 1; }.home-compact-week { grid-column: 2; grid-row: 1 / 3; }.home-status-chips { grid-column: 1; grid-row: 2; }.home-week-actions { grid-column: 1 / -1; grid-row: 3; } }
+@media (max-width: 850px) { .home-quick-start { grid-template-columns: 1fr; }.home-daily-quote-card { grid-column: 1; grid-row: 2; min-height: 390px; }.home-calendar-open-surface { min-height: 378px; }.home-quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }.home-stories-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 730px) { .home-shell { width: auto; padding: 16px 16px 24px; display: block; }.home-greeting-row { gap: 12px; min-height: 86px; margin-bottom: 16px; background-size: 60% auto; }.home-greeting-mascot { width: 75px; height: 75px; }.home-greeting-title { font-size: 23px; }.home-greeting-copy p { font-size: 12px; }.home-quick-start { display: grid; }.home-learning-column { grid-template-rows: auto auto; }.home-featured { min-height: 390px; }.home-featured-image { width: 100%; height: 53%; inset: 0 0 auto; }.home-featured-shade { background: linear-gradient(to top, var(--color-heritage-forest) 0%, var(--color-heritage-green) 48%, transparent 75%); }.home-featured-content { justify-content: end; width: 100%; min-height: 390px; padding: 16px 18px 38px; }.home-featured h2 { font-size: 24px; }.home-featured p { font-size: 12px; }.home-featured-dots { right: 18px; bottom: 14px; }.home-quick-actions { grid-template-columns: 1fr; }.home-continue-card, .home-quick-actions .home-vocab-card { min-height: 110px; }.home-daily-quote-card { min-height: 375px; margin: 12px 0 0; }.home-calendar-open-surface { min-height: 363px; }.home-week-strip { display: flex; flex-direction: column; align-items: stretch; gap: 14px; margin-top: 14px; }.home-week-strip-top, .home-week-strip-bottom { display: contents; }.home-week-summary, .home-compact-week, .home-status-chips, .home-week-actions { width: 100%; }.home-compact-week { justify-content: space-between; }.home-week-actions { flex-wrap: wrap; }.home-stories-grid { grid-template-columns: 1fr; }.home-footer-row { margin-top: 20px; }.home-story-card { grid-template-columns: 40% 1fr; } }
+@media (max-width: 400px) { .home-greeting-mascot { width: 58px; height: 58px; }.home-greeting-title { font-size: 20px; }.home-featured-meta span { font-size: 10px; }.home-calendar-details { padding-left: 10px; font-size: 10px; }.home-calendar-quote { padding-left: 20px; padding-right: 20px; }.home-status-chips { flex-wrap: wrap; } }
+@media (prefers-reduced-motion: reduce) { .home-featured *, .home-continue-card *, .home-story-card { transition-duration: .01ms !important; } }

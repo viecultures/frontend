@@ -1,4 +1,19 @@
 {
+  "featured": {
+    "label": "BÀI HỌC NỔI BẬT",
+    "description": "Khám phá một câu chuyện văn hóa Việt Nam qua tiếng Anh.",
+    "read": "Khám phá bài học",
+    "choose": "Chọn bài học nổi bật",
+    "slide": "Xem bài học {{count}}"
+  },
+  "quick": {
+    "greeting_subtitle": "Sẵn sàng khám phá thêm một câu chuyện Việt Nam hôm nay chứ?",
+    "continue_title": "Tiếp tục học",
+    "start_hint": "Bắt đầu câu chuyện đầu tiên của bạn",
+    "vocab_title": "Ôn tập từ vựng",
+    "lunar": "Âm lịch",
+    "scenery_location": "Phong cảnh Mù Cang Chải"
+  },
   "greeting": {
     "eyebrow": "SẴN SÀNG HỌC THÊM ĐIỀU MỚI",
     "welcome_back": "Chào {{name}}, mừng bạn quay lại!",
@@ -114,6 +129,7 @@
     "summary": "{{minutes}} phút · {{stories}} bài đọc tuần này",
     "summary_singular": "{{minutes}} phút · 1 bài đọc tuần này",
     "summary_empty": "0 phút · Bắt đầu nhịp học hôm nay",
+    "summary_days": "{{minutes}} phút · {{days}} ngày đọc tuần này",
     "view_calendar": "Xem lịch học"
   },
   "study_calendar": {

@@ -17,7 +17,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 }) => {
   const { t } = useTranslation('profile');
   return (
-    <div className="relative w-full rounded-3xl bg-rice-paper dark:bg-heritage-forest border-2 border-antique-gold/40 p-6 sm:p-8 shadow-md overflow-hidden transition-all">
+    <div className="profile-hero relative w-full rounded-3xl bg-rice-paper dark:bg-heritage-forest border-2 border-antique-gold/40 p-6 sm:p-8 shadow-md overflow-hidden transition-all">
       {/* Decorative Traditional Watermark Corner Pattern */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-radial from-antique-gold/10 to-transparent pointer-events-none rounded-bl-full" />
       <div className="absolute top-3 left-4 text-antique-gold/30 text-xs font-serif select-none pointer-events-none">
@@ -67,13 +67,8 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                 <h1 className="font-serif text-2xl sm:text-3xl font-bold text-heritage-green dark:text-warm-ivory tracking-tight">
                   {profile.name}
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-gold border border-antique-gold/40">
-                  {profile.currentLevel}
-                </span>
+                {profile.currentLevel && <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-heritage-green/10 dark:bg-antique-gold/15 text-heritage-green dark:text-antique-gold border border-antique-gold/40">{profile.currentLevel}</span>}
               </div>
-              <p className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 font-mono mt-0.5">
-                {profile.email}
-              </p>
             </div>
 
             {/* Edit Profile Action */}
@@ -88,25 +83,23 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           </div>
 
           {/* Bio / Motivation */}
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-sans max-w-2xl">
-            {profile.bio}
-          </p>
+          {profile.bio && <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-sans max-w-2xl">{profile.bio}</p>}
 
           {/* Metadata Badges */}
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-1 text-xs">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/60 dark:bg-black/20 border border-stone-200 dark:border-white/10 text-stone-600 dark:text-stone-300">
+            {profile.targetCefr && <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/60 dark:bg-black/20 border border-stone-200 dark:border-white/10 text-stone-600 dark:text-stone-300">
               <Target aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
               <span>
                 {t('profile.header_card.target_label', {
                   target: profileTargetLabel(profile.targetCefr),
                 })}
               </span>
-            </div>
+            </div>}
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/60 dark:bg-black/20 border border-stone-200 dark:border-white/10 text-stone-600 dark:text-stone-300">
+            {profile.joinedAt && <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/60 dark:bg-black/20 border border-stone-200 dark:border-white/10 text-stone-600 dark:text-stone-300">
               <Calendar aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
               <span>{t('profile.header_card.joined_label', { date: profile.joinedAt })}</span>
-            </div>
+            </div>}
 
             {!profile.isPro && (
               <Link
