@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MapProvincesLayerProps } from './types';
 import { REGION_PALETTES } from './constants';
 
 const JOURNEY_REGIONS = [
-  { key: 'north', label: 'Miền Bắc', x: 310, y: 200 },
-  { key: 'central', label: 'Miền Trung', x: 430, y: 460 },
-  { key: 'south', label: 'Miền Nam', x: 370, y: 740 },
+  { key: 'north', labelKey: 'map.north', x: 310, y: 200 },
+  { key: 'central', labelKey: 'map.central', x: 430, y: 460 },
+  { key: 'south', labelKey: 'map.south', x: 370, y: 740 },
 ] as const;
 
 export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
@@ -18,50 +19,11 @@ export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
   overviewByRegion = false,
   selectableRegions,
   onSelectRegion,
+  labelLanguage = 'vi',
+  showRegionLabels = true,
 }) => {
-  if (overviewByRegion && activeRegion === 'all') {
-    return (
-      <g id="layer-regions">
-        {JOURNEY_REGIONS.map((region) => {
-          const locked = !!selectableRegions && !selectableRegions.includes(region.key);
-          return (
-            <g key={region.key} data-region={region.key} data-locked={locked}>
-              <path
-                id={`region-${region.key}`}
-                data-region={region.key}
-                data-locked={locked}
-                d={provinces
-                  .filter((province) => province.region === region.key)
-                  .map((province) => province.d)
-                  .join(' ')}
-                fillRule="evenodd"
-                role={locked ? 'img' : 'button'}
-                tabIndex={locked ? undefined : 0}
-                aria-label={locked ? `${region.label}, locked` : `Explore ${region.label}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  if (!locked) onSelectRegion?.(region.key);
-                }}
-                onKeyDown={(event) => {
-                  if (!locked && (event.key === 'Enter' || event.key === ' ')) {
-                    event.preventDefault();
-                    onSelectRegion?.(region.key);
-                  }
-                }}
-                className="journey-region-shape"
-              />
-              <text x={region.x} y={region.y} textAnchor="middle" className="journey-region-map-label">
-                {region.label}
-                {locked && <tspan x={region.x} dy="22" className="journey-region-map-locked">Locked</tspan>}
-              </text>
-            </g>
-          );
-        })}
-      </g>
-    );
-  }
-
-  // In SVG, render selected and hovered province paths last so their glow and thick borders render on top
+  const { t } = useTranslation('common');
+  // Keep the hook order stable when switching between overview and province views.
   const sortedProvinces = useMemo(() => {
     return [...provinces].sort((a, b) => {
       const aSelected = selectedProvinceId === a.id ? 1 : 0;
@@ -75,6 +37,52 @@ export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
       return 0;
     });
   }, [provinces, selectedProvinceId, hoveredProvinceId]);
+
+  if (overviewByRegion && activeRegion === 'all') {
+    return (
+      <g id="layer-regions">
+        {JOURNEY_REGIONS.map((region) => {
+          const locked = !!selectableRegions && !selectableRegions.includes(region.key);
+          const regionLabel = t(region.labelKey, { lng: labelLanguage });
+          const lockedLabel = t('map.locked', { lng: labelLanguage });
+          return (
+            <g key={region.key} data-region={region.key} data-locked={locked}>
+              <path
+                id={`region-${region.key}`}
+                data-region={region.key}
+                data-locked={locked}
+                d={provinces
+                  .filter((province) => province.region === region.key)
+                  .map((province) => province.d)
+                  .join(' ')}
+                fillRule="evenodd"
+                role={locked ? 'img' : 'button'}
+                tabIndex={locked ? undefined : 0}
+                aria-label={locked ? `${regionLabel}, ${lockedLabel}` : t('map.explore_region', { region: regionLabel, lng: labelLanguage })}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (!locked) onSelectRegion?.(region.key);
+                }}
+                onKeyDown={(event) => {
+                  if (!locked && (event.key === 'Enter' || event.key === ' ')) {
+                    event.preventDefault();
+                    onSelectRegion?.(region.key);
+                  }
+                }}
+                className="journey-region-shape"
+              />
+              {showRegionLabels && (
+                <text x={region.x} y={region.y} textAnchor="middle" className="journey-region-map-label">
+                  {regionLabel}
+                  {locked && <tspan x={region.x} dy="22" className="journey-region-map-locked">{lockedLabel}</tspan>}
+                </text>
+              )}
+            </g>
+          );
+        })}
+      </g>
+    );
+  }
 
   return (
     <g id="layer-provinces" style={{ filter: 'drop-shadow(0 0 6px rgba(235, 195, 120, 0.45))' }}>

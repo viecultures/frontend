@@ -22,6 +22,7 @@ export interface UseVietnamMapOptions {
   onSelectLandmark?: (landmark: LandmarkArticle, province: ProvinceMapItem) => void;
   minScale?: number;
   maxScale?: number;
+  viewBoxOverride?: string;
 }
 
 export function useVietnamMap(options: UseVietnamMapOptions = {}) {
@@ -37,6 +38,7 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
     onSelectLandmark,
     minScale = 1.0,
     maxScale = 2.5,
+    viewBoxOverride,
   } = options;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -84,9 +86,9 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
   const touchDistStartRef = useRef<number | null>(null);
   const touchScaleStartRef = useRef<number>(1);
 
-  const currentViewBox =
-    (VIETNAM_REGION_VIEWBOXES as Record<string, { viewBox: string }>)[activeRegion]?.viewBox ||
-    '0 0 940 960';
+  const currentViewBox = viewBoxOverride ??
+    ((VIETNAM_REGION_VIEWBOXES as Record<string, { viewBox: string }>)[activeRegion]?.viewBox ||
+      '0 0 940 960');
 
   // Calculate strict pan bounds based on actual rendered SVG dimensions inside container
   const calculatePanBounds = useCallback((scale: number) => {
@@ -275,6 +277,7 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
 
   // Intercept scroll wheel with Zoom-to-cursor math and pan clamping
   useEffect(() => {
+    if (maxScale <= minScale) return;
     const elem = containerRef.current;
     if (!elem) return;
 

@@ -69,18 +69,15 @@ export function HomeDailyQuoteCard({
       <section className="home-daily-quote-card" aria-label={t('daily_quote.title')}>
         <span className="home-binder b1" aria-hidden="true" />
         <span className="home-binder b3" aria-hidden="true" />
-        <button
-          type="button"
-          className="home-calendar-open-surface"
-          onClick={() => setIsDialogOpen(true)}
-          aria-label={t('daily_quote.expand_title')}
-        >
-          <span
-            className="home-calendar-scenery"
-            style={{
-              backgroundImage: `linear-gradient(to bottom, color-mix(in srgb, var(--color-warm-ivory) 72%, transparent), transparent 48%), url('${finalImageUrl}')`,
-            }}
-            aria-hidden="true"
+        <div className="home-calendar-open-surface">
+          <span className="home-calendar-scenery" aria-hidden="true">
+            <img src={finalImageUrl} alt="" />
+          </span>
+          <button
+            type="button"
+            className="home-calendar-open-hitbox"
+            onClick={() => setIsDialogOpen(true)}
+            aria-label={t('daily_quote.expand_title')}
           />
           <span className="home-calendar-top">
             <span className="home-calendar-date">
@@ -131,7 +128,7 @@ export function HomeDailyQuoteCard({
           <span className="home-calendar-expand">
             <ArrowUpRight size={19} aria-hidden="true" />
           </span>
-        </button>
+        </div>
       </section>
       <DailyQuoteDialog
         isOpen={isDialogOpen}

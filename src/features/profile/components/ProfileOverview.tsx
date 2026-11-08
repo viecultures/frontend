@@ -13,7 +13,7 @@ interface ProfileOverviewProps {
 const regions: { id: RegionType; image: string }[] = [
   { id: 'north', image: '/images/landing/mu-cang-chai.webp' },
   { id: 'central', image: '/images/landing/hoi-an-lanterns.webp' },
-  { id: 'south', image: '/images/calendar/heritage-saigon.webp' },
+  { id: 'south', image: '/images/map-thumb/tp-hcm.jpg' },
 ];
 
 export const ProfileOverview: React.FC<ProfileOverviewProps> = ({ profile, seals, onSelectTab, onSelectRegion }) => {

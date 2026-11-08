@@ -56,6 +56,12 @@ export interface VietnamMapProps {
   markers?: readonly VietnamMapMarker[];
   onSelectMarker?: (marker: VietnamMapMarker) => void;
   customViewBox?: string;
+  /** Paint the mapped SVG extent as sea; the surrounding panel can remain neutral. */
+  fillSeaBackground?: boolean;
+  /** Keep the page scrollable when the map is used as a landing preview. */
+  enableZoomPan?: boolean;
+  /** Show regional text labels on overview mode (defaults to true) */
+  showRegionLabels?: boolean;
   /** Optional custom children to overlay on the map */
   children?: React.ReactNode;
 }
@@ -105,6 +111,8 @@ export interface MapProvincesLayerProps {
   overviewByRegion?: boolean;
   selectableRegions?: readonly Exclude<RegionKey, 'all'>[];
   onSelectRegion?: (region: Exclude<RegionKey, 'all'>) => void;
+  labelLanguage?: 'vi' | 'en';
+  showRegionLabels?: boolean;
 }
 
 export interface MapSeaLayerProps {

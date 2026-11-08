@@ -7,11 +7,8 @@ import { useAppNavigate } from '@/routes/useAppNavigate';
 import { MapJourneyPanel } from './MapJourneyPanel';
 import type { RegionKey } from '@/utils/useVietnamMap';
 import { readFirstRegionChoice, saveFirstRegionChoice, type FirstRegion } from '@/services/learning/firstRegionChoice';
-import {
-  Vietnam3RegionsLandingMap,
-  type LocationStoryPin,
-} from './Vietnam3RegionsLandingMap';
-import type { ProvinceMapItem } from '@/data/vietnam3RegionsGameData';
+import { LandingVietnamMap, type LocationStoryPin } from './LandingVietnamMap';
+import type { ProvinceMapItem } from '@/data/vietnamMapData';
 
 const FEATURED_PINS: LocationStoryPin[] = [
   {
@@ -182,11 +179,15 @@ export const VietnamHeritageMapSection: React.FC = () => {
       className="landing-section relative py-5 sm:py-7 lg:py-8 px-4 sm:px-8 lg:px-12 bg-[#FAF7F0] text-ink transition-colors duration-300 overflow-hidden scroll-mt-24"
       aria-labelledby="heritage-map-title"
     >
-      <div className="relative z-10 w-full max-w-[1380px] mx-auto min-h-[520px] lg:min-h-[580px] flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-6">
+      <div className="relative z-10 w-full max-w-[1380px] mx-auto min-h-[520px] lg:min-h-[580px] flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 lg:gap-6">
         {/* ========================================================= */}
         {/* LEFT COLUMN: Clean Editorial Headline & Subtitle          */}
         {/* ========================================================= */}
-        <div className="w-full lg:w-[310px] xl:w-[330px] shrink-0 flex flex-col justify-center py-2 z-10">
+        <div className="w-full lg:w-[310px] xl:w-[330px] shrink-0 flex flex-col pt-2 lg:pt-8 z-10">
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#C08B3E] mb-3 block">
+            {t('navigation.heritage_map', 'Bản đồ di sản')}
+          </span>
+
           <h2
             id="heritage-map-title"
             className="font-serif text-3xl sm:text-4xl lg:text-[38px] xl:text-[42px] font-bold text-[#1A3B32] leading-[1.22] tracking-tight m-0"
@@ -208,7 +209,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
         {/* ========================================================= */}
         <div className="w-full lg:flex-1 flex items-center justify-center relative min-h-[480px] sm:min-h-[520px] lg:min-h-[580px]">
           <div className="w-full h-full max-w-[560px] xl:max-w-[620px] aspect-square flex items-center justify-center shadow-lg rounded-2xl overflow-hidden border border-[#CBDAD6]/40">
-            <Vietnam3RegionsLandingMap
+            <LandingVietnamMap
               activeRegion={selectedRegion}
               lockedRegions={lockedRegions}
               selectedProvinceId={firstRegion ? activePin.provinceId : null}
@@ -232,7 +233,7 @@ export const VietnamHeritageMapSection: React.FC = () => {
         {/* ========================================================= */}
         {/* RIGHT COLUMN: White Learning Journey Card                 */}
         {/* ========================================================= */}
-        <div className="w-full lg:w-[320px] xl:w-[340px] shrink-0 flex justify-end z-10">
+        <div className="w-full lg:w-[320px] xl:w-[340px] shrink-0 flex justify-end lg:pt-2 z-10">
           <MapJourneyPanel
             selectedRegion={selectedRegion}
             firstRegion={firstRegion}

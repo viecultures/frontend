@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MapSeaLayerProps } from './types';
 
 export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
@@ -6,7 +7,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
   className = '',
   labelLanguage = 'vi',
 }) => {
-  const isEn = labelLanguage === 'en';
+  const { t } = useTranslation('common');
 
   return (
     <g id="layer-sea" className={`pointer-events-none select-none ${className}`}>
@@ -89,7 +90,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
           letterSpacing="4px"
           textAnchor="middle"
         >
-          {isEn ? 'GULF OF TONKIN' : 'VỊNH BẮC BỘ'}
+          {t('map.gulf_of_tonkin', { lng: labelLanguage })}
         </text>
         <path
           d="M365 248 C385 246, 405 250, 425 247 C440 245, 455 249, 460 248"
@@ -121,21 +122,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
           textAnchor="middle"
           opacity="0.65"
         >
-          BIỂN ĐÔNG
-        </text>
-        <text
-          x="680"
-          y="542"
-          fill="var(--color-sky-mist)"
-          fontSize="11"
-          fontFamily="var(--font-serif)"
-          fontStyle="italic"
-          fontWeight="600"
-          letterSpacing="5px"
-          textAnchor="middle"
-          opacity="0.45"
-        >
-          EAST SEA
+          {t('map.east_sea', { lng: labelLanguage })}
         </text>
       </g>
 
@@ -152,7 +139,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
           letterSpacing="3px"
           textAnchor="middle"
         >
-          {isEn ? 'GULF OF THAILAND' : 'VỊNH THÁI LAN'}
+          {t('map.gulf_of_thailand', { lng: labelLanguage })}
         </text>
       </g>
 
@@ -167,7 +154,7 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
           fontWeight="700"
           textAnchor="middle"
         >
-          Đ. Phú Quốc
+          {t('map.phu_quoc', { lng: labelLanguage })}
         </text>
         <text
           x="440"
@@ -178,21 +165,15 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
           fontWeight="700"
           textAnchor="middle"
         >
-          QĐ. Côn Đảo
+          {t('map.con_dao', { lng: labelLanguage })}
         </text>
       </g>
 
       {/* 6. Quần đảo Hoàng Sa & Trường Sa (Maritime Sovereignty) */}
       {islands.map((island) => {
         const isHoangSa = island.id === 'hoang-sa';
-        const labelLine1 = isEn
-          ? isHoangSa
-            ? 'HOANG SA ARCHIPELAGO'
-            : 'TRUONG SA ARCHIPELAGO'
-          : isHoangSa
-          ? 'QUẦN ĐẢO HOÀNG SA'
-          : 'QUẦN ĐẢO TRƯỜNG SA';
-        const labelLine2 = isEn ? '(VIETNAM)' : '(VIỆT NAM)';
+        const labelLine1 = t(isHoangSa ? 'map.hoang_sa' : 'map.truong_sa', { lng: labelLanguage });
+        const labelLine2 = `(${t('map.vietnam', { lng: labelLanguage })})`;
 
         // Position coordinates for badge
         const badgeWidth = 154;
