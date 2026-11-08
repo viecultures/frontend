@@ -127,6 +127,21 @@
     "add_to_home": "Add to Home Screen",
     "dismiss_aria": "Dismiss install suggestion"
   },
+  "map": {
+    "north": "North",
+    "central": "Central",
+    "south": "South",
+    "locked": "Locked",
+    "explore_region": "Explore {{region}}",
+    "gulf_of_tonkin": "GULF OF TONKIN",
+    "east_sea": "EAST SEA",
+    "gulf_of_thailand": "GULF OF THAILAND",
+    "phu_quoc": "Phu Quoc Island",
+    "con_dao": "Con Dao Islands",
+    "hoang_sa": "HOANG SA ARCHIPELAGO",
+    "truong_sa": "TRUONG SA ARCHIPELAGO",
+    "vietnam": "VIETNAM"
+  },
   "status": {
     "loading": "Loading data...",
     "success": "Success",

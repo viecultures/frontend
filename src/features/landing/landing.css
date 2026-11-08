@@ -428,3 +428,12 @@
 .landing-page #methodology .landing-section-heading { justify-content: center; text-align: center; }
 .landing-page #methodology .landing-section-description { margin-inline: auto; text-align: center; }
 .landing-page #methodology .landing-journey-grid { max-width: 1200px; margin-inline: auto; }
+
+/* Shared VietnamMap inside the Landing heritage preview. */
+.landing-vietnam-map-canvas #layer-regions path { stroke: var(--color-warm-ivory); stroke-width: 1.8px; cursor: pointer; }
+.landing-vietnam-map-canvas #layer-regions path[data-region='north'] { fill: var(--color-map-north); }
+.landing-vietnam-map-canvas #layer-regions path[data-region='central'] { fill: var(--color-map-central); }
+.landing-vietnam-map-canvas #layer-regions path[data-region='south'] { fill: var(--color-map-south); }
+.landing-vietnam-map-canvas #layer-regions path[data-locked='true'] { opacity: .7; }
+.landing-vietnam-map-canvas .journey-region-map-label { display: none; }
+.landing-vietnam-map--no-compass #nautical-compass { display: none; }

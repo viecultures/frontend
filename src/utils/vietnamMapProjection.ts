@@ -1,23 +1,51 @@
-// Calibrated projection for the 520 × 1100 Vietnam SVG. Both directions must
-// share these coefficients; a bounding-box interpolation is not equivalent.
-const projection = {
-  xLng: 55.5242, xLat: -0.3554, xOffset: -5609.5346,
-  yLng: 4.3056, yLat: -61.6367, yOffset: 1040.9510,
-};
+/**
+ * vietnamMapProjection.ts
+ *
+ * Official WGS84 Web Mercator projection calibrated for the 940 × 960 Vietnam Vector Map.
+ * Provides bidirectional translation between real-world GPS coordinates (lat, lng)
+ * and SVG canvas coordinates (x, y).
+ */
 
+const DEG2RAD = Math.PI / 180;
+const RAD2DEG = 180 / Math.PI;
+
+// Calibrated coefficients for Mercator (EPSG:3857) projection on 940 x 960 canvas
+const K_LNG = 2903.57;
+const X_OFFSET = -5053.76;
+
+const K_LAT = -2904.29;
+const Y_OFFSET = 1290.24;
+
+/**
+ * Convert real-world GPS coordinates (WGS84 lat, lng) to Vietnam SVG Map canvas coordinates (x, y)
+ */
 export function geoToSvg(lat: number, lng: number): { x: number; y: number } {
-  const x = projection.xLng * lng + projection.xLat * lat + projection.xOffset;
-  const y = projection.yLng * lng + projection.yLat * lat + projection.yOffset;
-  return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+  const radLng = lng * DEG2RAD;
+  const radLat = lat * DEG2RAD;
+
+  const x = K_LNG * radLng + X_OFFSET;
+  const y = K_LAT * Math.log(Math.tan(Math.PI / 4 + radLat / 2)) + Y_OFFSET;
+
+  return {
+    x: Math.round(x * 10) / 10,
+    y: Math.round(y * 10) / 10,
+  };
 }
 
-/** Inverse affine projection; retains precision until the next SVG conversion. */
+/**
+ * Convert Vietnam SVG canvas coordinates (x, y) back to real-world GPS coordinates (lat, lng)
+ */
 export function svgToGeo(x: number, y: number): { lat: number; lng: number } {
-  const dx = x - projection.xOffset;
-  const dy = y - projection.yOffset;
-  const determinant = projection.xLng * projection.yLat - projection.xLat * projection.yLng;
+  const radLng = (x - X_OFFSET) / K_LNG;
+  const lng = radLng * RAD2DEG;
+
+  const lnTerm = (y - Y_OFFSET) / K_LAT;
+  const tanTerm = Math.exp(lnTerm);
+  const radLat = 2 * (Math.atan(tanTerm) - Math.PI / 4);
+  const lat = radLat * RAD2DEG;
+
   return {
-    lng: (dx * projection.yLat - projection.xLat * dy) / determinant,
-    lat: (projection.xLng * dy - dx * projection.yLng) / determinant,
+    lat: Math.round(lat * 10000) / 10000,
+    lng: Math.round(lng * 10000) / 10000,
   };
 }

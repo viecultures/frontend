@@ -10,14 +10,16 @@ import type { CulturalSeal, RegionType, UserProfileData } from '../types';
 interface CulturalPassportViewProps {
   seals: CulturalSeal[];
   profile: UserProfileData;
+  initialRegion?: 'all' | RegionType;
 }
 
 export const CulturalPassportView: React.FC<CulturalPassportViewProps> = ({
   seals,
   profile,
+  initialRegion = 'all',
 }) => {
   const { t } = useTranslation('profile');
-  const [selectedRegion, setSelectedRegion] = useState<'all' | RegionType>('all');
+  const [selectedRegion, setSelectedRegion] = useState<'all' | RegionType>(initialRegion);
   const [inspectingSeal, setInspectingSeal] = useState<CulturalSeal | null>(null);
 
   const filteredSeals = seals.filter((s) => {

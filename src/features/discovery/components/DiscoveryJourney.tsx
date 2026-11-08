@@ -7,10 +7,12 @@ import {
   ArrowLeft,
   ArrowRight,
   BookOpen,
+  BookMarked,
   Bot,
   ChevronLeft,
   ChevronRight,
   Compass,
+  Flame,
   Headphones,
   LockKeyhole,
   MapPin,
@@ -20,14 +22,12 @@ import {
 } from "lucide-react";
 import { VietnamMap } from "@/components/map/VietnamMap";
 import { Button } from "@/components/ui/button";
-import {
-  VIETNAM_34_PROVINCES,
-  VIETNAM_REGION_VIEWBOXES,
-} from "@/data/vietnamMapData";
+import { VIETNAM_34_PROVINCES } from "@/data/vietnamMapData";
 import { toEnglishPlaceName } from "@/utils/vietnamMapUtils";
 import type { RegionKey } from "@/utils/useVietnamMap";
 import { paths } from "@/routes/paths";
 import {
+  getAllSavedVocabularies,
   readLearningValue,
   writeLearningValue,
 } from "@/services/learning/learningStorage";
@@ -50,29 +50,26 @@ const REGIONS = [
     nameKey: "journey.region_north",
     fallbackName: "Northern Vietnam",
     number: "1",
+    image: "/images/discovery/region-north-ho-guom.png",
+    descriptionKey: "journey.region_north_description",
   },
   {
     id: "central",
     nameKey: "journey.region_central",
     fallbackName: "Central Vietnam",
     number: "2",
+    image: "/images/discovery/region-central-hoi-an.png",
+    descriptionKey: "journey.region_central_description",
   },
   {
     id: "south",
     nameKey: "journey.region_south",
     fallbackName: "Southern Vietnam",
     number: "3",
+    image: "/images/discovery/region-south-floating-market.png",
+    descriptionKey: "journey.region_south_description",
   },
 ] as const;
-const REGION_SHAPES = Object.fromEntries(
-  REGIONS.map((region) => [
-    region.id,
-    VIETNAM_34_PROVINCES.filter((province) => province.region === region.id)
-      .map((province) => province.d)
-      .join(" "),
-  ]),
-) as Record<(typeof REGIONS)[number]["id"], string>;
-
 interface HoverPopoverState {
   series: JourneySeries;
   x: number;
@@ -226,6 +223,19 @@ export function DiscoveryJourney() {
     )];
   }, [allJourneys, isEn, staticUpcomingPreviews]);
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  const [savedWordCount, setSavedWordCount] = useState(() => getAllSavedVocabularies().length);
+
+  useEffect(() => {
+    const refreshSavedWords = () => setSavedWordCount(getAllSavedVocabularies().length);
+    window.addEventListener("vie_vocab_updated", refreshSavedWords);
+    window.addEventListener("storage", refreshSavedWords);
+    window.addEventListener("focus", refreshSavedWords);
+    return () => {
+      window.removeEventListener("vie_vocab_updated", refreshSavedWords);
+      window.removeEventListener("storage", refreshSavedWords);
+      window.removeEventListener("focus", refreshSavedWords);
+    };
+  }, []);
 
   // Floating Chapter Popover State
   const [hoverPopover, setHoverPopover] = useState<HoverPopoverState | null>(
@@ -912,7 +922,7 @@ export function DiscoveryJourney() {
   return (
     <div className="journey-page">
       <header className="journey-hero">
-        <div>
+        <div className="journey-hero-content">
           <h1>{t("journey.title")}</h1>
           <p>{t("journey.lead")}</p>
         </div>
@@ -960,6 +970,8 @@ export function DiscoveryJourney() {
           >
             <VietnamMap
               activeRegion={selectedRegion}
+              customViewBox={selectedRegion === "all" ? "100 30 790 920" : undefined}
+              fillSeaBackground={selectedRegion === "all"}
               overviewByRegion={!region}
               selectableRegions={["north"]}
               labelLanguage={isEn ? "en" : "vi"}
@@ -988,7 +1000,7 @@ export function DiscoveryJourney() {
 
         <aside
           className={`journey-rail ${region ? "journey-rail--featured" : "journey-rail--regions"}`}
-          aria-label={t("journey.featured_series")}
+          aria-label={t(region ? "journey.featured_series" : "journey.explore_vietnam")}
           aria-live={region ? "off" : "polite"}
           onFocus={() => setCarouselFocused(true)}
           onBlur={(event) => {
@@ -1011,14 +1023,7 @@ export function DiscoveryJourney() {
                       <span className="journey-region-number">
                         {item.number}
                       </span>
-                      <svg
-                        className="journey-region-thumbnail"
-                        viewBox={VIETNAM_REGION_VIEWBOXES[item.id].viewBox}
-                        aria-hidden="true"
-                        focusable="false"
-                      >
-                        <path d={REGION_SHAPES[item.id]} fillRule="evenodd" />
-                      </svg>
+                      <img className="journey-region-photo" src={item.image} alt="" loading="lazy" />
                       <span className="journey-region-copy">
                         <strong>{regionName}</strong>
                         <small className="journey-region-status">
@@ -1036,6 +1041,7 @@ export function DiscoveryJourney() {
                             {t("journey.recommended")}
                           </small>
                         )}
+                        <span className="journey-region-description">{t(item.descriptionKey)}</span>
                       </span>
                       {isOpen && (
                         <ArrowRight
@@ -1050,7 +1056,8 @@ export function DiscoveryJourney() {
                     <button
                       key={item.id}
                       type="button"
-                      className="journey-region-step journey-region-step--open"
+                      className={`journey-region-step journey-region-step--open ${selectedRegion === item.id ? "is-selected" : ""}`}
+                      aria-pressed={selectedRegion === item.id}
                       onClick={() => selectRegion(item.id)}
                     >
                       {stepContent}
@@ -1065,6 +1072,25 @@ export function DiscoveryJourney() {
                     </div>
                   );
                 })}
+              </div>
+              <div className="journey-learning-stats" role="group" aria-label={t("journey.learning_stats")}>
+                <div className="journey-learning-stat">
+                  <Flame size={24} aria-hidden="true" />
+                  <span className="journey-learning-stat-value">—</span>
+                  <span>{t("journey.streak_days")}</span>
+                  <small>{t("journey.no_data")}</small>
+                </div>
+                <div className="journey-learning-stat">
+                  <BookOpen size={24} aria-hidden="true" />
+                  <span className="journey-learning-stat-value">—</span>
+                  <span>{t("journey.completed_readings")}</span>
+                  <small>{t("journey.no_data")}</small>
+                </div>
+                <div className="journey-learning-stat">
+                  <BookMarked size={24} aria-hidden="true" />
+                  <span className="journey-learning-stat-value">{savedWordCount}</span>
+                  <span>{t("journey.saved_words")}</span>
+                </div>
               </div>
             </>
           ) : (

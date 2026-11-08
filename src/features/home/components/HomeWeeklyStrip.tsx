@@ -112,9 +112,7 @@ export function HomeWeeklyStrip({
   });
 
   const summaryText = weekTotalMinutes > 0
-    ? (weekStoriesCount === 1
-        ? t('weekly_strip.summary_singular', { minutes: weekTotalMinutes, defaultValue: `${weekTotalMinutes} min · 1 story this week` })
-        : t('weekly_strip.summary', { minutes: weekTotalMinutes, stories: weekStoriesCount, defaultValue: `${weekTotalMinutes} min · ${weekStoriesCount} stories this week` }))
+    ? t('weekly_strip.summary_days', { minutes: weekTotalMinutes, days: weekStoriesCount })
     : t('weekly_strip.summary_empty', '0 min · Start your learning rhythm today');
 
   return (

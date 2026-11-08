@@ -19,7 +19,7 @@ export function HomeGreetingHeader({
 
   return (
     <header className="home-greeting-row">
-      <h1 className="home-greeting-title">{greetingSentence}</h1>
+      <div className="home-greeting-copy"><h1 className="home-greeting-title">{greetingSentence}</h1><p>{t('quick.greeting_subtitle')}</p></div>
     </header>
   );
 }

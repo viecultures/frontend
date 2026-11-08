@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MapSeaLayerProps } from './types';
 
 export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
@@ -6,12 +7,12 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
   className = '',
   labelLanguage = 'vi',
 }) => {
-  const isEn = labelLanguage === 'en';
+  const { t } = useTranslation('common');
 
   return (
     <g id="layer-sea" className={`pointer-events-none select-none ${className}`}>
       {/* 1. Classical Nautical Compass Rose (Hoa Tiêu Hàng Hải Cổ Điển) */}
-      <g id="nautical-compass" transform="translate(710, 155)" opacity="0.85">
+      <g id="nautical-compass" transform="translate(780, 160)" opacity="0.85">
         {/* Outer Azimuth Rings */}
         <circle
           cx="0"
@@ -49,16 +50,12 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
         <path d="M0 0 L-15 15 L-3 3 Z" fill="var(--color-antique-gold)" opacity="0.6" />
 
         {/* Cardinal Rays (North, South, East, West) */}
-        {/* North Arrow Pointer (Prominent) */}
         <polygon points="0,-26 4,-6 0,0" fill="var(--color-antique-rich)" />
         <polygon points="0,-26 -4,-6 0,0" fill="var(--color-heritage-forest)" />
-        {/* South Arrow */}
         <polygon points="0,22 -3.5,5 0,0" fill="var(--color-antique-gold)" opacity="0.75" />
         <polygon points="0,22 3.5,5 0,0" fill="var(--color-heritage-forest)" opacity="0.6" />
-        {/* East Arrow */}
         <polygon points="22,0 5,3.5 0,0" fill="var(--color-antique-gold)" opacity="0.75" />
         <polygon points="22,0 5,-3.5 0,0" fill="var(--color-heritage-forest)" opacity="0.6" />
-        {/* West Arrow */}
         <polygon points="-22,0 -5,-3.5 0,0" fill="var(--color-antique-gold)" opacity="0.75" />
         <polygon points="-22,0 -5,3.5 0,0" fill="var(--color-heritage-forest)" opacity="0.6" />
 
@@ -83,8 +80,8 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
       {/* 2. Watermark: Vịnh Bắc Bộ (Gulf of Tonkin) */}
       <g id="watermark-tonkin" opacity="0.5">
         <text
-          x="350"
-          y="278"
+          x="410"
+          y="240"
           fill="var(--color-sky-mist)"
           fontSize="11"
           fontFamily="var(--font-serif)"
@@ -93,10 +90,10 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
           letterSpacing="4px"
           textAnchor="middle"
         >
-          {isEn ? 'GULF OF TONKIN' : 'VỊNH BẮC BỘ'}
+          {t('map.gulf_of_tonkin', { lng: labelLanguage })}
         </text>
         <path
-          d="M305 286 C325 284, 345 288, 365 285 C380 283, 395 287, 400 286"
+          d="M365 248 C385 246, 405 250, 425 247 C440 245, 455 249, 460 248"
           fill="none"
           stroke="var(--color-sky-mist)"
           strokeWidth="0.8"
@@ -106,9 +103,8 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
 
       {/* 3. Watermark: Biển Đông (East Sea) */}
       <g id="watermark-east-sea">
-        {/* Bathymetric contour curve representing the continental shelf */}
         <path
-          d="M480 340 C530 460, 560 620, 540 760 C520 860, 480 940, 420 1000"
+          d="M540 300 C600 420, 640 580, 620 720 C600 820, 560 900, 500 950"
           fill="none"
           stroke="var(--color-sky-mist)"
           strokeWidth="1.2"
@@ -116,8 +112,8 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
           opacity="0.25"
         />
         <text
-          x="585"
-          y="638"
+          x="680"
+          y="520"
           fill="var(--color-sky-mist)"
           fontSize="18"
           fontFamily="var(--font-serif)"
@@ -126,29 +122,15 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
           textAnchor="middle"
           opacity="0.65"
         >
-          BIỂN ĐÔNG
-        </text>
-        <text
-          x="585"
-          y="660"
-          fill="var(--color-sky-mist)"
-          fontSize="11"
-          fontFamily="var(--font-serif)"
-          fontStyle="italic"
-          fontWeight="600"
-          letterSpacing="5px"
-          textAnchor="middle"
-          opacity="0.45"
-        >
-          EAST SEA
+          {t('map.east_sea', { lng: labelLanguage })}
         </text>
       </g>
 
       {/* 4. Watermark: Vịnh Thái Lan (Gulf of Thailand) */}
       <g id="watermark-thailand-gulf" opacity="0.45">
         <text
-          x="105"
-          y="995"
+          x="180"
+          y="870"
           fill="var(--color-sky-mist)"
           fontSize="10"
           fontFamily="var(--font-serif)"
@@ -157,47 +139,41 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
           letterSpacing="3px"
           textAnchor="middle"
         >
-          {isEn ? 'GULF OF THAILAND' : 'VỊNH THÁI LAN'}
+          {t('map.gulf_of_thailand', { lng: labelLanguage })}
         </text>
       </g>
 
       {/* 5. Côn Đảo & Phú Quốc Subtle Watermark Labels */}
       <g id="offshore-island-labels" opacity="0.75">
         <text
-          x="142"
-          y="900"
+          x="270"
+          y="860"
           fill="var(--color-heritage-forest)"
           fontSize="8"
           fontFamily="var(--font-sans)"
           fontWeight="700"
           textAnchor="middle"
         >
-          Đ. Phú Quốc
+          {t('map.phu_quoc', { lng: labelLanguage })}
         </text>
         <text
-          x="368"
-          y="995"
+          x="440"
+          y="890"
           fill="var(--color-heritage-forest)"
           fontSize="8"
           fontFamily="var(--font-sans)"
           fontWeight="700"
           textAnchor="middle"
         >
-          QĐ. Côn Đảo
+          {t('map.con_dao', { lng: labelLanguage })}
         </text>
       </g>
 
       {/* 6. Quần đảo Hoàng Sa & Trường Sa (Maritime Sovereignty) */}
       {islands.map((island) => {
         const isHoangSa = island.id === 'hoang-sa';
-        const labelLine1 = isEn
-          ? isHoangSa
-            ? 'HOANG SA ARCHIPELAGO'
-            : 'TRUONG SA ARCHIPELAGO'
-          : isHoangSa
-          ? 'QUẦN ĐẢO HOÀNG SA'
-          : 'QUẦN ĐẢO TRƯỜNG SA';
-        const labelLine2 = isEn ? '(VIETNAM)' : '(VIỆT NAM)';
+        const labelLine1 = t(isHoangSa ? 'map.hoang_sa' : 'map.truong_sa', { lng: labelLanguage });
+        const labelLine2 = `(${t('map.vietnam', { lng: labelLanguage })})`;
 
         // Position coordinates for badge
         const badgeWidth = 154;
@@ -295,16 +271,11 @@ export const MapSeaLayer: React.FC<MapSeaLayerProps> = ({
                 opacity="0.65"
               />
 
-              {/* Gold Star Icon ★ */}
-              <text
-                x="14"
-                y="19"
-                textAnchor="middle"
+              {/* Star Icon */}
+              <polygon
+                points="14,13 16,18 21,18 17,21 19,26 14,23 9,26 11,21 7,18 12,18"
                 fill="var(--color-antique-bright)"
-                fontSize="11"
-              >
-                ★
-              </text>
+              />
 
               {/* Line 1: Archipelago Name */}
               <text
