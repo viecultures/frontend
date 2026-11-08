@@ -86,7 +86,7 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
 
   const currentViewBox =
     (VIETNAM_REGION_VIEWBOXES as Record<string, { viewBox: string }>)[activeRegion]?.viewBox ||
-    '0 0 850 1100';
+    '0 0 940 960';
 
   // Calculate strict pan bounds based on actual rendered SVG dimensions inside container
   const calculatePanBounds = useCallback((scale: number) => {
@@ -99,8 +99,8 @@ export function useVietnamMap(options: UseVietnamMapOptions = {}) {
 
     // Parse viewBox to determine actual rendered SVG aspect ratio
     const vbParts = currentViewBox.split(' ').map(Number);
-    const vbWidth = vbParts[2] || 850;
-    const vbHeight = vbParts[3] || 1100;
+    const vbWidth = vbParts[2] || 940;
+    const vbHeight = vbParts[3] || 960;
     const vbAspect = vbWidth / vbHeight;
     const containerAspect = width / height;
 

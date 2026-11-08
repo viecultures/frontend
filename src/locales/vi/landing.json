@@ -204,7 +204,15 @@
     "default_region_south": "Nam Bộ",
     "default_unesco_category": "Di sản UNESCO",
     "default_established": "Di sản truyền thống",
-    "default_unesco_status": "Di sản văn hóa tiêu biểu"
+    "default_unesco_status": "Di sản văn hóa tiêu biểu",
+    "east_sea": "BIỂN ĐÔNG",
+    "gulf_of_tonkin": "VỊNH BẮC BỘ",
+    "gulf_of_thailand": "VỊNH THÁI LAN",
+    "reset_view": "Xem toàn cảnh",
+    "locked_toast": "{{name}} đang bị khóa! Hãy khám phá Miền Bắc trước.",
+    "region_north": "Miền Bắc",
+    "region_central": "Miền Trung",
+    "region_south": "Miền Nam"
   },
   "map_journey": {
     "badge": "LỘ TRÌNH THEO VÙNG MIỀN",

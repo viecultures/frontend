@@ -927,13 +927,15 @@
 .home-dialog-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background: color-mix(in srgb, var(--color-heritage-forest) 50%, transparent);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  display: grid;
-  place-items: center;
-  padding: 16px;
+  z-index: 10000;
+  background: color-mix(in srgb, var(--color-heritage-forest) 55%, transparent);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
   box-sizing: border-box;
 }
 
@@ -972,14 +974,18 @@
 .home-heritage-dialog {
   position: relative;
   width: 100%;
-  max-width: 860px;
-  max-height: 88vh;
-  padding: 24px 28px 28px;
+  max-width: 880px;
+  max-height: min(660px, 90vh);
+  height: auto;
+  margin: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
   border-radius: 20px;
   background: var(--color-surface-raised);
   border: 1px solid var(--color-line);
   box-shadow: 0 24px 64px color-mix(in srgb, var(--color-heritage-forest) 28%, transparent);
-  overflow-y: auto;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -988,9 +994,17 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
+  padding: 14px 24px;
   border-bottom: 1px solid var(--color-line);
+  background: var(--color-surface-raised);
+  flex: none;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.home-dialog-header .home-dialog-close {
+  position: static;
+  flex: none;
 }
 
 .home-dialog-header-left {
@@ -1012,25 +1026,31 @@
 
 .home-heritage-popup {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 28px;
+  padding: 20px 28px 24px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 .home-quote-art-column {
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: 0;
 }
 
 .home-heritage-art-frame {
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 3;
   border-radius: 14px;
   box-shadow: 0 4px 16px color-mix(in srgb, var(--color-heritage-forest) 10%, transparent);
   background: var(--color-surface-muted);
   border: 1px solid var(--color-line);
-  border-radius: 12px;
   overflow: hidden;
-  margin-top: 10px;
+  margin-top: 4px;
 }
 
 .home-heritage-art-img {
@@ -1700,8 +1720,8 @@
 
   /* Dialogs on mobile */
   .home-heritage-dialog {
-    padding: 20px;
-    max-height: 90vh;
+    padding: 0;
+    max-height: 92vh;
   }
 
   .home-heritage-popup {

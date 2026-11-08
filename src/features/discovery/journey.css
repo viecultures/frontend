@@ -22,13 +22,13 @@
 .journey-map-heading > div > button { justify-self: start; padding-left: 0; color: var(--color-action); }
 .journey-map-heading span { color: var(--color-accent-ink); font-size: 14px; font-weight: 700; letter-spacing: .08em; }
 .journey-map-heading strong { font-family: var(--font-sans); font-size: 22px; font-weight: 700; text-align: right; }
-.journey-map { height: 560px; overflow: hidden; border-radius: var(--radius-inner); background: linear-gradient(rgba(24, 54, 51, .18), rgba(24, 54, 51, .18)), url('/images/discovery/journey-map-background.webp') center / cover no-repeat var(--color-sky-mist); }
+.journey-map { height: 560px; overflow: hidden; border-radius: var(--radius-inner); background: #E5F4F1; }
 .journey-map svg { filter: drop-shadow(0 5px 8px color-mix(in srgb, var(--color-heritage-forest) 16%, transparent)); }
 .journey-map #layer-regions path { cursor: pointer; pointer-events: bounding-box; stroke-width: 2.5px; transition: filter .2s ease, opacity .2s ease; }
 .journey-map #layer-regions path:not([data-locked='true']):hover, .journey-map #layer-regions path:not([data-locked='true']):focus-visible { filter: brightness(1.13) drop-shadow(0 0 6px var(--color-antique-gold)); }
 .journey-map #layer-regions path[data-locked='true'] { cursor: not-allowed; opacity: .65; }
-.journey-map .journey-region-map-label { fill: var(--color-warm-ivory); stroke: var(--color-heritage-forest); stroke-width: 4px; paint-order: stroke; font-family: var(--font-sans); font-size: 34px; font-weight: 800; pointer-events: none; }
-.journey-map .journey-region-map-locked { font-size: 24px; font-weight: 600; }
+.journey-map .journey-region-map-label { fill: var(--color-warm-ivory); stroke: var(--color-heritage-forest); stroke-width: 2.5px; paint-order: stroke; font-family: var(--font-sans); font-size: 20px; font-weight: 800; letter-spacing: 0.5px; pointer-events: none; }
+.journey-map .journey-region-map-locked { font-size: 13px; font-weight: 600; letter-spacing: 0.5px; }
 .journey-map #layer-regions path[data-region='north'] { fill: var(--journey-map-north); stroke: var(--journey-map-north); }
 .journey-map #layer-regions path[data-region='central'] { fill: var(--journey-map-central); stroke: var(--journey-map-central); }
 .journey-map #layer-regions path[data-region='south'] { fill: var(--journey-map-south); stroke: var(--journey-map-south); }
@@ -39,9 +39,7 @@
 .journey-map #layer-provinces path[data-region='central'][data-selected='true'] { fill: var(--journey-map-central); }
 .journey-map #layer-provinces path[data-region='south'][data-selected='true'] { fill: var(--journey-map-south); }
 .journey-map #layer-provinces path[data-selected='true'] { stroke: var(--color-antique-rich); stroke-width: 4px; }
-.journey-map #layer-sea circle { fill: var(--color-heritage-green); stroke: var(--color-warm-ivory); stroke-width: 1px; }
-.journey-map #layer-sea rect { fill: var(--color-sky-mist); stroke: none; }
-.journey-map #layer-sea text { fill: var(--color-heritage-green); }
+/* Native #layer-sea styling preserved */
 .journey-selected-place { display: flex; align-items: center; gap: 9px; padding: 12px 14px; border: 1px solid var(--color-action); border-radius: var(--radius-inner); background: var(--color-success-soft); color: var(--color-action); font-weight: 700; }
 .journey-selected-place button { margin-left: auto; min-height: 36px; text-decoration: underline; font-size: 14px; }
 .journey-rail { box-sizing: border-box; height: var(--journey-panel-height, auto); padding: 26px; overflow-y: auto; }

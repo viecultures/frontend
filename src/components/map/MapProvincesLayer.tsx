@@ -3,9 +3,9 @@ import type { MapProvincesLayerProps } from './types';
 import { REGION_PALETTES } from './constants';
 
 const JOURNEY_REGIONS = [
-  { key: 'north', label: 'Miền Bắc', x: 220, y: 155 },
-  { key: 'central', label: 'Miền Trung', x: 350, y: 570 },
-  { key: 'south', label: 'Miền Nam', x: 215, y: 865 },
+  { key: 'north', label: 'Miền Bắc', x: 310, y: 200 },
+  { key: 'central', label: 'Miền Trung', x: 430, y: 460 },
+  { key: 'south', label: 'Miền Nam', x: 370, y: 740 },
 ] as const;
 
 export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
@@ -52,7 +52,7 @@ export const MapProvincesLayer: React.FC<MapProvincesLayerProps> = ({
               />
               <text x={region.x} y={region.y} textAnchor="middle" className="journey-region-map-label">
                 {region.label}
-                {locked && <tspan x={region.x} dy="33" className="journey-region-map-locked">Locked</tspan>}
+                {locked && <tspan x={region.x} dy="22" className="journey-region-map-locked">Locked</tspan>}
               </text>
             </g>
           );

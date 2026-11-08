@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Heart, ChevronDown, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { DailyQuoteItem, DailyQuoteVocabItem } from '../data/dailyQuotesNovember';
@@ -70,6 +71,7 @@ export function DailyQuoteDialog({
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const popupBodyRef = useRef<HTMLDivElement>(null);
 
   // Fallback / mapped content fields
   const finalImageUrl = quote?.artworkUrl || imageUrl;
@@ -108,9 +110,20 @@ export function DailyQuoteDialog({
       setIsExpanded(false);
       setSelectedWord(null);
       setIsSaved(readIsSaved(quoteId));
-      closeButtonRef.current?.focus();
+      popupBodyRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+      closeButtonRef.current?.focus({ preventScroll: true });
     }
   }, [isOpen, quoteId]);
+
+  // Prevent background scroll when dialog is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen]);
 
   // Handle ESC key to close
   useEffect(() => {
@@ -140,7 +153,7 @@ export function DailyQuoteDialog({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className="home-dialog-backdrop"
       role="presentation"
@@ -155,7 +168,7 @@ export function DailyQuoteDialog({
         aria-modal="true"
         aria-labelledby="heritage-dialog-title"
       >
-        {/* Top Header Bar: Clean 3-part layout (Left: Eyebrow + Location, Center: Prev/Today/Next, Right: Close) */}
+        {/* Top Header Bar: Pinned at top, clean 3-part layout (Left: Eyebrow + Location, Center: Prev/Today/Next, Right: Close) */}
         <div className="home-dialog-header">
           <div className="home-dialog-header-left">
             <span className="home-eyebrow">
@@ -212,7 +225,8 @@ export function DailyQuoteDialog({
           </button>
         </div>
 
-        <div className="home-heritage-popup">
+        {/* Scrollable Popup Body */}
+        <div ref={popupBodyRef} className="home-heritage-popup">
           {/* Left column: Art, Author, Save CTA */}
           <div className="home-quote-art-column">
             <div className="home-heritage-art-frame">
@@ -366,6 +380,7 @@ export function DailyQuoteDialog({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

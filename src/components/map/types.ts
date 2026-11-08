@@ -40,6 +40,8 @@ export interface VietnamMapProps {
   showPoiPins?: boolean;
   /** Show sovereignty sea layer (Hoàng Sa & Trường Sa, Biển Đông) */
   showSeaLayer?: boolean;
+  /** Show neighboring countries borders (China, Laos, Cambodia, Thailand) */
+  showNeighbors?: boolean;
   /** Show province text labels */
   showLabels?: boolean;
   /** Show one selectable silhouette per region in the national overview. */

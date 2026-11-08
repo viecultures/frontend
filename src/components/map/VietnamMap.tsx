@@ -11,6 +11,7 @@ import type { VietnamMapProps } from './types';
 import { MapRegionTabs } from './MapRegionTabs';
 import { MapTooltip } from './MapTooltip';
 import { MapControls } from './MapControls';
+import { MapNeighborsLayer } from './MapNeighborsLayer';
 import { MapProvincesLayer } from './MapProvincesLayer';
 import { MapSeaLayer } from './MapSeaLayer';
 import { MapLabelsLayer } from './MapLabelsLayer';
@@ -32,6 +33,7 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
   showRegionTabs = true,
   showPoiPins = true,
   showSeaLayer = true,
+  showNeighbors = true,
   showLabels = true,
   overviewByRegion = false,
   selectableRegions,
@@ -140,6 +142,9 @@ export const VietnamMap: React.FC<VietnamMapProps> = ({
               handleBackdropClick();
             }}
           />
+
+          {/* Layer 0: Neighboring Countries (China, Laos, Cambodia, Thailand) */}
+          {showNeighbors && <MapNeighborsLayer />}
 
           {/* Layer 1: 34 Vector Provinces */}
           <MapProvincesLayer
