@@ -5,7 +5,7 @@
 .ai-workspace-page-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .ai-workspace-page-title > svg { color: var(--color-on-feature); flex-shrink: 0; }
 .ai-workspace-page-title :is(h1, h2) { font-family: var(--font-serif, serif); font-size: 16px; font-weight: 700; font-style: italic; color: var(--color-ink); white-space: nowrap; }
-.ai-workspace-page-title > span { color: var(--color-ink-faint); font-size: 12px; border-left: 1px solid var(--color-line); padding-left: 10px; margin-left: 2px; }
+.ai-workspace-page-title .ai-workspace-page-subtitle { color: var(--color-ink-faint); font-size: 12px; border-left: 1px solid var(--color-line); padding-left: 10px; margin-left: 2px; }
 .ai-workspace-page-content { flex: 1; min-height: 0; }
 .ai-chat-ui {
   --workspace-bg: var(--color-surface); --workspace-surface: var(--color-surface-muted); --workspace-raised: var(--color-surface-raised); --workspace-ink: var(--color-ink); --workspace-muted: var(--color-ink-faint);

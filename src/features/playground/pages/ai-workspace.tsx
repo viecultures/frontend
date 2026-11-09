@@ -18,7 +18,7 @@ export default function AiWorkspacePage() {
           <span>{context ? t('playground.workspace.reader_link') : t('playground.workspace.study_room_link')}</span>
         </Link>
         <div className="ai-workspace-page-title">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#8a9a6f] bg-[#fffaf0] shadow-[0_2px_0_-1px_#c9d6b0]">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#8a9a6f] bg-[#fffaf0] shadow-[0_2px_0_-1px_#c9d6b0]">
             <img
               src="/brand/viecultures-mascot-logo.png"
               alt=""
@@ -26,11 +26,11 @@ export default function AiWorkspacePage() {
               draggable={false}
               className="block h-full w-full object-cover select-none"
             />
-          </span>
+          </div>
           <h2 className="truncate font-serif text-[16px] font-bold italic leading-tight text-[#2f4a2c]">
             {t('playground.companion.header.title')}
           </h2>
-          <span>{t('playground.workspace.subtitle')}</span>
+          <span className="ai-workspace-page-subtitle">{t('playground.workspace.subtitle')}</span>
         </div>
         <Link to={PATHS.playground} className="ai-workspace-lab">
           <FlaskConical size={17} />

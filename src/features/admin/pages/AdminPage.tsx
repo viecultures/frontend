@@ -139,6 +139,23 @@ export const AdminPage: React.FC = () => {
     return 'posts';
   }, [location.search]);
 
+  const activeAiSubRoute = useMemo<'overview' | 'prompts' | 'providers' | 'tts' | 'logs'>(() => {
+    const stripped = location.pathname.replace(/^\/(vi|en)(\/|$)/, '/');
+    const match = stripped.match(/^\/admin\/(?:ai|ai_configs)(?:\/([a-zA-Z0-9_-]+))?/);
+    if (match && match[1]) {
+      const sub = match[1];
+      if (['overview', 'prompts', 'providers', 'tts', 'logs'].includes(sub)) {
+        return sub as 'overview' | 'prompts' | 'providers' | 'tts' | 'logs';
+      }
+    }
+    const params = new URLSearchParams(location.search);
+    const subParam = params.get('sub');
+    if (subParam && ['overview', 'prompts', 'providers', 'tts', 'logs'].includes(subParam)) {
+      return subParam as 'overview' | 'prompts' | 'providers' | 'tts' | 'logs';
+    }
+    return 'overview';
+  }, [location.pathname, location.search]);
+
   // When visiting /admin or /:lang/admin without subpath, redirect to /admin/dashboard
   useEffect(() => {
     const stripped = location.pathname.replace(/^\/(vi|en)(\/|$)/, '/');
@@ -1711,7 +1728,7 @@ export const AdminPage: React.FC = () => {
 
         {/* ── TAB 7: CẤU HÌNH AI & CHI PHÍ ─────────────────────────────────── */}
         {(activeTab === 'ai_configs' || activeTab === 'ai') && (
-          <AiConfigManagementView />
+          <AiConfigManagementView activeSubRoute={activeAiSubRoute} />
         )}
 
         {/* ── Preview Modal ─────────────────────────────────────────────── */}

@@ -15,6 +15,7 @@ import {
   Mic,
   MicOff,
   Sparkles,
+  Loader2,
   Keyboard,
   Send,
   ImagePlus,
@@ -26,7 +27,7 @@ import { useReaderHandoff } from '@/features/playground/lib/reader-handoff';
 import { useImagePreviewStore } from '../lib/image-previews';
 import { TwoPassVoiceDetector } from '../lib/two-pass-vad';
 import { twoPassSttService, type TwoPassSttData } from '../services/twoPassSttService';
-import { TwoPassSpeechVisualizer, type TwoPassVisualizerState } from './TwoPassSpeechVisualizer';
+import type { TwoPassVisualizerState } from './TwoPassSpeechVisualizer';
 
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -165,24 +166,29 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
 
           if (res.success && res.data) {
             if (!res.data.cleanedText.trim()) {
-              setTwoPassState('empty');
+              setTwoPassState('idle');
+              setTwoPassActive(false);
             } else {
               setTwoPassResult(res.data);
               setTextPrompt(res.data.cleanedText);
               setIsTextEntryVisible(true);
               setTwoPassState('idle');
+              setTwoPassActive(false);
             }
           } else {
-            setTwoPassState('error');
+            setTwoPassState('idle');
+            setTwoPassActive(false);
             setTwoPassError(res.message || t('playground.two_pass_stt.state_error_desc'));
           }
         } catch (err) {
-          setTwoPassState('error');
+          setTwoPassState('idle');
+          setTwoPassActive(false);
           setTwoPassError(err instanceof Error ? err.message : String(err));
         }
       },
       onError: (err: Error) => {
-        setTwoPassState('error');
+        setTwoPassState('idle');
+        setTwoPassActive(false);
         setTwoPassError(err.message);
       },
     };
@@ -198,7 +204,8 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
     try {
       await vadDetectorRef.current.start();
     } catch (err) {
-      setTwoPassState('error');
+      setTwoPassState('idle');
+      setTwoPassActive(false);
       setTwoPassError(err instanceof Error ? err.message : String(err));
     }
   }, [i18n.language, t]);
@@ -213,7 +220,12 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
   }, []);
 
   const handleToggleTwoPass = () => {
-    if (twoPassActive || twoPassState === 'listening') {
+    if (twoPassState === 'listening') {
+      handleStopTwoPassRecording();
+      // VAD bỏ qua âm quá ngắn (không gọi onSpeechEnd) -> tự reset để nút không bị kẹt ở trạng thái listening
+      setTwoPassState(prev => (prev === 'listening' ? 'idle' : prev));
+      setTwoPassActive(false);
+    } else if (twoPassActive) {
       stopTwoPassVad();
       setTwoPassActive(false);
       setTwoPassState('idle');
@@ -458,8 +470,8 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
         </button>
         <button
           className={cn('action-button mic-button relative', {
-            'mic-on ring-2 ring-red-400': !muted || twoPassState === 'listening',
-            'mic-off': muted && twoPassState !== 'listening',
+            'mic-on ring-2 ring-red-400': !muted,
+            'mic-off': muted,
           })}
           disabled={busy && !pushToTalk}
           onClick={handleMicClick}
@@ -480,11 +492,6 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
               <Mic className="w-5 h-5 text-red-500 animate-pulse" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
             </div>
-          ) : twoPassState === 'listening' ? (
-            <div className="relative flex items-center justify-center">
-              <Mic className="w-5 h-5 text-red-500 animate-pulse" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-            </div>
           ) : (
             <MicOff className="w-5 h-5" />
           )}
@@ -493,20 +500,30 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
         {/* Smart Two-Pass STT Button */}
         <button
           type="button"
-          className={cn('action-button two-pass-toggle-button relative', {
-            'two-pass-active text-amber-600 bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-700': twoPassActive || twoPassState === 'listening' || twoPassState === 'refining',
+          className={cn('action-button two-pass-toggle-button relative transition-all duration-200', {
+            'two-pass-listening bg-red-50 dark:bg-red-950/60 border-red-500 text-red-600 ring-2 ring-red-400': twoPassState === 'listening',
+            'two-pass-refining bg-amber-50 dark:bg-amber-950/60 border-amber-400 text-amber-600 ring-2 ring-amber-300': twoPassState === 'refining',
+            'two-pass-active text-amber-600 bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-700': twoPassActive && twoPassState !== 'listening' && twoPassState !== 'refining',
           })}
-          disabled={busy}
+          disabled={(busy && twoPassState !== 'listening') || twoPassState === 'refining'}
           onClick={handleToggleTwoPass}
-          title={t('playground.two_pass_stt.toggle_button_title', 'Smart Two-Pass STT (Tự động lọc từ thừa)')}
+          title={
+            twoPassState === 'listening'
+              ? 'Đang thu âm... Nhấn để dừng và chuyển thành văn bản'
+              : twoPassState === 'refining'
+              ? 'AI đang tinh chỉnh câu nói...'
+              : t('playground.two_pass_stt.toggle_button_title', 'Smart Two-Pass STT (Tự động lọc từ thừa)')
+          }
           aria-label={t('playground.two_pass_stt.toggle_button_title', 'Smart Two-Pass STT (Tự động lọc từ thừa)')}
-          aria-pressed={twoPassActive}
+          aria-pressed={twoPassActive || twoPassState === 'listening'}
         >
           {twoPassState === 'listening' ? (
             <div className="relative flex items-center justify-center">
-              <Mic className="w-5 h-5 text-red-500 animate-pulse" />
+              <Sparkles className="w-5 h-5 text-red-600 animate-pulse" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
             </div>
+          ) : twoPassState === 'refining' ? (
+            <Loader2 className="w-5 h-5 text-amber-600 animate-spin" />
           ) : (
             <Sparkles className="w-5 h-5" />
           )}
@@ -536,45 +553,6 @@ export function ControlTray({ trayRef }: ControlTrayProps) {
           </button>
         </>}
       </nav>
-
-      {/* Two-Pass Speech Visualizer & Learning Card */}
-      {(twoPassActive || twoPassResult !== null || twoPassState !== 'idle') && (
-        <TwoPassSpeechVisualizer
-          state={twoPassState}
-          volume={twoPassVolume}
-          smartCleanup={smartCleanup}
-          onToggleSmartCleanup={setSmartCleanup}
-          errorMessage={twoPassError}
-          resultData={twoPassResult}
-          onRetry={handleTwoPassRetry}
-          onStopListening={handleStopTwoPassRecording}
-          onApplyPrompt={(text) => {
-            setTextPrompt(text);
-            setIsTextEntryVisible(true);
-          }}
-          onDirectSend={async (text) => {
-            if (!active || busy || !text.trim()) return;
-            setTextPrompt(text);
-            const result = await sendMessage({ text, source: 'composer' });
-            if (result.status === 'ok') {
-              setTextPrompt('');
-              setTwoPassResult(null);
-            }
-          }}
-          onDismissResult={() => {
-            setTwoPassResult(null);
-            if (twoPassState !== 'listening' && twoPassState !== 'refining') {
-              setTwoPassActive(false);
-              setTwoPassState('idle');
-            }
-          }}
-          onCancelListening={() => {
-            stopTwoPassVad();
-            setTwoPassActive(false);
-            setTwoPassState('idle');
-          }}
-        />
-      )}
 
       {(!isMobile || isTextEntryVisible) && (
         <form className="prompt-form" onSubmit={handleTextSubmit}>

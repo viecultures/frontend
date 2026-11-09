@@ -35,6 +35,7 @@ export interface CreateAiKeyPayload {
 
 export interface UpdateAiKeyPayload {
   keyLabel?: string;
+  serviceType?: AiServiceType;
   rawKey?: string;
   priority?: number;
   active?: boolean;
@@ -108,6 +109,7 @@ export interface AzureRegionOption {
 export interface SystemAiSettingsDto {
   geminiChatModel: string;
   geminiTranslateModel: string;
+  geminiTtsModel?: string;
   geminiSttModel?: string;
   azureSpeechRegion: string;
   activeTtsProvider: string;
@@ -118,6 +120,7 @@ export interface SystemAiSettingsDto {
 export interface UpdateSystemAiSettingsPayload {
   geminiChatModel?: string;
   geminiTranslateModel?: string;
+  geminiTtsModel?: string;
   geminiSttModel?: string;
   azureSpeechRegion?: string;
   activeTtsProvider?: string;

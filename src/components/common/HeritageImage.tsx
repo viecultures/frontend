@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Image as ImageIcon } from 'lucide-react';
 import { resolveAssetUrl, getDefaultCategoryImage } from '../../utils/assetHelper';
 
-export interface HeritageImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+export interface HeritageImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
   src?: string | null;
   alt: string;
   category?: string | null;
