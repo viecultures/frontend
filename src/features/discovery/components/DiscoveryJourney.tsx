@@ -171,9 +171,17 @@ export function DiscoveryJourney() {
         }
         const mock = publicMap.get(id);
         if (mock && (!dbJourney.chapters || dbJourney.chapters.length === 0)) {
-          merged.push({ ...mock, ...dbJourney, chapters: mock.chapters });
+          merged.push({
+            ...mock,
+            ...dbJourney,
+            descriptionVi: dbJourney.descriptionVi || mock.descriptionVi,
+            chapters: mock.chapters,
+          });
         } else {
-          merged.push(dbJourney);
+          merged.push({
+            ...dbJourney,
+            descriptionVi: dbJourney.descriptionVi || mock?.descriptionVi,
+          });
         }
       }
 
@@ -215,7 +223,7 @@ export function DiscoveryJourney() {
           title: isEn ? series.title : series.titleVi || series.title,
           place: province ? getLocalizedProvinceName(province.name) : isEn ? "Vietnam" : "Việt Nam",
           imageUrl: series.imageUrl,
-          description: series.description,
+          description: isEn ? series.description : (series.descriptionVi || series.description),
         };
       });
     return [...dynamicUpcoming, ...staticUpcomingPreviews.filter(
@@ -823,8 +831,8 @@ export function DiscoveryJourney() {
             })}{" "}
             · B1
           </span>
-          <h3>{series.title}</h3>
-          <p>{series.description}</p>
+          <h3>{isEn ? series.title : (series.titleVi || series.title)}</h3>
+          <p>{isEn ? series.description : (series.descriptionVi || series.description)}</p>
           <div className="journey-spotlight-footer">
             {isUnlocked ? (
               <button
@@ -908,7 +916,7 @@ export function DiscoveryJourney() {
               })}
             </span>
             <h4>{isEn ? series.title : (series.titleVi || series.title)}</h4>
-            <p>{series.description}</p>
+            <p>{isEn ? series.description : (series.descriptionVi || series.description)}</p>
             <span className="journey-series-footer">
               {t("journey.explore_chapters")}{" "}
               <ArrowRight size={18} aria-hidden="true" />

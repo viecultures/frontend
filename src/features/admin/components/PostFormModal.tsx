@@ -1564,9 +1564,9 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                 ) : (
                   <div className="space-y-3">
                     {voiceTracks.map((track) => {
-                      const normalAudioUrl = track.normalUrl || track.fastUrl || '';
+                      const normalAudioUrl = track.audioUrl || track.normalUrl || track.fastUrl || '';
                       const isNormalPrimary = shadowingAudioUrl === normalAudioUrl;
-                      const isSlowPrimary = shadowingAudioUrl === track.slowUrl;
+                      const isSlowPrimary = Boolean(track.slowUrl && shadowingAudioUrl === track.slowUrl);
 
                       return (
                         <div
@@ -1655,7 +1655,7 @@ export const PostFormModal: React.FC<PostFormModalProps> = ({
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() => handleSetPrimaryAudio(track.slowUrl, track.voiceName, 'Slow')}
+                                  onClick={() => track.slowUrl && handleSetPrimaryAudio(track.slowUrl, track.voiceName, 'Slow')}
                                   className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
                                     isSlowPrimary
                                       ? 'bg-antique-gold text-heritage-dark font-extrabold'

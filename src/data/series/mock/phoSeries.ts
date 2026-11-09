@@ -11,6 +11,7 @@ export const PHO_SERIES_METADATA: SeriesMetadata = {
   provinceId: 'ha-noi',
   region: 'north',
   description: 'Explore the culinary science, morning rituals, and regional diversity of Vietnam’s iconic noodle soup.',
+  descriptionVi: 'Khám phá tinh hoa ẩm thực, văn hóa đón ngày mới và nét độc đáo của phở bò truyền thống – biểu tượng ẩm thực của đất Hà thành.',
   imageUrl,
   status: 'published',
   chapters: [

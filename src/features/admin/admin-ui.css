@@ -20,7 +20,7 @@
 :is(.admin-ui, .admin-dialog) thead { text-transform: none; letter-spacing: normal; }
 :is(.admin-ui, .admin-dialog) th { white-space: nowrap; }
 :is(.admin-ui, .admin-dialog) td { vertical-align: middle; }
-:is(.admin-ui, .admin-dialog) td button { display: inline-flex; align-items: center; justify-content: center; }
+:is(.admin-ui, .admin-dialog) td button { min-height: 32px; min-width: 32px; display: inline-flex; align-items: center; justify-content: center; }
 :is(.admin-ui, .admin-dialog) .text-antique-gold:not(svg) { color: var(--color-accent-ink); }
 :is(.admin-ui, .admin-dialog) .bg-heritage-green .text-antique-gold { color: var(--color-antique-bright); }
 .admin-dialog .font-serif { font-family: var(--font-sans); font-size: 16px; line-height: 1.8; }

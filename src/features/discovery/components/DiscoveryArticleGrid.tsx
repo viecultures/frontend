@@ -239,9 +239,20 @@ export const DiscoveryArticleGrid: React.FC<DiscoveryArticleGridProps> = ({
                     {secondaryTitle}
                   </p>
                   <p className="text-xs text-text-body mt-2 line-clamp-3 h-[3.6rem] leading-relaxed">
-                    {currentStats.cefrLevel && lesson.levelDetails?.[currentStats.cefrLevel]?.summary
-                      ? lesson.levelDetails[currentStats.cefrLevel].summary
-                      : lesson.summary}
+                    {(() => {
+                      const levelDetail = currentStats.cefrLevel
+                        ? lesson.levelDetails?.[currentStats.cefrLevel]
+                        : undefined;
+                      if (isVi) {
+                        return (
+                          levelDetail?.summaryVi ||
+                          lesson.summaryVi ||
+                          levelDetail?.summary ||
+                          lesson.summary
+                        );
+                      }
+                      return levelDetail?.summary || lesson.summary;
+                    })()}
                   </p>
                 </div>
 

@@ -20,6 +20,7 @@ export interface CatalogLevelDetail {
   vocabCount: number;
   wordCount?: number;
   summary?: string;
+  summaryVi?: string;
 }
 
 export interface CatalogLesson {
@@ -34,6 +35,7 @@ export interface CatalogLesson {
   region: string;
   imageUrl: string;
   summary: string;
+  summaryVi?: string;
   featured: boolean;
   totalReads: number;
   likesCount: number;
@@ -287,13 +289,18 @@ export const readerApiService = {
   // ─── 6. Map Backend CatalogLesson to UI Lesson Model ─────────────────────
   mapCatalogLessonToDiscoveryLesson(item: CatalogLesson): Lesson {
     const safeSummary = item.summary || 'Khám phá bài học văn hóa Việt Nam độc đáo cùng VieCultures.';
+    const matchedLandmark = VIETNAM_LANDMARKS.find(
+      lm => lm.id === item.id || lm.id === item.topicGroup
+    );
+    const resolvedSummaryVi = item.summaryVi || matchedLandmark?.excerptVi || safeSummary;
     const safeReadTime = item.readTime || '3 phút đọc';
     const safeVocabCount = typeof item.vocabCount === 'number' ? item.vocabCount : 0;
 
-    const defaultLevelDetail = (summaryText: string) => ({
+    const defaultLevelDetail = (summaryText: string, summaryViText: string) => ({
       readTime: safeReadTime,
       vocabCount: safeVocabCount,
       summary: summaryText,
+      summaryVi: summaryViText,
     });
 
     const levelDetails: Record<'Level 1' | 'Level 2' | 'Level 3', LevelDetail> = {
@@ -303,32 +310,27 @@ export const readerApiService = {
             vocabCount: item.levelDetails['Level 1'].vocabCount ?? safeVocabCount,
             wordCount: item.levelDetails['Level 1'].wordCount,
             summary: item.levelDetails['Level 1'].summary || safeSummary,
+            summaryVi: item.levelDetails['Level 1'].summaryVi || resolvedSummaryVi,
           }
-        : defaultLevelDetail(safeSummary),
+        : defaultLevelDetail(safeSummary, resolvedSummaryVi),
       'Level 2': item.levelDetails && item.levelDetails['Level 2']
         ? {
             readTime: item.levelDetails['Level 2'].readTime || safeReadTime,
             vocabCount: item.levelDetails['Level 2'].vocabCount ?? safeVocabCount,
             wordCount: item.levelDetails['Level 2'].wordCount,
             summary: item.levelDetails['Level 2'].summary || safeSummary,
+            summaryVi: item.levelDetails['Level 2'].summaryVi || resolvedSummaryVi,
           }
-        : {
-            readTime: safeReadTime,
-            vocabCount: safeVocabCount,
-            summary: safeSummary,
-          },
+        : defaultLevelDetail(safeSummary, resolvedSummaryVi),
       'Level 3': item.levelDetails && item.levelDetails['Level 3']
         ? {
             readTime: item.levelDetails['Level 3'].readTime || '6 phút đọc',
             vocabCount: item.levelDetails['Level 3'].vocabCount ?? 12,
             wordCount: item.levelDetails['Level 3'].wordCount,
             summary: item.levelDetails['Level 3'].summary || safeSummary,
+            summaryVi: item.levelDetails['Level 3'].summaryVi || resolvedSummaryVi,
           }
-        : {
-            readTime: '6 phút đọc',
-            vocabCount: 12,
-            summary: safeSummary,
-          },
+        : defaultLevelDetail(safeSummary, resolvedSummaryVi),
     };
 
     const availableLevels =
@@ -359,6 +361,7 @@ export const readerApiService = {
       readTime: safeReadTime,
       vocabCount: safeVocabCount,
       summary: safeSummary,
+      summaryVi: resolvedSummaryVi,
       gradient: 'from-amber-600/40 via-emerald-800/60 to-heritage-green/90',
       iconSymbol: iconMap[categorySafe] || 'landmark',
       imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1200&q=80',

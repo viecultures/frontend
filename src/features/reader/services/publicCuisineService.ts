@@ -15,13 +15,7 @@ let pending: Promise<PublicSeries[]> | null = null;
 
 export function getPublicCuisineSeries(): Promise<PublicSeries[]> {
   if (!pending) {
-    pending = fetch(`${API_BASE_URL}/api/cuisine-series`, { signal: AbortSignal.timeout(3000) })
-      .then(response => {
-        if (!response.ok) return publishedSnapshot as PublicSeries[];
-        return response.json() as Promise<PublicSeries[]>;
-      })
-      .then(series => (series && series.length) ? series : (publishedSnapshot as PublicSeries[]))
-      .catch(() => publishedSnapshot as PublicSeries[]);
+    pending = Promise.resolve(publishedSnapshot as PublicSeries[]);
   }
   return pending;
 }
@@ -39,6 +33,8 @@ const PROVINCE_MAP_34: Record<string, string> = {
 
 export function toPublicJourney(series: PublicSeries): JourneySeries {
   const provinceId = PROVINCE_MAP_34[series.provinceId] || series.provinceId;
+  const rawDesc = (series as { description?: string }).description || '';
+  const rawDescVi = (series as { descriptionVi?: string }).descriptionVi || rawDesc || series.titleVi;
   return {
     id: series.id,
     title: (series as { title?: string; titleEn?: string }).title || (series as { titleEn?: string }).titleEn || series.titleVi,
@@ -46,7 +42,8 @@ export function toPublicJourney(series: PublicSeries): JourneySeries {
     theme: 'cuisine',
     provinceId,
     region: series.region || 'north',
-    description: (series as { description?: string }).description || series.titleVi,
+    description: rawDesc || series.titleVi,
+    descriptionVi: rawDescVi,
     imageUrl: series.imageUrl || '',
     status: (series.status as SeriesStatus) || 'published',
     chapters: series.chapters.map(chapter => ({
@@ -64,6 +61,8 @@ export function toPublicJourney(series: PublicSeries): JourneySeries {
 
 export function toPublicSeriesMetadata(series: PublicSeries): SeriesMetadata {
   const provinceId = PROVINCE_MAP_34[series.provinceId] || series.provinceId;
+  const rawDesc = (series as { description?: string }).description || '';
+  const rawDescVi = (series as { descriptionVi?: string }).descriptionVi || rawDesc || series.titleVi;
   return {
     id: series.id,
     title: (series as { title?: string; titleEn?: string }).title || (series as { titleEn?: string }).titleEn || series.titleVi,
@@ -71,7 +70,8 @@ export function toPublicSeriesMetadata(series: PublicSeries): SeriesMetadata {
     theme: 'cuisine',
     provinceId,
     region: (series.region as SeriesMetadata['region']) || 'north',
-    description: (series as { description?: string }).description || series.titleVi,
+    description: rawDesc || series.titleVi,
+    descriptionVi: rawDescVi,
     imageUrl: series.imageUrl || '',
     status: (series.status as SeriesStatus) || 'published',
     chapters: series.chapters.map(chapter => ({
@@ -128,16 +128,18 @@ function parseVocabulary(source: string, paragraphs: Array<{ enText: string }>, 
 }
 
 export async function getPublicCuisineArticle(chapterId: string, level: Level): Promise<ReaderArticleData | null> {
+  const normalizedChapterId = chapterId.replace(/-(?:a1|a2|b1|b2|c1|c2)$/i, '');
   const seriesList = await getPublicCuisineSeries();
-  const series = seriesList.find(item => item.chapters.some(chapter => chapter.id === chapterId));
-  const chapter = series?.chapters.find(item => item.id === chapterId);
+  const series = seriesList.find(item => item.chapters.some(chapter => chapter.id === chapterId || chapter.id === normalizedChapterId));
+  const chapter = series?.chapters.find(item => item.id === chapterId || item.id === normalizedChapterId);
+  const effectiveChapterId = chapter?.id || normalizedChapterId;
   if (series && !['pho', 'bun-cha', 'cha-ca-la-vong', 'ca-kho-vu-dai'].includes(series.id)) {
     const cefr = { 'Level 1': 'A1', 'Level 2': 'B1', 'Level 3': 'C1' }[level];
-    const post = await readerApiService.getPostByTopicGroupAndLevel(chapterId, cefr);
+    const post = await readerApiService.getPostByTopicGroupAndLevel(effectiveChapterId, cefr);
     if (post) {
       const article = readerApiService.mapPostToReaderData(post);
-      const questions = CUISINE_QUESTIONS[chapterId] || article.questions || [];
-      return { ...article, id: chapterId, topicGroup: undefined, cefrLevel: undefined, questions };
+      const questions = CUISINE_QUESTIONS[effectiveChapterId] || article.questions || [];
+      return { ...article, id: effectiveChapterId, topicGroup: undefined, cefrLevel: undefined, questions };
     }
   }
   const variant = chapter?.variants[level];
@@ -147,9 +149,9 @@ export async function getPublicCuisineArticle(chapterId: string, level: Level): 
     enText: pair.enText,
     viText: pair.viText,
   }));
-  const vocabularies = parseVocabulary(variant.vocabularySource, paragraphs, chapterId);
+  const vocabularies = parseVocabulary(variant.vocabularySource, paragraphs, effectiveChapterId);
   return {
-    id: chapterId,
+    id: effectiveChapterId,
     titleEn: variant.titleEn || chapter.titleEn,
     titleVi: chapter.titleVi,
     summary: (chapter as { summary?: string }).summary,
@@ -161,6 +163,6 @@ export async function getPublicCuisineArticle(chapterId: string, level: Level): 
     paragraphs,
     vocabularies,
     vocabMap: Object.fromEntries(vocabularies.map(item => [item.word.toLowerCase(), item])),
-    questions: CUISINE_QUESTIONS[chapterId] || [],
+    questions: CUISINE_QUESTIONS[effectiveChapterId] || [],
   };
 }

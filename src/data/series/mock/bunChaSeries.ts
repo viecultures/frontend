@@ -11,6 +11,7 @@ export const BUN_CHA_SERIES_METADATA: SeriesMetadata = {
   provinceId: 'ha-noi',
   region: 'north',
   description: 'Discover the charcoal grilling secrets, lunchtime sidewalk culture, and refined elegance of Hanoi’s iconic bún chả.',
+  descriptionVi: 'Khám phá bí quyết nướng chả than hoa thơm lừng, văn hóa ăn trưa vỉa hè độc đáo và nét thanh tao của bún chả Hà Nội.',
   imageUrl,
   status: 'published',
   chapters: [

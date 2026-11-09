@@ -15,7 +15,11 @@ interface FlashcardStudyHeaderProps {
 }
 
 export function FlashcardStudyHeader({ activeLesson, isShuffled, onToggleShuffle, isAutoAudio, onToggleAutoAudio, accentVoice, onChangeVoice }: FlashcardStudyHeaderProps) {
-  const { t } = useTranslation('flashcards');
+  const { t, i18n } = useTranslation('flashcards');
+  const isVi = i18n.language === 'vi';
+  const displayTitle = isVi
+    ? (activeLesson.vietnameseTitle || activeLesson.title)
+    : (activeLesson.title || activeLesson.vietnameseTitle);
 
   return (
     <header className="vocab-study-heading">
@@ -25,7 +29,7 @@ export function FlashcardStudyHeader({ activeLesson, isShuffled, onToggleShuffle
       </Link>
       <div className="vocab-study-title-row">
         <div className="vocab-study-title">
-          <h1>{activeLesson.title}</h1>
+          <h1>{displayTitle}</h1>
           <span className="vocab-study-category">{t('header.flashcards_badge', 'Flashcards')}</span>
         </div>
         <div className="vocab-study-toolbar" aria-label={t('header.review_options', 'Review options')}>

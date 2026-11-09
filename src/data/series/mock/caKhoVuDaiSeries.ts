@@ -11,6 +11,7 @@ export const CA_KHO_VU_DAI_SERIES_METADATA: SeriesMetadata = {
   provinceId: 'ninh-binh',
   region: 'north',
   description: 'Discover the 16-hour longan wood simmering, literary roots in Nam Cao’s stories, and natural flavor layering of Hà Nam’s legendary braised carp.',
+  descriptionVi: 'Khám phá nghệ thuật kho cá 16 tiếng bằng củi nhãn, niêu đất cổ truyền và câu chuyện văn hóa gắn liền với trang văn Nam Cao của làng Vũ Đại.',
   imageUrl,
   status: 'published',
   chapters: [

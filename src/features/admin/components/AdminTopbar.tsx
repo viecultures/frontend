@@ -72,22 +72,53 @@ export const AdminTopbar: React.FC<AdminTopbarProps> = ({ onSearch, onToggleSide
     return match ? match[1] : 'dashboard';
   }, [tab, location.pathname]);
 
+  const activeContentSubTab = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('tab') || 'posts';
+  }, [location.search]);
+
+  const isContentSection = currentTab === 'content';
+
+  const getContentSubLabel = (subTabName: string): string => {
+    switch (subTabName) {
+      case 'journeys':
+        return 'Lộ trình học di sản';
+      case 'vocabularies':
+        return 'Từ vựng & Thuật ngữ';
+      default:
+        return 'Kho Bài viết';
+    }
+  };
+
   const getSubsystemLabel = (tabName: string): string => {
     switch (tabName) {
       case 'dashboard':
       case 'system_stats':
         return t('tabs.overview', 'Tổng quan & Tăng trưởng');
       case 'journeys':
-        return 'Hành trình học';
+        return 'Lộ trình học di sản';
       case 'posts':
         return t('tabs.posts', 'Kho Bài viết');
+      case 'vocabularies':
+        return 'Từ vựng & Thuật ngữ';
       case 'marketing':
         return 'Marketing & Đa kênh';
+      case 'subscriptions':
+        return 'Gói đăng ký & Doanh thu';
       case 'users':
         return t('tabs.users', 'Học viên CRM');
+      case 'analytics':
+        return 'Google Analytics';
+      case 'search_console':
+      case 'search-console':
+        return 'Google Search Console';
+      case 'ai_configs':
+      case 'ai':
+        return 'Cấu hình AI & Chi phí';
+      case 'history':
       case 'system':
       case 'logs':
-        return 'Hệ thống & Kiểm duyệt';
+        return 'Nhật ký & Lịch sử';
       default:
         return 'Bảng điều khiển';
     }
@@ -128,9 +159,21 @@ export const AdminTopbar: React.FC<AdminTopbarProps> = ({ onSearch, onToggleSide
 
         <ChevronRight aria-hidden="true" className="w-3.5 h-3.5 text-text-muted shrink-0" />
 
-        <span className="text-xs font-bold text-text-body dark:text-warm-ivory truncate max-w-[140px] sm:max-w-none">
-          {getSubsystemLabel(currentTab)}
-        </span>
+        {isContentSection ? (
+          <>
+            <span className="text-xs font-medium text-text-muted hidden md:inline">
+              Quản lý nội dung
+            </span>
+            <ChevronRight aria-hidden="true" className="w-3.5 h-3.5 text-text-muted shrink-0 hidden md:inline" />
+            <span className="text-xs font-bold text-heritage-green dark:text-antique-bright truncate max-w-[140px] sm:max-w-none">
+              {getContentSubLabel(activeContentSubTab)}
+            </span>
+          </>
+        ) : (
+          <span className="text-xs font-bold text-text-body dark:text-warm-ivory truncate max-w-[140px] sm:max-w-none">
+            {getSubsystemLabel(currentTab)}
+          </span>
+        )}
       </nav>
 
       {/* ── Right Area: Learner Switch, i18n, Admin Profile Dropdown ──── */}

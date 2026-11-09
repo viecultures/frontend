@@ -20,6 +20,7 @@ export interface BackendJourneyResponse {
   provinceId: string;
   region: string;
   description?: string;
+  descriptionVi?: string;
   imageUrl?: string;
   status: string;
   scheduledPublishAt?: string;
@@ -43,6 +44,7 @@ export function mapBackendJourneyToSeries(item: BackendJourneyResponse): Journey
     provinceId: item.provinceId,
     region: item.region,
     description: item.description || '',
+    descriptionVi: item.descriptionVi || '',
     imageUrl: item.imageUrl || '',
     status: item.status || 'published',
     scheduledPublishAt: item.scheduledPublishAt,

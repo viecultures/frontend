@@ -11,6 +11,7 @@ export const COM_CHAY_SERIES_METADATA: SeriesMetadata = {
   provinceId: 'ninh-binh',
   region: 'north',
   description: 'Discover the 19th-century origin of Đinh Hoàng Thăng, cast-iron pot crust techniques, and the dramatic sizzle of mountain goat sauce over crispy rice.',
+  descriptionVi: 'Tìm hiểu nguồn gốc thế kỷ 19 của ông Đinh Hoàng Thăng, kỹ thuật ép cháy đáy nồi gang giòn rụm và nước sốt dê núi thơm lừng đất cố đô Ninh Bình.',
   imageUrl,
   status: 'published',
   chapters: [

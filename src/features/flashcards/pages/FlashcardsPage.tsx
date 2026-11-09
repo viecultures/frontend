@@ -56,7 +56,8 @@ import { MocSonSealModal, StreakBadge } from '@/features/gamification';
  * - 100% SVG iconography, zero raw emojis
  */
 export const FlashcardsPage: React.FC = () => {
-  const { t } = useTranslation('flashcards');
+  const { t, i18n } = useTranslation('flashcards');
+  const isVi = i18n.language === 'vi';
   const [searchParams] = useSearchParams();
   const deckId = searchParams.get('deck') || 'imperial-hue';
   const level = searchParams.get('level') || 'Level 1';
@@ -541,7 +542,7 @@ export const FlashcardsPage: React.FC = () => {
                   : t('study.progress_saved_deck', 'Bộ thẻ văn hóa')}
               </p>
               <h1 className="text-heritage-green dark:text-warm-ivory">
-                {deck?.lesson.title || t('study.progress_title_default', 'Ôn tập từ vựng văn hóa')}
+                {(isVi ? (deck?.lesson.vietnameseTitle || deck?.lesson.title) : (deck?.lesson.title || deck?.lesson.vietnameseTitle)) || t('study.progress_title_default', 'Ôn tập từ vựng văn hóa')}
               </h1>
             </div>
           </div>
@@ -638,7 +639,7 @@ export const FlashcardsPage: React.FC = () => {
           isOpen={isSealModalOpen}
           onClose={() => setIsSealModalOpen(false)}
           articleId={deckId}
-          articleTitle={deck?.lesson.title || t('study.progress_title_default', 'Ôn tập từ vựng văn hóa')}
+          articleTitle={(isVi ? (deck?.lesson.vietnameseTitle || deck?.lesson.title) : (deck?.lesson.title || deck?.lesson.vietnameseTitle)) || t('study.progress_title_default', 'Ôn tập từ vựng văn hóa')}
           wordsLearnedCount={masteredCount}
           source="flashcard"
         />
