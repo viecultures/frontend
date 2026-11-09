@@ -118,4 +118,49 @@ export const handlers = [
   http.get('*/api/v1/admin/users', () => {
     return HttpResponse.json(mockAdminUsers, { status: 200 });
   }),
+
+  // 4. Text-To-Speech (TTS) Service Mock
+  http.post('*/api/tts', async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as {
+      text?: string;
+      voice?: string;
+      speed?: number;
+    };
+
+    if (!body || !body.text || !body.text.trim()) {
+      return HttpResponse.json(
+        {
+          timestamp: new Date().toISOString(),
+          status: 400,
+          error: 'BAD_REQUEST',
+          errorCode: 'VALIDATION_ERROR',
+          message: 'Nội dung văn bản (text) không được để trống',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (body.text.length > 1000) {
+      return HttpResponse.json(
+        {
+          timestamp: new Date().toISOString(),
+          status: 400,
+          error: 'BAD_REQUEST',
+          errorCode: 'VALIDATION_ERROR',
+          message: `Nội dung văn bản không được vượt quá 1.000 ký tự mỗi request (Độ dài hiện tại: ${body.text.length})`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Mock binary audio/mpeg (giả lập file âm thanh MP3)
+    const dummyAudioBuffer = new Uint8Array([0xff, 0xfb, 0x90, 0x64, 0x00, 0x00, 0x00, 0x00]);
+    return new HttpResponse(dummyAudioBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'audio/mpeg',
+        'Content-Length': String(dummyAudioBuffer.byteLength),
+      },
+    });
+  }),
 ];

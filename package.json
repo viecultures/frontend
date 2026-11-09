@@ -16,7 +16,13 @@
     "dev:mock": "vite --mode mock",
     "codegen:api": "openapi-typescript ../openapi.json -o src/types/api-schema.d.ts",
     "codegen:api:remote": "openapi-typescript http://localhost:8080/v3/api-docs -o src/types/api-schema.d.ts",
-    "type-check": "tsc -b --noEmit"
+    "type-check": "tsc -b --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:admin": "playwright test e2e/admin.spec.ts",
+    "test:e2e:learner": "playwright test e2e/learner-ai-flow.spec.ts",
+    "test:e2e:tts": "playwright test e2e/tts.spec.ts"
   },
   "dependencies": {
     "@google/genai": "1.33.0",
