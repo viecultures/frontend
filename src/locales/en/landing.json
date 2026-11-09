@@ -204,7 +204,15 @@
     "default_region_south": "Nam Bộ",
     "default_unesco_category": "Di sản UNESCO",
     "default_established": "Di sản truyền thống",
-    "default_unesco_status": "Di sản văn hóa tiêu biểu"
+    "default_unesco_status": "Di sản văn hóa tiêu biểu",
+    "east_sea": "EAST SEA",
+    "gulf_of_tonkin": "GULF OF TONKIN",
+    "gulf_of_thailand": "GULF OF THAILAND",
+    "reset_view": "Overview",
+    "locked_toast": "{{name}} is locked! Explore Northern Vietnam first.",
+    "region_north": "Northern Vietnam",
+    "region_central": "Central Vietnam",
+    "region_south": "Southern Vietnam"
   },
   "map_journey": {
     "badge": "LEARNING JOURNEY BY REGION",

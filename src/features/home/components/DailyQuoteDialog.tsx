@@ -1,10 +1,22 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, Heart, ChevronDown, ArrowUpRight } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { X, Heart, ChevronDown, ArrowUpRight, ChevronLeft, ChevronRight, Bookmark, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { DailyQuoteItem, DailyQuoteVocabItem } from '../data/dailyQuotesNovember';
+import { InPlaceDictionaryPopup } from '@/features/reader/components/InPlaceDictionaryPopup';
+import { useReaderDictionary } from '@/features/reader/hooks/useReaderDictionary';
+import { useSavedVocabulary, SavedVocabularyContext } from '@/features/reader/hooks/useSavedVocabulary';
+import { PERSONAL_DECK_ID, PERSONAL_DECK_LEVEL } from '@/services/learning/learningStorage';
+import type { VocabItem } from '@/data/readerData';
 
 interface DailyQuoteDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  quote?: DailyQuoteItem;
+  onPrevDay?: () => void;
+  onNextDay?: () => void;
+  isToday?: boolean;
+  onToday?: () => void;
   imageUrl?: string;
   quoteVi?: string;
   author?: string;
@@ -39,28 +51,15 @@ function saveQuoteFavorite(quoteId: string, shouldSave: boolean): void {
   }
 }
 
-const VOCAB_MEANINGS: Record<string, { ipa: string; pos: string; vi: string }> = {
-  independence: {
-    ipa: '/ˌɪndɪˈpendəns/',
-    pos: 'noun',
-    vi: 'sự độc lập, tự chủ',
-  },
-  freedom: {
-    ipa: '/ˈfriːdəm/',
-    pos: 'noun',
-    vi: 'sự tự do, quyền tự do',
-  },
-  precious: {
-    ipa: '/ˈpreʃəs/',
-    pos: 'adjective',
-    vi: 'quý giá, trân quý',
-  },
-};
-
 export function DailyQuoteDialog({
   isOpen,
   onClose,
-  imageUrl = '/images/calendar/heritage-hagiang-a4.jpg',
+  quote,
+  onPrevDay,
+  onNextDay,
+  isToday = true,
+  onToday,
+  imageUrl = '/images/map-thumb/ha-giang.jpg',
   quoteVi = 'Không có gì quý hơn độc lập, tự do.',
   author = 'Hồ Chí Minh',
   authorIntro = 'Vietnamese revolutionary leader',
@@ -68,7 +67,7 @@ export function DailyQuoteDialog({
 }: DailyQuoteDialogProps) {
   const { t, i18n } = useTranslation('home');
   const isVi = i18n.language === 'vi';
-  const quoteId = 'heritage-saigon';
+  const quoteId = quote?.id ?? 'heritage-saigon';
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
@@ -77,16 +76,98 @@ export function DailyQuoteDialog({
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const popupBodyRef = useRef<HTMLDivElement>(null);
 
-  // Reset expansion state to collapsed summary every time dialog is opened
+  // Fallback / mapped content fields
+  const finalImageUrl = quote?.artworkUrl || imageUrl;
+  const finalQuoteVi = quote?.quoteVi || quoteVi;
+  const finalQuoteEn = quote?.quoteEn || 'Nothing is more precious than independence and freedom.';
+  const finalAuthor = quote?.author || author;
+  const finalAuthorIntro = quote?.authorIntro || authorIntro;
+  const finalCreator = quote?.creator || creator;
+  const finalTopic = isVi
+    ? (quote?.topicVi || 'Độc lập & tự do')
+    : (quote?.topicEn || 'Independence & freedom');
+  const finalSummary = isVi
+    ? (quote?.summary20sVi || 'Lời của Chủ tịch Hồ Chí Minh thể hiện khát vọng độc lập, tự do của toàn dân tộc Việt Nam. Thông điệp giản dị mà sâu sắc: quyền tự quyết vận mệnh của một đất nước là điều thiêng liêng nhất.')
+    : (quote?.summary20sEn || 'Hồ Chí Minh’s words express Vietnam’s desire for independence and freedom. The message is simple: a country’s right to shape its own future is deeply precious.');
+
+  // The extended section is purely English learning context (no i18n needed)
+  const extendedWhoSaidIt = quote?.whoSaidItEn || authorIntro || 'A distinguished cultural voice in Vietnamese history.';
+  const extendedHistoricalContext = quote?.historicalContextEn || 'Historical and cultural background of this traditional Vietnamese expression.';
+  const extendedMeaning = quote?.meaningEn || 'In-depth linguistic insight into the values and spirit reflected in these words.';
+
+  const vocabItems: DailyQuoteVocabItem[] = quote?.vocabulary && quote.vocabulary.length > 0
+    ? quote.vocabulary
+    : [
+        { word: 'independence', ipa: '/ˌɪndɪˈpendəns/', pos: 'noun', meaningVi: 'sự độc lập, tự chủ' },
+        { word: 'freedom', ipa: '/ˈfriːdəm/', pos: 'noun', meaningVi: 'sự tự do, quyền tự do' },
+        { word: 'precious', ipa: '/ˈpreʃəs/', pos: 'adjective', meaningVi: 'quý giá, trân quý' },
+      ];
+
+  const selectedVocab = vocabItems.find(
+    (item) => item.word.toLowerCase() === selectedWord?.toLowerCase()
+  );
+
+  // Vocabulary deck storage hook (binds to user's personal deck)
+  const savedVocabulary = useSavedVocabulary(PERSONAL_DECK_ID, PERSONAL_DECK_LEVEL);
+
+  // Map daily quote vocab into in-place dictionary cache
+  const customVocabMap = useMemo(() => {
+    const map: Record<string, VocabItem> = {};
+    vocabItems.forEach((item) => {
+      map[item.word.toLowerCase()] = {
+        id: item.word.toLowerCase(),
+        word: item.word,
+        ipa: item.ipa,
+        pos: item.pos,
+        viMeaning: item.meaningVi,
+        enDefinition: item.meaningVi,
+        contextSentence: `“${finalQuoteEn}”`,
+      };
+    });
+    return map;
+  }, [vocabItems, finalQuoteEn]);
+
+  // Realtime in-place dictionary search for highlighted / selected text
+  const { popupState, closeDictionary, handleTextSelection } = useReaderDictionary(customVocabMap);
+
+  const isWordSaved = (word: string): boolean =>
+    savedVocabulary.words.some((w) => w.word.toLowerCase() === word.toLowerCase());
+
+  const handleToggleWordSave = (item: DailyQuoteVocabItem) => {
+    const vocabItem: VocabItem = {
+      id: item.word.toLowerCase(),
+      word: item.word,
+      ipa: item.ipa,
+      pos: item.pos,
+      viMeaning: item.meaningVi,
+      enDefinition: item.meaningVi,
+      contextSentence: `“${finalQuoteEn}”`,
+    };
+    savedVocabulary.toggle(vocabItem);
+  };
+
+  // Reset expansion state to collapsed summary every time dialog is opened or quote changes
   useEffect(() => {
     if (isOpen) {
       setIsExpanded(false);
       setSelectedWord(null);
       setIsSaved(readIsSaved(quoteId));
-      closeButtonRef.current?.focus();
+      popupBodyRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+      closeButtonRef.current?.focus({ preventScroll: true });
     }
   }, [isOpen, quoteId]);
+
+  // Prevent background scroll when dialog is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen]);
 
   // Handle ESC key to close
   useEffect(() => {
@@ -116,55 +197,105 @@ export function DailyQuoteDialog({
 
   if (!isOpen) return null;
 
-  return (
-    <div
-      className="home-dialog-backdrop"
-      role="presentation"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
+  return createPortal(
+    <SavedVocabularyContext.Provider value={savedVocabulary}>
       <div
-        ref={dialogRef}
-        className="home-dialog home-heritage-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="heritage-dialog-title"
+        className="home-dialog-backdrop"
+        role="presentation"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
       >
-        <button
-          ref={closeButtonRef}
-          type="button"
-          className="home-dialog-close"
-          onClick={onClose}
-          aria-label={t('common:close', 'Close')}
+        <div
+          ref={dialogRef}
+          className="home-dialog home-heritage-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="heritage-dialog-title"
         >
-          <X size={18} aria-hidden="true" />
-        </button>
-
-        <div className="home-heritage-popup">
-          {/* Left column: Art, Author, Save CTA */}
-          <div className="home-quote-art-column">
+          {/* Top Header Bar: Pinned at top, clean 3-part layout (Left: Eyebrow + Location, Center: Prev/Today/Next, Right: Close) */}
+          <div className="home-dialog-header">
+          <div className="home-dialog-header-left">
             <span className="home-eyebrow">
               {t('daily_quote.eyebrow_heritage', 'VIECULTURES HERITAGE')}
             </span>
+            {quote?.locationName && (
+              <span className="home-dialog-location-badge">
+                {quote.locationName}
+              </span>
+            )}
+          </div>
 
+          {(onPrevDay || onNextDay) && (
+            <div className="home-dialog-nav-bar" role="group" aria-label="Navigate date">
+              <button
+                type="button"
+                className="home-dialog-nav-btn"
+                onClick={onPrevDay}
+                aria-label="Previous day"
+                title="Previous day"
+              >
+                <ChevronLeft size={16} aria-hidden="true" />
+              </button>
+              {onToday && !isToday && (
+                <button
+                  type="button"
+                  className="home-dialog-today-btn"
+                  onClick={onToday}
+                  title="Back to today"
+                >
+                  {t('daily_quote.today', 'Today')}
+                </button>
+              )}
+              <button
+                type="button"
+                className="home-dialog-nav-btn"
+                onClick={onNextDay}
+                aria-label="Next day"
+                title="Next day"
+              >
+                <ChevronRight size={16} aria-hidden="true" />
+              </button>
+            </div>
+          )}
+
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="home-dialog-close"
+            onClick={onClose}
+            aria-label={t('common:close', 'Close')}
+          >
+            <X size={18} aria-hidden="true" />
+          </button>
+        </div>
+
+        {/* Scrollable Popup Body (with text selection lookup) */}
+        <div
+          ref={popupBodyRef}
+          className="home-heritage-popup"
+          onMouseUp={handleTextSelection}
+          onDoubleClick={handleTextSelection}
+        >
+          {/* Left column: Art, Author, Save CTA */}
+          <div className="home-quote-art-column">
             <div className="home-heritage-art-frame">
               <img
-                src={imageUrl}
+                src={finalImageUrl}
                 alt={t('daily_quote.caption_artwork', 'Calendar illustration')}
                 className="home-heritage-art-img"
               />
             </div>
 
             <div className="home-quote-author">
-              <b>{author}</b>
-              <span>{isVi ? 'Lãnh tụ cách mạng Việt Nam' : authorIntro}</span>
+              <b>{finalAuthor}</b>
+              <span>{finalAuthorIntro}</span>
             </div>
 
-            {creator && (
+            {finalCreator && (
               <p className="home-dialog-curator">
                 {t('daily_quote.created_by', 'Created by')}{' '}
-                <b>{creator}</b>
+                <b>{finalCreator}</b>
               </p>
             )}
 
@@ -187,30 +318,23 @@ export function DailyQuoteDialog({
             </button>
 
             <p className="home-art-caption">
-              {t(
-                'daily_quote.art_caption',
-                'Calendar artwork from your reference.\nThe printed date belongs to the sample design.'
-              )}
+              {t('daily_quote.art_caption', 'Vietnamese cultural heritage and scenic landscape.')}
             </p>
           </div>
 
           {/* Right column: Quote context & breakdown */}
           <article className="home-quote-context">
-            <span className="home-eyebrow">
-              {t('daily_quote.eyebrow_story', 'THE STORY BEHIND THE WORDS')}
-            </span>
-
             <h2 id="heritage-dialog-title" className="home-quote-context-title">
-              {isVi ? 'Độc lập & tự do' : 'Independence & freedom'}
+              {finalTopic}
             </h2>
 
             <blockquote className="home-quote-blockquote">
-              “{quoteVi}”
-              <cite>{author}</cite>
+              “{finalQuoteVi}”
+              <cite>{finalAuthor}</cite>
             </blockquote>
 
             <div className="home-english-quote">
-              <p>“Nothing is more precious than independence and freedom.”</p>
+              <p>“{finalQuoteEn}”</p>
               <small>
                 {t(
                   'daily_quote.english_translation_note',
@@ -226,14 +350,10 @@ export function DailyQuoteDialog({
               <span className="home-brief-label">
                 {t('daily_quote.brief_label', 'IN A FEW WORDS · 20-SECOND READ')}
               </span>
-              <p>
-                {isVi
-                  ? 'Lời của Chủ tịch Hồ Chí Minh thể hiện khát vọng độc lập, tự do của toàn dân tộc Việt Nam. Thông điệp giản dị mà sâu sắc: quyền tự quyết vận mệnh của một đất nước là điều thiêng liêng nhất.'
-                  : 'Hồ Chí Minh’s words express Vietnam’s desire for independence and freedom. The message is simple: a country’s right to shape its own future is deeply precious.'}
-              </p>
+              <p>{finalSummary}</p>
             </div>
 
-            {/* Expandable detailed section */}
+            {/* Expandable detailed section - Pure English Learning Context (No i18n needed) */}
             <div className="home-quote-expandable">
               <button
                 type="button"
@@ -243,8 +363,8 @@ export function DailyQuoteDialog({
               >
                 <span>
                   {isExpanded
-                    ? t('daily_quote.show_less', 'Show less')
-                    : t('daily_quote.read_more', 'Read more: context & meaning')}
+                    ? 'Show less'
+                    : 'Read more: context & meaning'}
                 </span>
                 <ChevronDown
                   size={16}
@@ -256,96 +376,73 @@ export function DailyQuoteDialog({
               {isExpanded && (
                 <div className="home-quote-expanded-body">
                   <section>
-                    <h3>{t('daily_quote.who_said_it', 'Who said it?')}</h3>
-                    <p>
-                      {isVi
-                        ? 'Chủ tịch Hồ Chí Minh là nhà lãnh đạo cách mạng Việt Nam. Cuộc đời và sự nghiệp của Người gắn liền với cuộc đấu tranh giành độc lập và hòa bình cho dân tộc.'
-                        : 'Hồ Chí Minh was a Vietnamese revolutionary leader. His life and work are closely connected with Vietnam’s struggle for independence.'}
-                    </p>
+                    <h3>Who said it?</h3>
+                    <p>{extendedWhoSaidIt}</p>
                   </section>
 
                   <section>
-                    <h3>{t('daily_quote.historical_context', 'The historical context')}</h3>
-                    <p>
-                      This statement is associated with Hồ Chí Minh’s call for resistance during the Vietnam War. It expresses the importance of a country’s right to decide its own future. The words present{' '}
-                      <button
-                        type="button"
-                        className="home-inline-word-btn"
-                        onClick={() => setSelectedWord('independence')}
-                      >
-                        independence
-                      </button>{' '}
-                      and{' '}
-                      <button
-                        type="button"
-                        className="home-inline-word-btn"
-                        onClick={() => setSelectedWord('freedom')}
-                      >
-                        freedom
-                      </button>{' '}
-                      as values that are more important than material wealth.
-                    </p>
+                    <h3>The historical context</h3>
+                    <p>{extendedHistoricalContext}</p>
                   </section>
 
                   <section>
-                    <h3>{t('daily_quote.meaning', 'What do the words mean?')}</h3>
-                    <p>
-                      Something{' '}
-                      <button
-                        type="button"
-                        className="home-inline-word-btn"
-                        onClick={() => setSelectedWord('precious')}
-                      >
-                        precious
-                      </button>{' '}
-                      is deeply valued. Here, independence means that a country governs itself. Freedom refers to the ability to live without oppression. To understand the quotation fully, we should read it in its historical setting.
-                    </p>
+                    <h3>What do the words mean?</h3>
+                    <p>{extendedMeaning}</p>
                   </section>
 
                   {/* Interactive Words To Know */}
                   <div className="home-quote-vocab-box">
                     <span className="home-vocab-box-label">
-                      {t('daily_quote.words_to_know', 'WORDS TO KNOW')}
+                      WORDS TO KNOW
                     </span>
                     <div className="home-vocab-chip-group">
-                      {['independence', 'freedom', 'precious'].map((word) => (
+                      {vocabItems.map((item) => (
                         <button
-                          key={word}
+                          key={item.word}
                           type="button"
-                          className={`home-vocab-word-chip ${selectedWord === word ? 'is-active' : ''}`}
-                          onClick={() => setSelectedWord(word)}
+                          className={`home-vocab-word-chip ${selectedWord === item.word ? 'is-active' : ''}`}
+                          onClick={() => setSelectedWord(item.word)}
                         >
-                          <span>{word}</span>
+                          <span>{item.word}</span>
                           <ArrowUpRight size={11} aria-hidden="true" />
                         </button>
                       ))}
                     </div>
 
-                    <p className="home-vocab-meaning-text" role="status">
-                      {selectedWord && VOCAB_MEANINGS[selectedWord] ? (
-                        <span>
-                          <strong>{selectedWord}</strong>{' '}
-                          <span className="home-ipa-text">{VOCAB_MEANINGS[selectedWord].ipa}</span> ·{' '}
-                          <em>{VOCAB_MEANINGS[selectedWord].pos}</em> ·{' '}
-                          {VOCAB_MEANINGS[selectedWord].vi}
-                        </span>
+                    <div className="home-vocab-meaning-text" role="status">
+                      {selectedVocab ? (
+                        <div className="home-vocab-selected-detail">
+                          <span className="home-vocab-meta">
+                            <strong>{selectedVocab.word}</strong>{' '}
+                            <span className="home-ipa-text">{selectedVocab.ipa}</span> ·{' '}
+                            <em>{selectedVocab.pos}</em> ·{' '}
+                            {selectedVocab.meaningVi}
+                          </span>
+                          <button
+                            type="button"
+                            className={`home-vocab-save-btn ${isWordSaved(selectedVocab.word) ? 'is-saved' : ''}`}
+                            onClick={() => handleToggleWordSave(selectedVocab)}
+                            title={isWordSaved(selectedVocab.word) ? t('daily_quote.vocab_saved', 'Đã lưu trong bộ từ') : t('daily_quote.vocab_add', 'Thêm vào bộ từ')}
+                          >
+                            {isWordSaved(selectedVocab.word) ? (
+                              <>
+                                <Check size={12} aria-hidden="true" />
+                                <span>{t('daily_quote.vocab_saved', 'Đã lưu')}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Bookmark size={12} aria-hidden="true" />
+                                <span>{t('daily_quote.vocab_add', 'Thêm vào bộ từ')}</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       ) : (
                         <span className="home-meaning-hint">
-                          {t('daily_quote.tap_word_hint', 'Tap a word to see its Vietnamese meaning.')}
+                          Tap a word to see its pronunciation & meaning, or highlight text to search.
                         </span>
                       )}
-                    </p>
-                  </div>
-
-                  {/* Editorial source draft disclaimer */}
-                  <div className="home-source-draft-note">
-                    <b>{t('daily_quote.draft_note_title', 'Editorial draft · source verification pending')}</b>
-                    <p>
-                      {t(
-                        'daily_quote.draft_note_desc',
-                        'This English context is sample learning content. The original historical source and exact wording still need verification before publication as a lesson.'
-                      )}
-                    </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -360,6 +457,17 @@ export function DailyQuoteDialog({
           </div>
         )}
       </div>
+
+      {/* Real-time In-Place Selection Dictionary Popup */}
+      <InPlaceDictionaryPopup
+        isOpen={popupState.isOpen}
+        vocab={popupState.vocab}
+        position={popupState.position}
+        onClose={closeDictionary}
+        themeMode="paper"
+      />
     </div>
+    </SavedVocabularyContext.Provider>,
+    document.body
   );
 }

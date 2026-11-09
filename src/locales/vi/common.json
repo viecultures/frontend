@@ -127,6 +127,21 @@
     "add_to_home": "Thêm vào MH chính",
     "dismiss_aria": "Bỏ qua gợi ý cài đặt"
   },
+  "map": {
+    "north": "Miền Bắc",
+    "central": "Miền Trung",
+    "south": "Miền Nam",
+    "locked": "Đang khóa",
+    "explore_region": "Khám phá {{region}}",
+    "gulf_of_tonkin": "VỊNH BẮC BỘ",
+    "east_sea": "BIỂN ĐÔNG",
+    "gulf_of_thailand": "VỊNH THÁI LAN",
+    "phu_quoc": "Đ. Phú Quốc",
+    "con_dao": "QĐ. Côn Đảo",
+    "hoang_sa": "QUẦN ĐẢO HOÀNG SA",
+    "truong_sa": "QUẦN ĐẢO TRƯỜNG SA",
+    "vietnam": "VIỆT NAM"
+  },
   "status": {
     "loading": "Đang tải dữ liệu...",
     "success": "Thành công",

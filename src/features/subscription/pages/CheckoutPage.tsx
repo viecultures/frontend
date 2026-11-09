@@ -218,6 +218,16 @@ export const CheckoutPage: React.FC = () => {
           amount: 350000,
           periodText: '1 năm',
         };
+      default:
+        return {
+          name: 'Gói Hội Viên Di Sản Plus (1 Tháng)',
+          cycle: 'Chu kỳ thanh toán: 1 Tháng',
+          listPrice: '69.000 VNĐ',
+          discount: '-20.000 VNĐ',
+          total: '49.000 VNĐ',
+          amount: 49000,
+          periodText: 'mỗi tháng',
+        };
     }
   }, [selectedPlan, dbPlans]);
 
