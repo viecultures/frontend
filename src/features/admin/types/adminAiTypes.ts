@@ -122,3 +122,27 @@ export interface UpdateSystemAiSettingsPayload {
   azureSpeechRegion?: string;
   activeTtsProvider?: string;
 }
+
+
+export type AiPromptCategory = 'COMPANION_CHAT' | 'TRANSLATION' | 'STT' | 'MAP_AI';
+
+export interface AiPromptVariable {
+  name: string;
+  description: string;
+}
+
+export interface AiPromptConfigDto {
+  key: string;
+  name: string;
+  description: string;
+  category: AiPromptCategory;
+  currentPrompt: string;
+  defaultPrompt: string;
+  isModified: boolean;
+  supportedVariables: AiPromptVariable[];
+  updatedAt?: string;
+}
+
+export interface UpdateAiPromptPayload {
+  promptText: string;
+}

@@ -58,6 +58,7 @@ import { PostPreviewModal } from '../components/PostPreviewModal';
 import { AdminDialog } from '../components/AdminDialog';
 import { AdminServiceConnections } from '../components/AdminServiceConnections';
 import { AiConfigManagementView } from '../components/ai/AiConfigManagementView';
+import { HeritageImage } from '@/components/common/HeritageImage';
 import { adminTopicLabel, adminRegionLabel, adminReadTimeLabel } from '../admin-presentation';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 import '../admin-ui.css';
@@ -1401,38 +1402,23 @@ export const AdminPage: React.FC = () => {
                                 {/* Visual Thumbnail with Quick Zoom */}
                                 <button
                                   type="button"
-                                  onClick={() => (post.imageUrl ? setQuickZoomPost(post) : handleOpenPreview(post))}
-                                  aria-label={post.imageUrl ? `Xem ảnh bài viết: ${post.titleEn}` : `Xem trước bài đọc: ${post.titleEn}`}
-                                  title={post.imageUrl ? 'Nhấp để xem ảnh trực quan nhanh' : 'Chưa có ảnh đại diện (Xem trước bài đọc)'}
+                                  onClick={() => setQuickZoomPost(post)}
+                                  aria-label={`Xem ảnh bài viết: ${post.titleEn}`}
+                                  title="Nhấp để xem ảnh trực quan nhanh"
                                   className="relative group/thumb shrink-0 w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden border border-antique-gold/30 bg-warm-ivory dark:bg-stone-800 shadow-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-antique-gold text-left"
                                 >
-                                  {post.imageUrl ? (
-                                    <img
-                                      src={post.imageUrl}
-                                      alt={post.titleEn}
-                                      loading="lazy"
-                                      onError={(e) => {
-                                        (e.currentTarget as HTMLImageElement).style.display = 'none';
-                                        const fallback = e.currentTarget.parentElement?.querySelector('.thumb-fallback');
-                                        if (fallback) fallback.classList.remove('hidden');
-                                      }}
-                                      className="w-full h-full object-cover transition-transform duration-300 group-hover/thumb:scale-110"
-                                    />
-                                  ) : null}
-                                  <div
-                                    className={`thumb-fallback w-full h-full flex flex-col items-center justify-center bg-stone-100 dark:bg-stone-800/80 text-antique-gold ${
-                                      post.imageUrl ? 'hidden' : ''
-                                    }`}
-                                  >
-                                    <ImageIcon aria-hidden="true" className="w-4 h-4 opacity-70" />
-                                    <span className="text-[9px] font-semibold text-text-muted mt-0.5">Di sản</span>
-                                  </div>
+                                  <HeritageImage
+                                    src={post.imageUrl}
+                                    alt={post.titleEn}
+                                    category={post.topic || 'Ẩm thực'}
+                                    loading="lazy"
+                                    containerClassName="w-full h-full"
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover/thumb:scale-110"
+                                  />
 
-                                  {post.imageUrl && (
-                                    <div className="absolute inset-0 bg-heritage-dark/60 backdrop-blur-[1px] opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center text-warm-ivory">
-                                      <Maximize2 aria-hidden="true" className="w-3.5 h-3.5 text-antique-bright drop-shadow-sm" />
-                                    </div>
-                                  )}
+                                  <div className="absolute inset-0 bg-heritage-dark/60 backdrop-blur-[1px] opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center text-warm-ivory">
+                                    <Maximize2 aria-hidden="true" className="w-3.5 h-3.5 text-antique-bright drop-shadow-sm" />
+                                  </div>
                                 </button>
 
                                 {/* Article Info */}
@@ -1738,19 +1724,15 @@ export const AdminPage: React.FC = () => {
             onClose={() => setQuickZoomPost(null)}
           >
             <div className="w-full max-w-2xl bg-rice-paper dark:bg-heritage-forest border border-antique-gold/30 rounded-3xl p-5 shadow-2xl space-y-4">
-              <div className="relative rounded-2xl overflow-hidden border border-antique-gold/30 bg-warm-ivory dark:bg-stone-900 shadow-inner max-h-[60vh] flex items-center justify-center">
-                {quickZoomPost.imageUrl ? (
-                  <img
-                    src={quickZoomPost.imageUrl}
-                    alt={quickZoomPost.titleEn}
-                    className="w-full h-auto max-h-[58vh] object-contain"
-                  />
-                ) : (
-                  <div className="py-16 text-center text-text-muted space-y-2">
-                    <ImageIcon aria-hidden="true" className="w-10 h-10 text-antique-gold/40 mx-auto" />
-                    <p className="text-xs">Chưa có ảnh đại diện cho bài viết này</p>
-                  </div>
-                )}
+              <div className="relative rounded-2xl overflow-hidden border border-antique-gold/30 bg-warm-ivory dark:bg-stone-900 shadow-inner max-h-[60vh] flex items-center justify-center w-full">
+                <HeritageImage
+                  src={quickZoomPost.imageUrl}
+                  alt={quickZoomPost.titleEn}
+                  category={quickZoomPost.topic || 'Ẩm thực'}
+                  loading="eager"
+                  containerClassName="w-full max-h-[58vh] flex items-center justify-center"
+                  className="w-full h-auto max-h-[58vh] object-contain"
+                />
               </div>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-antique-gold/20">

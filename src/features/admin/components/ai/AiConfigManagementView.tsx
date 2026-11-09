@@ -27,6 +27,7 @@ import {
   Save,
   Check,
   Mic,
+  FileText,
 } from 'lucide-react';
 import type {
   AiProvider,
@@ -41,8 +42,9 @@ import type {
 } from '../../types/adminAiTypes';
 import { adminAiConfigService } from '../../services/adminAiConfigService';
 import { AdminDialog } from '../AdminDialog';
+import { AiPromptManagementView } from './AiPromptManagementView';
 
-type AiSubTab = 'GEMINI' | 'AZURE' | 'COST';
+type AiSubTab = 'GEMINI' | 'AZURE' | 'COST' | 'PROMPTS';
 
 const DEFAULT_GEMINI_MODELS = [
   { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash (Khuyên dùng - Nhanh & Tối ưu chi phí)', desc: 'Thế hệ mới nhất, tốc độ phản hồi cực nhanh, đa phương thức tối ưu.' },
@@ -461,6 +463,22 @@ export const AiConfigManagementView: React.FC = () => {
           <span>Tổng quan Chi phí & Nhật ký</span>
           <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-warm-ivory">
             Telemetry
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSubTab('PROMPTS')}
+          className={`min-h-[44px] px-5 py-2.5 rounded-2xl font-heading text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+            activeSubTab === 'PROMPTS'
+              ? 'bg-heritage-green text-warm-ivory dark:bg-antique-gold/20 dark:text-antique-gold border border-antique-gold/30 shadow-md'
+              : 'text-text-secondary dark:text-warm-ivory/60 hover:text-text-body dark:hover:text-warm-ivory hover:bg-white/5'
+          }`}
+          aria-current={activeSubTab === 'PROMPTS' ? 'page' : undefined}
+        >
+          <FileText aria-hidden="true" className="w-4 h-4 text-antique-gold" />
+          <span>System Prompts</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-warm-ivory">
+            Tùy biến
           </span>
         </button>
       </nav>
@@ -1162,6 +1180,13 @@ export const AiConfigManagementView: React.FC = () => {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB 4: SYSTEM PROMPTS MANAGEMENT ────────────────────────────── */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {activeSubTab === 'PROMPTS' && (
+        <AiPromptManagementView />
+      )}
+
       {/* ── MODAL: THÊM KHÓA RIÊNG CHO TỪNG NHÀ CUNG CẤP ────────────────── */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {isModalOpen && (

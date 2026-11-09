@@ -20,6 +20,7 @@ import { journeyAdminService, type JourneyFilterParams } from '../services/journ
 import { JourneyFormModal } from './JourneyFormModal';
 import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
+import { HeritageImage } from '@/components/common/HeritageImage';
 
 export const JourneyManagementView: React.FC = () => {
   const navigate = useNavigate();
@@ -273,7 +274,13 @@ export const JourneyManagementView: React.FC = () => {
                       <div className="flex items-center gap-3">
                         {j.imageUrl ? (
                           <div className="w-14 h-12 rounded-xl overflow-hidden border border-antique-gold/30 shrink-0 bg-stone-200">
-                            <img src={j.imageUrl} alt="" className="w-full h-full object-cover" />
+                            <HeritageImage
+                              src={j.imageUrl}
+                              alt={j.theme}
+                              category="heritage"
+                              containerClassName="w-full h-full"
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                         ) : (
                           <div className="w-14 h-12 rounded-xl bg-antique-gold/15 text-antique-gold flex items-center justify-center shrink-0 font-bold">

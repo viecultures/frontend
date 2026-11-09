@@ -8,6 +8,8 @@ import type {
   TestAiKeyPayload,
   SystemAiSettingsDto,
   UpdateSystemAiSettingsPayload,
+  AiPromptConfigDto,
+  UpdateAiPromptPayload,
 } from '../types/adminAiTypes';
 import { getStoredToken } from '@/utils/auth-storage';
 import { API_BASE_URL } from '@/config/apiConfig';
@@ -293,6 +295,76 @@ export const adminAiConfigService = {
       return json.data;
     } catch (error) {
       console.error('[adminAiConfigService] Lỗi khi cập nhật AI settings:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Lấy danh sách toàn bộ cấu hình Prompt hệ thống
+   */
+  async getPrompts(): Promise<AiPromptConfigDto[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/ai-configs/prompts`, {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Không thể tải danh sách Prompts (HTTP ${res.status})`);
+      }
+
+      const json: ApiResponseEnvelope<AiPromptConfigDto[]> = await res.json();
+      return Array.isArray(json?.data) ? json.data : (Array.isArray(json) ? (json as unknown as AiPromptConfigDto[]) : []);
+    } catch (error) {
+      console.error('[adminAiConfigService] Lỗi khi lấy danh sách Prompts:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Cập nhật nội dung Prompt hệ thống theo key
+   */
+  async updatePrompt(key: string, payload: UpdateAiPromptPayload): Promise<AiPromptConfigDto> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/ai-configs/prompts/${encodeURIComponent(key)}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Không thể cập nhật Prompt (HTTP ${res.status})`);
+      }
+
+      const json: ApiResponseEnvelope<AiPromptConfigDto> = await res.json();
+      return json?.data ?? (json as unknown as AiPromptConfigDto);
+    } catch (error) {
+      console.error('[adminAiConfigService] Lỗi khi cập nhật Prompt:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Khôi phục Prompt hệ thống về giá trị mặc định của hệ thống
+   */
+  async resetPrompt(key: string): Promise<AiPromptConfigDto> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/ai-configs/prompts/${encodeURIComponent(key)}/reset`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Không thể khôi phục Prompt (HTTP ${res.status})`);
+      }
+
+      const json: ApiResponseEnvelope<AiPromptConfigDto> = await res.json();
+      return json?.data ?? (json as unknown as AiPromptConfigDto);
+    } catch (error) {
+      console.error('[adminAiConfigService] Lỗi khi khôi phục Prompt:', error);
       throw error;
     }
   },
