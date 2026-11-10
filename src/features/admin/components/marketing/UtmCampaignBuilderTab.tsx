@@ -104,7 +104,7 @@ export const UtmCampaignBuilderTab: React.FC = () => {
   // QR Modal
   const [activeQrCampaign, setActiveQrCampaign] = useState<EnhancedUtmCampaignItem | null>(null);
 
-  // Load Data
+  // Load Data (Cached & Stable Dependency to prevent double-fetch loops)
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -117,15 +117,15 @@ export const UtmCampaignBuilderTab: React.FC = () => {
       setPosts(pList);
       setJourneys(jList);
 
-      if (pList.length > 0 && !selectedTargetId) {
-        setSelectedTargetId(pList[0].id);
+      if (pList.length > 0) {
+        setSelectedTargetId((prev) => prev || pList[0].id);
       }
     } catch {
       // Ignored
     } finally {
       setIsLoading(false);
     }
-  }, [selectedTargetId]);
+  }, []);
 
   useEffect(() => {
     loadData();

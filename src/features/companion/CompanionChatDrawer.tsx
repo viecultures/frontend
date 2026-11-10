@@ -209,7 +209,8 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
 
         if (quota.status === 'fulfilled') {
           setRemainingTurns(quota.value.remainingTurns);
-          setIsPro(quota.value.isPro);
+          const activePro = Boolean(quota.value.isPro ?? quota.value.pro ?? getIsProUser());
+          setIsPro(activePro);
         }
 
         if (history.status === 'fulfilled' && history.value && history.value.length > 0) {
@@ -275,7 +276,7 @@ export const CompanionChatDrawer: React.FC<CompanionChatDrawerProps> = ({
     }
   }, [messages, isLoading, isHistoryLoading, viewMode]);
 
-  const isLimitReached = !isPro && remainingTurns !== null && remainingTurns <= 0;
+  const isLimitReached = !isPro && remainingTurns !== null && remainingTurns >= 0 && remainingTurns <= 0;
 
   const handleSend = async (messageText?: string) => {
     if (!user) {

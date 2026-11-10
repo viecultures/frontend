@@ -53,7 +53,7 @@ export const HeritageNewsletterTab: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitFeedback, setSubmitFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // Load initial data
+  // Load initial data (Stable dependency to prevent waterfall re-renders)
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setErrorMessage(null);
@@ -66,8 +66,8 @@ export const HeritageNewsletterTab: React.FC = () => {
       setNewsletters(nlList);
       setPosts(postsList);
       setSegments(segmentList);
-      if (segmentList.length > 0 && !segmentList.some((s) => s.key === targetSegment)) {
-        setTargetSegment(segmentList[0].key);
+      if (segmentList.length > 0) {
+        setTargetSegment((prev) => (segmentList.some((s) => s.key === prev) ? prev : segmentList[0].key));
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Lỗi tải danh sách bản tin';
@@ -75,7 +75,7 @@ export const HeritageNewsletterTab: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [targetSegment]);
+  }, []);
 
   useEffect(() => {
     loadData();

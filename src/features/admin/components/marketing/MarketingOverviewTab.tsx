@@ -15,28 +15,34 @@ import type { MarketingOverviewData } from '../../types/marketing.contract';
 export const MarketingOverviewTab: React.FC = () => {
   const [data, setData] = useState<MarketingOverviewData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const loadOverview = useCallback(async () => {
-    setIsLoading(true);
+  const loadOverview = useCallback(async (forceRefresh = false) => {
+    if (forceRefresh) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
     setErrorMessage(null);
     try {
-      const result = await growthEngineService.getOverviewData();
+      const result = await growthEngineService.getOverviewData(forceRefresh);
       setData(result);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Lỗi khi tải dữ liệu tổng quan tiếp thị';
       setErrorMessage(msg);
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
-    loadOverview();
+    loadOverview(false);
   }, [loadOverview]);
 
-  // ── State 1: Loading Skeleton ──────────────────────────────────────────────
-  if (isLoading) {
+  // ── State 1: Loading Skeleton (Chỉ hiển thị khi chưa có dữ liệu trong cache) ──
+  if (isLoading && !data) {
     return (
       <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Đang tải dữ liệu tổng quan tiếp thị">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -51,7 +57,7 @@ export const MarketingOverviewTab: React.FC = () => {
   }
 
   // ── State 2: Error Container with Retry ────────────────────────────────────
-  if (errorMessage || !data) {
+  if (errorMessage && !data) {
     return (
       <div className="p-8 rounded-xl border border-rose-200 bg-rose-50 dark:bg-rose-950/30 text-center space-y-4">
         <div className="w-12 h-12 mx-auto rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center text-rose-600 dark:text-rose-400">
@@ -63,7 +69,7 @@ export const MarketingOverviewTab: React.FC = () => {
         </div>
         <button
           type="button"
-          onClick={loadOverview}
+          onClick={() => loadOverview(true)}
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-heritage-green text-white text-xs font-semibold hover:bg-heritage-green/90 transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
@@ -71,6 +77,10 @@ export const MarketingOverviewTab: React.FC = () => {
         </button>
       </div>
     );
+  }
+
+  if (!data) {
+    return null;
   }
 
   const { kpis, funnelStages, topHeritageContent } = data;
@@ -95,11 +105,12 @@ export const MarketingOverviewTab: React.FC = () => {
         </div>
         <button
           type="button"
-          onClick={loadOverview}
-          className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700 transition-colors"
+          onClick={() => loadOverview(true)}
+          disabled={isRefreshing}
+          className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700 transition-colors disabled:opacity-50"
         >
-          <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
-          <span>Làm mới số liệu</span>
+          <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} aria-hidden="true" />
+          <span>{isRefreshing ? 'Đang cập nhật...' : 'Làm mới số liệu'}</span>
         </button>
       </div>
 

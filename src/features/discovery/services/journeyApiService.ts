@@ -74,7 +74,7 @@ export const journeyApiService = {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       const res = await fetch(url, { signal: controller.signal });
       clearTimeout(timeoutId);
 
@@ -100,7 +100,7 @@ export const journeyApiService = {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       const res = await fetch(url, { signal: controller.signal });
       clearTimeout(timeoutId);
 

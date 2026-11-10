@@ -176,11 +176,42 @@ const INITIAL_FREQUENCY_CONFIG: FrequencyCappingConfig = {
   maxDailyNotificationsPerUser: 2,
 };
 
+// ── IN-MEMORY CACHE ĐỂ CHỐNG NGHẼN NETWORK & LOẠI BỎ GIẬT LAG KHI CHUYỂN TAB ──
+const CACHE_TTL_MS = 60 * 1000; // 60 giây
+
+let overviewDataCache: { data: MarketingOverviewData; timestamp: number } | null = null;
+let audienceSegmentsCache: { data: AudienceSegmentOption[]; timestamp: number } | null = null;
+let postsShortCache: { data: ReadingPostItem[]; timestamp: number } | null = null;
+
+const getCachedPosts = async (force = false): Promise<ReadingPostItem[]> => {
+  const now = Date.now();
+  if (!force && postsShortCache && now - postsShortCache.timestamp < CACHE_TTL_MS) {
+    return postsShortCache.data;
+  }
+  const posts = await postAdminService.getPosts().catch(() => [] as ReadingPostItem[]);
+  postsShortCache = { data: posts, timestamp: now };
+  return posts;
+};
+
 export const growthEngineService = {
+  /**
+   * Xóa sạch cache để ép buộc tải lại số liệu mới nhất khi có thao tác ghi
+   */
+  invalidateCache(): void {
+    overviewDataCache = null;
+    audienceSegmentsCache = null;
+    postsShortCache = null;
+  },
+
   /**
    * Lấy số liệu phân khúc học viên THỰC TẾ từ Database (User & Subscriptions)
    */
-  async getAudienceSegments(): Promise<AudienceSegmentOption[]> {
+  async getAudienceSegments(forceRefresh: boolean = false): Promise<AudienceSegmentOption[]> {
+    const now = Date.now();
+    if (!forceRefresh && audienceSegmentsCache && now - audienceSegmentsCache.timestamp < CACHE_TTL_MS) {
+      return audienceSegmentsCache.data;
+    }
+
     try {
       const [overview, subMetrics] = await Promise.all([
         adminOverviewService.getOverview().catch(() => null),
@@ -196,7 +227,7 @@ export const growthEngineService = {
       const centralPosts = Number(overview?.regionCoverage?.['central']) || 0;
       const southPosts = Number(overview?.regionCoverage?.['south']) || 0;
 
-      return [
+      const segments: AudienceSegmentOption[] = [
         {
           key: 'ALL_USERS',
           label: 'Tất cả học viên (Toàn hệ thống)',
@@ -240,6 +271,9 @@ export const growthEngineService = {
           description: 'Học viên tương tác với các bài đọc và hành trình miền Nam.',
         },
       ];
+
+      audienceSegmentsCache = { data: segments, timestamp: now };
+      return segments;
     } catch {
       return [
         {
@@ -255,11 +289,16 @@ export const growthEngineService = {
   /**
    * Lấy số liệu Tổng quan & Phễu chuyển đổi THỰC TẾ từ Database
    */
-  async getOverviewData(): Promise<MarketingOverviewData> {
+  async getOverviewData(forceRefresh: boolean = false): Promise<MarketingOverviewData> {
+    const now = Date.now();
+    if (!forceRefresh && overviewDataCache && now - overviewDataCache.timestamp < CACHE_TTL_MS) {
+      return overviewDataCache.data;
+    }
+
     const [overview, subMetrics, posts, savedCampaigns] = await Promise.all([
       adminOverviewService.getOverview().catch(() => null),
       adminSubscriptionService.getMetrics().catch(() => null),
-      postAdminService.getPosts().catch(() => [] as ReadingPostItem[]),
+      getCachedPosts(forceRefresh),
       this.getEnhancedUtmCampaigns().catch(() => [] as EnhancedUtmCampaignItem[]),
     ]);
 
@@ -309,7 +348,7 @@ export const growthEngineService = {
       };
     });
 
-    return {
+    const result: MarketingOverviewData = {
       kpis: {
         utmClicks: totalUtmClicks,
         utmClicksChangePercent: 0,
@@ -359,6 +398,9 @@ export const growthEngineService = {
       ],
       topHeritageContent,
     };
+
+    overviewDataCache = { data: result, timestamp: now };
+    return result;
   },
 
   /**
@@ -423,6 +465,7 @@ export const growthEngineService = {
     } catch {
       // Ignored
     }
+    this.invalidateCache();
     return newItem;
   },
 
@@ -663,6 +706,7 @@ export const growthEngineService = {
     } catch {
       // Ignored
     }
+    this.invalidateCache();
     return newItem;
   },
 
@@ -674,6 +718,7 @@ export const growthEngineService = {
     } catch {
       // Ignored
     }
+    this.invalidateCache();
     return true;
   },
 };

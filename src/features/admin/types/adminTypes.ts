@@ -142,6 +142,9 @@ export interface AdminUserItem {
   englishLevel?: CefrLevel;
   createdAt?: string;
   savedVocabCount: number;
+  planCode?: string;
+  planName?: string;
+  subscriptionStatus?: string;
 }
 
 export interface AdminUserFilterParams {
