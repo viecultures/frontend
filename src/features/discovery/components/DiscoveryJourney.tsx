@@ -306,6 +306,12 @@ export function DiscoveryJourney() {
 
   // Library Pagination State (6 series per page)
   const [availablePage, setAvailablePage] = useState(1);
+  const [serverPagedJourneys, setServerPagedJourneys] = useState<{
+    items: JourneySeries[];
+    totalElements: number;
+    totalPages: number;
+  } | null>(null);
+  const [isJourneysLoading, setIsJourneysLoading] = useState(false);
   const [upcomingPage, setUpcomingPage] = useState(1);
   const availableLibraryRef = useRef<HTMLDivElement>(null);
   const upcomingLibraryRef = useRef<HTMLDivElement>(null);
@@ -420,15 +426,58 @@ export function DiscoveryJourney() {
     setAvailablePage(1);
   }, [firstRegion, selectedProvince]);
 
-  const totalAvailablePages = Math.max(
-    1,
-    Math.ceil(availableSeries.length / SERIES_PAGE_SIZE),
-  );
+  useEffect(() => {
+    let active = true;
+    setIsJourneysLoading(true);
+    journeyApiService
+      .getPagedJourneys({
+        page: availablePage - 1,
+        size: SERIES_PAGE_SIZE,
+        region: selectedProvince ? undefined : firstRegion,
+        provinceId: selectedProvince ? selectedProvince.id : undefined,
+        status: "published",
+      })
+      .then((pagedData) => {
+        if (!active) return;
+        if (pagedData && Array.isArray(pagedData.items)) {
+          setServerPagedJourneys({
+            items: pagedData.items,
+            totalElements: pagedData.totalElements,
+            totalPages: Math.max(1, pagedData.totalPages),
+          });
+        }
+      })
+      .catch((err) => {
+        console.warn("[DiscoveryJourney] Error loading paged journeys:", err);
+      })
+      .finally(() => {
+        if (active) setIsJourneysLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [availablePage, selectedProvince, firstRegion]);
+
+  const totalAvailablePages = serverPagedJourneys
+    ? serverPagedJourneys.totalPages
+    : Math.max(1, Math.ceil(availableSeries.length / SERIES_PAGE_SIZE));
+
+  const totalAvailableCount = serverPagedJourneys
+    ? serverPagedJourneys.totalElements
+    : availableSeries.length;
+
   const safeAvailablePage = Math.min(availablePage, totalAvailablePages);
-  const pagedAvailableSeries = useMemo(() => {
+
+  const displayAvailableSeries = useMemo(() => {
+    if (serverPagedJourneys) {
+      return serverPagedJourneys.items;
+    }
     const startIndex = (safeAvailablePage - 1) * SERIES_PAGE_SIZE;
     return availableSeries.slice(startIndex, startIndex + SERIES_PAGE_SIZE);
-  }, [availableSeries, safeAvailablePage]);
+  }, [serverPagedJourneys, availableSeries, safeAvailablePage]);
+
+  const pagedAvailableSeries = displayAvailableSeries;
 
   const totalUpcomingPages = Math.max(
     1,
@@ -1228,13 +1277,19 @@ export function DiscoveryJourney() {
           <div className="journey-library-section-heading">
             <h2>{t("journey.available_series")}</h2>
             <span>
-              {t("journey.series_count", { count: availableSeries.length })}
+              {t("journey.series_count", { count: totalAvailableCount })}
             </span>
           </div>
-          <ul className="journey-series-grid">
-            {pagedAvailableSeries.map(renderSeriesCard)}
-          </ul>
-          {availableSeries.length === 0 && (
+          {isJourneysLoading ? (
+            <div className="journey-series-grid opacity-60 transition-opacity duration-200">
+              {pagedAvailableSeries.map(renderSeriesCard)}
+            </div>
+          ) : (
+            <ul className="journey-series-grid">
+              {pagedAvailableSeries.map(renderSeriesCard)}
+            </ul>
+          )}
+          {!isJourneysLoading && totalAvailableCount === 0 && (
             <div className="journey-empty-region">
               <p>
                 {firstRegion
@@ -1246,7 +1301,7 @@ export function DiscoveryJourney() {
           <DiscoveryPagination
             currentPage={safeAvailablePage}
             totalPages={totalAvailablePages}
-            totalItems={availableSeries.length}
+            totalItems={totalAvailableCount}
             itemsPerPage={SERIES_PAGE_SIZE}
             onPageChange={handleAvailablePageChange}
             ariaLabel={t("journey.pagination_available_aria", {

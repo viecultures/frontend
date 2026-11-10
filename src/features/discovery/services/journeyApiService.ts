@@ -35,6 +35,22 @@ export interface JourneyFilterQuery {
   status?: string;
 }
 
+export interface PagedBackendJourneyResponse {
+  items: BackendJourneyResponse[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface PagedJourneySeriesResponse {
+  items: JourneySeries[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
 export function mapBackendJourneyToSeries(item: BackendJourneyResponse): JourneySeries {
   return {
     id: item.id,
@@ -92,6 +108,47 @@ export const journeyApiService = {
     } catch (error) {
       console.warn('[journeyApiService] Error fetching journeys from backend, falling back to mock data:', error);
       return JOURNEY_SERIES;
+    }
+  },
+
+  async getPagedJourneys(params: JourneyFilterQuery & { page: number; size?: number }): Promise<PagedJourneySeriesResponse | null> {
+    const searchParams = new URLSearchParams();
+    searchParams.append('page', String(params.page));
+    searchParams.append('size', String(params.size || 6));
+    if (params.status) searchParams.append('status', params.status);
+    if (params.region) searchParams.append('region', params.region);
+    if (params.provinceId) searchParams.append('provinceId', params.provinceId);
+    if (params.theme) searchParams.append('theme', params.theme);
+
+    const queryString = searchParams.toString();
+    const url = `${API_BASE_URL}/api/journeys?${queryString}`;
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        console.warn(`[journeyApiService] Failed to fetch paged journeys (HTTP ${res.status})`);
+        return null;
+      }
+
+      const data: PagedBackendJourneyResponse = await res.json();
+      if (!data || !Array.isArray(data.items)) {
+        return null;
+      }
+
+      return {
+        items: data.items.map(mapBackendJourneyToSeries),
+        page: data.page,
+        size: data.size,
+        totalElements: data.totalElements,
+        totalPages: data.totalPages,
+      };
+    } catch (error) {
+      console.warn('[journeyApiService] Error fetching paged journeys from backend:', error);
+      return null;
     }
   },
 
