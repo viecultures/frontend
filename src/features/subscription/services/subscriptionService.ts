@@ -105,40 +105,6 @@ export const FALLBACK_SUBSCRIPTION_PLANS: SubscriptionPlanItem[] = [
       'Heritage Scholar Badge on profile',
     ],
   },
-  {
-    id: 'plan_fallback_lifetime',
-    code: 'LIFETIME',
-    nameVi: 'Học giả Trọn đời',
-    nameEn: 'Heritage Master (Lifetime)',
-    descriptionVi: 'Đầu tư một lần, sở hữu vĩnh viễn toàn bộ kho tàng tri thức và tính năng tương lai',
-    priceVnd: 1490000,
-    discountPercent: 25,
-    billingCycle: 'ONE_TIME',
-    isActive: true,
-    isPopularBadge: false,
-    sortOrder: 4,
-    entitlements: {
-      maxAiAudioMinutesPerMonth: 999,
-      maxCefrLevelAccess: 'C2',
-      unlimitedJourneys: true,
-      offlineDownloadsAllowed: true,
-      highlightBadge: true,
-    },
-    perksVi: [
-      'Sở hữu trọn đời không cần gia hạn',
-      'Không giới hạn toàn bộ bài đọc và hành trình',
-      'Hạn ngạch AI Audio cao cấp tối đa',
-      'Ưu tiên quyền truy cập các tính năng AI mới sớm nhất',
-      'Huy hiệu Tinh hoa Di sản vĩnh viễn',
-    ],
-    perksEn: [
-      'Lifetime access with no renewal required',
-      'Unlimited readings & cultural journeys',
-      'Premium AI Audio quota',
-      'Early priority access to new AI capabilities',
-      'Lifetime Heritage Elite Badge',
-    ],
-  },
 ];
 
 export const subscriptionService = {
@@ -199,7 +165,7 @@ export const subscriptionService = {
         case 'ANNUAL':
           return '/ năm';
         case 'ONE_TIME':
-          return 'trọn đời';
+          return 'trọn gói';
         case 'MONTHLY':
         default:
           return '/ tháng';
@@ -211,7 +177,7 @@ export const subscriptionService = {
         case 'ANNUAL':
           return '/ year';
         case 'ONE_TIME':
-          return 'lifetime';
+          return 'one-time';
         case 'MONTHLY':
         default:
           return '/ month';
