@@ -37,6 +37,8 @@ import {
   History,
   ChevronLeft,
   ChevronRight,
+  Image as ImageIcon,
+  Maximize2,
 } from 'lucide-react';
 import type { ReadingPostItem, CefrLevel } from '../types/adminTypes';
 import { postAdminService, type PostFilterParams } from '../services/postAdminService';
@@ -56,6 +58,7 @@ import { PostPreviewModal } from '../components/PostPreviewModal';
 import { AdminDialog } from '../components/AdminDialog';
 import { AdminServiceConnections } from '../components/AdminServiceConnections';
 import { AiConfigManagementView } from '../components/ai/AiConfigManagementView';
+import { HeritageImage } from '@/components/common/HeritageImage';
 import { adminTopicLabel, adminRegionLabel, adminReadTimeLabel } from '../admin-presentation';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 import '../admin-ui.css';
@@ -136,6 +139,23 @@ export const AdminPage: React.FC = () => {
     return 'posts';
   }, [location.search]);
 
+  const activeAiSubRoute = useMemo<'overview' | 'prompts' | 'providers' | 'tts' | 'logs'>(() => {
+    const stripped = location.pathname.replace(/^\/(vi|en)(\/|$)/, '/');
+    const match = stripped.match(/^\/admin\/(?:ai|ai_configs)(?:\/([a-zA-Z0-9_-]+))?/);
+    if (match && match[1]) {
+      const sub = match[1];
+      if (['overview', 'prompts', 'providers', 'tts', 'logs'].includes(sub)) {
+        return sub as 'overview' | 'prompts' | 'providers' | 'tts' | 'logs';
+      }
+    }
+    const params = new URLSearchParams(location.search);
+    const subParam = params.get('sub');
+    if (subParam && ['overview', 'prompts', 'providers', 'tts', 'logs'].includes(subParam)) {
+      return subParam as 'overview' | 'prompts' | 'providers' | 'tts' | 'logs';
+    }
+    return 'overview';
+  }, [location.pathname, location.search]);
+
   // When visiting /admin or /:lang/admin without subpath, redirect to /admin/dashboard
   useEffect(() => {
     const stripped = location.pathname.replace(/^\/(vi|en)(\/|$)/, '/');
@@ -191,6 +211,7 @@ export const AdminPage: React.FC = () => {
   const [editingPost, setEditingPost] = useState<ReadingPostItem | null>(null);
   const [previewPost, setPreviewPost] = useState<ReadingPostItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [quickZoomPost, setQuickZoomPost] = useState<ReadingPostItem | null>(null);
 
   // Quick Vocab Drawer state
   const [vocabDrawerPost, setVocabDrawerPost] = useState<ReadingPostItem | null>(null);
@@ -417,6 +438,21 @@ export const AdminPage: React.FC = () => {
     }
   };
 
+  // Region Badge Color Helper
+  const getRegionBadgeClass = (region?: string) => {
+    const r = (region || '').toLowerCase();
+    if (r === 'north' || r.includes('bắc')) {
+      return 'bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800/60';
+    }
+    if (r === 'central' || r.includes('trung') || r.includes('huế') || r.includes('đà nẵng') || r.includes('quảng nam')) {
+      return 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800/60';
+    }
+    if (r === 'south' || r.includes('nam') || r.includes('hồ chí minh') || r.includes('cần thơ')) {
+      return 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60';
+    }
+    return 'bg-stone-50 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700/60';
+  };
+
   // Header Title and Action configuration
   const headerConfig = useMemo(() => {
     switch (activeTab) {
@@ -538,39 +574,34 @@ export const AdminPage: React.FC = () => {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="admin-ui w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        {/* ── Compact Page Header (Height <= 68px) ────────────────────────── */}
-        <div className="admin-compact-header min-h-[56px] max-h-[68px] h-[64px] rounded-2xl bg-heritage-green text-warm-ivory px-4 sm:px-6 shadow-md border border-antique-gold/40 flex items-center justify-between gap-3 transition-all">
+      <div className="admin-ui w-full px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+        {/* ── Clean SaaS Page Header ────────────────────────────────────────── */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-antique-gold/20">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-antique-gold/20 border border-antique-gold/40 flex items-center justify-center shrink-0 text-antique-bright">
-              <HeaderIcon aria-hidden="true" className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-heritage-green/10 dark:bg-antique-gold/15 border border-antique-gold/30 flex items-center justify-center shrink-0 text-heritage-green dark:text-antique-bright">
+              <HeaderIcon aria-hidden="true" className="w-5 h-5" />
             </div>
 
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h1 className="font-heading text-sm sm:text-base font-bold tracking-tight truncate">
-                  {headerConfig.title}
-                </h1>
-                {headerConfig.badge ? (
-                  <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-antique-gold/20 text-antique-bright text-[10px] font-bold border border-antique-gold/30 shrink-0">
-                    {headerConfig.badge}
-                  </span>
-                ) : null}
-              </div>
-              <p className="text-[11px] text-warm-ivory/80 truncate hidden md:block">
-                {headerConfig.subtitle}
-              </p>
+            <div className="min-w-0 flex items-center gap-2.5">
+              <h1 className="font-heading text-lg sm:text-xl font-bold text-heritage-green dark:text-warm-ivory tracking-tight truncate">
+                {headerConfig.title}
+              </h1>
+              {headerConfig.badge ? (
+                <span className="inline-flex px-2.5 py-0.5 rounded-full bg-antique-gold/20 text-heritage-dark dark:text-antique-bright text-xs font-bold border border-antique-gold/30 shrink-0">
+                  {headerConfig.badge}
+                </span>
+              ) : null}
             </div>
           </div>
 
           {/* Contextual Actions in Header */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
             {(activeTab === 'dashboard' || activeTab === 'system_stats') && (
               <button
                 type="button"
                 onClick={fetchOverview}
                 disabled={isOverviewLoading}
-                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                className="px-3.5 py-2 rounded-xl bg-rice-paper dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 border border-antique-gold/30 text-xs font-bold text-text-body dark:text-warm-ivory flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
                 title="Tải lại thống kê tổng quan"
               >
                 <RefreshCw aria-hidden="true" className={`w-3.5 h-3.5 ${isOverviewLoading ? 'animate-spin' : ''}`} />
@@ -583,7 +614,7 @@ export const AdminPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate(getLocalizedPath('/admin/cuisine-drafts', currentLang))}
-                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-semibold text-warm-ivory cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-rice-paper dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 border border-antique-gold/30 text-xs font-bold text-text-body dark:text-warm-ivory cursor-pointer transition-colors shadow-2xs"
                 >
                   Xem nháp EXE101
                 </button>
@@ -591,17 +622,17 @@ export const AdminPage: React.FC = () => {
                   type="button"
                   onClick={fetchPosts}
                   disabled={isLoading}
-                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                  className="px-3.5 py-2 rounded-xl bg-rice-paper dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 border border-antique-gold/30 text-xs font-bold text-text-body dark:text-warm-ivory flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
                   title={t('header.refresh_articles')}
                 >
-                  <RefreshCw aria-hidden="true" className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw aria-hidden="true" className={`w-3.5 h-3.5 text-antique-gold ${isLoading ? 'animate-spin' : ''}`} />
                   <span className="hidden sm:inline">{t('header.refresh_articles')}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleOpenCreate}
-                  className="px-3.5 py-1.5 rounded-xl bg-antique-gold text-heritage-dark hover:bg-antique-bright text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+                  className="px-4 py-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
                 >
                   <Plus aria-hidden="true" className="w-4 h-4" />
                   <span>{t('header.new_article')}</span>
@@ -610,27 +641,27 @@ export const AdminPage: React.FC = () => {
             )}
 
             {activeTab === 'subscriptions' && (
-              <div className="px-3 py-1.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5">
+              <div className="px-3.5 py-2 rounded-xl bg-rice-paper dark:bg-white/10 border border-antique-gold/30 text-xs font-semibold text-text-body dark:text-warm-ivory flex items-center gap-1.5">
                 <CreditCard aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
                 <span className="hidden sm:inline">Phân hệ Doanh thu</span>
               </div>
             )}
 
             {activeTab === 'users' && (
-              <div className="px-3 py-1.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5">
+              <div className="px-3.5 py-2 rounded-xl bg-rice-paper dark:bg-white/10 border border-antique-gold/30 text-xs font-semibold text-text-body dark:text-warm-ivory flex items-center gap-1.5">
                 <ShieldCheck aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
                 <span className="hidden sm:inline">{t('header.admin_access')}</span>
               </div>
             )}
 
             {(activeTab === 'history' || activeTab === 'system' || activeTab === 'logs') && (
-              <div className="px-3 py-1.5 rounded-xl bg-white/10 border border-antique-gold/30 text-xs font-semibold text-warm-ivory flex items-center gap-1.5">
+              <div className="px-3.5 py-2 rounded-xl bg-rice-paper dark:bg-white/10 border border-antique-gold/30 text-xs font-semibold text-text-body dark:text-warm-ivory flex items-center gap-1.5">
                 <History aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold" />
                 <span className="hidden sm:inline">Nhật ký & Lịch sử</span>
               </div>
             )}
           </div>
-        </div>
+        </header>
 
         {/* Alerts & Toasts */}
         {errorMsg && (
@@ -1178,42 +1209,80 @@ export const AdminPage: React.FC = () => {
         {/* ── TAB 3: KHO BÀI VIẾT & HỌC LIỆU (POSTS) ─────────────────────── */}
         {(activeTab === 'posts' || (activeTab === 'content' && activeContentSubTab === 'posts')) && (
           <div className="space-y-6">
-            {/* Filter & Search Bar */}
-            <div className="p-4 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
-              <form onSubmit={handleSearchSubmit} className="admin-search relative w-full md:w-96" role="search">
-                <Search aria-hidden="true" className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-                <input
-                  type="text"
-                  aria-label={t('filters.search_placeholder')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('filters.search_placeholder')}
-                  className="w-full pl-10 pr-4 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
-                />
-                <button type="submit" className="rounded-xl bg-heritage-green px-3 text-warm-ivory">
-                  {t('filters.search_button')}
-                </button>
-              </form>
+            {/* Filter & Search Bar: 2-Tier Structured Toolbar */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-rice-paper dark:bg-heritage-dark/60 border border-antique-gold/30 shadow-xs space-y-3">
+              {/* Tier 1: Search Form + Stats + Reset */}
+              <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                <form onSubmit={handleSearchSubmit} className="admin-search relative flex-1" role="search">
+                  <Search aria-hidden="true" className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+                  <input
+                    type="text"
+                    aria-label={t('filters.search_placeholder')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={t('filters.search_placeholder')}
+                    className="w-full pl-10 pr-24 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      aria-label="Xóa từ khóa tìm kiếm"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-20 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-heritage-green dark:hover:text-warm-ivory cursor-pointer"
+                    >
+                      <X aria-hidden="true" className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <button type="submit" className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-heritage-green px-3 py-1.5 text-warm-ivory hover:bg-heritage-dark transition-colors text-xs font-semibold cursor-pointer">
+                    {t('filters.search_button')}
+                  </button>
+                </form>
 
-              <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-                {/* Standalone / Journey Filter */}
+                <div className="flex items-center gap-2 shrink-0 justify-between md:justify-end">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-semibold text-heritage-green dark:text-antique-bright whitespace-nowrap">
+                    <Layers aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold shrink-0" />
+                    <span>{displayedPosts.length} / {posts.length} bài viết</span>
+                  </div>
+
+                  {(selectedLevel || selectedRegion || searchQuery || postStatusFilter !== 'all' || standaloneFilter !== 'all') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedLevel('');
+                        setSelectedRegion('');
+                        setSelectedTopic('');
+                        setSearchQuery('');
+                        setStandaloneFilter('all');
+                        setPostStatusFilter('all');
+                      }}
+                      className="px-3 py-2 rounded-xl bg-white/60 dark:bg-white/10 hover:bg-white text-xs font-bold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 cursor-pointer transition-colors"
+                    >
+                      {t('filters.clear_filters')}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Tier 2: 4-Column Balanced Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2 border-t border-antique-gold/15">
+                {/* 1. Standalone / Journey */}
                 <select
                   aria-label="Hình thức bài đọc"
                   value={standaloneFilter}
                   onChange={(e) => setStandaloneFilter(e.target.value as 'all' | 'standalone' | 'journey')}
-                  className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
                   <option value="all">Tất cả hình thức</option>
                   <option value="standalone">Chỉ bài độc lập</option>
                   <option value="journey">Thuộc hành trình học</option>
                 </select>
 
-                {/* Level Filter */}
+                {/* 2. Level CEFR */}
                 <select
                   aria-label={t('filters.all_levels')}
                   value={selectedLevel}
                   onChange={(e) => setSelectedLevel(e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
                   <option value="">{t('filters.all_levels')}</option>
                   {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => (
@@ -1223,50 +1292,33 @@ export const AdminPage: React.FC = () => {
                   ))}
                 </select>
 
-                {/* Region Filter */}
+                {/* 3. Region */}
                 <select
                   aria-label={t('filters.all_regions')}
                   value={selectedRegion}
                   onChange={(e) => setSelectedRegion(e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
                   <option value="">{t('filters.all_regions')}</option>
                   {Object.keys(postStats.regionsCount).map((r) => (
                     <option key={r} value={r}>
-                      {adminRegionLabel(r)} ({postStats.regionsCount[r]})
+                      {adminRegionLabel(r, currentLang)} ({postStats.regionsCount[r]})
                     </option>
                   ))}
                 </select>
 
-                {/* Material Readiness / Post Status Filter */}
+                {/* 4. Status */}
                 <select
                   aria-label={t('posts_table.status_filter.label')}
                   value={postStatusFilter}
                   onChange={(e) => setPostStatusFilter(e.target.value as 'all' | 'published' | 'draft' | 'missing_materials')}
-                  className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
                   <option value="all">{t('posts_table.status_filter.all')}</option>
                   <option value="published">{t('posts_table.status_filter.published')}</option>
                   <option value="draft">{t('posts_table.status_filter.draft')}</option>
                   <option value="missing_materials">{t('posts_table.status_filter.missing_materials')}</option>
                 </select>
-
-                {/* Reset Filter Button */}
-                {(selectedLevel || selectedRegion || searchQuery || postStatusFilter !== 'all') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedLevel('');
-                      setSelectedRegion('');
-                      setSelectedTopic('');
-                      setSearchQuery('');
-                      setPostStatusFilter('all');
-                    }}
-                    className="px-3 py-2 rounded-xl bg-white/40 dark:bg-white/10 hover:bg-white/60 text-xs font-bold text-text-muted cursor-pointer transition-colors"
-                  >
-                    {t('filters.clear_filters')}
-                  </button>
-                )}
               </div>
             </div>
 
@@ -1296,9 +1348,20 @@ export const AdminPage: React.FC = () => {
             {/* Posts Table */}
             <div className="bg-rice-paper dark:bg-heritage-dark/60 rounded-3xl border border-antique-gold/30 shadow-md overflow-hidden">
               {isLoading ? (
-                <div className="py-20 text-center space-y-3">
-                  <div className="inline-block animate-spin w-8 h-8 border-3 border-antique-gold border-t-transparent rounded-full" />
-                  <p className="text-xs text-text-muted">{t('posts_table.loading')}</p>
+                <div className="p-5 space-y-3 animate-pulse">
+                  {[...Array(5)].map((_, idx) => (
+                    <div key={idx} className="flex items-center gap-4 p-3.5 rounded-2xl bg-warm-ivory/60 dark:bg-white/5 border border-antique-gold/15">
+                      <div className="w-16 h-12 sm:w-20 sm:h-14 rounded-xl bg-antique-gold/15 shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-antique-gold/20 rounded w-1/3" />
+                        <div className="h-3 bg-antique-gold/10 rounded w-1/2" />
+                      </div>
+                      <div className="hidden sm:block h-6 w-20 rounded-full bg-antique-gold/15" />
+                      <div className="hidden md:block h-6 w-12 rounded-full bg-antique-gold/15" />
+                      <div className="hidden lg:block h-6 w-24 rounded-lg bg-antique-gold/15" />
+                      <div className="h-8 w-32 rounded-xl bg-antique-gold/20" />
+                    </div>
+                  ))}
                 </div>
               ) : displayedPosts.length === 0 ? (
                 <div className="py-20 text-center space-y-4">
@@ -1322,7 +1385,7 @@ export const AdminPage: React.FC = () => {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-warm-ivory/80 dark:bg-heritage-dark/80 border-b border-antique-gold/20 text-text-secondary uppercase text-[10px] font-bold tracking-wider">
+                    <thead className="bg-warm-ivory/90 dark:bg-heritage-dark/90 border-b border-antique-gold/30 text-text-secondary uppercase text-[10px] font-bold tracking-wider">
                       <tr>
                         <th className="px-5 py-3.5">{t('posts_table.col_title')}</th>
                         <th className="px-4 py-3.5">{t('posts_table.col_region')}</th>
@@ -1330,7 +1393,9 @@ export const AdminPage: React.FC = () => {
                         <th className="px-4 py-3.5">{t('posts_table.col_category')}</th>
                         <th className="px-4 py-3.5">{t('posts_table.col_content')}</th>
                         <th className="px-4 py-3.5 text-center">{t('posts_table.col_reads')}</th>
-                        <th className="px-5 py-3.5 text-right">{t('posts_table.col_actions')}</th>
+                        <th className="px-5 py-3.5 text-right sticky right-0 z-20 bg-warm-ivory/95 dark:bg-heritage-dark/95 border-l border-antique-gold/20 shadow-[-6px_0_12px_rgba(0,0,0,0.03)] backdrop-blur-xs">
+                          {t('posts_table.col_actions')}
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-antique-gold/15">
@@ -1339,7 +1404,6 @@ export const AdminPage: React.FC = () => {
                           (post.paragraphs && post.paragraphs.length > 0) ||
                           (post.wordCount && post.wordCount > 0)
                         );
-                        const paragraphCount = post.paragraphs?.length || (post.wordCount ? Math.ceil(post.wordCount / 50) : 0);
                         const vocabCount = post.vocabCount ?? post.vocabularies?.length ?? 0;
                         const hasAudio = Boolean(post.audioTracks || post.shadowingAudioUrl);
                         const quizCount = post.questionCount ?? (Array.isArray(post.questions) ? post.questions.length : 0);
@@ -1347,54 +1411,89 @@ export const AdminPage: React.FC = () => {
                         return (
                           <tr
                             key={post.id}
-                            className="hover:bg-warm-ivory/50 dark:hover:bg-white/5 transition-colors group"
+                            className="hover:bg-amber-50/40 dark:hover:bg-white/5 transition-colors group"
                           >
-                            <td className="px-5 py-4 max-w-sm">
-                              <div className="space-y-1">
-                                <div className="flex flex-wrap items-center gap-1.5">
-                                  {post.journeyTitleEn ? (
+                            {/* 1. Article Info with Left Visual Thumbnail */}
+                            <td className="px-5 py-3.5 min-w-[320px] max-w-md">
+                              <div className="flex items-start gap-3.5">
+                                {/* Visual Thumbnail with Quick Zoom */}
+                                <button
+                                  type="button"
+                                  onClick={() => setQuickZoomPost(post)}
+                                  aria-label={`Xem ảnh bài viết: ${post.titleEn}`}
+                                  title="Nhấp để xem ảnh trực quan nhanh"
+                                  className="relative group/thumb shrink-0 w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden border border-antique-gold/30 bg-warm-ivory dark:bg-stone-800 shadow-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-antique-gold text-left"
+                                >
+                                  <HeritageImage
+                                    src={post.imageUrl}
+                                    alt={post.titleEn}
+                                    category={post.topic || 'Ẩm thực'}
+                                    loading="lazy"
+                                    containerClassName="w-full h-full"
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover/thumb:scale-110"
+                                  />
+
+                                  <div className="absolute inset-0 bg-heritage-dark/60 backdrop-blur-[1px] opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center text-warm-ivory">
+                                    <Maximize2 aria-hidden="true" className="w-3.5 h-3.5 text-antique-bright drop-shadow-sm" />
+                                  </div>
+                                </button>
+
+                                {/* Article Info */}
+                                <div className="min-w-0 flex-1 space-y-1">
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    {post.journeyTitleEn ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const p = new URLSearchParams(location.search);
+                                          p.set('tab', 'posts');
+                                          if (post.journeyId) p.set('journeyId', post.journeyId);
+                                          navigate(`${location.pathname}?${p.toString()}`);
+                                        }}
+                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 hover:bg-antique-gold/35 text-heritage-green dark:text-antique-bright border border-antique-gold/35 transition-colors cursor-pointer"
+                                        title="Lọc các bài thuộc hành trình này"
+                                      >
+                                        <Compass aria-hidden="true" className="w-3 h-3 text-antique-gold" />
+                                        <span>Chặng {post.chapterOrder || 1}: {post.journeyTitleEn}</span>
+                                      </button>
+                                    ) : (
+                                      <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 dark:bg-white/10 text-text-muted">
+                                        Độc lập
+                                      </span>
+                                    )}
+                                    {post.topicGroup && (
+                                      <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-rice-paper dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-antique-gold/25">
+                                        {post.topicGroup}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <h4 className="font-heading font-bold text-sm sm:text-[15px] text-heritage-green dark:text-warm-ivory line-clamp-1 sm:line-clamp-2">
                                     <button
                                       type="button"
-                                      onClick={() => {
-                                        const p = new URLSearchParams(location.search);
-                                        p.set('tab', 'posts');
-                                        if (post.journeyId) p.set('journeyId', post.journeyId);
-                                        navigate(`${location.pathname}?${p.toString()}`);
-                                      }}
-                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-antique-gold/20 hover:bg-antique-gold/35 text-heritage-green dark:text-antique-bright border border-antique-gold/35 transition-colors cursor-pointer"
-                                      title="Lọc các bài thuộc hành trình này"
+                                      onClick={() => handleOpenPreview(post)}
+                                      className="text-left hover:text-antique-gold transition-colors cursor-pointer"
+                                      title={post.titleEn}
                                     >
-                                      <Compass aria-hidden="true" className="w-3 h-3 text-antique-gold" />
-                                      <span>Chặng {post.chapterOrder || 1}: {post.journeyTitleEn}</span>
+                                      {post.titleEn}
                                     </button>
-                                  ) : (
-                                    <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 dark:bg-white/10 text-text-muted">
-                                      Độc lập
-                                    </span>
-                                  )}
-                                  {post.topicGroup && (
-                                    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-antique-gold/20 text-heritage-dark dark:text-antique-bright border border-antique-gold/30">
-                                      {post.topicGroup}
-                                    </span>
-                                  )}
+                                  </h4>
+                                  <p className="text-xs text-stone-600 dark:text-stone-400 font-medium line-clamp-1">
+                                    {post.titleVi}
+                                  </p>
                                 </div>
-                                <h4 className="font-heading font-bold text-sm text-heritage-green dark:text-warm-ivory line-clamp-1 group-hover:text-antique-gold transition-colors">
-                                  {post.titleEn}
-                                </h4>
-                                <p className="text-[11px] text-text-muted line-clamp-1 italic">
-                                  {post.titleVi}
-                                </p>
                               </div>
                             </td>
 
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/60 dark:bg-white/10 border border-antique-gold/20">
-                                <MapPin aria-hidden="true" className="w-3 h-3 text-antique-gold" />
-                                <span>{adminRegionLabel(post.region)}</span>
+                            {/* 2. Vùng miền */}
+                            <td className="px-4 py-3.5 whitespace-nowrap">
+                              <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${getRegionBadgeClass(post.region)}`}>
+                                <MapPin aria-hidden="true" className="w-3 h-3 text-current opacity-70" />
+                                <span>{adminRegionLabel(post.region, currentLang)}</span>
                               </span>
                             </td>
 
-                            <td className="px-4 py-4 whitespace-nowrap">
+                            {/* 3. Cấp độ CEFR */}
+                            <td className="px-4 py-3.5 whitespace-nowrap">
                               <span
                                 className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${getLevelBadgeClass(
                                   post.level
@@ -1404,13 +1503,16 @@ export const AdminPage: React.FC = () => {
                               </span>
                             </td>
 
-                            <td className="px-4 py-4 whitespace-nowrap text-text-secondary text-[11px]">
-                              {adminTopicLabel(post.topic)}
+                            {/* 4. Chuyên mục */}
+                            <td className="px-4 py-3.5 whitespace-nowrap">
+                              <span className="inline-block px-2.5 py-1 rounded-lg text-[11px] font-medium bg-rice-paper/80 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-antique-gold/25">
+                                {adminTopicLabel(post.topic, currentLang)}
+                              </span>
                             </td>
 
-                            {/* Readiness Pills (Bài đọc, Từ vựng, Audio TTS, Quiz) */}
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <div className="flex flex-wrap items-center gap-1.5">
+                            {/* 5. Readiness Indicators (Thống nhất hàng ngang) */}
+                            <td className="px-4 py-3.5 whitespace-nowrap">
+                              <div className="flex items-center gap-1.5">
                                 {/* Reading Pill */}
                                 <button
                                   type="button"
@@ -1426,9 +1528,9 @@ export const AdminPage: React.FC = () => {
                                       setVocabDrawerPost(post);
                                     }
                                   }}
-                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs cursor-pointer ${
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
                                     vocabCount > 0
-                                      ? 'bg-blue-100 hover:bg-blue-200 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700/60 ring-1 ring-blue-500/10'
+                                      ? 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700/60'
                                       : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800/80 dark:hover:bg-stone-700 text-stone-500 border-stone-200 dark:border-stone-700'
                                   }`}
                                   title="Xem nhanh từ vựng của bài đọc"
@@ -1439,22 +1541,22 @@ export const AdminPage: React.FC = () => {
 
                                 {/* Audio TTS Pill */}
                                 <span
-                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all ${
                                     hasAudio
-                                      ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700/60 ring-1 ring-amber-500/10'
+                                      ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-700/60'
                                       : 'bg-stone-100 dark:bg-stone-800/80 text-stone-400 border-stone-200 dark:border-stone-700'
                                   }`}
                                   title={hasAudio ? t('posts_table.readiness.audio_ready') : t('posts_table.readiness.audio_empty')}
                                 >
                                   <Volume2 aria-hidden="true" className="w-3 h-3 shrink-0" />
-                                  <span>{hasAudio ? t('posts_table.readiness.audio_ready') : t('posts_table.readiness.audio_empty')}</span>
+                                  <span>{hasAudio ? 'Có audio' : 'Thiếu audio'}</span>
                                 </span>
 
                                 {/* Quiz Pill */}
                                 <span
-                                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-all shadow-xs ${
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all ${
                                     quizCount > 0
-                                      ? 'bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-700/60 ring-1 ring-purple-500/10'
+                                      ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-700/60'
                                       : 'bg-stone-100 dark:bg-stone-800/80 text-stone-400 border-stone-200 dark:border-stone-700'
                                   }`}
                                   title={t('posts_table.readiness.quiz_count', { count: quizCount })}
@@ -1465,61 +1567,66 @@ export const AdminPage: React.FC = () => {
                               </div>
                             </td>
 
-                            <td className="px-4 py-4 whitespace-nowrap text-center font-bold text-text-body dark:text-warm-ivory">
-                              {post.totalReads || 0}
+                            {/* 6. Lượt đọc */}
+                            <td className="px-4 py-3.5 whitespace-nowrap text-center font-bold text-text-body dark:text-warm-ivory">
+                              {(post.totalReads || 0).toLocaleString('vi-VN')}
                             </td>
 
-                            {/* Actions with Guardrail on Publish */}
-                            <td className="px-5 py-4 whitespace-nowrap text-right space-x-1.5">
-                              <button
-                                type="button"
-                                disabled={!hasParagraphs}
-                                onClick={() => {
-                                  setSuccessToast(`${t('posts_table.guardrails.published_badge')}: ${post.titleEn}`);
-                                  setTimeout(() => setSuccessToast(null), 3000);
-                                }}
-                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold border transition-all ${
-                                  !hasParagraphs
-                                    ? 'opacity-40 cursor-not-allowed bg-stone-100 dark:bg-stone-800 text-stone-500 border-stone-300'
-                                    : 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 hover:bg-emerald-200 cursor-pointer'
-                                }`}
-                                title={
-                                  !hasParagraphs
-                                    ? t('posts_table.guardrails.publish_locked')
-                                    : t('posts_table.guardrails.publish_action')
-                                }
-                              >
-                                <Send aria-hidden="true" className="w-3 h-3" />
-                                <span>{hasParagraphs ? t('posts_table.guardrails.published_badge') : t('posts_table.guardrails.draft_badge')}</span>
-                              </button>
+                            {/* 7. Thao tác (Sticky Right Column) */}
+                            <td className="px-5 py-3.5 whitespace-nowrap text-right sticky right-0 z-10 bg-rice-paper group-hover:bg-[#FAF4E4] dark:bg-[#122A22] dark:group-hover:bg-[#18362c] border-l border-antique-gold/20 shadow-[-6px_0_12px_rgba(0,0,0,0.03)] transition-colors">
+                              <div className="inline-flex items-center gap-1.5 justify-end">
+                                <button
+                                  type="button"
+                                  disabled={!hasParagraphs}
+                                  onClick={() => {
+                                    setSuccessToast(`${t('posts_table.guardrails.published_badge')}: ${post.titleEn}`);
+                                    setTimeout(() => setSuccessToast(null), 3000);
+                                  }}
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all ${
+                                    !hasParagraphs
+                                      ? 'opacity-40 cursor-not-allowed bg-stone-100 dark:bg-stone-800 text-stone-500 border-stone-300'
+                                      : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 cursor-pointer'
+                                  }`}
+                                  title={
+                                    !hasParagraphs
+                                      ? t('posts_table.guardrails.publish_locked')
+                                      : t('posts_table.guardrails.publish_action')
+                                  }
+                                >
+                                  <Send aria-hidden="true" className="w-3 h-3" />
+                                  <span>{hasParagraphs ? t('posts_table.guardrails.published_badge') : t('posts_table.guardrails.draft_badge')}</span>
+                                </button>
 
-                              <button
-                                type="button"
-                                onClick={() => handleOpenPreview(post)}
-                                className="p-1.5 rounded-lg text-heritage-green dark:text-antique-bright hover:bg-heritage-green/10 transition-colors cursor-pointer"
-                                title={t('posts_table.preview_action')}
-                                aria-label={t('posts_table.preview_action')}
-                              >
-                                <Eye aria-hidden="true" className="w-4 h-4" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleOpenEdit(post)}
-                                className="p-1.5 rounded-lg text-antique-gold hover:bg-antique-gold/15 transition-colors cursor-pointer"
-                                title={t('posts_table.edit_action')}
-                                aria-label={t('posts_table.edit_action')}
-                              >
-                                <Edit3 aria-hidden="true" className="w-4 h-4" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setDeletingId(post.id)}
-                                className="p-1.5 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
-                                title={t('posts_table.delete_action')}
-                                aria-label={t('posts_table.delete_action')}
-                              >
-                                <Trash2 aria-hidden="true" className="w-4 h-4" />
-                              </button>
+                                <div className="h-4 w-px bg-antique-gold/25 mx-0.5" />
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenPreview(post)}
+                                  className="p-1.5 rounded-lg text-heritage-green dark:text-antique-bright hover:bg-heritage-green/10 transition-colors cursor-pointer"
+                                  title={t('posts_table.preview_action')}
+                                  aria-label={t('posts_table.preview_action')}
+                                >
+                                  <Eye aria-hidden="true" className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEdit(post)}
+                                  className="p-1.5 rounded-lg text-antique-gold hover:bg-antique-gold/15 transition-colors cursor-pointer"
+                                  title={t('posts_table.edit_action')}
+                                  aria-label={t('posts_table.edit_action')}
+                                >
+                                  <Edit3 aria-hidden="true" className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setDeletingId(post.id)}
+                                  className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-colors cursor-pointer"
+                                  title={t('posts_table.delete_action')}
+                                  aria-label={t('posts_table.delete_action')}
+                                >
+                                  <Trash2 aria-hidden="true" className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );
@@ -1621,11 +1728,81 @@ export const AdminPage: React.FC = () => {
 
         {/* ── TAB 7: CẤU HÌNH AI & CHI PHÍ ─────────────────────────────────── */}
         {(activeTab === 'ai_configs' || activeTab === 'ai') && (
-          <AiConfigManagementView />
+          <AiConfigManagementView activeSubRoute={activeAiSubRoute} />
         )}
 
         {/* ── Preview Modal ─────────────────────────────────────────────── */}
         <PostPreviewModal post={previewPost} onClose={() => setPreviewPost(null)} />
+
+        {/* ── Quick Image Zoom Lightbox Modal ─────────────────────────────── */}
+        {quickZoomPost && (
+          <AdminDialog
+            title="Xem ảnh trực quan bài viết"
+            onClose={() => setQuickZoomPost(null)}
+          >
+            <div className="w-full max-w-2xl bg-rice-paper dark:bg-heritage-forest border border-antique-gold/30 rounded-3xl p-5 shadow-2xl space-y-4">
+              <div className="relative rounded-2xl overflow-hidden border border-antique-gold/30 bg-warm-ivory dark:bg-stone-900 shadow-inner max-h-[60vh] flex items-center justify-center w-full">
+                <HeritageImage
+                  src={quickZoomPost.imageUrl}
+                  alt={quickZoomPost.titleEn}
+                  category={quickZoomPost.topic || 'Ẩm thực'}
+                  loading="eager"
+                  containerClassName="w-full max-h-[58vh] flex items-center justify-center"
+                  className="w-full h-auto max-h-[58vh] object-contain"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-antique-gold/20">
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold border ${getLevelBadgeClass(quickZoomPost.level)}`}>
+                      {quickZoomPost.level}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getRegionBadgeClass(quickZoomPost.region)}`}>
+                      {adminRegionLabel(quickZoomPost.region, currentLang)}
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-rice-paper dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-antique-gold/25">
+                      {adminTopicLabel(quickZoomPost.topic, currentLang)}
+                    </span>
+                  </div>
+                  <h4 className="font-heading font-bold text-base text-heritage-green dark:text-warm-ivory">
+                    {quickZoomPost.titleEn}
+                  </h4>
+                  <p className="text-xs text-stone-600 dark:text-stone-400 font-medium">
+                    {quickZoomPost.titleVi}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const p = quickZoomPost;
+                      setQuickZoomPost(null);
+                      handleOpenPreview(p);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Eye aria-hidden="true" className="w-3.5 h-3.5" />
+                    <span>Xem bài đọc</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const p = quickZoomPost;
+                      setQuickZoomPost(null);
+                      handleOpenEdit(p);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-antique-gold hover:bg-antique-bright text-heritage-dark text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Edit3 aria-hidden="true" className="w-3.5 h-3.5" />
+                    <span>Chỉnh sửa</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </AdminDialog>
+        )}
 
         {/* Post Vocab Drawer */}
         <PostVocabDrawer

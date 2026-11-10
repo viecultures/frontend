@@ -31,7 +31,8 @@ interface FlashcardSessionSummaryProps {
 
 export function FlashcardSessionSummary({
   deck, session, level, onRestart, reward, totalXP, totalCoins, savedOnly, }: FlashcardSessionSummaryProps) {
-  const { t } = useTranslation('flashcards');
+  const { t, i18n } = useTranslation('flashcards');
+  const isVi = i18n.language === 'vi';
   
   const navigate = useAppNavigate();
   const [isWordListOpen, setIsWordListOpen] = useState(false);
@@ -86,10 +87,10 @@ export function FlashcardSessionSummary({
             <span>{t('summary.session_completed', 'Review complete')}</span>
           </div>
           <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-ink tracking-tight pt-1">
-            {deck.lesson.vietnameseTitle}
+            {isVi ? (deck.lesson.vietnameseTitle || deck.lesson.title) : (deck.lesson.title || deck.lesson.vietnameseTitle)}
           </h2>
           <p className="text-sm text-ink-soft">
-            {deck.lesson.title}
+            {isVi ? deck.lesson.title : deck.lesson.vietnameseTitle}
           </p>
         </div>
       </div>

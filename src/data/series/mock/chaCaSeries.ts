@@ -11,6 +11,7 @@ export const CHA_CA_SERIES_METADATA: SeriesMetadata = {
   provinceId: 'ha-noi',
   region: 'north',
   description: 'Explore the 1871 origin, interactive tabletop cooking, dill-turmeric pairing, and five elements balance of Hanoi’s iconic fish specialty.',
+  descriptionVi: 'Khám phá câu chuyện nguồn gốc từ năm 1871, nét văn hóa thưởng thức chả cá trên chảo nóng, sự kết hợp hoàn hảo giữa thì là, nghệ tươi và mắm tôm nức tiếng Hà thành.',
   imageUrl,
   status: 'published',
   chapters: [

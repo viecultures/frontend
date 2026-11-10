@@ -101,11 +101,19 @@ export default function ReaderPage() {
         setLoadedKey(requestedKey);
         return;
       }
-      if (!getSeriesArticle(targetId)) {
-        if (active) { setArticleError(true); setLoadedKey(requestedKey); }
+      const staticSeries = getSeriesArticle(targetId);
+      if (staticSeries) {
+        cacheArticle(staticSeries, selectedLevel);
+        setArticleData(staticSeries);
+        setLoadedKey(requestedKey);
         return;
       }
-      const post = await readerApiService.getPostById(targetId);
+      const cefr = selectedLevel === 'Level 1' ? 'A1' : selectedLevel === 'Level 3' ? 'C1' : 'B1';
+      let post = await readerApiService.getPostById(targetId);
+      if (!post) {
+        const topicGroup = targetId.replace(/-(?:a1|a2|b1|b2|c1|c2)$/i, '');
+        post = await readerApiService.getPostByTopicGroupAndLevel(topicGroup, cefr);
+      }
       if (!active) return;
       if (post && readerLevelFor(post.level) !== selectedLevel) {
         const actualLevel = readerLevelFor(post.level);

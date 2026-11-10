@@ -23,6 +23,7 @@ export interface SeriesMetadata {
   provinceId: string;
   region: SeriesRegion;
   description: string;
+  descriptionVi?: string;
   imageUrl: string;
   status: SeriesStatus;
   scheduledPublishAt?: string;

@@ -69,6 +69,7 @@ export function adaptAdminPostToReaderData(input: AdminReaderAdapterInput): Read
   // 2. Phân giải URL âm thanh từ shadowingAudioUrl hoặc voiceTracks đầu tiên
   const resolvedAudioUrl =
     input.shadowingAudioUrl?.trim() ||
+    input.voiceTracks?.[0]?.audioUrl?.trim() ||
     input.voiceTracks?.[0]?.normalUrl?.trim() ||
     input.voiceTracks?.[0]?.slowUrl?.trim() ||
     '';

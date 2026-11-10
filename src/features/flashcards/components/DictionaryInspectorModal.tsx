@@ -30,7 +30,13 @@ export function DictionaryInspectorModal({
   onPlayAudio,
   onGoToStudy,
 }: DictionaryInspectorModalProps) {
-  const { t } = useTranslation('flashcards');
+  const { t, i18n } = useTranslation('flashcards');
+  const isVi = i18n.language === 'vi';
+  const displayTitle = lesson
+    ? isVi
+      ? (lesson.vietnameseTitle || lesson.title)
+      : (lesson.title || lesson.vietnameseTitle)
+    : '';
   const [lazyCards, setLazyCards] = useState<PreviewCardItem[]>([]);
   const [isLoadingVocabs, setIsLoadingVocabs] = useState<boolean>(false);
   const vocabCacheRef = useRef<Map<string, PreviewCardItem[]>>(new Map());
@@ -156,10 +162,10 @@ export function DictionaryInspectorModal({
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div>
             <span className="text-[10px] font-bold uppercase bg-[#ECFDF5] text-[#059669] px-2.5 py-0.5 rounded-full">
-              {t(`categories.${lesson.category}`, lesson.category)}
+              {t(`categories.${lesson.category}`, lesson.categoryVi || lesson.category)}
             </span>
             <DialogTitle className="font-serif text-xl font-bold text-ink mt-1">
-              {t('inspector.title', { title: lesson.title, defaultValue: `Vocabulary preview: ${lesson.title}` })}
+              {t('inspector.title', { title: displayTitle, defaultValue: `Vocabulary preview: ${displayTitle}` })}
             </DialogTitle>
           </div>
           <button

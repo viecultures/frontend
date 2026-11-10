@@ -11,7 +11,14 @@ interface VocabularyDeckCardProps {
 }
 
 export function VocabularyDeckCard({ lesson, onGoToStudy, onInspectLesson }: VocabularyDeckCardProps) {
-  const { t } = useTranslation('flashcards');
+  const { t, i18n } = useTranslation('flashcards');
+  const isVi = i18n.language === 'vi';
+  const displayTitle = isVi
+    ? (lesson.vietnameseTitle || lesson.title)
+    : (lesson.title || lesson.vietnameseTitle);
+  const displaySummary = isVi
+    ? (lesson.summaryVi || lesson.summary)
+    : (lesson.summary || lesson.summaryVi);
   const handlePreview = () => onInspectLesson(lesson);
   const handleStudy = () => onGoToStudy(lesson.id);
 
@@ -27,10 +34,10 @@ export function VocabularyDeckCard({ lesson, onGoToStudy, onInspectLesson }: Voc
       <button
         className={`vocab-deck-cover bg-gradient-to-br ${lesson.gradient}`}
         onClick={handlePreview}
-        aria-label={t('deck_card.preview_aria', { title: lesson.title, defaultValue: `Preview ${lesson.title}` })}
+        aria-label={t('deck_card.preview_aria', { title: displayTitle, defaultValue: `Preview ${displayTitle}` })}
       >
         <DeckCoverIllustration category={lesson.category} className="vocab-deck-art" />
-        <span className="vocab-deck-category">{t(`categories.${lesson.category}`, lesson.category)}</span>
+        <span className="vocab-deck-category">{t(`categories.${lesson.category}`, lesson.categoryVi || lesson.category)}</span>
         <span className="vocab-deck-level">{lesson.cefrLevel}</span>
       </button>
       <div className="vocab-deck-body">
@@ -39,8 +46,8 @@ export function VocabularyDeckCard({ lesson, onGoToStudy, onInspectLesson }: Voc
           {t('deck_card.vocab_cards_count', { count: cardCount, defaultValue: `${cardCount} vocabulary cards` })}
           <span>{t('deck_card.lang_pair', 'EN / VI')}</span>
         </p>
-        <h3><button onClick={handlePreview}>{lesson.title}</button></h3>
-        <p className="vocab-deck-subtitle">{lesson.summary}</p>
+        <h3><button onClick={handlePreview}>{displayTitle}</button></h3>
+        <p className="vocab-deck-subtitle">{displaySummary}</p>
         <div className="vocab-deck-footer">
           <button className="vocab-deck-preview" onClick={handlePreview}>
             <BookOpen size={15} />

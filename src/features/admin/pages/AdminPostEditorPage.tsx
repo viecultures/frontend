@@ -442,7 +442,7 @@ export const AdminPostEditorPage: React.FC = () => {
         return [...prev, newTrack];
       });
 
-      const defaultAudioUrl = newTrack.normalUrl || newTrack.slowUrl;
+      const defaultAudioUrl = newTrack.audioUrl || newTrack.normalUrl || newTrack.slowUrl;
       if (!shadowingAudioUrl && defaultAudioUrl) {
         setShadowingAudioUrl(defaultAudioUrl);
       }
@@ -544,7 +544,7 @@ export const AdminPostEditorPage: React.FC = () => {
         imageUrl: imageUrl.trim() || undefined,
         shadowingAudioUrl:
           shadowingAudioUrl.trim() ||
-          (voiceTracks.length > 0 ? voiceTracks[0].normalUrl || voiceTracks[0].slowUrl : undefined),
+          (voiceTracks.length > 0 ? voiceTracks[0].audioUrl || voiceTracks[0].normalUrl || voiceTracks[0].slowUrl : undefined),
         audioTracks: voiceTracks.length > 0 ? JSON.stringify(voiceTracks) : undefined,
         summary: summary.trim() || undefined,
         featured,

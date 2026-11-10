@@ -35,6 +35,7 @@ export interface CreateAiKeyPayload {
 
 export interface UpdateAiKeyPayload {
   keyLabel?: string;
+  serviceType?: AiServiceType;
   rawKey?: string;
   priority?: number;
   active?: boolean;
@@ -108,6 +109,7 @@ export interface AzureRegionOption {
 export interface SystemAiSettingsDto {
   geminiChatModel: string;
   geminiTranslateModel: string;
+  geminiTtsModel?: string;
   geminiSttModel?: string;
   azureSpeechRegion: string;
   activeTtsProvider: string;
@@ -118,7 +120,32 @@ export interface SystemAiSettingsDto {
 export interface UpdateSystemAiSettingsPayload {
   geminiChatModel?: string;
   geminiTranslateModel?: string;
+  geminiTtsModel?: string;
   geminiSttModel?: string;
   azureSpeechRegion?: string;
   activeTtsProvider?: string;
+}
+
+
+export type AiPromptCategory = 'COMPANION_CHAT' | 'TRANSLATION' | 'STT' | 'MAP_AI';
+
+export interface AiPromptVariable {
+  name: string;
+  description: string;
+}
+
+export interface AiPromptConfigDto {
+  key: string;
+  name: string;
+  description: string;
+  category: AiPromptCategory;
+  currentPrompt: string;
+  defaultPrompt: string;
+  isModified: boolean;
+  supportedVariables: AiPromptVariable[];
+  updatedAt?: string;
+}
+
+export interface UpdateAiPromptPayload {
+  promptText: string;
 }

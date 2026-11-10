@@ -20,6 +20,10 @@ import {
   Globe,
   Cpu,
   History,
+  Volume2,
+  FileText,
+  Bell,
+  Zap,
 } from 'lucide-react';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 
@@ -39,7 +43,7 @@ interface ContentSubItem {
 }
 
 interface MarketingSubItem {
-  key: 'utm' | 'broadcast';
+  key: 'overview' | 'newsletter' | 'automation' | 'notifications' | 'utm' | 'broadcast';
   label: string;
   icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
   badge?: string;
@@ -49,6 +53,13 @@ interface SubscriptionSubItem {
   key: 'overview' | 'config';
   label: string;
   icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+}
+
+interface AiSubItem {
+  key: 'overview' | 'prompts' | 'providers' | 'tts' | 'logs';
+  label: string;
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+  badge?: string;
 }
 
 interface NavItem {
@@ -101,11 +112,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     if (activeTab === 'marketing') {
       const params = new URLSearchParams(location.search);
       const tab = params.get('tab');
-      if (tab === 'broadcast' || tab === 'utm') {
-        return tab;
-      }
+      if (tab === 'broadcast' || tab === 'newsletter') return 'newsletter';
+      if (tab === 'automation') return 'automation';
+      if (tab === 'notifications') return 'notifications';
+      if (tab === 'utm') return 'utm';
+      if (tab === 'overview') return 'overview';
+      return 'overview';
     }
-    return 'utm';
+    return 'overview';
   }, [activeTab, location.search]);
 
   // Current sub-tab for subscriptions
@@ -120,6 +134,22 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     return 'overview';
   }, [activeTab, location.search]);
 
+  // Current sub-tab for AI Studio
+  const activeAiSubTab = React.useMemo(() => {
+    if (activeTab === 'ai' || activeTab === 'ai_configs') {
+      const match = location.pathname.match(/\/admin\/(?:ai|ai_configs)\/([a-zA-Z0-9_-]+)/);
+      if (match && ['overview', 'prompts', 'providers', 'tts', 'logs'].includes(match[1])) {
+        return match[1];
+      }
+      const params = new URLSearchParams(location.search);
+      const sub = params.get('sub');
+      if (sub && ['overview', 'prompts', 'providers', 'tts', 'logs'].includes(sub)) {
+        return sub;
+      }
+    }
+    return 'overview';
+  }, [activeTab, location.pathname, location.search]);
+
   // Exclusive Accordion state: only one parent menu section can be expanded at a time
   const [expandedMenu, setExpandedMenu] = useState<string | null>(() => {
     if (
@@ -132,12 +162,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     }
     if (activeTab === 'marketing') return 'marketing';
     if (activeTab === 'subscriptions') return 'subscriptions';
+    if (activeTab === 'ai' || activeTab === 'ai_configs') return 'ai';
     return null;
   });
 
   const isContentOpen = expandedMenu === 'content';
   const isMarketingOpen = expandedMenu === 'marketing';
   const isSubscriptionsOpen = expandedMenu === 'subscriptions';
+  const isAiOpen = expandedMenu === 'ai';
 
   // Automatically sync exclusive expanded menu when navigating between tabs
   useEffect(() => {
@@ -152,6 +184,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       setExpandedMenu('marketing');
     } else if (activeTab === 'subscriptions') {
       setExpandedMenu('subscriptions');
+    } else if (activeTab === 'ai' || activeTab === 'ai_configs') {
+      setExpandedMenu('ai');
     } else {
       setExpandedMenu(null);
     }
@@ -191,14 +225,58 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const marketingSubItems: MarketingSubItem[] = [
     {
-      key: 'utm',
-      label: 'Tạo link UTM (Nội bộ)',
-      icon: Link,
+      key: 'overview',
+      label: 'Tổng quan & Phễu',
+      icon: BarChart3,
     },
     {
-      key: 'broadcast',
-      label: 'Email & Bản tin di sản',
+      key: 'newsletter',
+      label: 'Bản tin Di sản & Email',
       icon: Mail,
+    },
+    {
+      key: 'automation',
+      label: 'Tự động hóa hành vi',
+      icon: Zap,
+    },
+    {
+      key: 'notifications',
+      label: 'Quản lý thông báo',
+      icon: Bell,
+    },
+    {
+      key: 'utm',
+      label: 'Link UTM & Mã QR',
+      icon: Link,
+    },
+  ];
+
+  const aiSubItems: AiSubItem[] = [
+    {
+      key: 'overview',
+      label: 'Tổng quan & Chi phí',
+      icon: BarChart3,
+    },
+    {
+      key: 'prompts',
+      label: 'Kho System Prompts',
+      icon: FileText,
+      badge: 'Studio',
+    },
+    {
+      key: 'providers',
+      label: 'Mô hình & Khóa API',
+      icon: Cpu,
+    },
+    {
+      key: 'tts',
+      label: 'Giọng đọc & Phát âm TTS',
+      icon: Volume2,
+    },
+    {
+      key: 'logs',
+      label: 'Nhật ký & Giám sát',
+      icon: History,
     },
   ];
 
@@ -260,8 +338,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     {
       id: 'ai_configs',
       aliases: ['ai', 'ai-configs'],
-      fallbackLabel: 'Cấu hình AI & Chi phí',
+      fallbackLabel: 'AI Studio & Hạ tầng',
       icon: Cpu,
+      hasSubItems: true,
     },
   ];
 
@@ -319,6 +398,22 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       return;
     }
 
+    if (item.id === 'ai_configs' || item.id === 'ai') {
+      if (isCollapsed) {
+        navigate(getLocalizedPath(`/admin/ai/${activeAiSubTab}`, currentLang));
+        if (onNavigate) onNavigate();
+        return;
+      }
+      if (activeTab === 'ai_configs' || activeTab === 'ai') {
+        setExpandedMenu((prev) => (prev === 'ai' ? null : 'ai'));
+      } else {
+        setExpandedMenu('ai');
+        navigate(getLocalizedPath(`/admin/ai/${activeAiSubTab}`, currentLang));
+        if (onNavigate) onNavigate();
+      }
+      return;
+    }
+
     // Khi chọn các mục khác không có menu con: tự động thu gọn các mục lớn
     setExpandedMenu(null);
 
@@ -345,6 +440,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const handleMarketingSubClick = (subKey: string) => {
     navigate(`${getLocalizedPath('/admin/marketing', currentLang)}?tab=${subKey}`);
+    if (onNavigate) {
+      onNavigate();
+    }
+  };
+
+  const handleAiSubClick = (subKey: string) => {
+    navigate(getLocalizedPath(`/admin/ai/${subKey}`, currentLang));
     if (onNavigate) {
       onNavigate();
     }
@@ -451,7 +553,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                             className={`w-3.5 h-3.5 transition-transform duration-200 ${
                               (item.id === 'content' && isContentOpen) ||
                               (item.id === 'marketing' && isMarketingOpen) ||
-                              (item.id === 'subscriptions' && isSubscriptionsOpen)
+                              (item.id === 'subscriptions' && isSubscriptionsOpen) ||
+                              ((item.id === 'ai_configs' || item.id === 'ai') && isAiOpen)
                                 ? 'rotate-180 text-antique-gold'
                                 : 'text-text-muted'
                             }`}
@@ -579,6 +682,46 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                               />
                               <span className="truncate">{sub.label}</span>
                             </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Expandable Sub-items for AI Studio */}
+                  {!isCollapsed && (item.id === 'ai_configs' || item.id === 'ai') && item.hasSubItems && isAiOpen && (
+                    <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-antique-gold/30 ml-4 my-1">
+                      {aiSubItems.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isSubActive = (activeTab === 'ai' || activeTab === 'ai_configs') && activeAiSubTab === sub.key;
+
+                        return (
+                          <button
+                            key={sub.key}
+                            type="button"
+                            onClick={() => handleAiSubClick(sub.key)}
+                            className={`w-full px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all flex items-center justify-between cursor-pointer text-left group ${
+                              isSubActive
+                                ? 'bg-antique-gold/25 font-bold text-heritage-green dark:text-antique-bright border border-antique-gold/40'
+                                : 'text-text-muted hover:text-heritage-green dark:hover:text-antique-bright hover:bg-antique-gold/10'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <SubIcon
+                                aria-hidden="true"
+                                className={`w-3.5 h-3.5 shrink-0 ${
+                                  isSubActive
+                                    ? 'text-heritage-green dark:text-antique-bright'
+                                    : 'text-text-muted group-hover:text-heritage-green'
+                                }`}
+                              />
+                              <span className="truncate">{sub.label}</span>
+                            </div>
+                            {sub.badge && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider bg-antique-gold/20 text-heritage-green dark:text-antique-bright border border-antique-gold/30">
+                                {sub.badge}
+                              </span>
+                            )}
                           </button>
                         );
                       })}

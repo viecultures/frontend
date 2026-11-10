@@ -25,7 +25,8 @@ export interface AudioTrackDto {
   voiceId: string;
   voiceName: string;
   normalUrl?: string; // Phiên bản nguyên bản (chuẩn 100% - mặc định)
-  slowUrl: string;    // Phiên bản chậm (-15%)
+  audioUrl?: string;  // Phiên bản chuẩn 1.0x (Cloudflare R2)
+  slowUrl?: string;   // Phiên bản chậm (-15%)
   fastUrl?: string;   // alias fallback
   createdAt?: string;
   vocabCount?: number;
@@ -141,6 +142,9 @@ export interface AdminUserItem {
   englishLevel?: CefrLevel;
   createdAt?: string;
   savedVocabCount: number;
+  planCode?: string;
+  planName?: string;
+  subscriptionStatus?: string;
 }
 
 export interface AdminUserFilterParams {

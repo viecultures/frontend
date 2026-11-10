@@ -10,6 +10,7 @@ export interface LevelDetail {
   vocabCount: number;
   wordCount?: number;
   summary?: string;
+  summaryVi?: string;
 }
 
 export interface Lesson {
@@ -24,6 +25,7 @@ export interface Lesson {
   readTime: string;
   vocabCount: number;
   summary: string;
+  summaryVi?: string;
   gradient: string;
   iconSymbol: string;
   imageUrl?: string;
@@ -95,6 +97,7 @@ export const SERIES_LESSONS: Lesson[] = ALL_SERIES.flatMap((series, sIdx) => {
   return series.articles.map((article, idx) => {
     const chapterMeta = series.metadata.chapters[idx];
     const summary = article.summary || chapterMeta?.summary || article.summaryVi || '';
+    const summaryVi = article.summaryVi || chapterMeta?.summaryVi || summary;
 
     return {
       id: article.id,
@@ -109,21 +112,25 @@ export const SERIES_LESSONS: Lesson[] = ALL_SERIES.flatMap((series, sIdx) => {
           readTime: '3 phút đọc',
           vocabCount: Math.min(6, article.vocabularies?.length || 6),
           summary,
+          summaryVi,
         },
         'Level 2': {
           readTime: article.readTime || '3 phút đọc',
           vocabCount: article.vocabularies?.length || 10,
           summary,
+          summaryVi,
         },
         'Level 3': {
           readTime: '5 phút đọc',
           vocabCount: Math.min(14, (article.vocabularies?.length || 10) + 4),
           summary,
+          summaryVi,
         },
       },
       readTime: article.readTime || '3 phút đọc',
       vocabCount: article.vocabularies?.length || 10,
       summary,
+      summaryVi,
       gradient: category === 'Cuisine'
         ? 'from-amber-700 via-amber-800 to-amber-950'
         : 'from-heritage-green via-teal-800 to-emerald-950',

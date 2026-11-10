@@ -12,6 +12,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Crown,
   BookMarked,
   Calendar,
   Lock,
@@ -142,10 +143,11 @@ export const UserManagementView: React.FC = () => {
       if (users.length > 0) {
         try {
           // Client-side fallback with UTF-8 BOM
-          let csv = '\uFEFFID,Họ và tên,Email,Vai trò,Trình độ CEFR,Từ đã lưu,Phương thức đăng nhập,Ngày tạo,Trạng thái\r\n';
+          let csv = '\uFEFFID,Họ và tên,Email,Vai trò,Trình độ CEFR,Gói hội viên,Phương thức đăng nhập,Ngày tạo,Trạng thái\r\n';
           users.forEach((u) => {
             const role = u.role?.toUpperCase().includes('ADMIN') ? 'Quản trị viên' : 'Học viên';
             const cefr = u.englishLevel || 'Chưa thiết lập';
+            const plan = u.planName || (u.role?.toUpperCase().includes('ADMIN') ? 'Hội Viên Pro (Admin)' : 'Gói Cơ Bản (Miễn Phí)');
             const status = u.enabled ? 'Đang hoạt động' : 'Đã khóa';
             const row = [
               `"${u.id}"`,
@@ -153,7 +155,7 @@ export const UserManagementView: React.FC = () => {
               `"${u.email}"`,
               `"${role}"`,
               `"${cefr}"`,
-              u.savedVocabCount || 0,
+              `"${plan}"`,
               `"${u.authProvider || 'LOCAL'}"`,
               `"${u.createdAt || ''}"`,
               `"${status}"`,
@@ -506,7 +508,7 @@ export const UserManagementView: React.FC = () => {
                   <th className="px-5 py-3.5">{t('users.columns.user')}</th>
                   <th className="px-4 py-3.5">{t('users.columns.role')}</th>
                   <th className="px-4 py-3.5">{t('users.columns.cefr')}</th>
-                  <th className="px-4 py-3.5 text-center">{t('users.columns.saved_words')}</th>
+                  <th className="px-4 py-3.5">{t('users.columns.plan', 'Gói')}</th>
                   <th className="px-4 py-3.5">{t('users.columns.joined')}</th>
                   <th className="px-4 py-3.5">{t('users.columns.status')}</th>
                   <th className="sticky right-0 z-20 px-5 py-3.5 text-right bg-warm-ivory dark:bg-heritage-dark border-l border-antique-gold/20 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.08)]">
@@ -519,6 +521,12 @@ export const UserManagementView: React.FC = () => {
                   const isAdmin =
                     user.role?.toUpperCase() === 'ROLE_ADMIN' || user.role?.toUpperCase() === 'ADMIN';
                   const isSelf = Boolean(currentAdminEmail && user.email?.toLowerCase() === currentAdminEmail);
+                  const isProPlan = Boolean(
+                    isAdmin ||
+                    user.planCode === 'ADMIN' ||
+                    user.planCode === 'PRO' ||
+                    user.subscriptionStatus === 'ACTIVE'
+                  );
 
                   return (
                     <tr
@@ -592,12 +600,24 @@ export const UserManagementView: React.FC = () => {
                         )}
                       </td>
 
-                      {/* Saved Vocab Count */}
-                      <td className="px-4 py-4 whitespace-nowrap text-center">
-                        <span className="inline-flex items-center gap-1 font-semibold text-text-body dark:text-warm-ivory text-xs">
-                          <BookMarked aria-hidden="true" className="w-3.5 h-3.5 inline text-antique-gold mr-1" />
-                          {user.savedVocabCount || 0}
-                        </span>
+                      {/* Subscription Plan Badge */}
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {isProPlan ? (
+                          <span
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border border-antique-gold/40 shadow-xs select-none"
+                            title={user.planName || 'Hội Viên Pro'}
+                          >
+                            <Crown aria-hidden="true" className="w-3.5 h-3.5 text-antique-gold fill-current" />
+                            <span>{user.planName || 'Hội Viên Pro'}</span>
+                          </span>
+                        ) : (
+                          <span
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-stone-100 dark:bg-white/5 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-white/10 select-none"
+                            title={user.planName || 'Gói Cơ Bản (Miễn Phí)'}
+                          >
+                            <span>{user.planName || 'Gói Cơ Bản (Miễn Phí)'}</span>
+                          </span>
+                        )}
                       </td>
 
                       {/* Join Date */}

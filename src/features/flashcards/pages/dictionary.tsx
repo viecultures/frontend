@@ -229,13 +229,20 @@ export default function DictionaryPage() {
         !q ||
         lesson.title.toLowerCase().includes(q) ||
         lesson.vietnameseTitle.toLowerCase().includes(q) ||
-        lesson.summary.toLowerCase().includes(q);
+        lesson.summary.toLowerCase().includes(q) ||
+        Boolean(lesson.summaryVi?.toLowerCase().includes(q));
       return matchCat && matchSearch;
     });
-    if (sortOrder === "name") lessons.sort((a, b) => a.title.localeCompare(b.title, "en"));
+    if (sortOrder === "name") {
+      lessons.sort((a, b) =>
+        isVi
+          ? (a.vietnameseTitle || a.title).localeCompare(b.vietnameseTitle || b.title, "vi")
+          : a.title.localeCompare(b.title, "en")
+      );
+    }
     if (sortOrder === "newest") lessons.sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
     return lessons;
-  }, [isMyVocab, selectedCategory, debouncedQuery, sortOrder]);
+  }, [isMyVocab, selectedCategory, debouncedQuery, sortOrder, isVi]);
 
   // Filtered Saved Articles (My Vocabulary)
   const filteredSavedArticles = useMemo(() => {

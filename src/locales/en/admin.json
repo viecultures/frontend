@@ -153,6 +153,7 @@
       "user": "Users",
       "role": "Role",
       "cefr": "CEFR level",
+      "plan": "Subscription Plan",
       "saved_words": "Saved words",
       "joined": "Joined",
       "status": "Status",

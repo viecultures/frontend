@@ -15,6 +15,7 @@ import {
 import type { ReadingPostItem } from '../types/adminTypes';
 import { AdminDialog } from './AdminDialog';
 import { adminRegionLabel, adminTopicLabel } from '../admin-presentation';
+import { HeritageImage } from '@/components/common/HeritageImage';
 
 interface PostPreviewModalProps {
   post: ReadingPostItem | null;
@@ -138,7 +139,13 @@ export const PostPreviewModal: React.FC<PostPreviewModalProps> = ({ post, onClos
               <article className="rounded-2xl overflow-hidden bg-rice-paper dark:bg-heritage-dark border border-antique-gold/30 shadow-sm flex flex-col">
                 <div className="aspect-video w-full relative bg-stone-200 overflow-hidden">
                   {post.imageUrl ? (
-                    <img src={post.imageUrl} alt="" className="w-full h-full object-cover" />
+                    <HeritageImage
+                      src={post.imageUrl}
+                      alt={post.titleEn}
+                      category={post.topic}
+                      containerClassName="w-full h-full"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-text-muted gap-2">
                       <BookOpen aria-hidden="true" className="w-8 h-8 text-antique-gold" />
@@ -191,7 +198,13 @@ export const PostPreviewModal: React.FC<PostPreviewModalProps> = ({ post, onClos
               {/* Cover Banner */}
               {post.imageUrl && (
                 <div className="aspect-21/9 w-full rounded-2xl overflow-hidden border border-antique-gold/30 relative">
-                  <img src={post.imageUrl} alt="" className="w-full h-full object-cover" />
+                  <HeritageImage
+                    src={post.imageUrl}
+                    alt={post.titleEn}
+                    category={post.topic}
+                    containerClassName="w-full h-full"
+                    className="w-full h-full object-cover"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
                     <div className="text-warm-ivory space-y-1">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-antique-gold text-rice-paper">

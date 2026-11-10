@@ -11,6 +11,7 @@ export const BANH_CAY_SERIES_METADATA: SeriesMetadata = {
   provinceId: 'hung-yen',
   region: 'north',
   description: 'Explore Lady Nguyễn Thị Tần’s royal tribute, natural coloring with gac and gardenia, and the comforting winter ritual of hot tea with crispy sweet bánh cáy.',
+  descriptionVi: 'Khám phá thức quà tiến vua của Nữ quan Nguyễn Thị Tần, nghệ thuật nhuộm màu tự nhiên từ gấc và dành dành, cùng thú vui thưởng trà ấm nóng với bánh cáy ngày đông xứ Bắc.',
   imageUrl,
   status: 'published',
   chapters: [

@@ -36,6 +36,7 @@ export type JourneySeries = {
   provinceId: string;
   region?: string;
   description: string;
+  descriptionVi?: string;
   imageUrl: string;
   status?: string;
   scheduledPublishAt?: string;
@@ -51,6 +52,7 @@ function toJourneySeries(metadata: SeriesMetadata): JourneySeries {
     provinceId: metadata.provinceId,
     region: metadata.region,
     description: metadata.description,
+    descriptionVi: metadata.descriptionVi,
     imageUrl: metadata.imageUrl,
     status: metadata.status,
     scheduledPublishAt: metadata.scheduledPublishAt,

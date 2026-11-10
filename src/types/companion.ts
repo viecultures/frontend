@@ -45,4 +45,5 @@ export interface CompanionQuotaResponse {
   dailyLimit: number;
   remainingTurns: number;
   isPro: boolean;
+  pro?: boolean;
 }
