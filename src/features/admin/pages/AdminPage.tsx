@@ -45,19 +45,51 @@ import { postAdminService, type PostFilterParams } from '../services/postAdminSe
 import { adminUserService } from '../services/adminUserService';
 import { adminOverviewService, type AdminOverviewStats } from '../services/adminOverviewService';
 import { PostFormModal } from '../components/PostFormModal';
-import { UserManagementView } from '../components/UserManagementView';
-import { JourneyManagementView } from '../components/JourneyManagementView';
-import { VocabManagementView } from '../components/VocabManagementView';
 import { PostVocabDrawer } from '../components/PostVocabDrawer';
-import { AdminActivityLogView } from '../components/AdminActivityLogView';
-import { MarketingManagementView } from '../components/MarketingManagementView';
-import { SubscriptionManagementView } from '../components/subscriptions/SubscriptionManagementView';
-import { GoogleAnalyticsView } from '../components/google/GoogleAnalyticsView';
-import { GoogleSearchConsoleView } from '../components/google/GoogleSearchConsoleView';
 import { PostPreviewModal } from '../components/PostPreviewModal';
 import { AdminDialog } from '../components/AdminDialog';
 import { AdminServiceConnections } from '../components/AdminServiceConnections';
-import { AiConfigManagementView } from '../components/ai/AiConfigManagementView';
+
+const UserManagementView = React.lazy(() =>
+  import('../components/UserManagementView').then((m) => ({ default: m.UserManagementView }))
+);
+const JourneyManagementView = React.lazy(() =>
+  import('../components/JourneyManagementView').then((m) => ({ default: m.JourneyManagementView }))
+);
+const VocabManagementView = React.lazy(() =>
+  import('../components/VocabManagementView').then((m) => ({ default: m.VocabManagementView }))
+);
+const AdminActivityLogView = React.lazy(() =>
+  import('../components/AdminActivityLogView').then((m) => ({ default: m.AdminActivityLogView }))
+);
+const MarketingManagementView = React.lazy(() =>
+  import('../components/MarketingManagementView').then((m) => ({ default: m.MarketingManagementView }))
+);
+const SubscriptionManagementView = React.lazy(() =>
+  import('../components/subscriptions/SubscriptionManagementView').then((m) => ({
+    default: m.SubscriptionManagementView,
+  }))
+);
+const GoogleAnalyticsView = React.lazy(() =>
+  import('../components/google/GoogleAnalyticsView').then((m) => ({ default: m.GoogleAnalyticsView }))
+);
+const GoogleSearchConsoleView = React.lazy(() =>
+  import('../components/google/GoogleSearchConsoleView').then((m) => ({
+    default: m.GoogleSearchConsoleView,
+  }))
+);
+const AiConfigManagementView = React.lazy(() =>
+  import('../components/ai/AiConfigManagementView').then((m) => ({
+    default: m.AiConfigManagementView,
+  }))
+);
+
+const AdminTabLoadingFallback: React.FC = () => (
+  <div className="p-12 rounded-2xl border border-antique-gold/25 bg-rice-paper/60 dark:bg-heritage-dark/40 text-center space-y-3">
+    <div className="w-7 h-7 border-4 border-antique-gold border-t-transparent rounded-full animate-spin mx-auto" />
+    <p className="text-xs text-text-muted font-medium">Đang tải phân hệ quản trị...</p>
+  </div>
+);
 import { HeritageImage } from '@/components/common/HeritageImage';
 import { adminTopicLabel, adminRegionLabel, adminReadTimeLabel } from '../admin-presentation';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
@@ -1350,12 +1382,16 @@ export const AdminPage: React.FC = () => {
 
         {/* ── TAB 2: HÀNH TRÌNH HỌC (JOURNEYS) ─────────────────────────── */}
         {(activeTab === 'journeys' || (activeTab === 'content' && activeContentSubTab === 'journeys')) && (
-          <JourneyManagementView />
+          <React.Suspense fallback={<AdminTabLoadingFallback />}>
+            <JourneyManagementView />
+          </React.Suspense>
         )}
 
         {/* ── TAB: TỪ VỰNG HỆ THỐNG (VOCABULARIES) ──────────────────────── */}
         {(activeTab === 'vocabularies' || (activeTab === 'content' && activeContentSubTab === 'vocabularies')) && (
-          <VocabManagementView />
+          <React.Suspense fallback={<AdminTabLoadingFallback />}>
+            <VocabManagementView />
+          </React.Suspense>
         )}
 
         {/* ── TAB 3: KHO BÀI VIẾT & HỌC LIỆU (POSTS) ─────────────────────── */}
@@ -1879,33 +1915,35 @@ export const AdminPage: React.FC = () => {
           </div>
         )}
 
-        {/* ── TAB: QUẢN LÝ TỪ VỰNG (VOCABULARIES) ─────────────────────────── */}
-        {activeTab === 'vocabularies' && <VocabManagementView />}
+        <React.Suspense fallback={<AdminTabLoadingFallback />}>
+          {/* ── TAB: QUẢN LÝ TỪ VỰNG (VOCABULARIES) ─────────────────────────── */}
+          {activeTab === 'vocabularies' && <VocabManagementView />}
 
-        {/* ── TAB 4: MARKETING & ĐA KÊNH (MARKETING) ─────────────────────── */}
-        {activeTab === 'marketing' && <MarketingManagementView />}
+          {/* ── TAB 4: MARKETING & ĐA KÊNH (MARKETING) ─────────────────────── */}
+          {activeTab === 'marketing' && <MarketingManagementView />}
 
-        {/* ── TAB: GOOGLE ANALYTICS 4 (GA4) ───────────────────────────────── */}
-        {activeTab === 'analytics' && <GoogleAnalyticsView />}
+          {/* ── TAB: GOOGLE ANALYTICS 4 (GA4) ───────────────────────────────── */}
+          {activeTab === 'analytics' && <GoogleAnalyticsView />}
 
-        {/* ── TAB: GOOGLE SEARCH CONSOLE ─────────────────────────────────── */}
-        {activeTab === 'search_console' && <GoogleSearchConsoleView />}
+          {/* ── TAB: GOOGLE SEARCH CONSOLE ─────────────────────────────────── */}
+          {activeTab === 'search_console' && <GoogleSearchConsoleView />}
 
-        {/* ── TAB: GÓI ĐĂNG KÝ & DUYỆT ĐƠN (SUBSCRIPTIONS) ──────────────── */}
-        {activeTab === 'subscriptions' && <SubscriptionManagementView />}
+          {/* ── TAB: GÓI ĐĂNG KÝ & DUYỆT ĐƠN (SUBSCRIPTIONS) ──────────────── */}
+          {activeTab === 'subscriptions' && <SubscriptionManagementView />}
 
-        {/* ── TAB 5: HỌC VIÊN CRM (USERS) ─────────────────────────────────── */}
-        {activeTab === 'users' && <UserManagementView />}
+          {/* ── TAB 5: HỌC VIÊN CRM (USERS) ─────────────────────────────────── */}
+          {activeTab === 'users' && <UserManagementView />}
 
-        {/* ── TAB 6: NHẬT KÝ KIỂM TOÁN & LỊCH SỬ (HISTORY / LOGS / SYSTEM) ──────── */}
-        {(activeTab === 'history' || activeTab === 'system' || activeTab === 'logs') && (
-          <AdminActivityLogView />
-        )}
+          {/* ── TAB 6: NHẬT KÝ KIỂM TOÁN & LỊCH SỬ (HISTORY / LOGS / SYSTEM) ──────── */}
+          {(activeTab === 'history' || activeTab === 'system' || activeTab === 'logs') && (
+            <AdminActivityLogView />
+          )}
 
-        {/* ── TAB 7: CẤU HÌNH AI & CHI PHÍ ─────────────────────────────────── */}
-        {(activeTab === 'ai_configs' || activeTab === 'ai') && (
-          <AiConfigManagementView activeSubRoute={activeAiSubRoute} />
-        )}
+          {/* ── TAB 7: CẤU HÌNH AI & CHI PHÍ ─────────────────────────────────── */}
+          {(activeTab === 'ai_configs' || activeTab === 'ai') && (
+            <AiConfigManagementView activeSubRoute={activeAiSubRoute} />
+          )}
+        </React.Suspense>
 
         {/* ── Preview Modal ─────────────────────────────────────────────── */}
         <PostPreviewModal post={previewPost} onClose={() => setPreviewPost(null)} />

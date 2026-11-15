@@ -167,6 +167,20 @@ export interface PaginatedResponse<T> {
   empty?: boolean;
 }
 
+export interface PagedLearningJourneyResponse {
+  items: LearningJourneyItem[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface EntityOption {
+  id: string;
+  titleVi: string;
+  titleEn: string;
+}
+
 export interface UpdateUserStatusPayload {
   enabled: boolean;
 }

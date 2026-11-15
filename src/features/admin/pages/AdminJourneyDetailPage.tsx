@@ -34,6 +34,7 @@ import { AdminDialog } from '../components/AdminDialog';
 import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 import { adminRegionLabel } from '../admin-presentation';
+import { resolveReturnTo, useAdminCacheStore } from '../stores/adminCacheStore';
 
 const THEME_LABELS: Record<string, { en: string; vi: string }> = {
   cuisine: { en: 'Cuisine', vi: 'Ẩm thực' },
@@ -61,9 +62,6 @@ function getLevelBadgeClass(level?: string): string {
       return 'bg-stone-100 text-stone-700 border-stone-300 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700';
   }
 }
-
-import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
-import { resolveReturnTo, useAdminCacheStore } from '../stores/adminCacheStore';
 
 export const AdminJourneyDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

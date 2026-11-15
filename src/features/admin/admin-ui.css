@@ -1,25 +1,70 @@
-/* Keep the CMS palette and depth; share Reader typography and geometry. */
-.admin-ui, .admin-dialog { font-family: var(--font-sans); font-weight: 400; }
+/* Editorial Heritage CMS: sắc nét, góc gãy gọn, chất liệu giấy & mực di sản. */
+.admin-ui, .admin-dialog {
+  font-family: "Be Vietnam Pro", var(--font-sans);
+  font-weight: 400;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
 .admin-ui { min-width: 0; }
 :is(.admin-ui, .admin-dialog) :is(button, input, textarea, select) { font-family: inherit; }
-:is(.admin-ui, .admin-dialog) :is(button, input, textarea, select):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+:is(.admin-ui, .admin-dialog) :is(button, input, textarea, select):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 :is(.admin-ui, .admin-dialog) .bg-heritage-green button:focus-visible { outline-color: var(--color-antique-bright); }
-:is(.admin-ui, .admin-dialog) button { min-height: 44px; min-width: 44px; font-size: 14px; font-weight: 500; line-height: 1.5; cursor: pointer; }
+:is(.admin-ui, .admin-dialog) button { min-height: 44px; min-width: 44px; font-size: 14px; font-weight: 500; line-height: 1.5; cursor: pointer; transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 120ms ease; }
+:is(.admin-ui, .admin-dialog) button:active:not(:disabled) { transform: translateY(0.5px); }
 :is(.admin-ui, .admin-dialog) button:disabled { cursor: not-allowed; }
-:is(.admin-ui, .admin-dialog) :is(input:not([type='checkbox']):not([type='radio']), select, textarea) { min-height: 44px; min-width: 0; font-size: 15px; font-weight: 400; line-height: 1.65; }
-:is(.admin-ui, .admin-dialog) :is(label, th) { font-size: 14px; font-weight: 500; line-height: 1.5; }
-:is(.admin-ui, .admin-dialog) :is(.font-bold, .font-extrabold, .font-semibold) { font-weight: 500; }
-:is(.admin-ui, .admin-dialog) .font-light { font-weight: 400; }
-.admin-ui h1 { font-size: clamp(26px, 2.5vw, 34px); line-height: 1.35; font-weight: 500; letter-spacing: -.025em; }
-:is(.admin-ui, .admin-dialog) :is(h2, h3) { font-weight: 500; line-height: 1.4; letter-spacing: -.015em; }
-:is(.admin-ui, .admin-dialog) p { line-height: 1.7; }
-:is(.admin-ui, .admin-dialog) :is([class*='text-[9px]'], [class*='text-[10px]'], [class*='text-[11px]']):not(button):not(label):not(th) { font-size: 12px; line-height: 1.6; }
-:is(.admin-ui, .admin-dialog) :is(.rounded-3xl, .rounded-2xl) { border-radius: 16px; }
-:is(.admin-ui, .admin-dialog) :is(button, input, select, textarea, .rounded-xl) { border-radius: 12px; }
-:is(.admin-ui, .admin-dialog) table { font-size: 14px; line-height: 1.6; }
+:is(.admin-ui, .admin-dialog) :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  min-height: 44px;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+:is(.admin-ui, .admin-dialog) :is(label, th) { font-size: 13px; font-weight: 600; line-height: 1.5; }
+.admin-ui h1 { font-size: clamp(24px, 2.4vw, 32px); line-height: 1.28; font-weight: 700; letter-spacing: -.022em; }
+:is(.admin-ui, .admin-dialog) :is(h2, h3) { font-weight: 600; line-height: 1.35; letter-spacing: -.015em; }
+:is(.admin-ui, .admin-dialog) p { line-height: 1.65; }
+:is(.admin-ui, .admin-dialog) :is([class*='text-[9px]'], [class*='text-[10px]'], [class*='text-[11px]']):not(button):not(label):not(th) { font-size: 12px; line-height: 1.55; }
+
+/* Thang bo tròn gãy gọn kiểu ấn phẩm/sổ sách, giữ rounded-full cho avatar & pill */
+:is(.admin-ui, .admin-dialog) :is(.rounded-3xl, .rounded-2xl) { border-radius: 8px; }
+:is(.admin-ui, .admin-dialog) :is(button, input, select, textarea, .rounded-xl) { border-radius: 6px; }
+:is(.admin-ui, .admin-dialog) .rounded-lg { border-radius: 4px; }
+
+/* Nền giấy kẻ ô vuông siêu mờ cho vùng làm việc chính */
+.admin-paper-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--color-heritage-green) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-heritage-green) 4%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.dark .admin-paper-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--color-antique-gold) 4.5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-antique-gold) 4.5%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Bóng đổ nhuộm màu xanh di sản thay cho shadow đen trung tính */
+:is(.admin-ui, .admin-dialog) :is(.shadow-sm, .shadow, .shadow-md) {
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--color-heritage-green) 5%, transparent),
+    0 8px 20px -12px color-mix(in srgb, var(--color-heritage-green) 11%, transparent);
+}
+
+/* Bảng biểu & số liệu dùng Inter tabular-nums để thẳng hàng sắc nét */
+:is(.admin-ui, .admin-dialog) table {
+  font-family: "Inter", "Be Vietnam Pro", var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "cv11", "ss01";
+  font-size: 13.5px;
+  line-height: 1.55;
+}
 :is(.admin-ui, .admin-dialog) thead { text-transform: none; letter-spacing: normal; }
 :is(.admin-ui, .admin-dialog) th { white-space: nowrap; }
 :is(.admin-ui, .admin-dialog) td { vertical-align: middle; }
+:is(.admin-ui, .admin-dialog) tbody tr { transition: background-color 120ms ease; }
+:is(.admin-ui, .admin-dialog) tbody tr:hover { background-color: color-mix(in srgb, var(--color-rice-paper) 55%, transparent); }
+.dark :is(.admin-ui, .admin-dialog) tbody tr:hover { background-color: color-mix(in srgb, var(--color-warm-ivory) 4%, transparent); }
 :is(.admin-ui, .admin-dialog) td button { min-height: 32px; min-width: 32px; display: inline-flex; align-items: center; justify-content: center; }
 :is(.admin-ui, .admin-dialog) .text-antique-gold:not(svg) { color: var(--color-accent-ink); }
 :is(.admin-ui, .admin-dialog) .bg-heritage-green .text-antique-gold { color: var(--color-antique-bright); }

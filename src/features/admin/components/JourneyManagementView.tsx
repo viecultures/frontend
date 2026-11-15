@@ -14,8 +14,10 @@ import {
   Calendar,
   Clock,
   Eye,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
-import type { LearningJourneyItem } from '../types/adminTypes';
+import type { LearningJourneyItem, PagedLearningJourneyResponse } from '../types/adminTypes';
 import { journeyAdminService, type JourneyFilterParams } from '../services/journeyAdminService';
 import { JourneyFormModal } from './JourneyFormModal';
 import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
@@ -30,24 +32,29 @@ export const JourneyManagementView: React.FC = () => {
   const { i18n } = useTranslation('admin');
   const currentLang = resolveLanguage(i18n.language);
   const {
-    getCachedJourneys,
-    setCachedJourneys,
     invalidateJourneys,
+    getCachedTabData,
+    setCachedTabData,
+    invalidateTabData,
     saveScrollPosition,
     consumeScrollPosition,
   } = useAdminCacheStore();
 
   const [journeys, setJourneys] = useState<LearningJourneyItem[]>([]);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [hasLoadedJourneys, setHasLoadedJourneys] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  // Filters (URL-synced)
+  // Filters & Pagination (URL-synced)
   const searchQuery = searchParams.get('q') || '';
   const selectedRegion = searchParams.get('region') || '';
   const selectedTheme = searchParams.get('theme') || '';
   const selectedStatus = searchParams.get('status') || '';
+  const pageSize = 12;
+  const currentPage = Math.max(0, Number(searchParams.get('page') || '0') || 0);
 
   const [searchInput, setSearchInput] = useState(searchQuery);
   useEffect(() => {
@@ -63,9 +70,14 @@ export const JourneyManagementView: React.FC = () => {
       setSearchParams(
         (prev) => {
           const next = new URLSearchParams(prev);
+          let hasFilterChange = false;
           for (const [k, v] of Object.entries(updates)) {
+            if (k !== 'page') hasFilterChange = true;
             if (!v) next.delete(k);
             else next.set(k, v);
+          }
+          if (hasFilterChange && !('page' in updates)) {
+            next.delete('page');
           }
           return next;
         },
@@ -98,21 +110,25 @@ export const JourneyManagementView: React.FC = () => {
 
   const journeysCacheKey = useMemo(
     () =>
-      JSON.stringify({
+      `journeys_paged:${JSON.stringify({
         query: searchQuery.trim(),
         region: selectedRegion,
         theme: selectedTheme,
         status: selectedStatus,
-      }),
-    [searchQuery, selectedRegion, selectedTheme, selectedStatus]
+        page: currentPage,
+        size: pageSize,
+      })}`,
+    [searchQuery, selectedRegion, selectedTheme, selectedStatus, currentPage, pageSize]
   );
 
   const fetchJourneys = useCallback(
     async (force = false) => {
       if (!force) {
-        const cached = getCachedJourneys(journeysCacheKey);
+        const cached = getCachedTabData<PagedLearningJourneyResponse>(journeysCacheKey);
         if (cached) {
-          setJourneys(cached);
+          setJourneys(cached.items);
+          setTotalElements(cached.totalElements);
+          setTotalPages(cached.totalPages);
           setHasLoadedJourneys(true);
           setIsLoading(false);
           setErrorMsg(null);
@@ -123,15 +139,20 @@ export const JourneyManagementView: React.FC = () => {
       setIsLoading(true);
       setErrorMsg(null);
       try {
-        const params: JourneyFilterParams = {};
+        const params: JourneyFilterParams = {
+          page: currentPage,
+          size: pageSize,
+        };
         if (searchQuery.trim()) params.query = searchQuery.trim();
         if (selectedRegion) params.region = selectedRegion;
         if (selectedTheme) params.theme = selectedTheme;
         if (selectedStatus) params.status = selectedStatus;
 
-        const data = await journeyAdminService.getJourneys(params);
-        setJourneys(data);
-        setCachedJourneys(journeysCacheKey, data);
+        const data = await journeyAdminService.getPagedJourneys(params);
+        setJourneys(data.items);
+        setTotalElements(data.totalElements);
+        setTotalPages(data.totalPages);
+        setCachedTabData(journeysCacheKey, data);
         setHasLoadedJourneys(true);
       } catch (err: unknown) {
         setHasLoadedJourneys(false);
@@ -143,8 +164,10 @@ export const JourneyManagementView: React.FC = () => {
     },
     [
       journeysCacheKey,
-      getCachedJourneys,
-      setCachedJourneys,
+      getCachedTabData,
+      setCachedTabData,
+      currentPage,
+      pageSize,
       searchQuery,
       selectedRegion,
       selectedTheme,
@@ -187,6 +210,8 @@ export const JourneyManagementView: React.FC = () => {
     setSuccessToast(`Đã lưu hành trình: ${saved.titleEn}`);
     setTimeout(() => setSuccessToast(null), 3000);
     invalidateJourneys();
+    invalidateTabData('journeys_paged:');
+    invalidateTabData('utm:journey_options');
     fetchJourneys(true);
   };
 
@@ -465,6 +490,35 @@ export const JourneyManagementView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination Bar */}
+      {totalPages > 1 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-white/70 dark:bg-white/5 border border-antique-gold/25 text-xs">
+          <span className="text-text-muted">
+            Trang <strong className="text-heritage-green dark:text-warm-ivory">{currentPage + 1}</strong> / {totalPages} ({totalElements} hành trình)
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={currentPage <= 0 || isLoading}
+              onClick={() => updateJourneyParams({ page: currentPage - 1 <= 0 ? null : String(currentPage - 1) })}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-antique-gold/30 hover:bg-antique-gold/15 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition-colors cursor-pointer"
+            >
+              <ChevronLeft aria-hidden="true" className="w-3.5 h-3.5" />
+              <span>Trước</span>
+            </button>
+            <button
+              type="button"
+              disabled={currentPage >= totalPages - 1 || isLoading}
+              onClick={() => updateJourneyParams({ page: String(currentPage + 1) })}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-antique-gold/30 hover:bg-antique-gold/15 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition-colors cursor-pointer"
+            >
+              <span>Sau</span>
+              <ChevronRight aria-hidden="true" className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Create Journey Form Modal */}
       <JourneyFormModal

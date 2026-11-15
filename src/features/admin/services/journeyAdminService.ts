@@ -1,4 +1,9 @@
-import type { LearningJourneyItem, LearningJourneyPayload } from '../types/adminTypes';
+import type {
+  EntityOption,
+  LearningJourneyItem,
+  LearningJourneyPayload,
+  PagedLearningJourneyResponse,
+} from '../types/adminTypes';
 import { API_BASE_URL } from '@/config/apiConfig';
 import { getStoredToken } from '@/utils/auth-storage';
 
@@ -23,9 +28,43 @@ export interface JourneyFilterParams {
   theme?: string;
   status?: string;
   query?: string;
+  page?: number;
+  size?: number;
 }
 
 export const journeyAdminService = {
+  async getJourneyOptions(): Promise<EntityOption[]> {
+    const res = await fetch(`${API_BASE_URL}/api/journeys/options`, {
+      headers: getOptionalAuthHeaders(),
+    });
+    if (!res.ok) {
+      throw new Error(`Không thể tải danh sách tùy chọn hành trình (HTTP ${res.status})`);
+    }
+    return res.json();
+  },
+
+  async getPagedJourneys(
+    params?: JourneyFilterParams
+  ): Promise<PagedLearningJourneyResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.region) searchParams.append('region', params.region);
+    if (params?.provinceId) searchParams.append('provinceId', params.provinceId);
+    if (params?.theme) searchParams.append('theme', params.theme);
+    if (params?.status) searchParams.append('status', params.status);
+    if (params?.query) searchParams.append('query', params.query);
+    searchParams.append('page', String(params?.page ?? 0));
+    searchParams.append('size', String(params?.size ?? 12));
+
+    const url = `${API_BASE_URL}/api/journeys?${searchParams.toString()}`;
+    const res = await fetch(url, {
+      headers: getOptionalAuthHeaders(),
+    });
+    if (!res.ok) {
+      throw new Error(`Không thể tải danh sách hành trình học (HTTP ${res.status})`);
+    }
+    return res.json();
+  },
+
   async getJourneys(params?: JourneyFilterParams): Promise<LearningJourneyItem[]> {
     const searchParams = new URLSearchParams();
     if (params?.region) searchParams.append('region', params.region);

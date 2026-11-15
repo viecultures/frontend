@@ -1,4 +1,5 @@
 import type {
+  EntityOption,
   ReadingPostPayload,
   ReadingPostItem,
   ParagraphPairDto,
@@ -27,6 +28,14 @@ export interface PostFilterParams {
 
 export const postAdminService = {
   // ─── 1. API Calls ─────────────────────────────────────────────────────────
+
+  async getPostOptions(): Promise<EntityOption[]> {
+    const res = await fetch(`${API_BASE_URL}/api/posts/options`);
+    if (!res.ok) {
+      throw new Error(`Không thể tải danh sách tùy chọn bài viết (HTTP ${res.status})`);
+    }
+    return res.json();
+  },
 
   async getPosts(params?: PostFilterParams): Promise<ReadingPostItem[]> {
     const searchParams = new URLSearchParams();

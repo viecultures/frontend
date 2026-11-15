@@ -22,8 +22,9 @@ import type {
   EnhancedUtmCampaignItem,
   UtmChannel,
 } from '../../types/marketing.contract';
-import type { ReadingPostItem, LearningJourneyItem } from '../../types/adminTypes';
+import type { EntityOption } from '../../types/adminTypes';
 import { AdminDialog } from '../AdminDialog';
+import { useAdminCacheStore } from '../../stores/adminCacheStore';
 
 // Simple lightweight deterministic QR-like SVG pattern generator for reliable display and download
 const generateQrSvg = (text: string, size: number = 180): string => {
@@ -87,9 +88,10 @@ const generateQrSvg = (text: string, size: number = 180): string => {
 };
 
 export const UtmCampaignBuilderTab: React.FC = () => {
+  const { getCachedTabData, setCachedTabData } = useAdminCacheStore();
   const [campaigns, setCampaigns] = useState<EnhancedUtmCampaignItem[]>([]);
-  const [posts, setPosts] = useState<ReadingPostItem[]>([]);
-  const [journeys, setJourneys] = useState<LearningJourneyItem[]>([]);
+  const [posts, setPosts] = useState<EntityOption[]>([]);
+  const [journeys, setJourneys] = useState<EntityOption[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -104,14 +106,33 @@ export const UtmCampaignBuilderTab: React.FC = () => {
   // QR Modal
   const [activeQrCampaign, setActiveQrCampaign] = useState<EnhancedUtmCampaignItem | null>(null);
 
-  // Load Data (Cached & Stable Dependency to prevent double-fetch loops)
+  // Load Data (Cached lightweight options & Stable Dependency to prevent double-fetch loops)
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
+      const cachedPosts = getCachedTabData<EntityOption[]>('utm:post_options');
+      const cachedJourneys = getCachedTabData<EntityOption[]>('utm:journey_options');
+
       const [cList, pList, jList] = await Promise.all([
         growthEngineService.getEnhancedUtmCampaigns(),
-        postAdminService.getPosts().catch(() => [] as ReadingPostItem[]),
-        journeyAdminService.getJourneys().catch(() => [] as LearningJourneyItem[]),
+        cachedPosts
+          ? Promise.resolve(cachedPosts)
+          : postAdminService
+              .getPostOptions()
+              .then((res) => {
+                setCachedTabData('utm:post_options', res);
+                return res;
+              })
+              .catch(() => [] as EntityOption[]),
+        cachedJourneys
+          ? Promise.resolve(cachedJourneys)
+          : journeyAdminService
+              .getJourneyOptions()
+              .then((res) => {
+                setCachedTabData('utm:journey_options', res);
+                return res;
+              })
+              .catch(() => [] as EntityOption[]),
       ]);
       setCampaigns(cList);
       setPosts(pList);
@@ -125,7 +146,7 @@ export const UtmCampaignBuilderTab: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [getCachedTabData, setCachedTabData]);
 
   useEffect(() => {
     loadData();

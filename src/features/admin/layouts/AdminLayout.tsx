@@ -320,7 +320,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
         {/* ── Main Canvas (Warm Heritage #FAF6EE / bg-warm-ivory) ────────────── */}
         <main
-          className="flex-1 min-w-0 w-full min-h-[calc(100vh-56px)] bg-warm-ivory dark:bg-heritage-forest overflow-x-hidden overflow-y-auto transition-colors"
+          className="admin-paper-grid flex-1 min-w-0 w-full min-h-[calc(100vh-56px)] bg-warm-ivory dark:bg-heritage-forest overflow-x-hidden overflow-y-auto transition-colors"
           tabIndex={-1}
         >
           {children || <Outlet />}

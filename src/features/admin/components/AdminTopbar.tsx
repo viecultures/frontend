@@ -135,7 +135,7 @@ export const AdminTopbar: React.FC<AdminTopbarProps> = ({ onSearch, onToggleSide
   const adminInitial = adminName.charAt(0).toUpperCase();
 
   return (
-    <header className="admin-topbar sticky top-0 z-30 h-14 w-full bg-warm-ivory dark:bg-[#0f2420] border-b border-[#E5DEC9] dark:border-antique-gold/20 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4 transition-colors">
+    <header className="admin-topbar sticky top-0 z-30 h-14 w-full bg-warm-ivory dark:bg-[#0f2420] border-b border-[#E5DEC9] dark:border-antique-gold/20 px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4 transition-colors">
       {/* ── Left Area: Breadcrumbs ────────────────────────────────────── */}
       <nav aria-label="Đường dẫn điều hướng" className="flex items-center gap-1.5 sm:gap-2 min-w-0">
         {onToggleSidebar && (
