@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { ArrowUpRight, BookOpen, BookmarkCheck, RefreshCw, Wifi, WifiOff, Loader2 } from "lucide-react";
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { useAppNavigate } from '@/routes/useAppNavigate';
@@ -18,6 +19,7 @@ import {
 import { SavedVocabularyDecks } from '../components/SavedVocabularyDecks';
 import { paths } from '@/routes/paths';
 import { VOCABULARY_CATEGORY_LABELS, VOCABULARY_PAGE_SIZE } from '../lib/vocabulary-catalog';
+import { useDictionaryCacheStore } from '../stores/dictionaryCacheStore';
 import '../dictionary-components.css';
 
 const TOPIC_GRADIENTS: Record<string, string> = {
@@ -28,20 +30,56 @@ const TOPIC_GRADIENTS: Record<string, string> = {
   Folklore: 'from-[#65332d] via-[#7e4943] to-[#a36350]',
 };
 
-interface CatalogCacheEntry {
-  lessons: Lesson[];
-  totalElements: number;
-  totalPages: number;
-  topicCounts: Record<string, number>;
-}
-
 export default function DictionaryPage() {
   const { t, i18n } = useTranslation('flashcards');
   const isVi = i18n.language.toLowerCase().startsWith('vi');
   const navigate = useAppNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    getCatalogEntry,
+    setCatalogEntry,
+    saveScrollPosition,
+    consumeScrollPosition,
+  } = useDictionaryCacheStore();
+
   const libraryRef = useRef<HTMLElement>(null);
   const savedDecksRef = useRef<HTMLDivElement>(null);
-  const [sortOrder, setSortOrder] = useState<string>("default");
+
+  // URL-synced Search, Filter, Sort & Pagination
+  const debouncedQuery = searchParams.get('q') || '';
+  const selectedCategory = searchParams.get('category') || 'All';
+  const sortOrder = searchParams.get('sort') || 'default';
+  const currentPage = useMemo(() => {
+    const parsed = Number(searchParams.get('page'));
+    return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : 1;
+  }, [searchParams]);
+
+  const [searchQuery, setSearchQuery] = useState<string>(debouncedQuery);
+  useEffect(() => {
+    setSearchQuery(debouncedQuery);
+  }, [debouncedQuery]);
+
+  const updateDictionaryParams = useCallback(
+    (
+      updates: Record<string, string | null | undefined>,
+      options?: { replace?: boolean; resetPage?: boolean }
+    ) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          for (const [k, v] of Object.entries(updates)) {
+            if (!v) next.delete(k);
+            else next.set(k, v);
+          }
+          if (options?.resetPage) next.delete('page');
+          return next;
+        },
+        { replace: options?.replace ?? true }
+      );
+    },
+    [setSearchParams]
+  );
 
   // API State
   const [apiLessons, setApiLessons] = useState<Lesson[]>([]);
@@ -51,27 +89,23 @@ export default function DictionaryPage() {
   const [isApiConnected, setIsApiConnected] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Search & Filter state
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [debouncedQuery, setDebouncedQuery] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [vocabVersion, setVocabVersion] = useState<number>(0);
 
   // Inspector Modal state
   const [inspectLesson, setInspectLesson] = useState<Lesson | null>(null);
 
-  // In-memory catalog cache for instant page switching
-  const catalogCacheRef = useRef<Map<string, CatalogCacheEntry>>(new Map());
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Debounce search query input (300ms)
+  // Debounce search query input (300ms) -> URL ?q=
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
+    const trimmedInput = searchQuery.trim();
+    const trimmedUrl = debouncedQuery.trim();
+    if (trimmedInput === trimmedUrl) return;
+    const timer = window.setTimeout(() => {
+      updateDictionaryParams({ q: trimmedInput || null }, { replace: true, resetPage: true });
     }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+    return () => window.clearTimeout(timer);
+  }, [searchQuery, debouncedQuery, updateDictionaryParams]);
 
   // Sync saved vocabulary modifications
   useEffect(() => {
@@ -102,15 +136,17 @@ export default function DictionaryPage() {
     const trimmedQuery = query.trim().toLowerCase();
     const cacheKey = `${category}_${trimmedQuery}_${sort}_${page}`;
 
-    if (!forceRefresh && catalogCacheRef.current.has(cacheKey)) {
-      const cached = catalogCacheRef.current.get(cacheKey)!;
-      setApiLessons(cached.lessons);
-      setServerTotalElements(cached.totalElements);
-      setServerTotalPages(cached.totalPages);
-      if (cached.topicCounts) setTopicCounts(cached.topicCounts);
-      setIsApiConnected(true);
-      setIsLoading(false);
-      return;
+    if (!forceRefresh) {
+      const cached = getCatalogEntry(cacheKey);
+      if (cached) {
+        setApiLessons(cached.lessons);
+        setServerTotalElements(cached.totalElements);
+        setServerTotalPages(cached.totalPages);
+        if (cached.topicCounts) setTopicCounts(cached.topicCounts);
+        setIsApiConnected(true);
+        setIsLoading(false);
+        return;
+      }
     }
 
     if (abortControllerRef.current) {
@@ -145,14 +181,14 @@ export default function DictionaryPage() {
           return lesson;
         });
 
-        const entry: CatalogCacheEntry = {
+        const entry = {
           lessons: mappedLessons,
           totalElements: catalogData.totalElements ?? mappedLessons.length,
           totalPages: catalogData.totalPages ?? Math.max(1, Math.ceil((catalogData.totalElements ?? mappedLessons.length) / VOCABULARY_PAGE_SIZE)),
           topicCounts: catalogData.topicCounts ?? {},
         };
 
-        catalogCacheRef.current.set(cacheKey, entry);
+        setCatalogEntry(cacheKey, entry);
         setApiLessons(entry.lessons);
         setServerTotalElements(entry.totalElements);
         setServerTotalPages(entry.totalPages);
@@ -169,12 +205,24 @@ export default function DictionaryPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [getCatalogEntry, setCatalogEntry]);
 
   // Fetch when page, category, debounced search or sort order changes
   useEffect(() => {
     fetchCatalogLessons(currentPage, selectedCategory, debouncedQuery, sortOrder);
   }, [currentPage, selectedCategory, debouncedQuery, sortOrder, fetchCatalogLessons]);
+
+  // Restore scroll when returning from study/reader
+  useEffect(() => {
+    if (isLoading) return;
+    const routeKey = `${location.pathname}${location.search}`;
+    const savedY = consumeScrollPosition(routeKey);
+    if (savedY !== null && savedY > 0) {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: savedY, behavior: 'instant' as ScrollBehavior });
+      });
+    }
+  }, [isLoading, location.pathname, location.search, consumeScrollPosition]);
 
   // Clean up in-flight requests on unmount
   useEffect(() => {
@@ -297,7 +345,7 @@ export default function DictionaryPage() {
   }, [isMyVocab, filteredSavedArticles, safeCurrentPage]);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    updateDictionaryParams({ page: page <= 1 ? null : String(page) }, { replace: false });
     libraryRef.current?.scrollIntoView({
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
       block: "start",
@@ -305,7 +353,6 @@ export default function DictionaryPage() {
   };
 
   const handleRefreshSync = () => {
-    catalogCacheRef.current.clear();
     fetchCatalogLessons(currentPage, selectedCategory, debouncedQuery, sortOrder, true);
   };
 
@@ -321,6 +368,8 @@ export default function DictionaryPage() {
   };
 
   const handleGoToStudy = (lessonId: string) => {
+    const routeKey = `${location.pathname}${location.search}`;
+    saveScrollPosition(routeKey, window.scrollY);
     navigate(paths.flashcardStudy({ deck: lessonId }));
   };
 
@@ -335,23 +384,20 @@ export default function DictionaryPage() {
             searchQuery={searchQuery}
             onChangeSearch={(query) => {
               setSearchQuery(query);
-              setCurrentPage(1);
             }}
           />
 
           <DictionaryQuickActionCards
             onGoToRecent={() => handleGoToStudy(defaultHeroLessonId)}
             onExploreMore={() => {
-              setSelectedCategory("All");
-              setCurrentPage(1);
+              updateDictionaryParams({ category: null }, { resetPage: true });
               libraryRef.current?.scrollIntoView({
                 behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
                 block: "start",
               });
             }}
             onReviewSaved={() => {
-              setSelectedCategory("MyVocab");
-              setCurrentPage(1);
+              updateDictionaryParams({ category: "MyVocab" }, { resetPage: true });
               libraryRef.current?.scrollIntoView({
                 behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
                 block: 'start',
@@ -400,8 +446,11 @@ export default function DictionaryPage() {
                   aria-label={t('dictionary.sort_label', 'Sort vocabulary decks')}
                   value={sortOrder}
                   onChange={(e) => {
-                    setSortOrder(e.target.value);
-                    setCurrentPage(1);
+                    const val = e.target.value;
+                    updateDictionaryParams(
+                      { sort: val === 'default' ? null : val },
+                      { resetPage: true }
+                    );
                   }}
                 >
                   <option value="default">{t('dictionary.sort_recommended', 'Recommended')}</option>
@@ -417,8 +466,10 @@ export default function DictionaryPage() {
             categories={categoryOptions}
             selectedCategory={selectedCategory}
             onSelectCategory={(cat) => {
-              setSelectedCategory(cat);
-              setCurrentPage(1);
+              updateDictionaryParams(
+                { category: cat === 'All' ? null : cat },
+                { resetPage: true }
+              );
             }}
           />
 
@@ -467,8 +518,7 @@ export default function DictionaryPage() {
                   type="button"
                   className="vocab-button vocab-button-gold mt-2 inline-flex items-center gap-2 cursor-pointer"
                   onClick={() => {
-                    setSelectedCategory('All');
-                    setCurrentPage(1);
+                    updateDictionaryParams({ category: null }, { resetPage: true });
                   }}
                 >
                   <BookOpen size={16} aria-hidden="true" />

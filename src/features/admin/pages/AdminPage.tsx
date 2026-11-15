@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, MotionConfig } from 'motion/react';
 import {
@@ -61,6 +61,7 @@ import { AiConfigManagementView } from '../components/ai/AiConfigManagementView'
 import { HeritageImage } from '@/components/common/HeritageImage';
 import { adminTopicLabel, adminRegionLabel, adminReadTimeLabel } from '../admin-presentation';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
+import { useAdminCacheStore } from '../stores/adminCacheStore';
 import '../admin-ui.css';
 
 export type AdminTab =
@@ -176,6 +177,20 @@ export const AdminPage: React.FC = () => {
     }
   }, [activeTab, location.pathname, location.search, navigate]);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    getCachedPosts,
+    setCachedPosts,
+    removePostFromCache,
+    invalidatePosts,
+    getCachedOverview,
+    setCachedOverview,
+    totalUsersCount,
+    setTotalUsersCount,
+    saveScrollPosition,
+    consumeScrollPosition,
+  } = useAdminCacheStore();
+
   // Posts State
   const [posts, setPosts] = useState<ReadingPostItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -183,28 +198,88 @@ export const AdminPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  // Filters for Posts
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLevel, setSelectedLevel] = useState<string>('');
-  const [selectedRegion, setSelectedRegion] = useState<string>('');
-  const [selectedTopic, setSelectedTopic] = useState<string>('');
-  const [standaloneFilter, setStandaloneFilter] = useState<'all' | 'standalone' | 'journey'>('all');
-  const [postStatusFilter, setPostStatusFilter] = useState<'all' | 'published' | 'draft' | 'missing_materials'>('all');
+  // Filters for Posts (URL-synced as Single Source of Truth)
+  const searchQuery = searchParams.get('q') || '';
+  const selectedLevel = searchParams.get('level') || '';
+  const selectedRegion = searchParams.get('region') || '';
+  const selectedTopic = searchParams.get('topic') || '';
+  const rawScope = searchParams.get('scope');
+  const standaloneFilter: 'all' | 'standalone' | 'journey' =
+    rawScope === 'standalone' || rawScope === 'journey' ? rawScope : 'all';
+  const rawStatus = searchParams.get('status');
+  const postStatusFilter: 'all' | 'published' | 'draft' | 'missing_materials' =
+    rawStatus === 'published' || rawStatus === 'draft' || rawStatus === 'missing_materials'
+      ? rawStatus
+      : 'all';
+
+  // Local input buffer for responsive typing; debounced to URL ?q=
+  const [searchInput, setSearchInput] = useState(searchQuery);
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
 
   // Active Journey filter from URL parameter (?journeyId=...)
   const activeJourneyFilter = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get('journeyId') || '';
-  }, [location.search]);
+    return searchParams.get('journeyId') || '';
+  }, [searchParams]);
 
-  // Pagination for Posts
-  const [postCurrentPage, setPostCurrentPage] = useState(0);
-  const [postPageSize, setPostPageSize] = useState(10);
+  // Pagination for Posts (1-based ?page= in URL, 0-based internally)
+  const postCurrentPage = useMemo(() => {
+    const parsed = Number(searchParams.get('page'));
+    return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) - 1 : 0;
+  }, [searchParams]);
 
-  // Reset pagination on filter change
+  const postPageSize = useMemo(() => {
+    const parsed = Number(searchParams.get('size'));
+    return parsed === 20 || parsed === 50 ? parsed : 10;
+  }, [searchParams]);
+
+  const updatePostParams = useCallback(
+    (
+      updates: Record<string, string | null | undefined>,
+      options?: { replace?: boolean; resetPage?: boolean }
+    ) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          for (const [key, val] of Object.entries(updates)) {
+            if (!val) {
+              next.delete(key);
+            } else {
+              next.set(key, val);
+            }
+          }
+          if (options?.resetPage) {
+            next.delete('page');
+          }
+          return next;
+        },
+        { replace: options?.replace ?? false }
+      );
+    },
+    [setSearchParams]
+  );
+
+  // Debounce search input -> URL ?q= (only while on posts view)
+  const isPostsView =
+    activeTab === 'posts' || (activeTab === 'content' && activeContentSubTab === 'posts');
+  const debounceTimerRef = useRef<number | null>(null);
   useEffect(() => {
-    setPostCurrentPage(0);
-  }, [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, postStatusFilter, activeJourneyFilter]);
+    if (!isPostsView) return;
+    const trimmedInput = searchInput.trim();
+    const trimmedQuery = searchQuery.trim();
+    if (trimmedInput === trimmedQuery) return;
+
+    debounceTimerRef.current = window.setTimeout(() => {
+      updatePostParams({ q: trimmedInput || null }, { replace: true, resetPage: true });
+    }, 350);
+
+    return () => {
+      if (debounceTimerRef.current !== null) {
+        window.clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchInput, searchQuery, isPostsView, updatePostParams]);
 
   // Modals state for Posts
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -217,61 +292,114 @@ export const AdminPage: React.FC = () => {
   const [vocabDrawerPost, setVocabDrawerPost] = useState<ReadingPostItem | null>(null);
 
   // System Overview State
-  const [overviewStats, setOverviewStats] = useState<AdminOverviewStats | null>(null);
+  const [overviewStats, setOverviewStats] = useState<AdminOverviewStats | null>(() => getCachedOverview());
   const [isOverviewLoading, setIsOverviewLoading] = useState(false);
-  const [totalUsersCount, setTotalUsersCount] = useState<number | null>(null);
 
-  // Fetch overview stats from backend
-  const fetchOverview = useCallback(async () => {
-    setIsOverviewLoading(true);
-    try {
-      const data = await adminOverviewService.getOverview();
-      setOverviewStats(data);
-      if (data.totalUsers !== undefined) {
-        setTotalUsersCount(data.totalUsers);
+  // Fetch overview stats from backend (with cache)
+  const fetchOverview = useCallback(
+    async (force = false) => {
+      if (!force) {
+        const cached = getCachedOverview();
+        if (cached) {
+          setOverviewStats(cached);
+          if (cached.totalUsers !== undefined) {
+            setTotalUsersCount(cached.totalUsers);
+          }
+          return;
+        }
       }
-    } catch (err: unknown) {
-      console.warn('Lỗi khi tải thống kê tổng quan:', err);
-    } finally {
-      setIsOverviewLoading(false);
-    }
-  }, []);
+      setIsOverviewLoading(true);
+      try {
+        const data = await adminOverviewService.getOverview();
+        setOverviewStats(data);
+        setCachedOverview(data);
+        if (data.totalUsers !== undefined) {
+          setTotalUsersCount(data.totalUsers);
+        }
+      } catch (err: unknown) {
+        console.warn('Lỗi khi tải thống kê tổng quan:', err);
+      } finally {
+        setIsOverviewLoading(false);
+      }
+    },
+    [getCachedOverview, setCachedOverview, setTotalUsersCount]
+  );
 
-  // Fetch posts from API
-  const fetchPosts = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      const params: PostFilterParams = {};
-      if (searchQuery.trim()) params.query = searchQuery.trim();
-      if (selectedLevel) params.level = selectedLevel;
-      if (selectedRegion) params.region = selectedRegion;
-      if (selectedTopic) params.topic = selectedTopic;
-      if (standaloneFilter === 'standalone') params.standalone = true;
-      if (standaloneFilter === 'journey') params.standalone = false;
-      if (activeJourneyFilter) params.journeyId = activeJourneyFilter;
+  const postsCacheKey = useMemo(
+    () =>
+      JSON.stringify({
+        query: searchQuery.trim(),
+        level: selectedLevel,
+        region: selectedRegion,
+        topic: selectedTopic,
+        standalone: standaloneFilter,
+        journeyId: activeJourneyFilter,
+      }),
+    [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, activeJourneyFilter]
+  );
 
-      const data = await postAdminService.getPosts(params);
-      setPosts(data);
-      setHasLoadedPosts(true);
-    } catch (err: unknown) {
-      setHasLoadedPosts(false);
-      console.error('Lỗi tải bài viết:', err);
-      setErrorMsg((err instanceof Error ? err.message : '') || t('messages.load_error'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchQuery, selectedLevel, selectedRegion, selectedTopic, standaloneFilter, activeJourneyFilter, t]);
+  // Fetch posts from API (cache-first unless forced)
+  const fetchPosts = useCallback(
+    async (force = false) => {
+      if (!force) {
+        const cached = getCachedPosts(postsCacheKey);
+        if (cached) {
+          setPosts(cached);
+          setHasLoadedPosts(true);
+          setIsLoading(false);
+          setErrorMsg(null);
+          return;
+        }
+      }
 
-  // Fetch total users fallback if overview not called
+      setIsLoading(true);
+      setErrorMsg(null);
+      try {
+        const params: PostFilterParams = {};
+        if (searchQuery.trim()) params.query = searchQuery.trim();
+        if (selectedLevel) params.level = selectedLevel;
+        if (selectedRegion) params.region = selectedRegion;
+        if (selectedTopic) params.topic = selectedTopic;
+        if (standaloneFilter === 'standalone') params.standalone = true;
+        if (standaloneFilter === 'journey') params.standalone = false;
+        if (activeJourneyFilter) params.journeyId = activeJourneyFilter;
+
+        const data = await postAdminService.getPosts(params);
+        setPosts(data);
+        setCachedPosts(postsCacheKey, data);
+        setHasLoadedPosts(true);
+      } catch (err: unknown) {
+        setHasLoadedPosts(false);
+        console.error('Lỗi tải bài viết:', err);
+        setErrorMsg((err instanceof Error ? err.message : '') || t('messages.load_error'));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [
+      postsCacheKey,
+      getCachedPosts,
+      setCachedPosts,
+      searchQuery,
+      selectedLevel,
+      selectedRegion,
+      selectedTopic,
+      standaloneFilter,
+      activeJourneyFilter,
+      t,
+    ]
+  );
+
+  // Fetch total users fallback only when needed on dashboard/system_stats
   const fetchTotalUsers = useCallback(async () => {
+    if (totalUsersCount !== null) return;
     try {
       const res = await adminUserService.getUsers({ size: 1 });
       setTotalUsersCount(res.totalElements || 0);
     } catch (e) {
       console.warn('Không thể lấy tổng số user cho thống kê:', e);
     }
-  }, []);
+  }, [totalUsersCount, setTotalUsersCount]);
 
   useEffect(() => {
     if (
@@ -287,23 +415,47 @@ export const AdminPage: React.FC = () => {
   useEffect(() => {
     if (activeTab === 'dashboard' || activeTab === 'system_stats') {
       fetchOverview();
+      fetchTotalUsers();
     }
-    fetchTotalUsers();
   }, [activeTab, fetchOverview, fetchTotalUsers]);
+
+  // Restore scroll position when returning to posts list from editor
+  useEffect(() => {
+    if (!isPostsView || isLoading || !hasLoadedPosts) return;
+    const routeKey = `${location.pathname}${location.search}`;
+    const savedY = consumeScrollPosition(routeKey);
+    if (savedY !== null && savedY > 0) {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: savedY, behavior: 'instant' as ScrollBehavior });
+      });
+    }
+  }, [isPostsView, isLoading, hasLoadedPosts, location.pathname, location.search, consumeScrollPosition]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchPosts();
+    if (debounceTimerRef.current !== null) {
+      window.clearTimeout(debounceTimerRef.current);
+    }
+    const trimmed = searchInput.trim();
+    if (trimmed === searchQuery.trim()) {
+      fetchPosts(true);
+    } else {
+      updatePostParams({ q: trimmed || null }, { replace: true, resetPage: true });
+    }
   };
 
   // Open Create Page
   const handleOpenCreate = () => {
-    navigate(getLocalizedPath('/admin/posts/new', currentLang));
+    const returnTo = `${location.pathname}${location.search}`;
+    saveScrollPosition(returnTo, window.scrollY);
+    navigate(getLocalizedPath('/admin/posts/new', currentLang), { state: { returnTo } });
   };
 
   // Open Edit Page
   const handleOpenEdit = (post: ReadingPostItem) => {
-    navigate(getLocalizedPath(`/admin/posts/${post.id}/edit`, currentLang));
+    const returnTo = `${location.pathname}${location.search}`;
+    saveScrollPosition(returnTo, window.scrollY);
+    navigate(getLocalizedPath(`/admin/posts/${post.id}/edit`, currentLang), { state: { returnTo } });
   };
 
   // Open Preview Modal
@@ -318,14 +470,12 @@ export const AdminPage: React.FC = () => {
 
   // Quick filter to posts tab by CEFR Level
   const handleQuickFilterCefr = (lvl: string) => {
-    setSelectedLevel(lvl);
-    navigate(getLocalizedPath('/admin/posts', currentLang));
+    navigate(`${getLocalizedPath('/admin/posts', currentLang)}?level=${encodeURIComponent(lvl)}`);
   };
 
   // Quick filter to posts tab by Region
   const handleQuickFilterRegion = (regionKey: string) => {
-    setSelectedRegion(regionKey);
-    navigate(getLocalizedPath('/admin/posts', currentLang));
+    navigate(`${getLocalizedPath('/admin/posts', currentLang)}?region=${encodeURIComponent(regionKey)}`);
   };
 
   // Confirm and Delete Post
@@ -334,6 +484,7 @@ export const AdminPage: React.FC = () => {
     try {
       await postAdminService.deletePost(deletingId);
       setPosts((prev) => prev.filter((p) => p.id !== deletingId));
+      removePostFromCache(deletingId);
       setSuccessToast(t('messages.post_deleted'));
       setTimeout(() => setSuccessToast(null), 3000);
     } catch (err: unknown) {
@@ -345,7 +496,8 @@ export const AdminPage: React.FC = () => {
 
   // Callback on post saved
   const handlePostSaved = () => {
-    fetchPosts();
+    invalidatePosts();
+    fetchPosts(true);
     setSuccessToast(t('messages.post_saved'));
     setTimeout(() => setSuccessToast(null), 3000);
   };
@@ -599,7 +751,7 @@ export const AdminPage: React.FC = () => {
             {(activeTab === 'dashboard' || activeTab === 'system_stats') && (
               <button
                 type="button"
-                onClick={fetchOverview}
+                onClick={() => fetchOverview(true)}
                 disabled={isOverviewLoading}
                 className="px-3.5 py-2 rounded-xl bg-rice-paper dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 border border-antique-gold/30 text-xs font-bold text-text-body dark:text-warm-ivory flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
                 title="Tải lại thống kê tổng quan"
@@ -620,7 +772,7 @@ export const AdminPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={fetchPosts}
+                  onClick={() => fetchPosts(true)}
                   disabled={isLoading}
                   className="px-3.5 py-2 rounded-xl bg-rice-paper dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 border border-antique-gold/30 text-xs font-bold text-text-body dark:text-warm-ivory flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
                   title={t('header.refresh_articles')}
@@ -1218,16 +1370,19 @@ export const AdminPage: React.FC = () => {
                   <input
                     type="text"
                     aria-label={t('filters.search_placeholder')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                     placeholder={t('filters.search_placeholder')}
                     className="w-full pl-10 pr-24 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold"
                   />
-                  {searchQuery && (
+                  {searchInput && (
                     <button
                       type="button"
                       aria-label="Xóa từ khóa tìm kiếm"
-                      onClick={() => setSearchQuery('')}
+                      onClick={() => {
+                        setSearchInput('');
+                        updatePostParams({ q: null }, { replace: true, resetPage: true });
+                      }}
                       className="absolute right-20 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-heritage-green dark:hover:text-warm-ivory cursor-pointer"
                     >
                       <X aria-hidden="true" className="w-3.5 h-3.5" />
@@ -1244,16 +1399,22 @@ export const AdminPage: React.FC = () => {
                     <span>{displayedPosts.length} / {posts.length} bài viết</span>
                   </div>
 
-                  {(selectedLevel || selectedRegion || searchQuery || postStatusFilter !== 'all' || standaloneFilter !== 'all') && (
+                  {(selectedLevel || selectedRegion || selectedTopic || searchInput || searchQuery || postStatusFilter !== 'all' || standaloneFilter !== 'all') && (
                     <button
                       type="button"
                       onClick={() => {
-                        setSelectedLevel('');
-                        setSelectedRegion('');
-                        setSelectedTopic('');
-                        setSearchQuery('');
-                        setStandaloneFilter('all');
-                        setPostStatusFilter('all');
+                        setSearchInput('');
+                        updatePostParams(
+                          {
+                            q: null,
+                            level: null,
+                            region: null,
+                            topic: null,
+                            scope: null,
+                            status: null,
+                          },
+                          { resetPage: true }
+                        );
                       }}
                       className="px-3 py-2 rounded-xl bg-white/60 dark:bg-white/10 hover:bg-white text-xs font-bold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 cursor-pointer transition-colors"
                     >
@@ -1269,7 +1430,10 @@ export const AdminPage: React.FC = () => {
                 <select
                   aria-label="Hình thức bài đọc"
                   value={standaloneFilter}
-                  onChange={(e) => setStandaloneFilter(e.target.value as 'all' | 'standalone' | 'journey')}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    updatePostParams({ scope: val === 'all' ? null : val }, { resetPage: true });
+                  }}
                   className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
                   <option value="all">Tất cả hình thức</option>
@@ -1281,7 +1445,7 @@ export const AdminPage: React.FC = () => {
                 <select
                   aria-label={t('filters.all_levels')}
                   value={selectedLevel}
-                  onChange={(e) => setSelectedLevel(e.target.value)}
+                  onChange={(e) => updatePostParams({ level: e.target.value || null }, { resetPage: true })}
                   className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
                   <option value="">{t('filters.all_levels')}</option>
@@ -1296,7 +1460,7 @@ export const AdminPage: React.FC = () => {
                 <select
                   aria-label={t('filters.all_regions')}
                   value={selectedRegion}
-                  onChange={(e) => setSelectedRegion(e.target.value)}
+                  onChange={(e) => updatePostParams({ region: e.target.value || null }, { resetPage: true })}
                   className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
                   <option value="">{t('filters.all_regions')}</option>
@@ -1311,7 +1475,10 @@ export const AdminPage: React.FC = () => {
                 <select
                   aria-label={t('posts_table.status_filter.label')}
                   value={postStatusFilter}
-                  onChange={(e) => setPostStatusFilter(e.target.value as 'all' | 'published' | 'draft' | 'missing_materials')}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    updatePostParams({ status: val === 'all' ? null : val }, { resetPage: true });
+                  }}
                   className="w-full px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
                 >
                   <option value="all">{t('posts_table.status_filter.all')}</option>
@@ -1376,7 +1543,7 @@ export const AdminPage: React.FC = () => {
                   </div>
                   <button
                     type="button"
-                    onClick={!hasLoadedPosts ? fetchPosts : handleOpenCreate}
+                    onClick={!hasLoadedPosts ? () => fetchPosts(true) : handleOpenCreate}
                     className="px-5 py-2.5 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold hover:bg-heritage-dark transition-colors cursor-pointer"
                   >
                     {!hasLoadedPosts ? t('posts_table.try_again') : t('posts_table.create_article')}
@@ -1654,8 +1821,11 @@ export const AdminPage: React.FC = () => {
                         aria-label={t('posts_table.pagination.per_page', { defaultValue: 'Mỗi trang' })}
                         value={postPageSize}
                         onChange={(e) => {
-                          setPostPageSize(Number(e.target.value));
-                          setPostCurrentPage(0);
+                          const nextSize = Number(e.target.value);
+                          updatePostParams(
+                            { size: nextSize === 10 ? null : String(nextSize) },
+                            { resetPage: true }
+                          );
                         }}
                         className="px-2 py-1 rounded-lg bg-warm-ivory dark:bg-heritage-dark border border-antique-gold/30 text-xs font-semibold focus:outline-none focus:border-antique-gold cursor-pointer"
                       >
@@ -1669,7 +1839,10 @@ export const AdminPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setPostCurrentPage((p) => Math.max(0, p - 1))}
+                      onClick={() => {
+                        const prevPage = Math.max(0, safePostPage - 1);
+                        updatePostParams({ page: prevPage === 0 ? null : String(prevPage + 1) });
+                      }}
                       disabled={safePostPage === 0}
                       className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 hover:bg-antique-gold/20 text-text-body dark:text-warm-ivory font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-antique-gold"
                       aria-label={t('posts_table.pagination.prev', { defaultValue: 'Trang trước' })}
@@ -1688,7 +1861,10 @@ export const AdminPage: React.FC = () => {
 
                     <button
                       type="button"
-                      onClick={() => setPostCurrentPage((p) => Math.min(totalPostPages - 1, p + 1))}
+                      onClick={() => {
+                        const nextPage = Math.min(totalPostPages - 1, safePostPage + 1);
+                        updatePostParams({ page: nextPage === 0 ? null : String(nextPage + 1) });
+                      }}
                       disabled={safePostPage + 1 >= totalPostPages}
                       className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 hover:bg-antique-gold/20 text-text-body dark:text-warm-ivory font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-antique-gold"
                       aria-label={t('posts_table.pagination.next', { defaultValue: 'Trang sau' })}

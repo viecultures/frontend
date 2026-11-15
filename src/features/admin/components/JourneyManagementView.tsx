@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'motion/react';
 import {
@@ -21,58 +21,161 @@ import { JourneyFormModal } from './JourneyFormModal';
 import { VIETNAM_34_PROVINCES } from '@/data/vietnamMapData';
 import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
 import { HeritageImage } from '@/components/common/HeritageImage';
+import { useAdminCacheStore } from '../stores/adminCacheStore';
 
 export const JourneyManagementView: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { i18n } = useTranslation('admin');
   const currentLang = resolveLanguage(i18n.language);
+  const {
+    getCachedJourneys,
+    setCachedJourneys,
+    invalidateJourneys,
+    saveScrollPosition,
+    consumeScrollPosition,
+  } = useAdminCacheStore();
 
   const [journeys, setJourneys] = useState<LearningJourneyItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoadedJourneys, setHasLoadedJourneys] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  // Filters
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRegion, setSelectedRegion] = useState('');
-  const [selectedTheme, setSelectedTheme] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+  // Filters (URL-synced)
+  const searchQuery = searchParams.get('q') || '';
+  const selectedRegion = searchParams.get('region') || '';
+  const selectedTheme = searchParams.get('theme') || '';
+  const selectedStatus = searchParams.get('status') || '';
+
+  const [searchInput, setSearchInput] = useState(searchQuery);
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
 
   // Create Modal
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingJourney, setEditingJourney] = useState<LearningJourneyItem | null>(null);
 
+  const updateJourneyParams = useCallback(
+    (updates: Record<string, string | null | undefined>, replace = false) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          for (const [k, v] of Object.entries(updates)) {
+            if (!v) next.delete(k);
+            else next.set(k, v);
+          }
+          return next;
+        },
+        { replace }
+      );
+    },
+    [setSearchParams]
+  );
+
+  const debounceRef = useRef<number | null>(null);
+  useEffect(() => {
+    const trimmedInput = searchInput.trim();
+    const trimmedQuery = searchQuery.trim();
+    if (trimmedInput === trimmedQuery) return;
+    debounceRef.current = window.setTimeout(() => {
+      updateJourneyParams({ q: trimmedInput || null }, true);
+    }, 350);
+    return () => {
+      if (debounceRef.current !== null) window.clearTimeout(debounceRef.current);
+    };
+  }, [searchInput, searchQuery, updateJourneyParams]);
+
   const handleViewJourneyDetail = (journeyId: string) => {
-    navigate(getLocalizedPath(`/admin/journeys/${encodeURIComponent(journeyId)}`, currentLang));
+    const returnTo = `${location.pathname}${location.search}`;
+    saveScrollPosition(returnTo, window.scrollY);
+    navigate(getLocalizedPath(`/admin/journeys/${encodeURIComponent(journeyId)}`, currentLang), {
+      state: { returnTo },
+    });
   };
 
-  const fetchJourneys = async () => {
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      const params: JourneyFilterParams = {};
-      if (searchQuery.trim()) params.query = searchQuery.trim();
-      if (selectedRegion) params.region = selectedRegion;
-      if (selectedTheme) params.theme = selectedTheme;
-      if (selectedStatus) params.status = selectedStatus;
+  const journeysCacheKey = useMemo(
+    () =>
+      JSON.stringify({
+        query: searchQuery.trim(),
+        region: selectedRegion,
+        theme: selectedTheme,
+        status: selectedStatus,
+      }),
+    [searchQuery, selectedRegion, selectedTheme, selectedStatus]
+  );
 
-      const data = await journeyAdminService.getJourneys(params);
-      setJourneys(data);
-    } catch (err: unknown) {
-      console.error('Lỗi tải hành trình học:', err);
-      setErrorMsg((err instanceof Error ? err.message : '') || 'Không thể tải danh sách hành trình học.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const fetchJourneys = useCallback(
+    async (force = false) => {
+      if (!force) {
+        const cached = getCachedJourneys(journeysCacheKey);
+        if (cached) {
+          setJourneys(cached);
+          setHasLoadedJourneys(true);
+          setIsLoading(false);
+          setErrorMsg(null);
+          return;
+        }
+      }
+
+      setIsLoading(true);
+      setErrorMsg(null);
+      try {
+        const params: JourneyFilterParams = {};
+        if (searchQuery.trim()) params.query = searchQuery.trim();
+        if (selectedRegion) params.region = selectedRegion;
+        if (selectedTheme) params.theme = selectedTheme;
+        if (selectedStatus) params.status = selectedStatus;
+
+        const data = await journeyAdminService.getJourneys(params);
+        setJourneys(data);
+        setCachedJourneys(journeysCacheKey, data);
+        setHasLoadedJourneys(true);
+      } catch (err: unknown) {
+        setHasLoadedJourneys(false);
+        console.error('Lỗi tải hành trình học:', err);
+        setErrorMsg((err instanceof Error ? err.message : '') || 'Không thể tải danh sách hành trình học.');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [
+      journeysCacheKey,
+      getCachedJourneys,
+      setCachedJourneys,
+      searchQuery,
+      selectedRegion,
+      selectedTheme,
+      selectedStatus,
+    ]
+  );
 
   useEffect(() => {
     fetchJourneys();
-  }, [selectedRegion, selectedTheme, selectedStatus]);
+  }, [fetchJourneys]);
+
+  useEffect(() => {
+    if (isLoading || !hasLoadedJourneys) return;
+    const routeKey = `${location.pathname}${location.search}`;
+    const savedY = consumeScrollPosition(routeKey);
+    if (savedY !== null && savedY > 0) {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: savedY, behavior: 'instant' as ScrollBehavior });
+      });
+    }
+  }, [isLoading, hasLoadedJourneys, location.pathname, location.search, consumeScrollPosition]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchJourneys();
+    if (debounceRef.current !== null) window.clearTimeout(debounceRef.current);
+    const trimmed = searchInput.trim();
+    if (trimmed === searchQuery.trim()) {
+      fetchJourneys(true);
+    } else {
+      updateJourneyParams({ q: trimmed || null }, true);
+    }
   };
 
   const handleOpenCreate = () => {
@@ -83,7 +186,8 @@ export const JourneyManagementView: React.FC = () => {
   const handleSaved = (saved: LearningJourneyItem) => {
     setSuccessToast(`Đã lưu hành trình: ${saved.titleEn}`);
     setTimeout(() => setSuccessToast(null), 3000);
-    fetchJourneys();
+    invalidateJourneys();
+    fetchJourneys(true);
   };
 
   const getProvinceName = (provId: string) => {
@@ -166,8 +270,8 @@ export const JourneyManagementView: React.FC = () => {
             />
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Tìm hành trình theo tên, mã slug, mô tả..."
               className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/50 dark:bg-white/5 text-xs focus:outline-none focus:ring-2 focus:ring-antique-gold"
             />
@@ -183,7 +287,7 @@ export const JourneyManagementView: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           <select
             value={selectedRegion}
-            onChange={(e) => setSelectedRegion(e.target.value)}
+            onChange={(e) => updateJourneyParams({ region: e.target.value || null })}
             className="px-3 py-2 rounded-xl border border-antique-gold/30 bg-warm-ivory/50 dark:bg-white/5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-antique-gold"
           >
             <option value="">Tất cả miền</option>
@@ -194,7 +298,7 @@ export const JourneyManagementView: React.FC = () => {
 
           <select
             value={selectedTheme}
-            onChange={(e) => setSelectedTheme(e.target.value)}
+            onChange={(e) => updateJourneyParams({ theme: e.target.value || null })}
             className="px-3 py-2 rounded-xl border border-antique-gold/30 bg-warm-ivory/50 dark:bg-white/5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-antique-gold"
           >
             <option value="">Tất cả chủ đề</option>
@@ -207,7 +311,7 @@ export const JourneyManagementView: React.FC = () => {
 
           <select
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
+            onChange={(e) => updateJourneyParams({ status: e.target.value || null })}
             className="px-3 py-2 rounded-xl border border-antique-gold/30 bg-warm-ivory/50 dark:bg-white/5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-antique-gold"
           >
             <option value="">Tất cả trạng thái</option>
@@ -218,7 +322,7 @@ export const JourneyManagementView: React.FC = () => {
           </select>
 
           <button
-            onClick={fetchJourneys}
+            onClick={() => fetchJourneys(true)}
             className="p-2.5 rounded-xl border border-antique-gold/30 hover:bg-antique-gold/15 transition-colors cursor-pointer text-text-muted hover:text-heritage-green"
             title="Tải lại danh sách"
           >

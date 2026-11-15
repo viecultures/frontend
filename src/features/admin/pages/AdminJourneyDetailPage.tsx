@@ -62,12 +62,20 @@ function getLevelBadgeClass(level?: string): string {
   }
 }
 
+import { getLocalizedPath, resolveLanguage } from '@/routes/paths';
+import { resolveReturnTo, useAdminCacheStore } from '../stores/adminCacheStore';
+
 export const AdminJourneyDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation('admin');
   const currentLang = resolveLanguage(i18n.language);
+  const returnTo = resolveReturnTo(
+    location.state,
+    getLocalizedPath('/admin/content?tab=journeys', currentLang)
+  );
+  const currentDetailPath = `${location.pathname}${location.search}`;
 
   // Data state
   const [journey, setJourney] = useState<LearningJourneyItem | null>(null);
@@ -157,8 +165,9 @@ export const AdminJourneyDetailPage: React.FC = () => {
     setIsDeleting(true);
     try {
       await journeyAdminService.deleteJourney(journey.id);
+      useAdminCacheStore.getState().invalidateJourneys();
       setIsDeleteConfirmOpen(false);
-      navigate(getLocalizedPath('/admin/content?tab=journeys', currentLang));
+      navigate(returnTo);
     } catch (err: unknown) {
       console.error('Lỗi khi xóa hành trình:', err);
       setErrorMsg(err instanceof Error ? err.message : 'Không thể xóa hành trình.');
@@ -216,7 +225,7 @@ export const AdminJourneyDetailPage: React.FC = () => {
         <p className="text-xs text-text-muted">{errorMsg || 'Hành trình này có thể đã bị xóa hoặc đường dẫn không đúng.'}</p>
         <button
           type="button"
-          onClick={() => navigate(getLocalizedPath('/admin/content?tab=journeys', currentLang))}
+          onClick={() => navigate(returnTo)}
           className="px-4 py-2 rounded-xl bg-heritage-green text-warm-ivory font-bold text-xs hover:bg-heritage-forest transition-colors cursor-pointer"
         >
           Quay lại danh sách hành trình
@@ -240,7 +249,7 @@ export const AdminJourneyDetailPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => navigate(getLocalizedPath('/admin/content?tab=journeys', currentLang))}
+            onClick={() => navigate(returnTo)}
             className="p-2 rounded-xl border border-antique-gold/30 hover:bg-antique-gold/15 text-heritage-green dark:text-antique-bright transition-colors cursor-pointer"
             title="Quay lại danh sách hành trình"
           >
@@ -388,7 +397,11 @@ export const AdminJourneyDetailPage: React.FC = () => {
           </div>
           <button
             type="button"
-            onClick={() => navigate(getLocalizedPath(`/admin/posts/new?journeyId=${encodeURIComponent(journey.id)}`, currentLang))}
+            onClick={() =>
+              navigate(getLocalizedPath(`/admin/posts/new?journeyId=${encodeURIComponent(journey.id)}`, currentLang), {
+                state: { returnTo: currentDetailPath },
+              })
+            }
             className="px-3.5 py-1.5 rounded-xl bg-heritage-green text-warm-ivory font-bold text-xs hover:bg-heritage-forest transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <Plus className="w-3.5 h-3.5 text-antique-gold" />
@@ -407,7 +420,11 @@ export const AdminJourneyDetailPage: React.FC = () => {
             </p>
             <button
               type="button"
-              onClick={() => navigate(getLocalizedPath(`/admin/posts/new?journeyId=${encodeURIComponent(journey.id)}`, currentLang))}
+              onClick={() =>
+                navigate(getLocalizedPath(`/admin/posts/new?journeyId=${encodeURIComponent(journey.id)}`, currentLang), {
+                  state: { returnTo: currentDetailPath },
+                })
+              }
               className="px-4 py-2 rounded-xl bg-heritage-green text-warm-ivory font-bold text-xs hover:bg-heritage-forest transition-colors cursor-pointer"
             >
               Tạo bài học đầu tiên
@@ -495,7 +512,11 @@ export const AdminJourneyDetailPage: React.FC = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => navigate(getLocalizedPath(`/admin/posts/${post.id}/edit`, currentLang))}
+                          onClick={() =>
+                            navigate(getLocalizedPath(`/admin/posts/${post.id}/edit`, currentLang), {
+                              state: { returnTo: currentDetailPath },
+                            })
+                          }
                           className="px-2.5 py-1.5 rounded-lg bg-antique-gold/20 hover:bg-antique-gold/35 text-heritage-green dark:text-antique-bright text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
                           title="Chỉnh sửa bài đọc"
                         >
@@ -588,7 +609,11 @@ export const AdminJourneyDetailPage: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={() => navigate(getLocalizedPath(`/admin/posts/new?journeyId=${encodeURIComponent(journey.id)}`, currentLang))}
+                onClick={() =>
+                  navigate(getLocalizedPath(`/admin/posts/new?journeyId=${encodeURIComponent(journey.id)}`, currentLang), {
+                    state: { returnTo: currentDetailPath },
+                  })
+                }
                 className="w-full p-4 rounded-2xl border-2 border-dashed border-antique-gold/40 hover:border-antique-gold bg-rice-paper/50 hover:bg-rice-paper dark:bg-white/5 dark:hover:bg-white/10 transition-all flex items-center justify-center gap-2 text-xs font-bold text-heritage-green dark:text-antique-bright cursor-pointer"
               >
                 <Plus className="w-4 h-4 text-antique-gold" />
@@ -612,7 +637,9 @@ export const AdminJourneyDetailPage: React.FC = () => {
         }}
         onEditPost={(p) => {
           setVocabDrawerPost(null);
-          navigate(getLocalizedPath(`/admin/posts/${p.id}/edit`, currentLang));
+          navigate(getLocalizedPath(`/admin/posts/${p.id}/edit`, currentLang), {
+            state: { returnTo: currentDetailPath },
+          });
         }}
       />
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
@@ -32,12 +32,15 @@ import type {
 } from '../types/adminTypes';
 import { adminUserService } from '../services/adminUserService';
 import { getLocalizedPath } from '@/routes/paths';
+import { resolveReturnTo } from '../stores/adminCacheStore';
 import { getStoredUser, getStoredToken, parseJwt } from '@/utils/auth-storage';
 
 export const AdminLearnerDetailPage: React.FC = () => {
   const { id, lang } = useParams<{ id: string; lang?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation('admin');
+  const returnTo = resolveReturnTo(location.state, getLocalizedPath('/admin/users', lang));
 
   // Main state
   const [learner, setLearner] = useState<LearnerDetailItem | null>(null);
@@ -347,7 +350,7 @@ export const AdminLearnerDetailPage: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => navigate(getLocalizedPath('/admin/users', lang))}
+              onClick={() => navigate(returnTo)}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-antique-gold/40 text-heritage-green dark:text-warm-ivory text-xs font-bold hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer"
             >
               <ArrowLeft aria-hidden="true" className="w-4 h-4" />
@@ -377,7 +380,7 @@ export const AdminLearnerDetailPage: React.FC = () => {
           </Link>
           <ChevronRight aria-hidden="true" className="w-3.5 h-3.5 text-text-muted shrink-0" />
           <Link
-            to={getLocalizedPath('/admin/users', lang)}
+            to={returnTo}
             className="hover:text-heritage-green dark:hover:text-antique-bright transition-colors"
           >
             Quản lý người dùng
@@ -390,7 +393,7 @@ export const AdminLearnerDetailPage: React.FC = () => {
 
         <button
           type="button"
-          onClick={() => navigate(getLocalizedPath('/admin/users', lang))}
+          onClick={() => navigate(returnTo)}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-white/60 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-xs font-bold text-heritage-green dark:text-warm-ivory transition-colors cursor-pointer self-start sm:self-auto"
         >
           <ArrowLeft aria-hidden="true" className="w-4 h-4" />

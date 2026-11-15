@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Users,
@@ -26,13 +26,23 @@ import { adminUserService } from '../services/adminUserService';
 import { getStoredUser, getStoredToken, parseJwt } from '@/utils/auth-storage';
 import { isLocalAuthMode } from '@/config/authConfig';
 import { getLocalizedPath } from '@/routes/paths';
+import { useAdminCacheStore } from '../stores/adminCacheStore';
 
 type FilterGroup = 'all' | 'recent_7d' | 'inactive' | 'active' | 'admin';
 
 export const UserManagementView: React.FC = () => {
   const { t } = useTranslation('admin');
   const navigate = useNavigate();
+  const location = useLocation();
   const { lang } = useParams<{ lang?: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    getCachedUsers,
+    setCachedUsers,
+    invalidateUsers,
+    saveScrollPosition,
+    consumeScrollPosition,
+  } = useAdminCacheStore();
 
   const [users, setUsers] = useState<AdminUserItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,63 +63,190 @@ export const UserManagementView: React.FC = () => {
     return null;
   }, []);
 
-  // Filters & Pagination
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRole, setSelectedRole] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
-  const [filterGroup, setFilterGroup] = useState<FilterGroup>('all');
-  const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  // Filters & Pagination (URL-synced)
+  const searchQuery = searchParams.get('q') || '';
+  const selectedRole = searchParams.get('role') || '';
+  const selectedStatus = searchParams.get('status') || '';
+  const rawGroup = searchParams.get('group');
+  const filterGroup: FilterGroup =
+    rawGroup === 'recent_7d' || rawGroup === 'inactive' || rawGroup === 'active' || rawGroup === 'admin'
+      ? rawGroup
+      : 'all';
+  const currentPage = useMemo(() => {
+    const parsed = Number(searchParams.get('page'));
+    return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) - 1 : 0;
+  }, [searchParams]);
+  const pageSize = useMemo(() => {
+    const parsed = Number(searchParams.get('size'));
+    return parsed === 20 || parsed === 50 ? parsed : 10;
+  }, [searchParams]);
+
+  const [searchInput, setSearchInput] = useState(searchQuery);
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
+
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
 
   // Status updating map
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
-  // Load users from API
-  const fetchUsers = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      let enabledParam: boolean | undefined = undefined;
-      if (selectedStatus === 'enabled') enabledParam = true;
-      if (selectedStatus === 'disabled') enabledParam = false;
+  const updateUserParams = useCallback(
+    (
+      updates: Record<string, string | null | undefined>,
+      options?: { replace?: boolean; resetPage?: boolean }
+    ) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          for (const [key, val] of Object.entries(updates)) {
+            if (!val) {
+              next.delete(key);
+            } else {
+              next.set(key, val);
+            }
+          }
+          if (options?.resetPage) {
+            next.delete('page');
+          }
+          return next;
+        },
+        { replace: options?.replace ?? false }
+      );
+    },
+    [setSearchParams]
+  );
 
-      const res = await adminUserService.getUsers({
-        query: searchQuery.trim() || undefined,
-        role: selectedRole || undefined,
-        enabled: enabledParam,
-        filterGroup: filterGroup === 'all' ? undefined : filterGroup,
+  const debounceRef = useRef<number | null>(null);
+  useEffect(() => {
+    const trimmedInput = searchInput.trim();
+    const trimmedQuery = searchQuery.trim();
+    if (trimmedInput === trimmedQuery) return;
+
+    debounceRef.current = window.setTimeout(() => {
+      updateUserParams({ q: trimmedInput || null }, { replace: true, resetPage: true });
+    }, 350);
+
+    return () => {
+      if (debounceRef.current !== null) {
+        window.clearTimeout(debounceRef.current);
+      }
+    };
+  }, [searchInput, searchQuery, updateUserParams]);
+
+  const usersCacheKey = useMemo(
+    () =>
+      JSON.stringify({
+        query: searchQuery.trim(),
+        role: selectedRole,
+        status: selectedStatus,
+        filterGroup,
         page: currentPage,
         size: pageSize,
-      });
+      }),
+    [searchQuery, selectedRole, selectedStatus, filterGroup, currentPage, pageSize]
+  );
 
-      setUsers(res.content || []);
-      setTotalPages(res.totalPages || 1);
-      setTotalElements(res.totalElements || 0);
-      setHasLoadedUsers(true);
-    } catch (err: unknown) {
-      setHasLoadedUsers(false);
-      console.error('Lỗi tải người dùng:', err);
-      setErrorMsg(
-        isLocalAuthMode && !getStoredToken()
-          ? t('users.messages.unavailable_desc')
-          : t('users.messages.unavailable_desc')
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchQuery, selectedRole, selectedStatus, filterGroup, currentPage, pageSize, t]);
+  // Load users from API (cache-first)
+  const fetchUsers = useCallback(
+    async (force = false) => {
+      if (!force) {
+        const cached = getCachedUsers(usersCacheKey);
+        if (cached) {
+          setUsers(cached.content || []);
+          setTotalPages(cached.totalPages || 1);
+          setTotalElements(cached.totalElements || 0);
+          setHasLoadedUsers(true);
+          setIsLoading(false);
+          setErrorMsg(null);
+          return;
+        }
+      }
+
+      setIsLoading(true);
+      setErrorMsg(null);
+      try {
+        let enabledParam: boolean | undefined = undefined;
+        if (selectedStatus === 'enabled') enabledParam = true;
+        if (selectedStatus === 'disabled') enabledParam = false;
+
+        const res = await adminUserService.getUsers({
+          query: searchQuery.trim() || undefined,
+          role: selectedRole || undefined,
+          enabled: enabledParam,
+          filterGroup: filterGroup === 'all' ? undefined : filterGroup,
+          page: currentPage,
+          size: pageSize,
+        });
+
+        setUsers(res.content || []);
+        setTotalPages(res.totalPages || 1);
+        setTotalElements(res.totalElements || 0);
+        setCachedUsers(usersCacheKey, res);
+        setHasLoadedUsers(true);
+      } catch (err: unknown) {
+        setHasLoadedUsers(false);
+        console.error('Lỗi tải người dùng:', err);
+        setErrorMsg(
+          isLocalAuthMode && !getStoredToken()
+            ? t('users.messages.unavailable_desc')
+            : t('users.messages.unavailable_desc')
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [
+      usersCacheKey,
+      getCachedUsers,
+      setCachedUsers,
+      searchQuery,
+      selectedRole,
+      selectedStatus,
+      filterGroup,
+      currentPage,
+      pageSize,
+      t,
+    ]
+  );
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
+  // Restore scroll when returning from learner detail
+  useEffect(() => {
+    if (isLoading || !hasLoadedUsers) return;
+    const routeKey = `${location.pathname}${location.search}`;
+    const savedY = consumeScrollPosition(routeKey);
+    if (savedY !== null && savedY > 0) {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: savedY, behavior: 'instant' as ScrollBehavior });
+      });
+    }
+  }, [isLoading, hasLoadedUsers, location.pathname, location.search, consumeScrollPosition]);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setCurrentPage(0);
-    fetchUsers();
+    if (debounceRef.current !== null) {
+      window.clearTimeout(debounceRef.current);
+    }
+    const trimmed = searchInput.trim();
+    if (trimmed === searchQuery.trim()) {
+      fetchUsers(true);
+    } else {
+      updateUserParams({ q: trimmed || null }, { replace: true, resetPage: true });
+    }
   };
+
+  const resetAllFilters = useCallback(() => {
+    setSearchInput('');
+    updateUserParams(
+      { q: null, role: null, status: null, group: null },
+      { resetPage: true }
+    );
+  }, [updateUserParams]);
 
   // Export CSV handler
   const handleExportCsv = async () => {
@@ -193,6 +330,7 @@ export const UserManagementView: React.FC = () => {
       setUsers((prev) =>
         prev.map((u) => (u.id === user.id ? { ...u, enabled: updated.enabled } : u))
       );
+      invalidateUsers();
       setSuccessToast(
         `${user.name} - ${nextStatus ? t('users.status.enabled') : t('users.status.disabled')}`
       );
@@ -206,7 +344,9 @@ export const UserManagementView: React.FC = () => {
 
   // Navigate to detailed learner page
   const handleNavigateToDetail = (userId: string) => {
-    navigate(getLocalizedPath(`/admin/users/${userId}`, lang));
+    const returnTo = `${location.pathname}${location.search}`;
+    saveScrollPosition(returnTo, window.scrollY);
+    navigate(getLocalizedPath(`/admin/users/${userId}`, lang), { state: { returnTo } });
   };
 
   // Format date helper
@@ -313,10 +453,12 @@ export const UserManagementView: React.FC = () => {
         {marketingTabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => {
-              setFilterGroup(tab.key);
-              setCurrentPage(0);
-            }}
+            onClick={() =>
+              updateUserParams(
+                { group: tab.key === 'all' ? null : tab.key },
+                { resetPage: true }
+              )
+            }
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               filterGroup === tab.key
                 ? 'bg-heritage-green text-warm-ivory shadow-sm'
@@ -335,18 +477,18 @@ export const UserManagementView: React.FC = () => {
           <Search aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
             type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             placeholder={t('users.filters.search_placeholder')}
             className="w-full pl-10 pr-4 py-2 rounded-2xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs text-text-body dark:text-warm-ivory placeholder:text-text-muted focus:outline-none focus:border-antique-gold transition-colors"
           />
-          {searchQuery && (
+          {searchInput && (
             <button
               type="button"
               aria-label="Clear search"
               onClick={() => {
-                setSearchQuery('');
-                setCurrentPage(0);
+                setSearchInput('');
+                updateUserParams({ q: null }, { replace: true, resetPage: true });
               }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-body cursor-pointer"
             >
@@ -361,10 +503,7 @@ export const UserManagementView: React.FC = () => {
           <select
             aria-label={t('users.filters.all_roles')}
             value={selectedRole}
-            onChange={(e) => {
-              setSelectedRole(e.target.value);
-              setCurrentPage(0);
-            }}
+            onChange={(e) => updateUserParams({ role: e.target.value || null }, { resetPage: true })}
             className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
           >
             <option value="">{t('users.filters.all_roles')}</option>
@@ -376,10 +515,7 @@ export const UserManagementView: React.FC = () => {
           <select
             aria-label={t('users.filters.all_statuses')}
             value={selectedStatus}
-            onChange={(e) => {
-              setSelectedStatus(e.target.value);
-              setCurrentPage(0);
-            }}
+            onChange={(e) => updateUserParams({ status: e.target.value || null }, { resetPage: true })}
             className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
           >
             <option value="">{t('users.filters.all_statuses')}</option>
@@ -392,8 +528,11 @@ export const UserManagementView: React.FC = () => {
             aria-label={t('users.filters.per_page', { count: pageSize })}
             value={pageSize}
             onChange={(e) => {
-              setPageSize(Number(e.target.value));
-              setCurrentPage(0);
+              const nextSize = Number(e.target.value);
+              updateUserParams(
+                { size: nextSize === 10 ? null : String(nextSize) },
+                { resetPage: true }
+              );
             }}
             className="px-3 py-2 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold cursor-pointer"
           >
@@ -415,15 +554,9 @@ export const UserManagementView: React.FC = () => {
           </button>
 
           {/* Reset button */}
-          {(searchQuery || selectedRole || selectedStatus || filterGroup !== 'all') && (
+          {(searchInput || searchQuery || selectedRole || selectedStatus || filterGroup !== 'all') && (
             <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedRole('');
-                setSelectedStatus('');
-                setFilterGroup('all');
-                setCurrentPage(0);
-              }}
+              onClick={resetAllFilters}
               className="px-3 py-2 rounded-xl bg-white/40 dark:bg-white/10 hover:bg-white/60 text-xs font-bold text-text-muted cursor-pointer transition-colors"
             >
               {t('users.filters.clear_filters')}
@@ -432,7 +565,7 @@ export const UserManagementView: React.FC = () => {
 
           {/* Refresh button */}
           <button
-            onClick={fetchUsers}
+            onClick={() => fetchUsers(true)}
             disabled={isLoading}
             className="p-2 rounded-xl bg-white/40 dark:bg-white/10 hover:bg-white/60 border border-antique-gold/30 text-text-body dark:text-warm-ivory cursor-pointer transition-colors"
             title={t('users.filters.refresh')}
@@ -480,20 +613,14 @@ export const UserManagementView: React.FC = () => {
               </p>
             </div>
             {!hasLoadedUsers && (
-              <button type="button" onClick={fetchUsers} className="rounded-xl bg-heritage-green px-4 py-2 text-warm-ivory text-xs font-bold">
+              <button type="button" onClick={() => fetchUsers(true)} className="rounded-xl bg-heritage-green px-4 py-2 text-warm-ivory text-xs font-bold">
                 {t('users.messages.try_again')}
               </button>
             )}
-            {(searchQuery || selectedRole || selectedStatus || filterGroup !== 'all') && (
+            {(searchInput || searchQuery || selectedRole || selectedStatus || filterGroup !== 'all') && (
               <button
                 type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedRole('');
-                  setSelectedStatus('');
-                  setFilterGroup('all');
-                  setCurrentPage(0);
-                }}
+                onClick={resetAllFilters}
                 className="px-4 py-2 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold hover:bg-heritage-dark transition-colors cursor-pointer"
               >
                 {t('users.filters.clear_filters')}
@@ -695,7 +822,10 @@ export const UserManagementView: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+              onClick={() => {
+                const prevPage = Math.max(0, currentPage - 1);
+                updateUserParams({ page: prevPage === 0 ? null : String(prevPage + 1) });
+              }}
               disabled={currentPage <= 0 || isLoading}
               className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-white/60 dark:bg-white/10 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition-colors cursor-pointer"
             >
@@ -704,7 +834,10 @@ export const UserManagementView: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+              onClick={() => {
+                const nextPage = Math.min(totalPages - 1, currentPage + 1);
+                updateUserParams({ page: nextPage === 0 ? null : String(nextPage + 1) });
+              }}
               disabled={currentPage >= totalPages - 1 || isLoading}
               className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-white/60 dark:bg-white/10 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition-colors cursor-pointer"
             >

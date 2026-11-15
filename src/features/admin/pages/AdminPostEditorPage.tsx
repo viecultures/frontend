@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
@@ -83,9 +83,14 @@ const CEFR_LEVELS: CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 export const AdminPostEditorPage: React.FC = () => {
   const { t } = useTranslation('admin');
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { lang, id } = useParams<{ lang?: string; id?: string }>();
   const currentLang = resolveLanguage(lang);
   const isEdit = Boolean(id);
+  const queryJourneyId = searchParams.get('journeyId')?.trim() || '';
+  const queryReturnTo = searchParams.get('returnTo');
+  const rawStateReturnTo = (location.state as { returnTo?: unknown } | null)?.returnTo;
 
   // Loading & Initial post fetch
   const [isLoadingPost, setIsLoadingPost] = useState<boolean>(isEdit);
@@ -101,7 +106,20 @@ export const AdminPostEditorPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Form states
-  const [journeyId, setJourneyId] = useState<string>('');
+  const [journeyId, setJourneyId] = useState<string>(queryJourneyId);
+
+  const isSafeInternalPath = (value: unknown): value is string =>
+    typeof value === 'string' && value.startsWith('/') && !value.startsWith('//');
+
+  const effectiveJourneyId = journeyId.trim() || queryJourneyId;
+  const returnTo = isSafeInternalPath(rawStateReturnTo)
+    ? rawStateReturnTo
+    : isSafeInternalPath(queryReturnTo)
+      ? queryReturnTo
+      : effectiveJourneyId
+        ? getLocalizedPath(`/admin/journeys/${encodeURIComponent(effectiveJourneyId)}`, currentLang)
+        : getLocalizedPath('/admin/content?tab=posts', currentLang);
+  const isReturningToJourney = returnTo.includes('/admin/journeys/');
   const [chapterOrder, setChapterOrder] = useState<number>(1);
   const [provinceId, setProvinceId] = useState<string>('');
   const [journeysList, setJourneysList] = useState<LearningJourneyItem[]>([]);
@@ -297,7 +315,7 @@ export const AdminPostEditorPage: React.FC = () => {
 
   // Return to posts list
   const handleBackToList = () => {
-    navigate(getLocalizedPath('/admin/content?tab=posts', currentLang));
+    navigate(returnTo);
   };
 
   // Auto split bilingual paragraphs
@@ -568,9 +586,12 @@ export const AdminPostEditorPage: React.FC = () => {
         await postAdminService.createPost(payload);
       }
 
+      const { useAdminCacheStore } = await import('../stores/adminCacheStore');
+      useAdminCacheStore.getState().invalidatePosts();
+
       setSuccessToast(isEdit ? 'Đã lưu thay đổi bài đọc thành công.' : 'Đã xuất bản bài đọc mới thành công.');
       setTimeout(() => {
-        navigate(getLocalizedPath('/admin/content?tab=posts', currentLang));
+        navigate(returnTo);
       }, 1000);
     } catch (err: unknown) {
       setErrorMsg((err instanceof Error ? err.message : '') || 'Không thể lưu bài viết.');
@@ -648,10 +669,12 @@ export const AdminPostEditorPage: React.FC = () => {
             type="button"
             onClick={handleBackToList}
             className="p-1.5 rounded-xl hover:bg-white/10 text-warm-ivory transition-colors cursor-pointer flex items-center gap-1.5"
-            title="Quay lại danh sách bài đọc"
+            title={isReturningToJourney ? 'Quay lại chi tiết hành trình' : 'Quay lại danh sách bài đọc'}
           >
             <ArrowLeft aria-hidden="true" className="w-4 h-4 text-antique-gold" />
-            <span className="text-xs font-bold hidden sm:inline">Quản lý bài đọc</span>
+            <span className="text-xs font-bold hidden sm:inline">
+              {isReturningToJourney ? 'Quay lại hành trình' : 'Quản lý bài đọc'}
+            </span>
           </button>
 
           <span className="h-4 w-px bg-white/20 hidden sm:inline" />

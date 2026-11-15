@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import {
@@ -24,6 +24,7 @@ import { vocabAdminService } from '../services/vocabAdminService';
 import { postAdminService } from '../services/postAdminService';
 import { VocabFormModal } from './VocabFormModal';
 import { AdminDialog } from './AdminDialog';
+import { useAdminCacheStore } from '../stores/adminCacheStore';
 
 const CEFR_LEVELS = ['ALL', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
 
@@ -46,17 +47,50 @@ export const VocabManagementView: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  // Filters & Pagination State
+  // Filters & Pagination State (URL-synced)
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialSearch = searchParams.get('search') || '';
-  const initialPostId = searchParams.get('postId') || 'ALL';
+  const {
+    getCachedPosts,
+    setCachedPosts,
+    getCachedVocabs,
+    setCachedVocabs,
+    invalidateVocabs,
+  } = useAdminCacheStore();
 
-  const [searchInput, setSearchInput] = useState<string>(initialSearch);
-  const [debouncedSearch, setDebouncedSearch] = useState<string>(initialSearch);
-  const [selectedLevel, setSelectedLevel] = useState<string>('ALL');
-  const [selectedPostId, setSelectedPostId] = useState<string>(initialPostId);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const urlSearch = searchParams.get('search') || '';
+  const selectedLevel = searchParams.get('level') || 'ALL';
+  const selectedPostId = searchParams.get('postId') || 'ALL';
+  const currentPage = useMemo(() => {
+    const parsed = Number(searchParams.get('page'));
+    return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) - 1 : 0;
+  }, [searchParams]);
   const pageSize = 10;
+
+  const [searchInput, setSearchInput] = useState<string>(urlSearch);
+  useEffect(() => {
+    setSearchInput(urlSearch);
+  }, [urlSearch]);
+
+  const updateVocabParams = useCallback(
+    (
+      updates: Record<string, string | null | undefined>,
+      options?: { replace?: boolean; resetPage?: boolean }
+    ) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          for (const [k, v] of Object.entries(updates)) {
+            if (!v) next.delete(k);
+            else next.set(k, v);
+          }
+          if (options?.resetPage) next.delete('page');
+          return next;
+        },
+        { replace: options?.replace ?? true }
+      );
+    },
+    [setSearchParams]
+  );
 
   // Modal & Action State
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
@@ -68,15 +102,32 @@ export const VocabManagementView: React.FC = () => {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const audioInstanceRef = useRef<HTMLAudioElement | null>(null);
 
-  // Load post options for filter dropdown
+  // Load post options for filter dropdown (reuse admin posts cache)
   useEffect(() => {
     let isCancelled = false;
-    setIsLoadingPosts(true);
+    const defaultPostsKey = JSON.stringify({
+      query: '',
+      level: '',
+      region: '',
+      topic: '',
+      standalone: 'all',
+      journeyId: '',
+    });
+    const cachedPosts = getCachedPosts(defaultPostsKey);
+    if (cachedPosts) {
+      setPostOptions(
+        cachedPosts.map((p) => ({ id: p.id, titleEn: p.titleEn, titleVi: p.titleVi }))
+      );
+      setIsLoadingPosts(false);
+      return;
+    }
 
+    setIsLoadingPosts(true);
     postAdminService
       .getPosts()
       .then((res) => {
         if (!isCancelled && Array.isArray(res)) {
+          setCachedPosts(defaultPostsKey, res);
           setPostOptions(
             res.map((p) => ({
               id: p.id,
@@ -98,33 +149,19 @@ export const VocabManagementView: React.FC = () => {
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, [getCachedPosts, setCachedPosts]);
 
-  // Debounce search input by 350ms
+  // Debounce search input by 350ms -> URL ?search=
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchInput.trim());
-      setCurrentPage(0);
+    const trimmedInput = searchInput.trim();
+    const trimmedUrl = urlSearch.trim();
+    if (trimmedInput === trimmedUrl) return;
+    const handler = window.setTimeout(() => {
+      updateVocabParams({ search: trimmedInput || null }, { replace: true, resetPage: true });
     }, 350);
 
-    return () => clearTimeout(handler);
-  }, [searchInput]);
-
-  // Sync when search query or postId in URL changes
-  useEffect(() => {
-    const querySearch = searchParams.get('search');
-    if (querySearch !== null && querySearch !== searchInput) {
-      setSearchInput(querySearch);
-      setDebouncedSearch(querySearch);
-      setCurrentPage(0);
-    }
-
-    const queryPostId = searchParams.get('postId');
-    if (queryPostId !== null && queryPostId !== selectedPostId) {
-      setSelectedPostId(queryPostId || 'ALL');
-      setCurrentPage(0);
-    }
-  }, [searchParams]);
+    return () => window.clearTimeout(handler);
+  }, [searchInput, urlSearch, updateVocabParams]);
 
   // Cleanup audio instance
   useEffect(() => {
@@ -136,31 +173,65 @@ export const VocabManagementView: React.FC = () => {
     };
   }, []);
 
-  // Fetch vocabulary records
-  const loadVocabularies = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    try {
-      const res = await vocabAdminService.fetchVocabularies({
-        search: debouncedSearch || undefined,
-        level: selectedLevel !== 'ALL' ? selectedLevel : undefined,
-        postId: selectedPostId !== 'ALL' ? selectedPostId : undefined,
+  const vocabCacheKey = useMemo(
+    () =>
+      JSON.stringify({
+        search: urlSearch.trim(),
+        level: selectedLevel,
+        postId: selectedPostId,
         page: currentPage,
         size: pageSize,
-      });
+      }),
+    [urlSearch, selectedLevel, selectedPostId, currentPage]
+  );
 
-      setVocabPage(res);
-    } catch (err: unknown) {
-      console.error('Lỗi khi tải danh sách từ vựng:', err);
-      setErrorMessage(
-        (err instanceof Error ? err.message : '') ||
-          'Không thể kết nối đến máy chủ quản lý từ vựng. Vui lòng kiểm tra đường truyền.'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }, [debouncedSearch, selectedLevel, selectedPostId, currentPage]);
+  // Fetch vocabulary records (cache-first)
+  const loadVocabularies = useCallback(
+    async (force = false) => {
+      if (!force) {
+        const cached = getCachedVocabs(vocabCacheKey);
+        if (cached) {
+          setVocabPage(cached);
+          setIsLoading(false);
+          setErrorMessage(null);
+          return;
+        }
+      }
+
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      try {
+        const res = await vocabAdminService.fetchVocabularies({
+          search: urlSearch.trim() || undefined,
+          level: selectedLevel !== 'ALL' ? selectedLevel : undefined,
+          postId: selectedPostId !== 'ALL' ? selectedPostId : undefined,
+          page: currentPage,
+          size: pageSize,
+        });
+
+        setVocabPage(res);
+        setCachedVocabs(vocabCacheKey, res);
+      } catch (err: unknown) {
+        console.error('Lỗi khi tải danh sách từ vựng:', err);
+        setErrorMessage(
+          (err instanceof Error ? err.message : '') ||
+            'Không thể kết nối đến máy chủ quản lý từ vựng. Vui lòng kiểm tra đường truyền.'
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [
+      vocabCacheKey,
+      getCachedVocabs,
+      setCachedVocabs,
+      urlSearch,
+      selectedLevel,
+      selectedPostId,
+      currentPage,
+    ]
+  );
 
   useEffect(() => {
     loadVocabularies();
@@ -218,7 +289,8 @@ export const VocabManagementView: React.FC = () => {
   const handleSaveSuccess = (saved: AdminVocabItem) => {
     setSuccessToast(`Đã lưu thành công từ vựng: ${saved.word}`);
     setTimeout(() => setSuccessToast(null), 3000);
-    loadVocabularies();
+    invalidateVocabs();
+    loadVocabularies(true);
   };
 
   // Handle Delete Confirmation
@@ -231,7 +303,8 @@ export const VocabManagementView: React.FC = () => {
       setSuccessToast(`Đã xóa từ vựng "${deletingItem.word}" khỏi hệ thống.`);
       setTimeout(() => setSuccessToast(null), 3000);
       setDeletingItem(null);
-      loadVocabularies();
+      invalidateVocabs();
+      loadVocabularies(true);
     } catch (err: unknown) {
       console.error('Lỗi khi xóa từ vựng:', err);
       setErrorMessage(
@@ -296,7 +369,7 @@ export const VocabManagementView: React.FC = () => {
           </div>
           <button
             type="button"
-            onClick={loadVocabularies}
+            onClick={() => loadVocabularies(true)}
             className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors cursor-pointer shrink-0 self-start sm:self-auto"
           >
             Thử lại
@@ -348,15 +421,7 @@ export const VocabManagementView: React.FC = () => {
               value={selectedPostId}
               onChange={(e) => {
                 const val = e.target.value;
-                setSelectedPostId(val);
-                setCurrentPage(0);
-                const nextParams = new URLSearchParams(searchParams);
-                if (val === 'ALL') {
-                  nextParams.delete('postId');
-                } else {
-                  nextParams.set('postId', val);
-                }
-                setSearchParams(nextParams, { replace: true });
+                updateVocabParams({ postId: val === 'ALL' ? null : val }, { resetPage: true });
               }}
               className="w-full px-3 py-2.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 text-xs font-bold text-text-body dark:text-warm-ivory focus:outline-none focus-visible:ring-2 focus-visible:ring-antique-gold cursor-pointer truncate"
             >
@@ -380,8 +445,8 @@ export const VocabManagementView: React.FC = () => {
               id="vocab-filter-level"
               value={selectedLevel}
               onChange={(e) => {
-                setSelectedLevel(e.target.value);
-                setCurrentPage(0);
+                const val = e.target.value;
+                updateVocabParams({ level: val === 'ALL' ? null : val }, { resetPage: true });
               }}
               className="px-3 py-2.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 text-xs font-bold text-text-body dark:text-warm-ivory focus:outline-none focus-visible:ring-2 focus-visible:ring-antique-gold cursor-pointer"
             >
@@ -400,13 +465,10 @@ export const VocabManagementView: React.FC = () => {
               type="button"
               onClick={() => {
                 setSearchInput('');
-                setSelectedLevel('ALL');
-                setSelectedPostId('ALL');
-                setCurrentPage(0);
-                const nextParams = new URLSearchParams(searchParams);
-                nextParams.delete('search');
-                nextParams.delete('postId');
-                setSearchParams(nextParams, { replace: true });
+                updateVocabParams(
+                  { search: null, level: null, postId: null },
+                  { resetPage: true }
+                );
               }}
               className="px-3 py-2.5 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 text-xs font-bold text-text-muted hover:text-text-body transition-colors cursor-pointer"
             >
@@ -417,7 +479,7 @@ export const VocabManagementView: React.FC = () => {
           {/* Refresh Button */}
           <button
             type="button"
-            onClick={loadVocabularies}
+            onClick={() => loadVocabularies(true)}
             disabled={isLoading}
             className="p-2.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 hover:bg-antique-gold/20 text-text-muted hover:text-heritage-green dark:hover:text-antique-bright transition-colors cursor-pointer disabled:opacity-50"
             title="Làm mới danh sách từ vựng"
@@ -498,13 +560,10 @@ export const VocabManagementView: React.FC = () => {
                   type="button"
                   onClick={() => {
                     setSearchInput('');
-                    setSelectedLevel('ALL');
-                    setSelectedPostId('ALL');
-                    setCurrentPage(0);
-                    const nextParams = new URLSearchParams(searchParams);
-                    nextParams.delete('search');
-                    nextParams.delete('postId');
-                    setSearchParams(nextParams, { replace: true });
+                    updateVocabParams(
+                      { search: null, level: null, postId: null },
+                      { resetPage: true }
+                    );
                   }}
                   className="px-5 py-2.5 rounded-xl bg-antique-gold/25 hover:bg-antique-gold/40 text-heritage-green dark:text-antique-bright text-xs font-bold transition-colors cursor-pointer"
                 >
@@ -601,11 +660,10 @@ export const VocabManagementView: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => {
-                                setSelectedPostId(item.postId!);
-                                setCurrentPage(0);
-                                const nextParams = new URLSearchParams(searchParams);
-                                nextParams.set('postId', item.postId!);
-                                setSearchParams(nextParams, { replace: true });
+                                updateVocabParams(
+                                  { postId: item.postId || null },
+                                  { resetPage: true }
+                                );
                               }}
                               className="text-left font-semibold text-xs text-heritage-green dark:text-antique-bright hover:underline line-clamp-2 cursor-pointer transition-colors block"
                               title="Bấm để lọc các từ vựng thuộc bài viết này"
@@ -714,7 +772,10 @@ export const VocabManagementView: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                onClick={() => {
+                  const prevPage = Math.max(0, currentPage - 1);
+                  updateVocabParams({ page: prevPage === 0 ? null : String(prevPage + 1) });
+                }}
                 disabled={currentPage === 0}
                 className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 hover:bg-antique-gold/20 text-text-body dark:text-warm-ivory font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-antique-gold"
                 aria-label="Trang trước"
@@ -729,7 +790,7 @@ export const VocabManagementView: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setCurrentPage((p) => p + 1)}
+                onClick={() => updateVocabParams({ page: String(currentPage + 2) })}
                 disabled={currentPage + 1 >= vocabPage.totalPages}
                 className="px-3 py-1.5 rounded-xl border border-antique-gold/30 bg-warm-ivory/60 dark:bg-white/5 hover:bg-antique-gold/20 text-text-body dark:text-warm-ivory font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-antique-gold"
                 aria-label="Trang sau"

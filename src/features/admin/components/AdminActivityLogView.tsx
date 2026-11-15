@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search,
@@ -21,13 +21,16 @@ import {
   type ActivityLogItemDto,
   type ActivityStatsSummaryDto,
 } from '../services/adminActivityLogService';
+import { useAdminCacheStore } from '../stores/adminCacheStore';
 
 export const AdminActivityLogView: React.FC = () => {
+  const { getCachedTabData, setCachedTabData } = useAdminCacheStore();
   const [logs, setLogs] = useState<ActivityLogItemDto[]>([]);
   const [stats, setStats] = useState<ActivityStatsSummaryDto | null>(null);
   const [selectedLog, setSelectedLog] = useState<ActivityLogItemDto | null>(null);
 
   // Filters & Pagination State
+  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedEventType, setSelectedEventType] = useState<string>('');
@@ -43,44 +46,115 @@ export const AdminActivityLogView: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
 
-  // Fetch Logs
-  const fetchLogs = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      const data = await adminActivityLogService.getLogs({
-        search: searchQuery.trim() || undefined,
-        eventCategory: selectedCategory || undefined,
-        eventType: selectedEventType || undefined,
-        fromDate: fromDate || undefined,
-        toDate: toDate || undefined,
+  // Debounce search input 350ms
+  useEffect(() => {
+    const trimmed = searchInput.trim();
+    if (trimmed === searchQuery) return;
+    const timer = window.setTimeout(() => {
+      setPage(0);
+      setSearchQuery(trimmed);
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [searchInput, searchQuery]);
+
+  const logsCacheKey = useMemo(
+    () =>
+      `activity_logs:${JSON.stringify({
+        search: searchQuery,
+        selectedCategory,
+        selectedEventType,
+        fromDate,
+        toDate,
         page,
-        size: pageSize,
-        sortBy: 'createdAt',
-        direction: 'DESC',
-      });
+        pageSize,
+      })}`,
+    [searchQuery, selectedCategory, selectedEventType, fromDate, toDate, page, pageSize]
+  );
 
-      setLogs(data.content || []);
-      setTotalPages(data.totalPages || 1);
-      setTotalElements(data.totalElements || 0);
-    } catch (err: unknown) {
-      console.error('Lỗi khi tải nhật ký hành vi:', err);
-      const message = err instanceof Error ? err.message : 'Không thể kết nối máy chủ';
-      setErrorMsg(message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchQuery, selectedCategory, selectedEventType, fromDate, toDate, page, pageSize]);
+  // Fetch Logs (cache-first)
+  const fetchLogs = useCallback(
+    async (force = false) => {
+      if (!force) {
+        const cached = getCachedTabData<{
+          content: ActivityLogItemDto[];
+          totalPages: number;
+          totalElements: number;
+        }>(logsCacheKey);
+        if (cached) {
+          setLogs(cached.content);
+          setTotalPages(cached.totalPages);
+          setTotalElements(cached.totalElements);
+          setIsLoading(false);
+          setErrorMsg(null);
+          return;
+        }
+      }
 
-  // Fetch Stats Summary
-  const fetchStats = useCallback(async () => {
-    try {
-      const statsData = await adminActivityLogService.getStatsSummary();
-      setStats(statsData);
-    } catch (err) {
-      console.error('Lỗi khi tải thống kê nhật ký:', err);
-    }
-  }, []);
+      setIsLoading(true);
+      setErrorMsg(null);
+      try {
+        const data = await adminActivityLogService.getLogs({
+          search: searchQuery || undefined,
+          eventCategory: selectedCategory || undefined,
+          eventType: selectedEventType || undefined,
+          fromDate: fromDate || undefined,
+          toDate: toDate || undefined,
+          page,
+          size: pageSize,
+          sortBy: 'createdAt',
+          direction: 'DESC',
+        });
+
+        const content = data.content || [];
+        const tp = data.totalPages || 1;
+        const te = data.totalElements || 0;
+        setLogs(content);
+        setTotalPages(tp);
+        setTotalElements(te);
+        setCachedTabData(logsCacheKey, { content, totalPages: tp, totalElements: te });
+      } catch (err: unknown) {
+        console.error('Lỗi khi tải nhật ký hành vi:', err);
+        const message = err instanceof Error ? err.message : 'Không thể kết nối máy chủ';
+        setErrorMsg(message);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [
+      logsCacheKey,
+      getCachedTabData,
+      setCachedTabData,
+      searchQuery,
+      selectedCategory,
+      selectedEventType,
+      fromDate,
+      toDate,
+      page,
+      pageSize,
+    ]
+  );
+
+  // Fetch Stats Summary (cache-first)
+  const fetchStats = useCallback(
+    async (force = false) => {
+      const statsKey = 'activity_stats_summary';
+      if (!force) {
+        const cached = getCachedTabData<ActivityStatsSummaryDto>(statsKey);
+        if (cached) {
+          setStats(cached);
+          return;
+        }
+      }
+      try {
+        const statsData = await adminActivityLogService.getStatsSummary();
+        setStats(statsData);
+        setCachedTabData(statsKey, statsData);
+      } catch (err) {
+        console.error('Lỗi khi tải thống kê nhật ký:', err);
+      }
+    },
+    [getCachedTabData, setCachedTabData]
+  );
 
   useEffect(() => {
     fetchLogs();
@@ -92,11 +166,17 @@ export const AdminActivityLogView: React.FC = () => {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const trimmed = searchInput.trim();
     setPage(0);
-    fetchLogs();
+    if (trimmed === searchQuery) {
+      fetchLogs(true);
+    } else {
+      setSearchQuery(trimmed);
+    }
   };
 
   const handleClearFilters = () => {
+    setSearchInput('');
     setSearchQuery('');
     setSelectedCategory('');
     setSelectedEventType('');
@@ -327,15 +407,16 @@ export const AdminActivityLogView: React.FC = () => {
             />
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Tìm theo email, URL, IP hoặc nội dung..."
               className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-warm-ivory dark:bg-heritage-dark/80 border border-antique-gold/30 text-xs font-medium text-text-body dark:text-warm-ivory focus:outline-none focus:border-antique-gold focus-visible:ring-2 focus-visible:ring-antique-gold transition-colors duration-150 min-h-[40px]"
             />
-            {searchQuery && (
+            {searchInput && (
               <button
                 type="button"
                 onClick={() => {
+                  setSearchInput('');
                   setSearchQuery('');
                   setPage(0);
                 }}
@@ -430,8 +511,8 @@ export const AdminActivityLogView: React.FC = () => {
             <button
               type="button"
               onClick={() => {
-                fetchLogs();
-                fetchStats();
+                fetchLogs(true);
+                fetchStats(true);
               }}
               disabled={isLoading}
               className="p-2 rounded-xl bg-heritage-green hover:bg-heritage-dark text-warm-ivory cursor-pointer transition-colors duration-150 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-antique-gold focus-visible:outline-none"
@@ -492,8 +573,8 @@ export const AdminActivityLogView: React.FC = () => {
             <button
               type="button"
               onClick={() => {
-                fetchLogs();
-                fetchStats();
+                fetchLogs(true);
+                fetchStats(true);
               }}
               className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold transition-colors duration-150 cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:outline-none"
             >
@@ -578,8 +659,8 @@ export const AdminActivityLogView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            fetchLogs();
-                            fetchStats();
+                            fetchLogs(true);
+                            fetchStats(true);
                           }}
                           className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-heritage-green text-warm-ivory text-xs font-bold hover:bg-heritage-dark transition-colors duration-150 cursor-pointer shadow-xs focus-visible:ring-2 focus-visible:ring-antique-gold focus-visible:outline-none"
                         >
