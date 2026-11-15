@@ -52,6 +52,20 @@ export interface PagedJourneySeriesResponse {
 }
 
 export function mapBackendJourneyToSeries(item: BackendJourneyResponse): JourneySeries {
+  // Deduplicate chapters by chapterOrder so multi-level variants collapse into clean chapters
+  const chapterMap = new Map<number, BackendChapterSummary>();
+  (item.chapters || []).forEach(ch => {
+    const order = ch.chapterOrder != null ? ch.chapterOrder : 1;
+    // Prefer B1 or earlier chapter summary if multiple levels exist for the same chapterOrder
+    if (!chapterMap.has(order) || ch.level === 'B1') {
+      chapterMap.set(order, ch);
+    }
+  });
+
+  const uniqueChapters = Array.from(chapterMap.values()).sort(
+    (a, b) => (a.chapterOrder || 0) - (b.chapterOrder || 0)
+  );
+
   return {
     id: item.id,
     title: item.titleEn,
@@ -64,14 +78,14 @@ export function mapBackendJourneyToSeries(item: BackendJourneyResponse): Journey
     imageUrl: item.imageUrl || '',
     status: item.status || 'published',
     scheduledPublishAt: item.scheduledPublishAt,
-    chapters: (item.chapters || []).map(ch => ({
+    chapters: uniqueChapters.map(ch => ({
       id: ch.id,
       title: ch.titleEn,
       titleVi: ch.titleVi,
       summary: ch.summary || '',
       summaryVi: ch.titleVi || '',
       order: ch.chapterOrder,
-      readTime: ch.readTime || '5 min',
+      readTime: ch.readTime || '3 min read',
       preferredLevel: ch.level === 'A1' || ch.level === 'A2' ? 'Level 1' : ch.level === 'C1' || ch.level === 'C2' ? 'Level 3' : 'Level 2',
     })),
   };
@@ -134,7 +148,24 @@ export const journeyApiService = {
         return null;
       }
 
-      const data: PagedBackendJourneyResponse = await res.json();
+      const rawData = await res.json();
+      if (Array.isArray(rawData)) {
+        const mapped = rawData.map(mapBackendJourneyToSeries);
+        const pageSize = params.size || 6;
+        const totalElements = mapped.length;
+        const totalPages = Math.max(1, Math.ceil(totalElements / pageSize));
+        const startIndex = params.page * pageSize;
+        const items = mapped.slice(startIndex, startIndex + pageSize);
+        return {
+          items,
+          page: params.page,
+          size: pageSize,
+          totalElements,
+          totalPages,
+        };
+      }
+
+      const data: PagedBackendJourneyResponse = rawData;
       if (!data || !Array.isArray(data.items)) {
         return null;
       }

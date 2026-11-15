@@ -93,6 +93,32 @@ export default function ReaderPage() {
     setArticleData(null);
     setArticleError(false);
     const load = async () => {
+      // 1. Try real BE API first
+      const cefrCandidates = selectedLevel === 'Level 1' ? ['A1', 'A2'] : selectedLevel === 'Level 3' ? ['B2', 'C1', 'C2'] : ['B1'];
+      let post: ReadingPostItem | null = await readerApiService.getPostById(targetId);
+      if (!post) {
+        const topicGroup = targetId.replace(/-(?:a1|a2|b1|b2|c1|c2)$/i, '');
+        for (const cefr of cefrCandidates) {
+          post = await readerApiService.getPostByTopicGroupAndLevel(topicGroup, cefr);
+          if (post) break;
+        }
+      }
+      if (!active) return;
+      if (post) {
+        if (readerLevelFor(post.level) !== selectedLevel) {
+          const actualLevel = readerLevelFor(post.level);
+          setSelectedLevel(actualLevel);
+          setSearchParams(previous => { const next = new URLSearchParams(previous); next.set('level', actualLevel); return next; }, { replace: true });
+          return;
+        }
+        const resolved = readerApiService.mapPostToReaderData(post);
+        cacheArticle(resolved, selectedLevel);
+        setArticleData(resolved);
+        setLoadedKey(requestedKey);
+        return;
+      }
+
+      // 2. Fallback to public cuisine or static series
       const publishedCuisine = await getPublicCuisineArticle(targetId, selectedLevel).catch(() => null);
       if (!active) return;
       if (publishedCuisine) {
@@ -108,24 +134,12 @@ export default function ReaderPage() {
         setLoadedKey(requestedKey);
         return;
       }
-      const cefr = selectedLevel === 'Level 1' ? 'A1' : selectedLevel === 'Level 3' ? 'C1' : 'B1';
-      let post = await readerApiService.getPostById(targetId);
-      if (!post) {
-        const topicGroup = targetId.replace(/-(?:a1|a2|b1|b2|c1|c2)$/i, '');
-        post = await readerApiService.getPostByTopicGroupAndLevel(topicGroup, cefr);
-      }
-      if (!active) return;
-      if (post && readerLevelFor(post.level) !== selectedLevel) {
-        const actualLevel = readerLevelFor(post.level);
-        setSelectedLevel(actualLevel);
-        setSearchParams(previous => { const next = new URLSearchParams(previous); next.set('level', actualLevel); return next; }, { replace: true });
-        return;
-      }
-      const article = post ? readerApiService.mapPostToReaderData(post) :
-        readerApiService.getLocalArticle(targetId, selectedLevel) || getCachedArticle(targetId, selectedLevel);
-      if (article) cacheArticle(article, selectedLevel);
-      setArticleData(article);
-      setArticleError(!article);
+
+      // 3. Fallback to local / cached article
+      const fallbackArticle = readerApiService.getLocalArticle(targetId, selectedLevel) || getCachedArticle(targetId, selectedLevel);
+      if (fallbackArticle) cacheArticle(fallbackArticle, selectedLevel);
+      setArticleData(fallbackArticle);
+      setArticleError(!fallbackArticle);
       setLoadedKey(requestedKey);
     };
     void load().catch(() => { if (active) { setArticleError(true); setLoadedKey(requestedKey); } });
@@ -195,6 +209,35 @@ export default function ReaderPage() {
     const request = ++levelRequest.current;
     setLevelError('');
     let nextId = targetId;
+
+    const effectiveTopicGroup = articleData?.topicGroup || targetId.replace(/-(?:a1|a2|b1|b2|c1|c2)$/i, '');
+    if (effectiveTopicGroup) {
+      const candidates = { 'Level 1': ['A1', 'A2'], 'Level 2': ['B1'], 'Level 3': ['B2', 'C1', 'C2'] };
+      let found = false;
+      for (const level of candidates[newLevel]) {
+        const post = await readerApiService.getPostByTopicGroupAndLevel(effectiveTopicGroup, level);
+        if (request !== levelRequest.current) return;
+        if (post) {
+          nextId = post.id;
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        setSelectedLevel(newLevel);
+        setSearchParams(previous => {
+          const next = new URLSearchParams(previous);
+          next.set('level', newLevel);
+          if (nextId !== targetId) {
+            next.delete('story'); next.delete('article'); next.delete('id');
+            next.set('postId', nextId);
+          }
+          return next;
+        }, { replace: true });
+        return;
+      }
+    }
+
     if (!getSeriesArticle(targetId)) {
       const available = await getPublicCuisineArticle(targetId, newLevel).catch(() => null);
       if (request !== levelRequest.current) return;
@@ -206,16 +249,6 @@ export default function ReaderPage() {
     if (articleData?.cefrLevel && /^[ABC][12]$/.test(articleData.cefrLevel) && !articleData.topicGroup && newLevel !== selectedLevel) {
       setLevelError(t('level_error_unavailable', 'This article is not available at the selected level.'));
       return;
-    }
-    if (articleData?.topicGroup) {
-      const candidates = { 'Level 1': ['A1', 'A2'], 'Level 2': ['B1', 'B2'], 'Level 3': ['C1', 'C2'] };
-      let found = false;
-      for (const level of candidates[newLevel]) {
-        const post = await readerApiService.getPostByTopicGroupAndLevel(articleData.topicGroup, level);
-        if (request !== levelRequest.current) return;
-        if (post) { nextId = post.id; found = true; break; }
-      }
-      if (!found) { setLevelError(t('level_error_no_content', 'This article has no content at the selected level.')); return; }
     }
     if (request !== levelRequest.current) return;
     setSelectedLevel(newLevel);

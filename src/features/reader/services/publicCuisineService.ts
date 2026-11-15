@@ -133,15 +133,32 @@ export async function getPublicCuisineArticle(chapterId: string, level: Level): 
   const series = seriesList.find(item => item.chapters.some(chapter => chapter.id === chapterId || chapter.id === normalizedChapterId));
   const chapter = series?.chapters.find(item => item.id === chapterId || item.id === normalizedChapterId);
   const effectiveChapterId = chapter?.id || normalizedChapterId;
-  if (series && !['pho', 'bun-cha', 'cha-ca-la-vong', 'ca-kho-vu-dai'].includes(series.id)) {
-    const cefr = { 'Level 1': 'A1', 'Level 2': 'B1', 'Level 3': 'C1' }[level];
+
+  // 1. Try fetching live from Backend API first
+  const cefrCandidates = {
+    'Level 1': ['A1', 'A2'],
+    'Level 2': ['B1'],
+    'Level 3': ['B2', 'C1', 'C2'],
+  }[level] || ['B1'];
+
+  for (const cefr of cefrCandidates) {
     const post = await readerApiService.getPostByTopicGroupAndLevel(effectiveChapterId, cefr);
     if (post) {
       const article = readerApiService.mapPostToReaderData(post);
       const questions = CUISINE_QUESTIONS[effectiveChapterId] || article.questions || [];
-      return { ...article, id: effectiveChapterId, topicGroup: undefined, cefrLevel: undefined, questions };
+      return { ...article, id: effectiveChapterId, questions };
     }
   }
+
+  // Also try direct lookup by chapterId
+  const directPost = await readerApiService.getPostById(chapterId);
+  if (directPost) {
+    const article = readerApiService.mapPostToReaderData(directPost);
+    const questions = CUISINE_QUESTIONS[effectiveChapterId] || article.questions || [];
+    return { ...article, id: effectiveChapterId, questions };
+  }
+
+  // 2. Fallback to bundled JSON variant
   const variant = chapter?.variants[level];
   if (!series || !chapter || !variant) return null;
   const paragraphs = variant.paragraphs.map((pair, index) => ({
