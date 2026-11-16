@@ -587,7 +587,9 @@ export const AdminPostEditorPage: React.FC = () => {
       }
 
       const { useAdminCacheStore } = await import('../stores/adminCacheStore');
-      useAdminCacheStore.getState().invalidatePosts();
+      const cacheStore = useAdminCacheStore.getState();
+      cacheStore.invalidatePosts();
+      cacheStore.invalidateTabData('utm:post_options');
 
       setSuccessToast(isEdit ? 'Đã lưu thay đổi bài đọc thành công.' : 'Đã xuất bản bài đọc mới thành công.');
       setTimeout(() => {

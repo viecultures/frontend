@@ -215,6 +215,7 @@ export const AdminPage: React.FC = () => {
     setCachedPosts,
     removePostFromCache,
     invalidatePosts,
+    invalidateTabData,
     getCachedOverview,
     setCachedOverview,
     totalUsersCount,
@@ -517,6 +518,7 @@ export const AdminPage: React.FC = () => {
       await postAdminService.deletePost(deletingId);
       setPosts((prev) => prev.filter((p) => p.id !== deletingId));
       removePostFromCache(deletingId);
+      invalidateTabData('utm:post_options');
       setSuccessToast(t('messages.post_deleted'));
       setTimeout(() => setSuccessToast(null), 3000);
     } catch (err: unknown) {
@@ -529,6 +531,7 @@ export const AdminPage: React.FC = () => {
   // Callback on post saved
   const handlePostSaved = () => {
     invalidatePosts();
+    invalidateTabData('utm:post_options');
     fetchPosts(true);
     setSuccessToast(t('messages.post_saved'));
     setTimeout(() => setSuccessToast(null), 3000);

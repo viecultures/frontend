@@ -190,7 +190,7 @@ export const UserManagementView: React.FC = () => {
         console.error('Lỗi tải người dùng:', err);
         setErrorMsg(
           isLocalAuthMode && !getStoredToken()
-            ? t('users.messages.unavailable_desc')
+            ? 'Đang ở chế độ Auth cục bộ. Cần đăng nhập để tải danh sách người dùng.'
             : t('users.messages.unavailable_desc')
         );
       } finally {
@@ -279,7 +279,15 @@ export const UserManagementView: React.FC = () => {
       console.warn('Lỗi xuất CSV qua API, kiểm tra fallback client-side:', err);
       if (users.length > 0) {
         try {
-          // Client-side fallback with UTF-8 BOM
+          // Client-side fallback with UTF-8 BOM and Formula Injection prevention
+          const sanitizeCsvCell = (val: string): string => {
+            const clean = val.replace(/"/g, '""');
+            if (/^[=+\-@\t\r]/.test(clean)) {
+              return `'${clean}`;
+            }
+            return clean;
+          };
+
           let csv = '\uFEFFID,Họ và tên,Email,Vai trò,Trình độ CEFR,Gói hội viên,Phương thức đăng nhập,Ngày tạo,Trạng thái\r\n';
           users.forEach((u) => {
             const role = u.role?.toUpperCase().includes('ADMIN') ? 'Quản trị viên' : 'Học viên';
@@ -287,15 +295,15 @@ export const UserManagementView: React.FC = () => {
             const plan = u.planName || (u.role?.toUpperCase().includes('ADMIN') ? 'Hội Viên Pro (Admin)' : 'Gói Cơ Bản (Miễn Phí)');
             const status = u.enabled ? 'Đang hoạt động' : 'Đã khóa';
             const row = [
-              `"${u.id}"`,
-              `"${(u.name || '').replace(/"/g, '""')}"`,
-              `"${u.email}"`,
-              `"${role}"`,
-              `"${cefr}"`,
-              `"${plan}"`,
-              `"${u.authProvider || 'LOCAL'}"`,
-              `"${u.createdAt || ''}"`,
-              `"${status}"`,
+              `"${sanitizeCsvCell(u.id)}"`,
+              `"${sanitizeCsvCell(u.name || '')}"`,
+              `"${sanitizeCsvCell(u.email)}"`,
+              `"${sanitizeCsvCell(role)}"`,
+              `"${sanitizeCsvCell(cefr)}"`,
+              `"${sanitizeCsvCell(plan)}"`,
+              `"${sanitizeCsvCell(u.authProvider || 'LOCAL')}"`,
+              `"${sanitizeCsvCell(u.createdAt || '')}"`,
+              `"${sanitizeCsvCell(status)}"`,
             ].join(',');
             csv += row + '\r\n';
           });

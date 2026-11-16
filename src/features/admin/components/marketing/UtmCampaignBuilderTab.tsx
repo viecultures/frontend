@@ -119,6 +119,14 @@ export const UtmCampaignBuilderTab: React.FC = () => {
           ? Promise.resolve(cachedPosts)
           : postAdminService
               .getPostOptions()
+              .catch(async () => {
+                const fullPosts = await postAdminService.getPosts();
+                return fullPosts.map((p) => ({
+                  id: p.id,
+                  titleVi: p.titleVi,
+                  titleEn: p.titleEn,
+                }));
+              })
               .then((res) => {
                 setCachedTabData('utm:post_options', res);
                 return res;
@@ -128,6 +136,14 @@ export const UtmCampaignBuilderTab: React.FC = () => {
           ? Promise.resolve(cachedJourneys)
           : journeyAdminService
               .getJourneyOptions()
+              .catch(async () => {
+                const fullJourneys = await journeyAdminService.getJourneys();
+                return fullJourneys.map((j) => ({
+                  id: j.id,
+                  titleVi: j.titleVi,
+                  titleEn: j.titleEn,
+                }));
+              })
               .then((res) => {
                 setCachedTabData('utm:journey_options', res);
                 return res;

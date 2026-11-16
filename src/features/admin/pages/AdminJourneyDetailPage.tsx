@@ -163,7 +163,10 @@ export const AdminJourneyDetailPage: React.FC = () => {
     setIsDeleting(true);
     try {
       await journeyAdminService.deleteJourney(journey.id);
-      useAdminCacheStore.getState().invalidateJourneys();
+      const cacheStore = useAdminCacheStore.getState();
+      cacheStore.invalidateJourneys();
+      cacheStore.invalidateTabData('journeys_paged:');
+      cacheStore.invalidateTabData('utm:journey_options');
       setIsDeleteConfirmOpen(false);
       navigate(returnTo);
     } catch (err: unknown) {
@@ -653,6 +656,10 @@ export const AdminJourneyDetailPage: React.FC = () => {
         onClose={() => setIsEditModalOpen(false)}
         onSuccess={(updated) => {
           setJourney(updated);
+          const cacheStore = useAdminCacheStore.getState();
+          cacheStore.invalidateJourneys();
+          cacheStore.invalidateTabData('journeys_paged:');
+          cacheStore.invalidateTabData('utm:journey_options');
           setIsEditModalOpen(false);
           setSuccessToast(`Đã cập nhật hành trình: ${updated.titleEn}`);
           setTimeout(() => setSuccessToast(null), 3000);

@@ -15,6 +15,15 @@ const getPostAuthHeaders = (): Record<string, string> => {
   return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
 };
 
+const getOptionalAuthHeaders = (): Record<string, string> => {
+  const token = getStoredToken();
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+};
+
 export interface PostFilterParams {
   topic?: string;
   region?: string;
@@ -30,7 +39,9 @@ export const postAdminService = {
   // ─── 1. API Calls ─────────────────────────────────────────────────────────
 
   async getPostOptions(): Promise<EntityOption[]> {
-    const res = await fetch(`${API_BASE_URL}/api/posts/options`);
+    const res = await fetch(`${API_BASE_URL}/api/posts/options`, {
+      headers: getOptionalAuthHeaders(),
+    });
     if (!res.ok) {
       throw new Error(`Không thể tải danh sách tùy chọn bài viết (HTTP ${res.status})`);
     }
