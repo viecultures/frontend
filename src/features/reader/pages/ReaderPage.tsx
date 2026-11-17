@@ -7,6 +7,8 @@ import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import {
   AudioShadowingBar,
   BilingualReaderView,
+  EnglishReaderView,
+  JourneyPanel,
   ReaderPracticeView,
   ReaderToolbar,
   ReaderVocabDrawer,
@@ -37,6 +39,7 @@ import { MocSonSealModal } from '@/features/gamification';
 import { ReaderReflectionsSection } from '@/features/community/components/ReaderReflectionsSection';
 import { LessonStepper, type LessonStep } from '../components/LessonStepper';
 import { buildPracticeSegments } from '../lib/readerPractice';
+import { getReaderJourneyViewModel } from '../lib/readerJourneyViewModel';
 import { loadReaderSession, saveReaderSession, type ReaderSessionState } from '../services/readerSessionStorage';
 
 export default function ReaderPage() {
@@ -71,6 +74,8 @@ export default function ReaderPage() {
   // Keep old extensive-reader links working while exposing Practice as the workspace.
   const modeParam = searchParams.get('mode');
   const readingMode: 'bilingual' | 'practice' = modeParam === 'practice' || modeParam === 'extensive' ? 'practice' : 'bilingual';
+  // Internal fallback for comparing the former dual-pane reader without changing old mode URLs.
+  const ReadingView = searchParams.get('readerView') === 'bilingual' ? BilingualReaderView : EnglishReaderView;
   const practiceMode = practiceModeFrom(searchParams.get('practice'));
 
   // Initial level reads from URL query ?level=Level 1/2/3
@@ -105,8 +110,8 @@ export default function ReaderPage() {
     if (step === 'read') handleModeChange('bilingual');
     else handleStartPractice(step);
   };
-  const activeLessonStep: LessonStep = readingMode === 'bilingual' || practiceMode === 'questions'
-    ? 'read' : practiceMode;
+  const activeLessonStep: LessonStep | null = readingMode === 'bilingual' ? 'read'
+    : practiceMode === 'questions' ? null : practiceMode;
   const [loadedKey, setLoadedKey] = useState('');
   const [articleError, setArticleError] = useState(false);
   const [levelError, setLevelError] = useState('');
@@ -207,7 +212,11 @@ export default function ReaderPage() {
   const handleModeChange = (newMode: 'bilingual' | 'practice') => {
     setSearchParams(previous => {
       const next = new URLSearchParams(previous);
-      if (newMode === 'practice') next.set('mode', 'practice');
+      if (newMode === 'practice') {
+        next.set('mode', 'practice');
+        next.set('practice', articleData?.vocabularies.length ? 'vocab'
+          : articleData?.paragraphs.some(item => item.enText.trim()) ? 'dictation' : 'summary');
+      }
       else { next.delete('mode'); next.delete('practice'); }
       return next;
     });
@@ -472,6 +481,8 @@ export default function ReaderPage() {
   if (loadedKey !== requestedKey) return <main className="p-12" role="status">{t('loading_article', 'Loading article…')}</main>;
   if (articleError) return <main className="p-12" role="alert"><h1>{t('error_title', 'Could not load this article')}</h1><p>{t('error_desc', 'Check your connection or choose another article.')}</p><button onClick={() => setReloadAttempt(value => value + 1)}>{t('try_again', 'Try again')}</button> <Link to={PATHS.discovery}>{t('browse_articles', 'Browse articles')}</Link></main>;
 
+  const journeyVM = getReaderJourneyViewModel(articleData, session);
+
   return (
     <SavedVocabularyContext.Provider value={savedVocabulary}>
     <main className="reader-component-theme reader-desk min-h-screen relative selection:bg-sky-mist selection:text-heritage-green" data-desk-theme={themeMode}>
@@ -506,26 +517,24 @@ export default function ReaderPage() {
         isPro={isPro}
       />
 
-      {articleData && (() => {
-        const segments = buildPracticeSegments(articleData);
-        const hasAudioPractice = Boolean(articleData.shadowingAudioUrl && segments.length);
-        const records = session.dictation.passageRecords;
-        const dictationDone = segments.length > 0 && segments.every((_, index) =>
-          ['completed-self', 'completed-hinted', 'answer-revealed'].includes(records[index]?.status));
-        const vocabIds = new Set(articleData.vocabularies.map(item => item.id));
-        return <LessonStepper
+      {readingMode === 'practice' && articleData && <LessonStepper
           active={activeLessonStep}
           completed={{
-            read: session.readCompleted,
-            vocab: articleData.vocabularies.length > 0 && articleData.vocabularies.every(item => session.vocab.reviewedIds.includes(item.id)),
-            dictation: dictationDone,
-            shadowing: segments.length > 0 && segments.every(item => Boolean(session.shadowing.selfEvaluations[item.id])),
+            read: journeyVM.activities.read.completed,
+            vocab: journeyVM.activities.vocab.completed,
+            dictation: journeyVM.activities.dictation.completed,
+            shadowing: journeyVM.activities.shadowing.completed,
+            summary: journeyVM.activities.summary.completed,
+          }}
+          unavailable={{
+            read: !journeyVM.activities.read.available,
+            vocab: !journeyVM.activities.vocab.available,
+            dictation: !journeyVM.activities.dictation.available,
+            shadowing: !journeyVM.activities.shadowing.available,
             summary: false,
           }}
-          unavailable={{ vocab: vocabIds.size === 0, dictation: !hasAudioPractice, shadowing: !hasAudioPractice }}
           onSelect={selectLessonStep}
-        />;
-      })()}
+        />}
 
       {levelError && <p role="alert" className="px-8 py-3">{levelError}</p>}
       {sessionStorageError && <p role="alert" className="px-8 py-3">Không lưu được tiến độ học trong trình duyệt. Hãy kiểm tra quyền hoặc dung lượng lưu trữ.</p>}
@@ -535,14 +544,14 @@ export default function ReaderPage() {
       <section
         className="reader-desk-canvas"
       >
-        <div className="reader-desk-content">
+        <div className={`reader-desk-content ${readingMode === 'bilingual' && ReadingView === EnglishReaderView ? 'reader-desk-content--english' : ''}`}>
           <aside className="reader-margin-note reader-margin-note-left" aria-hidden="true">Rooted<br />in<br />heritage</aside>
           <aside className="reader-margin-note reader-margin-note-right" aria-hidden="true">Vietnamese<br />culture<br />a brighter<br />tomorrow</aside>
 
           {/* Always-visible listening and pronunciation controls. */}
           {readingMode === 'bilingual' && <section id="reader-audio" className="reader-audio-section" aria-labelledby="reader-audio-title">
           <h2 id="reader-audio-title" className="mb-3 font-sans text-lg font-semibold text-ink">{t('listen_section_title', 'Listen & practice pronunciation')}</h2>
-          {articleData && !articleData.shadowingAudioUrl ? <p role="status">{t('audio_unavailable', 'Audio is not available for this article yet. You can continue reading and reviewing vocabulary.')}</p> : <AudioShadowingBar
+          {articleData && !articleData.shadowingAudioUrl ? <p role="status" className="reader-audio-notice">{t('journey.audio_fallback')}</p> : <AudioShadowingBar
             articleTitle={articleData?.titleEn}
             onStartShadowing={() => handleStartPractice('shadowing')}
             isPlaying={isPlaying}
@@ -568,9 +577,19 @@ export default function ReaderPage() {
           />}
           </section>}
 
+          {/* Learning Journey Panel integrated into English Reader layout */}
+          {readingMode === 'bilingual' && ReadingView === EnglishReaderView && articleData && (
+            <JourneyPanel
+              journey={journeyVM}
+              activeStep="read"
+              onSelectStep={selectLessonStep}
+              themeMode={themeMode}
+            />
+          )}
+
           {/* Reading and Practice retain the same article and level. */}
           {readingMode === "bilingual" ? (
-            <BilingualReaderView
+            <ReadingView
               themeMode={themeMode}
               fontSize={fontSize}
               vocabBtnClass={vocabBtnClass}
@@ -588,9 +607,14 @@ export default function ReaderPage() {
               onStartPractice={handleStartPractice}
               onOpenSealModal={() => setIsSealModalOpen(true)}
               readCompleted={session.readCompleted}
+              practiceProgress={{
+                vocabReviewed: journeyVM.activities.vocab.current,
+                dictationFinished: journeyVM.activities.dictation.current,
+                shadowingAssessed: journeyVM.activities.shadowing.current,
+                totalSegments: journeyVM.activities.dictation.total,
+              }}
               onCompleteReading={() => {
                 updateSession(current => ({ ...current, readCompleted: true }));
-                selectLessonStep((articleData?.vocabularies.length ?? 0) > 0 ? 'vocab' : articleData?.shadowingAudioUrl ? 'dictation' : 'summary');
               }}
             />
           ) : (

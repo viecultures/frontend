@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import {
   BookOpen,
   Check,
   ChevronLeft,
   ChevronRight,
   Headphones,
+  Layers,
   Pause,
   Play,
   RotateCcw,
@@ -32,6 +34,8 @@ import {
 import '@/features/playground/components/shadowing/dictation-reveal.css';
 import './reader-practice.css';
 import { ReaderQuickFlashcards } from '../ReaderQuickFlashcards';
+import { VocabularyExplorer } from '../VocabularyExplorer';
+import { getVocabImageUrl } from '../../data/vocabImageManifest';
 import { ReaderSessionSummary } from './ReaderSessionSummary';
 import type { ReaderSessionState, ShadowingEvaluation } from '../../services/readerSessionStorage';
 
@@ -65,14 +69,6 @@ export function ReaderPracticeView({
   onDictationChange,
 }: ReaderPracticeViewProps) {
   const { t } = useTranslation('reader');
-  const modes: { id: PracticeMode; label: string }[] = useMemo(() => [
-    { id: 'questions', label: t('practice_view.modes.questions', 'Questions') },
-    { id: 'vocab', label: 'Ôn từ' },
-    { id: 'dictation', label: t('practice_view.modes.dictation', 'Dictation') },
-    { id: 'shadowing', label: t('practice_view.modes.shadowing', 'Shadowing') },
-    { id: 'summary', label: 'Tổng hợp' },
-  ], [t]);
-
   const segments = useMemo(() => buildPracticeSegments(articleData), [articleData]);
   const articleLevel = selectedLevel;
 
@@ -97,12 +93,33 @@ export function ReaderPracticeView({
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, QuestionAnswer>>({});
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const vocabTab = (searchParams.get('vocabView') || searchParams.get('view')) === 'review' ? 'review' : 'explore';
+
+  const handleSelectVocabTab = useCallback(
+    (tab: 'explore' | 'review', replace: boolean = false) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (tab === 'review') {
+            next.set('view', 'review');
+          } else {
+            next.delete('view');
+            next.delete('vocabView');
+          }
+          return next;
+        },
+        { replace }
+      );
+    },
+    [setSearchParams]
+  );
+
   const sample = usePracticeAudio(articleData.shadowingAudioUrl, mode === 'dictation' || mode === 'shadowing');
   const recorder = usePracticeRecorder(mode === 'shadowing');
   const { popupState, closeDictionary, handleTextSelection, handleVocabClick } = useReaderDictionary(articleData.vocabMap);
 
   const segment = segments[segmentIndex];
-  const tabs = useRef<HTMLDivElement>(null);
   const fullPlayer = useRef<HTMLAudioElement>(null);
 
   // Stop audio on mode/segment change
@@ -152,24 +169,6 @@ export function ReaderPracticeView({
       setShowSummary(true);
     }
   }, [segmentIndex, segments.length]);
-
-  function handleTabKey(event: React.KeyboardEvent<HTMLDivElement>) {
-    const index = modes.findIndex((item) => item.id === mode);
-    const next =
-      event.key === 'ArrowRight'
-        ? (index + 1) % modes.length
-        : event.key === 'ArrowLeft'
-        ? (index + modes.length - 1) % modes.length
-        : event.key === 'Home'
-        ? 0
-        : event.key === 'End'
-        ? modes.length - 1
-        : -1;
-    if (next < 0) return;
-    event.preventDefault();
-    onChangeMode(modes[next].id);
-    tabs.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
-  }
 
   // Calculate statistics across all passages
   const stats = useMemo(() => {
@@ -230,7 +229,7 @@ export function ReaderPracticeView({
   };
 
   if (mode === 'vocab') {
-    const cards = articleData.vocabularies.map(item => ({
+    const cards = articleData.vocabularies.map((item) => ({
       id: item.id,
       word: item.word,
       pos: item.pos,
@@ -238,28 +237,127 @@ export function ReaderPracticeView({
       viMeaning: item.viMeaning,
       contextSentence: item.contextSentence,
       culturalFact: item.enDefinition || item.contextSentence,
+      imageUrl: getVocabImageUrl(item.id, item.word),
     }));
-    return <div className="rp-workspace" data-practice-theme={themeMode}>
-      <button type="button" className="rp-back-link" onClick={onBackToReading}><ArrowLeft size={16} /> Quay lại bài đọc</button>
-      <ReaderQuickFlashcards
-        key={`${articleData.id}_${articleLevel}`}
-        themeMode={themeMode}
-        cards={cards}
-        deckId={articleData.id}
-        selectedLevel={articleLevel}
-        initialRememberedIds={session.vocab.rememberedIds}
-        initialReviewLaterIds={session.vocab.reviewLaterIds}
-        onProgress={(rememberedIds, reviewLaterIds) => onSessionChange(current => ({
-          ...current,
-          vocab: { rememberedIds, reviewLaterIds, reviewedIds: [...new Set([...rememberedIds, ...reviewLaterIds])] },
-        }))}
-        continueLabel={articleData.shadowingAudioUrl && segments.length ? 'Tiếp tục: Nghe chép chính tả' : 'Xem tổng hợp phiên học'}
-        onContinue={() => onChangeMode(articleData.shadowingAudioUrl && segments.length ? 'dictation' : 'summary')}
-      />
-    </div>;
+
+    if (vocabTab === 'explore') {
+      return (
+        <div className="rp-workspace" data-practice-theme={themeMode}>
+          <VocabularyExplorer
+            vocabularies={articleData.vocabularies}
+            themeMode={themeMode}
+            session={session}
+            articleTitle={articleData.titleVi || articleData.titleEn}
+            onStartReview={() => handleSelectVocabTab('review')}
+            onBackToReading={onBackToReading}
+            activeTab="explore"
+            onSelectTab={handleSelectVocabTab}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="rp-workspace" data-practice-theme={themeMode}>
+        <div className="space-y-4 mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <button
+              type="button"
+              className="rp-back-link inline-flex items-center gap-2 text-xs font-semibold text-heritage-green dark:text-antique-gold hover:underline cursor-pointer"
+              onClick={onBackToReading}
+            >
+              <ArrowLeft size={16} />
+              <span>{t('vocab_explorer.back_to_reading', 'Quay lại bài đọc')}</span>
+            </button>
+          </div>
+
+          {/* Sub-navigation Tabs */}
+          <div className="flex items-center justify-between gap-3 flex-wrap border-b border-antique-gold/25 pb-3">
+            <div
+              className="inline-flex rounded-xl p-1 bg-stone-200/60 dark:bg-stone-800/60 border border-antique-gold/20"
+              role="tablist"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={false}
+                onClick={() => handleSelectVocabTab('explore')}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold text-stone-600 dark:text-stone-300 hover:text-heritage-green dark:hover:text-antique-gold transition-all cursor-pointer"
+              >
+                <BookOpen size={15} />
+                <span>
+                  {t('vocab_explorer.tab_explore', {
+                    count: articleData.vocabularies.length,
+                    defaultValue: `Khám phá từ vựng (${articleData.vocabularies.length})`,
+                  })}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                aria-selected={true}
+                onClick={() => handleSelectVocabTab('review')}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold bg-heritage-green text-warm-ivory shadow-xs transition-all cursor-pointer"
+              >
+                <Layers size={15} />
+                <span>
+                  {t('vocab_explorer.tab_review', {
+                    reviewed: session.vocab?.reviewedIds?.length ?? 0,
+                    total: articleData.vocabularies.length,
+                    defaultValue: `Ôn tập Flashcards (${session.vocab?.reviewedIds?.length ?? 0}/${articleData.vocabularies.length})`,
+                  })}
+                </span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => handleSelectVocabTab('explore')}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-heritage-green dark:text-antique-gold hover:underline cursor-pointer"
+            >
+              <ArrowLeft size={14} />
+              <span>{t('vocab_explorer.back_to_explore', 'Xem danh sách từ vựng')}</span>
+            </button>
+          </div>
+        </div>
+
+        <ReaderQuickFlashcards
+          key={`${articleData.id}_${articleLevel}`}
+          themeMode={themeMode}
+          cards={cards}
+          deckId={articleData.id}
+          selectedLevel={articleLevel}
+          initialRememberedIds={session.vocab.rememberedIds}
+          initialReviewLaterIds={session.vocab.reviewLaterIds}
+          onProgress={(rememberedIds, reviewLaterIds) =>
+            onSessionChange((current) => ({
+              ...current,
+              vocab: {
+                rememberedIds,
+                reviewLaterIds,
+                reviewedIds: [...new Set([...rememberedIds, ...reviewLaterIds])],
+              },
+            }))
+          }
+          continueLabel={segments.length ? t('journey.suggest_dictation') : t('journey.results_activity')}
+          onContinue={() => onChangeMode(segments.length ? 'dictation' : 'summary')}
+        />
+      </div>
+    );
   }
 
-  if (mode === 'summary') return <ReaderSessionSummary article={articleData} level={articleLevel} session={session} />;
+  if (mode === 'summary') {
+    return (
+      <ReaderSessionSummary
+        article={articleData}
+        level={articleLevel}
+        session={session}
+        onBackToReading={onBackToReading}
+        onSelectPractice={onChangeMode}
+      />
+    );
+  }
 
   const evaluateShadowing = (value: ShadowingEvaluation) => {
     if (!segment || !recorder.takes[segment.id]) return;
@@ -292,36 +390,6 @@ export function ReaderPracticeView({
         <h1 className="rp-compact-story-title">{articleData.titleEn}</h1>
 
         <span className="rp-compact-level-pill">{articleLevel}</span>
-      </div>
-
-      {/* 2. Ba Tab Chức Năng Nằm Ngang */}
-      <div className="rp-mode-tabs-container">
-        <div
-          ref={tabs}
-          className="rp-mode-tabs"
-          role="tablist"
-          aria-label={t('practice_view.tabs_aria', 'Practice modes')}
-          onKeyDown={handleTabKey}
-        >
-          {modes.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              id={`practice-tab-${item.id}`}
-              aria-controls={`practice-panel-${mode}`}
-              aria-selected={mode === item.id}
-              tabIndex={mode === item.id ? 0 : -1}
-              className="rp-mode-tab"
-              onClick={() => {
-                setShowSummary(false);
-                onChangeMode(item.id);
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* 3. MODE: DICTATION */}
@@ -366,7 +434,7 @@ export function ReaderPracticeView({
 
             <div className="vc-dictation-summary-actions">
               <button type="button" className="vc-dictation-btn-next" onClick={() => onChangeMode('shadowing')}>
-                <span>Tiếp tục: Luyện nói đuổi</span><ChevronRight size={16} />
+                <span>{t('journey.suggest_shadowing')}</span><ChevronRight size={16} />
               </button>
               <button
                 type="button"
@@ -397,9 +465,9 @@ export function ReaderPracticeView({
           /* Bố cục 2 cột chính */
           <div
             className="vc-dictation-workspace"
-            role="tabpanel"
+            role="region"
             id="practice-panel-dictation"
-            aria-labelledby="practice-tab-dictation"
+            aria-label={t('journey.dictation_activity')}
           >
             <div className="vc-dictation-columns">
               {/* Cột Trái: Bảng Luyện Gọn Gàng (Audio + Grid + Progress + Actions trong cùng 1 viewport) */}
@@ -552,9 +620,9 @@ export function ReaderPracticeView({
         /* MODE: QUESTIONS & SHADOWING */
         <div
           className="rp-grid"
-          role="tabpanel"
+          role="region"
           id={`practice-panel-${mode}`}
-          aria-labelledby={`practice-tab-${mode}`}
+          aria-label={mode === 'questions' ? t('practice_view.modes.questions', 'Questions') : t('journey.shadowing_activity')}
         >
           <div className="rp-source">
             {mode === 'questions' ? (

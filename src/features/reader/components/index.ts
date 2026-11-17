@@ -1,5 +1,6 @@
 export { AudioShadowingBar } from "./audio-shadowing-bar";
 export { BilingualReaderView } from "./bilingual-reader-view";
+export { EnglishReaderView } from "./EnglishReaderView";
 export { ExtensiveReaderView } from "./extensive-reader-view";
 export { ReaderPracticeView } from './practice/ReaderPracticeView';
 export { ReaderToolbar } from "./ReaderToolbar";
@@ -12,3 +13,5 @@ export { ReaderDictationSection } from "./ReaderDictationSection";
 export { ReaderQuickFlashcards } from "./ReaderQuickFlashcards";
 export { LessonCompletionFlowModal } from "./LessonCompletionFlowModal";
 export { ReaderSeriesNavigation } from "./ReaderSeriesNavigation";
+export { JourneyPanel } from "./JourneyPanel";
+export { VocabularyExplorer } from "./VocabularyExplorer";

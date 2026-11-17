@@ -1,26 +1,30 @@
 import { BookOpen, CheckCircle2, ClipboardList, Headphones, Layers, Mic } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export type LessonStep = 'read' | 'vocab' | 'dictation' | 'shadowing' | 'summary';
 
 interface LessonStepperProps {
-  active: LessonStep;
+  active: LessonStep | null;
   completed: Partial<Record<LessonStep, boolean>>;
   unavailable: Partial<Record<LessonStep, boolean>>;
   onSelect: (step: LessonStep) => void;
 }
 
 const steps = [
-  { id: 'read', label: 'Đọc', icon: BookOpen },
-  { id: 'vocab', label: 'Ôn từ', icon: Layers },
-  { id: 'dictation', label: 'Nghe chép', icon: Headphones },
-  { id: 'shadowing', label: 'Luyện nói', icon: Mic },
-  { id: 'summary', label: 'Tổng hợp', icon: ClipboardList },
+  { id: 'read', labelKey: 'read', icon: BookOpen },
+  { id: 'vocab', labelKey: 'vocab', icon: Layers },
+  { id: 'dictation', labelKey: 'dictation', icon: Headphones },
+  { id: 'shadowing', labelKey: 'shadowing', icon: Mic },
+  { id: 'summary', labelKey: 'results', icon: ClipboardList },
 ] as const;
 
 export function LessonStepper({ active, completed, unavailable, onSelect }: LessonStepperProps) {
+  const { t } = useTranslation('reader');
   return (
-    <nav className="lesson-stepper" aria-label="Các chặng học của bài">
-      {steps.map(({ id, label, icon: Icon }, index) => {
+    <nav className="lesson-stepper" aria-label={t('journey.activity_nav')}>
+      <span className="lesson-stepper-label">{t('journey.activity_nav')}</span>
+      {steps.map(({ id, labelKey, icon: Icon }) => {
+        const label = t(`journey.${labelKey}`);
         const disabled = unavailable[id] === true;
         const current = active === id;
         const done = completed[id] === true;
@@ -28,14 +32,14 @@ export function LessonStepper({ active, completed, unavailable, onSelect }: Less
           <button
             key={id}
             type="button"
-            className={`lesson-stepper-item${current ? ' is-active' : ''}${done ? ' is-complete' : ''}`}
-            aria-current={current ? 'step' : undefined}
+            className={`lesson-stepper-item${current ? ' is-active' : ''}${done ? ' is-complete' : ''}${id === 'summary' ? ' is-summary' : ''}`}
+            aria-current={current ? 'page' : undefined}
             disabled={disabled}
-            title={disabled ? `${label}: bài này chưa có dữ liệu để luyện` : undefined}
+            title={disabled ? t('journey.unavailable', { activity: label }) : undefined}
             onClick={() => onSelect(id)}
           >
             {done ? <CheckCircle2 size={18} aria-hidden="true" /> : <Icon size={18} aria-hidden="true" />}
-            <span>{index + 1}. {label}</span>
+            <span>{label}</span>
           </button>
         );
       })}

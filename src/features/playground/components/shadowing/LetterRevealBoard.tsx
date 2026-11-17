@@ -266,36 +266,44 @@ export const LetterRevealBoard: React.FC<LetterRevealBoardProps> = ({
       {/* Tier 1: Sentence Preview with revealed words and dashed blanks */}
       <div className="vc-dictation-sentence-preview" aria-live="polite">
         <div className="vc-dictation-preview-text">
-          {tokenized.words.map((word, wIdx) => (
-            <span key={word.wordIndex} className="vc-dictation-preview-word">
-              {word.tokens.map((token) => {
-                if (token.isSpace) return null;
-                if (token.isPunctuation) {
+          {tokenized.words.map((word, wIdx) => {
+            const isWordActive =
+              !isCompleted &&
+              word.tokens.some((t) => t.tokenIndex === state.cursorIndex);
+            return (
+              <span
+                key={word.wordIndex}
+                className={`vc-dictation-preview-word ${isWordActive ? 'is-active' : ''}`}
+              >
+                {word.tokens.map((token) => {
+                  if (token.isSpace) return null;
+                  if (token.isPunctuation) {
+                    return (
+                      <span key={token.id} className="vc-dictation-preview-punct">
+                        {token.rawChar}
+                      </span>
+                    );
+                  }
+                  const isOpened =
+                    state.openedMap[token.tokenIndex] !== undefined ||
+                    state.status === 'answer-revealed';
+                  if (isOpened) {
+                    return (
+                      <span key={token.id} className="vc-dictation-preview-char revealed">
+                        {token.rawChar}
+                      </span>
+                    );
+                  }
                   return (
-                    <span key={token.id} className="vc-dictation-preview-punct">
-                      {token.rawChar}
+                    <span key={token.id} className="vc-dictation-preview-dash" aria-hidden="true">
+                      _
                     </span>
                   );
-                }
-                const isOpened =
-                  state.openedMap[token.tokenIndex] !== undefined ||
-                  state.status === 'answer-revealed';
-                if (isOpened) {
-                  return (
-                    <span key={token.id} className="vc-dictation-preview-char revealed">
-                      {token.rawChar}
-                    </span>
-                  );
-                }
-                return (
-                  <span key={token.id} className="vc-dictation-preview-dash" aria-hidden="true">
-                    _
-                  </span>
-                );
-              })}
-              {wIdx < tokenized.words.length - 1 && ' '}
-            </span>
-          ))}
+                })}
+                {wIdx < tokenized.words.length - 1 && ' '}
+              </span>
+            );
+          })}
         </div>
         <p className="vc-dictation-preview-caption">
           Letters appear as you type correctly.

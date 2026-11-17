@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   Clock,
   Plus,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import type { UserReflectionItem } from "../types";
 import {
@@ -185,6 +187,9 @@ export function ReaderReflectionsSection({
   const [authorNameInput, setAuthorNameInput] = useState(currentUser?.name || "");
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
+  const [isExpanded, setIsExpanded] = useState(false);
+  const PREVIEW_LIMIT = 2;
+  const visibleReflections = isExpanded ? reflections : reflections.slice(0, PREVIEW_LIMIT);
   const [notice, setNotice] = useState<{
     type: "success" | "pending" | "info";
     text: string;
@@ -579,7 +584,7 @@ export function ReaderReflectionsSection({
           </div>
         ) : (
           <div className="space-y-4">
-            {reflections.map((ref) => {
+            {visibleReflections.map((ref) => {
               const isLiked = likedIds.has(ref.id);
               const isReported = reportedIds.has(ref.id);
               const isPending = ref.status === "pending_review";
@@ -692,6 +697,35 @@ export function ReaderReflectionsSection({
                 </article>
               );
             })}
+
+            {reflections.length > PREVIEW_LIMIT && (
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-antique-gold/40 text-xs font-bold text-heritage-green dark:text-antique-gold hover:bg-antique-gold/10 transition-colors cursor-pointer"
+                >
+                  {isExpanded ? (
+                    <>
+                      <ChevronUp className="w-4 h-4" />
+                      <span>
+                        {t("community.reader_reflections.collapse_reflections", "Thu gọn chia sẻ")}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      <span>
+                        {t("community.reader_reflections.view_all_reflections", {
+                          count: reflections.length,
+                          defaultValue: `Xem toàn bộ ${reflections.length} chia sẻ`,
+                        })}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

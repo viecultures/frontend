@@ -172,7 +172,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               setIsFlipped(!isFlipped);
             }
           }}
-          className={`reader-quick-card relative min-h-[260px] sm:min-h-[290px] rounded-3xl p-6 sm:p-8 cursor-pointer transition-all duration-300 transform hover:scale-[1.01] border-2 shadow-lg flex flex-col justify-between ${
+          className={`reader-quick-card relative min-h-[200px] sm:min-h-[220px] rounded-3xl p-5 sm:p-6 cursor-pointer transition-all duration-300 transform hover:scale-[1.01] border-2 shadow-lg flex flex-col justify-between ${
             isDark
               ? 'bg-[#141C1A] border-antique-gold/50 hover:border-antique-gold'
               : 'bg-rice-paper border-antique-gold/70 hover:border-antique-gold'
@@ -192,7 +192,17 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
 
           {/* Card Content: Front vs Back */}
           {!isFlipped ? (
-            <div className="text-center py-6 space-y-3">
+            <div className="text-center py-4 space-y-2.5">
+              {currentCard.imageUrl && (
+                <div className="max-h-36 sm:max-h-40 rounded-xl overflow-hidden mx-auto border border-antique-gold/30 mb-2">
+                  <img
+                    src={currentCard.imageUrl}
+                    alt={currentCard.word}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              )}
               <div className="flex items-center justify-center gap-2">
                 <h3 className="font-sans text-3xl sm:text-4xl font-extrabold text-heritage-green dark:text-antique-gold">
                   {currentCard.word}
@@ -212,19 +222,29 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               <span className="inline-block px-3 py-0.5 rounded-full text-xs font-mono bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
                 {currentCard.pos}
               </span>
-              <p className="text-xs sm:text-sm italic opacity-85 max-w-md mx-auto pt-2">
+              <p className="text-xs sm:text-sm italic opacity-85 max-w-md mx-auto pt-1">
                 "{currentCard.contextSentence}"
               </p>
             </div>
           ) : (
-            <div className="text-center py-6 space-y-3 animate-in fade-in duration-200">
+            <div className="text-center py-4 space-y-2.5 animate-in fade-in duration-200">
+              {currentCard.imageUrl && (
+                <div className="max-h-32 sm:max-h-36 rounded-xl overflow-hidden mx-auto border border-antique-gold/30 mb-2">
+                  <img
+                    src={currentCard.imageUrl}
+                    alt={currentCard.word}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              )}
               <div className="text-sm font-mono text-antique-gold font-bold">
                 {currentCard.ipa}
               </div>
               <h4 className="font-sans text-xl sm:text-2xl font-bold text-heritage-green dark:text-white">
                 {currentCard.viMeaning}
               </h4>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-md mx-auto bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 flex items-start justify-center gap-1.5 text-left">
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-md mx-auto bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 flex items-start justify-center gap-1.5 text-left">
                 <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <span><strong>{onContinue ? 'Định nghĩa / ngữ cảnh:' : t('quick_flashcards.cultural_context', 'Cultural context:')}</strong> {currentCard.culturalFact}</span>
               </p>

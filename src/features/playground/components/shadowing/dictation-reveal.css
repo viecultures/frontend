@@ -206,6 +206,17 @@
   display: inline-flex;
   align-items: baseline;
   letter-spacing: 0.02em;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.vc-dictation-preview-word.is-active {
+  border-bottom-color: var(--color-antique-gold);
+}
+
+.vc-dictation-preview-word.is-active .vc-dictation-preview-dash {
+  color: var(--color-antique-gold);
 }
 
 .vc-dictation-preview-char.revealed {
@@ -254,15 +265,26 @@
 .vc-dictation-tile-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 12px;
+  gap: 10px 14px;
   align-items: center;
 }
 
 .vc-dictation-word-cluster {
   display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  flex-wrap: nowrap;
+  gap: 3px;
   align-items: center;
+  padding: 3px 6px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-heritage-green) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-heritage-green) 12%, transparent);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vc-dictation-word-cluster:has(.vc-dictation-tile.active) {
+  background: color-mix(in srgb, var(--color-antique-gold) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-antique-gold) 45%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-antique-gold) 30%, transparent);
 }
 
 .vc-dictation-tile {
@@ -361,6 +383,29 @@
   .vc-dictation-tile.active::after {
     animation: none;
     opacity: 1;
+  }
+  .vc-dictation-word-cluster,
+  .vc-dictation-preview-word {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .vc-dictation-tile {
+    width: 27px;
+    height: 33px;
+    min-width: 22px;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+  .vc-dictation-word-cluster {
+    gap: 2px;
+    padding: 2px 4px;
+    border-radius: 8px;
+    max-width: 100%;
+  }
+  .vc-dictation-tile-grid {
+    gap: 8px 10px;
   }
 }
 
@@ -613,9 +658,16 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 420px;
+  max-height: 320px;
   overflow-y: auto;
+  scrollbar-width: thin;
   padding-right: 4px;
+}
+
+@media (max-width: 1024px) {
+  .vc-dictation-passages-list {
+    max-height: 220px;
+  }
 }
 
 .vc-dictation-passage-item {

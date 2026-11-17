@@ -277,6 +277,8 @@
       "safe_space_tip": "Safe space · Write freely in English or bilingually, zero pressure",
       "ugc_feed_badge": "UGC Feed",
       "default_author": "VieCultures learner",
+      "collapse_reflections": "Show less",
+      "view_all_reflections": "View all {{count}} reflections",
       "roles": {
         "learner": "VieCultures learner",
         "intl": "International learner",

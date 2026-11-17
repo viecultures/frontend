@@ -15,6 +15,7 @@ export interface QuickFlashcardItem {
   viMeaning: string;
   contextSentence: string;
   culturalFact: string;
+  imageUrl?: string;
 }
 
 export interface AiQuickPrompt {

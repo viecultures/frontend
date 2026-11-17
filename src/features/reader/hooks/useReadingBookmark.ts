@@ -9,6 +9,7 @@ export function useReadingBookmark(
   level: string,
   leftRef: RefObject<HTMLDivElement | null>,
   rightRef: RefObject<HTMLDivElement | null>,
+  mode: 'panes' | 'page' = 'panes',
 ) {
   const account = getStoredUser()?.email || 'guest';
   useEffect(() => {
@@ -24,6 +25,43 @@ export function useReadingBookmark(
       image: article.imageUrl || '/images/landing/hoi-an-lanterns.webp',
       topic: article.topic, position, updatedAt: Date.now(),
     });
+    if (mode === 'page') {
+      const documentTop = () => left.getBoundingClientRect().top + window.scrollY;
+      const readingRange = () => Math.max(0, left.scrollHeight - window.innerHeight + 120);
+      const restore = () => {
+        if (!interacted) window.scrollTo({ top: documentTop() + position * readingRange(), behavior: 'instant' });
+      };
+      const onInteraction = () => { interacted = true; };
+      const onScroll = () => {
+        if (!interacted) return;
+        const range = readingRange();
+        if (range <= 0) return;
+        position = Math.min(1, Math.max(0, (window.scrollY - documentTop()) / range));
+        clearTimeout(timer);
+        timer = setTimeout(persist, 300);
+      };
+      const observer = new ResizeObserver(restore);
+      observer.observe(left);
+      const frame = requestAnimationFrame(restore);
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('wheel', onInteraction, { passive: true });
+      window.addEventListener('touchstart', onInteraction, { passive: true });
+      window.addEventListener('keydown', onInteraction);
+      window.addEventListener('pagehide', persist);
+      left.addEventListener('load', restore, true);
+      return () => {
+        clearTimeout(timer);
+        cancelAnimationFrame(frame);
+        observer.disconnect();
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('wheel', onInteraction);
+        window.removeEventListener('touchstart', onInteraction);
+        window.removeEventListener('keydown', onInteraction);
+        window.removeEventListener('pagehide', persist);
+        left.removeEventListener('load', restore, true);
+        persist();
+      };
+    }
     const restore = () => {
       if (interacted) return;
       left.scrollTop = position * Math.max(0, left.scrollHeight - left.clientHeight);
@@ -69,5 +107,5 @@ export function useReadingBookmark(
       });
       persist();
     };
-  }, [article, level, account, leftRef, rightRef]);
+  }, [article, level, account, leftRef, rightRef, mode]);
 }

@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from
 import { useTranslation } from "react-i18next";
 import Link from "@/components/Link";
 
-import { CheckCircle2, Headphones, PenTool, ChevronLeft, ChevronRight, RefreshCw, BookOpen, Award } from "lucide-react";
+import { CheckCircle2, Headphones, PenTool, ChevronLeft, ChevronRight, RefreshCw, BookOpen, Award, Mic, ClipboardList } from "lucide-react";
 import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
 import { paths } from "@/routes/paths";
 
@@ -14,7 +14,8 @@ import { ReaderLotus } from './ReaderLotus';
 import type { PracticeMode } from '../lib/readerPractice';
 import { useReadingBookmark } from '../hooks/useReadingBookmark';
 
-interface BilingualReaderViewProps {
+export interface BilingualReaderViewProps {
+  layout?: 'bilingual' | 'english';
   themeMode: "paper" | "dark";
   fontSize: number;
   vocabBtnClass: string;
@@ -33,9 +34,11 @@ interface BilingualReaderViewProps {
   onOpenSealModal?: () => void;
   readCompleted?: boolean;
   onCompleteReading?: () => void;
+  practiceProgress?: { vocabReviewed: number; dictationFinished: number; shadowingAssessed: number; totalSegments: number };
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
+  layout = 'bilingual',
   themeMode,
   fontSize,
   vocabBtnClass,
@@ -53,15 +56,18 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   onOpenSealModal,
   readCompleted = false,
   onCompleteReading,
+  practiceProgress,
 }) => {
   const { t } = useTranslation('reader');
   // ── Proportional Scroll Sync Refs & State ─────────────────────────────────
   const leftSheetRef = useRef<HTMLDivElement>(null);
   const rightSheetRef = useRef<HTMLDivElement>(null);
   const sheetsRef = useRef<HTMLDivElement>(null);
-  useReadingBookmark(articleData, selectedLevel, leftSheetRef, rightSheetRef);
+  const englishOnly = layout === 'english';
+  useReadingBookmark(articleData, selectedLevel, leftSheetRef, rightSheetRef, englishOnly ? 'page' : 'panes');
   // Keep both illustrations aligned while translated headings reflow independently.
   useLayoutEffect(() => {
+    if (englishOnly) return;
     const intros = [leftSheetRef.current, rightSheetRef.current]
       .map(sheet => sheet?.querySelector('.reader-article-intro-content'))
       .filter((intro): intro is Element => Boolean(intro));
@@ -73,7 +79,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
     intros.forEach(intro => observer.observe(intro));
     alignHeaders();
     return () => observer.disconnect();
-  }, [articleData?.id]);
+  }, [articleData?.id, englishOnly]);
   const activeScrollerRef = useRef<"left" | "right" | null>(null);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState<boolean>(true);
@@ -143,11 +149,11 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   const isDark = themeMode === "dark";
 
   return (
-    <div className="reader-bilingual-view space-y-8 animate-in fade-in duration-300">
+    <div className={`${englishOnly ? 'reader-english-view' : 'reader-bilingual-view'} space-y-8 animate-in fade-in duration-300`}>
 
       {/* ── Scroll & Layout View Toolbar Indicator ───────────────────────── */}
       <div className="reader-scroll-tools flex items-center justify-between px-2 text-xs font-semibold gap-3" role="group" aria-label={t('bilingual.controls_aria', 'Reading controls and tips')}>
-        <div className="flex items-center gap-2 flex-wrap">
+        {!englishOnly && <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
               aria-pressed={isScrollSyncEnabled}
@@ -165,7 +171,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               <RefreshCw className={`w-3.5 h-3.5 ${isScrollSyncEnabled ? "text-antique-gold" : ""}`} />
               <span>{isScrollSyncEnabled ? t('bilingual.scroll_sync_on', 'Scroll sync: On') : t('bilingual.scroll_sync_off', 'Scroll sync: Off')}</span>
             </button>
-        </div>
+        </div>}
 
         <p role="note" className={`reader-lookup-tip text-[11px] font-medium flex items-center gap-1.5 ${isDark ? "text-sky-mist" : "text-heritage-green/80"
           }`}>
@@ -175,13 +181,13 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
       </div>
 
       {/* ── BILINGUAL VIEW: Dual Paper Sheets ─────────────────────────────── */}
-      <div ref={sheetsRef} className="reader-bilingual-sheets">
+      <div ref={sheetsRef} className={englishOnly ? 'reader-english-sheets' : 'reader-bilingual-sheets'}>
           {/* ── LEFT PAPER SHEET (ENGLISH ORIGINAL) ─────────────────────────── */}
           <ReaderArticleContent
             language="en" themeMode={themeMode} fontSize={fontSize} articleData={articleData}
             wordCount={articleData?.wordCount || (selectedLevel === 'Level 1' ? 220 : selectedLevel === 'Level 2' ? 370 : 520)}
             vocabClassName={vocabBtnClass} onVocabClick={handleVocabClick}
-            scrollable scrollRef={leftSheetRef}
+            scrollable={!englishOnly} scrollRef={leftSheetRef}
             onMouseEnter={() => { activeScrollerRef.current = 'left'; }}
             onTouchStart={() => { activeScrollerRef.current = 'left'; }}
             onWheel={() => { activeScrollerRef.current = 'left'; }}
@@ -190,7 +196,7 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           />
 
           {/* ── RIGHT PAPER SHEET (TIẾNG VIỆT TRANSLATION) ────────────────────── */}
-          <div className="reader-book-spine" aria-hidden="true">
+          {!englishOnly && <div className="reader-book-spine" aria-hidden="true">
             <ReaderLotus />
             <span className="reader-spine-line" />
             <span>
@@ -202,8 +208,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
               ))}
             </span>
             <span className="reader-spine-line" />
-          </div>
-          <ReaderArticleContent
+          </div>}
+          {!englishOnly && <ReaderArticleContent
             language="vi" themeMode={themeMode} fontSize={fontSize} articleData={articleData}
             vocabClassName={vocabBtnClass} onVocabClick={handleVocabClick}
             scrollable scrollRef={rightSheetRef}
@@ -212,16 +218,32 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
             onWheel={() => { activeScrollerRef.current = 'right'; }}
             onScroll={() => handleScroll('right')}
             onMouseUp={handleTextSelection} onDoubleClick={handleTextSelection}
-          />
+          />}
       </div>
+
+      {englishOnly && articleData && onCompleteReading && (
+        <div className="reader-reading-completion" data-practice-theme={themeMode}>
+          <div className="reader-reading-completion-inner">
+            <button
+              type="button"
+              className="reader-read-confirm reader-read-confirm-primary"
+              aria-pressed={readCompleted}
+              onClick={onCompleteReading}
+            >
+              <CheckCircle2 size={19} />
+              {readCompleted ? t('journey.read_marked') : t('journey.mark_read')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Unified Bottom Card: Reading Check Quiz + Practice Next Steps ───── */}
       <div
         data-practice-theme={themeMode}
-        className={`reader-practice-surface reader-practice-card rounded-3xl p-8 sm:p-12 transition-colors duration-300 grid grid-cols-1 lg:grid-cols-12 gap-10 ${bottomCardBgClass}`}
+        className={`reader-practice-surface reader-practice-card reader-learning-card rounded-3xl p-6 sm:p-10 transition-colors duration-300 ${bottomCardBgClass}`}
       >
-        {/* Left 7 Cols: Quiz Section */}
-        <div className="reader-practice-questions lg:col-span-7 pr-0 lg:pr-8 lg:border-r border-antique-gold/20">
+        {/* Reading check stays optional and has its own comfortable reading width. */}
+        <div className="reader-practice-questions reader-check-section">
           {articleData?.questions && articleData.questions.length > 0 ? (
             <>
               <div className="mb-6 pb-4 border-b border-antique-gold/20">
@@ -425,95 +447,77 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           )}
         </div>
 
-        {/* Right 5 Cols: Practice Next Steps */}
-        <div className="reader-practice-actions lg:col-span-5 flex flex-col justify-between">
+        {/* Optional activities follow the reading check without implying a locked sequence. */}
+        <div className="reader-practice-actions reader-learning-activities">
           <div>
-            <div className="mb-4">
-              <span className="text-sm font-semibold text-antique-gold">
-                {t('bilingual.next_steps', 'Next steps')}
-              </span>
-              <h3
-                className={`font-sans text-xl font-bold mt-1 ${themeMode === "dark" ? "text-warm-ivory" : "text-heritage-green"
-                  }`}
-              >
-                {t('bilingual.practice_what_you_read', 'Practice what you read')}
-              </h3>
-              <p className="text-xs opacity-80 mt-1 leading-relaxed">
-                {t('bilingual.next_steps_desc', 'Choose an activity to review the vocabulary and structures from this article.')}
-              </p>
+            <div className="reader-activities-heading">
+              <div>
+                <span className="text-sm font-semibold text-antique-gold">
+                  {t('journey.suggested_label')}
+                </span>
+                <h3
+                  className={`font-sans text-xl font-bold mt-1 ${themeMode === "dark" ? "text-warm-ivory" : "text-heritage-green"
+                    }`}
+                >
+                  {t('journey.choose_title')}
+                </h3>
+                <p className="text-xs opacity-80 mt-1 leading-relaxed">
+                  {t('journey.choose_desc')}
+                </p>
+              </div>
+
+              {!englishOnly && onCompleteReading && <button type="button" className="reader-read-confirm" aria-pressed={readCompleted} onClick={onCompleteReading}>
+                <CheckCircle2 size={17} /> {readCompleted ? t('journey.read_marked') : t('journey.mark_read')}
+              </button>}
             </div>
 
-            <div className="space-y-3 mt-6">
-              {/* Ceremonial Mộc Son Đỏ & Daily Streak Activation */}
-              {onOpenSealModal && (
-                <button
-                  type="button"
-                  onClick={onOpenSealModal}
-                  className="w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold bg-[#9E2A2B] hover:bg-[#852223] text-white border border-antique-gold shadow-md transition-all cursor-pointer group"
-                >
-                  <span className="flex items-center gap-2">
-                    <Award className="w-4 h-4 text-antique-gold group-hover:rotate-12 transition-transform" />
-                    <span>{t('bilingual.stamp_seal_btn', 'Đóng Mộc Son Đỏ & Kích hoạt Streak')}</span>
-                  </span>
-                  <ChevronRight className="w-4 h-4 opacity-80 group-hover:translate-x-1 transition-transform" />
-                </button>
-              )}
+            <div className="reader-activity-grid">
 
-              <Link
-                href={paths.flashcardStudy({ deck: articleData?.id, level: selectedLevel })}
-                className="reader-practice-primary flex w-full items-center justify-between px-5 py-3.5 rounded-2xl"
-              >
-                <span className="flex items-center gap-2"><BookOpen className="w-4 h-4" /> {t('bilingual.study_flashcards', 'Study vocabulary flashcards')}</span>
-                <ChevronRight className="w-4 h-4 opacity-80" />
-              </Link>
+              {articleData && articleData.vocabularies.length > 0 && <button type="button" className="reader-activity-choice" onClick={() => onStartPractice('vocab')}>
+                <BookOpen size={19} /><span><strong>{t('journey.vocab_activity')}</strong><small>{t('journey.vocab_progress', { done: practiceProgress?.vocabReviewed || 0, total: articleData.vocabularies.length })}</small></span><ChevronRight size={17} />
+              </button>}
 
               {/* Open Dictation with this article. */}
-              <button
+              {articleData?.paragraphs.some(item => item.enText.trim()) && <button
                 type="button"
                 onClick={() => onStartPractice('dictation')}
-                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all cursor-pointer group ${themeMode === "dark"
-                  ? "bg-[#18211E] text-warm-ivory border-antique-gold/20 hover:bg-[#232F2B]"
-                  : "bg-rice-paper text-heritage-green border-heritage-green/12 hover:bg-mist-cloud"
-                  }`}
+                className="reader-activity-choice"
               >
-                <span className="flex items-center gap-2">
-                  <Headphones className="w-4 h-4 text-antique-gold" />
-                  <span>{t('bilingual.practice_dictation', 'Practice dictation')}</span>
-                </span>
-                <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-1 transition-transform" />
-              </button>
+                <Headphones size={19} /><span><strong>{t('journey.dictation_activity')}</strong><small>{t('journey.dictation_progress', { done: practiceProgress?.dictationFinished || 0, total: practiceProgress?.totalSegments || 0 })}</small></span><ChevronRight size={17} />
+              </button>}
+
+              {articleData?.paragraphs.some(item => item.enText.trim()) && <button type="button" className="reader-activity-choice" onClick={() => onStartPractice('shadowing')}>
+                <Mic size={19} /><span><strong>{t('journey.shadowing_activity')}</strong><small>{t('journey.shadowing_progress', { done: practiceProgress?.shadowingAssessed || 0, total: practiceProgress?.totalSegments || 0 })}</small></span><ChevronRight size={17} />
+              </button>}
+
+            </div>
+
+            <button type="button" className="reader-results-choice" onClick={() => onStartPractice('summary')}>
+              <ClipboardList size={18} /> {t('journey.results_activity')} <ChevronRight size={16} />
+            </button>
+
+            <div className="reader-activity-footer">
+              {articleData && articleData.vocabularies.length > 0 && <Link className="reader-full-deck-link" href={paths.flashcardStudy({ deck: articleData.id, level: selectedLevel })}>{t('journey.full_deck')}</Link>}
+
+              {onOpenSealModal && <div className="reader-seal-legacy">
+                <button type="button" onClick={onOpenSealModal}><Award size={17} /> {t('bilingual.stamp_seal_btn', 'Đóng Mộc Son Đỏ & Kích hoạt Streak')}</button>
+              </div>}
 
               {/* Community Reflection Link */}
               <Link
                 href="/community"
-                className={`flex items-center justify-between px-5 py-3.5 rounded-2xl text-xs font-bold border transition-all group ${themeMode === "dark"
-                  ? "bg-[#18211E] text-warm-ivory border-antique-gold/20 hover:bg-[#232F2B]"
-                  : "bg-rice-paper text-heritage-green border-heritage-green/12 hover:bg-mist-cloud"
-                  }`}
+                className="reader-community-link"
               >
                 <span className="flex items-center gap-2">
-                  <PenTool className="w-4 h-4 text-antique-gold" />
+                  <PenTool className="w-4 h-4" />
                   {t('bilingual.write_reflection', 'Write a reflection')}
                 </span>
-                <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
         </div>
       </div>
-
-      {articleData && onCompleteReading && (
-        <section className="reader-journey-read-complete" aria-label="Tiếp tục hành trình học">
-          <h3>{readCompleted ? 'Bạn đã xác nhận đọc xong bài này' : 'Bạn đã đọc xong bài này?'}</h3>
-          <p>Tiếp tục với các hoạt động luyện tập của chính bài đọc này.</p>
-          <button type="button" className="reader-journey-continue" onClick={onCompleteReading}>
-            {articleData.vocabularies.length > 0
-              ? `Tiếp tục: Ôn ${articleData.vocabularies.length} từ mục tiêu`
-              : articleData.shadowingAudioUrl ? 'Tiếp tục: Nghe chép chính tả' : 'Xem tổng hợp phiên'}
-            <ChevronRight size={17} />
-          </button>
-        </section>
-      )}
 
       {/* ── In-Place Dictionary Popup ──────────────────────────────────────── */}
       <InPlaceDictionaryPopup

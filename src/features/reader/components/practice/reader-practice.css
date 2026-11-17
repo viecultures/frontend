@@ -60,10 +60,10 @@
 .rp-listening-stage > svg { color: var(--desk-gold); }
 .rp-listening-stage h3 { color: var(--desk-ink); font-size: 24px; font-weight: 500; }
 .rp-listening-stage p { font-size: 13px; line-height: 1.8; }
-.rp-segments { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; max-height: 65vh; overflow-y: auto; }
-.rp-workspace button.rp-segment { align-items: flex-start; justify-content: flex-start; text-align: left; line-height: 1.8; font-weight: 400; padding: 16px; border-color: transparent; border-left: 3px solid transparent; flex-shrink: 0; overflow-wrap: anywhere; }
-.rp-workspace .rp-segment > span:first-child { min-width: 20px; font-size: 11px; color: var(--desk-muted); padding-top: 4px; }
-.rp-workspace .rp-segment[aria-current='step'] { background: color-mix(in srgb, var(--desk-gold) 12%, transparent); border-left-color: var(--desk-gold); }
+.rp-segments { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; max-height: 46vh; overflow-y: auto; scrollbar-width: thin; }
+.rp-workspace button.rp-segment { align-items: flex-start; justify-content: flex-start; text-align: left; line-height: 1.5; font-size: 13px; font-weight: 400; padding: 10px 14px; border-radius: 8px; border-color: transparent; border-left: 3px solid transparent; flex-shrink: 0; overflow-wrap: anywhere; }
+.rp-workspace .rp-segment > span:first-child { min-width: 22px; font-size: 11px; font-weight: 700; color: var(--desk-muted); padding-top: 1px; }
+.rp-workspace .rp-segment[aria-current='step'] { background: color-mix(in srgb, var(--desk-gold) 15%, transparent); border-left-color: var(--desk-gold); }
 .rp-take-mark { margin-left: auto; font-size: 10px; color: var(--desk-muted); }
 .rp-revealed { margin: 28px 0; line-height: 1.85; }
 .rp-shadowing-target { padding-left: 16px; border-left: 2px solid var(--desk-gold); font-size: 14px; line-height: 1.8; }
@@ -224,6 +224,71 @@
 .rp-mode-tab[aria-selected="true"]:hover {
   background: var(--color-heritage-dark);
 }
+
+/* P4: Focused Shadowing Loop & Evaluation Controls */
+.rp-step-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 8px 16px;
+  border: 1px solid var(--desk-line);
+  border-radius: 9px;
+  background: var(--desk-paper);
+  color: var(--desk-ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.rp-step-btn:hover:enabled {
+  border-color: var(--desk-gold);
+  background: color-mix(in srgb, var(--desk-gold) 12%, var(--desk-paper));
+}
+.rp-eval-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-antique-gold);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--desk-ink);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.rp-eval-btn:hover:enabled {
+  border-color: var(--color-heritage-green);
+  background: color-mix(in srgb, var(--color-heritage-green) 8%, transparent);
+}
+.rp-eval-btn.is-selected-needs-work {
+  background: color-mix(in srgb, #e11d48 14%, transparent);
+  border-color: #e11d48;
+  color: #e11d48;
+}
+.rp-eval-btn.is-selected-satisfied {
+  background: var(--color-heritage-green);
+  border-color: var(--color-heritage-green);
+  color: #FFFFFF;
+}
+.rp-shadowing-header h2 {
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--desk-ink);
+}
+.rp-shadowing-progress-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rp-take-wrapper audio {
+  width: 100%;
+  margin-top: 4px;
+}
 @media (max-width: 1000px) { .rp-grid { grid-template-columns: minmax(0, 1.25fr) minmax(290px, 1fr); gap: 18px; } .rp-activity { padding: 20px; } }
 @media (max-width: 767px) {
   .rp-heading { flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
@@ -235,6 +300,6 @@
   .rp-activity textarea { font-size: 16px; }
   .rp-listening-stage { min-height: 260px; padding-inline: 12px; }
   .rp-activity h2 { font-size: 23px; }
-  .rp-segments { max-height: 65vh; }
+  .rp-segments { max-height: 46vh; }
   .reader-desk-title { justify-content: space-between; }
 }
