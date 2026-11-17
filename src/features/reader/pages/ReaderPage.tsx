@@ -35,6 +35,9 @@ import { PATHS } from '@/routes/paths';
 import { practiceModeFrom, type PracticeMode } from '../lib/readerPractice';
 import { MocSonSealModal } from '@/features/gamification';
 import { ReaderReflectionsSection } from '@/features/community/components/ReaderReflectionsSection';
+import { LessonStepper, type LessonStep } from '../components/LessonStepper';
+import { buildPracticeSegments } from '../lib/readerPractice';
+import { loadReaderSession, saveReaderSession, type ReaderSessionState } from '../services/readerSessionStorage';
 
 export default function ReaderPage() {
   const { t } = useTranslation('reader');
@@ -83,6 +86,27 @@ export default function ReaderPage() {
 
   const targetId = searchParams.get('postId') || searchParams.get('id') || searchParams.get('story') || searchParams.get('article') || 'pho-hanoi-history';
   const requestedKey = articleKey(targetId, selectedLevel);
+  const learningArticleId = articleData?.id || targetId;
+  const learningKey = articleKey(learningArticleId, selectedLevel);
+  const [sessionHolder, setSessionHolder] = useState<{ key: string; value: ReaderSessionState }>(() => ({
+    key: learningKey,
+    value: loadReaderSession(learningArticleId, selectedLevel),
+  }));
+  const [sessionStorageError, setSessionStorageError] = useState(false);
+  const session = sessionHolder.key === learningKey
+    ? sessionHolder.value
+    : loadReaderSession(learningArticleId, selectedLevel);
+  const updateSession = (change: (current: ReaderSessionState) => ReaderSessionState) => {
+    const next = { ...change(session), updatedAt: Date.now() };
+    setSessionStorageError(!saveReaderSession(next));
+    setSessionHolder({ key: learningKey, value: next });
+  };
+  const selectLessonStep = (step: LessonStep) => {
+    if (step === 'read') handleModeChange('bilingual');
+    else handleStartPractice(step);
+  };
+  const activeLessonStep: LessonStep = readingMode === 'bilingual' || practiceMode === 'questions'
+    ? 'read' : practiceMode;
   const [loadedKey, setLoadedKey] = useState('');
   const [articleError, setArticleError] = useState(false);
   const [levelError, setLevelError] = useState('');
@@ -482,7 +506,29 @@ export default function ReaderPage() {
         isPro={isPro}
       />
 
+      {articleData && (() => {
+        const segments = buildPracticeSegments(articleData);
+        const hasAudioPractice = Boolean(articleData.shadowingAudioUrl && segments.length);
+        const records = session.dictation.passageRecords;
+        const dictationDone = segments.length > 0 && segments.every((_, index) =>
+          ['completed-self', 'completed-hinted', 'answer-revealed'].includes(records[index]?.status));
+        const vocabIds = new Set(articleData.vocabularies.map(item => item.id));
+        return <LessonStepper
+          active={activeLessonStep}
+          completed={{
+            read: session.readCompleted,
+            vocab: articleData.vocabularies.length > 0 && articleData.vocabularies.every(item => session.vocab.reviewedIds.includes(item.id)),
+            dictation: dictationDone,
+            shadowing: segments.length > 0 && segments.every(item => Boolean(session.shadowing.selfEvaluations[item.id])),
+            summary: false,
+          }}
+          unavailable={{ vocab: vocabIds.size === 0, dictation: !hasAudioPractice, shadowing: !hasAudioPractice }}
+          onSelect={selectLessonStep}
+        />;
+      })()}
+
       {levelError && <p role="alert" className="px-8 py-3">{levelError}</p>}
+      {sessionStorageError && <p role="alert" className="px-8 py-3">Không lưu được tiến độ học trong trình duyệt. Hãy kiểm tra quyền hoặc dung lượng lưu trữ.</p>}
       {!savedVocabulary.canSave && <p role="alert" className="px-8 py-3">{t('save_vocab_error', 'Could not save vocabulary. Check your browser storage space and permissions.')}</p>}
 
       {/* Main Reader canvas */}
@@ -541,6 +587,11 @@ export default function ReaderPage() {
               articleData={articleData}
               onStartPractice={handleStartPractice}
               onOpenSealModal={() => setIsSealModalOpen(true)}
+              readCompleted={session.readCompleted}
+              onCompleteReading={() => {
+                updateSession(current => ({ ...current, readCompleted: true }));
+                selectLessonStep((articleData?.vocabularies.length ?? 0) > 0 ? 'vocab' : articleData?.shadowingAudioUrl ? 'dictation' : 'summary');
+              }}
             />
           ) : (
             articleData && <ReaderPracticeView
@@ -553,6 +604,13 @@ export default function ReaderPage() {
               onChangeMode={handlePracticeModeChange}
               onBackToReading={() => handleModeChange('bilingual')}
               fullAudioUrl={articleData.shadowingAudioUrl}
+              selectedLevel={selectedLevel}
+              session={session}
+              onSessionChange={updateSession}
+              onDictationChange={(records) => updateSession(current => ({
+                ...current,
+                dictation: { total: buildPracticeSegments(articleData).length, passageRecords: records },
+              }))}
             />
           )}
 

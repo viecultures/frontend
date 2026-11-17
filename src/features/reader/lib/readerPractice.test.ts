@@ -56,6 +56,8 @@ test('dictation counts inserted, repeated and missing words instead of scoring b
 test('unknown practice modes open Questions and valid modes are shareable', () => {
   assert.equal(practiceModeFrom(null), 'questions');
   assert.equal(practiceModeFrom('invalid'), 'questions');
+  assert.equal(practiceModeFrom('vocab'), 'vocab');
   assert.equal(practiceModeFrom('dictation'), 'dictation');
   assert.equal(practiceModeFrom('shadowing'), 'shadowing');
+  assert.equal(practiceModeFrom('summary'), 'summary');
 });

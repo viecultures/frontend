@@ -1,6 +1,6 @@
 import type { ReaderArticleData } from '../services/readerApiService';
 
-export type PracticeMode = 'questions' | 'dictation' | 'shadowing';
+export type PracticeMode = 'questions' | 'vocab' | 'dictation' | 'shadowing' | 'summary';
 export interface PracticeSegment {
   id: string;
   text: string;
@@ -14,7 +14,7 @@ export interface DictationAnswer {
 }
 
 export function practiceModeFrom(value: string | null): PracticeMode {
-  return value === 'dictation' || value === 'shadowing' ? value : 'questions';
+  return value === 'vocab' || value === 'dictation' || value === 'shadowing' || value === 'summary' ? value : 'questions';
 }
 
 export function buildPracticeSegments(article: ReaderArticleData): PracticeSegment[] {

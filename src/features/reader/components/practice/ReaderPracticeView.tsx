@@ -31,6 +31,9 @@ import {
 } from '../../services/dictationSessionStorage';
 import '@/features/playground/components/shadowing/dictation-reveal.css';
 import './reader-practice.css';
+import { ReaderQuickFlashcards } from '../ReaderQuickFlashcards';
+import { ReaderSessionSummary } from './ReaderSessionSummary';
+import type { ReaderSessionState, ShadowingEvaluation } from '../../services/readerSessionStorage';
 
 interface ReaderPracticeViewProps {
   articleData: ReaderArticleData;
@@ -41,6 +44,10 @@ interface ReaderPracticeViewProps {
   onChangeMode: (mode: PracticeMode) => void;
   onBackToReading: () => void;
   fullAudioUrl?: string;
+  selectedLevel: string;
+  session: ReaderSessionState;
+  onSessionChange: (change: (current: ReaderSessionState) => ReaderSessionState) => void;
+  onDictationChange: (records: Record<number, DictationState>) => void;
 }
 
 export function ReaderPracticeView({
@@ -52,16 +59,22 @@ export function ReaderPracticeView({
   onChangeMode,
   onBackToReading,
   fullAudioUrl,
+  selectedLevel,
+  session,
+  onSessionChange,
+  onDictationChange,
 }: ReaderPracticeViewProps) {
   const { t } = useTranslation('reader');
   const modes: { id: PracticeMode; label: string }[] = useMemo(() => [
     { id: 'questions', label: t('practice_view.modes.questions', 'Questions') },
+    { id: 'vocab', label: 'Ôn từ' },
     { id: 'dictation', label: t('practice_view.modes.dictation', 'Dictation') },
     { id: 'shadowing', label: t('practice_view.modes.shadowing', 'Shadowing') },
+    { id: 'summary', label: 'Tổng hợp' },
   ], [t]);
 
   const segments = useMemo(() => buildPracticeSegments(articleData), [articleData]);
-  const articleLevel = articleData.level || 'Level 2';
+  const articleLevel = selectedLevel;
 
   // Load saved session or initialize
   const savedSession = useMemo(
@@ -84,7 +97,7 @@ export function ReaderPracticeView({
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, QuestionAnswer>>({});
 
-  const sample = usePracticeAudio(articleData.shadowingAudioUrl, mode !== 'questions');
+  const sample = usePracticeAudio(articleData.shadowingAudioUrl, mode === 'dictation' || mode === 'shadowing');
   const recorder = usePracticeRecorder(mode === 'shadowing');
   const { popupState, closeDictionary, handleTextSelection, handleVocabClick } = useReaderDictionary(articleData.vocabMap);
 
@@ -111,20 +124,19 @@ export function ReaderPracticeView({
   // Persist session to localStorage
   const handlePassageStateChange = useCallback(
     (newState: DictationState) => {
-      setPassageRecords((prev) => {
-        const next = { ...prev, [segmentIndex]: newState };
-        saveDictationSession({
-          articleId: articleData.id,
-          level: articleLevel,
-          lastPassageIndex: segmentIndex,
-          records: next,
-          speed: sample.speed,
-          repeat: sample.repeat,
-        });
-        return next;
+      const next = { ...passageRecords, [segmentIndex]: newState };
+      saveDictationSession({
+        articleId: articleData.id,
+        level: articleLevel,
+        lastPassageIndex: segmentIndex,
+        records: next,
+        speed: sample.speed,
+        repeat: sample.repeat,
       });
+      setPassageRecords(next);
+      onDictationChange(next);
     },
-    [articleData.id, articleLevel, segmentIndex, sample.speed, sample.repeat]
+    [articleData.id, articleLevel, segmentIndex, sample.speed, sample.repeat, onDictationChange, passageRecords]
   );
 
   const listenToSegment = useCallback(() => {
@@ -211,9 +223,54 @@ export function ReaderPracticeView({
 
   const handleRestartWholeArticle = () => {
     clearDictationSession(articleData.id, articleLevel);
+    onDictationChange({});
     setPassageRecords({});
     setSegmentIndex(0);
     setShowSummary(false);
+  };
+
+  if (mode === 'vocab') {
+    const cards = articleData.vocabularies.map(item => ({
+      id: item.id,
+      word: item.word,
+      pos: item.pos,
+      ipa: item.ipa,
+      viMeaning: item.viMeaning,
+      contextSentence: item.contextSentence,
+      culturalFact: item.enDefinition || item.contextSentence,
+    }));
+    return <div className="rp-workspace" data-practice-theme={themeMode}>
+      <button type="button" className="rp-back-link" onClick={onBackToReading}><ArrowLeft size={16} /> Quay lại bài đọc</button>
+      <ReaderQuickFlashcards
+        key={`${articleData.id}_${articleLevel}`}
+        themeMode={themeMode}
+        cards={cards}
+        deckId={articleData.id}
+        selectedLevel={articleLevel}
+        initialRememberedIds={session.vocab.rememberedIds}
+        initialReviewLaterIds={session.vocab.reviewLaterIds}
+        onProgress={(rememberedIds, reviewLaterIds) => onSessionChange(current => ({
+          ...current,
+          vocab: { rememberedIds, reviewLaterIds, reviewedIds: [...new Set([...rememberedIds, ...reviewLaterIds])] },
+        }))}
+        continueLabel={articleData.shadowingAudioUrl && segments.length ? 'Tiếp tục: Nghe chép chính tả' : 'Xem tổng hợp phiên học'}
+        onContinue={() => onChangeMode(articleData.shadowingAudioUrl && segments.length ? 'dictation' : 'summary')}
+      />
+    </div>;
+  }
+
+  if (mode === 'summary') return <ReaderSessionSummary article={articleData} level={articleLevel} session={session} />;
+
+  const evaluateShadowing = (value: ShadowingEvaluation) => {
+    if (!segment || !recorder.takes[segment.id]) return;
+    onSessionChange(current => ({
+      ...current,
+      shadowing: {
+        recordedSegmentIds: [...new Set([...current.shadowing.recordedSegmentIds, segment.id])],
+        selfEvaluations: { ...current.shadowing.selfEvaluations, [segment.id]: value },
+      },
+    }));
+    if (value === 'satisfied' && segmentIndex < segments.length - 1) setSegmentIndex(segmentIndex + 1);
   };
 
   return (
@@ -308,6 +365,9 @@ export function ReaderPracticeView({
             </div>
 
             <div className="vc-dictation-summary-actions">
+              <button type="button" className="vc-dictation-btn-next" onClick={() => onChangeMode('shadowing')}>
+                <span>Tiếp tục: Luyện nói đuổi</span><ChevronRight size={16} />
+              </button>
               <button
                 type="button"
                 className="vc-dictation-btn-next"
@@ -633,6 +693,9 @@ export function ReaderPracticeView({
                   onListen={listenToSegment}
                   onStopSample={sample.stop}
                   total={segments.length}
+                  evaluation={session.shadowing.selfEvaluations[segment.id]}
+                  previousRecordingLost={session.shadowing.recordedSegmentIds.includes(segment.id) && !recorder.takes[segment.id]}
+                  onEvaluate={evaluateShadowing}
                 />
                 <div className="rp-navigation rp-passage-navigation">
                   <button
@@ -650,6 +713,11 @@ export function ReaderPracticeView({
                     {t('practice_view.next_passage', 'Next passage')} <ChevronRight size={15} />
                   </button>
                 </div>
+                {segments.length > 0 && segments.every(item => session.shadowing.selfEvaluations[item.id]) && (
+                  <button type="button" className="reader-journey-continue" onClick={() => onChangeMode('summary')}>
+                    Xem tổng hợp phiên học <ChevronRight size={17} />
+                  </button>
+                )}
               </>
             ) : (
               <section className="rp-activity">
@@ -661,9 +729,7 @@ export function ReaderPracticeView({
                     'Choose another article to practise dictation or shadowing.'
                   )}
                 </p>
-                <button type="button" onClick={onBackToReading}>
-                  {t('practice_view.back_to_reading', 'Back to reading')}
-                </button>
+                <button type="button" onClick={() => onChangeMode('summary')}>Xem tổng hợp phiên học</button>
               </section>
             )}
           </div>

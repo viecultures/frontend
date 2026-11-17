@@ -31,6 +31,8 @@ interface BilingualReaderViewProps {
   articleData?: ReaderArticleData | null;
   onStartPractice: (mode?: PracticeMode) => void;
   onOpenSealModal?: () => void;
+  readCompleted?: boolean;
+  onCompleteReading?: () => void;
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
@@ -49,6 +51,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   articleData,
   onStartPractice,
   onOpenSealModal,
+  readCompleted = false,
+  onCompleteReading,
 }) => {
   const { t } = useTranslation('reader');
   // ── Proportional Scroll Sync Refs & State ─────────────────────────────────
@@ -497,6 +501,19 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
           </div>
         </div>
       </div>
+
+      {articleData && onCompleteReading && (
+        <section className="reader-journey-read-complete" aria-label="Tiếp tục hành trình học">
+          <h3>{readCompleted ? 'Bạn đã xác nhận đọc xong bài này' : 'Bạn đã đọc xong bài này?'}</h3>
+          <p>Tiếp tục với các hoạt động luyện tập của chính bài đọc này.</p>
+          <button type="button" className="reader-journey-continue" onClick={onCompleteReading}>
+            {articleData.vocabularies.length > 0
+              ? `Tiếp tục: Ôn ${articleData.vocabularies.length} từ mục tiêu`
+              : articleData.shadowingAudioUrl ? 'Tiếp tục: Nghe chép chính tả' : 'Xem tổng hợp phiên'}
+            <ChevronRight size={17} />
+          </button>
+        </section>
+      )}
 
       {/* ── In-Place Dictionary Popup ──────────────────────────────────────── */}
       <InPlaceDictionaryPopup

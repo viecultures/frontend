@@ -18,7 +18,12 @@ import { paths } from '@/routes/paths';
 interface ReaderQuickFlashcardsProps {
   themeMode?: 'paper' | 'dark';
   cards?: QuickFlashcardItem[];
-  onOpenMocSonModal: () => void;
+  onOpenMocSonModal?: () => void;
+  initialRememberedIds?: string[];
+  initialReviewLaterIds?: string[];
+  onProgress?: (rememberedIds: string[], reviewLaterIds: string[]) => void;
+  onContinue?: () => void;
+  continueLabel?: string;
   deckId?: string;
   selectedLevel?: string;
 }
@@ -27,6 +32,11 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
   themeMode = 'paper',
   cards = READER_DEFAULT_FLASHCARDS,
   onOpenMocSonModal,
+  initialRememberedIds = [],
+  initialReviewLaterIds = [],
+  onProgress,
+  onContinue,
+  continueLabel = 'Tiếp tục: Nghe chép chính tả',
   deckId = 'tet-holiday',
   selectedLevel = 'Level 2',
 }) => {
@@ -34,8 +44,8 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
   const isDark = themeMode === 'dark';
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
-  const [rememberedIds, setRememberedIds] = useState<Set<string>>(new Set());
-  const [reviewLaterIds, setReviewLaterIds] = useState<Set<string>>(new Set());
+  const [rememberedIds, setRememberedIds] = useState<Set<string>>(() => new Set(initialRememberedIds));
+  const [reviewLaterIds, setReviewLaterIds] = useState<Set<string>>(() => new Set(initialReviewLaterIds));
 
   const currentCard = cards[currentIndex] || cards[0];
 
@@ -60,31 +70,32 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
   };
 
   const markRemembered = () => {
-    if (!currentCard) return;
-    setRememberedIds((prev) => new Set(prev).add(currentCard.id));
-    setReviewLaterIds((prev) => {
-      const next = new Set(prev);
-      next.delete(currentCard.id);
-      return next;
-    });
+    if (!currentCard || !isFlipped) return;
+    const remembered = new Set(rememberedIds).add(currentCard.id);
+    const reviewLater = new Set(reviewLaterIds);
+    reviewLater.delete(currentCard.id);
+    setRememberedIds(remembered);
+    setReviewLaterIds(reviewLater);
+    onProgress?.([...remembered], [...reviewLater]);
     handleNext();
   };
 
   const markReviewLater = () => {
-    if (!currentCard) return;
-    setReviewLaterIds((prev) => new Set(prev).add(currentCard.id));
-    setRememberedIds((prev) => {
-      const next = new Set(prev);
-      next.delete(currentCard.id);
-      return next;
-    });
+    if (!currentCard || !isFlipped) return;
+    const reviewLater = new Set(reviewLaterIds).add(currentCard.id);
+    const remembered = new Set(rememberedIds);
+    remembered.delete(currentCard.id);
+    setReviewLaterIds(reviewLater);
+    setRememberedIds(remembered);
+    onProgress?.([...remembered], [...reviewLater]);
     handleNext();
   };
 
   // Keyboard shortcut listener for active recall (Space = Flip, 1 = Review, 2 = Remembered)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      if ((e.target as HTMLElement)?.closest('input, textarea, button, select, a, [contenteditable="true"]')) return;
+      if (e.code === 'Space' && (e.target as HTMLElement)?.closest('[role="button"]')) return;
 
       if (e.code === 'Space') {
         e.preventDefault();
@@ -106,14 +117,16 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, currentCard, cards.length]);
+  }, [currentIndex, currentCard, cards.length, rememberedIds, reviewLaterIds, onProgress]);
 
-  const totalReviewed = new Set([...rememberedIds, ...reviewLaterIds]).size;
-  const isAllReviewed = totalReviewed >= Math.min(cards.length, 3);
+  const totalReviewed = cards.filter(card => rememberedIds.has(card.id) || reviewLaterIds.has(card.id)).length;
+  const isAllReviewed = cards.length > 0 && totalReviewed >= cards.length;
 
   const containerBgClass = isDark
     ? 'bg-[#1E2925] text-warm-ivory border-antique-gold/30 shadow-xl'
     : 'bg-warm-ivory text-ink-soft border-heritage-green/12 shadow-xl';
+
+  if (!currentCard) return <section className="reader-practice-surface reader-study-component"><p>Bài này chưa có từ vựng để ôn.</p>{onContinue && <button type="button" onClick={onContinue}>{continueLabel}</button>}</section>;
 
   return (
     <div data-practice-theme={themeMode} className={`reader-practice-surface reader-practice-card reader-study-component reader-flashcards-component rounded-3xl p-6 sm:p-10 transition-colors duration-300 border space-y-6 ${containerBgClass}`}>
@@ -213,7 +226,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
               </h4>
               <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-md mx-auto bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 flex items-start justify-center gap-1.5 text-left">
                 <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                <span><strong>{t('quick_flashcards.cultural_context', 'Cultural context:')}</strong> {currentCard.culturalFact}</span>
+                <span><strong>{onContinue ? 'Định nghĩa / ngữ cảnh:' : t('quick_flashcards.cultural_context', 'Cultural context:')}</strong> {currentCard.culturalFact}</span>
               </p>
             </div>
           )}
@@ -229,6 +242,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           <button
             type="button"
             onClick={markReviewLater}
+            disabled={!isFlipped}
             aria-pressed={reviewLaterIds.has(currentCard.id)}
             className={`reader-quick-review flex items-center justify-center gap-2 py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
               reviewLaterIds.has(currentCard.id)
@@ -243,6 +257,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
           <button
             type="button"
             onClick={markRemembered}
+            disabled={!isFlipped}
             aria-pressed={rememberedIds.has(currentCard.id)}
             className={`reader-quick-remember flex items-center justify-center gap-2 py-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
               rememberedIds.has(currentCard.id)
@@ -286,8 +301,10 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
         </div>
       </div>
 
-      {/* ── MILESTONE BANNER: ĐÓNG MỘC SON ─────────────────────────────────── */}
-      <div className="mt-8 pt-6 border-t border-antique-gold/30">
+      {onContinue && isAllReviewed && <button type="button" className="reader-journey-continue" onClick={onContinue}>{continueLabel} <ArrowRight size={17} /></button>}
+
+      {/* Legacy milestone remains available only where its original callback is supplied. */}
+      {onOpenMocSonModal && <div className="mt-8 pt-6 border-t border-antique-gold/30">
         <div className="reader-quick-milestone rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#9E2A2B]/15 via-heritage-green/10 to-antique-gold/20 border-2 border-antique-gold flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-1.5 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2">
@@ -314,7 +331,7 @@ export const ReaderQuickFlashcards: React.FC<ReaderQuickFlashcardsProps> = ({
             <BookOpen className="w-4 h-4 text-antique-gold" />
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   );
 };
