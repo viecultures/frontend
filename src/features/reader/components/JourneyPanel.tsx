@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Award,
   BookOpen,
   CheckCircle2,
   ChevronDown,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { ReaderJourneyViewModel, JourneyActivityId, JourneyActivityProgress } from '../lib/readerJourneyViewModel';
 import type { LessonStep } from './LessonStepper';
+import type { StoryRewardStatusResponse } from '../types/rewardTypes';
 
 export interface JourneyPanelProps {
   journey: ReaderJourneyViewModel;
@@ -21,6 +23,8 @@ export interface JourneyPanelProps {
   onSelectStep: (step: LessonStep) => void;
   themeMode?: 'paper' | 'dark';
   className?: string;
+  rewardStatus?: StoryRewardStatusResponse | null;
+  onOpenSealModal?: () => void;
 }
 
 const ACTIVITY_ICONS: Record<JourneyActivityId, React.ElementType> = {
@@ -37,6 +41,8 @@ export const JourneyPanel: React.FC<JourneyPanelProps> = ({
   onSelectStep,
   themeMode = 'paper',
   className = '',
+  rewardStatus,
+  onOpenSealModal,
 }) => {
   const { t } = useTranslation('reader');
   const [isMobileExpanded, setIsMobileExpanded] = useState<boolean>(false);
@@ -258,6 +264,51 @@ export const JourneyPanel: React.FC<JourneyPanelProps> = ({
           {renderActivityRow('dictation')}
           {renderActivityRow('shadowing')}
         </div>
+
+        {/* Cultural Mộc Son Reward Status */}
+        {rewardStatus && (
+          <div className="reader-journey-reward-status mt-3 pt-3 border-t border-antique-gold/20">
+            <div className="flex items-center justify-between text-xs font-serif text-heritage-green mb-1.5">
+              <span className="flex items-center gap-1.5 font-semibold">
+                <Award size={15} className={rewardStatus.hasStamp ? "text-antique-gold" : rewardStatus.eligibleToClaim ? "text-terracotta animate-bounce" : "text-ink-soft/40"} />
+                {t('bilingual.heritage_seal', 'Mộc Son Di Sản')}
+              </span>
+              <span className={`px-2 py-0.5 rounded-full text-[11px] font-sans font-medium ${
+                rewardStatus.hasStamp
+                  ? "bg-emerald-100/70 text-emerald-800"
+                  : rewardStatus.eligibleToClaim
+                  ? "bg-terracotta/15 text-terracotta animate-pulse"
+                  : "bg-black/5 text-ink-soft/60"
+              }`}>
+                {rewardStatus.hasStamp
+                  ? t('bilingual.stamp_status_owned', 'Đã nhận')
+                  : rewardStatus.eligibleToClaim
+                  ? t('bilingual.stamp_status_ready', 'Sẵn sàng nhận')
+                  : t('bilingual.stamp_status_unclaimed', 'Chưa đạt')}
+              </span>
+            </div>
+            {onOpenSealModal && (
+              <button
+                type="button"
+                onClick={onOpenSealModal}
+                className={`w-full mt-1.5 py-1.5 px-3 rounded-lg text-xs font-sans flex items-center justify-center gap-1.5 transition-colors ${
+                  rewardStatus.hasStamp
+                    ? "text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200"
+                    : rewardStatus.eligibleToClaim
+                    ? "text-warm-ivory bg-terracotta hover:bg-terracotta/90 font-semibold shadow-xs"
+                    : "text-ink-soft/70 bg-warm-ivory hover:text-ink-soft border border-antique-gold/20"
+                }`}
+              >
+                <Award size={14} />
+                {rewardStatus.hasStamp
+                  ? t('bilingual.view_stamp_btn', 'Xem Mộc Son')
+                  : rewardStatus.eligibleToClaim
+                  ? t('bilingual.claim_stamp_btn', 'Đóng Mộc Son Đỏ')
+                  : t('bilingual.stamp_seal_btn', 'Xem Mộc Son')}
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Journey Recap Navigation Link */}
         <div className="reader-journey-recap-footer">

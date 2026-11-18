@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useLayoutEffect, useCallback } from
 import { useTranslation } from "react-i18next";
 import Link from "@/components/Link";
 
-import { CheckCircle2, Headphones, PenTool, ChevronLeft, ChevronRight, RefreshCw, BookOpen, Award, Mic, ClipboardList } from "lucide-react";
+import { CheckCircle2, Headphones, PenTool, ChevronLeft, ChevronRight, RefreshCw, BookOpen, Award, Mic, ClipboardList, Loader2 } from "lucide-react";
 import { READER_QUIZ_QUESTIONS } from "@/data/readerData";
 import { paths } from "@/routes/paths";
 
@@ -13,6 +13,7 @@ import { ReaderArticleContent } from './ReaderArticleContent';
 import { ReaderLotus } from './ReaderLotus';
 import type { PracticeMode } from '../lib/readerPractice';
 import { useReadingBookmark } from '../hooks/useReadingBookmark';
+import type { StoryRewardStatusResponse } from "../types/rewardTypes";
 
 export interface BilingualReaderViewProps {
   layout?: 'bilingual' | 'english';
@@ -35,6 +36,8 @@ export interface BilingualReaderViewProps {
   readCompleted?: boolean;
   onCompleteReading?: () => void;
   practiceProgress?: { vocabReviewed: number; dictationFinished: number; shadowingAssessed: number; totalSegments: number };
+  rewardStatus?: StoryRewardStatusResponse | null;
+  isRewardLoading?: boolean;
 }
 
 export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
@@ -57,6 +60,8 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
   readCompleted = false,
   onCompleteReading,
   practiceProgress,
+  rewardStatus,
+  isRewardLoading = false,
 }) => {
   const { t } = useTranslation('reader');
   // ── Proportional Scroll Sync Refs & State ─────────────────────────────────
@@ -227,11 +232,16 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
             <button
               type="button"
               className="reader-read-confirm reader-read-confirm-primary"
-              aria-pressed={readCompleted}
+              aria-pressed={readCompleted || rewardStatus?.readConfirmed}
+              disabled={isRewardLoading}
               onClick={onCompleteReading}
             >
-              <CheckCircle2 size={19} />
-              {readCompleted ? t('journey.read_marked') : t('journey.mark_read')}
+              {isRewardLoading ? (
+                <Loader2 size={19} className="animate-spin" />
+              ) : (
+                <CheckCircle2 size={19} />
+              )}
+              {readCompleted || rewardStatus?.readConfirmed ? t('journey.read_marked') : t('journey.mark_read')}
             </button>
           </div>
         </div>
@@ -466,9 +476,22 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
                 </p>
               </div>
 
-              {!englishOnly && onCompleteReading && <button type="button" className="reader-read-confirm" aria-pressed={readCompleted} onClick={onCompleteReading}>
-                <CheckCircle2 size={17} /> {readCompleted ? t('journey.read_marked') : t('journey.mark_read')}
-              </button>}
+              {!englishOnly && onCompleteReading && (
+                <button
+                  type="button"
+                  className="reader-read-confirm"
+                  aria-pressed={readCompleted || rewardStatus?.readConfirmed}
+                  disabled={isRewardLoading}
+                  onClick={onCompleteReading}
+                >
+                  {isRewardLoading ? (
+                    <Loader2 size={17} className="animate-spin" />
+                  ) : (
+                    <CheckCircle2 size={17} />
+                  )}
+                  {readCompleted || rewardStatus?.readConfirmed ? t('journey.read_marked') : t('journey.mark_read')}
+                </button>
+              )}
             </div>
 
             <div className="reader-activity-grid">
@@ -499,9 +522,28 @@ export const BilingualReaderView: React.FC<BilingualReaderViewProps> = ({
             <div className="reader-activity-footer">
               {articleData && articleData.vocabularies.length > 0 && <Link className="reader-full-deck-link" href={paths.flashcardStudy({ deck: articleData.id, level: selectedLevel })}>{t('journey.full_deck')}</Link>}
 
-              {onOpenSealModal && <div className="reader-seal-legacy">
-                <button type="button" onClick={onOpenSealModal}><Award size={17} /> {t('bilingual.stamp_seal_btn', 'Đóng Mộc Son Đỏ & Kích hoạt Streak')}</button>
-              </div>}
+              {onOpenSealModal && (
+                <div className="reader-seal-legacy">
+                  <button
+                    type="button"
+                    onClick={onOpenSealModal}
+                    className={`reader-seal-btn flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border transition-all text-sm ${
+                      rewardStatus?.hasStamp
+                        ? "text-emerald-700 bg-emerald-50/80 border-emerald-300 hover:bg-emerald-100"
+                        : rewardStatus?.eligibleToClaim
+                        ? "text-terracotta bg-terracotta/10 border-terracotta hover:bg-terracotta/20 font-semibold shadow-xs"
+                        : "text-heritage-green bg-warm-ivory border-antique-gold/30 hover:border-antique-gold/60"
+                    }`}
+                  >
+                    <Award size={17} className={rewardStatus?.eligibleToClaim ? "animate-bounce text-terracotta" : ""} />
+                    {rewardStatus?.hasStamp
+                      ? t('bilingual.view_stamp_btn', 'Xem Mộc Son Đã Nhận')
+                      : rewardStatus?.eligibleToClaim
+                      ? t('bilingual.claim_stamp_btn', 'Đóng Mộc Son Đỏ')
+                      : t('bilingual.stamp_seal_btn', 'Đóng Mộc Son Đỏ')}
+                  </button>
+                </div>
+              )}
 
               {/* Community Reflection Link */}
               <Link

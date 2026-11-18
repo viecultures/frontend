@@ -131,7 +131,12 @@
     "next_steps": "Next steps",
     "practice_what_you_read": "Practice what you read",
     "next_steps_desc": "Choose an activity to review the vocabulary and structures from this article.",
-    "stamp_seal_btn": "Stamp Heritage Seal & Activate Streak",
+    "stamp_seal_btn": "Stamp Heritage Red Seal",
+    "claim_stamp_btn": "Stamp Heritage Red Seal",
+    "view_stamp_btn": "View Earned Heritage Seal",
+    "stamp_status_owned": "Heritage Seal Earned",
+    "stamp_status_ready": "Ready to Stamp Seal",
+    "stamp_status_unclaimed": "Seal Unearned",
     "study_flashcards": "Study vocabulary flashcards",
     "practice_dictation": "Practice dictation",
     "write_reflection": "Write a reflection"

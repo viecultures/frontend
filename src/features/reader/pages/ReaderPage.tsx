@@ -35,12 +35,14 @@ import { articleKey, cacheArticle, getCachedArticle } from '@/services/learning/
 import { useSavedVocabulary, SavedVocabularyContext } from '../hooks/useSavedVocabulary';
 import { PATHS } from '@/routes/paths';
 import { practiceModeFrom, type PracticeMode } from '../lib/readerPractice';
-import { MocSonSealModal } from '@/features/gamification';
+import { MocSonSealModal, FoodStickerRevealModal } from '@/features/gamification';
+import type { FoodStickerAwardDto } from '../types/rewardTypes';
 import { ReaderReflectionsSection } from '@/features/community/components/ReaderReflectionsSection';
 import { LessonStepper, type LessonStep } from '../components/LessonStepper';
 import { buildPracticeSegments } from '../lib/readerPractice';
 import { getReaderJourneyViewModel } from '../lib/readerJourneyViewModel';
 import { loadReaderSession, saveReaderSession, type ReaderSessionState } from '../services/readerSessionStorage';
+import { useStoryReward } from '../hooks/useStoryReward';
 
 export default function ReaderPage() {
   const { t } = useTranslation('reader');
@@ -70,6 +72,8 @@ export default function ReaderPage() {
   const [fontSize, setFontSize] = useState<number>(17);
   const [themeMode, setThemeMode] = useState<"paper" | "dark">("paper");
   const [isSealModalOpen, setIsSealModalOpen] = useState<boolean>(false);
+  const [unlockedSticker, setUnlockedSticker] = useState<FoodStickerAwardDto | null>(null);
+  const [isStickerRevealOpen, setIsStickerRevealOpen] = useState<boolean>(false);
 
   // Keep old extensive-reader links working while exposing Practice as the workspace.
   const modeParam = searchParams.get('mode');
@@ -105,6 +109,20 @@ export default function ReaderPage() {
     const next = { ...change(session), updatedAt: Date.now() };
     setSessionStorageError(!saveReaderSession(next));
     setSessionHolder({ key: learningKey, value: next });
+  };
+
+  // Cultural Reward & Mộc Son v2 state hook (strictly uses server-provided storyId)
+  const storyReward = useStoryReward(articleData?.id || targetId, articleData?.storyId);
+
+  const handleCompleteReading = async () => {
+    updateSession(current => ({ ...current, readCompleted: true }));
+    if (isLoggedIn) {
+      try {
+        await storyReward.confirmReading();
+      } catch (err) {
+        console.warn("Failed to confirm reading with server reward API:", err);
+      }
+    }
   };
   const selectLessonStep = (step: LessonStep) => {
     if (step === 'read') handleModeChange('bilingual');
@@ -305,6 +323,7 @@ export default function ReaderPage() {
   useEffect(() => {
     setIsVocabDrawerOpen(false); setSelectedVocab(null);
     setQ1Answer(''); setQ2Answer(''); setQuizSubmitted(false);
+    setIsStickerRevealOpen(false); setUnlockedSticker(null);
   }, [requestedKey]);
 
   // Quiz States (Bilingual Mode)
@@ -584,6 +603,8 @@ export default function ReaderPage() {
               activeStep="read"
               onSelectStep={selectLessonStep}
               themeMode={themeMode}
+              rewardStatus={storyReward.status}
+              onOpenSealModal={() => setIsSealModalOpen(true)}
             />
           )}
 
@@ -606,16 +627,16 @@ export default function ReaderPage() {
               articleData={articleData}
               onStartPractice={handleStartPractice}
               onOpenSealModal={() => setIsSealModalOpen(true)}
-              readCompleted={session.readCompleted}
+              readCompleted={session.readCompleted || storyReward.hasReadConfirmed}
               practiceProgress={{
                 vocabReviewed: journeyVM.activities.vocab.current,
                 dictationFinished: journeyVM.activities.dictation.current,
                 shadowingAssessed: journeyVM.activities.shadowing.current,
                 totalSegments: journeyVM.activities.dictation.total,
               }}
-              onCompleteReading={() => {
-                updateSession(current => ({ ...current, readCompleted: true }));
-              }}
+              onCompleteReading={handleCompleteReading}
+              rewardStatus={storyReward.status}
+              isRewardLoading={storyReward.isLoading}
             />
           ) : (
             articleData && <ReaderPracticeView
@@ -694,14 +715,43 @@ export default function ReaderPage() {
         themeMode={themeMode}
       />
 
-            {/* Ceremonial Cultural Red Seal (Mộc Son Đỏ) Modal */}
+      {/* Ceremonial Cultural Red Seal (Mộc Son Đỏ v2) Modal */}
       <MocSonSealModal
         isOpen={isSealModalOpen}
-        onClose={() => setIsSealModalOpen(false)}
+        onClose={() => {
+          setIsSealModalOpen(false);
+          if (unlockedSticker?.newUnlock) {
+            setIsStickerRevealOpen(true);
+          }
+        }}
         articleId={articleData?.id || targetId}
         articleTitle={articleData?.titleVi || articleData?.titleEn || 'Phở Hà Nội'}
         wordsLearnedCount={articleData?.vocabularies?.length || 4}
         source="reader"
+        storyId={storyReward.storyId}
+        hasStamp={storyReward.hasStamp}
+        stampAwardedAt={storyReward.status?.stampAwardedAt}
+        onClaimStamp={isLoggedIn ? storyReward.claimStamp : undefined}
+        onAfterStamp={(claimResp) => {
+          storyReward.refetchStatus();
+          if (claimResp?.unlockedSticker?.newUnlock) {
+            setUnlockedSticker(claimResp.unlockedSticker);
+          }
+        }}
+        onOpenStickerReveal={(sticker) => {
+          setUnlockedSticker(sticker);
+          setIsStickerRevealOpen(true);
+        }}
+      />
+
+      {/* Food Sticker Reveal Modal (Phase P5c.3c.1) */}
+      <FoodStickerRevealModal
+        isOpen={isStickerRevealOpen}
+        onClose={() => {
+          setIsStickerRevealOpen(false);
+          setUnlockedSticker(null);
+        }}
+        sticker={unlockedSticker}
       />
     </main>
     </SavedVocabularyContext.Provider>

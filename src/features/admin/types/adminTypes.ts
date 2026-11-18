@@ -59,6 +59,7 @@ export interface QuizQuestionDto {
 
 export interface ReadingPostPayload {
   id?: string;
+  storyId?: string;
   journeyId?: string;
   journeyTitleEn?: string;
   chapterOrder?: number;

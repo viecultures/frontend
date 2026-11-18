@@ -131,7 +131,12 @@
     "next_steps": "Bước tiếp theo",
     "practice_what_you_read": "Luyện tập nội dung vừa đọc",
     "next_steps_desc": "Chọn hoạt động để ôn tập từ vựng và cấu trúc ngữ pháp trong bài viết.",
-    "stamp_seal_btn": "Đóng Mộc Son Đỏ & Kích hoạt Streak",
+    "stamp_seal_btn": "Đóng Mộc Son Đỏ",
+    "claim_stamp_btn": "Đóng Mộc Son Đỏ",
+    "view_stamp_btn": "Xem Mộc Son Đã Nhận",
+    "stamp_status_owned": "Mộc Son Đã Nhận",
+    "stamp_status_ready": "Sẵn Sàng Đóng Mộc",
+    "stamp_status_unclaimed": "Chưa Đạt Mộc Son",
     "study_flashcards": "Học từ vựng qua flashcards",
     "practice_dictation": "Luyện nghe chép chính tả",
     "write_reflection": "Viết cảm nhận & chia sẻ"

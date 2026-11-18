@@ -72,6 +72,7 @@ export interface QuizQuestionItem {
 
 export interface ReaderArticleData {
   id: string;
+  storyId?: string;
   topicGroup?: string;
   journeyId?: string;
   isStandalone?: boolean;
@@ -199,6 +200,7 @@ export const readerApiService = {
 
     return {
       id: post.id,
+      storyId: post.storyId,
       topicGroup: post.topicGroup,
       titleEn: post.titleEn,
       titleVi: post.titleVi,

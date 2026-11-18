@@ -5,4 +5,6 @@ export * from './BadgesCollectionGrid';
 export * from './SubscriptionSettingsCard';
 export * from './SavedVocabQuickView';
 export * from './SealDetailModal';
+export * from './FoodStickerCard';
+export * from './StoryStampsSection';
 export * from './EditProfileModal';

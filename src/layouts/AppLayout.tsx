@@ -29,7 +29,7 @@ export const AppLayout: React.FC<LayoutProps> = ({ isLoggedIn = false, user, onL
         onLogout={onLogout}
         onOpenSettings={openSettings}
       />
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
         <Outlet />
       </main>
       <Footer />

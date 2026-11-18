@@ -40,6 +40,28 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { lang: paramLang } = useParams<{ lang?: string }>();
   const location = useLocation();
 
+  // Close menus on route change
+  React.useEffect(() => {
+    setIsMenuOpen(false);
+    setIsProfileOpen(false);
+  }, [location.pathname]);
+
+  // Close menus on Escape key
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (isMenuOpen) {
+          setIsMenuOpen(false);
+        }
+        if (isProfileOpen) {
+          setIsProfileOpen(false);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMenuOpen, isProfileOpen]);
+
   const match = location.pathname.match(/^\/(vi|en)(\/|$)/);
   const currentLang = resolveLanguage(
     paramLang || (match ? match[1] : undefined) || i18n?.language
@@ -66,7 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </Link>
         <nav
           id="main-navigation"
-          className={`vc-navbar-links${isMenuOpen ? ' is-open' : ''}`}
+          className={`vc-navbar-links ${isMenuOpen ? 'is-open flex' : 'hidden md:flex'}`}
           aria-label={t('footer.navigation_title', 'Main navigation')}
         >
           {navItems.map((item) => (
@@ -130,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
           <button
             type="button"
-            className="vc-navbar-menu"
+            className="vc-navbar-menu inline-flex md:hidden"
             aria-label={isMenuOpen ? t('navbar.close_nav', 'Close navigation') : t('navbar.open_nav', 'Open navigation')}
             aria-expanded={isMenuOpen}
             aria-controls="main-navigation"
