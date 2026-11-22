@@ -1,9 +1,7 @@
 import type { ReadingPostItem } from '@/features/admin/types/adminTypes';
 import type { VocabItem } from '@/data/readerData';
 import { VOCAB_DATABASE } from '@/data/readerData';
-import { LESSONS_DATA, type Lesson, type LevelDetail } from '@/data/discoveryData';
-import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
-import { resolveDeckCards } from '@/data/flashcardsData';
+import type { Lesson, LevelDetail } from '@/data/discoveryData';
 import { API_BASE_URL } from '@/config/apiConfig';
 
 export function readerLevelFor(level: string): 'Level 1' | 'Level 2' | 'Level 3' {
@@ -288,10 +286,7 @@ export const readerApiService = {
   // ─── 6. Map Backend CatalogLesson to UI Lesson Model ─────────────────────
   mapCatalogLessonToDiscoveryLesson(item: CatalogLesson): Lesson {
     const safeSummary = item.summary || 'Khám phá bài học văn hóa Việt Nam độc đáo cùng VieCultures.';
-    const matchedLandmark = VIETNAM_LANDMARKS.find(
-      lm => lm.id === item.id || lm.id === item.topicGroup
-    );
-    const resolvedSummaryVi = item.summaryVi || matchedLandmark?.excerptVi || safeSummary;
+    const resolvedSummaryVi = item.summaryVi || safeSummary;
     const safeReadTime = item.readTime || '3 phút đọc';
     const safeVocabCount = typeof item.vocabCount === 'number' ? item.vocabCount : 0;
 
@@ -373,108 +368,7 @@ export const readerApiService = {
   },
 
   // ─── 7. Resolve Local Article Fallback (Curated Heritage Articles) ────────
-  getLocalArticle(id: string, requestedLevel: string = 'Level 2'): ReaderArticleData | null {
-    if (!id) return null;
-
-    const normalize = (s: string) => s.toLowerCase().trim().replace(/[-_\s]+/g, '');
-    const normTarget = normalize(id);
-    // 1. Check in LESSONS_DATA
-    const lesson = LESSONS_DATA.find((l) => normalize(l.id) === normTarget);
-    if (lesson) {
-      const safeLevel: 'Level 1' | 'Level 2' | 'Level 3' =
-        requestedLevel === 'Level 1' || requestedLevel === 'Level 3' ? requestedLevel : 'Level 2';
-      const levelDetail = lesson.levelDetails?.[safeLevel] || lesson.levelDetails?.['Level 2'];
-      const vocabMap: Record<string, VocabItem> = {};
-      const vocabList: VocabItem[] = [];
-
-      const cards = resolveDeckCards(lesson.id);
-      if (cards.length > 0) {
-        cards.forEach((c) => {
-          const item: VocabItem = {
-            id: c.id,
-            word: c.word,
-            pos: c.pos,
-            ipa: c.ipa,
-            viMeaning: c.viMeaning,
-            contextSentence: c.contextEn,
-            enDefinition: VOCAB_DATABASE[c.word.toLowerCase()]?.enDefinition,
-          };
-          vocabMap[c.word.toLowerCase()] = item;
-          vocabList.push(item);
-        });
-      }
-
-      return {
-        id: lesson.id,
-        titleEn: lesson.title,
-        titleVi: lesson.vietnameseTitle,
-        topic: lesson.categoryVi,
-        region: 'Việt Nam',
-        level: requestedLevel,
-        cefrLevel: requestedLevel,
-        wordCount: levelDetail?.wordCount || 320,
-        readTime: levelDetail?.readTime || lesson.readTime,
-        imageUrl: lesson.imageUrl,
-        summary: levelDetail?.summary || lesson.summary,
-        paragraphs: [
-          {
-            orderIndex: 0,
-            enText: levelDetail?.summary || lesson.summary,
-            viText: lesson.vietnameseTitle + ' là một trong những nét đẹp văn hóa độc đáo của Việt Nam.',
-          },
-          {
-            orderIndex: 1,
-            enText: `Discovering ${lesson.title} offers deeper insights into the traditions and timeless spirit of Vietnamese heritage.`,
-            viText: `Khám phá ${lesson.vietnameseTitle} mang lại những hiểu biết sâu sắc hơn về truyền thống và tinh thần bất biến của di sản Việt.`,
-          },
-        ],
-        vocabularies: vocabList,
-        vocabMap,
-      };
-    }
-
-    // 2. Check in VIETNAM_LANDMARKS
-    const landmark = VIETNAM_LANDMARKS.find((lm) => normalize(lm.id) === normTarget);
-    if (landmark) {
-      const vocabMap: Record<string, VocabItem> = {};
-      const vocabList: VocabItem[] = [];
-
-      resolveDeckCards(landmark.id).forEach(card => {
-        const item: VocabItem = { id: card.id, word: card.word, pos: card.pos, ipa: card.ipa,
-          viMeaning: card.viMeaning, contextSentence: card.contextEn, enDefinition: VOCAB_DATABASE[card.word.toLowerCase()]?.enDefinition };
-        vocabMap[item.word.toLowerCase()] = item;
-        vocabList.push(item);
-      });
-
-      return {
-        id: landmark.id,
-        titleEn: landmark.title,
-        titleVi: landmark.titleVi,
-        topic: landmark.category,
-        region: landmark.region === 'north' ? 'Miền Bắc' : landmark.region === 'central' ? 'Miền Trung' : 'Miền Nam',
-        level: requestedLevel,
-        cefrLevel: landmark.level || requestedLevel,
-        wordCount: 280,
-        readTime: landmark.readTime,
-        imageUrl: landmark.image,
-        summary: landmark.subtitle,
-        paragraphs: [
-          {
-            orderIndex: 0,
-            enText: landmark.excerptEn,
-            viText: landmark.excerptVi,
-          },
-          {
-            orderIndex: 1,
-            enText: landmark.speakingSentenceEn,
-            viText: landmark.speakingSentenceVi,
-          },
-        ],
-        vocabularies: vocabList,
-        vocabMap,
-      };
-    }
-
+  getLocalArticle(_id: string, _requestedLevel: string = 'Level 2'): ReaderArticleData | null {
     return null;
   },
 };
