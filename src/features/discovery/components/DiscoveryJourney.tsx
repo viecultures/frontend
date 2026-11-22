@@ -245,12 +245,12 @@ export function DiscoveryJourney() {
     };
   }, []);
 
-  // Floating Chapter Popover State
+  // Chapter Popover State (Click to view chapters)
   const [hoverPopover, setHoverPopover] = useState<HoverPopoverState | null>(
     null,
   );
-  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seriesTriggerRef = useRef<HTMLElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const [selectedChapter, setSelectedChapter] =
     useState<SelectedChapter | null>(null);
   const skillDialogRef = useRef<HTMLDialogElement>(null);
@@ -290,11 +290,54 @@ export function DiscoveryJourney() {
   }, [selectedChapter]);
 
   useEffect(() => {
-    if (hoverPopover?.pinned)
-      document
-        .querySelector<HTMLButtonElement>(".journey-hover-chapter-link")
-        ?.focus();
-  }, [hoverPopover?.pinned, hoverPopover?.series.id]);
+    if (!hoverPopover) return;
+
+    document
+      .querySelector<HTMLButtonElement>(".journey-hover-chapter-link")
+      ?.focus();
+
+    function handleOutsideClick(event: MouseEvent | TouchEvent) {
+      const target = event.target as Node | null;
+      if (!target) return;
+
+      if (popoverRef.current && popoverRef.current.contains(target)) {
+        return;
+      }
+
+      if (target instanceof Element && target.closest(".journey-series-tile")) {
+        return;
+      }
+
+      closeSeriesChapters();
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        closeSeriesChapters();
+      }
+    }
+
+    function updatePosition() {
+      if (seriesTriggerRef.current) {
+        const { x, y } = calculateElementPopoverPosition(seriesTriggerRef.current);
+        setHoverPopover((current) => (current ? { ...current, x, y } : null));
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", updatePosition, { passive: true });
+    window.addEventListener("resize", updatePosition);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", updatePosition);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [hoverPopover?.series.id]);
 
   const availableSeries = allJourneys.filter((series) =>
     (!series.status || series.status === "published") &&
@@ -736,25 +779,23 @@ export function DiscoveryJourney() {
     writeLearningValue(`journey:unlocked:${provinceId}`, true);
   }
 
-  function clearHideTimeout() {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
-    }
-  }
-
-  function calculatePopoverPosition(clientX: number, clientY: number) {
+  function calculateElementPopoverPosition(element: HTMLElement) {
+    const rect = element.getBoundingClientRect();
     const popoverWidth = 360;
-    const popoverHeight = 290;
+    const popoverHeight = 320;
     const margin = 16;
-    const offset = 14;
+    const offset = 12;
 
-    let x = clientX + offset;
-    if (x + popoverWidth > window.innerWidth - margin) {
-      x = Math.max(margin, clientX - popoverWidth - offset);
+    let x: number;
+    if (rect.right + offset + popoverWidth <= window.innerWidth - margin) {
+      x = rect.right + offset;
+    } else if (rect.left - offset - popoverWidth >= margin) {
+      x = rect.left - offset - popoverWidth;
+    } else {
+      x = Math.max(margin, Math.min(window.innerWidth - popoverWidth - margin, rect.left));
     }
 
-    let y = clientY - 40;
+    let y = rect.top;
     if (y + popoverHeight > window.innerHeight - margin) {
       y = Math.max(margin, window.innerHeight - popoverHeight - margin);
     }
@@ -765,62 +806,25 @@ export function DiscoveryJourney() {
     return { x, y };
   }
 
-  function handleSeriesMouseEnter(series: JourneySeries, e: React.MouseEvent) {
-    clearHideTimeout();
-    const { x, y } = calculatePopoverPosition(e.clientX, e.clientY);
-    setHoverPopover((current) =>
-      current?.pinned ? current : { series, x, y },
-    );
-  }
-
-  function handleSeriesMouseMove(series: JourneySeries, e: React.MouseEvent) {
-    clearHideTimeout();
-    setHoverPopover((current) => {
-      if (current?.pinned || (current && current.series.id === series.id)) {
-        return current;
-      }
-      const { x, y } = calculatePopoverPosition(e.clientX, e.clientY);
-      return { series, x, y };
-    });
-  }
-
-  function handleSeriesMouseLeave() {
-    clearHideTimeout();
-    hideTimeoutRef.current = setTimeout(() => {
-      setHoverPopover((current) => (current?.pinned ? current : null));
-    }, 280);
-  }
-
-  function handlePopoverMouseEnter() {
-    clearHideTimeout();
-  }
-
-  function handlePopoverMouseLeave() {
-    clearHideTimeout();
-    hideTimeoutRef.current = setTimeout(() => {
-      setHoverPopover((current) => (current?.pinned ? current : null));
-    }, 180);
-  }
-
-  function openSeriesChapters(series: JourneySeries, element: HTMLElement) {
-    clearHideTimeout();
+  function toggleSeriesChapters(series: JourneySeries, element: HTMLElement) {
+    if (hoverPopover?.series.id === series.id) {
+      closeSeriesChapters();
+      return;
+    }
     seriesTriggerRef.current = element;
-    const rect = element.getBoundingClientRect();
-    const { x, y } = calculatePopoverPosition(rect.right, rect.top + 40);
+    const { x, y } = calculateElementPopoverPosition(element);
     setHoverPopover({ series, x, y, pinned: true });
   }
 
   function closeSeriesChapters() {
-    const wasPinned = hoverPopover?.pinned;
     setHoverPopover(null);
-    if (wasPinned) seriesTriggerRef.current?.focus();
+    seriesTriggerRef.current?.focus();
   }
 
   function chooseChapter(
     chapter: JourneySeries["chapters"][number],
     series: JourneySeries,
   ) {
-    clearHideTimeout();
     setHoverPopover(null);
     setSelectedChapter({
       id: chapter.id,
@@ -921,21 +925,16 @@ export function DiscoveryJourney() {
         ? "Vietnam"
         : "Việt Nam";
 
+    const isExpanded = hoverPopover?.series.id === series.id;
+
     return (
-      <li
-        key={series.id}
-        onMouseEnter={(e) => handleSeriesMouseEnter(series, e)}
-        onMouseMove={(e) => handleSeriesMouseMove(series, e)}
-        onMouseLeave={handleSeriesMouseLeave}
-      >
+      <li key={series.id}>
         <button
           type="button"
-          className="journey-series-tile"
-          aria-expanded={
-            hoverPopover?.series.id === series.id && !!hoverPopover.pinned
-          }
+          className={`journey-series-tile ${isExpanded ? "is-selected" : ""}`}
+          aria-expanded={isExpanded}
           aria-controls="journey-chapter-list"
-          onClick={(event) => openSeriesChapters(series, event.currentTarget)}
+          onClick={(event) => toggleSeriesChapters(series, event.currentTarget)}
         >
           <div className="journey-series-image">
             {series.imageUrl && !failedImages[series.id] ? (
@@ -1554,17 +1553,16 @@ export function DiscoveryJourney() {
         </div>
       </section>
 
-      {/* Floating chapter popover for hovered series */}
+      {/* Chapter popover for selected series */}
       {hoverPopover && (
         <div
+          ref={popoverRef}
           id="journey-chapter-list"
           className="journey-hover-popover"
           style={{
             left: `${hoverPopover.x}px`,
             top: `${hoverPopover.y}px`,
           }}
-          onMouseEnter={handlePopoverMouseEnter}
-          onMouseLeave={handlePopoverMouseLeave}
           onKeyDown={(event) => {
             if (event.key === "Escape") closeSeriesChapters();
           }}
