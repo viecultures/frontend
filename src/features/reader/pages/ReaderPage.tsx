@@ -25,8 +25,6 @@ import { GEMINI_VOICES, type GeminiVoice } from "../types/voice";
 import { readerApiService, readerLevelFor } from "../services/readerApiService";
 import type { ReaderArticleData } from "../services/readerApiService";
 import type { ReadingPostItem } from "@/features/admin/types/adminTypes";
-import { getPublicCuisineArticle } from '../services/publicCuisineService';
-import { getSeriesArticle } from '@/data/series';
 import { getStoredUser, clearAuthStorage, getIsProUser, type AppUser } from "@/utils/auth-storage";
 
 import { articleKey, cacheArticle, getCachedArticle } from '@/services/learning/learningStorage';
@@ -119,28 +117,17 @@ export default function ReaderPage() {
         return;
       }
 
-      // 2. Fallback to public cuisine or static series
-      const publishedCuisine = await getPublicCuisineArticle(targetId, selectedLevel).catch(() => null);
-      if (!active) return;
-      if (publishedCuisine) {
-        cacheArticle(publishedCuisine, selectedLevel);
-        setArticleData(publishedCuisine);
-        setLoadedKey(requestedKey);
-        return;
-      }
-      const staticSeries = getSeriesArticle(targetId);
-      if (staticSeries) {
-        cacheArticle(staticSeries, selectedLevel);
-        setArticleData(staticSeries);
+      // 2. Fallback to cached article if offline/previously loaded
+      const fallbackArticle = getCachedArticle(targetId, selectedLevel);
+      if (fallbackArticle) {
+        setArticleData(fallbackArticle);
         setLoadedKey(requestedKey);
         return;
       }
 
-      // 3. Fallback to local / cached article
-      const fallbackArticle = readerApiService.getLocalArticle(targetId, selectedLevel) || getCachedArticle(targetId, selectedLevel);
-      if (fallbackArticle) cacheArticle(fallbackArticle, selectedLevel);
-      setArticleData(fallbackArticle);
-      setArticleError(!fallbackArticle);
+      // 3. Mark article error if not found in API or cache
+      setArticleData(null);
+      setArticleError(true);
       setLoadedKey(requestedKey);
     };
     void load().catch(() => { if (active) { setArticleError(true); setLoadedKey(requestedKey); } });
@@ -239,14 +226,6 @@ export default function ReaderPage() {
       }
     }
 
-    if (!getSeriesArticle(targetId)) {
-      const available = await getPublicCuisineArticle(targetId, newLevel).catch(() => null);
-      if (request !== levelRequest.current) return;
-      if (!available) {
-        setLevelError(t('level_error_no_content', 'This article has no content at the selected level.'));
-        return;
-      }
-    }
     if (articleData?.cefrLevel && /^[ABC][12]$/.test(articleData.cefrLevel) && !articleData.topicGroup && newLevel !== selectedLevel) {
       setLevelError(t('level_error_unavailable', 'This article is not available at the selected level.'));
       return;

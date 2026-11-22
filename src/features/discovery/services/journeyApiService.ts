@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '@/config/apiConfig';
-import { JOURNEY_SERIES, type JourneySeries } from '@/data/series';
+import type { JourneySeries } from '@/data/series';
 
 export interface BackendChapterSummary {
   id: string;
@@ -109,19 +109,19 @@ export const journeyApiService = {
       clearTimeout(timeoutId);
 
       if (!res.ok) {
-        console.warn(`[journeyApiService] Failed to fetch journeys (HTTP ${res.status}), using mock fallback.`);
-        return JOURNEY_SERIES;
+        console.warn(`[journeyApiService] Failed to fetch journeys (HTTP ${res.status})`);
+        return [];
       }
 
       const data: BackendJourneyResponse[] = await res.json();
       if (!Array.isArray(data) || data.length === 0) {
-        return JOURNEY_SERIES;
+        return [];
       }
 
       return data.map(mapBackendJourneyToSeries);
     } catch (error) {
-      console.warn('[journeyApiService] Error fetching journeys from backend, falling back to mock data:', error);
-      return JOURNEY_SERIES;
+      console.warn('[journeyApiService] Error fetching journeys from backend:', error);
+      return [];
     }
   },
 
@@ -193,16 +193,14 @@ export const journeyApiService = {
       clearTimeout(timeoutId);
 
       if (!res.ok) {
-        const fallback = JOURNEY_SERIES.find(s => s.id === id);
-        return fallback || null;
+        return null;
       }
 
       const data: BackendJourneyResponse = await res.json();
       return mapBackendJourneyToSeries(data);
     } catch (error) {
-      console.warn(`[journeyApiService] Error fetching journey ${id}, checking mock fallback:`, error);
-      const fallback = JOURNEY_SERIES.find(s => s.id === id);
-      return fallback || null;
+      console.warn(`[journeyApiService] Error fetching journey ${id}:`, error);
+      return null;
     }
   },
 };

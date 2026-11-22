@@ -5,7 +5,6 @@ import { LESSONS_DATA, type Lesson, type LevelDetail } from '@/data/discoveryDat
 import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
 import { resolveDeckCards } from '@/data/flashcardsData';
 import { API_BASE_URL } from '@/config/apiConfig';
-import { getSeriesArticle } from '@/data/series';
 
 export function readerLevelFor(level: string): 'Level 1' | 'Level 2' | 'Level 3' {
   if (level === 'A1' || level === 'A2' || level === 'Level 1') return 'Level 1';
@@ -376,9 +375,6 @@ export const readerApiService = {
   // ─── 7. Resolve Local Article Fallback (Curated Heritage Articles) ────────
   getLocalArticle(id: string, requestedLevel: string = 'Level 2'): ReaderArticleData | null {
     if (!id) return null;
-
-    const seriesArticle = getSeriesArticle(id);
-    if (seriesArticle) return seriesArticle;
 
     const normalize = (s: string) => s.toLowerCase().trim().replace(/[-_\s]+/g, '');
     const normTarget = normalize(id);

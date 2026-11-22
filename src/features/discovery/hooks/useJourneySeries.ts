@@ -5,12 +5,8 @@ import {
   readLearningValue,
   writeLearningValue,
 } from "@/services/learning/learningStorage";
-import { JOURNEY_SERIES, type JourneySeries } from "../data/learningJourney";
+import { type JourneySeries } from "../data/learningJourney";
 import { journeyApiService } from "../services/journeyApiService";
-import {
-  getPublicCuisineSeries,
-  toPublicJourney,
-} from "@/features/reader/services/publicCuisineService";
 
 const SERIES_PAGE_SIZE = 6;
 
@@ -33,58 +29,17 @@ export function useJourneySeries({
   reduceMotion,
   closeSeriesChapters,
 }: UseJourneySeriesOptions) {
-  const [unlockedPlaces, setUnlockedPlaces] = useState<Record<string, boolean>>(
-    () =>
-      Object.fromEntries(
-        JOURNEY_SERIES.map((series) => [
-          series.provinceId,
-          readLearningValue<boolean>(`journey:unlocked:${series.provinceId}`) === true,
-        ]),
-      ),
-  );
-  const [allJourneys, setAllJourneys] = useState<JourneySeries[]>(JOURNEY_SERIES);
+  const [unlockedPlaces, setUnlockedPlaces] = useState<Record<string, boolean>>({});
+  const [allJourneys, setAllJourneys] = useState<JourneySeries[]>([]);
 
   useEffect(() => {
     let active = true;
-    Promise.all([
-      journeyApiService.getJourneys(),
-      getPublicCuisineSeries().catch(() => []),
-    ]).then(([backendJourneys, publicCuisine]) => {
+    journeyApiService.getJourneys().then((backendJourneys) => {
       if (!active) return;
-      const backendMap = new Map((backendJourneys || []).map((journey) => [journey.id, journey]));
-      const publicMap = new Map(publicCuisine.map((series) => [series.id, toPublicJourney(series)]));
-      const merged: JourneySeries[] = [];
-      const handledIds = new Set<string>();
-
-      for (const [id, dbJourney] of backendMap) {
-        handledIds.add(id);
-        if (dbJourney.status === "draft" || dbJourney.status === "archived") continue;
-        const mock = publicMap.get(id);
-        if (mock && (!dbJourney.chapters || dbJourney.chapters.length === 0)) {
-          merged.push({
-            ...mock,
-            ...dbJourney,
-            descriptionVi: dbJourney.descriptionVi || mock.descriptionVi,
-            chapters: mock.chapters,
-          });
-        } else {
-          merged.push({
-            ...dbJourney,
-            descriptionVi: dbJourney.descriptionVi || mock?.descriptionVi,
-          });
-        }
-      }
-
-      for (const [id, mockJourney] of publicMap) {
-        if (
-          !handledIds.has(id) &&
-          mockJourney.status !== "draft" &&
-          mockJourney.status !== "archived"
-        ) {
-          merged.push(mockJourney);
-        }
-      }
-      setAllJourneys(merged);
+      const valid = (backendJourneys || []).filter(
+        (journey) => journey.status !== "draft" && journey.status !== "archived",
+      );
+      setAllJourneys(valid);
     });
     return () => {
       active = false;
