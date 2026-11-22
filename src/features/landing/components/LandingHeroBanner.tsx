@@ -3,18 +3,16 @@ import { ArrowDown, ArrowRight, BookOpen, Mic2 } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
-import { cuisineStories, featuredCuisineStory, firstCuisineChapterPath } from '../lib/cuisineStories';
+import { firstCuisineChapterPath } from '../lib/cuisineStories';
 
 const EASE_CURVE = [0.22, 1, 0.36, 1] as const;
 
 export const LandingHeroBanner: React.FC = () => {
-  const { t, i18n } = useTranslation('landing');
+  const { t } = useTranslation('landing');
   const reducedMotion = useReducedMotion();
   const canAnimate = !reducedMotion;
 
-  const storyName = featuredCuisineStory
-    ? (i18n.language.startsWith('vi') ? featuredCuisineStory.titleVi : featuredCuisineStory.title)
-    : t('hero.fallback_story');
+  const storyName = t('hero.fallback_story', 'Hành trình văn hóa Việt Nam');
 
   return (
     <section className="landing-intro-hero" aria-labelledby="landing-title">
@@ -65,7 +63,7 @@ export const LandingHeroBanner: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.55 }}
           >
-            <span>{t('hero.footnote_series', { count: cuisineStories.length })}</span>
+            <span>{t('hero.footnote_series', { count: 37, defaultValue: '37 chuỗi hành trình văn hóa' })}</span>
             <span>{t('hero.footnote_bilingual')}</span>
           </motion.div>
         </div>
@@ -76,9 +74,7 @@ export const LandingHeroBanner: React.FC = () => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.95, delay: 0.2, ease: EASE_CURVE }}
         >
-          {featuredCuisineStory && (
-            <img src={featuredCuisineStory.imageUrl} alt={t('hero.image_alt', { title: storyName })} width={1024} height={576} fetchPriority="high" />
-          )}
+          <img src="/images/series/pho-hanoi.webp" alt={t('hero.image_alt', { title: storyName })} width={1024} height={576} fetchPriority="high" />
           <div className="landing-intro-image-label">
             <BookOpen size={18} aria-hidden="true" />
             <span>{t('hero.image_label', { title: storyName })}</span>

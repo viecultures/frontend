@@ -404,6 +404,8 @@ export default function DictionaryPage() {
               });
             }}
             savedWordCount={savedWordCount}
+            featuredLesson={apiLessons[0] || null}
+            totalDecksCount={totalCatalogDecks}
           />
         </div>
 

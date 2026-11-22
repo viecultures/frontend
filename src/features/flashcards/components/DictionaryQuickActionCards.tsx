@@ -1,7 +1,6 @@
 import { ArrowRight, BookOpen, Compass, BookmarkCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { LESSONS_DATA } from "@/data/discoveryData";
-import { resolveDeckCards } from "@/data/flashcardsData";
+import type { Lesson } from "@/data/discoveryData";
 import { DeckCoverIllustration } from "./DeckCoverIllustration";
 
 interface DictionaryQuickActionCardsProps {
@@ -9,15 +8,36 @@ interface DictionaryQuickActionCardsProps {
   onExploreMore: () => void;
   onReviewSaved: () => void;
   savedWordCount: number;
+  featuredLesson?: Lesson | null;
+  totalDecksCount?: number;
 }
 
-export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onReviewSaved, savedWordCount }: DictionaryQuickActionCardsProps) {
-  const { t } = useTranslation('flashcards');
+export function DictionaryQuickActionCards({
+  onGoToRecent,
+  onExploreMore,
+  onReviewSaved,
+  savedWordCount,
+  featuredLesson,
+  totalDecksCount = 0,
+}: DictionaryQuickActionCardsProps) {
+  const { t, i18n } = useTranslation('flashcards');
+  const isVi = (i18n.language || '').startsWith('vi');
+
+  const displayTitle = featuredLesson
+    ? (isVi ? featuredLesson.vietnameseTitle : featuredLesson.title)
+    : t('dictionary.featured_title_emphasis', 'a taste of Hanoi pho.');
+
+  const displayDesc = featuredLesson
+    ? (isVi ? (featuredLesson.summaryVi || featuredLesson.summary) : featuredLesson.summary)
+    : t('dictionary.featured_desc', 'Explore Hanoi pho, one flashcard at a time.');
+
+  const cardCount = featuredLesson?.vocabCount || (featuredLesson?.dbVocabularies?.length ?? 10);
+  const featuredCategory = featuredLesson?.category || 'Cuisine';
 
   return (
     <section className="vocab-actions" aria-label={t('dictionary.quick_actions_aria', 'Start learning vocabulary')}>
       <article className="vocab-featured">
-        <DeckCoverIllustration category="Cuisine" className="vocab-featured-image" />
+        <DeckCoverIllustration category={featuredCategory} className="vocab-featured-image" />
         <div className="vocab-featured-content">
           <span className="vocab-featured-label">
             <BookOpen size={14} />
@@ -25,9 +45,9 @@ export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onRevi
           </span>
           <h2>
             {t('dictionary.featured_title_prefix', 'A little English,')}<br />
-            {t('dictionary.featured_title_emphasis', 'a taste of Hanoi pho.')}
+            {displayTitle}
           </h2>
-          <p>{t('dictionary.featured_desc', 'Explore Hanoi pho, one flashcard at a time.')}</p>
+          <p className="line-clamp-2">{displayDesc}</p>
           <div className="vocab-featured-footer">
             <button className="vocab-button vocab-button-gold" onClick={onGoToRecent}>
               {t('dictionary.start_learning', 'Start learning')}
@@ -35,7 +55,7 @@ export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onRevi
             </button>
             <span>
               <BookOpen size={15} />
-              {t('deck_card.vocab_cards_count', { count: resolveDeckCards("pho-hanoi-history").length, defaultValue: `${resolveDeckCards("pho-hanoi-history").length} vocabulary cards` })}
+              {t('deck_card.vocab_cards_count', { count: cardCount, defaultValue: `${cardCount} vocabulary cards` })}
             </span>
           </div>
         </div>
@@ -45,7 +65,7 @@ export function DictionaryQuickActionCards({ onGoToRecent, onExploreMore, onRevi
           <span className="vocab-tile-icon"><Compass size={22} /></span>
           <span className="vocab-tile-copy">
             <strong>{t('dictionary.explore_decks', 'Explore the decks')}</strong>
-            <span>{t('dictionary.explore_decks_subtitle', { count: LESSONS_DATA.length, defaultValue: `${LESSONS_DATA.length} cuisine decks` })}</span>
+            <span>{t('dictionary.explore_decks_subtitle', { count: totalDecksCount, defaultValue: `${totalDecksCount} cuisine decks` })}</span>
           </span>
           <ArrowRight size={18} />
         </button>

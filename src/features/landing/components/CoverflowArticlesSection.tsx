@@ -1,18 +1,55 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
 import { PATHS, paths } from '@/routes/paths';
-import { cuisineStories } from '../lib/cuisineStories';
+import { journeyApiService } from '@/features/discovery/services/journeyApiService';
+import type { SeriesMetadata } from '@/data/series/types';
 
 export const CoverflowArticlesSection: React.FC = () => {
   const { t, i18n } = useTranslation('landing');
+  const [stories, setStories] = useState<SeriesMetadata[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const active = cuisineStories[activeIndex];
+  const active = stories[activeIndex];
   const isVietnamese = i18n.language.startsWith('vi');
 
+  useEffect(() => {
+    let mounted = true;
+    journeyApiService.getJourneys({ status: 'published' }).then((journeys) => {
+      if (!mounted) return;
+      const mapped = journeys
+        .filter((j) => j.theme === 'cuisine' && j.chapters.length > 0)
+        .map((j) => ({
+          id: j.id,
+          title: j.title,
+          titleVi: j.titleVi || j.title,
+          theme: 'cuisine' as const,
+          provinceId: j.provinceId,
+          region: j.region as SeriesMetadata['region'],
+          description: j.description,
+          imageUrl: j.imageUrl,
+          status: 'published' as const,
+          chapters: j.chapters.map((c) => ({
+            id: c.id,
+            order: c.order,
+            titleEn: c.title,
+            titleVi: c.titleVi || c.title,
+            summary: c.summary,
+            summaryVi: c.summaryVi || c.summary,
+            readTime: c.readTime,
+            cefrLevel: c.preferredLevel,
+          })),
+        }));
+      if (mapped.length > 0) {
+        setStories(mapped);
+      }
+    }).catch(() => {});
+    return () => { mounted = false; };
+  }, []);
+
   const move = (direction: number) => {
-    setActiveIndex((index) => (index + direction + cuisineStories.length) % cuisineStories.length);
+    if (stories.length === 0) return;
+    setActiveIndex((index) => (index + direction + stories.length) % stories.length);
   };
 
   return (
@@ -36,9 +73,9 @@ export const CoverflowArticlesSection: React.FC = () => {
               if (event.key === 'ArrowRight') { event.preventDefault(); move(1); }
             }}>
               <div className="landing-series-stage">
-                {cuisineStories.map((series, index) => {
-                  let offset = (index - activeIndex + cuisineStories.length) % cuisineStories.length;
-                  if (offset > cuisineStories.length / 2) offset -= cuisineStories.length;
+                {stories.map((series, index) => {
+                  let offset = (index - activeIndex + stories.length) % stories.length;
+                  if (offset > stories.length / 2) offset -= stories.length;
                   const distance = Math.abs(offset);
                   const visible = distance <= 2;
                   return (
@@ -69,7 +106,7 @@ export const CoverflowArticlesSection: React.FC = () => {
               </div>
               <div className="landing-series-controls">
                 <button type="button" onClick={() => move(-1)} aria-label={t('articles.previous_series')}><ChevronLeft size={22} aria-hidden="true" /></button>
-                <span aria-live="polite">{activeIndex + 1} / {cuisineStories.length}</span>
+                <span aria-live="polite">{activeIndex + 1} / {stories.length}</span>
                 <button type="button" onClick={() => move(1)} aria-label={t('articles.next_series')}><ChevronRight size={22} aria-hidden="true" /></button>
               </div>
             </div>

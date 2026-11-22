@@ -11,11 +11,62 @@ export interface VocabItem {
   isProfane?: boolean;
 }
 
-import { ALL_SERIES_ARTICLES } from "./series/seriesRegistry";
-
-export const VOCAB_DATABASE: Record<string, VocabItem> = Object.fromEntries(
-  ALL_SERIES_ARTICLES.flatMap(article => article.vocabularies.map(item => [item.word.toLowerCase(), item])),
-);
+export const VOCAB_DATABASE: Record<string, VocabItem> = {
+  sacred: {
+    id: 'vocab-sacred',
+    word: 'sacred',
+    pos: 'adjective',
+    ipa: '/ˈseɪ.krɪd/',
+    viMeaning: 'thiêng liêng, tôn kính',
+    enDefinition: 'connected with God or dedicated to a religious purpose',
+    contextSentence: 'The temple is considered a sacred cultural sanctuary.',
+  },
+  heritage: {
+    id: 'vocab-heritage',
+    word: 'heritage',
+    pos: 'noun',
+    ipa: '/ˈher.ɪ.tɪdʒ/',
+    viMeaning: 'di sản văn hóa',
+    enDefinition: 'features belonging to the culture of a particular society',
+    contextSentence: 'Vietnamese culinary traditions are a treasured cultural heritage.',
+  },
+  broth: {
+    id: 'vocab-broth',
+    word: 'broth',
+    pos: 'noun',
+    ipa: '/brɒθ/',
+    viMeaning: 'nước dùng',
+    enDefinition: 'soup consisting of meat or vegetable chunks cooked in stock',
+    contextSentence: 'The aromatic broth is simmered overnight with beef bones.',
+  },
+  simmer: {
+    id: 'vocab-simmer',
+    word: 'simmer',
+    pos: 'verb',
+    ipa: '/ˈsɪm.ər/',
+    viMeaning: 'ninh nhỏ lửa',
+    enDefinition: 'stay just below the boiling point while bubbling gently',
+    contextSentence: 'Let the broth simmer gently to develop depth of flavour.',
+  },
+  aroma: {
+    id: 'vocab-aroma',
+    word: 'aroma',
+    pos: 'noun',
+    ipa: '/əˈrəʊ.mə/',
+    viMeaning: 'hương thơm đặc trưng',
+    enDefinition: 'a distinctive, typically pleasant smell',
+    contextSentence: 'A rich aroma of roasted spices fills the morning air.',
+  },
+  fragrant: {
+    id: 'vocab-fragrant',
+    word: 'fragrant',
+    pos: 'adjective',
+    ipa: '/ˈfreɪ.ɡrənt/',
+    viMeaning: 'thơm ngát',
+    enDefinition: 'having a pleasant or sweet smell',
+    contextSentence: 'Fresh herbs add a fragrant note to the warm bowl.',
+  },
+};
 
 // Helper function to extract the full sentence containing the target word or phrase
 export function extractSentenceContext(fullParagraphText: string, targetPhrase: string): string {

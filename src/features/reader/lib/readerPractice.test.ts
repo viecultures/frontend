@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildPracticeSegments, checkDictation, practiceModeFrom } from './readerPractice';
-import { PHO_SERIES_ARTICLES } from '@/data/series';
+import { PHO_SERIES_ARTICLES } from '@/data/series/mock/phoSeries';
 
 const base = PHO_SERIES_ARTICLES[0];
 

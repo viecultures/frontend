@@ -8,13 +8,13 @@ import {
   getSeriesByProvince,
   getSeriesArticle,
   getSeriesNavigation,
-  PHO_SERIES_METADATA,
-  BUN_CHA_SERIES_METADATA,
-  CHA_CA_SERIES_METADATA,
-  CA_KHO_VU_DAI_SERIES_METADATA,
-  COM_CHAY_SERIES_METADATA,
-  BANH_CAY_SERIES_METADATA,
 } from './index';
+import { PHO_SERIES_METADATA } from './mock/phoSeries';
+import { BUN_CHA_SERIES_METADATA } from './mock/bunChaSeries';
+import { CHA_CA_SERIES_METADATA } from './mock/chaCaSeries';
+import { CA_KHO_VU_DAI_SERIES_METADATA } from './mock/caKhoVuDaiSeries';
+import { COM_CHAY_SERIES_METADATA } from './mock/comChaySeries';
+import { BANH_CAY_SERIES_METADATA } from './mock/banhCaySeries';
 
 describe('Article Series Mock Data Hub', () => {
   it('registers all series with valid metadata and non-empty chapters', () => {

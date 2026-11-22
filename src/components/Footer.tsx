@@ -3,11 +3,8 @@ import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { BrandLogo } from './BrandLogo';
 import { LocalizedLink as Link } from '@/components/common/LocalizedLink';
-import { getPublishedSeries } from '@/data/series';
-import { PATHS, paths } from '@/routes/paths';
+import { PATHS } from '@/routes/paths';
 
-const foodSeries = getPublishedSeries()
-  .filter((series) => series.theme === 'cuisine' && series.chapters.length > 0);
 const storyLibraryPath = PATHS.discovery;
 
 const footerLinkClass =
@@ -36,13 +33,16 @@ export const Footer: React.FC = () => {
           <nav aria-label={t('footer.food_title')}>
             <h3 className="mb-3 text-sm font-bold text-antique-bright">{t('footer.food_title')}</h3>
             <ul className="space-y-0.5">
-              {foodSeries.slice(0, 3).map((series) => (
-                <li key={series.id}>
-                  <Link to={paths.reader({ story: series.chapters[0].id })} className={footerLinkClass}>
-                    {isVietnamese ? series.titleVi : series.title}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link to={PATHS.discovery} className={footerLinkClass}>
+                  {isVietnamese ? 'Khám phá ẩm thực ba miền' : 'Explore regional cuisine'}
+                </Link>
+              </li>
+              <li>
+                <Link to={PATHS.discovery} className={footerLinkClass}>
+                  {isVietnamese ? 'Di sản văn hóa phi vật thể' : 'Intangible cultural heritage'}
+                </Link>
+              </li>
               <li>
                 <Link to={storyLibraryPath} className={footerLinkClass}>
                   {t('footer.all_stories')}

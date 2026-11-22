@@ -3,13 +3,12 @@ import { ArrowRight, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { paths, PATHS } from '@/routes/paths';
 import type { ReadingBookmark } from '../lib/studyRoomStorage';
-import { getSeriesArticle } from '@/data/series/seriesRegistry';
 
 interface HomeContinueCardProps { bookmark?: ReadingBookmark; }
 
 export function HomeContinueCard({ bookmark: storedBookmark }: HomeContinueCardProps) {
   const { t } = useTranslation('home');
-  const bookmark = storedBookmark && getSeriesArticle(storedBookmark.id) ? storedBookmark : undefined;
+  const bookmark = storedBookmark?.id && storedBookmark?.title ? storedBookmark : undefined;
   const position = Math.round((bookmark?.position || 0) * 100);
 
   return <section className="home-room-continue home-room-panel" aria-labelledby="home-continue-title">
@@ -38,7 +37,7 @@ export function HomeContinueCard({ bookmark: storedBookmark }: HomeContinueCardP
         <progress value={position} max={100} aria-label={t('continue_card.reading_position', 'Reading position')} />
       </div>}
       <div className="home-room-continue-actions">
-        <Link className="home-room-primary" to={paths.reader({ postId: bookmark?.id || 'pho-hanoi-history', level: bookmark?.level || 'Level 1' })}>
+        <Link className="home-room-primary" to={bookmark ? paths.reader({ postId: bookmark.id, level: bookmark.level || 'Level 1' }) : PATHS.discovery}>
           {bookmark ? t('continue_card.btn_continue', 'Continue reading') : t('continue_card.btn_start', 'Start your first story')}
           <ArrowRight size={17} aria-hidden="true" />
         </Link>

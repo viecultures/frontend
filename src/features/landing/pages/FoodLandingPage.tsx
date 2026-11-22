@@ -4,16 +4,14 @@ import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react';
 import { ArrowDown, BookOpen, Bookmark, Headphones, Menu, Pause, Play, RotateCcw, X, ArrowRight } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
-import { getPublishedSeries } from '@/data/series';
 import type { SeriesMetadata } from '@/data/series/types';
 import { PATHS, paths } from '@/routes/paths';
 import { useAppNavigate } from '@/routes/useAppNavigate';
-import { getPublicCuisineSeries, toPublicSeriesMetadata } from '@/features/reader/services/publicCuisineService';
 import { journeyApiService } from '@/features/discovery/services/journeyApiService';
 import type { JourneySeries } from '@/data/series';
 import '../food-landing.css';
 
-const initialCuisineSeries = getPublishedSeries().filter((series) => series.theme === 'cuisine');
+const initialCuisineSeries: SeriesMetadata[] = [];
 
 const fromBackendJourney = (journey: JourneySeries): SeriesMetadata => ({
   id: journey.id,
@@ -80,13 +78,14 @@ const FoodLandingPage: React.FC = () => {
 
   useEffect(() => {
     let active = true;
-    Promise.all([getPublicCuisineSeries(), journeyApiService.getJourneys({ status: 'published' })]).then(([seriesList, backendJourneys]) => {
+    journeyApiService.getJourneys({ status: 'published' }).then((backendJourneys) => {
       if (!active) return;
-      const allowed = new Set([...initialCuisineSeries.map(item => item.id), ...seriesList.map(item => item.id)]);
-      const fromBackend = backendJourneys.filter(item => allowed.has(item.id) && item.chapters.length > 0).map(fromBackendJourney);
-      const fallback = [...initialCuisineSeries, ...seriesList.map(toPublicSeriesMetadata)]
-        .filter(item => !fromBackend.some(backend => backend.id === item.id));
-      setCuisineSeries([...fromBackend, ...fallback]);
+      const fromBackend = backendJourneys
+        .filter(item => item.theme === 'cuisine' && item.chapters.length > 0)
+        .map(fromBackendJourney);
+      if (fromBackend.length > 0) {
+        setCuisineSeries(fromBackend);
+      }
     }).catch(() => {});
     return () => { active = false; };
   }, []);

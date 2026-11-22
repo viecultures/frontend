@@ -1,12 +1,8 @@
-import { getPublishedSeries } from '@/data/series';
-import { PATHS, paths } from '@/routes/paths';
+import type { SeriesMetadata } from '@/data/series/types';
+import { PATHS } from '@/routes/paths';
 
-export const cuisineStories = getPublishedSeries().filter(
-  (series) => series.theme === 'cuisine' && series.chapters.length > 0,
-);
+export const cuisineStories: SeriesMetadata[] = [];
 
-export const featuredCuisineStory = cuisineStories.find((series) => series.id === 'pho') ?? cuisineStories[0];
+export const featuredCuisineStory: SeriesMetadata | null = null;
 
-export const firstCuisineChapterPath = featuredCuisineStory
-  ? paths.reader({ story: featuredCuisineStory.chapters[0].id })
-  : PATHS.discovery;
+export const firstCuisineChapterPath = PATHS.discovery;

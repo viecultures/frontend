@@ -4,26 +4,72 @@ import type { CulturalSeal, UserBadge, UserProfileData } from '../types';
 const PROFILE_STORAGE_KEY = 'vie_profile_data_v1';
 const SEALS_STORAGE_KEY = 'vie_cultural_seals_v1';
 
-import { ALL_SERIES, ALL_SERIES_ARTICLES } from "@/data/series/seriesRegistry";
-
-const allowedPostIds = new Set(ALL_SERIES_ARTICLES.map(article => article.id));
-
-export const INITIAL_SEALS: CulturalSeal[] = ALL_SERIES.map((series, index) => ({
-  id: `seal-${series.metadata.id}`,
-  postId: series.metadata.chapters[0].id,
-  titleVi: series.metadata.titleVi,
-  titleEn: series.metadata.title,
-  region: series.metadata.region,
-  province: series.metadata.provinceId,
-  isUnlocked: false,
-  stampedAt: null,
-  sealCode: `VN-CUISINE-${String(index + 1).padStart(3, "0")}`,
-  badgeIcon: "utensils",
-  quoteVi: series.metadata.description,
-  quoteEn: series.metadata.description,
-  learnedWordsCount: 0,
-  readingMinutes: 0,
-}));
+export const INITIAL_SEALS: CulturalSeal[] = [
+  {
+    id: 'seal-pho',
+    postId: 'pho-01',
+    titleVi: 'Phở Hà Nội',
+    titleEn: 'Hanoi Pho Heritage',
+    region: 'north',
+    province: 'ha-noi',
+    isUnlocked: false,
+    stampedAt: null,
+    sealCode: 'VN-CUISINE-001',
+    badgeIcon: 'utensils',
+    quoteVi: 'Hương vị tinh hoa ẩm thực thủ đô nghìn năm văn hiến.',
+    quoteEn: 'The quintessential flavor of thousand-year-old Hanoi.',
+    learnedWordsCount: 0,
+    readingMinutes: 0,
+  },
+  {
+    id: 'seal-bun-cha',
+    postId: 'bun-cha-01',
+    titleVi: 'Bún Chả Hà Nội',
+    titleEn: 'Hanoi Bun Cha',
+    region: 'north',
+    province: 'ha-noi',
+    isUnlocked: false,
+    stampedAt: null,
+    sealCode: 'VN-CUISINE-002',
+    badgeIcon: 'utensils',
+    quoteVi: 'Món ăn truyền thống lưu giữ nét thanh lịch Tràng An.',
+    quoteEn: 'A traditional dish capturing the elegance of ancient Hanoi.',
+    learnedWordsCount: 0,
+    readingMinutes: 0,
+  },
+  {
+    id: 'seal-banh-mi',
+    postId: 'saigon-banh-mi-01',
+    titleVi: 'Bánh Mì Sài Gòn',
+    titleEn: 'Saigon Banh Mi',
+    region: 'south',
+    province: 'ho-chi-minh',
+    isUnlocked: false,
+    stampedAt: null,
+    sealCode: 'VN-CUISINE-003',
+    badgeIcon: 'utensils',
+    quoteVi: 'Văn hóa ẩm thực đường phố vang danh thế giới.',
+    quoteEn: 'World-renowned street food culture from the heart of Saigon.',
+    learnedWordsCount: 0,
+    readingMinutes: 0,
+  },
+  {
+    id: 'seal-hue-cuisine',
+    postId: 'hue-cuisine-01',
+    titleVi: 'Ẩm Thực Cung Đình Huế',
+    titleEn: 'Hue Imperial Cuisine',
+    region: 'central',
+    province: 'thua-thien-hue',
+    isUnlocked: false,
+    stampedAt: null,
+    sealCode: 'VN-CUISINE-004',
+    badgeIcon: 'utensils',
+    quoteVi: 'Sự tao nhã và cầu kỳ của ẩm thực hoàng gia xứ Huế.',
+    quoteEn: 'The elegance and sophistication of royal Hue cuisine.',
+    learnedWordsCount: 0,
+    readingMinutes: 0,
+  },
+];
 
 export const INITIAL_BADGES: UserBadge[] = [
   {
@@ -211,7 +257,7 @@ export const profileService = {
       const raw = localStorage.getItem(userKey) || localStorage.getItem(SEALS_STORAGE_KEY);
       if (!raw) return INITIAL_SEALS;
       const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed.filter((seal): seal is CulturalSeal => allowedPostIds.has(seal?.postId)) : INITIAL_SEALS;
+      return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_SEALS;
     } catch {
       return INITIAL_SEALS;
     }
@@ -222,16 +268,40 @@ export const profileService = {
     const now = new Date();
     const formatted = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
 
-    const updated = seals.map((s) => {
-      if (s.id === sealId || s.postId === sealId) {
-        return {
-          ...s,
+    const existingIndex = seals.findIndex((s) => s.id === sealId || s.postId === sealId);
+    let updated: CulturalSeal[];
+    if (existingIndex >= 0) {
+      updated = seals.map((s, idx) => {
+        if (idx === existingIndex) {
+          return {
+            ...s,
+            isUnlocked: true,
+            stampedAt: s.stampedAt || formatted,
+          };
+        }
+        return s;
+      });
+    } else {
+      updated = [
+        ...seals,
+        {
+          id: `seal-${sealId}`,
+          postId: sealId,
+          titleVi: 'Mộc Son Di Sản',
+          titleEn: 'Heritage Seal',
+          region: 'north',
+          province: 'vietnam',
           isUnlocked: true,
-          stampedAt: s.stampedAt || formatted,
-        };
-      }
-      return s;
-    });
+          stampedAt: formatted,
+          sealCode: `VN-MOC-${Math.floor(1000 + Math.random() * 9000)}`,
+          badgeIcon: 'award',
+          quoteVi: 'Chứng nhận hoàn thành bài đọc di sản',
+          quoteEn: 'Heritage reading completion certificate',
+          learnedWordsCount: 0,
+          readingMinutes: 0,
+        },
+      ];
+    }
 
     try {
       const userKey = getUserKey(SEALS_STORAGE_KEY);
