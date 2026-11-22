@@ -26,6 +26,11 @@ dist-ssr
 *.cjs
 # Build 
 .dist
+*.tsbuildinfo
+
+# Test Outputs
+playwright-report
+test-results
 
 
 # Environment variables
