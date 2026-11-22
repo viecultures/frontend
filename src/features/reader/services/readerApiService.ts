@@ -97,6 +97,8 @@ export interface ReaderArticleData {
   questions?: QuizQuestionItem[];
 }
 
+const unwrap = <T>(res: any): T => (res && res.data !== undefined ? res.data : res);
+
 export const readerApiService = {
   // ─── 1. Fetch Post Detail by ID ──────────────────────────────────────────
   async getPostById(id: string, signal?: AbortSignal): Promise<ReadingPostItem | null> {
@@ -104,7 +106,8 @@ export const readerApiService = {
       const activeSignal = signal || AbortSignal.timeout(8000);
       const res = await fetch(`${API_BASE_URL}/api/posts/${encodeURIComponent(id)}`, { signal: activeSignal });
       if (!res.ok) return null;
-      return await res.json();
+      const json = await res.json();
+      return unwrap<ReadingPostItem>(json);
     } catch (err: unknown) {
       if ((err as Error)?.name === 'AbortError') return null;
       console.warn(`[Reader API] Lỗi khi tải bài viết ID ${id}:`, err);
@@ -121,7 +124,8 @@ export const readerApiService = {
       });
       const res = await fetch(`${API_BASE_URL}/api/posts?${searchParams.toString()}`);
       if (!res.ok) return null;
-      const list: ReadingPostItem[] = await res.json();
+      const json = await res.json();
+      const list: ReadingPostItem[] = unwrap<ReadingPostItem[]>(json);
       return list && list.length > 0 ? list[0] : null;
     } catch (err: unknown) {
       if ((err as Error)?.name === 'AbortError') return null;
@@ -135,7 +139,8 @@ export const readerApiService = {
     try {
       const res = await fetch(`${API_BASE_URL}/api/posts`);
       if (!res.ok) return [];
-      return await res.json();
+      const json = await res.json();
+      return unwrap<ReadingPostItem[]>(json);
     } catch (err: unknown) {
       if ((err as Error)?.name === 'AbortError') return [];
       console.warn('[Reader API] Lỗi khi tải danh sách bài viết:', err);
@@ -270,7 +275,8 @@ export const readerApiService = {
         );
         return null;
       }
-      return await res.json();
+      const json = await res.json();
+      return unwrap<CatalogResponseData>(json);
     } catch (err: unknown) {
       const errObj = err as Error | undefined;
       if (errObj?.name === 'AbortError') {

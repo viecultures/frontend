@@ -65,7 +65,8 @@ export async function fetchVocabProgress(userId?: string): Promise<Record<string
     const res = await fetch(url, { signal: controller.signal });
     clearTimeout(timeout);
     if (res.ok) {
-      const remoteData: VocabProgressPayload[] = await res.json();
+      const raw = await res.json();
+      const remoteData: VocabProgressPayload[] = (raw && raw.data !== undefined) ? raw.data : raw;
       if (Array.isArray(remoteData)) {
         const merged = { ...localRecords };
         for (const item of remoteData) {

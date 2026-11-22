@@ -35,6 +35,8 @@ export interface PostFilterParams {
   provinceId?: string;
 }
 
+const unwrap = <T>(res: any): T => (res && res.data !== undefined ? res.data : res);
+
 export const postAdminService = {
   // ─── 1. API Calls ─────────────────────────────────────────────────────────
 
@@ -45,7 +47,8 @@ export const postAdminService = {
     if (!res.ok) {
       throw new Error(`Không thể tải danh sách tùy chọn bài viết (HTTP ${res.status})`);
     }
-    return res.json();
+    const json = await res.json();
+    return unwrap<EntityOption[]>(json);
   },
 
   async getPosts(params?: PostFilterParams): Promise<ReadingPostItem[]> {
@@ -64,7 +67,8 @@ export const postAdminService = {
     if (!res.ok) {
       throw new Error(`Không thể tải danh sách bài viết (HTTP ${res.status})`);
     }
-    return res.json();
+    const json = await res.json();
+    return unwrap<ReadingPostItem[]>(json);
   },
 
   async getPostById(id: string): Promise<ReadingPostItem> {
@@ -72,7 +76,8 @@ export const postAdminService = {
     if (!res.ok) {
       throw new Error(`Không tìm thấy bài viết ID: ${id}`);
     }
-    return res.json();
+    const json = await res.json();
+    return unwrap<ReadingPostItem>(json);
   },
 
   async createPost(payload: ReadingPostPayload): Promise<ReadingPostItem> {
@@ -86,7 +91,8 @@ export const postAdminService = {
       const errData = await res.text();
       throw new Error(errData || `Lỗi khi tạo bài viết (HTTP ${res.status})`);
     }
-    return res.json();
+    const json = await res.json();
+    return unwrap<ReadingPostItem>(json);
   },
 
   async updatePost(id: string, payload: ReadingPostPayload): Promise<ReadingPostItem> {
@@ -100,7 +106,8 @@ export const postAdminService = {
       const errData = await res.text();
       throw new Error(errData || `Lỗi khi cập nhật bài viết (HTTP ${res.status})`);
     }
-    return res.json();
+    const json = await res.json();
+    return unwrap<ReadingPostItem>(json);
   },
 
   async deletePost(id: string): Promise<{ success: boolean; message: string }> {
@@ -112,7 +119,8 @@ export const postAdminService = {
     if (!res.ok) {
       throw new Error(`Lỗi khi xóa bài viết ID: ${id}`);
     }
-    return res.json();
+    const json = await res.json();
+    return unwrap<{ success: boolean; message: string }>(json);
   },
 
   // ─── 2. Thông minh: Tự động chia đoạn song ngữ (Auto-Split Bilingual) ────
@@ -305,7 +313,8 @@ export const postAdminService = {
     try {
       const res = await fetch(`${API_BASE_URL}/api/voice/models`);
       if (!res.ok) throw new Error('Không thể tải danh sách model giọng đọc');
-      return await res.json();
+      const json = await res.json();
+      return unwrap<any[]>(json);
     } catch (err) {
       console.warn('[postAdminService] Lỗi tải voice models từ server, kích hoạt danh sách chuẩn:', err);
       return [

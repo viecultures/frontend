@@ -566,7 +566,8 @@ export async function lookupWordInstant(
       const res = await fetch(url, { signal: controller.signal });
       clearTimeout(timer);
       if (res.ok) {
-        const beData = await res.json();
+        const raw = await res.json();
+        const beData = (raw && raw.data !== undefined) ? raw.data : raw;
         if (beData && beData.word && beData.viMeaning) {
           const item: VocabItem = {
             id: beData.id || lowerWord.replace(/\s+/g, '-'),
