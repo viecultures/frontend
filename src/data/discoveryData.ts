@@ -1,6 +1,5 @@
 import type { Level } from '@/types';
 import type { VocabItemDto } from '@/features/admin/types/adminTypes';
-import { ALL_SERIES } from './series';
 
 // Catalog Lesson Interface
 export type LevelType = 'Level 1' | 'Level 2' | 'Level 3';
@@ -90,58 +89,7 @@ const CATEGORY_VI_MAP: Record<string, string> = {
   Folklore: 'Lễ Hội & Tín Ngưỡng',
 };
 
-export const SERIES_LESSONS: Lesson[] = ALL_SERIES.flatMap((series, sIdx) => {
-  const category = getCategoryForTheme(series.metadata.theme);
-  const categoryVi = CATEGORY_VI_MAP[category];
-
-  return series.articles.map((article, idx) => {
-    const chapterMeta = series.metadata.chapters[idx];
-    const summary = article.summary || chapterMeta?.summary || article.summaryVi || '';
-    const summaryVi = article.summaryVi || chapterMeta?.summaryVi || summary;
-
-    return {
-      id: article.id,
-      title: article.titleEn,
-      vietnameseTitle: article.titleVi,
-      category,
-      categoryVi,
-      cefrLevel: 'Level 2' as LevelType,
-      availableLevels: ['Level 1', 'Level 2', 'Level 3'] as LevelType[],
-      levelDetails: {
-        'Level 1': {
-          readTime: '3 phút đọc',
-          vocabCount: Math.min(6, article.vocabularies?.length || 6),
-          summary,
-          summaryVi,
-        },
-        'Level 2': {
-          readTime: article.readTime || '3 phút đọc',
-          vocabCount: article.vocabularies?.length || 10,
-          summary,
-          summaryVi,
-        },
-        'Level 3': {
-          readTime: '5 phút đọc',
-          vocabCount: Math.min(14, (article.vocabularies?.length || 10) + 4),
-          summary,
-          summaryVi,
-        },
-      },
-      readTime: article.readTime || '3 phút đọc',
-      vocabCount: article.vocabularies?.length || 10,
-      summary,
-      summaryVi,
-      gradient: category === 'Cuisine'
-        ? 'from-amber-700 via-amber-800 to-amber-950'
-        : 'from-heritage-green via-teal-800 to-emerald-950',
-      iconSymbol: category === 'Cuisine' ? 'UtensilsCrossed' : 'Landmark',
-      imageUrl: article.imageUrl || series.metadata.imageUrl,
-      dateAdded: `2026-04-${String(25 - Math.min(15, sIdx)).padStart(2, '0')}`,
-      provinceId: series.metadata.provinceId,
-      isNational: series.metadata.provinceId === 'ha-noi',
-    };
-  });
-});
+export const SERIES_LESSONS: Lesson[] = [];
 
 export const LESSONS_DATA: Lesson[] = SERIES_LESSONS;
 

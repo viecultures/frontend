@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Lesson } from "@/data/discoveryData";
-import { LESSONS_DATA } from "@/data/discoveryData";
 import { readerApiService } from "@/features/reader/services/readerApiService";
 import {
   readLearningValue,
@@ -80,26 +79,22 @@ export function useJourneyArticles({
             setArticlesError(null);
           } else {
             setServerCatalog(null);
-            if (!LESSONS_DATA || LESSONS_DATA.length === 0) {
-              setArticlesError(
-                isEn
-                  ? "Unable to load reading stories. Please check your internet connection."
-                  : "Không thể tải danh sách bài đọc. Vui lòng kiểm tra kết nối mạng.",
-              );
-            }
+            setArticlesError(
+              isEn
+                ? "Unable to load reading stories. Please check your internet connection or start the backend server."
+                : "Không thể tải danh sách bài đọc. Vui lòng kiểm tra kết nối mạng hoặc máy chủ Backend.",
+            );
           }
         })
         .catch((err: unknown) => {
           if (!active) return;
           console.warn("Could not load catalog lessons for discovery:", err);
           setServerCatalog(null);
-          if (!LESSONS_DATA || LESSONS_DATA.length === 0) {
-            setArticlesError(
-              isEn
-                ? "Unable to load reading stories. Please check your internet connection."
-                : "Không thể tải danh sách bài đọc. Vui lòng kiểm tra kết nối mạng.",
-            );
-          }
+          setArticlesError(
+            isEn
+              ? "Unable to load reading stories. Please check your internet connection or start the backend server."
+              : "Không thể tải danh sách bài đọc. Vui lòng kiểm tra kết nối mạng hoặc máy chủ Backend.",
+          );
         })
         .finally(() => {
           if (active) setIsArticlesLoading(false);
@@ -125,55 +120,7 @@ export function useJourneyArticles({
     setArticlesPage(1);
   }, [searchQuery, selectedTopic, selectedCefr, selectedProvince, articlesPageSize]);
 
-  const fallbackStandaloneLessons = useMemo(() => {
-    return LESSONS_DATA.filter((lesson) => {
-      const journeyId = (
-        "journeyId" in lesson ? ((lesson as { journeyId?: string }).journeyId || "") : ""
-      ).toLowerCase().trim();
-      if (journeyId && topJourneyKeys.has(journeyId)) return false;
-
-      const id = (lesson.id || "").toLowerCase().trim();
-      if (topJourneyKeys.has(id)) return false;
-      for (const key of topJourneyKeys) {
-        if (id.startsWith(key + "-") || id === key) return false;
-      }
-      return true;
-    });
-  }, [topJourneyKeys]);
-
-  const fallbackFilteredArticles = useMemo(() => {
-    let list = fallbackStandaloneLessons;
-
-    if (selectedProvince) {
-      const provinceMatches = list.filter((lesson) => lesson.provinceId === selectedProvince.id);
-      if (provinceMatches.length > 0) list = provinceMatches;
-    }
-    if (selectedTopic !== "All") list = list.filter((lesson) => lesson.category === selectedTopic);
-    if (selectedCefr !== "All") {
-      list = list.filter((lesson) =>
-        lesson.availableLevels
-          ? lesson.availableLevels.includes(selectedCefr as "Level 1" | "Level 2" | "Level 3")
-          : true,
-      );
-    }
-    if (searchQuery.trim()) {
-      const query = searchQuery
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/gi, "d")
-        .toLowerCase()
-        .trim();
-      list = list.filter((lesson) => {
-        const combined = `${lesson.title || ""} ${lesson.vietnameseTitle || ""} ${lesson.summary || ""} ${lesson.category || ""} ${lesson.categoryVi || ""}`
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/đ/gi, "d")
-          .toLowerCase();
-        return combined.includes(query);
-      });
-    }
-    return list;
-  }, [fallbackStandaloneLessons, selectedProvince, selectedTopic, selectedCefr, searchQuery]);
+  const fallbackFilteredArticles = useMemo<Lesson[]>(() => [], []);
 
   const isUsingServerData = serverCatalog !== null;
   const totalArticlesItems = isUsingServerData
