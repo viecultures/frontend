@@ -1,8 +1,8 @@
-import React, { useId, useState } from 'react';
+import React, { useId, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Landmark, Volume2, X, MapPin, Utensils, Bot, ChevronDown, ChevronRight, BookOpen, ExternalLink } from 'lucide-react';
 import type { ProvinceCultureData } from '../types';
-import { VIETNAM_LANDMARKS } from '@/data/landmarksData';
+import { journeyApiService } from '@/features/discovery/services/journeyApiService';
 import { paths } from '@/routes/paths';
 
 interface ProvinceHoverCardProps {
@@ -23,8 +23,32 @@ export const ProvinceHoverCard: React.FC<ProvinceHoverCardProps> = ({
   const { t } = useTranslation('playground');
   const [expanded, setExpanded] = useState(false);
   const detailsId = useId();
-  const matchingLandmarks = React.useMemo(() => {
-    return VIETNAM_LANDMARKS.filter(item => item.provinceId === provinceDetail.id);
+  const [matchingStories, setMatchingStories] = useState<Array<{ id: string; title: string; level: string; readTime: string }>>([]);
+
+  useEffect(() => {
+    let active = true;
+    journeyApiService.getJourneys({ provinceId: provinceDetail.id, status: 'published' })
+      .then((journeys) => {
+        if (!active) return;
+        const stories: Array<{ id: string; title: string; level: string; readTime: string }> = [];
+        for (const j of journeys || []) {
+          for (const ch of j.chapters || []) {
+            stories.push({
+              id: ch.id,
+              title: ch.title,
+              level: ch.preferredLevel || 'Level 2',
+              readTime: ch.readTime || '3 min read',
+            });
+          }
+        }
+        setMatchingStories(stories);
+      })
+      .catch(() => {
+        if (active) setMatchingStories([]);
+      });
+    return () => {
+      active = false;
+    };
   }, [provinceDetail.id]);
   return (
     <div className="ai-workspace-place-card absolute top-4 right-4 z-30 w-72 sm:w-80 bg-white/95 dark:bg-[#162420]/95 backdrop-blur-xl border border-heritage-green/20 dark:border-antique-gold/30 rounded-2xl shadow-2xl p-3.5 animate-in fade-in zoom-in-95 duration-200 select-text">
@@ -101,19 +125,19 @@ export const ProvinceHoverCard: React.FC<ProvinceHoverCardProps> = ({
       </div>
 
       {/* Matching VieCultures Reading Articles */}
-      {matchingLandmarks.length > 0 && (
+      {matchingStories.length > 0 && (
         <div className="pt-2 border-t border-black/5 dark:border-white/10 space-y-1.5">
           <div className="flex items-center justify-between text-[10px] text-[#5D706A] dark:text-[#8E9F99]">
             <span className="font-semibold flex items-center gap-1 text-antique-gold">
               <BookOpen className="w-3 h-3 text-antique-gold" /> {t('playground.hover_card.viecultures_stories')}
             </span>
-            <span className="text-[9.5px] font-mono">{t('playground.hover_card.stories_count', { count: matchingLandmarks.length })}</span>
+            <span className="text-[9.5px] font-mono">{t('playground.hover_card.stories_count', { count: matchingStories.length })}</span>
           </div>
           <div className="space-y-1">
-            {matchingLandmarks.slice(0, 2).map((art) => (
+            {matchingStories.slice(0, 2).map((art) => (
               <a
                 key={art.id}
-                href={paths.reader({ article: art.id, level: art.level || 'Level 2' })}
+                href={paths.reader({ postId: art.id, level: art.level || 'Level 2' })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-1.5 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-antique-gold/10 dark:hover:bg-antique-gold/15 border border-black/5 dark:border-white/10 hover:border-antique-gold/30 transition-all group text-left cursor-pointer"

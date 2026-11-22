@@ -153,7 +153,7 @@ function MapAiContent() {
                   onSelectLandmark={handleSelectLandmark}
                   showControls={true}
                   showRegionTabs={true}
-                  showPoiPins={true}
+                  showPoiPins={false}
                   showSeaLayer={true}
                   showLabels={true}
                   showTooltip={true}
